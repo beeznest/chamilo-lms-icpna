@@ -99,7 +99,7 @@ switch ($action) {
 
         $result = Database::query($sql);
         $results = array();
-        while ($row = Database::fetch_array($result, 'ASSOC')){
+        while ($row = Database::fetch_array($result,'ASSOC')){
             $results[] = $row;
         }
 
@@ -158,6 +158,7 @@ switch ($action) {
         }
         break;
     case 'update_question_order':
+
         $course_info = api_get_course_info($course_code);
         $course_id = $course_info['real_id'];
 
@@ -167,7 +168,7 @@ switch ($action) {
             return Display::display_error_message(get_lang('Error'));
         }
         if (api_is_allowed_to_edit(null, true)) {
-            $new_question_list = $_POST['question_id_list'];
+            $new_question_list     = $_POST['question_id_list'];
             $TBL_QUESTIONS = Database::get_course_table(TABLE_QUIZ_TEST_QUESTION);
             $counter = 1;
             foreach ($new_question_list as $new_order_id) {
@@ -189,7 +190,6 @@ switch ($action) {
     case 'save_exercise_by_now':
         $course_info = api_get_course_info($course_code);
         $course_id = $course_info['real_id'];
-
         //Use have permissions?
         if (api_is_allowed_to_session_edit()) {
 
@@ -240,7 +240,6 @@ switch ($action) {
 
             //First time here we create an attempt (getting the exe_id)
             if (empty($exercise_stat_info)) {
-
             } else {
                 //We know the user we get the exe_id
                 $exe_id        = $exercise_stat_info['exe_id'];
@@ -324,7 +323,7 @@ switch ($action) {
             	//this variable commes from exercise_submit_modal.php
                 $hotspot_delineation_result = null;
                 if (isset($_SESSION['hotspot_delineation_result']) && isset($_SESSION['hotspot_delineation_result'][$objExercise->selectId()])) {
-                    $hotspot_delineation_result = $_SESSION['hotspot_delineation_result'][$objExercise->selectId()][$my_question_id];
+            	$hotspot_delineation_result = $_SESSION['hotspot_delineation_result'][$objExercise->selectId()][$my_question_id];
                 }
 
                 if ($type == 'simple') {
@@ -342,10 +341,9 @@ switch ($action) {
                     if ($objQuestionTmp->type  == HOT_SPOT) {
             	        delete_attempt_hotspot($exe_id, api_get_user_id() , $course_code, $my_question_id);
                     }
-
                     if (isset($attempt_list[$my_question_id]) && isset($attempt_list[$my_question_id]['marks'])) {
-                        $total_score  -= $attempt_list[$my_question_id]['marks'];
-                    }
+            	    $total_score  -= $attempt_list[$my_question_id]['marks'];
+            	}
             	}
 
 
@@ -369,6 +367,7 @@ switch ($action) {
 
                 if (isset($_SESSION['duration_time'][$key]) && !empty($_SESSION['duration_time'][$key])) {
                     $duration = $now - $_SESSION['duration_time'][$key];
+
                     if (!empty($exercise_stat_info['exe_duration'])) {
                         $duration += $exercise_stat_info['exe_duration'];
                     }
@@ -390,7 +389,6 @@ switch ($action) {
                                         $exercise_stat_info['orig_lp_item_id'],
                                         $exercise_stat_info['orig_lp_item_view_id'],
                                         $duration,
-                                        $question_list,
                                         'incomplete',
                                         $remind_list);
 

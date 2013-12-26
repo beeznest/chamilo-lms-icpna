@@ -149,6 +149,8 @@ class learnpath {
                 $this->created_on       = $row['created_on'];
                 $this->modified_on      = $row['modified_on'];
                 $this->ref              = $row['ref'];
+                $this->category_id = $row['category_id'];
+                $this->max_attempts = $row['max_attempts'];
 
                 if ($row['publicated_on'] != '0000-00-00 00:00:00') {
                     $this->publicated_on   = $row['publicated_on'];
@@ -622,7 +624,7 @@ class learnpath {
      * @param	string	Zip file containing the learnpath or directory containing the learnpath
      * @return	integer	The new learnpath ID on success, 0 on failure
      */
-    public static function add_lp($course, $name, $description = '', $learnpath = 'guess', $origin = 'zip', $zipname = '', $publicated_on = '', $expired_on = '') {
+    public static function add_lp($course, $name, $description = '', $learnpath = 'guess', $origin = 'zip', $zipname = '', $publicated_on = '', $expired_on = '', $category_id = 0) {
         global $charset;
         $course_id = api_get_course_int_id();
         $tbl_lp = Database :: get_course_table(TABLE_LP_MAIN);
@@ -630,6 +632,7 @@ class learnpath {
         // Check lp_name doesn't exist, otherwise append something.
         $i = 0;
         $name = Database::escape_string($name);
+        $category_id = intval($category_id);
 
         // Session id.
         $session_id = api_get_session_id();
@@ -695,8 +698,8 @@ class learnpath {
                     $dsp = $row[0] + 1;
                 }
 
-                $sql_insert = "INSERT INTO $tbl_lp (c_id, lp_type,name,description,path,default_view_mod, default_encoding,display_order,content_maker,content_local,js_lib,session_id, created_on, publicated_on, expired_on) " .
-                              "VALUES ($course_id, $type,'$name','$description','','embedded','UTF-8','$dsp','Chamilo','local','','".$session_id."', '".api_get_utc_datetime()."' , '".$publicated_on."' , '".$expired_on."')";
+                $sql_insert = "INSERT INTO $tbl_lp (c_id, lp_type,name,description,path,default_view_mod, default_encoding,display_order,content_maker,content_local,js_lib,session_id, created_on, publicated_on, expired_on, category_id) " .
+                              "VALUES ($course_id, $type,'$name','$description','','embedded','UTF-8','$dsp','Chamilo','local','','".$session_id."', '".api_get_utc_datetime()."' , '".$publicated_on."' , '".$expired_on."', $category_id)";
 
                 Database::query($sql_insert);
                 $id = Database :: insert_id();
@@ -2290,6 +2293,10 @@ class learnpath {
         return false;
     }
 
+    public function get_category_id() {
+        return $this->category_id;
+    }
+
     /**
      * Gets the learnpath author
      * @return	string	LP's author
@@ -2513,6 +2520,7 @@ class learnpath {
         $sql = "SELECT count(*) FROM $table WHERE c_id = $course_id AND lp_iv_id = $lp_iv_id";
         $res = Database::query($sql);
         $res = 0;
+        $num = 0;
         if (Database::num_rows($res)) {
             $row = Database::fetch_array($res);
             $num = $row[0];
@@ -2576,6 +2584,7 @@ class learnpath {
         //@todo seems that this always returns 0
         $res = Database::query($sql);
         $res = 0;
+        $num = 0;
         if (Database::num_rows($res)) {
             $row = Database :: fetch_array($res);
             $num = $row[0];
@@ -2859,6 +2868,8 @@ class learnpath {
             $result = Database::query($sql);
             $count = Database :: num_rows($result);*/
             if ($item['type'] == 'quiz') {
+                //error_log("1-->>>>>>>>>>>>>>>>");
+                //error_log($item['status']);
                 if ($item['status'] == 'completed') {
                     $html .= "&nbsp;<img id='toc_img_" . $item['id'] . "' src='" . $icon_name[$item['status']] . "' alt='" . substr($item['status'], 0, 1) . "' width='14' />";
                 } else {
@@ -3601,7 +3612,7 @@ class learnpath {
         if (empty($item)) {
             $item = $this->current;
         }
-        if (is_object($this->items[$item])) {
+        if (isset($this->items[$item]) && is_object($this->items[$item])) {
 
             if ($this->type == 2) {
                 //Getting prereq from scorm
@@ -3660,13 +3671,18 @@ class learnpath {
      * @param	integer	Learnpath ID
      * @param	string	New visibility
      */
-    public function toggle_visibility($lp_id, $set_visibility = 1) {
+    public function toggle_visibility($lp_id, $set_visibility = 1, $course_id = null) {
         //if ($this->debug > 0) { error_log('New LP - In learnpath::toggle_visibility()', 0); }
         $action = 'visible';
         if ($set_visibility != 1) {
             $action = 'invisible';
         }
-        return api_item_property_update(api_get_course_info(), TOOL_LEARNPATH, $lp_id, $action, api_get_user_id());
+        if (!empty($course_id)) {
+            $course = api_get_course_info_by_id($course_id);
+        } else {
+            $course = api_get_course_info();
+        }
+        return api_item_property_update($course, TOOL_LEARNPATH, $lp_id, $action, api_get_user_id());
     }
 
     /**
@@ -3744,6 +3760,7 @@ class learnpath {
         $lp_view_table = Database :: get_course_table(TABLE_LP_VIEW);
         $sql = "INSERT INTO $lp_view_table (c_id, lp_id, user_id, view_count, session_id) " .
         	   "VALUES ($course_id, " . $this->lp_id . "," . $this->get_user_id() . "," . ($this->attempt + 1) . ", $session_id)";
+
         if ($this->debug > 2) {
             error_log('New LP - Inserting new lp_view for restart: ' . $sql, 0);
         }
@@ -4143,8 +4160,7 @@ class learnpath {
         if ($this->debug > 2) {
             error_log('New LP - lp updated with new theme : ' . $this->theme, 0);
         }
-        //$res = Database::query($sql);
-        $res = Database::query($sql);
+        Database::query($sql);
         return true;
     }
 
@@ -4166,7 +4182,7 @@ class learnpath {
         if ($this->debug > 2) {
             error_log('New LP - lp updated with new preview image : ' . $this->preview_image, 0);
         }
-        $res = Database::query($sql);
+        Database::query($sql);
         return true;
     }
 
@@ -4259,7 +4275,7 @@ class learnpath {
         if ($this->debug > 2) {
             error_log('New LP - lp updated with new proximity : ' . $this->proximity, 0);
         }
-        $res = Database::query($sql);
+        Database::query($sql);
         return true;
     }
 
@@ -4274,6 +4290,56 @@ class learnpath {
         $this->last = $id;
     }
 
+    public function get_max_attempts() {
+        return $this->max_attempts;
+    }
+
+    public function check_attempts() {
+        $max_attempts = $this->get_max_attempts();
+        switch($max_attempts) {
+            case 0: //unlimited
+                return true;
+                break;
+            case $max_attempts >= 1:
+                if ($this->attempt <= $max_attempts) {
+                    return true;
+                }
+                break;
+        }
+        return false;
+    }
+
+    function check_item_attempts($item_id) {
+        if (isset($this->items[$item_id]) && is_object($this->items[$item_id])) {
+            $count = $this->items[$item_id]->get_view_count();
+            $max_attempts = $this->get_max_attempts();
+            switch ($max_attempts) {
+                case 0: //unlimited
+                    return true;
+                    break;
+                case $max_attempts >= 1:
+                    if ($count <= $max_attempts) {
+                        return true;
+                    }
+                    break;
+            }
+            return false;
+        }
+    }
+
+    public function set_max_attempts($attempts) {
+        $mode = 'multiple';
+        if ($attempts == 1) {
+            $mode = 'single';
+        }
+        $this->max_attempts = intval($attempts);
+
+        $lp_id = $this->get_id();
+        $lp_table = Database :: get_course_table(TABLE_LP_MAIN);
+        $sql = "UPDATE $lp_table SET max_attempts = '" . $this->max_attempts . "' WHERE c_id = ".$this->course_int_id." AND id = '$lp_id'";
+        Database::query($sql);
+        $this->set_attempt_mode($mode);
+    }
 
      /**
      * Sets use_max_score
@@ -4281,7 +4347,6 @@ class learnpath {
      * @return  boolean True on success / False on error
      */
     public function set_use_max_score($use_max_score = 1) {
-        $course_id = api_get_course_int_id();
         if ($this->debug > 0) {
             error_log('New LP - In learnpath::set_use_max_score()', 0);
         }
@@ -4289,12 +4354,12 @@ class learnpath {
         $this->use_max_score = $use_max_score;
         $lp_table = Database :: get_course_table(TABLE_LP_MAIN);
         $lp_id = $this->get_id();
-        $sql = "UPDATE $lp_table SET use_max_score = '" . $this->use_max_score . "' WHERE c_id = ".$course_id." AND id = '$lp_id'";
+        $sql = "UPDATE $lp_table SET use_max_score = '" . $this->use_max_score . "' WHERE c_id = ".$this->course_int_id." AND id = '$lp_id'";
 
         if ($this->debug > 2) {
             error_log('New LP - lp updated with new use_max_score : ' . $this->use_max_score, 0);
         }
-        $res = Database::query($sql);
+        Database::query($sql);
         return true;
     }
 
@@ -4320,7 +4385,7 @@ class learnpath {
         if ($this->debug > 2) {
             error_log('New LP - lp updated with new expired_on : ' . $this->expired_on, 0);
         }
-        $res = Database::query($sql);
+        Database::query($sql);
         return true;
     }
 
@@ -4345,10 +4410,20 @@ class learnpath {
         if ($this->debug > 2) {
             error_log('New LP - lp updated with new publicated_on : ' . $this->publicated_on, 0);
         }
-        $res = Database::query($sql);
+        Database::query($sql);
         return true;
     }
 
+    public function set_category_id($category_id) {
+        $this->category_id = $category_id;
+
+        $course_id = api_get_course_int_id();
+        $lp_table = Database :: get_course_table(TABLE_LP_MAIN);
+        $lp_id = $this->get_id();
+        $sql = "UPDATE $lp_table SET category_id = '" . intval($category_id). "' WHERE c_id = ".$course_id." AND id = '$lp_id'";
+        Database::query($sql);
+        return true;
+    }
 
 
     /**
@@ -4492,13 +4567,21 @@ class learnpath {
         $res = Database::query($sql);
         if (Database :: num_rows($res) > 0) {
             $row = Database :: fetch_array($res);
-            $view_mode = $row['default_view_mod'];
-            if ($view_mode == 'fullscreen') {
-                $view_mode = 'embedded';
-            } elseif ($view_mode == 'embedded') {
-                $view_mode = 'embedframe';
-            } elseif ($view_mode == 'embedframe') {
-                $view_mode = 'fullscreen';
+            $default_view_mode = $row['default_view_mod'];
+            $view_mode = $default_view_mode;
+            switch ($default_view_mode) {
+                case 'fullscreen':
+                    $view_mode = 'embedded';
+                    break;
+                case 'embedded':
+                    $view_mode = 'embedframe';
+                    break;
+                case 'embedframe':
+                    $view_mode = 'impress';
+                    break;
+                case 'impress':
+                    $view_mode = 'fullscreen';
+                    break;
             }
             $sql = "UPDATE $lp_table SET default_view_mod = '$view_mode' WHERE c_id = ".$course_id." AND id = " . $this->get_id();
             $res = Database::query($sql);
@@ -9276,6 +9359,79 @@ EOD;
                 $old_type = $item->get_type();
             }
         }
+    }
+
+    static function create_category($params) {
+        global $app;
+        $em = $app['orm.em'];
+        $item = new Entity\EntityCLpCategory();
+        $item->setName($params['name']);
+        $item->setCId($params['c_id']);
+        $em->persist($item);
+        $em->flush();
+    }
+
+    static function update_category($params) {
+        global $app;
+        $em = $app['orm.em'];
+        $item = $em->find('Entity\EntityCLpCategory', $params['id']);
+        if ($item) {
+            $item->setName($params['name']);
+            $item->setCId($params['c_id']);
+            $em->persist($item);
+            $em->flush();
+        }
+    }
+
+    static function get_categories($course_id) {
+        global $app;
+        $em = $app['orm.em'];
+        $items = $em->getRepository('Entity\EntityCLpCategory')->findBy(array('cId' => $course_id), array('name' => 'ASC'));
+        return $items;
+    }
+
+    static function get_category($id) {
+        global $app;
+        $em = $app['orm.em'];
+        $item = $em->find('Entity\EntityCLpCategory', $id);
+        return $item;
+    }
+
+    static function get_category_by_course($course_id) {
+        global $app;
+        $items = $app['orm.em']->getRepository('Entity\EntityCLpCategory')->findBy(array('cId' => $course_id));
+        return $items;
+    }
+
+    static function delete_category($id) {
+        global $app;
+        $em = $app['orm.em'];
+        $item = $em->find('Entity\EntityCLpCategory', $id);
+        if ($item) {
+            $courseId = $item->getCId();
+            $query = "SELECT id FROM c_lp WHERE c_id = $courseId AND category_id = $id";
+            $r = Database::query($query);
+
+            // Setting category = 0.
+            while ($row = Database::fetch_array($r)) {
+                $qd = "UPDATE c_lp SET category_id = 0 WHERE c_id = $courseId and id = ".$row['id'];
+                $d = Database::query($qd);
+            }
+
+            $em->remove($item);
+            $em->flush();
+        }
+    }
+
+    static function get_category_from_course_into_select($course_id) {
+        $items = self::get_category_by_course($course_id);
+        $cats = array();
+        if (!empty($items)) {
+            foreach($items as $cat) {
+                $cats[$cat->getId()] = $cat->getName();
+            }
+        }
+        return $cats;
     }
 }
 

@@ -139,7 +139,6 @@ class Result
 			$sql .= ' evaluation_id = '.Database::escape_string($evaluation_id);
 			$paramcount ++;
 		}
-
 		$result = Database::query($sql);
 		$allres=array();
 		while ($data=Database::fetch_array($result)) {
@@ -172,13 +171,27 @@ class Result
 			if (isset($this->score)) {
 			 $sql .= ", ".$this->get_score();
 			}
-			$sql .= ")";
+			$sql .= ")";            
 			Database::query($sql);
 		} else {
 			die('Error in Result add: required field empty');
 		}
 
 	}
+    /**
+     * Insert these results into the database as a group
+     */
+    public function group_add($evals) {
+        $tbl_grade_results = Database :: get_main_table(TABLE_MAIN_GRADEBOOK_RESULT);
+        $sql = "INSERT INTO ".$tbl_grade_results
+                ." (user_id, evaluation_id, created_at, score) VALUES ";
+        foreach ($evals as $ev) {
+            $sql .= "(".(int)$ev['user_id'].",".(int)$ev['evaluation_id'].",'"
+                 .$ev['created_at']."', ".$ev['score']."),";
+        }
+        $sql = substr($sql,0,-1);
+        Database::query($sql);
+    }
 	/**
 	 * insert log result
 	 */

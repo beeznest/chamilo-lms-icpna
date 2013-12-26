@@ -57,7 +57,7 @@ if (!empty($group_id)) {
     $interbreadcrumb[] = array ("url"=>"../group/group_space.php?gidReq=".$group_id, "name"=> get_lang('GroupSpace').' '.$group_properties['name']);
 }
 
-$tpl	= new Template(get_lang('Agenda'));
+$tpl = new Template(get_lang('Agenda'));
 
 $tpl->assign('use_google_calendar', 0);
 
@@ -124,8 +124,8 @@ $region_value = api_get_language_isocode();
 if ($region_value == 'en') {
     $region_value = 'en-GB';
 }
-$tpl->assign('region_value', 	$region_value);
 
+$tpl->assign('region_value', 	$region_value);
 
 $export_icon = '../img/export.png';
 $export_icon_low = '../img/export_low_fade.png';
@@ -136,7 +136,10 @@ $tpl->assign('export_ical_confidential_icon', 	Display::return_icon($export_icon
 $actions = null;
 if (api_is_allowed_to_edit(false,true) OR (api_get_course_setting('allow_user_edit_agenda') && !api_is_anonymous()) && api_is_allowed_to_session_edit(false,true) OR $is_group_tutor) {
     if ($type == 'course') {
-        $actions = display_courseadmin_links();
+        if (isset($_GET['user_id'])) {
+            $filter = $_GET['user_id'];
+        }
+        $actions = display_courseadmin_links($filter);
     }
 	$tpl->assign('actions', $actions);
 }
@@ -163,7 +166,12 @@ $tpl->assign('type_event_class', $type_event_class);
 $tpl->assign('can_add_events', $can_add_events);
 
 //Setting AJAX caller
-$agenda_ajax_url = api_get_path(WEB_AJAX_PATH).'agenda.ajax.php?type='.$type;
+if (isset($_GET['user_id'])) {
+    $user_id = $_GET['user_id'];
+    $agenda_ajax_url = api_get_path(WEB_AJAX_PATH).'agenda.ajax.php?user_id='.$user_id.'&type='.$type;
+} else {
+    $agenda_ajax_url = api_get_path(WEB_AJAX_PATH).'agenda.ajax.php?type='.$type;
+}
 $tpl->assign('web_agenda_ajax_url', $agenda_ajax_url);
 
 $course_code  = api_get_course_id();
@@ -186,11 +194,4 @@ if ((api_is_allowed_to_edit() || $is_group_tutor) && $course_code != '-1' && $ty
     $select = $agenda->construct_not_selected_select_form($group_list, $user_list);
     $tpl->assign('visible_to', $select);
 }
-
-//Loading Agenda template
-$content = $tpl->fetch('default/agenda/month.tpl');
-
-$tpl->assign('content', $content);
-
-//Loading main Chamilo 1 col template
-$tpl->display_one_col_template();
+$tpl->display('default/agenda/month.tpl');

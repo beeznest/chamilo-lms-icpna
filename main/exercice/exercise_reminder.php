@@ -4,12 +4,11 @@
 *	Exercise reminder overview
 *	Then it shows the results on the screen.
 *	@package chamilo.exercise
-
 * 	@author Julio Montoya Armas switchable fill in blank option added
-
 */
-
-/*	INIT SECTION	*/
+/**
+ *	INIT SECTION
+ */
 require_once 'exercise.class.php';
 require_once 'question.class.php';
 require_once 'answer.class.php';
@@ -27,7 +26,6 @@ if ($_GET['origin']=='learnpath') {
 	require_once '../newscorm/aiccItem.class.php';
 }
 require_once api_get_path(LIBRARY_PATH).'exercise_show_functions.lib.php';
-require_once api_get_path(LIBRARY_PATH).'mail.lib.inc.php';
 
 $this_section = SECTION_COURSES;
 
@@ -230,7 +228,7 @@ echo Display::div($table, array('class'=>'span10'));
 $exercise_actions = Display::url(get_lang('EndTest'), 'javascript://', array('onclick'=>'final_submit();', 'class'=>'btn btn-warning'));
 $exercise_actions .=  '&nbsp;'.Display::url(get_lang('ReviewQuestions'), 'javascript://', array('onclick'=>'review_questions();','class'=>'btn btn-success'));
 
-echo Display::div('', array('class'=>'clear'));
+echo Display::div(' ', array('class'=>'clear'));
 echo Display::div($exercise_actions, array('class'=>'form-actions'));
 
 if ($origin != 'learnpath') {

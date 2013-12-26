@@ -100,7 +100,7 @@ if ($_GET['chatid'] != '') {
 	$time = date("Y-m-d H:i:s", $time);
 	$chatid = intval($_GET['chatid']);
 	if ($_GET['chatid'] == strval(intval($_GET['chatid']))) {
-		$sql = "update $track_user_table set chatcall_user_id = '".Database::escape_string($_user['user_id'])."', chatcall_date = '".Database::escape_string($time)."', chatcall_text = '' where (user_id = ".(int)Database::escape_string($chatid).")";
+		$sql = "UPDATE $track_user_table SET chatcall_user_id = '".Database::escape_string($_user['user_id'])."', chatcall_date = '".Database::escape_string($time)."', chatcall_text = '' where (user_id = ".(int)Database::escape_string($chatid).")";
 		$result = Database::query($sql);
 		//redirect caller to chat
 		header("Location: ".api_get_path(WEB_CODE_PATH)."chat/chat.php?".api_get_cidreq()."&origin=whoisonline&target=".Security::remove_XSS($chatid));
@@ -154,16 +154,13 @@ if ((api_get_setting('showonline', 'world') == 'true' && !$_user['user_id']) || 
 $tpl = new Template(get_lang('UsersOnLineList'));
 
 if (api_get_setting('allow_social_tool') == 'true' && !api_is_anonymous()) {
+    $tpl->set_help('Groups');
     $tpl->assign('social_left_content', $social_left_content);
-    //$tpl->assign('social_left_menu', $social_left_menu);
     $tpl->assign('social_right_content', $social_right_content);
     $social_layout = $tpl->get_template('layout/social_layout.tpl');
     $tpl->display($social_layout);
 } else {
-    $content = $social_right_content;
-    $tpl->assign('actions', $actions);
-    $tpl->assign('message', $show_message);
     $tpl->assign('header', get_lang('UsersOnLineList'));
-    $tpl->assign('content', $content);
+    $tpl->assign('content', $social_right_content);
     $tpl->display_one_col_template();
 }

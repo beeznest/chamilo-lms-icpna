@@ -6,7 +6,9 @@
  * @package chamilo.exercise
  * @author Toon Keppens
  */
-
+/**
+ * Init
+ */
 use \ChamiloSession as Session;
 
 $modifyAnswers = intval($_GET['hotspotadmin']);
@@ -824,7 +826,7 @@ if ($modifyAnswers) {
                                     </td>
 
                                     <?php
-                                    require_once(api_get_path(LIBRARY_PATH) . "/fckeditor/fckeditor.php");
+
                                     $oFCKeditor = new FCKeditor("comment[$i]");
                                     $content = $comment[$i];
                                     $oFCKeditor->ToolbarSet = 'TestProposedAnswer';

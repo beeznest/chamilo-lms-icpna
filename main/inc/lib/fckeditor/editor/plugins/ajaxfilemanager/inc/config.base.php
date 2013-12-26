@@ -99,7 +99,14 @@ if(!empty($_course['path']) && Security::remove_XSS($_GET['editor'])!="stand_alo
 		$PathChamiloAjaxFileManager='../../../../../../../home/default_platform_document/';
 	} else {
 		//my profile
-		$my_path					= UserManager::get_user_picture_path_by_id(api_get_user_id(),'none');
+		$my_path					= UserManager::get_user_picture_path_by_id(api_get_user_id(),'none',true);
+                $dir = api_get_path(SYS_CODE_PATH).$my_path['dir'];
+                if (!is_dir($dir)) {
+                    mkdir($dir);
+                }
+                if (!is_dir($dir.'my_files')) {
+                    mkdir($dir.'my_files');
+                }
 		$PathChamiloAjaxFileManager	= '../../../../../../../main/'.$my_path['dir'].'my_files/';
 	}
 }

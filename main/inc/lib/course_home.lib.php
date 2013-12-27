@@ -672,7 +672,7 @@ class CourseHome {
                         }
                     }
                 } else {
-                    $item['visibility'] .=  '&nbsp;&nbsp;&nbsp;&nbsp;';
+                    $item['visibility'] .= null;
                 }
 
                 // NOTE : Table contains only the image file name, not full path

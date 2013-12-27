@@ -1,0 +1,19 @@
+<?php
+$ThereIsNoInformationAboutYourSessions="No hay información disponible sobre sus programas académicos";
+$TakenSessions="Programas académicos seguidos";
+$StudentSessions="Programas académicos del estudiante";
+$SessionCourses="Programas académicos de cursos";
+$SeeSessionList="Ver la lista de programas académicos";
+$NumberOfSessions="Número de programas académicos";
+$NbPastSessions="Programas académicos pasados";
+$NbInactiveSessions="Número de programas académicos inactivos";
+$NbFutureSessions="Programas académicos futuros";
+$NbActiveSessions="Programas académicos activos";
+$langLoginsExplaination="Este es el listado de sus accesos junto con las herramientas que ha visitado en esos programas académicos.";
+$FollowedSessions="Programas académicos seguidos";
+$DisplaySessionOverview="Resumen de los programas académicos";
+$AssignSessionsTo="Asignar programas académicos a";
+$NbStudentPerSession="Número de estudiantes por programa académico";
+$NbCoursesPerSession="Número de cursos por programa académico";
+$MoySession="Media de programa académico";
+$LPExerciseResultsBySession="Resultados de los ejercicios de las lecciones por programa académico";

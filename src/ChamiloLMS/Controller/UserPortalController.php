@@ -92,4 +92,25 @@ class UserPortalController extends CommonController
 
         return new Response($response, 200, array());
     }
+
+    /**
+     * Toggle the student view action
+     */
+    public function toggleStudentViewAction(Application $app)
+    {
+        if (!api_is_allowed_to_edit(false, false, false, false)) {
+            return '';
+        }
+
+        /** @var Request $request */
+        $request = $app['request'];
+        $studentView = $request->getSession()->get('studentview');
+        if (empty($studentView) || $studentView == 'studentview') {
+            $request->getSession()->set('studentview', 'teacherview');
+            return 'teacherview';
+        } else {
+            $request->getSession()->set('studentview', 'studentview');
+            return 'studentview';
+        }
+    }
 }

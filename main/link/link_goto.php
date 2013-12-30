@@ -19,18 +19,42 @@
 /*	INIT SECTION */
 
 require_once '../inc/global.inc.php';
+require_once api_get_path(LIBRARY_PATH).'link.lib.php';
+
 $this_section = SECTION_COURSES;
+$linkId = intval($_GET['link_id']);
+$linkInfo = get_link_info($linkId);
 
-$link_url = html_entity_decode(Security::remove_XSS($_GET['link_url']));
-$link_id = intval($_GET['link_id']);
+if ($linkInfo['target'] == '_in_header') {
 
-// Launch event
-event_link($link_id);
+    $tpl = $app['template'];
+    $url = $linkInfo['url'];
+    $interbreadcrumb[] = array('url' => 'link.php', 'name' => get_lang('Links'));
+    $frame = '<iframe name="page" onload="javascript:resizeIframe(this);" style="width:100%;height:500px" frameBorder=0px; src="'.$url.'">
+             </iframe>';
+    $js = "<script>
+    function resizeIframe(obj) {
+        /*var body = obj.contentWindow.document.body;
+        var height =$(obj, top.document).height();
+        console.log(height);
+        console.log(jQuery('iframe',top.document).height());
+        obj.style.height = height;*/
+    }
+    </script>";
+    $tpl->assign('content', $js.$frame);
+    $tpl->display_one_col_template();
+} else {
 
-header("Cache-Control: no-store, no-cache, must-revalidate");   // HTTP/1.1
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");                                     // HTTP/1.0
-header("Location: $link_url");
+    $link_url = html_entity_decode(Security::remove_XSS($_GET['link_url']));
 
-// To be sure that the script stops running after the redirection
-exit;
+    // Launch event
+    event_link($linkId);
+
+    header("Cache-Control: no-store, no-cache, must-revalidate");   // HTTP/1.1
+    header("Cache-Control: post-check=0, pre-check=0", false);
+    header("Pragma: no-cache");                                     // HTTP/1.0
+    header("Location: $link_url");
+
+    // To be sure that the script stops running after the redirection
+    exit;
+}

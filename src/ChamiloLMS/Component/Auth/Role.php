@@ -1,24 +1,31 @@
 <?php
 /* For licensing terms, see /license.txt */
+
 namespace ChamiloLMS\Component\Auth;
+
+use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Entity\CourseRelUser;
+
 /**
  * Class Role
  * @package ChamiloLMS\Component\Auth
  */
-
-use Symfony\Component\Security\Core\Role\RoleInterface;
-use Symfony\Component\Security\Core\User\AdvancedUserInterface;
-
 class Role implements RoleInterface
 {
     private $user;
 
     /**
      * @param AdvancedUserInterface $user
+     * @param string $status
+     * @param int $courseId
      */
-    public function __construct(AdvancedUserInterface $user)
+    public function __construct(AdvancedUserInterface $user, $status, $courseId)
     {
         $this->user = $user;
+        $this->status = $status;
+        $this->courseId = $courseId;
     }
 
     /**
@@ -26,10 +33,20 @@ class Role implements RoleInterface
      */
     public function getRole()
     {
-        /*$globalPlatform = api_is_global_platform_admin($this->user->getUserId());
-        if ($globalPlatform) {
-            //return 'ROLE_GLOBAL_ADMIN';
-        }*/
+        $role = 'ROLE';
+        $status = $this->status;
+        $courseId = $this->courseId;
 
+        switch ($status) {
+            case STUDENT:
+                $role .= '_STUDENT';
+                break;
+            case COURSEMANAGER:
+                $role .= '_TEACHER';
+                break;
+        }
+
+        $role .= '_COURSE_'.$courseId.'_SESSION_0';
+        return $role;
     }
 }

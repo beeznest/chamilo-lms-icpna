@@ -51,6 +51,7 @@ class UserRepository extends EntityRepository implements UserProviderInterface
         $query = $this
             ->createQueryBuilder('u')
             ->where('u.username = :username OR u.email = :email')
+            ->leftJoin('u.roles', 'r')
             ->setParameter('username', $username)
             ->setParameter('email', $username)
             ->getQuery();
@@ -81,13 +82,12 @@ class UserRepository extends EntityRepository implements UserProviderInterface
      */
     public function refreshUser(UserInterface $user)
     {
-        return $user;
-        /*
+        //return $user;
         $class = get_class($user);
         if (!$this->supportsClass($class)) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $class));
         }
-        return $this->loadUserByUsername($user->getUsername());*/
+        return $this->loadUserByUsername($user->getUsername());
     }
 
     /**

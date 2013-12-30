@@ -278,14 +278,15 @@ class User implements AdvancedUserInterface, \Serializable, EquatableInterface
      */
     public function __construct()
     {
+        $this->salt = sha1(uniqid(null, true));
+        $this->isActive = true;
+        $this->registrationDate = new \DateTime();
+
         $this->courses = new ArrayCollection();
         $this->items = new ArrayCollection();
         $this->classes = new ArrayCollection();
         $this->roles = new ArrayCollection();
         $this->curriculumItems = new ArrayCollection();
-        $this->salt = sha1(uniqid(null, true));
-        $this->isActive = true;
-        $this->registrationDate = new \DateTime();
         $this->portals = new ArrayCollection();
         $this->dropBoxSentFiles = new ArrayCollection();
         $this->dropBoxReceivedFiles = new ArrayCollection();
@@ -299,11 +300,13 @@ class User implements AdvancedUserInterface, \Serializable, EquatableInterface
         return $this->dropBoxSentFiles;
     }
 
+    /**
+     * @return ArrayCollection
+     */
     public function getDropBoxReceivedFiles()
     {
         return $this->dropBoxReceivedFiles;
     }
-
 
     /**
      * @return ArrayCollection
@@ -447,7 +450,13 @@ class User implements AdvancedUserInterface, \Serializable, EquatableInterface
     public function getRoles()
     {
         $roles = $this->roles->toArray();
-        //$roles[] = new Auth\Role($this);
+        $courses = $this->getCourses();
+        if (!empty($courses)) {
+            /** @var CourseRelUser $course */
+            foreach ($courses as $course) {
+                $roles[] = new Auth\Role($this, $course->getStatus(), $course->getCId());
+            }
+        }
         return $roles;
     }
 
@@ -460,6 +469,18 @@ class User implements AdvancedUserInterface, \Serializable, EquatableInterface
         $this->roles->add($role);
 
         return $this;
+    }
+
+    /**
+     * @param string $role
+     * @return bool
+     */
+    public function hasRole($role)
+    {
+        if (in_array($role, $this->getRoles())) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -495,7 +516,7 @@ class User implements AdvancedUserInterface, \Serializable, EquatableInterface
             $this->salt,
             $this->password,
             $this->isActive
-            ) = \unserialize($serialized);
+        ) = \unserialize($serialized);
     }
 
     /**

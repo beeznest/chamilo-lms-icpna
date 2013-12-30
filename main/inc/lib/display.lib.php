@@ -106,14 +106,20 @@ class Display
      */
     public static function display_introduction_section($tool, $editor_config = null)
     {
-        echo self::return_introduction_section($tool, $editor_config);
+        global $app;
+        $urlGenerator = $app['url_generator'];
+        echo self::return_introduction_section($urlGenerator, $tool);
     }
 
-    public static function return_introduction_section($tool, $editor_config = null)
+    /**
+     * @param Symfony\Component\Routing\RouterInterface $urlGenerator
+     * @param string $tool
+     * @param array $toolList
+     * @return null|string
+     */
+    public static function return_introduction_section($urlGenerator, $tool, $toolList = array())
     {
-        global $charset;
         $is_allowed_to_edit = api_is_allowed_to_edit();
-        $moduleId = $tool;
         $courseInfo = api_get_course_info();
         $introduction_section = null;
 
@@ -124,27 +130,28 @@ class Display
             $course_id = api_get_course_int_id();
 
             /* Retrieves the module introduction text, if exist */
-
             $sql = "SELECT intro_text FROM $TBL_INTRODUCTION
-                    WHERE c_id = $course_id AND id='".Database::escape_string($tool)."' AND session_id = '".intval($session_id)."'";
+                    WHERE
+                        c_id = $course_id AND
+                        id='".Database::escape_string($tool)."' AND
+                        session_id = '".intval($session_id)."'";
             $intro_dbQuery = Database::query($sql);
-            $intro_content = null;
+            $introContent = null;
             if (Database::num_rows($intro_dbQuery) > 0) {
-                $intro_dbResult = Database::fetch_array($intro_dbQuery);
-                $intro_content = $intro_dbResult['intro_text'];
+                $row = Database::fetch_array($intro_dbQuery);
+                $introContent = $row['intro_text'];
             }
+
+            $introContent = CourseHome::replaceTextWithToolUrls($introContent, $toolList);
 
             /* Determines the correct display */
-            $intro_dispForm = false;
-            $intro_dispCommand = false;
+            $displayIntro = false;
 
             if ($is_allowed_to_edit) {
-                $intro_dispCommand = true;
+                $displayIntro = true;
             }
 
-            /* Executes the display */
-
-            $thematic_description_html = '';
+            $thematicDescription = '';
 
             if ($tool == TOOL_COURSE_HOMEPAGE) {
                 $thematic = new Thematic($courseInfo);
@@ -168,55 +175,54 @@ class Display
                 if (!empty($thematic_advance_info)) {
 
                     $thematic_advance = get_lang('CourseThematicAdvance').'&nbsp;'.$thematic->get_total_average_of_thematic_advances().'%';
-                    if (api_is_allowed_to_edit(null, true)) {
-                        //$thematic_advance = '<a href="'.api_get_path(WEB_CODE_PATH).'course_progress/index.php?action=thematic_details&'.api_get_cidreq().'">'.get_lang('CourseThematicAdvance').'&nbsp;'.$thematic->get_total_average_of_thematic_advances().'%</a>';
-                    }
                     $thematic_info = $thematic->get_thematic_list($thematic_advance_info['thematic_id']);
 
                     $thematic_advance_info['start_date'] = api_get_local_time($thematic_advance_info['start_date']);
                     $thematic_advance_info['start_date'] = api_format_date($thematic_advance_info['start_date'], DATE_TIME_FORMAT_LONG);
 
-                    $thematic_description_html = '<div class="thematic-postit">
+                    $thematicDescription = '<div class="thematic-postit">
                                                   <div class="thematic-postit-top"><h3><a class="thematic-postit-head" style="" href="#"> '.$thematic_advance.'</h3></a></div>
                                                   <div class="thematic-postit-center" style="display:none">';
-                    $thematic_description_html .= '<div><strong>'.$thematic_info['title'].'</strong></div>';
-                    $thematic_description_html .= '<div style="font-size:8pt;"><strong>'.$thematic_advance_info['start_date'].'</strong></div>';
-                    $thematic_description_html .= '<div>'.$thematic_advance_info['content'].'</div>';
-                    $thematic_description_html .= '<div>'.get_lang('DurationInHours').' : '.$thematic_advance_info['duration'].'</div>';
-
+                    $thematicDescription .= '<div><strong>'.$thematic_info['title'].'</strong></div>';
+                    $thematicDescription .= '<div style="font-size:8pt;"><strong>'.$thematic_advance_info['start_date'].'</strong></div>';
+                    $thematicDescription .= '<div>'.$thematic_advance_info['content'].'</div>';
+                    $thematicDescription .= '<div>'.get_lang('DurationInHours').' : '.$thematic_advance_info['duration'].'</div>';
 
                     if (!empty($thematic_advance_info2)){
                         $thematic_info2 = $thematic->get_thematic_list($thematic_advance_info2['thematic_id']);
-
                         $thematic_advance_info2['start_date'] = api_get_local_time($thematic_advance_info2['start_date']);
                         $thematic_advance_info2['start_date'] = api_format_date($thematic_advance_info2['start_date'], DATE_TIME_FORMAT_LONG);
 
-                        $thematic_description_html .= '<div><strong>'.$thematic_info2['title'].'</strong></div>';
-                        $thematic_description_html .= '<div style="font-size:8pt;"><strong>'.$thematic_advance_info2['start_date'].'</strong></div>';
-                        $thematic_description_html .= '<div>'.$thematic_advance_info2['content'].'</div>';
-                        $thematic_description_html .= '<div>'.get_lang('DurationInHours').' : '.$thematic_advance_info2['duration'].'</div>';
-                        $thematic_description_html .= '<br />';
+                        $thematicDescription .= '<div><strong>'.$thematic_info2['title'].'</strong></div>';
+                        $thematicDescription .= '<div style="font-size:8pt;"><strong>'.$thematic_advance_info2['start_date'].'</strong></div>';
+                        $thematicDescription .= '<div>'.$thematic_advance_info2['content'].'</div>';
+                        $thematicDescription .= '<div>'.get_lang('DurationInHours').' : '.$thematic_advance_info2['duration'].'</div>';
+                        $thematicDescription .= '<br />';
                     }
-                    $thematic_description_html .= '</div>
+                    $thematicDescription .= '</div>
                                               <div class="thematic-postit-bottom"></div>
                                               </div>';
                 }
             }
 
             $introduction_section .= '<div id="introduction_block" class="row"><div class="col-md-12">';
-            $introduction_section .=  $thematic_description_html;
+            $introduction_section .=  $thematicDescription;
 
-            if (!empty($intro_content)) {
-                $introduction_section .=  $intro_content;
+            if (!empty($introContent)) {
+                $introduction_section .=  $introContent;
             }
             $introduction_section .=  '</div>';
 
-            if ($intro_dispCommand) {
-                if (empty($intro_content)) {
+            if ($displayIntro) {
+                if (empty($introContent)) {
                     // Displays "Add intro" commands
                     $introduction_section .=  '<div id="introduction_block_action" class="col-md-2 col-md-offset-10">';
 
-                    $url = api_get_path(WEB_PUBLIC_PATH).'introduction/edit/'.$tool;
+                    $url = $urlGenerator->generate(
+                        'introduction.controller:editAction',
+                        array('tool' => $tool, 'course' => api_get_course_id())
+                    );
+
                     $introduction_section .=  "<a href=\"".$url."?".api_get_cidreq()."\">";
                     $introduction_section .=  Display::return_icon('introduction_add.gif', get_lang('AddIntro')).' ';
                     $introduction_section .=  "</a>";
@@ -226,17 +232,21 @@ class Display
                 } else {
                     // Displays "edit intro && delete intro" commands
                     $introduction_section .=  '<div id="introduction_block_action" class="col-md-2 col-md-offset-10">';
-                    //$url = $app['url_generator']->generate('introduction_edit', array('tool' => $moduleId));
-                    $url = api_get_path(WEB_PUBLIC_PATH).'introduction/edit/'.$tool;
+                    $url = $urlGenerator->generate(
+                        'introduction.controller:editAction',
+                        array('tool' => $tool, 'course' => api_get_course_id())
+                    );
 
                     $introduction_section .=  "<a href=\"".$url."?".api_get_cidreq()."\">";
                     $introduction_section .=  Display::return_icon('edit.png', get_lang('Modify')).' ';
                     $introduction_section .=  "</a>";
 
-                    //$url = $app['url_generator']->generate('introduction_delete', array('tool' => $moduleId));
-                    $url = api_get_path(WEB_PUBLIC_PATH).'introduction/delete/'.$tool;
+                    $url = $urlGenerator->generate(
+                        'introduction.controller:deleteAction',
+                        array('tool' => $tool, 'course' => api_get_course_id())
+                    );
 
-                    $introduction_section .=  "<a onclick=\"javascript:if(!confirm('".addslashes(api_htmlentities(get_lang('ConfirmYourChoice'),ENT_QUOTES,$charset))."')) return false;\" href=\"".$url."?".api_get_cidreq()."\">";
+                    $introduction_section .=  "<a onclick=\"javascript:if(!confirm('".addslashes(api_htmlentities(get_lang('ConfirmYourChoice')))."')) return false;\" href=\"".$url."?".api_get_cidreq()."\">";
                     $introduction_section .=  Display::return_icon('delete.png', get_lang('AddIntro')).' ';
                     $introduction_section .=  "</a>";
                     $introduction_section .=  "</div>";
@@ -812,16 +822,17 @@ class Display
     }
 
     /**
-     * Returns the htmlcode for an image
+     * Returns the html code for an image
      *
-     * @param string $image the filename of the file (in the main/img/ folder
+     * @param string $image_path the filename of the file (in the main/img/ folder
      * @param string $alt_text the alt text (probably a language variable)
      * @param array additional attributes (for instance height, width, onclick, ...)
+     * @param bool $applyFilter
      * @author Julio Montoya 2010
+     * @return string
      */
     public static function img($image_path, $alt_text = '', $additional_attributes = array(), $applyFilter = true)
     {
-
         // Sanitizing the parameter $image_path
         if ($applyFilter) {
             $image_path = Security::filter_img_path($image_path);
@@ -845,12 +856,13 @@ class Display
     }
 
     /**
-     * Returns the htmlcode for a tag (h3, h1, div, a, button), etc
+     * Returns the html code for a tag (h3, h1, div, a, button), etc
      *
-     * @param string $image the filename of the file (in the main/img/ folder
-     * @param string $alt_text the alt text (probably a language variable)
-     * @param array additional attributes (for instance height, width, onclick, ...)
+     * @param string $tag the filename of the file (in the main/img/ folder
+     * @param string $content the alt text (probably a language variable)
+     * @param array $additional_attributes (for instance height, width, onclick, ...)
      * @author Julio Montoya 2010
+     * @return string
      */
     public static function tag($tag, $content, $additional_attributes = array())
     {
@@ -873,6 +885,10 @@ class Display
 
     /**
      * Creates a URL anchor
+     * @param string $name
+     * @param string $url
+     * @param array $extra_attributes
+     * @return string
      */
     public static function url($name, $url, $extra_attributes = array())
     {

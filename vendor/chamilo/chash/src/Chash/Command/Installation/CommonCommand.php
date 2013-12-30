@@ -182,7 +182,24 @@ class CommonCommand extends AbstractCommand
      */
     public function getInstallationFolder()
     {
-        return realpath(__DIR__.'/../../Resources/Database').'/';
+
+        $chashFolder = dirname(dirname(dirname(__FILE__)));
+        return $chashFolder.'/Resources/Database/';
+    }
+
+    /**
+     * Gets the installation version path
+     *
+     * @param string $version
+     *
+     * @return string
+     */
+    public function getInstallationPath($version)
+    {
+        if ($version == 'master') {
+            $version = $this->getLatestVersion();
+        }
+        return $this->getInstallationFolder().$version.'/';
     }
 
     /**
@@ -377,21 +394,6 @@ class CommonCommand extends AbstractCommand
     }
 
     /**
-     * Gets the installation version path
-     *
-     * @param string $version
-     *
-     * @return string
-     */
-    public function getInstallationPath($version)
-    {
-        if ($version == 'master') {
-            $version = $this->getLatestVersion();
-        }
-        return __DIR__.'/../../Resources/Database/'.$version.'/';
-    }
-
-    /**
      * @return string
      */
     public function getLatestVersion()
@@ -507,9 +509,9 @@ class CommonCommand extends AbstractCommand
             ),
             '1.11.0'  => array(
                 'require_update' => true,
-                'pre' => 'pre.sql',
+                /*'pre' => 'pre.sql',
                 'post' => 'post.sql',
-                'update_db' => 'update.php',
+                'update_db' => 'update.php',*/
                 'update_files' => null,
                 'hook_to_doctrine_version' => '11'
             ),
@@ -922,7 +924,7 @@ class CommonCommand extends AbstractCommand
     }
 
     /**
-     * @param \Symfony\Component\Console\Input\InputInterface $input
+     * @param InputInterface $input
      * @param array $params
      * @return array
      */
@@ -939,7 +941,7 @@ class CommonCommand extends AbstractCommand
     }
 
     /**
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param OutputInterface $output
      * @param string $version
      * @param string $updateInstallation
      * @param string $defaultTempFolder
@@ -1274,10 +1276,9 @@ class CommonCommand extends AbstractCommand
         $connection->update('user', array('phone' => $settings['phone']), array('user_id' => '1'));
         $connection->update('user', array('password' => $settings['password']), array('user_id' => '1'));
         $connection->update('user', array('email' => $settings['email']), array('user_id' => '1'));
+        // Admin user.
         $connection->update('user', array('language' => $settings['language']), array('user_id' => '1'));
-
-        // Already updated by the script
-        //$connection->insert('admin', array('user_id' => 1));
+        // Anonymous user.
         $connection->update('user', array('language' => $settings['language']), array('user_id' => '2'));
     }
 

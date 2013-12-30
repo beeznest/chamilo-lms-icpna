@@ -197,7 +197,27 @@ $app['allow_admin_toolbar'] = array(
     'ROLE_QUESTION_MANAGER',
     'ROLE_SESSION_MANAGER'
 );
+/*
+use ChamiloLMS\Component\Auth\CourseVoter;
+use ChamiloLMS\Component\Auth\CourseAccessDecisionManager;
 
+$app['course_decision_manager'] = $app->share(function($app) {
+    return new CourseAccessDecisionManager();
+});
+
+$app['course_voter'] = $app->share(function($app) {
+    return new CourseVoter($app['course_decision_manager']);
+});
+
+$app['security.voters'] = $app->extend('security.voters', function($voters) use ($app) {
+    $voters[] = $app['course_voter'];
+    return $voters;
+});
+
+$app['security.access_manager'] = $app->share(function($app) {
+    return new AccessDecisionManager($app['security.voters'], 'unanimous');
+});
+*/
 use SilexOpauth\OpauthExtension;
 
 $strategies = isset($_configuration['strategies']) ? $_configuration['strategies'] : null;
@@ -287,7 +307,7 @@ $app['form.extensions'] = $app->share($app->extend('form.extensions', function (
     return $extensions;
 }));
 
-// Needed to use the "UniqueEntity" validator
+// Needed to use the "UniqueEntity" validator.
 $app['validator.validator_factory'] = $app->share(function ($app) {
     $uniqueValidator = new Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator($app['manager_registry']);
     $factory = new ChamiloLMS\Component\Validator\ConstraintValidatorFactory();
@@ -674,6 +694,8 @@ $app['pages.controller'] = $app->share(
     }
 );
 
+//@todo improve loading of controllers.
+
 $app['index.controller'] = $app->share(
     function () use ($app) {
         $controller = new ChamiloLMS\Controller\IndexController($app);
@@ -696,24 +718,6 @@ $app['userPortal.controller'] = $app->share(
 $app['learnpath.controller'] = $app->share(
     function () use ($app) {
         return new ChamiloLMS\Controller\LearnpathController();
-    }
-);
-
-$app['course_home.controller'] = $app->share(
-    function () use ($app) {
-        return new ChamiloLMS\Controller\CourseHomeController();
-    }
-);
-
-$app['course_home.controller'] = $app->share(
-    function () use ($app) {
-        return new ChamiloLMS\Controller\CourseHomeController();
-    }
-);
-
-$app['introduction_tool.controller'] = $app->share(
-    function () use ($app) {
-        return new ChamiloLMS\Controller\IntroductionToolController();
     }
 );
 
@@ -830,6 +834,18 @@ $app['session_tree.controller'] = $app->share(
 $app['upgrade.controller'] = $app->share(
     function () use ($app) {
         return new ChamiloLMS\Controller\Admin\Administrator\UpgradeController($app);
+    }
+);
+
+$app['course_home.controller'] = $app->share(
+    function () use ($app) {
+        return new ChamiloLMS\Controller\Tool\CourseHome\CourseHomeController($app);
+    }
+);
+
+$app['introduction.controller'] = $app->share(
+    function () use ($app) {
+        return new ChamiloLMS\Controller\Tool\Introduction\IntroductionController($app);
     }
 );
 

@@ -914,12 +914,16 @@ VALUES
 ('tool_visible_by_default_at_creation','forums','checkbox','Tools','true','ToolVisibleByDefaultAtCreationTitle','ToolVisibleByDefaultAtCreationComment',NULL,'Forums', 1),
 ('tool_visible_by_default_at_creation','quiz','checkbox','Tools','true','ToolVisibleByDefaultAtCreationTitle','ToolVisibleByDefaultAtCreationComment',NULL,'Quiz', 1),
 ('tool_visible_by_default_at_creation','gradebook','checkbox','Tools','true','ToolVisibleByDefaultAtCreationTitle','ToolVisibleByDefaultAtCreationComment',NULL,'Gradebook', 1),
+<<<<<<< HEAD
 ('session_tutor_reports_visibility', NULL, 'radio', 'Session', 'true', 'SessionTutorsCanSeeExpiredSessionsResultsTitle', 'SessionTutorsCanSeeExpiredSessionsResultsComment', NULL, NULL, 1),
 ('gradebook_show_percentage_in_reports',NULL,'radio','Gradebook','true','GradebookShowPercentageInReportsTitle','GradebookShowPercentageInReportsComment',NULL,NULL, 0),
 ('session_page_enabled', NULL, 'radio', 'Session', 'true', 'SessionPageEnabledTitle', 'SessionPageEnabledComment', NULL, NULL, 1),
 ('settings_latest_update', NULL, NULL, NULL, '', '','', NULL, NULL, 0),
 ('chamilo_database_version', NULL, 'textfield', NULL, 'xxx','DatabaseVersion','', NULL, NULL, 0);
 
+=======
+('chamilo_database_version', NULL, 'textfield',NULL, '1.9.5','DatabaseVersion','', NULL, NULL, 0);
+>>>>>>> Add tables to db_main.sql to install it
 UNLOCK TABLES;
 /*!40000 ALTER TABLE settings_current ENABLE KEYS */;
 
@@ -3080,6 +3084,7 @@ CREATE TABLE course_type (
     translation_var char(40) default 'UndefinedCourseTypeLabel',
     description TEXT default '',
     props text default ''
+    primary
 );
 
 INSERT INTO course_type (id, name) VALUES (1, 'All tools');
@@ -3151,3 +3156,149 @@ CREATE TABLE branch_transaction (
 
 -- Do not move this
 UPDATE settings_current SET selected_value = '1.10.0.21309' WHERE variable = 'chamilo_database_version';
+--
+-- Tables for rules like sequence
+--
+
+DROP TABLE IF EXISTS r_rule;
+CREATE TABLE r_rule (
+    id int unsigned not null auto_increment,
+    description TEXT default '',
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS r_condition;
+CREATE TABLE r_condition (
+    id int unsigned not null auto_increment,
+    description TEXT default '',
+    mat_op char(2) not null,
+    param float not null,
+    act_true int unsigned,
+    act_false int unsigned,
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS r_rule_condition;
+CREATE TABLE r_rule_condition (
+    id int unsigned not null auto_increment,
+    r_rule_id int unsigned not null,
+    r_condition_id int unsigned not null,
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS r_method;
+CREATE TABLE r_method (
+    id int unsigned not null auto_increment,
+    description TEXT default '',
+    met_type varchar(50) default '',
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS r_rule_method;
+CREATE TABLE r_rule_method (
+    id int unsigned not null auto_increment,
+    r_rule_id int unsigned not null,
+    r_method_id int unsigned not null,
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS r_variable;
+CREATE TABLE r_variable (
+    id int unsigned not null auto_increment,
+    description TEXT default '',
+    var_type varchar(50),
+    val varchar(50) default '',
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS r_formula;
+CREATE TABLE r_formula (
+    id int unsigned not null auto_increment,
+    r_method_id int unsigned not null,
+    method_order int unsigned not null,
+    method_op varchar(50) not null,
+    r_variable_id int unsigned not null,
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS r_valid;
+CREATE TABLE r_valid (
+    id int unsigned not null auto_increment,
+    r_variable_id int unsigned not null,
+    r_condition_id int unsigned not null,
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS r_type_entity;
+CREATE TABLE r_type_entity (
+    id int unsigned not null auto_increment,
+    description TEXT default '',
+    ent_table varchar(50) not null,
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS r_row_entity;
+CREATE TABLE r_row_entity (
+    id int unsigned not null auto_increment,
+    r_type_entity_id int unsigned not null,
+    c_id  int unsigned not null,
+    session_id int unsigned not null default 0,
+    row_id int unsigned not null,
+    PRIMARY KEY (id)
+);
+/*
+DROP TABLE IF EXISTS r_group;
+CREATE TABLE r_group (
+    id int unsigned not null primary key,
+    description TEXT default '',
+    advance int unsigned not null default 0,
+    qty_complete int unsigned not null default 0,
+    qty_total int unsigned not null default 0,
+    success_date unsigned default null,
+    success tinyint unsigned not null default 0,
+    available tinyint unsigned not null default 0,
+);
+DROP TABLE IF EXISTS r_group_entity;
+CREATE TABLE r_group_entity (
+    r_group_id int unsigned not null primary key,
+    r_row_entity_id int unsigned not null primary key
+);
+
+DROP TABLE IF EXISTS r_sequence;
+CREATE TABLE r_sequence (
+    r_group_id int unsigned not null primary key,
+    r_group_id_next int unsigned not null primary key,
+    is_part tinyint unsigned not null default 0,
+);
+*/
+
+DROP TABLE IF EXISTS r_sequence;
+CREATE TABLE r_sequence (
+    id int unsigned not null auto_increment,
+    r_row_entity_id int unsigned not null,
+    r_row_entity_id_next int unsigned not null,
+    is_part tinyint unsigned not null default 0,
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS r_value;
+CREATE TABLE r_value (
+    id int unsigned not null auto_increment,
+    r_row_entity_id int unsigned not null,
+    r_variable_id int unsigned not null,
+    val varchar (50) not null,
+    PRIMARY KEY (id)
+);
+--
+-- Inserts for sequence rule (whitout lang terms)
+--
+
+INSERT INTO r_rule (description) VALUES ('Si el usuario completa un 70% de una entidad o grupo de recursos podrá acceder acceder a otra entidad o grupo de recursos');
+INSERT INTO r_condition (description, mat_op, param, act_true, act_false) VALUES ('<= 100%','LE', 100.0, 2, null), ('>= 70%','GE', 70.0, 0, null);
+INSERT INTO r_rule_condition VALUES (1,1,1),(2,1,2);
+INSERT INTO r_method (description) VALUES ('Actualiza avance');
+INSERT INTO r_rule_method VALUES (1,1,1);
+INSERT INTO r_variable VALUES (1, 'Avance procentual', 'resultado', '0.0'),(2,'Elementos completados', 'atributo', '0'), (3, 'Total de elementos', 'atributo', '0'), (4, 'Fecha de logro', 'parametro', '0000-00-00');
+INSERT INTO r_formula VALUES (1,1,1,'++',2),(2,1,2,'divide',3),(3,1,3,'asigna',1);
+INSERT INTO r_valid VALUES (1,1,1),(2,1,2);
+INSERT INTO r_type_entity VALUES (1,'Entity.Lp','c_lp'),(2,'Entity.Quiz','c_quiz'),(3,'Entity.LpItem','c_lp_item');

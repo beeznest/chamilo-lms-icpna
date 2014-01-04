@@ -77,7 +77,7 @@ class SystemAnnouncementManager {
 			$url = api_get_self();
 			echo '<div class="system_announcements">';
 
-			echo '<h3>'.get_lang('SystemAnnouncements').'</h3>';
+			//echo '<h3>'.get_lang('SystemAnnouncements').'</h3>';
 
 			echo '<div style="margin:10px;text-align:right;"><a href="news_list.php">'.get_lang('More').'</a></div>';
 
@@ -620,7 +620,7 @@ class SystemAnnouncementManager {
 		$announcements = Database::query($sql);
 		$html = '';
 		if (Database::num_rows($announcements) > 0) {
-			$html .=  Display::page_header(get_lang('SystemAnnouncements'));
+			//$html .=  Display::page_header(get_lang('SystemAnnouncements'));
 			$html .=  '<div id="container-slider" class="span6"><ul id="slider">';
 			while ($announcement = Database::fetch_object($announcements)) {
                 $content = $announcement->content;

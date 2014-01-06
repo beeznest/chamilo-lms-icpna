@@ -349,3 +349,16 @@ define('TABLE_BRANCH_SYNC_LOG',              'branch_sync_log');
 define('TABLE_BRANCH_TRANSACTION',           'branch_transaction');
 define('TABLE_BRANCH_TRANSACTION_STATUS',    'branch_transaction_status');
 
+//Sequence tables
+define('TABLE_MAIN_SEQUENCE',                'sequence');
+define('TABLE_SEQUENCE_CONDITION',           'sequence_condition');
+define('TABLE_SEQUENCE_FORMULA',             'sequence_formula');
+define('TABLE_SEQUENCE_METHOD',              'sequence_method');
+define('TABLE_SEQUENCE_ROW_ENTITY',          'sequence_row_entity');
+define('TABLE_SEQUENCE_RULE',                'sequence_rule');
+define('TABLE_SEQUENCE_RULE_CONDITION',      'sequence_condition');
+define('TABLE_SEQUENCE_RULE_METHOD',         'sequence_rule_method');
+define('TABLE_SEQUENCE_TYPE_ENTITY',         'sequence_type_entity');
+define('TABLE_SEQUENCE_VALID',               'sequence_valid');
+define('TABLE_SEQUENCE_VALUE',               'sequence_value');
+define('TABLE_SEQUENCE_VARIABLE',            'sequence_variable');

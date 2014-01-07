@@ -3182,6 +3182,7 @@ CREATE TABLE sequence_rule_condition (
     PRIMARY KEY (id)
 );
 
+/*
 DROP TABLE IF EXISTS sequence_method;
 CREATE TABLE sequence_method (
     id int unsigned not null auto_increment,
@@ -3189,7 +3190,18 @@ CREATE TABLE sequence_method (
     met_type varchar(50) default '',
     PRIMARY KEY (id)
 );
+*/
 
+DROP TABLE IF EXISTS sequence_method;
+CREATE TABLE sequence_method (
+    id int unsigned not null auto_increment,
+    description TEXT default '',
+    formula TEXT default '',
+    met_type varchar(50) default '',
+    PRIMARY KEY (id)
+);
+
+/*
 DROP TABLE IF EXISTS sequence_rule_method;
 CREATE TABLE sequence_rule_method (
     id int unsigned not null auto_increment,
@@ -3197,22 +3209,42 @@ CREATE TABLE sequence_rule_method (
     sequence_method_id int unsigned not null,
     PRIMARY KEY (id)
 );
+*/
+
+DROP TABLE IF EXISTS sequence_rule_method;
+CREATE TABLE sequence_rule_method (
+    id int unsigned not null auto_increment,
+    sequence_rule_id int unsigned not null,
+    sequence_method_id int unsigned not null,
+    method_order int unsigned not null,
+    PRIMARY KEY (id)
+);
 
 DROP TABLE IF EXISTS sequence_variable;
 CREATE TABLE sequence_variable (
     id int unsigned not null auto_increment,
     description TEXT default '',
-    var_type varchar(50),
-    val varchar(50) default '',
+    name varchar(50),
+    default_val varchar(50) default '',
     PRIMARY KEY (id)
 );
-
+/*
 DROP TABLE IF EXISTS sequence_formula;
 CREATE TABLE sequence_formula (
     id int unsigned not null auto_increment,
     sequence_method_id int unsigned not null,
     method_order int unsigned not null,
+    iteration int unsigned not null default 1,
     method_op varchar(50) not null,
+    sequence_variable_id int unsigned not null,
+    PRIMARY KEY (id)
+);
+*/
+
+DROP TABLE IF EXISTS sequence_formula;
+CREATE TABLE sequence_formula (
+    id int unsigned not null auto_increment,
+    sequence_method_id int unsigned not null,
     sequence_variable_id int unsigned not null,
     PRIMARY KEY (id)
 );
@@ -3242,31 +3274,6 @@ CREATE TABLE sequence_row_entity (
     row_id int unsigned not null,
     PRIMARY KEY (id)
 );
-/*
-DROP TABLE IF EXISTS r_group;
-CREATE TABLE r_group (
-    id int unsigned not null primary key,
-    description TEXT default '',
-    advance int unsigned not null default 0,
-    qty_complete int unsigned not null default 0,
-    qty_total int unsigned not null default 0,
-    success_date unsigned default null,
-    success tinyint unsigned not null default 0,
-    available tinyint unsigned not null default 0,
-);
-DROP TABLE IF EXISTS r_group_entity;
-CREATE TABLE r_group_entity (
-    r_group_id int unsigned not null primary key,
-    r_row_entity_id int unsigned not null primary key
-);
-
-DROP TABLE IF EXISTS r_sequence;
-CREATE TABLE r_sequence (
-    r_group_id int unsigned not null primary key,
-    r_group_id_next int unsigned not null primary key,
-    is_part tinyint unsigned not null default 0,
-);
-*/
 
 DROP TABLE IF EXISTS sequence;
 CREATE TABLE sequence (
@@ -3288,7 +3295,8 @@ CREATE TABLE sequence_value (
     success tinyint not null default 0,
     success_date datetime not null,
     available tinyint not null default 0,
-    available_date datetime not null,
+    available_start_date datetime not null,
+    available_end_date datetime not null,
     PRIMARY KEY (id)
 );
 --
@@ -3298,9 +3306,17 @@ CREATE TABLE sequence_value (
 INSERT INTO sequence_rule (description) VALUES ('Si el usuario completa un 70% de una entidad o grupo de recursos podrá acceder acceder a otra entidad o grupo de recursos');
 INSERT INTO sequence_condition (description, mat_op, param, act_true, act_false) VALUES ('<= 100%','LE', 100.0, 2, null), ('>= 70%','GE', 70.0, 0, null);
 INSERT INTO sequence_rule_condition VALUES (1,1,1),(2,1,2);
-INSERT INTO sequence_method (description) VALUES ('Actualiza avance');
-INSERT INTO sequence_rule_method VALUES (1,1,1);
-INSERT INTO sequence_variable VALUES (1, 'Avance procentual', 'resultado', '0.0'),(2,'Elementos completados', 'atributo', '0'), (3, 'Total de elementos', 'atributo', '0'), (4, 'Completado', 'parametro', 0), (5, 'Disponible', 'atributo', 0);
-INSERT INTO sequence_formula VALUES (1,1,1,'++',2),(2,1,2,'divide',3),(3,1,3,'asigna',1);
+INSERT INTO sequence_method (description,formula) VALUES ('Aumenta elemento completado','$#2 += $#2'), ('Actualiza Avance', '$#1 = $#2 / $#3');
+INSERT INTO sequence_rule_method VALUES (1,1,1,1),(2,1,2,2);
+INSERT INTO sequence_variable VALUES
+    (1, 'Avance porcentual', 'advance', 0.0),
+    (2, 'Elementos completados', 'complete_items', 0),
+    (3, 'Total de elementos', 'total_items', 0),
+    (4, 'Completado', 'success', 0),
+    (5, 'Fecha de completado', 'success_date', '0000-00-00 00:00:00'),
+    (6, 'Disponible', 'available', 0),
+    (7, 'Fecha de inicio de disponibilidad', 'available_start_date', '0000-00-00 00:00:00'),
+    (8, 'Fecha de fin de disponibilidad', 'available_end_date', '0000-00-00 00:00:00');
+INSERT INTO sequence_formula VALUES (1,1,2),(2,2,2),(3,2,3),(4,2,1);
 INSERT INTO sequence_valid VALUES (1,1,1),(2,1,2);
 INSERT INTO sequence_type_entity VALUES (1,'Entity.Lp','c_lp'),(2,'Entity.Quiz','c_quiz'),(3,'Entity.LpItem','c_lp_item');

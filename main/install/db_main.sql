@@ -3197,6 +3197,7 @@ CREATE TABLE sequence_method (
     id int unsigned not null auto_increment,
     description TEXT default '',
     formula TEXT default '',
+    assign int unsigned not null,
     met_type varchar(50) default '',
     PRIMARY KEY (id)
 );
@@ -3303,11 +3304,32 @@ CREATE TABLE sequence_value (
 -- Inserts for sequence rule (whitout lang terms)
 --
 
-INSERT INTO sequence_rule (description) VALUES ('Si el usuario completa un 70% de una entidad o grupo de recursos podrá acceder acceder a otra entidad o grupo de recursos');
-INSERT INTO sequence_condition (description, mat_op, param, act_true, act_false) VALUES ('<= 100%','LE', 100.0, 2, null), ('>= 70%','GE', 70.0, 0, null);
-INSERT INTO sequence_rule_condition VALUES (1,1,1),(2,1,2);
-INSERT INTO sequence_method (description,formula) VALUES ('Aumenta elemento completado','$#2 += $#2'), ('Actualiza Avance', '$#1 = $#2 / $#3');
-INSERT INTO sequence_rule_method VALUES (1,1,1,1),(2,1,2,2);
+INSERT INTO sequence_rule (description) VALUES
+    ('Si el usuario completa un 70% de una entidad o grupo de recursos podrá acceder acceder a otra entidad o grupo de recursos');
+INSERT INTO sequence_condition (description, mat_op, param, act_true, act_false) VALUES
+    ('<= 100%','<=', 100.0, 2, null),
+    ('>= 70%','>=', 70.0, 0, null);
+INSERT INTO sequence_rule_condition VALUES
+    (1,1,1),
+    (2,1,2);
+INSERT INTO sequence_method (description,formula, assign, met_type) VALUES
+    ('Aumenta elemento completado','v#2 + 1', 2, 'add'),
+    ('Actualiza Avance', 'v#2 / v#3', 1, 'update'),
+    ('Almacena total de elementos', '$total_items', 3,'init'),
+    ('Activa logro', '1', 4, 'success'),
+    ('Almacena la fecha de logro', 'api_get_utc_datetime()', 5, 'success'),
+    ('Activa disponibilidad', '1', 6, 'success'),
+    ('Almacena la fecha inicio de disponibilidad', 'api_get_utc_datetime()', 7, 'success'),
+    ('Almacena la fecha fin de disponibilidad', 'api_get_utc_datetime($available_end_date)', 8, 'success');
+INSERT INTO sequence_rule_method VALUES
+    (1,1,1,1),
+    (2,1,2,2),
+    (3,1,3,0),
+    (4,1,4,0),
+    (5,1,5,0),
+    (6,1,6,0),
+    (7,1,7,0),
+    (8,1,8,0);
 INSERT INTO sequence_variable VALUES
     (1, 'Avance porcentual', 'advance', 0.0),
     (2, 'Elementos completados', 'complete_items', 0),
@@ -3317,6 +3339,21 @@ INSERT INTO sequence_variable VALUES
     (6, 'Disponible', 'available', 0),
     (7, 'Fecha de inicio de disponibilidad', 'available_start_date', '0000-00-00 00:00:00'),
     (8, 'Fecha de fin de disponibilidad', 'available_end_date', '0000-00-00 00:00:00');
-INSERT INTO sequence_formula VALUES (1,1,2),(2,2,2),(3,2,3),(4,2,1);
-INSERT INTO sequence_valid VALUES (1,1,1),(2,1,2);
-INSERT INTO sequence_type_entity VALUES (1,'Entity.Lp','c_lp'),(2,'Entity.Quiz','c_quiz'),(3,'Entity.LpItem','c_lp_item');
+INSERT INTO sequence_formula VALUES
+    (1,1,2),
+    (2,2,2),
+    (3,2,3),
+    (4,2,1),
+    (5,3,3),
+    (6,4,4),
+    (7,5,5),
+    (8,6,6),
+    (9,7,7),
+    (10,8,8);
+INSERT INTO sequence_valid VALUES
+    (1,1,1),
+    (2,1,2);
+INSERT INTO sequence_type_entity VALUES
+    (1,'Entity.Lp','c_lp'),
+    (2,'Entity.Quiz','c_quiz'),
+    (3,'Entity.LpItem','c_lp_item');

@@ -3261,6 +3261,7 @@ CREATE TABLE sequence_valid (
 DROP TABLE IF EXISTS sequence_type_entity;
 CREATE TABLE sequence_type_entity (
     id int unsigned not null auto_increment,
+    name varchar(50) default '',
     description TEXT default '',
     ent_table varchar(50) not null,
     PRIMARY KEY (id)
@@ -3313,14 +3314,14 @@ INSERT INTO sequence_rule_condition VALUES
     (1,1,1),
     (2,1,2);
 INSERT INTO sequence_method (description,formula, assign, met_type) VALUES
-    ('Aumenta elemento completado','v#2 + 1', 2, 'add'),
-    ('Actualiza Avance', 'v#2 / v#3', 1, 'update'),
-    ('Almacena total de elementos', '$total_items', 3,'init'),
-    ('Activa logro', '1', 4, 'success'),
-    ('Almacena la fecha de logro', 'api_get_utc_datetime()', 5, 'success'),
-    ('Activa disponibilidad', '1', 6, 'success'),
-    ('Almacena la fecha inicio de disponibilidad', 'api_get_utc_datetime()', 7, 'success'),
-    ('Almacena la fecha fin de disponibilidad', 'api_get_utc_datetime($available_end_date)', 8, 'success');
+    ('Aumenta elemento completado','v#2 + 1;', 2, 'add'),
+    ('Actualiza Avance', 'v#2 / v#3;', 1, 'update'),
+    ('Almacena total de elementos', '$total_items;', 3,'init'),
+    ('Activa logro', '1;', 4, 'success'),
+    ('Almacena la fecha de logro', '(empty(v#5))? api_get_utc_datetime() : v#5;', 5, 'success'),
+    ('Activa disponibilidad', '1;', 6, 'pre'),
+    ('Almacena la fecha inicio de disponibilidad', '(empty(v#7))? api_get_utc_datetime() : v#7;', 7, 'pre'),
+    ('Almacena la fecha fin de disponibilidad', '(!empty($available_end_date))? api_get_utc_datetime($available_end_date) : "0000-00-00 00:00:00";', 8, 'pre');
 INSERT INTO sequence_rule_method VALUES
     (1,1,1,1),
     (2,1,2,2),
@@ -3354,6 +3355,6 @@ INSERT INTO sequence_valid VALUES
     (1,1,1),
     (2,1,2);
 INSERT INTO sequence_type_entity VALUES
-    (1,'Entity.Lp','c_lp'),
-    (2,'Entity.Quiz','c_quiz'),
-    (3,'Entity.LpItem','c_lp_item');
+    (1,'Lp', 'Learning Path','c_lp'),
+    (2,'Quiz', 'Quiz and Tests','c_quiz'),
+    (3,'LpItem', ' Items of a Learning Path','c_lp_item');

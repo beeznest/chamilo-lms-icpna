@@ -3885,6 +3885,9 @@ class learnpath {
                             user_id = " . $this->get_user_id()." ".$session_condition;
             $res = Database::query($sql); // Ignore errors as some tables might not have the progress field just yet.
             $this->progress_db = $progress;
+
+            //Temporaly located here for #7220
+            Sequence::temp_hack_1(1, $this->get_id(), $progress, $this->get_user_id());
         }
     }
 

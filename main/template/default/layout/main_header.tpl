@@ -3,6 +3,7 @@
 <!--[if IE 7]>    <html lang="{{ document_language }}" class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>    <html lang="{{ document_language }}" class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]><!--><html lang="{{ document_language }}" class="no-js"> <!--<![endif]-->
+
 <head>
 {% include "default/layout/head.tpl" %}
 </head>
@@ -22,66 +23,79 @@
             {{ help_content }}
             {{ bug_notification_link }}
         </ul>
-
+            
         {# topbar #}
         {% include "default/layout/topbar.tpl" %}
 
         <div id="main" class="container">
-            <header>
-                <div class="row">
-                    <div id="header_left" class="span4">
-                        {# logo #}
-                        {{ logo }}
+<header>
+<!-- HEADER Y PERFIL DE USUARIO -->
+<div class="row-fluid">
+  <div class="span12">
+    <div class="span3">
+        <div class="home-ico">
+          <a href="{{ _p.web }}">Inicio</a>
+        </div>
+      </div>
+    <div class="span6">
+          {# logo #} <!--LLama al logotipo -->
+          {{ logo }}
+    </div>
+    <div class="span3">
+         <div class="perfil-user">
+            <div id='cssmenu'>
+            <ul>
+               <li class='has-sub'><a href='#'><span>
+               <img src="http://icpna.chamilo.net/main/upload/users/1/1/medium_1_52cd7d4aa8bf5_USER.jpg" class="imagen-username" />
+               <span class="welcome">Bienvenido</span><br>
+               <span class="usermane">Aberto Cordero</span>
+               </span></a>
+                  <ul>
+                     <li class="home"><a href='#'><span>Pagina Principal</span></a></li>
+                     <li class="edit"><a href='#'><span>Actualización de datos</span></a></li>
+                     <li class='closed'><a href='#'><span>Salir</span></a></li>
+                  </ul>
+               </li>
+            </ul>
+            </div>
+            </div>
+    </div>
+  </div>
+</div>
 
-                        {# plugin_header left #}
-                        {% if plugin_header_left is not null %}
-                            <div id="plugin_header_left">
-                                {{ plugin_header_left }}
-                            </div>
-                        {% endif %}
-                    </div>
-                    <div id="header_center" class="span3">
-                        {# plugin_header center #}
-                        {% if plugin_header_center is not null %}
-                            <div id="plugin_header_center">
-                                {{ plugin_header_center }}
-                            </div>
-                        {% endif %}
-                        &nbsp;
-                    </div>
-                    <div id="header_right" class="span5">
-                        <ul id="notifications" class="nav nav-pills pull-right">
-                            {{ notification_menu }}
-                        </ul>
-
-                        {# plugin_header right #}
-                        {% if plugin_header_right is not null %}
-                            <div id="plugin_header_right">
-                                {{ plugin_header_right }}
-                            </div>
-                        {% endif %}
-                        &nbsp;
-                    </div>
+<!-- FIN DEL PERFIL DE USUARIOS -->
+    {% if _u.logged == 1 %}
+    <!-- DATOS DE LA FRANJA CELESTE DATOS DE UBICACION -->
+    <div class="row-fluid">
+        <div class="span12 celeste">
+          <div class="row-fluid">
+            <div class="span7"> <div class="main-subinicio">Curso V-Learning Adultos - <a href="#">Módulo 3</a></div></div>
+            <div class="span5">           
+              <div class="row-fluid">
+                <div class="span9">
+                    <a href="#">Proceso: Módulo 3</a>
+                    <div id="animacion">
+                    <div class="color-bar-process uno"><span>70%</span></div>
                 </div>
+                </div>
+                <div class="span2">
+                    <a href="#">
+                      <img src="http://icpna.chamilo.net/main/css/test_ICPNA/images/help.png">
+                    </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    <!-- FIN DE LA FRANJA CELESTE DE UBICACION -->
+    {% endif %}
+     <!--  {# menu #}
+     {% include "default/layout/menu.tpl" %} -->
+</header>
 
-                {% if plugin_header_main %}
-                    <div class="row">
-                        <div class="span12">
-                            <div id="plugin_header_main">
-                                {{ plugin_header_main }}
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-
-                {# menu #}
-                {% include "default/layout/menu.tpl" %}
-
-                {# breadcrumb #}
-                {{ breadcrumb }}
-            </header>
 
             <div id="top_main_content" class="row">
-            {# course navigation links/shortcuts need to be activated by the admin #}
+                  {# course navigation links/shortcuts need to be activated by the admin #}
             {% include "default/layout/course_navigation.tpl" %}
 {% endif %}

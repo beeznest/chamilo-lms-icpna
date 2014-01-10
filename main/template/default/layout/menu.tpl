@@ -19,13 +19,13 @@
 
                     {% if user_notifications is not null %}
                     <li>
-                        <a href="{{ profile_url }}">{{ user_notifications }}</a>
+                        <a href="{{ message_url }}">{{ user_notifications }}</a>
                     </li>
                     {% endif %}
 
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            {{ _u.messages_count }}  <img src="{{ _u.avatar_small }}"/>
+                            <img src="{{ _u.avatar_small }}"/>
                             {{ _u.complete_name }}
                             <b class="caret"></b>
                         </a>

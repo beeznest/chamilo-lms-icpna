@@ -215,6 +215,8 @@ class learnpath {
             $sql_ins = "INSERT INTO $lp_table (c_id, lp_id, user_id, view_count, session_id) VALUES ($course_id, $lp_id, $user_id, 1, $session_id)";
             $res_ins = Database::query($sql_ins);
             $this->lp_view_id = Database :: insert_id();
+            //Sequence rule
+            Sequence::temp_hack_4_insert(1, 1, $lp_id, $course_id, $session_id, $user_id);
             if ($this->debug > 2) {
                 error_log('New LP - learnpath::__construct() ' . __LINE__ . ' - inserting new lp_view: ' . $sql_ins, 0);
             }
@@ -705,6 +707,10 @@ class learnpath {
                 $id = Database :: insert_id();
                 if ($id > 0) {
                     $course_info = api_get_course_info();
+                    //Sequence rule
+                    Sequence::temp_hack_2_insert('Lp', $id, $course_id, $session_id);
+                    Sequence::temp_hack_3_insert(1, 1, 0, $id, $course_id, $session_id, 0);
+
                     // Insert into item_property.
                     api_item_property_update($course_info, TOOL_LEARNPATH, $id, 'LearnpathAdded', api_get_user_id());
                     api_set_default_visibility($id, TOOL_LEARNPATH);
@@ -3247,6 +3253,9 @@ class learnpath {
             $res = Database::query($sql);
             $id = Database :: insert_id();
             $this->lp_view_id = $id;
+
+            //Sequence rule #7220
+            Sequence::temp_hack_4_insert($this->get_total_items_count(), 1, $this->get_id(), $course_id, api_get_session_id(), $this->get_user_id());
         }
         return $this->lp_view_id;
     }
@@ -3768,6 +3777,8 @@ class learnpath {
         if ($view_id = Database :: insert_id($res)) {
             $this->lp_view_id = $view_id;
             $this->attempt = $this->attempt + 1;
+            //Sequence rule
+            Sequence::temp_hack_4($this-get_total_items_count,1,$this->lp_id, $this->get_user_id());
         } else {
             $this->error = 'Could not insert into item_view table...';
             return false;
@@ -3887,7 +3898,7 @@ class learnpath {
             $this->progress_db = $progress;
 
             //Temporaly located here for #7220
-            Sequence::temp_hack_1(1, $this->get_id(), $progress, $this->get_user_id());
+            Sequence::temp_hack_4_update(1,$this->get_id(),$course_id,api_get_session_id(),$this->get_user_id(),1,$this->get_complete_items_count(),$this->get_total_items_count(),null);
         }
     }
 
@@ -4251,9 +4262,11 @@ class learnpath {
         $sql = "UPDATE $lp_table SET prerequisite = '".$this->prerequisite."'
                 WHERE c_id = ".$course_id." AND id = '$lp_id'";
         if ($this->debug > 2) {
-            error_log('New LP - lp updated with new preview requisite : ' . $this->requisite, 0);
+            error_log('New LP - lp updated with new preview requisite : ' . $this->prerequisite, 0);
         }
         Database::query($sql);
+        //Rule sequence 70% of pre-req #7220
+        Sequence::temp_hack_3_update(1, 1, $this->prerequisite, $lp_id, $course_id, api_get_session_id());
         return true;
     }
 
@@ -9331,6 +9344,9 @@ EOD;
         $sql = "UPDATE $tbl_lp_item SET prerequisite = ''
                 WHERE c_id = ".$course_id." AND lp_id = '$lp_id'";
         Database::query($sql);
+
+        //Rule sequence 70% of pre-req #7220
+        Sequence::temp_hack_3_update(1, 1, 0, $lp_id, $course_id, api_get_session_id());
 
         //Cleaning mastery score for exercises
         $sql = "UPDATE $tbl_lp_item SET mastery_score = ''

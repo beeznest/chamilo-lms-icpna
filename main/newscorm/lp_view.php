@@ -161,7 +161,7 @@ if (!isset($src)) {
                 //Prevents FF 3.6 + Adobe Reader 9 bug see BT#794 when calling a pdf file in a LP.
                 $file_info = parse_url($src);
                 $file_info = pathinfo($file_info['path']);
-                if (isset($file_info['extension']) && api_strtolower(substr($file_info['extension'], 0, 3) == 'pdf')) {
+                if (api_strtolower(substr($file_info['extension'], 0, 3) == 'pdf')) {
                     $src = api_get_path(WEB_CODE_PATH).'newscorm/lp_view_item.php?lp_item_id='.$lp_item_id;
                 }
                 $_SESSION['oLP']->start_current_item(); // starts time counter manually if asset
@@ -206,10 +206,6 @@ if ($debug) {
     error_log('$_REQUEST[exeId]: '.intval($_REQUEST['exeId']));
     error_log('$lp_id: '.$lp_id);
     error_log('$_GET[lp_item_id]: '.intval($_GET['lp_item_id']));
-}
-
-if (!$_SESSION['oLP']->check_attempts()) {
-    api_not_allowed(true);
 }
 
 if ($type_quiz && !empty($_REQUEST['exeId']) && isset($lp_id) && isset($_GET['lp_item_id'])) {
@@ -283,7 +279,7 @@ if ($_SESSION['oLP']->mode == 'fullscreen') {
 }
 
 // Not in fullscreen mode.
-Display::display_reduced_header($nameTools);
+Display::display_header($nameTools); //para fullscreen el scroom
 
 // Check if audio recorder needs to be in studentview.
 if (isset($_SESSION['status']) && $_SESSION['status'][$course_code] == 5) {
@@ -296,7 +292,7 @@ if (isset($_SESSION['status']) && $_SESSION['status'][$course_code] == 5) {
 $_SESSION['loaded_lp_view'] = true;
 
 $display_none = '';
-$margin_left = '305px';
+$margin_left = '225px';
 
 //Media player code
 
@@ -326,9 +322,9 @@ if (Database::num_rows($res_media) > 0) {
         if (!empty($row_media['audio'])) {$show_audioplayer = true; break;}
     }
 }
-
 echo '<div id="learning_path_main" style="width:100%;height:100%;">';
     $is_allowed_to_edit = api_is_allowed_to_edit(null, true, false, false);
+    /*
     if ($is_allowed_to_edit) {
         echo '<div id="learning_path_breadcrumb_zone">';
         global $interbreadcrumb;
@@ -337,10 +333,13 @@ echo '<div id="learning_path_main" style="width:100%;height:100%;">';
         $interbreadcrumb[] = array('url' => '#', 'name' => get_lang('Preview'));
         //$interbreadcrumb[] = array('type' => 'right', 'url' => api_get_self()."?action=add_item&type=step&lp_id=".$_SESSION['oLP']->lp_id."&isStudentView=false", 'name' => get_lang('Edit'), 'class' => 'btn btn-mini btn-warning');
 
-        echo $app['template']->return_breadcrumb($interbreadcrumb, null, null);
+        echo return_breadcrumb($interbreadcrumb, null, null);
         echo '</div>';
     }
-    echo '<div id="learning_path_left_zone" style="'.$display_none.'"> ';
+    */
+
+    echo '<div id="learning_path_left_zone" class="help-left-zone"> ';
+    /*
     echo '<div id="header">
             <table>
                 <tr>
@@ -361,11 +360,12 @@ echo '<div id="learning_path_main" style="width:100%;height:100%;">';
                 </tr>
             </table>
         </div>';
+    */ 
 ?>
         <!-- end header -->
 
         <!-- Author image preview -->
-        <div id="author_image">
+        <!--div id="author_image">
             <div id="author_icon">
                 <?php
                 if ($_SESSION['oLP']->get_preview_image() != '') {
@@ -388,14 +388,14 @@ echo '<div id="learning_path_main" style="width:100%;height:100%;">';
                     <?php echo $progress_bar; ?>
                 </div>
             </div>
-        </div>
+        </div-->
         <!-- end image preview Layout -->
 
-        <div id="author_name">
+        <!--<div id="author_name">
             <?php echo $_SESSION['oLP']->get_author(); ?>
         </div>
 
-        <!-- media player layout -->
+        media player layout -->
         <?php
         if ($show_audioplayer) {
             echo '<div id="lp_media_file">';
@@ -421,12 +421,13 @@ echo '<div id="learning_path_main" style="width:100%;height:100%;">';
         // hub 26-05-2010 Fullscreen or not fullscreen
         $height = '100%';
         if ($_SESSION['oLP']->mode == 'fullscreen') {
-            echo '<iframe id="content_id_blank" name="content_name_blank" src="blank.php" border="0" frameborder="0" style="width:100%;height:'.$height.'" webkitAllowFullScreen mozallowfullscreen allowFullScreen ></iframe>';
+            echo '<iframe id="content_id_blank" name="content_name_blank" src="blank.php" border="0" frameborder="0" style="width:100%;height:'.$height.'" ></iframe>';
         } else {
-            echo '<iframe id="content_id" name="content_name" src="'.$src.'" border="0" frameborder="0" style="display: block; width:100%;height:'.$height.'" webkitAllowFullScreen mozallowfullscreen allowFullScreen ></iframe>';
+            echo '<iframe id="content_id" name="content_name" src="'.$src.'" border="0" frameborder="0" class="redimension-scorm"></iframe>';
         }
     ?>
     </div>
+
     <!-- end right Zone -->
 </div>
 
@@ -436,9 +437,10 @@ echo '<div id="learning_path_main" style="width:100%;height:100%;">';
         document.body.style.overflow = 'hidden';
         var IE = window.navigator.appName.match(/microsoft/i);
         var hauteurHeader = document.getElementById('header').offsetHeight;
-        var hauteurAuthorImg = document.getElementById('author_image').offsetHeight;
-        var hauteurAuthorName = document.getElementById('author_name').offsetHeight;
-
+        //var hauteurAuthorImg = document.getElementById('author_image').offsetHeight;
+        //var hauteurAuthorName = document.getElementById('author_name').offsetHeight;
+        var hauteurAuthorImg = 0;
+        var hauteurAuthorName = 0;
         var hauteurMedia = 0;
         if ($("#lp_media_file").length != 0) {
             hauteurMedia = document.getElementById('lp_media_file').offsetHeight;
@@ -503,3 +505,4 @@ $_setting['show_navigation_menu'] = $save_setting;
 if ($debug) {
     error_log(' ------- end lp_view.php ------');
 }
+Display::display_footer();

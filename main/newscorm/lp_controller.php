@@ -199,10 +199,6 @@ if ($debug > 0) error_log('New LP - Passed oLP creation check', 0);
 
 $is_allowed_to_edit = api_is_allowed_to_edit(false, true, false, false);
 
-
-/**
- * Actions switching
- */
 if (isset($_SESSION['oLP'])) {
     $_SESSION['oLP']->update_queue = array(); // Reinitialises array used by javascript to update items in the TOC.
     $_SESSION['oLP']->message = ''; // Should use ->clear_message() method but doesn't work.
@@ -221,6 +217,7 @@ if (isset($_GET['isStudentView']) && $_GET['isStudentView'] == 'true') {
         if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'view' && !isset($_REQUEST['exeId'])) {
             $_REQUEST['action'] = 'build';
         }
+        $_SESSION['studentview'] = null;
     }
 }
 
@@ -312,21 +309,6 @@ switch ($action) {
             }
         }
         break;
-    case 'add_lp_category':
-        if (!$is_allowed_to_edit) {
-            api_not_allowed(true);
-        }
-        require 'lp_add_category.php';
-        break;
-    case 'delete_lp_category':
-        if (!$is_allowed_to_edit) {
-            api_not_allowed(true);
-        }
-        if (isset($_REQUEST['id'])) {
-            learnpath::delete_category($_REQUEST['id']);
-        }
-        require 'lp_list.php';
-        break;
     case 'add_lp':
         if (!$is_allowed_to_edit) {
             api_not_allowed(true);
@@ -355,7 +337,7 @@ switch ($action) {
                 	$expired_on   = null;
                 }
 
-                $new_lp_id = learnpath::add_lp(api_get_course_id(), Security::remove_XSS($_REQUEST['lp_name']), '', 'chamilo', 'manual', '', $publicated_on, $expired_on, $_REQUEST['category_id']);
+                $new_lp_id = learnpath::add_lp(api_get_course_id(), Security::remove_XSS($_REQUEST['lp_name']), '', 'chamilo', 'manual', '', $publicated_on, $expired_on);
 
                 if (is_numeric($new_lp_id)) {
                     // TODO: Maybe create a first module directly to avoid bugging the user with useless queries
@@ -682,14 +664,15 @@ switch ($action) {
             }
             $_SESSION['oLP']->set_theme($_REQUEST['lp_theme']);
 
-            if (isset($_REQUEST['hide_toc_frame'])) {
-                $_SESSION['oLP']->set_hide_toc_frame($_REQUEST['hide_toc_frame']);
+            if (isset($_REQUEST['hide_toc_frame']) && $_REQUEST['hide_toc_frame'] == 1) {
+                $hide_toc_frame = $_REQUEST['hide_toc_frame'];
+            } else {
+                $hide_toc_frame = null;
             }
+            $_SESSION['oLP']->set_hide_toc_frame($hide_toc_frame);
 
             $_SESSION['oLP']->set_prerequisite($_REQUEST['prerequisites']);
             $_SESSION['oLP']->set_use_max_score($_REQUEST['use_max_score']);
-
-            $_SESSION['oLP']->set_max_attempts($_REQUEST['max_attempts']);
 
             if (isset($_REQUEST['activate_start_date_check']) && $_REQUEST['activate_start_date_check'] == 1) {
             	$publicated_on  = $_REQUEST['publicated_on'];
@@ -704,7 +687,7 @@ switch ($action) {
             } else {
             	$expired_on   = null;
             }
-            $_SESSION['oLP']->set_category_id($_REQUEST['category_id']);
+
             $_SESSION['oLP']->set_modified_on();
             $_SESSION['oLP']->set_publicated_on($publicated_on);
             $_SESSION['oLP']->set_expired_on($expired_on);
@@ -901,11 +884,12 @@ switch ($action) {
     case 'switch_view_mode':
         if ($debug > 0) error_log('New LP - switch_view_mode action triggered', 0);
         if (!$lp_found) { error_log('New LP - No learnpath given for switch', 0); require 'lp_list.php'; }
-        $_SESSION['refresh'] = 1;
-        $_SESSION['oLP']->update_default_view_mode();
+        if (Security::check_token('get')) {
+            $_SESSION['refresh'] = 1;
+            $_SESSION['oLP']->update_default_view_mode();
+        }
         require 'lp_list.php';
         break;
-
     case 'switch_force_commit':
         if ($debug > 0) error_log('New LP - switch_force_commit action triggered', 0);
         if (!$lp_found) { error_log('New LP - No learnpath given for switch', 0); require 'lp_list.php'; }

@@ -51,19 +51,13 @@ if ($dokeos_chapter) {
     switch ($lp_type) {
         case 1:
             $_SESSION['oLP']->stop_previous_item();
-            $check_attempts = $_SESSION['oLP']->check_item_attempts($lp_item_id);
-            if ($check_attempts) {
-                $prereq_check = $_SESSION['oLP']->prerequisites_match($lp_item_id);
-                if ($prereq_check === true) {
-                    $src = $_SESSION['oLP']->get_link('http', $lp_item_id);
-                    $_SESSION['oLP']->start_current_item(); // starts time counter manually if asset
-                } else {
-                    $src = 'blank.php?error=prerequisites';
-                }
+            $prereq_check = $_SESSION['oLP']->prerequisites_match($lp_item_id);
+            if ($prereq_check === true) {
+                $src = $_SESSION['oLP']->get_link('http', $lp_item_id);
+                $_SESSION['oLP']->start_current_item(); // starts time counter manually if asset
             } else {
-                $src = 'blank.php?error=max_attempt_reached';
+                $src = 'blank.php?error=prerequisites';
             }
-
             break;
         case 2:
             $_SESSION['oLP']->stop_previous_item();

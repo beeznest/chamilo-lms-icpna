@@ -1140,10 +1140,13 @@ function update_toc(update_action, update_id, change_ids) {
     if (update_id != 0) {
         switch (update_action) {
             case 'unhighlight':
+                myelem.removeClass("scorm_item_highlight")
+                      .removeClass("scorm_item")
+                      .addClass("scorm_item");
                 if (update_id%2==0) {
-                    myelem.attr('class',"scorm_item_2");
+                    myelem.removeClass("scorm_item_1").addClass("scorm_item_2");
                 } else {
-                    myelem.attr('class',"scorm_item_1");
+                    myelem.removeClass("scorm_item_2").addClass("scorm_item_1");
                 }
                 break;
             case 'highlight':
@@ -1151,43 +1154,52 @@ function update_toc(update_action, update_id, change_ids) {
                    olms.lms_next_item = update_id;
                    olms.lms_previous_item = update_id;
                 }
-                myelem.attr('class',"scorm_item_highlight");
+                myelem.removeClass("scorm_item_1")
+                      .removeClass("scorm_item_2")
+                      .addClass("scorm_item_highlight");
                 break;
             case 'not attempted':
-                if( myelemimg.attr('src') != '../img/notattempted.gif') {
-                    myelemimg.attr('src','../img/notattempted.gif');
-                    myelemimg.attr('alt','n');
-                }
+                myelem.removeClass("scorm-status-completed")
+                      .removeClass("scorm-status-failed")
+                      .addClass("scorm-status-not-attempted")
+                      .removeAttr("alt")
+                      .attr("alt","n");
                 break;
             case 'incomplete':
-                if( myelemimg.attr('src') != '../img/incomplete.png') {
-                    myelemimg.attr('src','../img/incomplete.png');
-                    myelemimg.attr('alt','i');
-                }
+                myelem.removeClass("scorm-status-completed")
+                      .removeClass("scorm-status-failed")
+                      .addClass("scorm-status-not-attempted")
+                      .removeAttr("alt")
+                      .attr("alt","i");
                 break;
             case 'completed':
-                if( myelemimg.attr('src') != '../img/completed.png') {
-                    myelemimg.attr('src','../img/completed.png');
-                    myelemimg.attr('alt','c');
-                }
-                break;
-            case 'failed':
-                if( myelemimg.attr('src') != '../img/delete.png') {
-                    myelemimg.attr('src','../img/delete.png');
-                    myelemimg.attr('alt','f');
-                }
+                myelem.removeClass("scorm-status-not-attempted")
+                      .removeClass("scorm-status-failed")
+                      .addClass("scorm-status-completed")
+                      .removeAttr("alt")
+                      .attr("alt","c");
                 break;
             case 'passed':
-                if( myelemimg.attr('src') != '../img/completed.png' && myelemimg.attr('alt') != 'passed') {
-                    myelemimg.attr('src','../img/completed.png');
-                    myelemimg.attr('alt','p');
-                }
+                myelem.removeClass("scorm-status-not-attempted")
+                      .removeClass("scorm-status-failed")
+                      .addClass("scorm-status-completed")
+                      .removeAttr("alt")
+                      .attr("alt","p");
+                break;
+            case 'failed':
+                myelem.removeClass("scorm-status-not-attempted")
+                      .removeClass("scorm-status-completed")
+                      .addClass("scorm-status-failed")
+                      .removeAttr("alt")
+                      .attr("alt","f");
                 break;
             case 'browsed':
-                if( myelemimg.attr('src') != '../img/completed.png' && myelemimg.attr('alt') != 'browsed') {
-                    myelemimg.attr('src','../img/completed.png');
-                    myelemimg.attr('alt','b');
-                }
+                myelem.removeClass("scorm-status-not-attempted")
+                      .removeClass("scorm-status-failed")
+                      .addClass("scorm-status-completed")
+                      .addClass("scorm-status-browsed")
+                      .removeAttr("alt")
+                      .attr("alt","b");
                 break;
             default:
                 logit_lms('Update action unknown',2);

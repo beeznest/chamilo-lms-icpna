@@ -4023,7 +4023,7 @@ footer {
     text-align: center;
 }
 
-.inner_lp_toc {
+/*.inner_lp_toc {
     overflow: auto;
     background-color: white;
     height: 210px;
@@ -4107,7 +4107,7 @@ footer {
     padding: 10px 0px 10px 0px;
     text-decoration: none;
     font-weight: normal;
-    /* background:#FDFDFD; */
+    /* background:#FDFDFD; 
 }
 
 .inner_lp_toc .scorm_item_2 {
@@ -4134,7 +4134,7 @@ footer {
     height:20px;
     width: 70%;
 }
-
+*/
 
 .bottom_actions {
     display: block;

@@ -65,7 +65,7 @@ footer {
     background-image: url(images/color.png);
     background-repeat:repeat-x;    
     color:#ffffff;
-    height: 11em;
+    height: 15em;
 }
 
 footer .container .row{
@@ -873,6 +873,13 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
   background-color: #5ECAD4;
   padding: 10px;
   max-height: 40px;
+  font-size: 12px;
+}
+.celeste a{
+  color: #000;
+}
+.celeste a:hover{
+  text-decoration: underline;
 }
 .home-ico a {
 font-size: 15px;
@@ -923,7 +930,7 @@ color: #fff;
 }
 
 }
-
+    
 @media (min-width: 481px) and (max-width: 981px) {
 header .row-fluid .span9 {
   width: auto;
@@ -935,6 +942,7 @@ header .row-fluid .span9 {
   width: 100px;
 }
 
+
 }
 /*FIN DE ICPNA MODULO*/
 
@@ -943,68 +951,10 @@ header .row-fluid .span9 {
   min-height: 800px;
   width:100%;
 }
-#scorm_title {
-  display: none;
-}
-
-.inner_lp_toc .scorm_item_highlight {
-  background: #d80100;
-  border: 1px solid #999999;
-  font-weight: normal;
-  margin-right: 0;
-  padding: 10px 0;
-  text-decoration: none;
-  text-shadow: none;
-  color: #fff;
-}
-
-.inner_lp_toc .scorm_item_highlight .item a{
-  color: #fff;
-}
-.inner_lp_toc .scorm_item a {
-  font-size: 14px;
-  margin-right: 1px;
-  padding-bottom: 2px;
-  text-decoration: none;
-  font-weight: normal;
-}
-
-.inner_lp_toc .scorm_item_1 {
-  background: transparent;
-  border-bottom: 1px solid #CCCCCC;
-  color: #444444;
-  font-weight: normal;
-  margin-right: 1px;
-  padding: 10px 0;
-  text-decoration: none;
-  text-shadow: 0 1px 1px #F6F6F6;
-}
-
-.inner_lp_toc .scorm_item_2 {
-  background: transparent;
-  border-bottom: 1px solid #CCCCCC;
-  color: #444444;
-  font-weight: normal;
-  margin-right: 1px;
-  padding: 10px 0;
-  text-decoration: none;
-}
-
-.inner_lp_toc {
-  background-color: #FFFFFF;
-  height: 100%;
-  overflow:hidden;
-}
 #learning_path_left_zone {
-  float: left;
-  height: 1024px;
-  padding: 10px 4px;
-  width: 200px;
-  background-color:#eee; 
-}
-
-.inner_lp_toc .scorm-status-completed{
-  background: url(images/check.png) no-repeat;
-  background-color: #FCFCFC;
+    float: left;
+    padding-left: 8px;
+    padding-right: 4px;
+    width: 200px;
 }
 /*FIN DEL ESTILO PARA MODULO DE SCROOM*/

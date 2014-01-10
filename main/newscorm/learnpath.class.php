@@ -2815,7 +2815,7 @@ class learnpath {
                 }
             } else {
                 if ($item['type'] != 'dokeos_chapter' && $item['type'] != 'dokeos_module' && $item['type'] != 'dir') {
-                    $add_class = $class_name['completed'];
+                    $add_class = $class_name[$item['status']];
                 }
             }
             $add_class_level = 'scorm-level-4';
@@ -2844,7 +2844,7 @@ class learnpath {
             }
 
             //if ($scorm_color_background != '') {
-                $html .= '<div id="toc_' . $item['id'] . '" class="' . $add_class_level . ' ' . $add_class . ' ' . $scorm_color_background . ' ' . $style . ' ' . $style_item . '">';
+                $html .= '<div id="toc_' . $item['id'] . '" class="' . $add_class_level . ' ' . $add_class . ' ' . $scorm_color_background . ' ' . (($style != $scorm_color_background)?$style:'') . ' ' . $style_item . '">';
             //}
 
             // The anchor will let us center the TOC on the currently viewed item &^D

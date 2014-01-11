@@ -292,7 +292,7 @@ if (isset($_SESSION['status']) && $_SESSION['status'][$course_code] == 5) {
 $_SESSION['loaded_lp_view'] = true;
 
 $display_none = '';
-$margin_left = '225px';
+$margin_left = '255px';
 
 //Media player code
 

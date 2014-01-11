@@ -30,14 +30,23 @@
     padding-bottom: 2px;
     text-decoration: none;
     font-family: Helvetica,Arial,sans-serif;
-    color: #2F3E46;    
+   
 }
 
 .inner_lp_toc .scorm_item a.chapter_module {
     font-weight: normal;
     margin-right: 10px;
 }
+
+.inner_lp_toc .scorm-status-completed{
+    background-color: #666573;
+    background-image: url("images/check.png");
+    background-position: 190px center;
+    background-repeat: no-repeat;
+}
+
 .inner_lp_toc .scorm_item_highlight {   
+<<<<<<< HEAD
     border:1px solid #00516e;
     background:#4b88b6;
     font-weight:bold;
@@ -52,6 +61,19 @@
     margin-right: 0px;
     padding: 10px 0px 10px 0px;
     text-decoration: none;  
+=======
+    /*background-color: #d80100; */ /* Color Rojo */ 
+    background-color: #0134A1;  /* Color Azul */
+    padding: 10px 10px 10px 35px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    background-image: url(images/flecha.png);
+    background-position: 15px center;
+    background-repeat: no-repeat;
+>>>>>>> a2ca283... Improvements to LP display with new theme - refs BT#7154
 }
 
 .inner_lp_toc .scorm_item_highlight a {
@@ -61,6 +83,7 @@
     font-weight: bold;
 }
 
+<<<<<<< HEAD
 .inner_lp_toc .scorm_item_section {
     border:1px solid #222;
     background:#333;
@@ -79,6 +102,8 @@
     text-decoration: none;  
     
 }
+=======
+>>>>>>> a2ca283... Improvements to LP display with new theme - refs BT#7154
 
 .inner_lp_toc .scorm_item {
     font-size: 16px;
@@ -89,6 +114,7 @@
 }
 
 .inner_lp_toc .scorm_item_1 {
+<<<<<<< HEAD
     border-bottom: 1px solid #CCCCCC;
     background:#eee;
     font-weight:bold;
@@ -104,11 +130,16 @@
     margin-right: 1px;
     padding: 10px 0px 10px 0px;
     text-decoration: none;
+=======
+    /*background-color:#CCCCCC;*/   
+    padding: 10px 10px 10px 35px;
+>>>>>>> a2ca283... Improvements to LP display with new theme - refs BT#7154
     font-weight: normal;
     /* background:#FDFDFD; */   
 }
 
 .inner_lp_toc .scorm_item_2 {    
+<<<<<<< HEAD
     background-image:-webkit-gradient(linear,left top,left bottom,from(#fdfdfd),to(#eee));
     background-image:-webkit-linear-gradient(top,#fdfdfd,#eee);
     background-image:-moz-linear-gradient(top,#fdfdfd,#eee);
@@ -123,6 +154,28 @@
     padding: 10px 0px 10px 0px;
     text-decoration: none;
     font-weight: normal;
+=======
+    /*background-color: #CCCCCC; */
+    padding: 10px 10px 10px 35px;
+    text-decoration: none;
+    font-weight: normal;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.inner_lp_toc .scorm-level-0 a{
+    color: #fff;
+}
+
+.inner_lp_toc .scorm-status-not-attempted{
+     background-color: #CCCCCC;
+}
+.inner_lp_toc .scorm-status-not-attempted a{
+    color: #000;
+>>>>>>> a2ca283... Improvements to LP display with new theme - refs BT#7154
 }
 
 .inner_lp_toc .scorm_title {

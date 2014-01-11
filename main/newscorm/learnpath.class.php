@@ -2760,7 +2760,7 @@ class learnpath {
         if (empty($toc_list)) {
             $toc_list = $this->get_toc();
         }
-        $html = '<div id="scorm_title" class="scorm_title">'.Security::remove_XSS($this->get_name()) . '</div>';
+        //$html = '<div id="scorm_title" class="scorm_title">'.Security::remove_XSS($this->get_name()) . '</div>';
 
         $hide_teacher_icons_lp = isset($_configuration['hide_teacher_icons_lp']) ? $_configuration['hide_teacher_icons_lp'] : true;
 

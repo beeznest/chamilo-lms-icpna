@@ -29,15 +29,24 @@
     padding-bottom: 2px;
     text-decoration: none;
     font-family: Helvetica,Arial,sans-serif;
-    color: #2F3E46;    
+   
 }
 
 .inner_lp_toc .scorm_item a.chapter_module {
     font-weight: normal;
     margin-right: 10px;
 }
+
+.inner_lp_toc .scorm-status-completed{
+    background-color: #666573;
+    background-image: url("images/check.png");
+    background-position: 190px center;
+    background-repeat: no-repeat;
+}
+
 .inner_lp_toc .scorm_item_highlight {   
-    background-color: #d80100; 
+    /*background-color: #d80100; */ /* Color Rojo */ 
+    background-color: #0134A1;  /* Color Azul */
     padding: 10px 10px 10px 35px;
     margin-top: 5px;
     margin-bottom: 5px;
@@ -55,17 +64,6 @@
     text-decoration: none;
 }
 
-.inner_lp_toc .scorm-status-completed{
-    background-color: #333;
-}
-
-/*.inner_lp_toc .scorm_item_section {
-    border:1px solid #222;
-    background:#333;
-    color:#fff; 
-    margin-right: 1px;
-    padding: 10px;
-}*/
 
 .inner_lp_toc .scorm_item {
     font-size: 12px;
@@ -76,7 +74,7 @@
 }
 
 .inner_lp_toc .scorm_item_1 {
-    background-color:#CCCCCC;   
+    /*background-color:#CCCCCC;*/   
     padding: 10px 10px 10px 35px;
     font-weight: normal;
     margin-top: 5px;
@@ -88,7 +86,7 @@
 }
 
 .inner_lp_toc .scorm_item_2 {    
-    background-color: #CCCCCC; 
+    /*background-color: #CCCCCC; */
     padding: 10px 10px 10px 35px;
     text-decoration: none;
     font-weight: normal;
@@ -99,10 +97,14 @@
     border-radius: 5px;
 }
 
-.inner_lp_toc .scorm_item_2 a{
-    color: #000;
+.inner_lp_toc .scorm-level-0 a{
+    color: #fff;
 }
-.inner_lp_toc .scorm_item_1 a{
+
+.inner_lp_toc .scorm-status-not-attempted{
+     background-color: #CCCCCC;
+}
+.inner_lp_toc .scorm-status-not-attempted a{
     color: #000;
 }
 

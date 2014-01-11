@@ -8,7 +8,7 @@
 /* the following for regular <a> elements */
 a {
     text-decoration: none;
-    color :#3757f7
+    /*color :#3757f7*/
 }
 a:visited {
     text-decoration: none;    
@@ -955,6 +955,6 @@ header .row-fluid .span9 {
     float: left;
     padding-left: 8px;
     padding-right: 4px;
-    width: 200px;
+    width: 235px;
 }
 /*FIN DEL ESTILO PARA MODULO DE SCROOM*/

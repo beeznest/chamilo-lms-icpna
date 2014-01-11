@@ -2760,7 +2760,7 @@ class learnpath {
         if (empty($toc_list)) {
             $toc_list = $this->get_toc();
         }
-        $html = '<div id="scorm_title" class="scorm_title">'.Security::remove_XSS($this->get_name()) . '</div>';
+        //$html = '<div id="scorm_title" class="scorm_title">'.Security::remove_XSS($this->get_name()) . '</div>';
 
         $hide_teacher_icons_lp = isset($_configuration['hide_teacher_icons_lp']) ? $_configuration['hide_teacher_icons_lp'] : true;
 
@@ -2844,7 +2844,11 @@ class learnpath {
             }
 
             //if ($scorm_color_background != '') {
+<<<<<<< HEAD
                 $html .= '<div id="toc_' . $item['id'] . '" class="' . $add_class_level . ' ' . $add_class . ' ' . $scorm_color_background . ' ' . (($style != $scorm_color_background)?$style:'') . ' ' . $style_item . '">';
+=======
+                $html .= '<div id="toc_' . $item['id'] . '" class="' . $add_class_level . ' ' . $add_class . ' ' . $scorm_color_background . ' ' . (($style != $scorm_color_background)?$style:'') . ' ">';
+>>>>>>> 682ec943a9958e7ca86b27be233a3ba3a1bf319b
             //}
 
             // The anchor will let us center the TOC on the currently viewed item &^D

@@ -1090,7 +1090,7 @@ class learnpath {
         $res_select = Database::query($sql_select);
         $row_select = Database :: fetch_array($res_select);
         $audio_update_sql = '';
-        if (is_array($audio) && !empty ($audio['tmp_name']) && $audio['error'] === 0) {
+	if (is_array($audio) && !empty ($audio['tmp_name']) && $audio['error'] === 0) {
             // Create the audio folder if it does not exist yet.
             global $_course;
             $filepath = api_get_path(SYS_COURSE_PATH) . $_course['path'] . '/document/';
@@ -2844,7 +2844,7 @@ class learnpath {
             }
 
             //if ($scorm_color_background != '') {
-                $html .= '<div id="toc_' . $item['id'] . '" class="' . $add_class_level . ' ' . $add_class . ' ' . $scorm_color_background . ' ' . (($style != $scorm_color_background)?$style:'') . ' ">';
+                $html .= '<div id="toc_' . $item['id'] . '" class="' . $add_class_level . ' ' . $add_class . ' ' . $scorm_color_background . ' ' . (($style != $scorm_color_background)?$style:'') . '">';
             //}
 
             // The anchor will let us center the TOC on the currently viewed item &^D

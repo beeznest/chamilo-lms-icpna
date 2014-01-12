@@ -1171,7 +1171,7 @@ class Template {
         $session_name   = api_get_session_name($session_id);
         $_course        = api_get_course_info();
         $user_id        = api_get_user_id();
-        $course_id      = api_get_course_id();
+        $course_code    = api_get_course_id();
 
 
         /*  Plugins for banner section */
@@ -1292,14 +1292,14 @@ class Template {
 
         /* Part 4 . Show the teacher view/student view button at the right of the breadcrumb */
         $view_as_student_link = null;
-        if ($user_id && isset($course_id)) {
+        if ($user_id && isset($course_code)) {
             if ((api_is_course_admin() || api_is_course_coach() || api_is_platform_admin()) && api_get_setting('student_view_enabled') == 'true') {
                 $view_as_student_link = api_display_tool_view_option();
             }
             // if we know the user and we are in a course, get the total course
             // progress to show globally from the template (header, breadcrumb, etc)
             require_once api_get_path(LIBRARY_PATH).'tracking.lib.php';
-            $progress = tracking::get_avg_student_progress($user_id, $course_id, null, $session_id);
+            $progress = tracking::get_avg_student_progress($user_id, $course_code, null, $session_id);
             $this->assign('course_progress', $progress);
         }
 

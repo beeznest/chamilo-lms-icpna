@@ -562,10 +562,7 @@ class Template {
         }
         $this->assign('message_link', $message_link);
 
-        $institution = api_get_setting('Institution');
-        $portal_name = empty($institution) ? api_get_setting('siteName') : $institution;
-
-        $this->assign('portal_name', $portal_name);
+        // portal_name and site_name are available in the template's "_s" array
 
         //Menu
         $menu = $this->return_menu();
@@ -1178,18 +1175,23 @@ class Template {
             switch (api_get_setting('breadcrumbs_course_homepage')) {
                 case 'get_lang':
                     $navigation_item['title'] = Display::img(api_get_path(WEB_CSS_PATH).'home.png', get_lang('CourseHomepageLink')).' '.get_lang('CourseHomepageLink');
+                    $this->assign('breadcrumb_course_title', get_lang('CourseHomepageLink'));
                     break;
                 case 'course_code':
                     $navigation_item['title'] = Display::img(api_get_path(WEB_CSS_PATH).'home.png', $_course['official_code']).' '.$_course['official_code'];
+                    $this->assign('breadcrumb_course_title', $_course['official_code']);
                     break;
                 case 'session_name_and_course_title':
                     $navigation_item['title'] = Display::img(api_get_path(WEB_CSS_PATH).'home.png', $_course['name'].$my_session_name).' '.$course_title.$my_session_name;
+                    $this->assign('breadcrumb_course_title', $course_title.$my_session_name);
                     break;
                 default:
                     if (api_get_session_id() != -1 ) {
                         $navigation_item['title'] = Display::img(api_get_path(WEB_CSS_PATH).'home.png', $_course['name'].$my_session_name).' '.$course_title.$my_session_name;
+                        $this->assign('breadcrumb_course_title', $course_title.$my_session_name);
                     } else {
                         $navigation_item['title'] = Display::img(api_get_path(WEB_CSS_PATH).'home.png', $_course['name']).' '.$course_title;
+                        $this->assign('breadcrumb_course_title', $course_title);
                     }
                     break;
             }
@@ -1199,6 +1201,7 @@ class Template {
             $navigation_item_my_courses['url'] = api_get_path(WEB_PATH).'user_portal.php';
             $navigation[] = $navigation_item_my_courses;
             */
+            $this->assign('breadcrumb_course_url', $navigation_item['url']);
             $navigation[] = $navigation_item;
         }
 
@@ -1248,6 +1251,8 @@ class Template {
             $navigation_item['url'] = '#';
             $navigation_item['title'] = $nameTools;
             $navigation[] = $navigation_item;
+            $this->assign('breadcrumb_tool_name', $nameTools);
+            $this->assign('breadcrumb_tool_url', $navigation_item['url']);
         }
 
         $final_navigation = array();

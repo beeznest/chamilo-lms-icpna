@@ -304,9 +304,9 @@ $(function() {
 </script>
 {{ header_extra_content }}
 
-<!-- PARA MOSTRAR BARRA DE PROGRESO -->
+<!-- Animated progress bar -->
 <script type="text/javascript">
 $(document).ready(function(){
-       $(".uno").filter(':not(:animated)').animate({width:'70%'},{duration:3500});
+       $(".blue-back-bar").filter(':not(:animated)').animate({width:'70%'},{duration:3500});
 });
 </script>

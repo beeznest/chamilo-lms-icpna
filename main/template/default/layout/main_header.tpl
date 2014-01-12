@@ -50,7 +50,7 @@
             <div id='cssmenu'>
             <ul>
                <li class='has-sub'><a href='#'><span>
-               <img src="{{ _p.web }}/main/upload/users/1/1/medium_1_52cd7d4aa8bf5_USER.jpg" class="user-pic" />
+               <img src="{{ _u.avatar_small }}" class="user-pic" />
                <span class="welcome">{{"Welcome"|get_lang}}</span><br />
                <span class="username">{{u.complete_name}}</span>
                </span></a>
@@ -71,11 +71,11 @@
     <div class="row-fluid">
         <div class="span12 light-blue-bar">
           <div class="row-fluid">
-            <div class="span7"> <div class="main-start">{{ portal_name }} - <a href="#">Módulo 3</a></div></div>
+            <div class="span7"> <div class="main-start">{{ _s.site_name }} - <a href="{{ breadcrumb_course_url }}">{{ breadcrumb_course_title }}</a></div></div>
             <div class="span5">           
               <div class="row-fluid">
                 <div class="span9">
-                    <a href="#">Proceso: Módulo 3</a>
+                    <a href="{{ breadcrumb_course_url }}">{{"Progress"|get_lang}}: {{ breadcrumb_course_title }}</a>
                     <div id="bar-animation">
                     <div class="color-bar-process blue-back-bar"><span>70%</span></div>
                 </div>

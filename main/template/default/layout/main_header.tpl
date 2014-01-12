@@ -55,9 +55,9 @@
                <span class="username">{{u.complete_name}}</span>
                </span></a>
                   <ul>
-                     <li class="home"><a href='#'><span>{{ "Profile" |get_lang }}</span></a></li>
-                     <li class="edit"><a href='#'><span>{{ "EditProfile "|get_lang }}</span></a></li>
-                     <li class="close"><a href='#'><span>{{ "Logout" |get_lang }}</span></a></li>
+                     <li class="home"><a href='{{ _p.web_main }}social/home.php'><span>{{ "Profile" |get_lang }}</span></a></li>
+                     <li class="edit"><a href='{{ _p.web_main }}auth/profile.php'><span>{{ "EditProfile" |get_lang }}</span></a></li>
+                     <li class="close"><a href='{{ logout_link }}'><span>{{ "Logout" |get_lang }}</span></a></li>
                   </ul>
                </li>
             </ul>
@@ -75,9 +75,11 @@
             <div class="span5">           
               <div class="row-fluid">
                 <div class="span9">
+                    {% if course_is_set %}
                     <a href="{{ breadcrumb_course_url }}">{{"Progress"|get_lang}}: {{ breadcrumb_course_title }}</a>
                     <div id="bar-animation">
                     <div class="color-bar-process blue-back-bar"><span>{{ course_progress }}%</span></div>
+                    {% endif %}
                 </div>
                 </div>
                 <div class="span2">

@@ -303,7 +303,7 @@ header #logo {
   text-align: right;
 }
 
-#animacion {
+#bar-animation {
     background-color: #fff;
     /*padding: 4px 4px 4px 4px;*/
     height: 15px;
@@ -329,7 +329,7 @@ header #logo {
     font-family: "Tahoma", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
     color: #fff;
 }
-.uno{
+.blue-back-bar{
     background-color: #5e92ff;
 }
 
@@ -721,7 +721,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
     line-height: 12px;
 
 }
-#cssmenu .usermane{
+#cssmenu .username{
     font-size: 12px;
     text-transform: capitalize;
 }
@@ -841,10 +841,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
 #cssmenu .edit{
     background:url(images/iconos-perfil.png) no-repeat 15px -30px;
 }
-#cssmenu .closed{
+#cssmenu .close{
     background:url(images/iconos-perfil.png) no-repeat 15px -75px;
 }
-.imagen-username{
+.user-pic{
      background-color: #fff;
      padding: 2px; 
     -webkit-border-radius: 150px;
@@ -869,16 +869,16 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
   margin-bottom: 20px;
 }
 
-.celeste {
+.light-blue-bar {
   background-color: #5ECAD4;
   padding: 10px;
   max-height: 40px;
   font-size: 12px;
 }
-.celeste a{
+.light-blue-bar a{
   color: #000;
 }
-.celeste a:hover{
+.light-blue-bar a:hover{
   text-decoration: underline;
 }
 .home-ico a {
@@ -919,7 +919,7 @@ color: #fff;
   width: 90%;
 }
 
-#animacion {
+#bar-animation {
   width: 150px;
 }
 .imagen-username{
@@ -938,7 +938,7 @@ header .row-fluid .span9 {
 
 }
 @media (max-width: 800px) {
-#animacion {
+#bar-animation {
   width: 100px;
 }
 

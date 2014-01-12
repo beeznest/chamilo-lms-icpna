@@ -1090,7 +1090,7 @@ class learnpath {
         $res_select = Database::query($sql_select);
         $row_select = Database :: fetch_array($res_select);
         $audio_update_sql = '';
-        if (is_array($audio) && !empty ($audio['tmp_name']) && $audio['error'] === 0) {
+	if (is_array($audio) && !empty ($audio['tmp_name']) && $audio['error'] === 0) {
             // Create the audio folder if it does not exist yet.
             global $_course;
             $filepath = api_get_path(SYS_COURSE_PATH) . $_course['path'] . '/document/';
@@ -2760,7 +2760,7 @@ class learnpath {
         if (empty($toc_list)) {
             $toc_list = $this->get_toc();
         }
-        //$html = '<div id="scorm_title" class="scorm_title">'.Security::remove_XSS($this->get_name()) . '</div>';
+        $html = '<div id="scorm_title" class="scorm_title">'.Security::remove_XSS($this->get_name()) . '</div>';
 
         $hide_teacher_icons_lp = isset($_configuration['hide_teacher_icons_lp']) ? $_configuration['hide_teacher_icons_lp'] : true;
 
@@ -2844,11 +2844,7 @@ class learnpath {
             }
 
             //if ($scorm_color_background != '') {
-<<<<<<< HEAD
-                $html .= '<div id="toc_' . $item['id'] . '" class="' . $add_class_level . ' ' . $add_class . ' ' . $scorm_color_background . ' ' . (($style != $scorm_color_background)?$style:'') . ' ' . $style_item . '">';
-=======
-                $html .= '<div id="toc_' . $item['id'] . '" class="' . $add_class_level . ' ' . $add_class . ' ' . $scorm_color_background . ' ' . (($style != $scorm_color_background)?$style:'') . ' ">';
->>>>>>> 682ec943a9958e7ca86b27be233a3ba3a1bf319b
+                $html .= '<div id="toc_' . $item['id'] . '" class="' . $add_class_level . ' ' . $add_class . ' ' . $scorm_color_background . ' ' . (($style != $scorm_color_background)?$style:'') . '">';
             //}
 
             // The anchor will let us center the TOC on the currently viewed item &^D

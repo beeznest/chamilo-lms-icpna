@@ -55,9 +55,9 @@
                <span class="username">{{u.complete_name}}</span>
                </span></a>
                   <ul>
-                     <li class="home"><a href='#'><span>{{Profile|get_lang}}</span></a></li>
-                     <li class="edit"><a href='#'><span>{{EditProfile|get_lang}}</span></a></li>
-                     <li class="close"><a href='#'><span>{{Logout|get_lang}}</span></a></li>
+                     <li class="home"><a href='#'><span>{{ "Profile" |get_lang }}</span></a></li>
+                     <li class="edit"><a href='#'><span>{{ "EditProfile "|get_lang }}</span></a></li>
+                     <li class="close"><a href='#'><span>{{ "Logout" |get_lang }}</span></a></li>
                   </ul>
                </li>
             </ul>
@@ -81,9 +81,11 @@
                 </div>
                 </div>
                 <div class="span2">
-                    <a href="#">
+                    {% if help_url != '' %}
+                    <a href="{{ help_url }}" class="ajax">
                       <img src="{{ _p.web_css }}ICPNA/images/help.png">
                     </a>
+                    {% endif %}
                 </div>
               </div>
             </div>

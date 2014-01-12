@@ -1278,6 +1278,10 @@ class Template {
             if ((api_is_course_admin() || api_is_course_coach() || api_is_platform_admin()) && api_get_setting('student_view_enabled') == 'true') {
                 $view_as_student_link = api_display_tool_view_option();
             }
+            // if we know the user and we are in a course, get the total course
+            // progress to show globally from the template (header, breadcrumb, etc)
+            $progress = tracking::get_avg_student_progress($user_id, $course_id, null, $session_id);
+            $this->assign('course_progress', $progress);
         }
 
         if (!empty($final_navigation)) {

@@ -307,6 +307,6 @@ $(function() {
 <!-- Animated progress bar -->
 <script type="text/javascript">
 $(document).ready(function(){
-       $(".blue-back-bar").filter(':not(:animated)').animate({width:'70%'},{duration:3500});
+       $(".blue-back-bar").filter(':not(:animated)').animate({width:'{{ course_progress }}%'},{duration:2000});
 });
 </script>

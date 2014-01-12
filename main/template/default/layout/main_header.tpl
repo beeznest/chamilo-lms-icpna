@@ -77,7 +77,7 @@
                 <div class="span9">
                     <a href="{{ breadcrumb_course_url }}">{{"Progress"|get_lang}}: {{ breadcrumb_course_title }}</a>
                     <div id="bar-animation">
-                    <div class="color-bar-process blue-back-bar"><span>70%</span></div>
+                    <div class="color-bar-process blue-back-bar"><span>{{ course_progress }}%</span></div>
                 </div>
                 </div>
                 <div class="span2">

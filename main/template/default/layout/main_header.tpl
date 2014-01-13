@@ -49,7 +49,7 @@
                       <li class='has-sub'><a href='#'><span>
                       <img src="{{ _u.avatar}}" class="user-pic" />
                       <span class="welcome">{{"Welcome"|get_lang}}</span><br />
-                      <span class="username">{{u.complete_name}}</span></span></a>
+                      <span class="username">{{_u.complete_name}}</span></span></a>
                       <ul>
                          <li class="home"><a href='{{ _p.web_main }}social/home.php'><span>{{ "Profile" |get_lang }}</span></a></li>
                          <li class="edit"><a href='{{ _p.web_main }}auth/profile.php'><span>{{ "EditProfile" |get_lang }}</span></a></li>

@@ -218,14 +218,14 @@ $introduction_section .=  $thematic_description_html;
 $introduction_section .=  '</div>';
 
 $introduction_section .=  '<div class="span12">';
-if ($intro_dispDefault) {	
-	$intro_content = $intro_content;
-	if (!empty($intro_content))	{
-		$introduction_section .=  $intro_content;
-	}
-	$introduction_section .= '<div class="span12">';
-	$introduction_section .= "<a href=\"".api_get_self()."?intro_iconListEdit=1\">".Display::return_icon('edit.png',get_lang('Modify'),'',ICON_SIZE_SMALL)."</a>";
-	$introduction_section .= '</div>';
+if ($intro_dispDefault) {
+    $intro_content = $intro_content;
+    if (!empty($intro_content))	{
+        $introduction_section .=  $intro_content;
+    }
+    $introduction_section .= '<div class="span12">';
+    $introduction_section .= "<a href=\"".api_get_self()."?intro_iconListEdit=1\">".Display::return_icon('edit.png',get_lang('Modify'),'',ICON_SIZE_SMALL)."</a>";
+    $introduction_section .= '</div>';
 }
 $introduction_section .=  '</div>';
 

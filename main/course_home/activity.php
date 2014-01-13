@@ -14,10 +14,12 @@
  */
 function return_block($title, $content)
 {
-    $html = '<div class="page-header">
-<h3>'.$title.'</h3>
-</div>
-'.$content.'</div>';
+    $html = '<div style="clear: both;">&nbsp;</div>'
+            .'<div class="page-header">'
+            .'<h3>'.$title.'</h3>'
+            .'</div>'
+            .$content;
+            //.'</div>';
     return $html;
 }
 

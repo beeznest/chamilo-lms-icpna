@@ -229,30 +229,30 @@ if ($intro_dispDefault) {
 }
 $introduction_section .=  '</div>';
 
-if ($intro_dispCommand) {    
-	if (empty($intro_content)) {
-		// Displays "Add intro" commands
-		$introduction_section .=  '<div id="courseintro_empty">';
-		if (!empty ($GLOBALS['_cid'])) {			
-			$introduction_section .=  "<a href=\"".api_get_self()."?".api_get_cidreq()."&amp;intro_cmdAdd=1\">";            
-            $introduction_section .=  Display::return_icon('introduction_add.gif', get_lang('AddIntro')).' ';            		
-			$introduction_section .=  "</a>";
-		} else {
-			$introduction_section .= "<a href=\"".api_get_self()."?intro_cmdAdd=1\">\n".get_lang('AddIntro')."</a>";
-		}
-		$introduction_section .= "</div>";
+if ($intro_dispCommand) {
+    if (empty($intro_content)) {
+        // Displays "Add intro" commands
+        $introduction_section .=  '<div id="courseintro_empty">';
+        if (!empty ($GLOBALS['_cid'])) {
+            $introduction_section .=  "<a href=\"".api_get_self()."?".api_get_cidreq()."&amp;intro_cmdAdd=1\">";
+            $introduction_section .=  Display::return_icon('introduction_add.gif', get_lang('AddIntro')).' ';
+            $introduction_section .=  "</a>";
+        } else {
+            $introduction_section .= "<a href=\"".api_get_self()."?intro_cmdAdd=1\">\n".get_lang('AddIntro')."</a>";
+        }
+        $introduction_section .= "</div>";
 
-	} else {
-		// Displays "edit intro && delete intro" commands
-		$introduction_section .=  '<div id="courseintro_empty">';
-		if (!empty ($GLOBALS['_cid'])) {
-			$introduction_section .=  "<a href=\"".api_get_self()."?".api_get_cidreq()."&amp;intro_cmdEdit=1\">".Display::return_icon('edit.png',get_lang('Modify'),'',ICON_SIZE_SMALL)."</a>";			
-			$introduction_section .=  "<a href=\"".api_get_self()."?".api_get_cidreq()."&amp;intro_cmdDel=1\" onclick=\"javascript:if(!confirm('".addslashes(api_htmlentities(get_lang('ConfirmYourChoice'),ENT_QUOTES,$charset))."')) return false;\">".Display::return_icon('delete.png',get_lang('Delete'),'',ICON_SIZE_SMALL)."</a>";
-		} else {
-			$introduction_section .=  "<a href=\"".api_get_self()."?intro_cmdEdit=1\">".Display::return_icon('edit.png',get_lang('Modify'),'',ICON_SIZE_SMALL)."</a>";			
-			$introduction_section .=  "<a href=\"".api_get_self()."?intro_cmdDel=1\" onclick=\"javascript:if(!confirm('".addslashes(api_htmlentities(get_lang('ConfirmYourChoice'),ENT_QUOTES,$charset))."')) return false;\">".Display::return_icon('delete.png',get_lang('Delete'),'',ICON_SIZE_SMALL)."</a>";
-		}
-		$introduction_section .=  "</div>";
-	}
+    } else {
+    // Displays "edit intro && delete intro" commands
+        $introduction_section .=  '<div id="courseintro_empty">';
+        if (!empty ($GLOBALS['_cid'])) {
+            $introduction_section .=  "<a href=\"".api_get_self()."?".api_get_cidreq()."&amp;intro_cmdEdit=1\">".Display::return_icon('edit.png',get_lang('Modify'),'',ICON_SIZE_SMALL)."</a>";
+            $introduction_section .=  "<a href=\"".api_get_self()."?".api_get_cidreq()."&amp;intro_cmdDel=1\" onclick=\"javascript:if(!confirm('".addslashes(api_htmlentities(get_lang('ConfirmYourChoice'),ENT_QUOTES,$charset))."')) return false;\">".Display::return_icon('delete.png',get_lang('Delete'),'',ICON_SIZE_SMALL)."</a>";
+        } else {
+            $introduction_section .=  "<a href=\"".api_get_self()."?intro_cmdEdit=1\">".Display::return_icon('edit.png',get_lang('Modify'),'',ICON_SIZE_SMALL)."</a>";
+            $introduction_section .=  "<a href=\"".api_get_self()."?intro_cmdDel=1\" onclick=\"javascript:if(!confirm('".addslashes(api_htmlentities(get_lang('ConfirmYourChoice'),ENT_QUOTES,$charset))."')) return false;\">".Display::return_icon('delete.png',get_lang('Delete'),'',ICON_SIZE_SMALL)."</a>";
+        }
+        $introduction_section .=  "</div>";
+    }
 }
 $introduction_section .=  '</div>';

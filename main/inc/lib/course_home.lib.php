@@ -746,6 +746,34 @@ class CourseHome {
                         null,
                         array('class' => 'tool-icon', 'id' => 'toolimage_'.$tool['id'])
                     );
+                } elseif ($tool['image'] == 'scormbuilder.gif') {
+                    if (api_is_allowed_to_edit(null, true)) {
+                        $tool_link_params['href'] .= '&isStudentView=true';
+                    }
+                    $image = $tool['image'];
+                    $lp_id = self::get_published_lp_id_from_link($tool['link']);
+                    if ($lp_id) {
+                        $lp = new learnpath(api_get_course_id(), $lp_id, api_get_user_id());
+                        $path = $lp->get_preview_image_path(64);
+                        error_log($path);
+                        if (!empty($path)) {
+                            $icon = Display::img(
+                                $path,
+                                null,
+                                array('class' => 'tool-icon', 'id' => 'toolimage_'.$tool['id'])
+                            );
+                        } else {
+                            $image = (substr($tool['image'], 0, strpos($tool['image'], '.'))).'.png';
+
+                            $icon = Display::return_icon(
+                                $image,
+                                null,
+                                array('class' => 'tool-icon', 'id' => 'toolimage_'.$tool['id']),
+                                ICON_SIZE_BIG,
+                                false
+                            );
+                        }
+                    }
                 } else {
                     $image = (substr($tool['image'], 0, strpos($tool['image'], '.'))).'.png';
 

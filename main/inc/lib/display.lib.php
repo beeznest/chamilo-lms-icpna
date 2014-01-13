@@ -107,7 +107,8 @@ class Display {
         if (api_get_setting('enable_tool_introduction') == 'true' || $tool == TOOL_COURSE_HOMEPAGE) {
             $introduction_section = null;
             require api_get_path(INCLUDE_PATH).'introductionSection.inc.php';
-            $introduction_section = CourseHome::replaceTextWithToolUrls($introduction_section, $toolList);
+            // $intro_dispForm is defined in introductionSection.inc.php if we are editing
+            $introduction_section = CourseHome::replaceTextWithToolUrls($introduction_section, $toolList, $intro_dispForm);
             return $introduction_section;
         }
     }

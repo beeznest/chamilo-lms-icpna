@@ -737,7 +737,26 @@ class CourseHome {
                     $tool_link_params['href'] = api_get_path(WEB_PLUGIN_PATH).$tool['original_link'].'?'.api_get_cidreq();
                 }
 
-                $icon = Display::return_icon($tool['image'], $tool_name, array('class' => 'tool-icon', 'id' => 'toolimage_'.$tool['id']), ICON_SIZE_BIG, false);
+                //$icon = Display::return_icon($tool['image'], $tool_name, array('class' => 'tool-icon', 'id' => 'toolimage_'.$tool['id']), ICON_SIZE_BIG, false);
+
+                if (!empty($tool['custom_icon'])) {
+                    //self::getCustomIconPath($courseInfo)
+                    $icon = Display::img(
+                        $tool['image'],
+                        null,
+                        array('class' => 'tool-icon', 'id' => 'toolimage_'.$tool['id'])
+                    );
+                } else {
+                    $image = (substr($tool['image'], 0, strpos($tool['image'], '.'))).'.png';
+
+                    $icon = Display::return_icon(
+                        $image,
+                        null,
+                        array('class' => 'tool-icon', 'id' => 'toolimage_'.$tool['id']),
+                        ICON_SIZE_BIG,
+                        false
+                    );
+                }
 
                 // Validation when belongs to a session
                 $session_img = api_get_session_image($tool['session_id'], $_user['status']);
@@ -1072,9 +1091,8 @@ class CourseHome {
      * @param array $toolList The list of tools to replace
      * @return string The modified string
      */
-    public static function replaceTextWithToolUrls($text, $toolList)
+    public static function replaceTextWithToolUrls($text, $toolList, $editMode = false)
     {
-        error_log(print_r($toolList,1));
         if (empty($toolList)) {
             return $text;
         }
@@ -1084,8 +1102,10 @@ class CourseHome {
                 continue;
             }
             $toolName = $tool['tool']['name'];
-            $search = array("{{ ".$toolName." }}", "((".$toolName."))");
-            $text = str_replace($search, $tool['icon'], $text);
+            $search = array("{{ ".$toolName." }}", "{{".$toolName."}}", "((".$toolName."))", "(( ".$toolName." ))");
+            if (!$editMode) {
+                $text = str_replace($search, $tool['icon'], $text);
+            }
         }
 
         return $text;

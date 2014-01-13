@@ -137,16 +137,19 @@ class Template {
         }
 
         $help_content = '';
+        $help_url = '';
         if (api_get_setting('enable_help_link') == 'true') {
             if (!empty($help)) {
                 $help = Security::remove_XSS($help);
                 $help_content = '<li class="help">';
-                $help_content .= '<a href="' . api_get_path(WEB_CODE_PATH) . 'help/help.php?open=' . $help . '&height=400&width=600" class="ajax" title="' . get_lang('Help') . '">';
+                $help_url = api_get_path(WEB_CODE_PATH) . 'help/help.php?open=' . $help . '&height=400&width=600';
+                $help_content .= '<a href="' . $help_url . '" class="ajax" title="' . get_lang('Help') . '">';
                 $help_content .= '<img src="' . api_get_path(WEB_IMG_PATH) . 'help.large.png" alt="' . get_lang('Help') . '" title="' . get_lang('Help') . '" />';
                 $help_content .= '</a></li>';
             }
         }
         $this->assign('help_content', $help_content);
+        $this->assign('help_url', $help_url);
     }
 
     /*
@@ -260,8 +263,23 @@ class Template {
     /** Set course parameters */
     private function set_course_parameters() {
         //Setting course id
-        $course_id = api_get_course_int_id();
-        $this->course_id = $course_id;
+        $course = api_get_course_info();
+        if (empty($course)) {
+            $this->assign('course_is_set', false);
+            return;
+        }
+        $this->assign('course_is_set', true);
+        $this->course_id = $course['id'];
+        $_c = array(
+            'id' => $course['id'],
+            'code' => $course['code'],
+            'title' => $course['name'],
+            'visibility' => $course['visibility'],
+            'language' => $course['language'],
+            'directory' => $course['directory'],
+            'session_id' => api_get_session_id(),
+        );
+        $this->assign('_c',$_c);
     }
 
     /** Set user parameters */
@@ -562,10 +580,7 @@ class Template {
         }
         $this->assign('message_link', $message_link);
 
-        $institution = api_get_setting('Institution');
-        $portal_name = empty($institution) ? api_get_setting('siteName') : $institution;
-
-        $this->assign('portal_name', $portal_name);
+        // portal_name and site_name are available in the template's "_s" array
 
         //Menu
         $menu = $this->return_menu();
@@ -1156,7 +1171,7 @@ class Template {
         $session_name   = api_get_session_name($session_id);
         $_course        = api_get_course_info();
         $user_id        = api_get_user_id();
-        $course_id      = api_get_course_id();
+        $course_code    = api_get_course_id();
 
 
         /*  Plugins for banner section */
@@ -1178,18 +1193,23 @@ class Template {
             switch (api_get_setting('breadcrumbs_course_homepage')) {
                 case 'get_lang':
                     $navigation_item['title'] = Display::img(api_get_path(WEB_CSS_PATH).'home.png', get_lang('CourseHomepageLink')).' '.get_lang('CourseHomepageLink');
+                    $this->assign('breadcrumb_course_title', get_lang('CourseHomepageLink'));
                     break;
                 case 'course_code':
                     $navigation_item['title'] = Display::img(api_get_path(WEB_CSS_PATH).'home.png', $_course['official_code']).' '.$_course['official_code'];
+                    $this->assign('breadcrumb_course_title', $_course['official_code']);
                     break;
                 case 'session_name_and_course_title':
                     $navigation_item['title'] = Display::img(api_get_path(WEB_CSS_PATH).'home.png', $_course['name'].$my_session_name).' '.$course_title.$my_session_name;
+                    $this->assign('breadcrumb_course_title', $course_title.$my_session_name);
                     break;
                 default:
                     if (api_get_session_id() != -1 ) {
                         $navigation_item['title'] = Display::img(api_get_path(WEB_CSS_PATH).'home.png', $_course['name'].$my_session_name).' '.$course_title.$my_session_name;
+                        $this->assign('breadcrumb_course_title', $course_title.$my_session_name);
                     } else {
                         $navigation_item['title'] = Display::img(api_get_path(WEB_CSS_PATH).'home.png', $_course['name']).' '.$course_title;
+                        $this->assign('breadcrumb_course_title', $course_title);
                     }
                     break;
             }
@@ -1199,6 +1219,7 @@ class Template {
             $navigation_item_my_courses['url'] = api_get_path(WEB_PATH).'user_portal.php';
             $navigation[] = $navigation_item_my_courses;
             */
+            $this->assign('breadcrumb_course_url', $navigation_item['url']);
             $navigation[] = $navigation_item;
         }
 
@@ -1248,6 +1269,8 @@ class Template {
             $navigation_item['url'] = '#';
             $navigation_item['title'] = $nameTools;
             $navigation[] = $navigation_item;
+            $this->assign('breadcrumb_tool_name', $nameTools);
+            $this->assign('breadcrumb_tool_url', $navigation_item['url']);
         }
 
         $final_navigation = array();
@@ -1269,10 +1292,15 @@ class Template {
 
         /* Part 4 . Show the teacher view/student view button at the right of the breadcrumb */
         $view_as_student_link = null;
-        if ($user_id && isset($course_id)) {
+        if ($user_id && isset($course_code)) {
             if ((api_is_course_admin() || api_is_course_coach() || api_is_platform_admin()) && api_get_setting('student_view_enabled') == 'true') {
                 $view_as_student_link = api_display_tool_view_option();
             }
+            // if we know the user and we are in a course, get the total course
+            // progress to show globally from the template (header, breadcrumb, etc)
+            require_once api_get_path(LIBRARY_PATH).'tracking.lib.php';
+            $progress = tracking::get_avg_student_progress($user_id, $course_code, null, $session_id);
+            $this->assign('course_progress', $progress);
         }
 
         if (!empty($final_navigation)) {

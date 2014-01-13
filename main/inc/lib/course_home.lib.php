@@ -574,28 +574,28 @@ class CourseHome {
     /**
      * Displays the tools of a certain category.
      * @param array List of tools as returned by get_tools_category()
-     * @param   int rows
-     * @return void
+     * @param bool rows
+     * @return string
      */
-    public static function show_tools_category($all_tools_list, $rows = false) {
+    public static function show_tools_category($toolList, $rows = false) {
         global $_user;
         $theme = api_get_setting('homepage_view');
         if ($theme == 'vertical_activity') {
             //ordering by get_lang name
             $order_tool_list = array();
-            if (is_array($all_tools_list) && count($all_tools_list)>0) {
-                foreach($all_tools_list as $key=>$new_tool) {
+            if (is_array($toolList) && count($toolList)>0) {
+                foreach($toolList as $key=>$new_tool) {
                     $tool_name = self::translate_tool_name($new_tool);
                     $order_tool_list [$key]= $tool_name;
                 }
                 natsort($order_tool_list);
                 $my_temp_tool_array = array();
                 foreach($order_tool_list as $key=>$new_tool) {
-                    $my_temp_tool_array[] = $all_tools_list[$key];
+                    $my_temp_tool_array[] = $toolList[$key];
                 }
-                $all_tools_list = $my_temp_tool_array;
+                $toolList = $my_temp_tool_array;
             } else {
-                $all_tools_list = array();
+                $toolList = array();
             }
         }
         $web_code_path      = api_get_path(WEB_CODE_PATH);
@@ -608,19 +608,15 @@ class CourseHome {
         $items = array();
         $app_plugin = new AppPlugin();
 
-        if (isset($all_tools_list)) {
+        if (isset($toolList)) {
             $lnk = '';
-            foreach ($all_tools_list as & $tool) {
+            foreach ($toolList as & $tool) {
                 $item = array();
 
                 $tool['original_link'] = $tool['link'];
 
                 if ($tool['image'] == 'scormbuilder.gif') {
-                    // display links to lp only for current session
-                    /*if ($session_id != $tool['session_id']) {
-                        continue;
-                    }*/
-                    // check if the published learnpath is visible for student
+                    // Check if the published learnpath is visible for student
                     $published_lp_id = self::get_published_lp_id_from_link($tool['link']);
                     if (!api_is_allowed_to_edit(null, true) && !learnpath::is_lp_visible_for_student($published_lp_id,api_get_user_id())) {
                         continue;
@@ -741,7 +737,53 @@ class CourseHome {
                     $tool_link_params['href'] = api_get_path(WEB_PLUGIN_PATH).$tool['original_link'].'?'.api_get_cidreq();
                 }
 
-                $icon = Display::return_icon($tool['image'], $tool_name, array('class' => 'tool-icon', 'id' => 'toolimage_'.$tool['id']), ICON_SIZE_BIG, false);
+                //$icon = Display::return_icon($tool['image'], $tool_name, array('class' => 'tool-icon', 'id' => 'toolimage_'.$tool['id']), ICON_SIZE_BIG, false);
+
+                if (!empty($tool['custom_icon'])) {
+                    //self::getCustomIconPath($courseInfo)
+                    $icon = Display::img(
+                        $tool['image'],
+                        null,
+                        array('class' => 'tool-icon', 'id' => 'toolimage_'.$tool['id'])
+                    );
+                } elseif ($tool['image'] == 'scormbuilder.gif') {
+                    if (api_is_allowed_to_edit(null, true)) {
+                        $tool_link_params['href'] .= '&isStudentView=true';
+                    }
+                    $image = $tool['image'];
+                    $lp_id = self::get_published_lp_id_from_link($tool['link']);
+                    if ($lp_id) {
+                        $lp = new learnpath(api_get_course_id(), $lp_id, api_get_user_id());
+                        $path = $lp->get_preview_image_path(64);
+                        if (!empty($path)) {
+                            $icon = Display::img(
+                                $path,
+                                null,
+                                array('class' => 'tool-icon', 'id' => 'toolimage_'.$tool['id'])
+                            );
+                        } else {
+                            $image = (substr($tool['image'], 0, strpos($tool['image'], '.'))).'.png';
+
+                            $icon = Display::return_icon(
+                                $image,
+                                null,
+                                array('class' => 'tool-icon', 'id' => 'toolimage_'.$tool['id']),
+                                ICON_SIZE_BIG,
+                                false
+                            );
+                        }
+                    }
+                } else {
+                    $image = (substr($tool['image'], 0, strpos($tool['image'], '.'))).'.png';
+
+                    $icon = Display::return_icon(
+                        $image,
+                        null,
+                        array('class' => 'tool-icon', 'id' => 'toolimage_'.$tool['id']),
+                        ICON_SIZE_BIG,
+                        false
+                    );
+                }
 
                 // Validation when belongs to a session
                 $session_img = api_get_session_image($tool['session_id'], $_user['status']);
@@ -824,7 +866,11 @@ class CourseHome {
                 $i++;
             }
         }
-        return $html;
+
+        return array(
+            'content' => $html,
+            'tool_list' => $items
+        );
     }
 
     /**
@@ -1064,5 +1110,35 @@ class CourseHome {
             $html .= '</div>';
         }
         return $html;
+    }
+
+    /**
+     * Replace markers in the introduction section by their corresponding icon and text
+     * @param string $text The string in which to replace the text by icons
+     * @param array $toolList The list of tools to replace
+     * @return string The modified string
+     */
+    public static function replaceTextWithToolUrls($text, $toolList, $editMode = false)
+    {
+        if (empty($toolList)) {
+            return $text;
+        }
+
+        foreach ($toolList as $tool) {
+            if (!isset($tool['icon'])) {
+                continue;
+            }
+            $toolName = $tool['tool']['name'];
+            $show = '<div class="span2">'
+                . '<div class="course-dialogo-completed">'.$tool['icon'].'</div>'
+                . '<div class="center-items"><h4><a href="'.$tool['tool']['link'].'">'.$toolName.'</a></h4></div>'
+                . '</div>';
+            $search = array("{{ ".$toolName." }}", "{{".$toolName."}}", "((".$toolName."))", "(( ".$toolName." ))");
+            if (!$editMode) {
+                $text = str_replace($search, $show, $text);
+            }
+        }
+
+        return $text;
     }
 }

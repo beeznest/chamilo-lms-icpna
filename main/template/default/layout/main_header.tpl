@@ -29,12 +29,16 @@
 
         <div id="main" class="container">
 <header>
-<!-- HEADER Y PERFIL DE USUARIO -->
+
+<!-- END HEADER, START USER PROFILE BLOCK -->
+
+{# only show user block and breadcrumb if user is logged in#}
+{% if _u.logged == 1 %}
 <div class="row-fluid">
   <div class="span12">
     <div class="span3">
         <div class="home-ico">
-          <a href="{{ _p.web }}">Inicio</a>
+          <a href="{{ _p.web }}">{{"Home"|get_lang}}</a>
         </div>
       </div>
     <div class="span6">
@@ -42,18 +46,18 @@
           {{ logo }}
     </div>
     <div class="span3">
-         <div class="perfil-user">
+         <div class="user-profile-block">
             <div id='cssmenu'>
             <ul>
                <li class='has-sub'><a href='#'><span>
-               <img src="http://icpna.chamilo.net/main/upload/users/1/1/medium_1_52cd7d4aa8bf5_USER.jpg" class="imagen-username" />
-               <span class="welcome">Bienvenido</span><br>
-               <span class="usermane">Aberto Cordero</span>
+               <img src="{{ _u.avatar_small }}" class="user-pic" />
+               <span class="welcome">{{"Welcome"|get_lang}}</span><br />
+               <span class="username">{{u.complete_name}}</span>
                </span></a>
                   <ul>
-                     <li class="home"><a href='#'><span>Pagina Principal</span></a></li>
-                     <li class="edit"><a href='#'><span>Actualización de datos</span></a></li>
-                     <li class='closed'><a href='#'><span>Salir</span></a></li>
+                     <li class="home"><a href='{{ _p.web_main }}social/home.php'><span>{{ "Profile" |get_lang }}</span></a></li>
+                     <li class="edit"><a href='{{ _p.web_main }}auth/profile.php'><span>{{ "EditProfile" |get_lang }}</span></a></li>
+                     <li class="close"><a href='{{ logout_link }}'><span>{{ "Logout" |get_lang }}</span></a></li>
                   </ul>
                </li>
             </ul>
@@ -62,36 +66,38 @@
     </div>
   </div>
 </div>
-
-<!-- FIN DEL PERFIL DE USUARIOS -->
-    {% if _u.logged == 1 %}
-    <!-- DATOS DE LA FRANJA CELESTE DATOS DE UBICACION -->
+<!-- END OF USER PROFILE BLOCK -->
+<!-- START OF LIGHT BLUE RIBBON -->
     <div class="row-fluid">
-        <div class="span12 celeste">
+        <div class="span12 light-blue-bar">
           <div class="row-fluid">
-            <div class="span7"> <div class="main-subinicio">Curso V-Learning Adultos - <a href="#">Módulo 3</a></div></div>
+            <div class="span7"> <div class="main-start">{{ _s.site_name }} - <a href="{{ breadcrumb_course_url }}">{{ breadcrumb_course_title }}</a></div></div>
             <div class="span5">           
               <div class="row-fluid">
                 <div class="span9">
-                    <a href="#">Proceso: Módulo 3</a>
-                    <div id="animacion">
-                    <div class="color-bar-process uno"><span>70%</span></div>
+                    {% if course_is_set %}
+                    <a href="{{ breadcrumb_course_url }}">{{"Progress"|get_lang}}: {{ breadcrumb_course_title }}</a>
+                    <div id="bar-animation">
+                    <div class="color-bar-process blue-back-bar"><span>{{ course_progress }}%</span></div>
+                    {% endif %}
                 </div>
                 </div>
                 <div class="span2">
-                    <a href="#">
-                      <img src="http://icpna.chamilo.net/main/css/test_ICPNA/images/help.png">
+                    {% if help_url != '' %}
+                    <a href="{{ help_url }}" class="ajax">
+                      <img src="{{ _p.web_css }}ICPNA/images/help.png">
                     </a>
+                    {% endif %}
                 </div>
               </div>
             </div>
           </div>
         </div>
     </div>
-    <!-- FIN DE LA FRANJA CELESTE DE UBICACION -->
     {% endif %}
-     <!--  {# menu #}
-     {% include "default/layout/menu.tpl" %} -->
+    <!-- END OF LIGHT BLUE BREADCRUMB -->
+    <!--  {# menu #}
+    {% include "default/layout/menu.tpl" %} -->
 </header>
 
 

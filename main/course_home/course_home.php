@@ -229,31 +229,33 @@ $reqdate = "&reqdate=$temps";
 
 /*	MAIN CODE */
 
-/*	Introduction section (editable by course admins) */
-
-$content = Display::return_introduction_section(TOOL_COURSE_HOMEPAGE, array(
-		'CreateDocumentWebDir' => api_get_path(WEB_COURSE_PATH).api_get_course_path().'/document/',
-		'CreateDocumentDir'    => 'document/',
-		'BaseHref'             => api_get_path(WEB_COURSE_PATH).api_get_course_path().'/'
-	)
-);
-
 /*	SWITCH TO A DIFFERENT HOMEPAGE VIEW
 	the setting homepage_view is adjustable through
 	the platform administration section */
 
+$content = '';
 if ($show_autolunch_lp_warning) {
     $show_message .= Display::return_message(get_lang('TheLPAutoLaunchSettingIsONStudentsWillBeRedirectToAnSpecificLP'),'warning');
 }
 if (api_get_setting('homepage_view') == 'activity' || api_get_setting('homepage_view') == 'activity_big') {
-	require 'activity.php';
+	$result = require 'activity.php';
 } elseif (api_get_setting('homepage_view') == '2column') {
-	require '2column.php';
+	$result = require '2column.php';
 } elseif (api_get_setting('homepage_view') == '3column') {
-	require '3column.php';
+    $result = require '3column.php';
 } elseif (api_get_setting('homepage_view') == 'vertical_activity') {
-	require 'vertical_activity.php';
+    $result = require 'vertical_activity.php';
 }
+/*	Introduction section (editable by course admins) */
+
+$content = Display::return_introduction_section(TOOL_COURSE_HOMEPAGE, $result['tool_list'], array(
+        'CreateDocumentWebDir' => api_get_path(WEB_COURSE_PATH).api_get_course_path().'/document/',
+        'CreateDocumentDir'    => 'document/',
+        'BaseHref'             => api_get_path(WEB_COURSE_PATH).api_get_course_path().'/'
+    )
+);
+
+$content .= $result['content'];
 $content = '<div id="course_tools">'.$content.'</div>';
 $tpl = new Template(null);
 

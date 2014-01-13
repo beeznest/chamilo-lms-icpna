@@ -68,17 +68,21 @@
     <div class="row-fluid">
         <div class="span12 light-blue-bar">
           <div class="row-fluid">
-            <div class="span7"> <div class="main-start">{{ _s.site_name }} - <a href="{{ breadcrumb_course_url }}">{{ breadcrumb_course_title }}</a></div></div>
+            <div class="span7"> <div class="main-start">{{ _s.site_name }}
+            {% if course_is_set %}
+              - <a href="{{ breadcrumb_course_url }}">{{ breadcrumb_course_title }}</a>
+            {% endif %}
+            </div></div>
             <div class="span5">           
               <div class="row-fluid">
-                <div class="span9">
                     {% if course_is_set %}
+                <div class="span9">
                     <a href="{{ breadcrumb_course_url }}">{{"Progress"|get_lang}}: {{ breadcrumb_course_title }}</a>
                     <div id="bar-animation">
                     <div class="color-bar-process blue-back-bar"><span>{{ course_progress }}%</span></div>
+                    </div>
+                </div>
                     {% endif %}
-                </div>
-                </div>
                 <div class="span2">
                     {% if help_url != '' %}
                     <a href="{{ help_url }}" class="ajax">

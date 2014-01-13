@@ -1129,9 +1129,9 @@ class CourseHome {
                 continue;
             }
             $toolName = $tool['tool']['name'];
-            $show = '<div class="span4 course-tool">'
-                . '<div class="big_icon">'.$tool['icon'].'</div>'
-                . '<div class="content"><h4><a href="'.$tool['tool']['link'].'">'.$toolName.'</a></h4></div>'
+            $show = '<div class="span2">'
+                . '<div class="course-dialogo-completed">'.$tool['icon'].'</div>'
+                . '<div class="center-items"><h4><a href="'.$tool['tool']['link'].'">'.$toolName.'</a></h4></div>'
                 . '</div>';
             $search = array("{{ ".$toolName." }}", "{{".$toolName."}}", "((".$toolName."))", "(( ".$toolName." ))");
             if (!$editMode) {

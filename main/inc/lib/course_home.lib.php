@@ -574,28 +574,28 @@ class CourseHome {
     /**
      * Displays the tools of a certain category.
      * @param array List of tools as returned by get_tools_category()
-     * @param   int rows
-     * @return void
+     * @param bool rows
+     * @return string
      */
-    public static function show_tools_category($all_tools_list, $rows = false) {
+    public static function show_tools_category($toolList, $rows = false) {
         global $_user;
         $theme = api_get_setting('homepage_view');
         if ($theme == 'vertical_activity') {
             //ordering by get_lang name
             $order_tool_list = array();
-            if (is_array($all_tools_list) && count($all_tools_list)>0) {
-                foreach($all_tools_list as $key=>$new_tool) {
+            if (is_array($toolList) && count($toolList)>0) {
+                foreach($toolList as $key=>$new_tool) {
                     $tool_name = self::translate_tool_name($new_tool);
                     $order_tool_list [$key]= $tool_name;
                 }
                 natsort($order_tool_list);
                 $my_temp_tool_array = array();
                 foreach($order_tool_list as $key=>$new_tool) {
-                    $my_temp_tool_array[] = $all_tools_list[$key];
+                    $my_temp_tool_array[] = $toolList[$key];
                 }
-                $all_tools_list = $my_temp_tool_array;
+                $toolList = $my_temp_tool_array;
             } else {
-                $all_tools_list = array();
+                $toolList = array();
             }
         }
         $web_code_path      = api_get_path(WEB_CODE_PATH);
@@ -608,19 +608,15 @@ class CourseHome {
         $items = array();
         $app_plugin = new AppPlugin();
 
-        if (isset($all_tools_list)) {
+        if (isset($toolList)) {
             $lnk = '';
-            foreach ($all_tools_list as & $tool) {
+            foreach ($toolList as & $tool) {
                 $item = array();
 
                 $tool['original_link'] = $tool['link'];
 
                 if ($tool['image'] == 'scormbuilder.gif') {
-                    // display links to lp only for current session
-                    /*if ($session_id != $tool['session_id']) {
-                        continue;
-                    }*/
-                    // check if the published learnpath is visible for student
+                    // Check if the published learnpath is visible for student
                     $published_lp_id = self::get_published_lp_id_from_link($tool['link']);
                     if (!api_is_allowed_to_edit(null, true) && !learnpath::is_lp_visible_for_student($published_lp_id,api_get_user_id())) {
                         continue;
@@ -824,7 +820,11 @@ class CourseHome {
                 $i++;
             }
         }
-        return $html;
+
+        return array(
+            'content' => $html,
+            'tool_list' => $items
+        );
     }
 
     /**
@@ -1064,5 +1064,30 @@ class CourseHome {
             $html .= '</div>';
         }
         return $html;
+    }
+
+    /**
+     * Replace markers in the introduction section by their corresponding icon and text
+     * @param string $text The string in which to replace the text by icons
+     * @param array $toolList The list of tools to replace
+     * @return string The modified string
+     */
+    public static function replaceTextWithToolUrls($text, $toolList)
+    {
+        error_log(print_r($toolList,1));
+        if (empty($toolList)) {
+            return $text;
+        }
+
+        foreach ($toolList as $tool) {
+            if (!isset($tool['icon'])) {
+                continue;
+            }
+            $toolName = $tool['tool']['name'];
+            $search = array("{{ ".$toolName." }}", "((".$toolName."))");
+            $text = str_replace($search, $tool['icon'], $text);
+        }
+
+        return $text;
     }
 }

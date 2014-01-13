@@ -12,6 +12,14 @@
  *
  *	@package chamilo.course_home
  */
+function return_block($title, $content)
+{
+    $html = '<div class="page-header">
+<h3>'.$title.'</h3>
+</div>
+'.$content.'</div>';
+    return $html;
+}
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : null;
 $course_id = api_get_course_int_id();
@@ -56,65 +64,48 @@ if (api_is_platform_admin()) {
 //	COURSE ADMIN ONLY VIEW
 
 // Start of tools for CourseAdmins (teachers/tutors)
-if (api_is_allowed_to_edit(null, true) && !api_is_coach()) {
-	$content .=  '<div class="courseadminview" style="border:0px; margin-top: 0px;padding:0px;">
-		<div class="normal-message" id="id_normal_message" style="display:none">';
-			$content .=  '<img src="'.api_get_path(WEB_PATH).'main/inc/lib/javascript/indicator.gif"/>&nbsp;&nbsp;';
-			$content .=  get_lang('PleaseStandBy');
-            $content .=  '</div>
-		<div class="confirmation-message" id="id_confirmation_message" style="display:none"></div>
-	</div>';
+$totalList = array();
+if ($session_id == 0 && api_is_course_admin() && api_is_allowed_to_edit(null, true)) {
+    $list = CourseHome::get_tools_category(TOOL_AUTHORING);
+    $result = CourseHome::show_tools_category($list);
+    $content .= return_block(get_lang('Authoring'), $result['content']);
+    $totalList = $result['tool_list'];
 
-
-	if (api_get_setting('show_session_data') == 'true' && $session_id > 0) {
-        $content .= '<div class="courseadminview">
-            <span class="viewcaption">'.get_lang('SessionData').'</span>
-            <table class="course_activity_home">'.CourseHome::show_session_data($session_id).'
-            </table>
-        </div>';
-	}
-    $my_list = CourseHome::get_tools_category(TOOL_AUTHORING);
-	$items = CourseHome::show_tools_category($my_list);
-    $content .= return_block(get_lang('Authoring'),  $items);
-
-    $my_list = CourseHome::get_tools_category(TOOL_INTERACTION);
-
+    $list = CourseHome::get_tools_category(TOOL_INTERACTION);
     $list2 = CourseHome::get_tools_category(TOOL_COURSE_PLUGIN);
+    $list = array_merge($list, $list2);
+    $result = CourseHome::show_tools_category($list);
+    $totalList = array_merge($totalList, $result['tool_list']);
 
-    $my_list = array_merge($my_list,$list2);
-    $items =  CourseHome::show_tools_category($my_list);
+    $content .= return_block(get_lang('Interaction'), $result['content']);
 
-    $content .= return_block(get_lang('Interaction'),  $items);
+    $list = CourseHome::get_tools_category(TOOL_ADMIN_PLATFORM);
+    $totalList = array_merge($totalList, $list);
+    $result = CourseHome::show_tools_category($list);
 
-    $my_list = CourseHome::get_tools_category(TOOL_ADMIN_PLATFORM);
-    $items = CourseHome::show_tools_category($my_list);
+    $totalList = array_merge($totalList, $result['tool_list']);
 
-    $content .= return_block(get_lang('Administration'),  $items);
+    $content .= return_block(get_lang('Administration'), $result['content']);
 
 } elseif (api_is_coach()) {
-	if (api_get_setting('show_session_data') == 'true' && $session_id > 0) {
 
-		$content .= '<div class="row">
-			<span class="viewcaption">'.get_lang('SessionData').'</span>
-			<table class="course_activity_home">';
-				$content .= CourseHome::show_session_data($session_id);
-             $content .=  '</table></div>';
-	}
-
-    $content .=  '<div class="row">';
-				$my_list = CourseHome::get_tools_category(TOOL_STUDENT_VIEW);
-				$content .= CourseHome::show_tools_category($my_list);
+    $content .= '<div class="row">';
+    $list = CourseHome::get_tools_category(TOOL_STUDENT_VIEW);
+    $content .= CourseHome::show_tools_category($result['content']);
+    $totalList = array_merge($totalList, $result['tool_list']);
     $content .= '</div>';
 } else {
-	$my_list = CourseHome::get_tools_category(TOOL_STUDENT_VIEW);
-	if (count($my_list) > 0) {
+    $list = CourseHome::get_tools_category(TOOL_STUDENT_VIEW);
+    if (count($list) > 0) {
         $content .= '<div class="row">';
-        $content .= CourseHome::show_tools_category($my_list);
+        $result = CourseHome::show_tools_category($list);
+        $content .= $result['content'];
+        $totalList = array_merge($totalList, $result['tool_list']);
         $content .= '</div>';
-	}
+    }
 }
 
-function return_block($title, $content) {
-    $html = '<div class="row"><div class="span12"><div class="page-header"><h3>'.$title.'</h3></div></div></div><div class="row">'.$content.'</div>';
-    return $html;
-}
+return array(
+    'content' => $content,
+    'tool_list' => $totalList
+);

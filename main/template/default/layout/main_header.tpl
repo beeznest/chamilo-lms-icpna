@@ -3,7 +3,6 @@
 <!--[if IE 7]>    <html lang="{{ document_language }}" class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>    <html lang="{{ document_language }}" class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]><!--><html lang="{{ document_language }}" class="no-js"> <!--<![endif]-->
-
 <head>
 {% include "default/layout/head.tpl" %}
 </head>
@@ -28,46 +27,44 @@
         {% include "default/layout/topbar.tpl" %}
 
         <div id="main" class="container">
-<header>
-
-<!-- END HEADER, START USER PROFILE BLOCK -->
-
-{# only show user block and breadcrumb if user is logged in#}
-{% if _u.logged == 1 %}
-<div class="row-fluid">
-  <div class="span12">
-    <div class="span3">
-        <div class="home-ico">
-          <a href="{{ _p.web }}">{{"Home"|get_lang}}</a>
+        <header>
+        <!-- END HEADER, START USER PROFILE BLOCK -->
+        {# only show user block and breadcrumb if user is logged in#}
+        {% if _u.logged == 1 %}
+        <div class="row-fluid">
+        <div class="span12">
+        <div class="span3">
+            <div class="home-ico">
+              <a href="{{ _p.web }}">{{"Home"|get_lang}}</a>
+            </div>
         </div>
-      </div>
-    <div class="span6">
-          {# logo #} <!--LLama al logotipo -->
-          {{ logo }}
-    </div>
-    <div class="span3">
-         <div class="user-profile-block">
-            <div id='cssmenu'>
-            <ul>
-               <li class='has-sub'><a href='#'><span>
-               <img src="{{ _u.avatar}}" class="user-pic" />
-               <span class="welcome">{{"Welcome"|get_lang}}</span><br />
-               <span class="username">{{u.complete_name}}</span>
-               </span></a>
+            <div class="span6">
+              {# logo #} <!--LLama al logotipo -->
+              {{ logo }}
+            </div>
+            <div class="span3">
+                  <div class="user-profile-block">
+                  <div id='cssmenu'>
                   <ul>
-                     <li class="home"><a href='{{ _p.web_main }}social/home.php'><span>{{ "Profile" |get_lang }}</span></a></li>
-                     <li class="edit"><a href='{{ _p.web_main }}auth/profile.php'><span>{{ "EditProfile" |get_lang }}</span></a></li>
-                     <li class="close"><a href='{{ logout_link }}'><span>{{ "Logout" |get_lang }}</span></a></li>
+                      <li class='has-sub'><a href='#'><span>
+                      <img src="{{ _u.avatar}}" class="user-pic" />
+                      <span class="welcome">{{"Welcome"|get_lang}}</span><br />
+                      <span class="username">{{u.complete_name}}</span></span></a>
+                      <ul>
+                         <li class="home"><a href='{{ _p.web_main }}social/home.php'><span>{{ "Profile" |get_lang }}</span></a></li>
+                         <li class="edit"><a href='{{ _p.web_main }}auth/profile.php'><span>{{ "EditProfile" |get_lang }}</span></a></li>
+                         <li class="close"><a href='{{ logout_link }}'><span>{{ "Logout" |get_lang }}</span></a></li>
+                      </ul>
+                      </li>
                   </ul>
-               </li>
-            </ul>
+              </div>
             </div>
-            </div>
+        </div>
     </div>
-  </div>
-</div>
+
 <!-- END OF USER PROFILE BLOCK -->
 <!-- START OF LIGHT BLUE RIBBON -->
+ 
     <div class="row-fluid">
         <div class="span12 light-blue-bar">
           <div class="row-fluid">
@@ -95,8 +92,8 @@
         </div>
     </div>
     {% endif %}
-    <!-- END OF LIGHT BLUE BREADCRUMB -->
-    <!--  {# menu #}
+    <!-- END OF LIGHT BLUE BREADCRUMB 
+     {# menu #}
     {% include "default/layout/menu.tpl" %} -->
 </header>
 

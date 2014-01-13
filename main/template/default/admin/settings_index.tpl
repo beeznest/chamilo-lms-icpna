@@ -1,25 +1,17 @@
+{% block header %}
+{% include "default/layout/main_header.tpl" %}    
+{% endblock %}
 <script>
 $(function() {
     //$("#settings").tabs();
 });
 </script>
-
-<div id="settings">
-    <!--
-    <ul>
-        <li><a href="#tabs-1">Users</a></li>
-        <li><a href="#tabs-2">Courses</a></li>
-        <li><a href="#tabs-3">Platform</a></li>
-        <li><a href="#tabs-4">Aenean lacinia</a></li>
-        <li><a href="#tabs-5">Aenean lacinia</a></li>
-        <li><a href="#tabs-6">Aenean lacinia</a></li>
-        <li><a href="#tabs-7">Aenean lacinia</a></li>
-        <li><a href="#tabs-8">Aenean lacinia</a></li>        
-    </ul>
-    -->        
-    <div class="row">
+{% block body %}
+<div id="settings">      
+    <div>
+    <div class="span12">
     {% for block_item in blocks %}
-        <div id="tabs-{{loop.index}}" class="span6">
+        <div id="tabs-{{loop.index}}" class="span5">
             <div class="well_border">
                 <h4>{{block_item.icon}} {{block_item.label}}</h4>                
                 <div style="list-style-type:none">
@@ -42,4 +34,16 @@ $(function() {
         </div>        
     {% endfor %}
     </div>
+    </div>
 </div>
+{% endblock %}
+{% block footer %}
+    {#  Footer  #}
+    {% if show_footer == true %}
+        </div> <!-- end of #row" -->
+        </div> <!-- end of #main" -->
+        <div class="push"></div>
+        </div> <!-- end of #wrapper section -->
+    {% endif %}
+{% include "default/layout/main_footer.tpl" %}
+{% endblock %}

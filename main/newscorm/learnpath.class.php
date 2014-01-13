@@ -216,6 +216,7 @@ class learnpath {
             $res_ins = Database::query($sql_ins);
             $this->lp_view_id = Database :: insert_id();
             //Sequence rule
+            require_once '../inc/lib/sequence.lib.php';
             Sequence::temp_hack_4_insert(1, 1, $lp_id, $course_id, $session_id, $user_id);
             if ($this->debug > 2) {
                 error_log('New LP - learnpath::__construct() ' . __LINE__ . ' - inserting new lp_view: ' . $sql_ins, 0);
@@ -708,8 +709,13 @@ class learnpath {
                 if ($id > 0) {
                     $course_info = api_get_course_info();
                     //Sequence rule
-                    Sequence::temp_hack_2_insert('Lp', $id, $course_id, $session_id);
-                    Sequence::temp_hack_3_insert(1, 1, 0, $id, $course_id, $session_id, 0);
+                    require_once '../inc/lib/sequence.lib.php';
+                    if(!Sequence::temp_hack_2_insert(1, $id, $course_id, $session_id)) {
+                        $sql_hack = "INSERT INTO sequence_row_entity(sequence_type_entity_id, c_id, session_id, row_id) VALUES 
+                        (1, $course_id, $session_id, 1)";
+                        Database::query($sql_hack);
+                    }
+                    $trap = Sequence::temp_hack_3_insert(1, 1, 0, $id, $course_id, $session_id, 0);
 
                     // Insert into item_property.
                     api_item_property_update($course_info, TOOL_LEARNPATH, $id, 'LearnpathAdded', api_get_user_id());
@@ -3255,6 +3261,7 @@ class learnpath {
             $this->lp_view_id = $id;
 
             //Sequence rule #7220
+            require_once '../inc/lib/sequence.lib.php';
             Sequence::temp_hack_4_insert($this->get_total_items_count(), 1, $this->get_id(), $course_id, api_get_session_id(), $this->get_user_id());
         }
         return $this->lp_view_id;
@@ -3778,6 +3785,7 @@ class learnpath {
             $this->lp_view_id = $view_id;
             $this->attempt = $this->attempt + 1;
             //Sequence rule
+            require_once '../inc/lib/sequence.lib.php';
             Sequence::temp_hack_4($this-get_total_items_count,1,$this->lp_id, $this->get_user_id());
         } else {
             $this->error = 'Could not insert into item_view table...';
@@ -3898,6 +3906,7 @@ class learnpath {
             $this->progress_db = $progress;
 
             //Temporaly located here for #7220
+            require_once '../inc/lib/sequence.lib.php';
             Sequence::temp_hack_4_update(1,$this->get_id(),$course_id,api_get_session_id(),$this->get_user_id(),1,$this->get_complete_items_count(),$this->get_total_items_count(),null);
         }
     }
@@ -4266,6 +4275,7 @@ class learnpath {
         }
         Database::query($sql);
         //Rule sequence 70% of pre-req #7220
+        require_once '../inc/lib/sequence.lib.php';
         Sequence::temp_hack_3_update(1, 1, $this->prerequisite, $lp_id, $course_id, api_get_session_id());
         return true;
     }
@@ -9346,6 +9356,7 @@ EOD;
         Database::query($sql);
 
         //Rule sequence 70% of pre-req #7220
+        require_once '../inc/lib/sequence.lib.php';
         Sequence::temp_hack_3_update(1, 1, 0, $lp_id, $course_id, api_get_session_id());
 
         //Cleaning mastery score for exercises

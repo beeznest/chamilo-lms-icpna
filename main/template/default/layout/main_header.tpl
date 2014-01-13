@@ -50,7 +50,7 @@
             <div id='cssmenu'>
             <ul>
                <li class='has-sub'><a href='#'><span>
-               <img src="{{ _u.avatar_small }}" class="user-pic" />
+               <img src="{{ _u.avatar}}" class="user-pic" />
                <span class="welcome">{{"Welcome"|get_lang}}</span><br />
                <span class="username">{{u.complete_name}}</span>
                </span></a>

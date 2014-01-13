@@ -390,29 +390,6 @@ header #logo {
     text-align: center;
 }
 /*ICONOS DE ESTADO DE LAS LECCIONES*/
-.course-dialogo-completed{
-    background: url(images/dialogo-ico.png) 0 0 no-repeat;
-    width: 74px;
-    height: 74px;
-    margin:auto;
-}
-.course-dialogo-process{
-    background-image: url(images/dialogo-ico.png);
-    background-repeat: no-repeat;
-    background-position: -73px 0;
-    width: 74px;
-    height: 74px;
-    margin:auto;
-}
-.course-dialogo-close{
-    background-image: url(images/dialogo-ico.png);
-    background-repeat: no-repeat;
-    background-position: -146px 0;
-    width: 74px;
-    height: 74px;
-    margin:auto;
-    
-}
 .center{
     text-align: center;
 }

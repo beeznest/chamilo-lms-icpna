@@ -755,7 +755,6 @@ class CourseHome {
                     if ($lp_id) {
                         $lp = new learnpath(api_get_course_id(), $lp_id, api_get_user_id());
                         $path = $lp->get_preview_image_path(64);
-                        error_log($path);
                         if (!empty($path)) {
                             $icon = Display::img(
                                 $path,
@@ -1130,9 +1129,13 @@ class CourseHome {
                 continue;
             }
             $toolName = $tool['tool']['name'];
+            $show = '<div class="span4 course-tool">'
+                . '<div class="big_icon">'.$tool['icon'].'</div>'
+                . '<div class="content"><h4><a href="'.$tool['tool']['link'].'">'.$toolName.'</a></h4></div>'
+                . '</div>';
             $search = array("{{ ".$toolName." }}", "{{".$toolName."}}", "((".$toolName."))", "(( ".$toolName." ))");
             if (!$editMode) {
-                $text = str_replace($search, $tool['icon'], $text);
+                $text = str_replace($search, $show, $text);
             }
         }
 

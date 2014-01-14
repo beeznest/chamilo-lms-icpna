@@ -874,6 +874,36 @@ class CourseHome {
     }
 
     /**
+     * List tools to customize its icons
+     *
+     */
+    public function tools_iconListAction()
+    {
+        $course_tool_table  = Database::get_course_table(TABLE_TOOL_LIST);
+        $sessionId            = api_get_session_id();
+        $courseId              = api_get_course_int_id();
+        $itemsFromSession = array();
+        if (!empty($sessionId)) {
+            $sql = "SELECT * FROM $course_tool_table
+                    WHERE category = 'authoring'
+                    AND c_id = $courseId
+                    AND session_id = $sessionId
+                    ORDER BY id";
+        } else {
+            $sql = "SELECT * FROM $course_tool_table
+                    WHERE category = 'authoring'
+                    AND c_id = $courseId
+                    ORDER BY id";
+        }
+        $result = Database::query($sql);
+        $data = array();
+        while ($row = Database::fetch_assoc($result)) {
+            $data[] = $row;
+        }
+        return $data;
+    }
+
+    /**
      * Shows the general data for a particular meeting
      *
      * @param id	session id

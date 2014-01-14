@@ -217,7 +217,7 @@ class learnpath {
             $this->lp_view_id = Database :: insert_id();
             //Sequence rule
             require_once '../inc/lib/sequence.lib.php';
-            Sequence::temp_hack_4_insert(1, 1, $lp_id, $course_id, $session_id, $user_id);
+            Sequence::temp_hack_4_insert(1, 1, $lp_id, $course_id, $session_id, $user_id, 1);
             if ($this->debug > 2) {
                 error_log('New LP - learnpath::__construct() ' . __LINE__ . ' - inserting new lp_view: ' . $sql_ins, 0);
             }
@@ -950,6 +950,10 @@ class learnpath {
         $res_del_lp = Database::query($sql_del_lp);
         $this->update_display_order(); // Updates the display order of all lps.
         api_item_property_update(api_get_course_info(), TOOL_LEARNPATH, $this->lp_id, 'delete', api_get_user_id());
+
+        //Sequence Delete
+        require_once '../inc/lib/sequence.lib.php';
+        Sequence::temp_hack_5(1, $this->lp_id, $course_id, $this->lp_session_id, 1);
 
         require_once '../gradebook/lib/be.inc.php';
 
@@ -3907,7 +3911,7 @@ class learnpath {
 
             //Temporaly located here for #7220
             require_once '../inc/lib/sequence.lib.php';
-            Sequence::temp_hack_4_update(1,$this->get_id(),$course_id,api_get_session_id(),$this->get_user_id(),1,$this->get_complete_items_count(),$this->get_total_items_count(),null);
+            Sequence::temp_hack_4_update(1,$this->get_id(),$course_id,api_get_session_id(),$this->get_user_id(),1,$this->get_complete_items_count(),max($this->get_total_items_count(),1),null);
         }
     }
 

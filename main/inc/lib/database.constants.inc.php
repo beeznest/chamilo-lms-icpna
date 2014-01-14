@@ -356,7 +356,7 @@ define('TABLE_SEQUENCE_FORMULA',             'sequence_formula');
 define('TABLE_SEQUENCE_METHOD',              'sequence_method');
 define('TABLE_SEQUENCE_ROW_ENTITY',          'sequence_row_entity');
 define('TABLE_SEQUENCE_RULE',                'sequence_rule');
-define('TABLE_SEQUENCE_RULE_CONDITION',      'sequence_condition');
+define('TABLE_SEQUENCE_RULE_CONDITION',      'sequence_rule_condition');
 define('TABLE_SEQUENCE_RULE_METHOD',         'sequence_rule_method');
 define('TABLE_SEQUENCE_TYPE_ENTITY',         'sequence_type_entity');
 define('TABLE_SEQUENCE_VALID',               'sequence_valid');

@@ -216,7 +216,7 @@ class learnpath {
             $res_ins = Database::query($sql_ins);
             $this->lp_view_id = Database :: insert_id();
             //Sequence rule
-            require_once '../inc/lib/sequence.lib.php';
+            require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
             Sequence::temp_hack_4_insert(1, 1, $lp_id, $course_id, $session_id, $user_id, 1);
             if ($this->debug > 2) {
                 error_log('New LP - learnpath::__construct() ' . __LINE__ . ' - inserting new lp_view: ' . $sql_ins, 0);
@@ -709,7 +709,7 @@ class learnpath {
                 if ($id > 0) {
                     $course_info = api_get_course_info();
                     //Sequence rule
-                    require_once '../inc/lib/sequence.lib.php';
+                    require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
                     if(!Sequence::temp_hack_2_insert(1, $id, $course_id, $session_id)) {
                         $sql_hack = "INSERT INTO sequence_row_entity(sequence_type_entity_id, c_id, session_id, row_id) VALUES 
                         (1, $course_id, $session_id, 1)";
@@ -952,7 +952,7 @@ class learnpath {
         api_item_property_update(api_get_course_info(), TOOL_LEARNPATH, $this->lp_id, 'delete', api_get_user_id());
 
         //Sequence Delete
-        require_once '../inc/lib/sequence.lib.php';
+        require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
         Sequence::temp_hack_5(1, $this->lp_id, $course_id, $this->lp_session_id, 1);
 
         require_once '../gradebook/lib/be.inc.php';
@@ -2084,7 +2084,7 @@ class learnpath {
             $prerequisite = $row['prerequisite'];
             $is_visible = true;
             $progress = 0;
-
+            /*
             if (!empty($prerequisite)) {
                 $progress = self::get_db_progress($prerequisite,$student_id,'%', '', false, api_get_session_id());
                 $progress = intval($progress);
@@ -2092,9 +2092,14 @@ class learnpath {
                     $is_visible = false;
                 }
             }
+            */
+            require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
+            $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $lp_id, api_get_course_int_id(), api_get_session_id());
+            if (!Sequence::get_available_lp_by_row_entity_id($row_entity_id, $student_id)) {
+                $is_visible = false;
+            }
 
             // Also check the time availability of the LP
-
             if ($is_visible) {
 	            //Adding visibility reestrinctions
 	            if (!empty($row['publicated_on']) && $row['publicated_on'] != '0000-00-00 00:00:00') {
@@ -2122,6 +2127,7 @@ class learnpath {
             }
             return $is_visible;
         }
+
         return false;
     }
     /**
@@ -3265,7 +3271,7 @@ class learnpath {
             $this->lp_view_id = $id;
 
             //Sequence rule #7220
-            require_once '../inc/lib/sequence.lib.php';
+            require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
             Sequence::temp_hack_4_insert($this->get_total_items_count(), 1, $this->get_id(), $course_id, api_get_session_id(), $this->get_user_id());
         }
         return $this->lp_view_id;
@@ -3789,7 +3795,7 @@ class learnpath {
             $this->lp_view_id = $view_id;
             $this->attempt = $this->attempt + 1;
             //Sequence rule
-            require_once '../inc/lib/sequence.lib.php';
+            require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
             Sequence::temp_hack_4($this->get_total_items_count(),1,$this->lp_id, $this->get_user_id());
         } else {
             $this->error = 'Could not insert into item_view table...';
@@ -3910,7 +3916,7 @@ class learnpath {
             $this->progress_db = $progress;
 
             //Temporaly located here for #7220
-            require_once '../inc/lib/sequence.lib.php';
+            require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
             Sequence::temp_hack_4_update(1,$this->get_id(),$course_id,api_get_session_id(),$this->get_user_id(),1,$this->get_complete_items_count(),max($this->get_total_items_count(),1),null);
         }
     }
@@ -4279,7 +4285,7 @@ class learnpath {
         }
         Database::query($sql);
         //Rule sequence 70% of pre-req #7220
-        require_once '../inc/lib/sequence.lib.php';
+        require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
         Sequence::temp_hack_3_update(1, 1, $this->prerequisite, $lp_id, $course_id, api_get_session_id());
         return true;
     }
@@ -9360,7 +9366,7 @@ EOD;
         Database::query($sql);
 
         //Rule sequence 70% of pre-req #7220
-        require_once '../inc/lib/sequence.lib.php';
+        require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
         Sequence::temp_hack_3_update(1, 1, 0, $lp_id, $course_id, api_get_session_id());
 
         //Cleaning mastery score for exercises

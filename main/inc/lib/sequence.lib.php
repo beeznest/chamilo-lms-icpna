@@ -94,15 +94,12 @@ class Sequence {
             while(isset($con)) {
                 $var = self::get_variable_by_condition_id($con['id']);
                 $val = self::get_value_by_user_id($row_entity_id, $user_id, 1);
-                var_dump($var);
-                var_dump($val);
                 $statement = 'return ('.floatval($val[0][$var[0]["name"]]).' '.$con["mat_op"].' '.$con["param"].');';
                 if (eval($statement)) {
                     $go = (!isset($con['act_true']))? -1 : intval($con['act_true']);
                 } else {
                     $go = (!isset($con['act_false']))? -1 : intval($con['act_false']);
                 }
-                var_dump($go);
                 if ($go === 0) {
                     return true;
                 } else {
@@ -272,7 +269,6 @@ class Sequence {
             $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
             $sql = "SELECT * FROM $val_table WHERE user_id = $user_id $available_filter $success_filter $row_entity_filter";
             $result = Database::query($sql);
-            var_dump($sql);
             if (Database::num_rows($result) > 0) {
                 while($temp_value = Database::fetch_array($result,'ASSOC')){
                     $value[] = $temp_value;
@@ -468,19 +464,15 @@ class Sequence {
             $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
             $sql = "SELECT * FROM $seq_table WHERE sequence_row_entity_id = $row_entity_id";
             $result = Database::query($sql);
-            var_dump($sql);
             while ($temp_seq_array = Database::fetch_array($result, 'ASSOC')){
                 $seq_array[] = $temp_seq_array;
             }
-            var_dump($seq_array);
             if (is_array($seq_array)) {
                 foreach ($seq_array as $seq) {
                     $sql = "SELECT id FROM $seq_table WHERE sequence_row_entity_id_next = ".$seq['sequence_row_entity_id_next'];
                     $result = Database::query($sql);
-                    var_dump($sql);
                     if (Database::num_rows($result) > 1){
                         $value = self::get_value_by_row_entity_id($seq['sequence_row_entity_id_next']);
-                        var_dump($value);
                         foreach ($value as $val) {
                             if ($seq['is_part'] === 1) {
                                 self::execute_formulas_by_user_id($seq['sequence_row_entity_id_next'], $val['user_id'], '', 1, 0, -1, null);
@@ -493,7 +485,6 @@ class Sequence {
                         $sql = "UPDATE $seq_table SET sequence_row_entity_id = 0 WHERE sequence_row_entity_id_next = ".$seq['sequence_row_entity_id_next'];
                         Database::query($sql);
                         self::temp_hack_4_set_aval($seq['sequence_row_entity_id_next'], 1);
-                        var_dump("VAAAAAAAAAAAAAAAAAAR");
                     }
                 }
             }
@@ -501,7 +492,6 @@ class Sequence {
             (sequence_row_entity_id = $row_entity_id AND sequence_row_entity_id_next = 0 ) OR
             (sequence_row_entity_id_next = $row_entity_id)";
             Database::query($sql);
-            var_dump($sql);
             if (Database::affected_rows() > 0) {
                 return (!empty($seq_array))? $seq_array : true;
             }
@@ -539,5 +529,23 @@ class Sequence {
         $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
         $sql = "UPDATE $val_table SET available = $available WHERE sequence_row_entity_id = $row_entity_id";
         Database::query($sql);
+    }
+
+    /**
+     * Bool Available for LP
+     */
+    public static function get_available_lp_by_row_entity_id ($row_entity_id, $user_id)
+    {
+        $seq_val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
+        require_once 'sequence.lib.php';
+        if ($row_entity_id > 0) {
+            $sql_seq = "SELECT val.available available FROM $seq_val_table val WHERE val.sequence_row_entity_id = $row_entity_id AND val.user_id = $user_id LIMIT 0, 1";
+            $result_seq = Database::query($sql_seq);
+            $arr_seq = Database::fetch_array($result_seq);
+            if (intval($arr_seq['available']) === 1) {
+                return true;
+            }
+        }
+        return false;
     }
 }

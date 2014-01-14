@@ -173,43 +173,67 @@ class Sequence {
         $value = self::get_value_by_user_id($row_entity_id, $user_id, $available);
         if ($value !== false) {
             if (!empty($met_type)) {
-                $met_filter = " met.met_type NOT IN ('success', 'pre', 'update') ";
+                $met_filter = " AND met.met_type NOT IN ('success', 'pre', 'update') ";
             } else {
-                $met_filter = " met.met_type = $met_type ";
+                $met_filter = " AND met.met_type = $met_type ";
             }
             $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
             $rul_table = Database::get_main_table(TABLE_SEQUENCE_RULE);
             $rul_met_table = Database::get_main_table(TABLE_SEQUENCE_RULE_METHOD);
             $met_table = Database::get_main_table(TABLE_SEQUENCE_METHOD);
             $var_table = Database::get_main_table(TABLE_SEQUENCE_VARIABLE);
-            $sql = "SELECT var.name FROM $var_table var";
+            $sql = "SELECT var.id, var.name FROM $var_table var";
             $result = Database::query($sql);
+            $variable = [];
             if (Database::num_rows($result) > 0) {
-                $variable = Database::fetch_array($result);
+                while($temp_var = Database::fetch_row($result));
+                $variable[$temp_var['id']] = $temp_var['name'];
             }
             $sql = "SELECT rul.id FROM $rul_table rul";
-            $sql = "SELECT rm.sequence_method_id FROM $rul_met_table rm WHERE rm.sequence = ($sql) ORDER BY rm.method_order";
-            $sql = "SELECT DISTINCT met.id, met.formula, met.assign FROM $met_table met WHERE $met_filter met.id = ($sql)";
+            $sql = "SELECT DISTINCT rm.method_order, met.id, met.formula, met.assign FROM $met_table met, $rul_met_table rm WHERE 
+            met.id = rm.sequence_method_id AND rm.sequence_rule_id IN ($sql) $met_filter ORDER BY rm.method_order";
             $result = Database::query($sql);
             if (Database::num_rows($result) > 0) {
                 $formula= Database::fetch_array($result);
             }
             $pat = "/v#(\d+)/";
-            $rep = '$val[$variable[$1]["name"]]';
-            if((isset($value) && isset($formula)) && isset ($variable)) {
-                foreach ($value as $val) {
+            if (isset($formula) && isset($variable)) {
+                if (is_array($value[0])) {
+                    $rep = '$val[$variable[$1]]';
+                    foreach ($value as $val) {
+                        $sql_array = array(
+                            'update' => " $val_table SET "
+                        );
+                        foreach ($formula as $fml) {
+                            $assign_key = $variable[$fml['assign']];
+                            $assign_val = &$val[$variable[$fml['assign']]];
+                            $fml_exe = preg_replace($pat, $rep, $fml['formula']);
+                            $fml_exe = 'return '.$fml_exe;
+                            $assign_val = eval($fml_exe);
+                            $sql_array[$assign_key] = " = $assign_val, ";
+                        }
+                        $sql_array['where'] = ' id = '.$val['id'];
+                        $sql = '';
+                        foreach ($sql_array as $sql_key => $sql_val) {
+                            $sql .= $sql_key;
+                            $sql .= $sql_val;
+                        }
+                        $result = Database::query($sql);
+                    }
+                } else {
+                    $rep = '$value[$variable[$1]]';
                     $sql_array = array(
-                        'update' => " $val_table SET "
+                        'UPDATE' => " $val_table SET "
                     );
                     foreach ($formula as $fml) {
-                        $assign_key = $variable[$fml['assign']]['name'];
-                        $assign_val = &$val[$variable[$fml['assign']]['name']];
+                        $assign_key = $variable[$fml['assign']];
+                        $assign_val = &$val[$variable[$fml['assign']]];
                         $fml_exe = preg_replace($pat, $rep, $fml['formula']);
                         $fml_exe = 'return '.$fml_exe;
                         $assign_val = eval($fml_exe);
                         $sql_array[$assign_key] = " = $assign_val, ";
                     }
-                    $sql_array['where'] = ' id = '.$val['id'];
+                    $sql_array['WHERE'] = ' id = '.$val['id'];
                     $sql = '';
                     foreach ($sql_array as $sql_key => $sql_val) {
                         $sql .= $sql_key;
@@ -405,10 +429,15 @@ class Sequence {
     public static function temp_hack_3_update($entity_id_prev, $entity_id_next, $row_id_prev = 0, $row_id_next = 0, $c_id = 0, $session_id = 0) {
         $row_entity_id_prev = self::get_row_entity_id_by_row_id($entity_id_prev, $row_id_prev, $c_id, $session_id);
         $row_entity_id_next = self::get_row_entity_id_by_row_id($entity_id_next, $row_id_next, $c_id, $session_id);
-        if ($row_entity_id_prev !== false && $row_entity_id_next !== false) {
+        if ($row_entity_id_prev !== 0 || $row_entity_id_next !== 0) {
             $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
             $sql = "UPDATE $seq_table SET sequence_row_entity_id = $row_entity_id_prev WHERE sequence_row_entity_id_next = $row_entity_id_next";
             Database::query($sql);
+            if ($row_entity_id_prev === 0) {
+                self::temp_hack_4_set_aval($row_entity_id_next, 1);
+            } else {
+                self::temp_hack_4_set_aval($row_entity_id_next, 0);
+            }
         }
     }
 
@@ -474,5 +503,12 @@ class Sequence {
             }
         }
         return false;
+    }
+    public static function temp_hack_4_set_aval($row_entity_id, $available)
+    {
+        $available = intval(Database::escape_string($available));
+        $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
+        $sql = "UPDATE $val_table SET available = $available WHERE sequence_row_entity_id = $row_entity_id";
+        Database::query($sql);
     }
 }

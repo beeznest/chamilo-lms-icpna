@@ -3786,7 +3786,7 @@ class learnpath {
             $this->attempt = $this->attempt + 1;
             //Sequence rule
             require_once '../inc/lib/sequence.lib.php';
-            Sequence::temp_hack_4($this-get_total_items_count,1,$this->lp_id, $this->get_user_id());
+            Sequence::temp_hack_4($this->get_total_items_count(),1,$this->lp_id, $this->get_user_id());
         } else {
             $this->error = 'Could not insert into item_view table...';
             return false;

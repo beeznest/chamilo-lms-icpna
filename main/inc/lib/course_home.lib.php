@@ -741,9 +741,10 @@ class CourseHome {
 
                 if (!empty($tool['custom_icon'])) {
                     //self::getCustomIconPath($courseInfo)
+                    $image = api_get_path(REL_COURSE_PATH).api_get_course_path().'/upload/course_home_icons/' . $tool['custom_icon'];
                     $icon = Display::img(
-                        $tool['image'],
-                        null,
+                        $image,
+                        $tool['description'],
                         array('class' => 'tool-icon', 'id' => 'toolimage_'.$tool['id'])
                     );
                 } elseif ($tool['image'] == 'scormbuilder.gif') {

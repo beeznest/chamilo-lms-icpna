@@ -279,6 +279,15 @@ class GDWrapper extends ImageWrapper {
 			$this->width = $width;
 			$this->height = $height;
 		}
+
+        //if type is png, resize image over a transparent background
+        if ($this->type == 'png') {
+            imagealphablending($dst_img, false);
+            imagesavealpha($dst_img,true);
+            $transparent = imagecolorallocatealpha($dst_img, 255, 255, 255, 127);
+            imagefilledrectangle($dst_img, 0, 0, $width, $height, $transparent);
+        }
+
 		$src_img = $this->bg;
 		@ImageCopyResampled($dst_img, $src_img, $deltaw, $deltah, 0, 0, $width, $height, ImageSX($src_img), ImageSY($src_img));
 		$this->bg = $dst_img;

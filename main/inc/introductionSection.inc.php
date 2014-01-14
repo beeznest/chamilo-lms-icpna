@@ -194,12 +194,13 @@ if ($intro_editAllowed) {
         }
 
         $form->addElement('header', get_lang('EditIcon'));
-        //$form->addElement('hidden', 'id');
-        //$form->addElement('hidden', 'c_id');
         $form->addElement('text', 'name', get_lang('Name'));
         $form->addElement('text', 'links', get_lang('Links'));
         //$form->addElement('text', 'custom_icon', get_lang('CustomIcon'));
+        $allowed_picture_types = array ('jpg', 'jpeg', 'png');
         $form->addElement('file', 'icon', get_lang('CustomIcon'));
+        $form->addRule('icon', get_lang('OnlyImagesAllowed').' ('.implode(',', $allowed_picture_types).')', 'filetype', $allowed_picture_types);
+
         $form->addElement('select', 'target', get_lang('Target'), array('_self' => '_self', '_blank' => '_blank'));
         $form->addElement('select', 'visibility', get_lang('Visibility'), array(1 => get_lang('Visible'), 0 => get_lang('Invisible')));
         $form->addElement('textarea', 'description', get_lang('Description'),array ('rows' => '3', 'cols' => '40'));
@@ -213,8 +214,6 @@ if ($intro_editAllowed) {
 
         if ($form->validate()) {
             if (isset($_FILES['icon']['size']) && $_FILES['icon']['size'] !== 0) {
-                //$picture_element = $form->getElement('icon');
-                //$picture         = $picture_element->getValue();
 
                 //Check if directory exists or create it if it doesn't
                 $dir = api_get_path(SYS_COURSE_PATH).api_get_course_path().'/upload/course_home_icons';
@@ -242,13 +241,24 @@ if ($intro_editAllowed) {
                     $file_exists = file_exists($path.$new_file_name);
                 }*/
 
-                //copy the image to the course upload folder
-                if (!copy($_FILES['icon']['tmp_name'], $dir . '/' . $_FILES['icon']['name'])) {
-                    //error message
+                //Resize image if it is larger than 64px
+                $temp = new Image($_FILES['icon']['tmp_name']);
+                $picture_infos = $temp->get_image_info();
+                if ($picture_infos['width'] > 64) {
+                    $thumbwidth = 64;
+                } else {
+                    $thumbwidth = $picture_infos['width'];
                 }
+                if ($picture_infos['height'] > 64) {
+                    $new_height = 64;
+                } else {
+                    $new_height = $picture_infos['height'];
+                }
+                $temp->resize($thumbwidth, $new_height, 0);
 
-                //$id             = Database::escape_string($_POST['id']);
-                //$c_id           = Database::escape_string($_POST['c_id']);
+                //copy the image to the course upload folder
+                $result = $temp->send_image($dir . '/' . $_FILES['icon']['name']);
+
                 $name           = Database::escape_string($_POST['name']);
                 $link           = Database::escape_string($_POST['links']);
                 $target         = Database::escape_string($_POST['target']);

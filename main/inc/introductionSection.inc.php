@@ -226,15 +226,14 @@ if ($intro_editAllowed) {
                 }
 
                 //change filename if already exists
-                /*$ext = explode('.', basename($document->path));
+                /*$i = '';
+                $ext = explode('.', basename($_FILES['icon']['tmp_name']));
                 if (count($ext) > 1) {
                     $ext = array_pop($ext);
-                    $file_name_no_ext = substr($document->path, 0, - (strlen($ext) + 1));
+                    $file_name_no_ext = substr($_FILES['icon']['tmp_name'], 0, - (strlen($ext) + 1));
                     $ext = '.'.$ext;
-                } else {
-                    $ext = '';
-                    $file_name_no_ext = $document->path;
-                }
+                } 
+
                 $new_file_name = $file_name_no_ext.'_'.$i.$ext;
                 $file_exists = file_exists($path.$new_file_name);
                 while ($file_exists) {
@@ -279,10 +278,8 @@ if ($intro_editAllowed) {
 
                 $result = Database::query($sql);
                 $intro_dispForm = false;
-                
-                //TODO fix confirmation message
-                //$introduction_section .= Display::display_confirmation_message(get_lang('Saved'),false);
-                Redirect::go(api_get_path(WEB_COURSE_PATH) . $_course['path'] . '/index.php');
+
+                Redirect::go(api_get_path(WEB_COURSE_PATH) . $_course['path'] . '/index.php?msg=Saved');
             }
         }
     }
@@ -303,9 +300,7 @@ if ($intro_editAllowed) {
         WHERE c_id = $course_id AND id = $intro_iconDelete";
         $result = Database::query($sql);
 
-        //TODO fix confirmation message
-        //Display::display_normal_message(get_lang('Deleted'), false);
-        Redirect::go(api_get_path(WEB_COURSE_PATH) . $_course['path'] . '/index.php');
+        Redirect::go(api_get_path(WEB_COURSE_PATH) . $_course['path'] . '/index.php?msg=Deleted');
     }
 }
 

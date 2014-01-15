@@ -39,6 +39,7 @@ $intro_cmdDel = empty($_GET['intro_cmdDel']) ? '' : $_GET['intro_cmdDel'];
 $intro_cmdAdd = empty($_GET['intro_cmdAdd']) ? '' : $_GET['intro_cmdAdd'];
 $intro_iconList = empty($_GET['intro_iconList']) ? '' : $_GET['intro_iconList'];
 $intro_iconEdit = empty($_GET['intro_iconEdit']) ? '' : $_GET['intro_iconEdit'];
+$intro_iconDelete = empty($_GET['intro_iconDelete']) ? '' : $_GET['intro_iconDelete'];
 
 if (!empty ($GLOBALS['_cid'])) {
 	$form = new FormValidator('introduction_text', 'post', api_get_self().'?'.api_get_cidreq());
@@ -159,7 +160,7 @@ if ($intro_editAllowed) {
             $introduction_section .= '<td><a href="' . api_get_path(WEB_CODE_PATH) . $tool['link'] . '?' . api_get_cidreq() . '"><img src="' . api_get_path(WEB_IMG_PATH).$tool['image']. '"></a></td>';
             $introduction_section .= '<td><a href="' . api_get_path(WEB_CODE_PATH) . $tool['link'] . '?' . api_get_cidreq() . '">' .  $tool['name']. '</a></td>';
             $introduction_section .= '<td><a class="btn btn-primary" href="' . api_get_self() . '?intro_iconEdit=' . $tool['id'] . '">' . get_lang('Edit'). '</a></td>';
-            $delete = (!empty($tool['custom_icon'])) ? '<a class="btn btn-danger" href="' . api_get_self() . '?intro_iconEdit=' . $tool['id'] . '">' . get_lang('Delete'). '</a>' : '';
+            $delete = (!empty($tool['custom_icon'])) ? '<a class="btn btn-danger" href="' . api_get_self() . '?intro_iconDelete=' . $tool['id'] . '">' . get_lang('Delete'). '</a>' : '';
             $introduction_section .= '<td>' . $delete . '</td>';
             $introduction_section .= '</tr>';
         }
@@ -188,31 +189,31 @@ if ($intro_editAllowed) {
         $default['description'] = $tool['description'];
 
         if (!empty ($GLOBALS['_cid'])) {
-            $form = new FormValidator('icon_edit', 'post', api_get_self().'?intro_iconEdit=' . $default['id']);
+            $formEdit = new FormValidator('icon_edit', 'post', api_get_self().'?intro_iconEdit=' . $default['id']);
         } else {
-            $form = new FormValidator('icon_edit');
-        }
+            $formEdit = new FormValidator('icon_edit');
+       	}
 
-        $form->addElement('header', get_lang('EditIcon'));
-        $form->addElement('text', 'name', get_lang('Name'));
-        $form->addElement('text', 'links', get_lang('Links'));
-        //$form->addElement('text', 'custom_icon', get_lang('CustomIcon'));
+        $formEdit->addElement('header', get_lang('EditIcon'));
+        $formEdit->addElement('text', 'name', get_lang('Name'));
+        $formEdit->addElement('text', 'links', get_lang('Links'));
+            //$formEdit->addElement('text', 'custom_icon', get_lang('CustomIcon'));
         $allowed_picture_types = array ('jpg', 'jpeg', 'png');
-        $form->addElement('file', 'icon', get_lang('CustomIcon'));
-        $form->addRule('icon', get_lang('OnlyImagesAllowed').' ('.implode(',', $allowed_picture_types).')', 'filetype', $allowed_picture_types);
+        $formEdit->addElement('file', 'icon', get_lang('CustomIcon'));
+        $formEdit->addRule('icon', get_lang('OnlyImagesAllowed').' ('.implode(',', $allowed_picture_types).')', 'filetype', $allowed_picture_types);
 
-        $form->addElement('select', 'target', get_lang('Target'), array('_self' => '_self', '_blank' => '_blank'));
-        $form->addElement('select', 'visibility', get_lang('Visibility'), array(1 => get_lang('Visible'), 0 => get_lang('Invisible')));
-        $form->addElement('textarea', 'description', get_lang('Description'),array ('rows' => '3', 'cols' => '40'));
-        $form->addElement('style_submit_button', 'intro_cmdUpdate', get_lang('SaveIntroText'), 'class="save"');
+        $formEdit->addElement('select', 'target', get_lang('Target'), array('_self' => '_self', '_blank' => '_blank'));
+        $formEdit->addElement('select', 'visibility', get_lang('Visibility'), array(1 => get_lang('Visible'), 0 => get_lang('Invisible')));
+        $formEdit->addElement('textarea', 'description', get_lang('Description'),array ('rows' => '3', 'cols' => '40'));
+        $formEdit->addElement('style_submit_button', 'intro_cmdUpdate', get_lang('SaveIntroText'), 'class="save"');
 
-        $form->setDefaults($default);
+        $formEdit->setDefaults($default);
 
         $introduction_section .= '<div id="courseintro" style="width: 98%">';
-        $introduction_section .= $form->return_form();
+        $introduction_section .= $formEdit->return_form();
         $introduction_section .= '</div>';
 
-        if ($form->validate()) {
+        if ($formEdit->validate()) {
             if (isset($_FILES['icon']['size']) && $_FILES['icon']['size'] !== 0) {
 
                 //Check if directory exists or create it if it doesn't
@@ -276,10 +277,27 @@ if ($intro_editAllowed) {
                             WHERE c_id = $course_id AND id = $intro_iconEdit";
 
                 $result = Database::query($sql);
-
-            //Display :: display_confirmation_message(get_lang('IconSaved'));
+                $intro_dispForm = false;
+            	//$introduction_section .= Display::display_confirmation_message(get_lang('Saved'),false);
             }
         }
+    }
+}
+
+/* INTRODUCTION MICRO MODULE - DELETE ICON */
+
+if ($intro_editAllowed) {
+    if (!empty($intro_iconDelete)) {
+        $intro_dispForm = false;
+        $course_id = api_get_course_int_id();
+        $course_tool_table  = Database::get_course_table(TABLE_TOOL_LIST);
+
+        $sql    = "UPDATE $course_tool_table
+        SET custom_icon = '',
+        description = ''
+        WHERE c_id = $course_id AND id = $intro_iconDelete";
+        $result = Database::query($sql);
+        //$introduction_section .= Display::display_normal_message(get_lang('Deleted'), false);
     }
 }
 

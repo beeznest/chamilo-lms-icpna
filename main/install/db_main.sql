@@ -3261,7 +3261,7 @@ CREATE TABLE sequence_valid (
 DROP TABLE IF EXISTS sequence_type_entity;
 CREATE TABLE sequence_type_entity (
     id int unsigned not null auto_increment,
-    name varchar(50) default '',
+    name varchar(50) not null default '',
     description TEXT default '',
     ent_table varchar(50) not null,
     PRIMARY KEY (id)
@@ -3274,6 +3274,7 @@ CREATE TABLE sequence_row_entity (
     c_id  int unsigned not null,
     session_id int unsigned not null default 0,
     row_id int unsigned not null,
+    name varchar(200) not null default '',
     PRIMARY KEY (id)
 );
 
@@ -3315,16 +3316,16 @@ INSERT INTO sequence_rule_condition VALUES
     (2,1,2);
 INSERT INTO sequence_method (description,formula, assign, met_type) VALUES
     ('Aumenta elemento completado','v#2 + $complete_items;', 2, 'add'),
-    ('Actualiza Avance por división', 'v#2 / v#3;', 1, 'div'),
+    ('Actualiza Avance por división', 'v#2 / v#3 * 100;', 1, 'div'),
     ('Actualiza total de elementos', '$total_items;', 3,'update'),
     ('Activa logro', '1;', 4, 'success'),
     ('Almacena la fecha de logro', '(empty(v#5))? api_get_utc_datetime() : v#5;', 5, 'success'),
     ('Activa disponibilidad', '1;', 6, 'pre'),
     ('Almacena la fecha inicio de disponibilidad', '(empty(v#7))? api_get_utc_datetime() : v#7;', 7, 'pre'),
-    ('Almacena la fecha fin de disponibilidad', '(!empty($available_end_date))? api_get_utc_datetime($available_end_date) : "0000-00-00 00:00:00";', 8, 'pre'),
+    ('Almacena la fecha fin de disponibilidad', '(empty($available_end_date))? api_get_utc_datetime($available_end_date) : "0000-00-00 00:00:00";', 8, 'pre'),
     ('Aumenta el total de elementos', 'v#3 + $total_items;', 3,'add'),
     ('Actualiza elementos completados', '$complete_items;', 2,'update'),
-    ('Actualiza Avance', '$complete_items / $total_items;', 1, 'update');
+    ('Actualiza Avance', '$complete_items / $total_items * 100;', 1, 'update');
 INSERT INTO sequence_rule_method VALUES
     (1,1,1,1),
     (2,1,2,3),

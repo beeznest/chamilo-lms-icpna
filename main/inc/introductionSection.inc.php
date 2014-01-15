@@ -174,7 +174,8 @@ if ($intro_editAllowed) {
     if (!empty($intro_iconEdit)) {
         //defaults
         $course_tool_table  = Database::get_course_table(TABLE_TOOL_LIST);
-        $course_id = api_get_course_int_id();
+        $course_id          = api_get_course_int_id();
+        $_course            = api_get_course_info();
 
         $sql = "SELECT * FROM $course_tool_table  WHERE category = 'authoring' AND id = $intro_iconEdit AND c_id = $course_id";
         $result = Database::query($sql);
@@ -278,7 +279,10 @@ if ($intro_editAllowed) {
 
                 $result = Database::query($sql);
                 $intro_dispForm = false;
-            	//$introduction_section .= Display::display_confirmation_message(get_lang('Saved'),false);
+                
+                //TODO fix confirmation message
+                //$introduction_section .= Display::display_confirmation_message(get_lang('Saved'),false);
+                Redirect::go(api_get_path(WEB_COURSE_PATH) . $_course['path'] . '/index.php');
             }
         }
     }
@@ -288,16 +292,20 @@ if ($intro_editAllowed) {
 
 if ($intro_editAllowed) {
     if (!empty($intro_iconDelete)) {
-        $intro_dispForm = false;
-        $course_id = api_get_course_int_id();
-        $course_tool_table  = Database::get_course_table(TABLE_TOOL_LIST);
+        $intro_dispForm    = false;
+        $course_id         = api_get_course_int_id();
+        $_course           = api_get_course_info();
+        $course_tool_table = Database::get_course_table(TABLE_TOOL_LIST);
 
         $sql    = "UPDATE $course_tool_table
         SET custom_icon = '',
         description = ''
         WHERE c_id = $course_id AND id = $intro_iconDelete";
         $result = Database::query($sql);
-        //$introduction_section .= Display::display_normal_message(get_lang('Deleted'), false);
+
+        //TODO fix confirmation message
+        //Display::display_normal_message(get_lang('Deleted'), false);
+        Redirect::go(api_get_path(WEB_COURSE_PATH) . $_course['path'] . '/index.php');
     }
 }
 

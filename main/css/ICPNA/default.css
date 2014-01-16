@@ -306,17 +306,17 @@ header #logo {
 #bar-animation {
     background-color: #fff;
     /*padding: 4px 4px 4px 4px;*/
-    height: 15px;
+    height: 20px;
     border-radius: 8px;
     -moz-border-radius: 8px;
     -webkit-border-radius: 8px;
     -khtml-border-radius: 8px;
-    width: 180px;
+    width: 100%;
     display: inline-block;
 }
 .color-bar-process {
-    height: 15px;
-    line-height: 14px;
+    height: 20px;
+    /*line-height: 14px;*/
     text-align: right;
     width: 0;
     border-radius: 8px;
@@ -797,7 +797,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
   color: white;
   font-size: 12px;
   text-decoration: none;
-  width: 150px;
+  width: 134px;
   text-align: right;
   border-left: 4px solid transparent;
   -webkit-transition: all 0.35s ease-in-out;
@@ -820,6 +820,9 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
 }
 #cssmenu .close{
     background:url(images/iconos-perfil.png) no-repeat 15px -75px;
+}
+#cssmenu .email{
+    background:url(images/iconos-perfil.png) no-repeat 15px -120px;
 }
 .user-pic{
      background-color: #fff;
@@ -862,7 +865,36 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
 font-size: 15px;
 color: #fff;
 }
+.user-profile-block {
+    margin-left: 58px;
+    width: 205px;
+}
+.ajax{
+  float: right;
+}
+
 /*Fin de la definicion*/
+
+.column-one{
+  width: 55%;
+  float: left;
+}
+.column-two{
+  
+  width: 19%;
+  float: left;
+  text-align: right;
+  padding-right: 1%;
+}
+.column-tree{
+
+  width: 21%;
+  float: left;
+}
+.column-four{
+  width: 3%;
+  float: left;
+}
 
 /*FIN DE PERFIL DE USUARIO 500px y 769*/
 

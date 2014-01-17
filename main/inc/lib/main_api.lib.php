@@ -2325,6 +2325,9 @@ function api_is_allowed_to_create_course() {
  * @return boolean True if current user is a course administrator
  */
 function api_is_course_admin() {
+    if (api_is_platform_admin()) {
+        return true;
+    }
     return $_SESSION['is_courseAdmin'];
 }
 
@@ -2333,6 +2336,9 @@ function api_is_course_admin() {
  * @return bool     True if current user is a course coach
  */
 function api_is_course_coach() {
+    if (api_is_platform_admin()) {
+        return true;
+    }
     return $_SESSION['is_courseCoach'];
 }
 
@@ -2341,6 +2347,9 @@ function api_is_course_coach() {
  * @return bool     True if current user is a course tutor
  */
 function api_is_course_tutor() {
+    if (api_is_platform_admin()) {
+        return true;
+    }
     return $_SESSION['is_courseTutor'];
 }
 

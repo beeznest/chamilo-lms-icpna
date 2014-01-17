@@ -102,8 +102,8 @@ class Display {
     }
 
     public static function return_introduction_section($tool, $toolList = array(), $editor_config = null) {
-        $is_allowed_to_edit = api_is_allowed_to_edit();
-        $moduleId = $tool;
+        $is_allowed_to_edit = api_is_allowed_to_edit(); //used in introductionSection
+        $moduleId = $tool; // used in introductionSection
         if (api_get_setting('enable_tool_introduction') == 'true' || $tool == TOOL_COURSE_HOMEPAGE) {
             $introduction_section = null;
             require api_get_path(INCLUDE_PATH).'introductionSection.inc.php';

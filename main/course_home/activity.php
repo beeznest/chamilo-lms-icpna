@@ -96,6 +96,11 @@ if ($session_id == 0 && api_is_course_admin() && api_is_allowed_to_edit(null, tr
     $content .= CourseHome::show_tools_category($result['content']);
     $totalList = array_merge($totalList, $result['tool_list']);
     $content .= '</div>';
+    $list2 = CourseHome::get_tools_category(TOOL_STUDENT_VIEW, true);
+    if (count($list2) > 0) {
+        $result = CourseHome::show_tools_category($list2);
+        $totalList = array_merge($totalList, $result['tool_list']);
+    }
 } else {
     $list = CourseHome::get_tools_category(TOOL_STUDENT_VIEW);
     if (count($list) > 0) {
@@ -104,6 +109,11 @@ if ($session_id == 0 && api_is_course_admin() && api_is_allowed_to_edit(null, tr
         $content .= $result['content'];
         $totalList = array_merge($totalList, $result['tool_list']);
         $content .= '</div>';
+    }
+    $list2 = CourseHome::get_tools_category(TOOL_STUDENT_VIEW, true);
+    if (count($list2) > 0) {
+        $result = CourseHome::show_tools_category($list2);
+        $totalList = array_merge($totalList, $result['tool_list']);
     }
 }
 

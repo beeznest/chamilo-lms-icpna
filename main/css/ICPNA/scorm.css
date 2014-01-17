@@ -79,7 +79,7 @@
 
 .inner_lp_toc .scorm_item_1 {
     /*background-color:#CCCCCC;*/   
-    padding: 10px 10px 10px 35px;
+    padding: 10px 35px;
     font-weight: normal;
     margin-top: 5px;
     margin-bottom: 5px;
@@ -91,7 +91,7 @@
 
 .inner_lp_toc .scorm_item_2 {    
     /*background-color: #CCCCCC; */
-    padding: 10px 10px 10px 35px;
+    padding: 10px 35px;
     text-decoration: none;
     font-weight: normal;
     margin-top: 5px;
@@ -103,7 +103,7 @@
 
 .inner_lp_toc .scorm-level-0 a{
     color: #fff;
-    padding: 0.3em;
+    font-size: 15px;
 }
 
 .inner_lp_toc .scorm-level-0 a:focus{

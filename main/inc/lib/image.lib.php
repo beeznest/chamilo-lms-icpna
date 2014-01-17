@@ -190,7 +190,8 @@ class ImagickWrapper extends ImageWrapper {
      * Convert image to black & white
      */
     function convert2bw() {
-        return true;
+        error_log('Function '.__FUNCTION__.' not implemented yet for class '.__CLASS__);
+        return false;
     }
 }
 

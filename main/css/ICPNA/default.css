@@ -388,6 +388,7 @@ header #logo {
 }
 .center-items{
     text-align: center;
+    padding-left:15px;
 }
 /*ICONOS DE ESTADO DE LAS LECCIONES*/
 .center{
@@ -411,7 +412,7 @@ header #logo {
     cursor: pointer;
     display: block;
     height: 95px;
-    width: 95px;
+    width: 100px;
     /*position: absolute;*/
     margin:auto;
     padding-top: 1em;
@@ -423,7 +424,7 @@ header #logo {
     cursor: pointer;
     display: block;
     height: 95px;
-    width: 95px;
+    width: 100px;
     /*position: absolute;*/
     margin:auto;
     padding-top: 1em;
@@ -435,7 +436,7 @@ header #logo {
     cursor: pointer;
     display: block;
     height: 95px;
-    width: 95px;
+    width: 100px;
     /*position: absolute;*/
     margin:auto;
     padding-top: 1em;

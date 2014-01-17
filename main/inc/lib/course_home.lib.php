@@ -746,7 +746,7 @@ class CourseHome {
                         null,
                         array('class' => 'tool-icon', 'id' => 'toolimage_'.$tool['id'])
                     );
-                } elseif ($tool['image'] == 'scormbuilder.gif') {
+                } elseif ($tool['image'] == 'scormbuilder.gif' or $tool['image'] == 'scormbuilder_na.gif') {
                     if (api_is_allowed_to_edit(null, true)) {
                         $tool_link_params['href'] .= '&isStudentView=true';
                     }
@@ -754,7 +754,7 @@ class CourseHome {
                     $lp_id = self::get_published_lp_id_from_link($tool['link']);
                     if ($lp_id) {
                         $lp = new learnpath(api_get_course_id(), $lp_id, api_get_user_id());
-                        $path = $lp->get_preview_image_path(64);
+                        $path = $lp->get_preview_image_path(64, 'web', ($tool['visibility'] == '0'));
                         if (!empty($path)) {
                             $icon = Display::img(
                                 $path,
@@ -1130,6 +1130,12 @@ class CourseHome {
                 continue;
             }
             $state = 'closed';
+            $iconPath = $tool['pure_icon'];
+            if ($state == 'closed') {
+                $iconPath = preg_split('/64\./',$iconPath);
+                error_log(print_r($iconPath,1));
+                $iconPath = $iconPath[0].'-na'.$iconPath[1];
+            }
             $toolName = $tool['tool']['name'];
             $show = '<div class="span2 center">'
               . ' <a href="'.$tool['tool']['link'].'" class="state-icon-link">'

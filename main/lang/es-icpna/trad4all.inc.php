@@ -18,3 +18,4 @@ $EditionNotAvailableFromSession="No es posible editar este recurso de curso desd
 $ANewSessionWasCreated="Un programa académico ha sido creado";
 $CopyLabelSuffix="Copia";
 $StudentList="Lista de alumnos";
+$Inbox="Correos";

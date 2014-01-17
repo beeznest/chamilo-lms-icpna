@@ -416,6 +416,7 @@ header #logo {
     /*position: absolute;*/
     margin:auto;
     padding-top: 1em;
+    z-index:100;
 }
 
 .row .state-icon-process{
@@ -428,6 +429,7 @@ header #logo {
     /*position: absolute;*/
     margin:auto;
     padding-top: 1em;
+    z-index:100;
 }
 
 .row .state-icon-closed{
@@ -440,6 +442,7 @@ header #logo {
     /*position: absolute;*/
     margin:auto;
     padding-top: 1em;
+    z-index:100;
 }
 
 /* FIN DEL ESTADO DE ICONOS DE LAS LECCIONES */

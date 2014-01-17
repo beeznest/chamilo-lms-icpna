@@ -9178,6 +9178,15 @@ EOD;
                         //Resize to 64 for course homepage
                         $temp->resize(64, 64, 0);
                         $temp->send_image($updir.'/'.$filename.'.64.'.$file_extension);
+                        unset($temp);
+                        // Generate a black & white copy of the 64px icon
+                        $temp = new Image($updir.'/'.$filename.'.64.'.$file_extension);
+                        $r = $temp->convert2bw();
+                        if ($r === false) {
+                            error_log('Conversion to B&W of '.$updir.'/'.$filename.'.64.'.$file_extension.' failed');
+                        } else {
+                            $temp->send_image($updir.'/'.$filename.'.64-na.'.$file_extension);
+                        }
                         return true;
                     }
                 }

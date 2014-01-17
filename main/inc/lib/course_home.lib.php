@@ -618,7 +618,10 @@ class CourseHome {
                 if ($tool['image'] == 'scormbuilder.gif') {
                     // Check if the published learnpath is visible for student
                     $published_lp_id = self::get_published_lp_id_from_link($tool['link']);
-                    if (!api_is_allowed_to_edit(null, true) && !learnpath::is_lp_visible_for_student($published_lp_id,api_get_user_id())) {
+                    if (api_is_allowed_to_edit(null, true)) {
+                        $studentview = true;
+                    }
+                    if (!api_is_allowed_to_edit(null, true) && !learnpath::is_lp_visible_for_student($published_lp_id, api_get_user_id())) {
                         continue;
                     }
                 }

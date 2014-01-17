@@ -410,33 +410,35 @@ header #logo {
     background: transparent url(images/estados-iconos.png) no-repeat;
     cursor: pointer;
     display: block;
-    height: 90px;
-    width: 85px;
+    height: 95px;
+    width: 95px;
     /*position: absolute;*/
     margin:auto;
+    padding-top: 1em;
 }
 
 .row .state-icon-process{
     background: transparent url(images/estados-iconos.png) no-repeat;
-    background-position: -85px 0px;
+    background-position: -105px 0px;
     cursor: pointer;
     display: block;
-    height: 90px;
-    width: 85px;
+    height: 95px;
+    width: 95px;
     /*position: absolute;*/
     margin:auto;
-    padding-top: 0.5em;
+    padding-top: 1em;
 }
 
 .row .state-icon-closed{
     background: transparent url(images/estados-iconos.png) no-repeat;
-    background-position: -171px 0px;
+    background-position: -210px 0px;
     cursor: pointer;
     display: block;
-    height: 90px;
-    width: 85px;
+    height: 95px;
+    width: 95px;
     /*position: absolute;*/
     margin:auto;
+    padding-top: 1em;
 }
 
 /* FIN DEL ESTADO DE ICONOS DE LAS LECCIONES */

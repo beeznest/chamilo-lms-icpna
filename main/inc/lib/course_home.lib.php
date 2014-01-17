@@ -789,6 +789,7 @@ class CourseHome {
                 $session_img = api_get_session_image($tool['session_id'], $_user['status']);
                 $item['url_params'] = $tool_link_params;
                 $item['icon']       = Display::url($icon, $tool_link_params['href'], $tool_link_params);
+                $item['pure_icon']  = $icon;
                 $item['tool']       = $tool;
                 $item['name']       = $tool_name;
 
@@ -1128,15 +1129,15 @@ class CourseHome {
             if (!isset($tool['icon'])) {
                 continue;
             }
+            $state = 'closed';
             $toolName = $tool['tool']['name'];
             $show = '<div class="span2 center">'
-              . '<div class="icon-courses-dialogue-completed">'
               . ' <a href="'.$tool['tool']['link'].'" class="state-icon-link">'
-              . '  <span class="state-icon-completed"></span>'
+              . '   <span class="state-icon-' . $state . '">'
+              . $tool['pure_icon']
+              . '   </span>'
               . ' </a>'
-              . '</div>'
-              . '<div class="center-items"><a href="'.$tool['tool']['link'].'">'.$toolName.'</a></div>'
-              . '</div>';
+              . '<div class="center-items"><a href="'.$tool['tool']['link'].'">'.$toolName.'</a></div></div>';
             $search = array("{{ ".$toolName." }}", "{{".$toolName."}}", "((".$toolName."))", "(( ".$toolName." ))");
             if (!$editMode) {
                 $text = str_replace($search, $show, $text);

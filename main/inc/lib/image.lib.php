@@ -17,18 +17,18 @@ define('IMAGE_PROCESSOR', 'gd'); // imagick or gd strings
 class Image {
 	var $image_wrapper = null;
 
-	function __construct($path) {		
+	function __construct($path) {
 	    $path = preg_match(VALID_WEB_PATH, $path) ? (api_is_internal_path($path) ? api_get_path(TO_SYS, $path) : $path) : $path;
 	    if (IMAGE_PROCESSOR == 'gd') {
-	        $this->image_wrapper = new GDWrapper($path);	        
+	        $this->image_wrapper = new GDWrapper($path);
 	    } else {
 	    	if (class_exists('Imagick')) {
 	        	$this->image_wrapper = new ImagickWrapper($path);
 	    	} else {
 	    		Display::display_warning_message('Class Imagick not found');
-	    		exit;	    			    		
-	    	}	        
-	    }	    	    
+	    		exit;
+	    	}
+	    }
 	}
 	public function resize($thumbw, $thumbh, $border = 0, $specific_size = false) {
         $this->image_wrapper->resize($thumbw, $thumbh, $border, $specific_size );
@@ -191,9 +191,9 @@ class ImagickWrapper extends ImageWrapper {
  */
 class GDWrapper extends ImageWrapper {
     var $bg;
-	
+
     function __construct($path) {
-        parent::__construct($path);        		
+        parent::__construct($path);
     }
     
     public function set_image_wrapper() {   
@@ -220,8 +220,9 @@ class GDWrapper extends ImageWrapper {
         if ($handler) {
             $this->image_validated = true;
             $this->bg = $handler;
-            @imagealphablending($this->bg, true);	
-        }           
+            @imagealphablending($this->bg, false);
+            @imagesavealpha($this->bg, true);
+        }
     }
     	
     public function get_image_size() {
@@ -258,7 +259,9 @@ class GDWrapper extends ImageWrapper {
             }
 			$deltaw = (int)(($thumbw - $width) / 2);
 			$deltah = (int)(($thumbh - $height) / 2);
-			$dst_img = @ImageCreateTrueColor($thumbw, $thumbh);
+            $dst_img = @ImageCreateTrueColor($thumbw, $thumbh);
+            @imagealphablending($dst_img, false);
+            @imagesavealpha($dst_img, true);
 			if (!empty($this->color)) {
 				@imagefill($dst_img, 0, 0, $this->color);
 			}
@@ -276,6 +279,8 @@ class GDWrapper extends ImageWrapper {
 			$deltaw = 0;
 			$deltah = 0;
 			$dst_img = @ImageCreateTrueColor($width, $height);
+            @imagealphablending($dst_img, false);
+            @imagesavealpha($dst_img, true);
 			$this->width = $width;
 			$this->height = $height;
 		}

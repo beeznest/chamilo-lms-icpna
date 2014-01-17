@@ -3080,7 +3080,6 @@ CREATE TABLE course_type (
     translation_var char(40) default 'UndefinedCourseTypeLabel',
     description TEXT default '',
     props text default ''
-    primary
 );
 
 INSERT INTO course_type (id, name) VALUES (1, 'All tools');
@@ -3182,16 +3181,6 @@ CREATE TABLE sequence_rule_condition (
     PRIMARY KEY (id)
 );
 
-/*
-DROP TABLE IF EXISTS sequence_method;
-CREATE TABLE sequence_method (
-    id int unsigned not null auto_increment,
-    description TEXT default '',
-    met_type varchar(50) default '',
-    PRIMARY KEY (id)
-);
-*/
-
 DROP TABLE IF EXISTS sequence_method;
 CREATE TABLE sequence_method (
     id int unsigned not null auto_increment,
@@ -3201,16 +3190,6 @@ CREATE TABLE sequence_method (
     met_type varchar(50) default '',
     PRIMARY KEY (id)
 );
-
-/*
-DROP TABLE IF EXISTS sequence_rule_method;
-CREATE TABLE sequence_rule_method (
-    id int unsigned not null auto_increment,
-    sequence_rule_id int unsigned not null,
-    sequence_method_id int unsigned not null,
-    PRIMARY KEY (id)
-);
-*/
 
 DROP TABLE IF EXISTS sequence_rule_method;
 CREATE TABLE sequence_rule_method (
@@ -3229,18 +3208,6 @@ CREATE TABLE sequence_variable (
     default_val varchar(50) default '',
     PRIMARY KEY (id)
 );
-/*
-DROP TABLE IF EXISTS sequence_formula;
-CREATE TABLE sequence_formula (
-    id int unsigned not null auto_increment,
-    sequence_method_id int unsigned not null,
-    method_order int unsigned not null,
-    iteration int unsigned not null default 1,
-    method_op varchar(50) not null,
-    sequence_variable_id int unsigned not null,
-    PRIMARY KEY (id)
-);
-*/
 
 DROP TABLE IF EXISTS sequence_formula;
 CREATE TABLE sequence_formula (

@@ -400,10 +400,10 @@ class CourseHome {
      * by show_tools_category()
      * @param string $course_tool_category	contains the category of tools to
      * display: "toolauthoring", "toolinteraction", "tooladmin", "tooladminplatform", "toolplugin"
+     * @param bool $only_hidden Allows you to force the listing of tools hidden to students (and only those). This will allow the manual management of this list later on
      * @return array
      */
-
-    public static function get_tools_category($course_tool_category) {
+    public static function get_tools_category($course_tool_category, $only_hidden = false) {
         $course_tool_table  = Database::get_course_table(TABLE_TOOL_LIST);
         $is_platform_admin  = api_is_platform_admin();
         $all_tools_list = array();
@@ -415,9 +415,9 @@ class CourseHome {
 
         switch ($course_tool_category) {
             case TOOL_STUDENT_VIEW:
-                    $condition_display_tools = ' WHERE visibility = 1 AND (category = "authoring" OR category = "interaction" OR category = "plugin") ';
+                    $condition_display_tools = ' WHERE visibility = '.($only_hidden ? '0' : '1') .' AND (category = "authoring" OR category = "interaction" OR category = "plugin") ';
                     if ((api_is_coach() || api_is_course_tutor()) && $_SESSION['studentview'] != 'studentview') {
-                        $condition_display_tools = ' WHERE (visibility = 1 AND (category = "authoring" OR category = "interaction" OR category = "plugin") OR (name = "'.TOOL_TRACKING.'") )   ';
+                        $condition_display_tools = ' WHERE ( visibility = '.($only_hidden ? '0':'1'). ' AND (category = "authoring" OR category = "interaction" OR category = "plugin") OR (name = "'.TOOL_TRACKING.'") )   ';
                     }
                     $sql = "SELECT * FROM $course_tool_table  $condition_display_tools AND c_id = $course_id $condition_session ORDER BY id";
                     $result = Database::query($sql);
@@ -747,7 +747,7 @@ class CourseHome {
                         $tool['description'],
                         array('class' => 'tool-icon', 'id' => 'toolimage_'.$tool['id'])
                     );
-                } elseif ($tool['image'] == 'scormbuilder.gif') {
+                } elseif ($tool['image'] == 'scormbuilder.gif' or $tool['image'] == 'scormbuilder_na.gif') {
                     if (api_is_allowed_to_edit(null, true)) {
                         $tool_link_params['href'] .= '&isStudentView=true';
                     }
@@ -755,7 +755,7 @@ class CourseHome {
                     $lp_id = self::get_published_lp_id_from_link($tool['link']);
                     if ($lp_id) {
                         $lp = new learnpath(api_get_course_id(), $lp_id, api_get_user_id());
-                        $path = $lp->get_preview_image_path(64);
+                        $path = $lp->get_preview_image_path(64, 'web');
                         if (!empty($path)) {
                             $icon = Display::img(
                                 $path,
@@ -790,6 +790,7 @@ class CourseHome {
                 $session_img = api_get_session_image($tool['session_id'], $_user['status']);
                 $item['url_params'] = $tool_link_params;
                 $item['icon']       = Display::url($icon, $tool_link_params['href'], $tool_link_params);
+                $item['pure_icon']  = $icon;
                 $item['tool']       = $tool;
                 $item['name']       = $tool_name;
 
@@ -1159,11 +1160,18 @@ class CourseHome {
             if (!isset($tool['icon'])) {
                 continue;
             }
+            $state = 'closed';
             $toolName = $tool['tool']['name'];
-            $show = '<div class="span2">'
-                . '<div class="course-dialogo-completed">'.$tool['icon'].'</div>'
-                . '<div class="center-items"><h4><a href="'.$tool['tool']['link'].'">'.$toolName.'</a></h4></div>'
-                . '</div>';
+            $show = '<div class="span2 center">'
+
+              . ($tool['visibility']==1 ? ' <a href="'.$tool['tool']['link'].'" class="state-icon-link">' : '')
+              . '   <span class="state-icon-' . $state . '">'
+              . $tool['pure_icon']
+              . '   </span>'
+              . ($tool['visibility'] ? ' </a>':'')
+              . '<div class="center-items">'
+              . ($tool['visibility']==1 ? '<a href="'.$tool['tool']['link'].'">'.$toolName.'</a>' : $toolName)
+               . '</div></div>';
             $search = array("{{ ".$toolName." }}", "{{".$toolName."}}", "((".$toolName."))", "(( ".$toolName." ))");
             if (!$editMode) {
                 $text = str_replace($search, $show, $text);

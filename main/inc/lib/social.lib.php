@@ -498,7 +498,7 @@ class SocialManager extends UserManager {
             $html .= '<li class="'.$active.'"><a href="'.api_get_path(WEB_PATH).'main/social/home.php">'.Display::return_icon('home.png',get_lang('Home'),array()).get_lang('Home').'</a></li>';
             $active = $show=='messages' ? 'active' : null;
             $html .= '<li class="'.$active.'"><a href="'.api_get_path(WEB_PATH).'main/messages/inbox.php?f=social">'.Display::return_icon('instant_message.png',get_lang('Messages'),array()).get_lang('Messages').$count_unread_message.'</a></li>';
-
+/*
             //Invitations
             $active = $show=='invitations' ? 'active' : null;
             $html .= '<li class="'.$active.'"><a href="'.api_get_path(WEB_PATH).'main/social/invitations.php">'.Display::return_icon('invitation.png',get_lang('Invitations'),array()).get_lang('Invitations').$total_invitations.'</a></li>';
@@ -518,8 +518,10 @@ class SocialManager extends UserManager {
             //My files
             $active = $show=='myfiles' ? 'active' : null;
             $html .= '<li class="'.$active.'"><a href="'.api_get_path(WEB_PATH).'main/social/myfiles.php">'.Display::return_icon('briefcase.png',get_lang('MyFiles'),array(), 16).get_lang('MyFiles').'</span></a></li>';    
+                  */ 
             $html .='</ul>
-                  </div>';         
+                  </div>';  
+
         }
         
         if (in_array($show, $show_groups) && !empty($group_id)) {

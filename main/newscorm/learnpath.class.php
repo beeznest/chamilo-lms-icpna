@@ -2265,7 +2265,14 @@ class learnpath {
         }
     }
 
-    public function get_preview_image_path($size = null, $path_type = 'web') {
+    /**
+     * Gets the path for the learning path preview icon
+     * @param null $size The expected size of the preview icon
+     * @param string $path_type Whether we want the system path or the web path
+     * @param bool $gray Set if we want the gray version of the icon (if any). Only works if size is set to 64
+     * @return bool|string
+     */
+    public function get_preview_image_path($size = null, $path_type = 'web', $gray = false) {
         $preview_image = $this->get_preview_image();
         if (isset($preview_image) && !empty($preview_image)) {
             $image_sys_path = api_get_path(SYS_COURSE_PATH).$this->course_info['path'].'/upload/learning_path/images/';
@@ -2273,6 +2280,18 @@ class learnpath {
             if (isset($size)) {
                 $info = pathinfo($preview_image);
                 $image_custom_size = $info['filename'].'.'.$size.'.'.$info['extension'];
+                $image_custom_size_gray = $info['filename'].'.'.$size.'_na.'.$info['extension'];
+                if ($gray) {
+                    if (file_exists($image_sys_path.$image_custom_size_gray)) {
+                        if ($path_type == 'web') {
+                            return $image_path.$image_custom_size_gray;
+                        } else {
+                            return $image_sys_path.$image_custom_size_gray;
+                        }
+                    } else {
+                        //falling back to normal icon
+                    }
+                }
                 if (file_exists($image_sys_path.$image_custom_size)) {
                     if ($path_type == 'web') {
                         return $image_path.$image_custom_size;
@@ -9175,9 +9194,18 @@ EOD;
                         $image_moved = true;
                         $this->set_preview_image($new_file_name);
 
-                        //Resize to 32
+                        //Resize to 64 for course homepage
                         $temp->resize(64, 64, 0);
                         $temp->send_image($updir.'/'.$filename.'.64.'.$file_extension);
+                        unset($temp);
+                        // Generate a black & white copy of the 64px icon
+                        $temp = new Image($updir.'/'.$filename.'.64.'.$file_extension);
+                        $r = $temp->convert2bw();
+                        if ($r === false) {
+                            error_log('Conversion to B&W of '.$updir.'/'.$filename.'.64.'.$file_extension.' failed');
+                        } else {
+                            $temp->send_image($updir.'/'.$filename.'.64_na.'.$file_extension);
+                        }
                         return true;
                     }
                 }

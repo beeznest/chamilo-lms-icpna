@@ -306,17 +306,17 @@ header #logo {
 #bar-animation {
     background-color: #fff;
     /*padding: 4px 4px 4px 4px;*/
-    height: 15px;
+    height: 20px;
     border-radius: 8px;
     -moz-border-radius: 8px;
     -webkit-border-radius: 8px;
     -khtml-border-radius: 8px;
-    width: 180px;
+    width: 100%;
     display: inline-block;
 }
 .color-bar-process {
-    height: 15px;
-    line-height: 14px;
+    height: 20px;
+    /*line-height: 14px;*/
     text-align: right;
     width: 0;
     border-radius: 8px;
@@ -388,239 +388,13 @@ header #logo {
 }
 .center-items{
     text-align: center;
+    padding-left:15px;
 }
 /*ICONOS DE ESTADO DE LAS LECCIONES*/
 .center{
     text-align: center;
 }
 
-/*ICONO DIALOGO*/
-
-.row .icon-courses-dialogue-completed {
-  background: url("images/iconos-nuevos.png") no-repeat scroll;
-  cursor: pointer;
-  height: 90px;
-  left: 0;
-  margin: auto;
-  position: relative;
-  top: 0;
-  width: 90px;
-  background-position: -0px -0px;
-}
-
-.row .icon-courses-dialogue-process {
-  background: url("images/iconos-nuevos.png") no-repeat scroll;
-  cursor: pointer;
-  height: 90px;
-  left: 0;
-  margin: auto;
-  position: relative;
-  top: 0;
-  width: 90px;
-  background-position: -84px 0px;
-}
-
-.row .icon-courses-dialogue-closed {
-  background: url("images/iconos-nuevos.png") no-repeat scroll;
-  cursor: pointer;
-  height: 90px;
-  left: 0;
-  margin: auto;
-  position: relative;
-  top: 0;
-  width: 90px;
-  background-position: -168px 0px;
-}
-
-/*ICONO MICROFONO*/
-
-.row .icon-courses-micro-completed {
-  background: url("images/iconos-nuevos.png") no-repeat scroll;
-  cursor: pointer;
-  height: 90px;
-  left: 0;
-  margin: auto;
-  position: relative;
-  top: 0;
-  width: 90px;
-  background-position: 0px -74px;
-}
-
-.row .icon-courses-micro-process {
-  background: url("images/iconos-nuevos.png") no-repeat scroll;
-  cursor: pointer;
-  height: 90px;
-  left: 0;
-  margin: auto;
-  position: relative;
-  top: 0;
-  width: 90px;
-  background-position: -84px -74px;
-}
-
-.row .icon-courses-micro-closed {
-  background: url("images/iconos-nuevos.png") no-repeat scroll;
-  cursor: pointer;
-  height: 90px;
-  left: 0;
-  margin: auto;
-  position: relative;
-  top: 0;
-  width: 90px;
-  background-position: -168px -74px;
-}
-
-/*ICONO TEST*/
-
-.row .icon-courses-test-completed {
-  background: url("images/iconos-nuevos.png") no-repeat scroll;
-  cursor: pointer;
-  height: 90px;
-  left: 0;
-  margin: auto;
-  position: relative;
-  top: 0;
-  width: 90px;
-  background-position: 0px -152px;
-}
-
-.row .icon-courses-test-process {
-  background: url("images/iconos-nuevos.png") no-repeat scroll;
-  cursor: pointer;
-  height: 90px;
-  left: 0;
-  margin: auto;
-  position: relative;
-  top: 0;
-  width: 90px;
-  background-position: -84px -152px;
-}
-
-.row .icon-courses-test-closed {
-  background: url("images/iconos-nuevos.png") no-repeat scroll;
-  cursor: pointer;
-  height: 90px;
-  left: 0;
-  margin: auto;
-  position: relative;
-  top: 0;
-  width: 90px;
-  background-position: -168px -152px;
-}
-
-/*ICONO PICTURE*/
-
-.row .icon-courses-picture-completed {
-   background: url("images/iconos-nuevos.png") no-repeat scroll;
-  cursor: pointer;
-  height: 90px;
-  left: 0;
-  margin: auto;
-  position: relative;
-  top: 0;
-  width: 90px;
-  background-position: 0px -235px;
-}
-
-.row .icon-courses-picture-process {
-   background: url("images/iconos-nuevos.png") no-repeat scroll;
-  cursor: pointer;
-  height: 90px;
-  left: 0;
-  margin: auto;
-  position: relative;
-  top: 0;
-  width: 90px;
-  background-position: -84px -235px;
-}
-
-.row .icon-courses-picture-closed {
-   background: url("images/iconos-nuevos.png") no-repeat scroll;
-  cursor: pointer;
-  height: 90px;
-  left: 0;
-  margin: auto;
-  position: relative;
-  top: 0;
-  width: 90px;
-  background-position: -168px -235px;
-}
-
-/*ICONO AUDIO*/
-
-.row .icon-courses-audio-completed {
-   background: url("images/iconos-nuevos.png") no-repeat scroll;
-  cursor: pointer;
-  height: 90px;
-  left: 0;
-  margin: auto;
-  position: relative;
-  top: 0;
-  width: 90px;
-  background-position: 0px -300px;
-}
-
-.row .icon-courses-audio-process {
-   background: url("images/iconos-nuevos.png") no-repeat scroll;
-  cursor: pointer;
-  height: 90px;
-  left: 0;
-  margin: auto;
-  position: relative;
-  top: 0;
-  width: 90px;
-  background-position: -84px -300px;
-}
-
-.row .icon-courses-audio-closed {
-   background: url("images/iconos-nuevos.png") no-repeat scroll;
-  cursor: pointer;
-  height: 90px;
-  left: 0;
-  margin: auto;
-  position: relative;
-  top: 0;
-  width: 90px;
-  background-position: -168px -300px;
-}
-
-/*ICONO PLAYER*/
-
-.row .icon-courses-player-completed {
-   background: url("images/iconos-nuevos.png") no-repeat scroll;
-  cursor: pointer;
-  height: 90px;
-  left: 0;
-  margin: auto;
-  position: relative;
-  top: 0;
-  width: 90px;
-  background-position: 0px -388px;
-}
-
-.row .icon-courses-player-process {
-   background: url("images/iconos-nuevos.png") no-repeat scroll;
-  cursor: pointer;
-  height: 90px;
-  left: 0;
-  margin: auto;
-  position: relative;
-  top: 0;
-  width: 90px;
-  background-position: -84px -388px;
-}
-
-.row .icon-courses-player-closed {
-   background: url("images/iconos-nuevos.png") no-repeat scroll;
-  cursor: pointer;
-  height: 90px;
-  left: 0;
-  margin: auto;
-  position: relative;
-  top: 0;
-  width: 90px;
-  background-position: -168px -388px;
-}
 /* FIN DE TIPOS DE EJERCICIOS EN LAS LECCIONES*/
 
 .row .state-icon-link{
@@ -637,37 +411,46 @@ header #logo {
     background: transparent url(images/estados-iconos.png) no-repeat;
     cursor: pointer;
     display: block;
-    height: 90px;
-    width: 85px;
+    height: 95px;
+    width: 100px;
     /*position: absolute;*/
     margin:auto;
+    padding-top: 1em;
+    z-index:100;
 }
 
 .row .state-icon-process{
     background: transparent url(images/estados-iconos.png) no-repeat;
-    background-position: -85px 0px;
+    background-position: -105px 0px;
     cursor: pointer;
     display: block;
-    height: 90px;
-    width: 85px;
+    height: 95px;
+    width: 100px;
     /*position: absolute;*/
     margin:auto;
+    padding-top: 1em;
+    z-index:100;
 }
 
 .row .state-icon-closed{
     background: transparent url(images/estados-iconos.png) no-repeat;
-    background-position: -171px 0px;
+    background-position: -210px 0px;
     cursor: pointer;
     display: block;
-    height: 90px;
-    width: 85px;
+    height: 95px;
+    width: 100px;
     /*position: absolute;*/
     margin:auto;
+    padding-top: 1em;
+    z-index:100;
 }
 
 /* FIN DEL ESTADO DE ICONOS DE LAS LECCIONES */
 .helf-header{
     padding-top: 2.1em;
+}
+.ico-help{
+	padding-left: 1.5em;
 }
 .color-border-style{
     clear: both;
@@ -797,7 +580,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
   color: white;
   font-size: 12px;
   text-decoration: none;
-  width: 150px;
+  width: 134px;
   text-align: right;
   border-left: 4px solid transparent;
   -webkit-transition: all 0.35s ease-in-out;
@@ -820,6 +603,9 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
 }
 #cssmenu .close{
     background:url(images/iconos-perfil.png) no-repeat 15px -75px;
+}
+#cssmenu .email{
+    background:url(images/iconos-perfil.png) no-repeat 15px -120px;
 }
 .user-pic{
      background-color: #fff;
@@ -850,7 +636,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
   background-color: #5ECAD4;
   padding: 10px;
   max-height: 40px;
-  font-size: 12px;
+  font-size: 14px;
 }
 .light-blue-bar a{
   color: #000;
@@ -862,7 +648,33 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
 font-size: 15px;
 color: #fff;
 }
+.user-profile-block {
+    margin-left: 40px;
+    width: 225px;
+}
+
 /*Fin de la definicion*/
+
+.column-one{
+  width: 55%;
+  float: left;
+}
+.column-two{
+  
+  width: 19%;
+  float: left;
+  text-align: right;
+  padding-right: 1%;
+}
+.column-tree{
+
+  width: 21%;
+  float: left;
+}
+.column-four{
+  width: 3%;
+  float: left;
+}
 
 /*FIN DE PERFIL DE USUARIO 500px y 769*/
 
@@ -935,3 +747,6 @@ header .row-fluid .span9 {
     width: 235px;
 }
 /*FIN DEL ESTILO PARA MODULO DE SCROOM*/
+.new_actions-fixed {
+  top: 0;
+}

@@ -1,0 +1,42 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
+</head>
+<body>
+<table border="0" width="573" style="border:1px solid #ccc;">
+  <tr>
+    <td style="text-align:right;">
+      <img src="images/logo-icpna.jpg">
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="images/baja-servicio-header.jpg">
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table border="0" width="100%">
+          <tr>
+            <td width="10%"><img src="images/esquina-left.png"></td>
+            <td width="80%"><img src="images/degrade-top.png"></td> 
+            <td width="10%"><img src="images/esquina-rigth.png"></td>            
+          </tr>
+          <tr>
+            <td width="10%">Algo aca</td>
+            <td width="80%" style="font-family:Arial; font-size:13px; line-height:28px;"><p>Como lo solicitaste, estamos dando de baja a tu cuenta a partir del sábado 15 de Enero de 2014. No podrás acceder al sistema a a partir de esa fecha.</p>
+
+            <p style="font-weight:bold; font-size:14px; font-style:italic;">Esperamos que regreses pronto</p></td> 
+            <td width="10%">Algo aca</td>          
+          </tr>
+          <tr>
+              <td colspan="3" style="text-align:right;"><img src="images/logo-movistar.jpg"></td>
+                       
+          </tr>      
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

@@ -17,18 +17,18 @@ define('IMAGE_PROCESSOR', 'gd'); // imagick or gd strings
 class Image {
 	var $image_wrapper = null;
 
-	function __construct($path) {		
+	function __construct($path) {
 	    $path = preg_match(VALID_WEB_PATH, $path) ? (api_is_internal_path($path) ? api_get_path(TO_SYS, $path) : $path) : $path;
 	    if (IMAGE_PROCESSOR == 'gd') {
-	        $this->image_wrapper = new GDWrapper($path);	        
+	        $this->image_wrapper = new GDWrapper($path);
 	    } else {
 	    	if (class_exists('Imagick')) {
 	        	$this->image_wrapper = new ImagickWrapper($path);
 	    	} else {
 	    		Display::display_warning_message('Class Imagick not found');
-	    		exit;	    			    		
-	    	}	        
-	    }	    	    
+	    		exit;
+	    	}
+	    }
 	}
 	public function resize($thumbw, $thumbh, $border = 0, $specific_size = false) {
         $this->image_wrapper->resize($thumbw, $thumbh, $border, $specific_size );
@@ -42,6 +42,9 @@ class Image {
 	public function get_image_info() {
 	    return $this->image_wrapper->get_image_info();
 	}
+    public function convert2bw() {
+        $this->image_wrapper->convert2bw();
+    }
 }
 
 /**
@@ -183,6 +186,13 @@ class ImagickWrapper extends ImageWrapper {
 		    return $result;
 		}		
 	}
+    /**
+     * Convert image to black & white
+     */
+    function convert2bw() {
+        error_log('Function '.__FUNCTION__.' not implemented yet for class '.__CLASS__);
+        return false;
+    }
 }
 
 /**
@@ -190,10 +200,11 @@ class ImagickWrapper extends ImageWrapper {
  * @package chamilo.include.image
  */
 class GDWrapper extends ImageWrapper {
-    var $bg;
-	
+    public $bg;
+    public $bgBW;
+
     function __construct($path) {
-        parent::__construct($path);        		
+        parent::__construct($path);
     }
     
     public function set_image_wrapper() {   
@@ -220,8 +231,10 @@ class GDWrapper extends ImageWrapper {
         if ($handler) {
             $this->image_validated = true;
             $this->bg = $handler;
-            @imagealphablending($this->bg, true);	
-        }           
+            $this->bgBW = $handler;
+            @imagealphablending($this->bg, false);
+            @imagesavealpha($this->bg, true);
+        }
     }
     	
     public function get_image_size() {
@@ -258,7 +271,9 @@ class GDWrapper extends ImageWrapper {
             }
 			$deltaw = (int)(($thumbw - $width) / 2);
 			$deltah = (int)(($thumbh - $height) / 2);
-			$dst_img = @ImageCreateTrueColor($thumbw, $thumbh);
+            $dst_img = @ImageCreateTrueColor($thumbw, $thumbh);
+            @imagealphablending($dst_img, false);
+            @imagesavealpha($dst_img, true);
 			if (!empty($this->color)) {
 				@imagefill($dst_img, 0, 0, $this->color);
 			}
@@ -276,28 +291,22 @@ class GDWrapper extends ImageWrapper {
 			$deltaw = 0;
 			$deltah = 0;
 			$dst_img = @ImageCreateTrueColor($width, $height);
+            @imagealphablending($dst_img, false);
+            @imagesavealpha($dst_img, true);
 			$this->width = $width;
 			$this->height = $height;
 		}
-
-        //if type is png, resize image over a transparent background
-        if ($this->type == 'png') {
-            imagealphablending($dst_img, false);
-            imagesavealpha($dst_img,true);
-            $transparent = imagecolorallocatealpha($dst_img, 255, 255, 255, 127);
-            imagefilledrectangle($dst_img, 0, 0, $width, $height, $transparent);
-        }
-
-		$src_img = $this->bg;
-		@ImageCopyResampled($dst_img, $src_img, $deltaw, $deltah, 0, 0, $width, $height, ImageSX($src_img), ImageSY($src_img));
-		$this->bg = $dst_img;
+                $src_img = $this->bg;
+                @ImageCopyResampled($dst_img, $src_img, $deltaw, $deltah, 0, 0, $width, $height, ImageSX($src_img), ImageSY($src_img));
+                $this->bg = $dst_img;
 		@imagedestroy($src_img);
 	}
 	
-	public function send_image($file = '', $compress = -1, $convert_file_to = null) {	
+	public function send_image($file = '', $compress = -1, $convert_file_to = null) {
 	    if (!$this->image_validated) return false;
         $compress = (int)$compress;
         $type = $this->type;
+        error_log('In for '.$file);
         if (!empty($convert_file_to) && in_array($convert_file_to, $this->allowed_extensions)) {
             $type = $convert_file_to;            
         }
@@ -313,6 +322,7 @@ class GDWrapper extends ImageWrapper {
 				if ($compress != -1) {
 					@imagetruecolortopalette($this->bg, true, $compress);
 				}
+                error_log('all good so far');
 				return imagepng($this->bg, $file, $compress);
 				break;
 			case 'gif':
@@ -325,10 +335,39 @@ class GDWrapper extends ImageWrapper {
 			default: return 0;
 		}
 		// TODO: Occupied memory is not released, because the following fragment of code is actually dead.
-		@imagedestroy($this->bg);
+		@imagedestroy($bg);
 		//@imagedestroy($this->logo);
 	}
+    /**
+     * Convert image to black & white
+     */
+    function convert2bw() {
+        if (!$this->image_validated) return false;
+        // Transform to BW
+        $dest_img = imagecreate($this->width, $this->height);
+        @imagealphablending($dest_img, false);
+        @imagesavealpha($dest_img, true);
+        $palette = array();
+        for ($c = 0; $c < 256; $c++) {
+            $palette[$c] = imagecolorallocate($dest_img, $c, $c, $c);
+        }
+        //Read the original colors pixel by pixel
+        for ($y=0; $y < $this->height; $y++) {
+            for ($x=0; $x < $this->width; $x++) {
+                $rgb = imagecolorat($this->bg, $x, $y);
+                $r = ($rgb >> 16) & 0xFF;
+                $g = ($rgb >> 8) & 0xFF;
+                $b = $rgb & 0xFF;
+                //This is where we actually use yiq to modify our rbg values, and then convert them to our grayscale palette
+                $gs = $this->yiq($r, $g, $b);
+                imagesetpixel($dest_img, $x, $y, $palette[$gs]);
+            }
+        }
+        @ImageCopyResampled($dest_img, $this->bg, 0, 0, 0, 0, $this->width, $this->height, ImageSX($this->bg), ImageSY($this->bg));
+        $this->bg = $dest_img;
 
+        return true;
+    }
 	
     
     /* 
@@ -380,6 +419,16 @@ class GDWrapper extends ImageWrapper {
     /* //@deprecated
 	function setfont($fontfile) {
 		$this->fontfile = $fontfile;
-	}*/	
-	
+	}*/
+    /**
+     * Returns a YIQ value from RGB
+     * @see http://en.wikipedia.org/wiki/YIQ
+     * @param int $r Red
+     * @param int $g Green
+     * @param int $b Blue
+     * @return float YIQ value
+     */
+    function yiq($r, $g, $b) {
+        return (($r * 0.299) + ($g * 0.587) + ($b * 0.114));
+    }
 }

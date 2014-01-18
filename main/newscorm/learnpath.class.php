@@ -2089,7 +2089,7 @@ class learnpath {
             */
             require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
             $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $lp_id, api_get_course_int_id(), api_get_session_id());
-            if (!Sequence::get_available_lp_by_row_entity_id($row_entity_id, $student_id)) {
+            if (Sequence::get_available_lp_by_row_entity_id($row_entity_id, $student_id) === false) {
                 $is_visible = false;
             }
 
@@ -3313,7 +3313,7 @@ class learnpath {
             //Sequence rule #7220
             require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
             $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $this->get_id(), $course_id, api_get_session_id());
-            Sequence::temp_hack_4_insert($this->get_total_items_count(), $row_entity_id, $this->get_user_id());
+            Sequence::temp_hack_4_insert($this->get_total_items_count(), $row_entity_id, $this->get_user_id(), 0);
         }
         return $this->lp_view_id;
     }
@@ -3832,7 +3832,7 @@ class learnpath {
             //Sequence rule
             require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
             $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $this->lp_id, $course_id, $session_id);
-            Sequence::temp_hack_4_insert($this->get_total_items_count(),$row_entity_id,$this->lp_id, $this->get_user_id());
+            Sequence::temp_hack_4_insert($this->get_total_items_count(),$row_entity_id,$this->lp_id, $this->get_user_id(), 0);
         } else {
             $this->error = 'Could not insert into item_view table...';
             return false;
@@ -9377,6 +9377,12 @@ EOD;
                 $old_type = $item->get_type();
             }
         }
+    }
+
+    public static function get_state_by_lp_id($lp_id) {
+        require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
+        $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $lp_id, api_get_course_int_id(), api_get_session_id());
+        return Sequence::get_available_lp_by_row_entity_id($row_entity_id, api_get_user_id());
     }
 }
 

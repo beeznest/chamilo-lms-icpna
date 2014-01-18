@@ -107,9 +107,6 @@ class CourseHome {
                 }*/
                 // check if the published learnpath is visible for student
                 $published_lp_id = self::get_published_lp_id_from_link($tool['link']);
-                if (!api_is_allowed_to_edit(null, true) && !learnpath::is_lp_visible_for_student($published_lp_id, api_get_user_id())) {
-                    continue;
-                }
             }
 
             if (api_get_session_id() != 0 && in_array($tool['name'], array('course_maintenance', 'course_setting'))) {
@@ -290,9 +287,6 @@ class CourseHome {
                     // check if the published learnpath is visible for student
                     $published_lp_id = self::get_published_lp_id_from_link($tool['link']);
 
-                    if (!api_is_allowed_to_edit(null, true) && !learnpath::is_lp_visible_for_student($published_lp_id,api_get_user_id())) {
-                        continue;
-                    }
                 }
 
                 if (api_get_session_id() != 0 && in_array($tool['name'], array('course_maintenance', 'course_setting'))) {
@@ -620,9 +614,6 @@ class CourseHome {
                     $published_lp_id = self::get_published_lp_id_from_link($tool['link']);
                     if (api_is_allowed_to_edit(null, true)) {
                         $studentview = true;
-                    }
-                    if (!api_is_allowed_to_edit(null, true) && !learnpath::is_lp_visible_for_student($published_lp_id, api_get_user_id())) {
-                        continue;
                     }
                 }
 
@@ -968,7 +959,9 @@ class CourseHome {
         if (!empty($param_lp_id)) {
             $a_param_lp_id = explode('=',$param_lp_id);
             if (isset($a_param_lp_id[1])) {
-                $lp_id = intval($a_param_lp_id[1]);
+                $a_param_lp_id = explode('&', $a_param_lp_id[1]);
+                if (!empty($a_param_lp_id[0]))
+                $lp_id = intval($a_param_lp_id[0]);
             }
         }
         return $lp_id;
@@ -1132,7 +1125,13 @@ class CourseHome {
             if (!isset($tool['icon'])) {
                 continue;
             }
-            $state = 'closed';
+
+            $state = learnpath::get_state_by_lp_id(self::get_published_lp_id_from_link($tool['tool']['original_link']));
+
+            if ($state === 'process' || $state === 'completed') {
+                $tool['visibility'] = 1;
+            }
+
             $toolName = $tool['tool']['name'];
             $show = '<div class="span2 center">'
 

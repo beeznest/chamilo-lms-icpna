@@ -38,6 +38,7 @@ $use_anonymous = true;
 
 // Inlcuding the global initialization file.
 require dirname(__FILE__).'/../inc/global.inc.php';
+$msg = (isset($_GET['msg'])) ? api_htmlentities($_GET['msg']) : null ; 
 
 // Delete LP sessions - commented out after seeing that normal
 // users in their first learnpath step (1st SCO of a SCORM)
@@ -100,9 +101,14 @@ $(document).ready(function() {
 		});
 	});
 });
-
+        
 /* toogle for post-it in course home */
 $(function() {
+    $("#course_tools img").tooltip({
+            placement: "left",
+            show: 500,
+            hide: 500
+        });
 	$(".thematic-postit-head").click(function() {
 		$(".thematic-postit-center").slideToggle("fast");
 	});
@@ -149,10 +155,10 @@ if (isset($_GET['action']) && $_GET['action'] == 'subscribe') {
         Security::clear_token();
         $auth = new Auth();
         $msg = $auth->subscribe_user($course_code);
-        if (!empty($msg)) {
-            $show_message .= Display::return_message(get_lang($msg));
-        }
     }
+}
+if (!empty($msg)) {
+    $show_message .= Display::return_message(get_lang($msg));
 }
 
 /*	Is the user allowed here? */

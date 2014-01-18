@@ -296,9 +296,9 @@ class GDWrapper extends ImageWrapper {
 			$this->width = $width;
 			$this->height = $height;
 		}
-        $src_img = $this->bg;
-        @ImageCopyResampled($dst_img, $src_img, $deltaw, $deltah, 0, 0, $width, $height, ImageSX($src_img), ImageSY($src_img));
-        $this->bg = $dst_img;
+                $src_img = $this->bg;
+                @ImageCopyResampled($dst_img, $src_img, $deltaw, $deltah, 0, 0, $width, $height, ImageSX($src_img), ImageSY($src_img));
+                $this->bg = $dst_img;
 		@imagedestroy($src_img);
 	}
 	

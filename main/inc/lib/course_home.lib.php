@@ -741,9 +741,10 @@ class CourseHome {
 
                 if (!empty($tool['custom_icon'])) {
                     //self::getCustomIconPath($courseInfo)
+                    $image = api_get_path(REL_COURSE_PATH).api_get_course_path().'/upload/course_home_icons/' . $tool['custom_icon'];
                     $icon = Display::img(
-                        $tool['image'],
-                        null,
+                        $image,
+                        $tool['description'],
                         array('class' => 'tool-icon', 'id' => 'toolimage_'.$tool['id'])
                     );
                 } elseif ($tool['image'] == 'scormbuilder.gif' or $tool['image'] == 'scormbuilder_na.gif') {
@@ -872,6 +873,36 @@ class CourseHome {
             'content' => $html,
             'tool_list' => $items
         );
+    }
+
+    /**
+     * List tools to customize its icons
+     *
+     */
+    public function tools_iconListAction()
+    {
+        $course_tool_table  = Database::get_course_table(TABLE_TOOL_LIST);
+        $sessionId            = api_get_session_id();
+        $courseId              = api_get_course_int_id();
+        $itemsFromSession = array();
+        if (!empty($sessionId)) {
+            $sql = "SELECT * FROM $course_tool_table
+                    WHERE category = 'authoring'
+                    AND c_id = $courseId
+                    AND session_id = $sessionId
+                    ORDER BY id";
+        } else {
+            $sql = "SELECT * FROM $course_tool_table
+                    WHERE category = 'authoring'
+                    AND c_id = $courseId
+                    ORDER BY id";
+        }
+        $result = Database::query($sql);
+        $data = array();
+        while ($row = Database::fetch_assoc($result)) {
+            $data[] = $row;
+        }
+        return $data;
     }
 
     /**

@@ -1419,7 +1419,7 @@ function api_get_course_info_by_id($id = null, $add_extra_values = false) {
             $course_data = Database::fetch_array($result);
             if ($add_extra_values) {
                 $extra_field_values = new ExtraField('course');
-                $course_data['extra_fields'] = $extra_field_values->get_handler_extra_data($course_code);
+                $course_data['extra_fields'] = $extra_field_values->get_handler_extra_data($course_data['code']);
             }
             $_course = api_format_course_array($course_data);
         }
@@ -6804,4 +6804,36 @@ function api_mail_html($recipient_name, $recipient_email, $subject, $body, $send
     $mail->ClearAddresses();
 
     return 1;
+}
+/**
+ * Show a string in
+ * @param string $string Some string to dump, removing tabs, spaces, newlines, etc (usually most useful for SQL queries)
+ * @param int $dump Set to 1 to use print_r()
+ */
+function api_error_log($string, $dump = 0)
+{
+    // Clean query
+    $bt = debug_backtrace();
+    $caller = array_shift($bt);;
+    if ($dump == 1) {
+        $string = print_r($string, 1);
+    } else {
+        $string = str_replace(array("\r", "\n", "\t", "\10"), '', $string);
+        $string = str_replace('    ',' ', $string);
+    }
+
+    error_log("-------------------------------------");
+    error_log($string);
+    error_log("File: ".$caller['file']." +".$caller['line']);
+    error_log("-------------------------------------");
+}
+
+/**
+ * Show a string in the default error_log. Alias for api_error_log().
+ * @param string $string Some string to dump, removing tabs, spaces, newlines, etc (usually most useful for SQL queries)
+ * @param int $dump Set to 1 to use print_r()
+ */
+function api_elog($string, $dump = 0)
+{
+    return api_error_log($string, $dump);
 }

@@ -439,12 +439,11 @@ class Sequence {
         return false;
     }
 
-    public static function temp_hack_4_insert($total_items, $row_entity_id, $user_id = 0, $available = -1) {
+    public static function temp_hack_4_insert($total_items, $row_entity_id, $user_id = 0, $available = 0) {
         $user_id = intval(Database::escape_string($user_id));
         $total_items = intval(Database::escape_string($total_items));
         $available = intval(Database::escape_string($available));
-        if ($available === -1) {
-            $available = 0;
+        if ($available === 0) {
             $pre_req = self::get_pre_req_id_by_row_entity_id($row_entity_id);
             foreach ($pre_req as $pr) {
                 if($pr === 0) {
@@ -482,7 +481,7 @@ class Sequence {
                 }
             } else {
                 if ($user_id === 0) {
-                    $user_id = self::get_user_id_by_row_entity_id($row_entity_id_next);
+                    $user_id = self::get_user_id_by_row_entity_id($row_entity_id_prev);
                     var_dump($user_id);
                     foreach ($user_id as $us_id) {
                         self::action_pre_init($row_entity_id_next, $us_id);

@@ -2089,8 +2089,9 @@ class learnpath {
             */
             require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
             $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $lp_id, api_get_course_int_id(), api_get_session_id());
-            if (Sequence::get_available_lp_by_row_entity_id($row_entity_id, $student_id) === false) {
-                $is_visible = false;
+            $state = Sequence::get_available_lp_by_row_entity_id($row_entity_id, $student_id);
+            if ($state === 'process' || $state === 'completed') {
+                $is_visible = true;
             }
 
             // Also check the time availability of the LP

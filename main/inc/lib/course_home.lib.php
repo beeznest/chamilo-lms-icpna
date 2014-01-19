@@ -876,32 +876,36 @@ class CourseHome {
     }
 
     /**
-     * List tools to customize its icons
-     *
+     * List course homepage tools from authoring and interaction sections
+     * @param   int $cid The course ID (guessed from context if not provided)
+     * @param   int $sid The session ID (guessed from context if not provided)
+     * @return  array List of all tools data from the c_tools table
      */
-    public function tools_iconListAction()
+    public function toolsIconsAction($cid = null, $sid = null)
     {
-        $course_tool_table  = Database::get_course_table(TABLE_TOOL_LIST);
-        $sessionId            = api_get_session_id();
-        $courseId              = api_get_course_int_id();
-        $itemsFromSession = array();
-        if (!empty($sessionId)) {
-            $sql = "SELECT * FROM $course_tool_table
-                    WHERE category = 'authoring'
-                    AND c_id = $courseId
-                    AND session_id = $sessionId
-                    ORDER BY id";
+        if (empty($cid)) {
+            api_get_course_int_id();
         } else {
-            $sql = "SELECT * FROM $course_tool_table
-                    WHERE category = 'authoring'
-                    AND c_id = $courseId
-                    ORDER BY id";
+            $cid = intval($cid);
         }
+        if (empty($sid)) {
+            api_get_session_id();
+        } else {
+            $sid = intval($sid);
+        }
+        if (empty($cid)) {
+            // We shouldn't get here, but for some reason api_get_course_int_id() doesn't seem to get the course from the context, sometimes
+            return array();
+        }
+        $courseToolTable  = Database::get_course_table(TABLE_TOOL_LIST);
+        $sql = "SELECT * FROM $courseToolTable
+                WHERE category in ('authoring','interaction')
+                AND c_id = $cid
+                AND session_id = $sid
+                ORDER BY id";
+        api_error_log($sql);
         $result = Database::query($sql);
-        $data = array();
-        while ($row = Database::fetch_assoc($result)) {
-            $data[] = $row;
-        }
+        $data = Database::store_result($result);
         return $data;
     }
 

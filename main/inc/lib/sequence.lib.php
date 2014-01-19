@@ -614,8 +614,14 @@ class Sequence {
      * Bool Available for LP
      */
     public static function get_state_lp_by_row_entity_id ($row_entity_id, $user_id) {
+        $row_entity_id = intval(Database::escape_string($row_entity_id));
+        $user_id = intval(Database::escape_string($user_id));
         $seq_val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
-        if ($row_entity_id > 0) {
+        if ($row_entity_id > 0 && $user_id > 0) {
+            if (self::get_value_by_user_id($row_entity_id, $user_id) === false) {
+                self::temp_hack_4_insert(1,$row_entity_id,$user_id, 0);
+                return self::get_state_lp_by_row_entity_id($row_entity_id, $user_id);
+            }
             $sql_seq = "SELECT val.available, val.success FROM $seq_val_table val WHERE val.sequence_row_entity_id = $row_entity_id AND val.user_id = $user_id LIMIT 0, 1";
             $result_seq = Database::query($sql_seq);
             $arr_seq = Database::fetch_array($result_seq);

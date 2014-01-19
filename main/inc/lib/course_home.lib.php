@@ -1177,7 +1177,6 @@ class CourseHome {
             }
             if ($type_entity_id > 0 && $id > 0) {
                 require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
-
                 $row_entity_id = Sequence::get_row_entity_id_by_row_id($type_entity_id, $id, api_get_course_int_id(), api_get_session_id());
                 $state = Sequence::get_state_lp_by_row_entity_id($row_entity_id, api_get_user_id());
                 $courseInfo = api_get_course_info();
@@ -1197,6 +1196,9 @@ class CourseHome {
                 $basedir = ($is_lp_icon)? '/upload/learning_path/images/':'/upload/course_home_icons/';
                 if ($state === 'process' || $state === 'completed') {
                     $tool['visibility'] = 1;
+                    if (strpos($custom_icon, '_na') !== false) {
+                        $custom_icon = preg_replace('/_na/', '', $custom_icon);
+                    }
                     $iconPathTemp = api_get_path(WEB_COURSE_PATH).$courseInfo['directory'].$basedir.$custom_icon;
                     if (is_file(api_get_path(SYS_COURSE_PATH).$courseInfo['directory'].$basedir.$custom_icon)) {
                         $icon_path = 'src="'.$iconPathTemp;
@@ -1204,6 +1206,9 @@ class CourseHome {
                         $tool['icon'] = preg_replace($regex, $icon_path, $tool['icon']);
                     } else {
                         $icon_path = 'src="' . api_get_path(WEB_IMG_PATH) . $dir_icons . $tool['tool']['image'];
+                        if (strpos($icon_path,'_na') !== false) {
+                            $icon_path = preg_replace('/_na/', '', $icon_path);
+                        }
                         $icon_path = substr($icon_path,0,-3) . $ext_png;
                         $tool['pure_icon'] = preg_replace($regex, $icon_path, $tool['pure_icon']);
                         $tool['icon'] = preg_replace($regex, $icon_path, $tool['icon']);

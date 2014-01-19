@@ -213,6 +213,10 @@ class learnpath {
             $sql_ins = "INSERT INTO $lp_table (c_id, lp_id, user_id, view_count, session_id) VALUES ($course_id, $lp_id, $user_id, 1, $session_id)";
             $res_ins = Database::query($sql_ins);
             $this->lp_view_id = Database :: insert_id();
+            //Sequence rule
+            require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
+            $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $lp_id, $course_id, $session_id);
+            Sequence::temp_hack_4_insert(1, $row_entity_id, $user_id, 0);
             if ($this->debug > 2) {
                 error_log('New LP - learnpath::__construct() ' . __LINE__ . ' - inserting new lp_view: ' . $sql_ins, 0);
             }
@@ -702,6 +706,11 @@ class learnpath {
                 $id = Database :: insert_id();
                 if ($id > 0) {
                     $course_info = api_get_course_info();
+                    //Sequence rule
+                    require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
+                    Sequence::temp_hack_2_insert(1, $id, $course_id, $session_id, $name);
+                    Sequence::temp_hack_3_insert(1, 1, 0, $id, $course_id, $session_id, 0);
+
                     // Insert into item_property.
                     api_item_property_update($course_info, TOOL_LEARNPATH, $id, 'LearnpathAdded', api_get_user_id());
                     api_set_default_visibility($id, TOOL_LEARNPATH);
@@ -935,6 +944,10 @@ class learnpath {
         $res_del_lp = Database::query($sql_del_lp);
         $this->update_display_order(); // Updates the display order of all lps.
         api_item_property_update(api_get_course_info(), TOOL_LEARNPATH, $this->lp_id, 'delete', api_get_user_id());
+
+        //Sequence Delete
+        require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
+        Sequence::temp_hack_5(1, $this->lp_id, $course_id, $this->lp_session_id, 1);
 
         require_once '../gradebook/lib/be.inc.php';
 
@@ -2065,7 +2078,7 @@ class learnpath {
             $prerequisite = $row['prerequisite'];
             $is_visible = true;
             $progress = 0;
-
+            /*
             if (!empty($prerequisite)) {
                 $progress = self::get_db_progress($prerequisite,$student_id,'%', '', false, api_get_session_id());
                 $progress = intval($progress);
@@ -2073,9 +2086,15 @@ class learnpath {
                     $is_visible = false;
                 }
             }
+            */
+            require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
+            $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $lp_id, api_get_course_int_id(), api_get_session_id());
+            $state = Sequence::get_state_lp_by_row_entity_id($row_entity_id, $student_id);
+            if ($state === 'process' || $state === 'completed') {
+                $is_visible = true;
+            }
 
             // Also check the time availability of the LP
-
             if ($is_visible) {
 	            //Adding visibility reestrinctions
 	            if (!empty($row['publicated_on']) && $row['publicated_on'] != '0000-00-00 00:00:00') {
@@ -2103,6 +2122,7 @@ class learnpath {
             }
             return $is_visible;
         }
+
         return false;
     }
     /**
@@ -3290,6 +3310,11 @@ class learnpath {
             $res = Database::query($sql);
             $id = Database :: insert_id();
             $this->lp_view_id = $id;
+
+            //Sequence rule #7220
+            require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
+            $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $this->get_id(), $course_id, api_get_session_id());
+            Sequence::temp_hack_4_insert($this->get_total_items_count(), $row_entity_id, $this->get_user_id(), 0);
         }
         return $this->lp_view_id;
     }
@@ -3805,6 +3830,10 @@ class learnpath {
         if ($view_id = Database :: insert_id($res)) {
             $this->lp_view_id = $view_id;
             $this->attempt = $this->attempt + 1;
+            //Sequence rule
+            require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
+            $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $this->lp_id, $course_id, $session_id);
+            Sequence::temp_hack_4_insert($this->get_total_items_count(),$row_entity_id,$this->lp_id, $this->get_user_id(), 0);
         } else {
             $this->error = 'Could not insert into item_view table...';
             return false;
@@ -3922,6 +3951,10 @@ class learnpath {
                             user_id = " . $this->get_user_id()." ".$session_condition;
             $res = Database::query($sql); // Ignore errors as some tables might not have the progress field just yet.
             $this->progress_db = $progress;
+
+            //Temporaly located here for #7220
+            require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
+            Sequence::temp_hack_4_update(1, $this->get_id(), $course_id, api_get_session_id(), $this->get_user_id(), 1, $this->get_complete_items_count(), max($this->get_total_items_count(),1), null);
         }
     }
 
@@ -4286,9 +4319,12 @@ class learnpath {
         $sql = "UPDATE $lp_table SET prerequisite = '".$this->prerequisite."'
                 WHERE c_id = ".$course_id." AND id = '$lp_id'";
         if ($this->debug > 2) {
-            error_log('New LP - lp updated with new preview requisite : ' . $this->requisite, 0);
+            error_log('New LP - lp updated with new preview requisite : ' . $this->prerequisite, 0);
         }
         Database::query($sql);
+        //Rule sequence 70% of pre-req #7220
+        require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
+        Sequence::temp_hack_3_update(1, 1, $this->prerequisite, $lp_id, $course_id, api_get_session_id());
         return true;
     }
 
@@ -9309,6 +9345,9 @@ EOD;
                 WHERE c_id = ".$course_id." AND lp_id = '$lp_id'";
         Database::query($sql);
 
+        //Rule sequence 70% of pre-req #7220
+        require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
+        Sequence::temp_hack_3_update(1, 1, 0, $lp_id, $course_id, api_get_session_id());
         //Cleaning mastery score for exercises
         $sql = "UPDATE $tbl_lp_item SET mastery_score = ''
                 WHERE c_id = ".$course_id." AND lp_id = '$lp_id' AND item_type = 'quiz'";
@@ -9339,6 +9378,12 @@ EOD;
                 $old_type = $item->get_type();
             }
         }
+    }
+
+    public static function get_state_by_lp_id($lp_id) {
+        require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
+        $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $lp_id, api_get_course_int_id(), api_get_session_id());
+        return Sequence::get_state_lp_by_row_entity_id($row_entity_id, api_get_user_id());
     }
 }
 

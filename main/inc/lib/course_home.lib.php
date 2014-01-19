@@ -107,9 +107,6 @@ class CourseHome {
                 }*/
                 // check if the published learnpath is visible for student
                 $published_lp_id = self::get_published_lp_id_from_link($tool['link']);
-                if (!api_is_allowed_to_edit(null, true) && !learnpath::is_lp_visible_for_student($published_lp_id, api_get_user_id())) {
-                    continue;
-                }
             }
 
             if (api_get_session_id() != 0 && in_array($tool['name'], array('course_maintenance', 'course_setting'))) {
@@ -290,9 +287,6 @@ class CourseHome {
                     // check if the published learnpath is visible for student
                     $published_lp_id = self::get_published_lp_id_from_link($tool['link']);
 
-                    if (!api_is_allowed_to_edit(null, true) && !learnpath::is_lp_visible_for_student($published_lp_id,api_get_user_id())) {
-                        continue;
-                    }
                 }
 
                 if (api_get_session_id() != 0 && in_array($tool['name'], array('course_maintenance', 'course_setting'))) {
@@ -618,8 +612,8 @@ class CourseHome {
                 if ($tool['image'] == 'scormbuilder.gif') {
                     // Check if the published learnpath is visible for student
                     $published_lp_id = self::get_published_lp_id_from_link($tool['link']);
-                    if (!api_is_allowed_to_edit(null, true) && !learnpath::is_lp_visible_for_student($published_lp_id,api_get_user_id())) {
-                        continue;
+                    if (api_is_allowed_to_edit(null, true)) {
+                        $studentview = true;
                     }
                 }
 
@@ -1000,7 +994,9 @@ class CourseHome {
         if (!empty($param_lp_id)) {
             $a_param_lp_id = explode('=',$param_lp_id);
             if (isset($a_param_lp_id[1])) {
-                $lp_id = intval($a_param_lp_id[1]);
+                $a_param_lp_id = explode('&', $a_param_lp_id[1]);
+                if (!empty($a_param_lp_id[0]))
+                $lp_id = intval($a_param_lp_id[0]);
             }
         }
         return $lp_id;
@@ -1164,7 +1160,88 @@ class CourseHome {
             if (!isset($tool['icon'])) {
                 continue;
             }
-            $state = 'closed';
+            $image = substr($tool['tool']['image'], 0, 4);
+            switch ($image) {
+                case 'scor':
+                    $type_entity_id = 1;
+                    $id = self::get_published_id_from_link($tool['tool']['link'], 'lp_id=');
+                    break;
+                case 'quiz':
+                    $type_entity_id = 2;
+                    $id = self::get_published_id_from_link($tool['tool']['link'], 'exerciseId=');
+                    break;
+                default:
+                    $type_entity_id = 0;
+                    $id = self::get_published_id_from_link($tool['tool']['link'], 'd=');
+                    break;
+            }
+            if ($type_entity_id > 0 && $id > 0) {
+                require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
+                $row_entity_id = Sequence::get_row_entity_id_by_row_id($type_entity_id, $id, api_get_course_int_id(), api_get_session_id());
+                $state = Sequence::get_state_lp_by_row_entity_id($row_entity_id, api_get_user_id());
+                $courseInfo = api_get_course_info();
+                $regex ='/src=\"\S*\.(gif|png|jpg)/';
+                $dir_icons = 'icons/64/';
+                $ext_png = 'png';
+                $is_lp_icon = false;
+                if (!empty($tool['tool']['custom_icon'])) {
+                    $custom_icon = $tool['tool']['custom_icon'];
+                } else {
+                    $custom_icon = preg_replace('/(.)+alt=\"/','',$tool['pure_icon']);
+                    $custom_icon = preg_replace('/\"(.)+/','',$custom_icon);
+                    if ($custom_icon !== $tool['tool']['image']) {
+                        $is_lp_icon = true;
+                    }
+                }
+                $basedir = ($is_lp_icon)? '/upload/learning_path/images/':'/upload/course_home_icons/';
+                if ($state === 'process' || $state === 'completed') {
+                    $tool['visibility'] = 1;
+                    if (strpos($custom_icon, '_na') !== false) {
+                        $custom_icon = preg_replace('/_na/', '', $custom_icon);
+                    }
+                    $iconPathTemp = api_get_path(WEB_COURSE_PATH).$courseInfo['directory'].$basedir.$custom_icon;
+                    if (is_file(api_get_path(SYS_COURSE_PATH).$courseInfo['directory'].$basedir.$custom_icon)) {
+                        $icon_path = 'src="'.$iconPathTemp;
+                        $tool['pure_icon'] = preg_replace($regex, $icon_path, $tool['pure_icon']);
+                        $tool['icon'] = preg_replace($regex, $icon_path, $tool['icon']);
+                    } else {
+                        $icon_path = 'src="' . api_get_path(WEB_IMG_PATH) . $dir_icons . $tool['tool']['image'];
+                        if (strpos($icon_path,'_na') !== false) {
+                            $icon_path = preg_replace('/_na/', '', $icon_path);
+                        }
+                        $icon_path = substr($icon_path,0,-3) . $ext_png;
+                        $tool['pure_icon'] = preg_replace($regex, $icon_path, $tool['pure_icon']);
+                        $tool['icon'] = preg_replace($regex, $icon_path, $tool['icon']);
+                    }
+                } else {
+                    $iconPathNATemp = api_get_path(WEB_COURSE_PATH).$courseInfo['directory'].$basedir.$custom_icon;
+                    $iconPathNATempSys = api_get_path(SYS_COURSE_PATH).$courseInfo['directory'].$basedir.$custom_icon;
+                    $ext = pathinfo($iconPathNATempSys, PATHINFO_EXTENSION);
+                    if (strpos($iconPathNATempSys,'_na') === false) {
+                        $iconPathNATempSys = substr($iconPathNATempSys,0,-(strlen($ext)+1)) . '_na.' . $ext_png;
+                    }
+                    if (is_file($iconPathNATempSys)) {
+                        if (strpos($iconPathNATemp,'_na') === false) {
+                            $iconPathNATemp = substr($iconPathNATemp,0,-(strlen($ext)+1)) . '_na.' . $ext_png;
+                        }
+                        $icon_path = $iconPathNATemp;
+                        $icon_path = 'src="' . $icon_path;
+                        $tool['pure_icon'] = preg_replace($regex, $icon_path,$tool['pure_icon']);
+                        $tool['icon'] = preg_replace($regex, $icon_path,$tool['icon']);
+                    } else {
+                        $ext = pathinfo(api_get_path(WEB_IMG_PATH). $dir_icons . $tool['tool']['image'], PATHINFO_EXTENSION);
+                        $default_icon = api_get_path(WEB_IMG_PATH). $dir_icons . substr($tool['tool']['image'],0,-(strlen($ext)+1));
+                        if (strpos($default_icon,'_na') === false) {
+                            $icon_path = $default_icon .'_na.'. $ext_png;
+                        } else {
+                            $icon_path = $default_icon .'.'. $ext_png;
+                        }
+                        $icon_path = 'src="'. $icon_path;
+                        $tool['pure_icon'] = preg_replace($regex, $icon_path,$tool['pure_icon']);
+                        $tool['icon'] = preg_replace($regex, $icon_path,$tool['icon']);
+                    }
+                }
+            }
             $toolName = $tool['tool']['name'];
             $show = '<div class="span2 center">'
 
@@ -1181,7 +1258,20 @@ class CourseHome {
                 $text = str_replace($search, $show, $text);
             }
         }
-
         return $text;
+    }
+
+    public static function get_published_id_from_link($published_lp_link, $type_id = 'd=') {
+        $id = 0;
+        $param_id = strstr($published_lp_link, $type_id);
+        if (!empty($param_id)) {
+            $a_param_id = explode('=',$param_id);
+            if (isset($a_param_id[1])) {
+                $a_param_id = explode('&', $a_param_id[1]);
+                if (!empty($a_param_id[0]))
+                    $id = intval($a_param_id[0]);
+            }
+        }
+        return $id;
     }
 }

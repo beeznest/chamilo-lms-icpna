@@ -257,7 +257,19 @@ if ($intro_editAllowed) {
                 $temp->resize($thumbwidth, $new_height, 0);
 
                 //copy the image to the course upload folder
-                $result = $temp->send_image($dir . '/' . $_FILES['icon']['name']);
+                $path = $dir . '/' . $_FILES['icon']['name'];
+                $result = $temp->send_image($path);
+
+                $temp = new Image($path);
+                $r = $temp->convert2bw();
+                $ext = pathinfo($path, PATHINFO_EXTENSION);
+                $bwPath = substr($path,0,-(strlen($ext)+1)) . '_na.' . $ext;
+
+                if ($r === false) {
+                    error_log('Conversion to B&W of '.$path.' failed in '.__FILE__.' at line '.__LINE__);
+                } else {
+                    $temp->send_image($bwPath);
+                }
                 $icon_name = $_FILES['icon']['name'];
             }
 

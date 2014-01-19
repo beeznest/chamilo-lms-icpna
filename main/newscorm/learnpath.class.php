@@ -2089,7 +2089,7 @@ class learnpath {
             */
             require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
             $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $lp_id, api_get_course_int_id(), api_get_session_id());
-            $state = Sequence::get_available_lp_by_row_entity_id($row_entity_id, $student_id);
+            $state = Sequence::get_state_lp_by_row_entity_id($row_entity_id, $student_id);
             if ($state === 'process' || $state === 'completed') {
                 $is_visible = true;
             }
@@ -9383,7 +9383,7 @@ EOD;
     public static function get_state_by_lp_id($lp_id) {
         require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
         $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $lp_id, api_get_course_int_id(), api_get_session_id());
-        return Sequence::get_available_lp_by_row_entity_id($row_entity_id, api_get_user_id());
+        return Sequence::get_state_lp_by_row_entity_id($row_entity_id, api_get_user_id());
     }
 }
 

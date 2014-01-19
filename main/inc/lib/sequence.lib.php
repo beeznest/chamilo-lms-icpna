@@ -613,7 +613,7 @@ class Sequence {
     /**
      * Bool Available for LP
      */
-    public static function get_available_lp_by_row_entity_id ($row_entity_id, $user_id) {
+    public static function get_state_lp_by_row_entity_id ($row_entity_id, $user_id) {
         $seq_val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
         if ($row_entity_id > 0) {
             $sql_seq = "SELECT val.available, val.success FROM $seq_val_table val WHERE val.sequence_row_entity_id = $row_entity_id AND val.user_id = $user_id LIMIT 0, 1";

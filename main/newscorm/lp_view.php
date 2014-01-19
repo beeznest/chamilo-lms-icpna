@@ -292,7 +292,11 @@ if (isset($_SESSION['status']) && $_SESSION['status'][$course_code] == 5) {
 $_SESSION['loaded_lp_view'] = true;
 
 $display_none = '';
-$margin_left = '255px';
+$margin_left = '257px';
+echo "
+    <script>
+    var marginLeftIni = '$margin_left'
+</script>";
 
 //Media player code
 
@@ -433,69 +437,69 @@ echo '<div id="learning_path_main" style="width:100%;height:100%;">';
 
 <script>
     // Resize right and left pane to full height (HUB 20-05-2010).
-    function updateContentHeight() {
-        document.body.style.overflow = 'hidden';
-        var IE = window.navigator.appName.match(/microsoft/i);
-        var hauteurHeader = document.getElementById('header').offsetHeight;
-        //var hauteurAuthorImg = document.getElementById('author_image').offsetHeight;
-        //var hauteurAuthorName = document.getElementById('author_name').offsetHeight;
-        var hauteurAuthorImg = 0;
-        var hauteurAuthorName = 0;
-        var hauteurMedia = 0;
-        if ($("#lp_media_file").length != 0) {
-            hauteurMedia = document.getElementById('lp_media_file').offsetHeight;
-        }
-
-        var hauteurTitre = document.getElementById('scorm_title').offsetHeight;
-        var hauteurAction = 0;
-        if (document.getElementById('actions_lp')) hauteurAction = document.getElementById('actions_lp').offsetHeight;
-        var hauteurHaut = hauteurHeader+hauteurAuthorImg+hauteurAuthorName+hauteurMedia+hauteurTitre+hauteurAction;
-        var innerHauteur = (IE) ? document.body.clientHeight : window.innerHeight ;
-        var debugsize = 0;
-        // -40 is a static adjustement for margin, spaces on the page
-        <?php if (!empty($_SESSION['oLP']->scorm_debug)) echo 'debugsize = 150;' ?>
-        document.getElementById('inner_lp_toc').style.height = innerHauteur - hauteurHaut - 40 - debugsize + "px";
-        if (document.getElementById('content_id')) {
-            document.getElementById('content_id').style.height = innerHauteur + 'px';
-        }
-
-    // Loads the glossary library.
-    <?php
+//    function updateContentHeight() {
+//        document.body.style.overflow = 'hidden';
+//        var IE = window.navigator.appName.match(/microsoft/i);
+//        var hauteurHeader = document.getElementById('header').offsetHeight;
+//        //var hauteurAuthorImg = document.getElementById('author_image').offsetHeight;
+//        //var hauteurAuthorName = document.getElementById('author_name').offsetHeight;
+//        var hauteurAuthorImg = 0;
+//        var hauteurAuthorName = 0;
+//        var hauteurMedia = 0;
+//        if ($("#lp_media_file").length != 0) {
+//            hauteurMedia = document.getElementById('lp_media_file').offsetHeight;
+//        }
+//
+//        var hauteurTitre = document.getElementById('scorm_title').offsetHeight;
+//        var hauteurAction = 0;
+//        if (document.getElementById('actions_lp')) hauteurAction = document.getElementById('actions_lp').offsetHeight;
+//        var hauteurHaut = hauteurHeader+hauteurAuthorImg+hauteurAuthorName+hauteurMedia+hauteurTitre+hauteurAction;
+//        var innerHauteur = (IE) ? document.body.clientHeight : window.innerHeight ;
+//        var debugsize = 0;
+//        // -40 is a static adjustement for margin, spaces on the page
+//        <?php if (!empty($_SESSION['oLP']->scorm_debug)) echo 'debugsize = 150;' ?>
+//        document.getElementById('inner_lp_toc').style.height = innerHauteur - hauteurHaut - 40 - debugsize + "px";
+//        if (document.getElementById('content_id')) {
+//            document.getElementById('content_id').style.height = innerHauteur + 'px';
+//        }
+//
+//    // Loads the glossary library.
+//    <?php
       if (api_get_setting('show_glossary_in_extra_tools') == 'true') {
            if (api_get_setting('show_glossary_in_documents') == 'ismanual') {
-                ?>
-            $.frameReady(function(){
-                   //  $("<div>I am a div courses</div>").prependTo("body");
-         }, "top.content_name",
-          { load: [
-                  {type:"script", id:"_fr1", src:"<?php echo api_get_path(WEB_LIBRARY_PATH); ?>javascript/jquery.min.js"},
-                  {type:"script", id:"_fr4", src:"<?php echo api_get_path(WEB_LIBRARY_PATH); ?>javascript/jquery-ui/smoothness/jquery-ui-1.8.21.custom.min.js"},
-                  {type:"stylesheet", id:"_fr5", src:"<?php echo api_get_path(WEB_LIBRARY_PATH); ?>javascript/jquery-ui/smoothness/jquery-ui-1.8.21.custom.css"},
-                  {type:"script", id:"_fr2", src:"<?php echo api_get_path(WEB_LIBRARY_PATH); ?>javascript/jquery.highlight.js"}
-
-          ] }
-          );
-    <?php
+    ?>//
+//            $.frameReady(function(){
+//                   //  $("<div>I am a div courses</div>").prependTo("body");
+//         }, "top.content_name",
+//          { load: [
+//                  {type:"script", id:"_fr1", src:"<?php echo api_get_path(WEB_LIBRARY_PATH); ?>javascript/jquery.min.js"},
+//                  {type:"script", id:"_fr4", src:"<?php echo api_get_path(WEB_LIBRARY_PATH); ?>javascript/jquery-ui/smoothness/jquery-ui-1.8.21.custom.min.js"},
+//                  {type:"stylesheet", id:"_fr5", src:"<?php echo api_get_path(WEB_LIBRARY_PATH); ?>javascript/jquery-ui/smoothness/jquery-ui-1.8.21.custom.css"},
+//                  {type:"script", id:"_fr2", src:"<?php echo api_get_path(WEB_LIBRARY_PATH); ?>javascript/jquery.highlight.js"}
+//
+//          ] }
+//          );
+//    <?php
         } elseif (api_get_setting('show_glossary_in_documents') == 'isautomatic') {
-      ?>
-    $.frameReady(function(){
-        //  $("<div>I am a div courses</div>").prependTo("body");
-      }, "top.content_name",
-      { load: [
-              {type:"script", id:"_fr1", src:"<?php echo api_get_path(WEB_LIBRARY_PATH); ?>javascript/jquery.min.js"},
-              {type:"script", id:"_fr4", src:"<?php echo api_get_path(WEB_LIBRARY_PATH); ?>javascript/jquery-ui/smoothness/jquery-ui-1.8.21.custom.min.js"},
-              {type:"stylesheet", id:"_fr5", src:"<?php echo api_get_path(WEB_LIBRARY_PATH); ?>javascript/jquery-ui/smoothness/jquery-ui-1.8.21.custom.css"},
-              {type:"script", id:"_fr2", src:"<?php echo api_get_path(WEB_LIBRARY_PATH); ?>javascript/jquery.highlight.js"}
-
-          ] }
-          );
-      <?php
+      ?>//
+//    $.frameReady(function(){
+//        //  $("<div>I am a div courses</div>").prependTo("body");
+//      }, "top.content_name",
+//      { load: [
+//              {type:"script", id:"_fr1", src:"<?php echo api_get_path(WEB_LIBRARY_PATH); ?>javascript/jquery.min.js"},
+//              {type:"script", id:"_fr4", src:"<?php echo api_get_path(WEB_LIBRARY_PATH); ?>javascript/jquery-ui/smoothness/jquery-ui-1.8.21.custom.min.js"},
+//              {type:"stylesheet", id:"_fr5", src:"<?php echo api_get_path(WEB_LIBRARY_PATH); ?>javascript/jquery-ui/smoothness/jquery-ui-1.8.21.custom.css"},
+//              {type:"script", id:"_fr2", src:"<?php echo api_get_path(WEB_LIBRARY_PATH); ?>javascript/jquery.highlight.js"}
+//
+//          ] }
+//          );
+//      <?php
            }
       }
-      ?>
-}
-    window.onload = updateContentHeight;
-    window.onresize = updateContentHeight;
+      ?>//
+//}
+//    window.onload = updateContentHeight;
+//    window.onresize = updateContentHeight;
 -->
 </script>
 <?php

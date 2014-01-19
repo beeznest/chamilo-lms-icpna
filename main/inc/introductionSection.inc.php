@@ -37,6 +37,9 @@ $intro_cmdEdit = empty($_GET['intro_cmdEdit']) ? '' : $_GET['intro_cmdEdit'];
 $intro_cmdUpdate = isset($_POST['intro_cmdUpdate']);
 $intro_cmdDel = empty($_GET['intro_cmdDel']) ? '' : $_GET['intro_cmdDel'];
 $intro_cmdAdd = empty($_GET['intro_cmdAdd']) ? '' : $_GET['intro_cmdAdd'];
+$editIconsList = empty($_GET['editIconsList']) ? '' : $_GET['editIconsList'];
+$editIcon = empty($_GET['editIcon']) ? '' : $_GET['editIcon'];
+$deleteIcon = empty($_GET['deleteIcon']) ? '' : $_GET['deleteIcon'];
 
 if (!empty ($GLOBALS['_cid'])) {
 	$form = new FormValidator('introduction_text', 'post', api_get_self().'?'.api_get_cidreq());
@@ -132,6 +135,10 @@ if ($intro_cmdEdit || $intro_cmdAdd) {
 	$intro_dispDefault = false;
 	$intro_dispForm = true;
 	$intro_dispCommand = false;
+} else if ($editIconsList || $editIcon) {
+	$intro_dispDefault  = false;
+	$intro_dispForm     = false;
+	$intro_dispCommand  = false;
 } else {
 	$intro_dispDefault = true;
 	$intro_dispForm = false;
@@ -141,6 +148,173 @@ if ($intro_cmdEdit || $intro_cmdAdd) {
 	} else {
 		$intro_dispCommand = false;
 	}
+}
+
+if ($intro_editAllowed) {
+    /* INTRODUCTION MICRO MODULE - DISPLAY ICONS LIST */
+    if ($editIconsList) {
+        $toolsList = CourseHome::toolsIconsAction(api_get_course_int_id(), api_get_session_id());
+        $introduction_section .= '<table style="width:100%;">';
+        foreach ($toolsList as $tool) {
+            $introduction_section .= '<tr>';
+            $introduction_section .= '<td><a href="' . api_get_path(WEB_CODE_PATH) . $tool['link'] . '?' . api_get_cidreq() . '"><img src="' . api_get_path(WEB_IMG_PATH).$tool['image']. '"></a></td>';
+            $introduction_section .= '<td><a href="' . api_get_path(WEB_CODE_PATH) . $tool['link'] . '?' . api_get_cidreq() . '">' .  $tool['name']. '</a></td>';
+            $introduction_section .= '<td><a class="btn btn-primary" href="' . api_get_self() . '?editIcon=' . $tool['id'] . '">' . get_lang('Edit'). '</a></td>';
+            $delete = (!empty($tool['custom_icon'])) ? '<a class="btn btn-danger" href="' . api_get_self() . '?deleteIcon=' . $tool['id'] . '">' . get_lang('Delete'). '</a>' : '';
+            $introduction_section .= '<td>' . $delete . '</td>';
+            $introduction_section .= '</tr>';
+        }
+        $introduction_section .= '</table>';
+
+    }
+    /* INTRODUCTION MICRO MODULE - EDIT ICON */
+    if (!empty($editIcon)) {
+        //defaults
+        $course_tool_table  = Database::get_course_table(TABLE_TOOL_LIST);
+        $course_id          = api_get_course_int_id();
+        $_course            = api_get_course_info();
+        $session_id         = api_get_session_id();
+
+        $sql = "SELECT * FROM $course_tool_table  WHERE c_id = $course_id AND id = $editIcon AND session_id = $session_id";
+        $result = Database::query($sql);
+        $tool = Database::fetch_assoc($result);
+
+        $default['id']          = $tool['id'];
+        $default['c_id']        = $tool['c_id'];
+        $default['name']        = $tool['name'];
+        $default['links']       = $tool['link'];
+        $default['target']      = $tool['target'];
+        $default['visibility']  = $tool['visibility'];
+        $default['description'] = $tool['description'];
+
+        if (!empty ($GLOBALS['_cid'])) {
+            $formEdit = new FormValidator('icon_edit', 'post', api_get_self().'?editIcon=' . $default['id']);
+        } else {
+            $formEdit = new FormValidator('icon_edit');
+       	}
+
+        $formEdit->addElement('header', get_lang('EditIcon'));
+        $formEdit->addElement('text', 'name', get_lang('Name'));
+        $formEdit->addElement('text', 'links', get_lang('Links'));
+            //$formEdit->addElement('text', 'custom_icon', get_lang('CustomIcon'));
+        $allowed_picture_types = array ('jpg', 'jpeg', 'png');
+        $formEdit->addElement('file', 'icon', get_lang('CustomIcon'));
+        $formEdit->addRule('icon', get_lang('OnlyImagesAllowed').' ('.implode(',', $allowed_picture_types).')', 'filetype', $allowed_picture_types);
+
+        $formEdit->addElement('select', 'target', get_lang('Target'), array('_self' => '_self', '_blank' => '_blank'));
+        $formEdit->addElement('select', 'visibility', get_lang('Visibility'), array(1 => get_lang('Visible'), 0 => get_lang('Invisible')));
+        $formEdit->addElement('textarea', 'description', get_lang('Description'),array ('rows' => '3', 'cols' => '40'));
+        $formEdit->addElement('style_submit_button', 'intro_cmdUpdate', get_lang('SaveIntroText'), 'class="save"');
+
+        $formEdit->setDefaults($default);
+
+        $introduction_section .= '<div id="courseintro" style="width: 98%">';
+        $introduction_section .= $formEdit->return_form();
+        $introduction_section .= '</div>';
+
+        if ($formEdit->validate()) {
+            $icon_path = '';
+            if (isset($_FILES['icon']['size']) && $_FILES['icon']['size'] !== 0) {
+
+                //Check if directory exists or create it if it doesn't
+                $dir = api_get_path(SYS_COURSE_PATH).api_get_course_path().'/upload/course_home_icons';
+                if (!is_dir($dir)) {  //if (!file_exists($path)) {
+                    if (!mkdir($dir, api_get_permissions_for_new_directories())) {
+                        //error message
+                    }
+                }
+
+                //change filename if already exists
+                /*$i = '';
+                $ext = explode('.', basename($_FILES['icon']['tmp_name']));
+                if (count($ext) > 1) {
+                    $ext = array_pop($ext);
+                    $file_name_no_ext = substr($_FILES['icon']['tmp_name'], 0, - (strlen($ext) + 1));
+                    $ext = '.'.$ext;
+                } 
+
+                $new_file_name = $file_name_no_ext.'_'.$i.$ext;
+                $file_exists = file_exists($path.$new_file_name);
+                while ($file_exists) {
+                    $i++;
+                    $new_file_name = $file_name_no_ext.'_'.$i.$ext;
+                    $file_exists = file_exists($path.$new_file_name);
+                }*/
+
+                //Resize image if it is larger than 64px
+                $temp = new Image($_FILES['icon']['tmp_name']);
+                $picture_infos = $temp->get_image_info();
+                if ($picture_infos['width'] > 64) {
+                    $thumbwidth = 64;
+                } else {
+                    $thumbwidth = $picture_infos['width'];
+                }
+                if ($picture_infos['height'] > 64) {
+                    $new_height = 64;
+                } else {
+                    $new_height = $picture_infos['height'];
+                }
+                $temp->resize($thumbwidth, $new_height, 0);
+
+                //copy the image to the course upload folder
+                $path = $dir . '/' . $_FILES['icon']['name'];
+                $result = $temp->send_image($path);
+
+                $temp = new Image($path);
+                $r = $temp->convert2bw();
+                $ext = pathinfo($path, PATHINFO_EXTENSION);
+                $bwPath = substr($path,0,-(strlen($ext)+1)) . '_na.' . $ext;
+
+                if ($r === false) {
+                    error_log('Conversion to B&W of '.$path.' failed in '.__FILE__.' at line '.__LINE__);
+                } else {
+                    $temp->send_image($bwPath);
+                }
+                $icon_name = $_FILES['icon']['name'];
+            }
+
+            $name           = Database::escape_string($_POST['name']);
+            $link           = Database::escape_string($_POST['links']);
+            $target         = Database::escape_string($_POST['target']);
+            $custom_icon    = Database::escape_string($icon_name);
+            $visibility     = Database::escape_string($_POST['visibility']);
+            $description    = Database::escape_string($_POST['description']);
+
+            $sql    = "UPDATE $course_tool_table
+                        SET name = '$name',
+                            link = '$link',
+                            visibility = '$visibility',
+                            target = '$target',
+                            custom_icon = '$custom_icon',
+                            description = '$description'
+                        WHERE c_id = $course_id AND id = $editIcon AND session_id = $session_id";
+
+            $result = Database::query($sql);
+            $intro_dispForm = false;
+
+            Redirect::go(api_get_path(WEB_COURSE_PATH) . $_course['path'] . '/index.php?msg=Saved');
+        }
+    }
+}
+
+/* INTRODUCTION MICRO MODULE - DELETE ICON */
+
+if ($intro_editAllowed) {
+    if (!empty($deleteIcon)) {
+        $intro_dispForm    = false;
+        $course_id         = api_get_course_int_id();
+        $_course           = api_get_course_info();
+        $session_id        = api_get_session_id();
+        $course_tool_table = Database::get_course_table(TABLE_TOOL_LIST);
+
+        $sql    = "UPDATE $course_tool_table
+        SET custom_icon = '',
+        description = ''
+        WHERE c_id = $course_id AND id = $deleteIcon AND session_id = $session_id";
+        $result = Database::query($sql);
+
+        Redirect::go(api_get_path(WEB_COURSE_PATH) . $_course['path'] . '/index.php?msg=Deleted');
+    }
 }
 
 /* Executes the display */
@@ -218,38 +392,39 @@ $introduction_section .=  $thematic_description_html;
 $introduction_section .=  '</div>';
 
 $introduction_section .=  '<div class="span12">';
-if ($intro_dispDefault) {	
-	$intro_content = $intro_content;
-	if (!empty($intro_content))	{
-		$introduction_section .=  $intro_content;
-	}
+if ($intro_dispDefault) {
+    $intro_content = $intro_content;
+    if (!empty($intro_content))	{
+        $introduction_section .=  $intro_content;
+    }
 }
 $introduction_section .=  '</div>';
 
-if ($intro_dispCommand) {    
-	if (empty($intro_content)) {
-		// Displays "Add intro" commands
-		$introduction_section .=  '<div id="courseintro_empty">';
-		if (!empty ($GLOBALS['_cid'])) {			
-			$introduction_section .=  "<a href=\"".api_get_self()."?".api_get_cidreq()."&amp;intro_cmdAdd=1\">";            
-            $introduction_section .=  Display::return_icon('introduction_add.gif', get_lang('AddIntro')).' ';            		
-			$introduction_section .=  "</a>";
-		} else {
-			$introduction_section .= "<a href=\"".api_get_self()."?intro_cmdAdd=1\">\n".get_lang('AddIntro')."</a>";
-		}
-		$introduction_section .= "</div>";
+if ($intro_dispCommand) {
+    if (empty($intro_content)) {
+        // Displays "Add intro" commands
+        $introduction_section .=  '<div id="courseintro_empty">';
+        if (!empty ($GLOBALS['_cid'])) {
+            $introduction_section .=  "<a href=\"".api_get_self()."?".api_get_cidreq()."&amp;intro_cmdAdd=1\">";
+            $introduction_section .=  Display::return_icon('introduction_add.gif', get_lang('AddIntro')).' ';
+            $introduction_section .=  "</a>";
+        } else {
+            $introduction_section .= "<a href=\"".api_get_self()."?intro_cmdAdd=1\">\n".get_lang('AddIntro')."</a>";
+        }
+        $introduction_section .= "</div>";
 
-	} else {
-		// Displays "edit intro && delete intro" commands
-		$introduction_section .=  '<div id="courseintro_empty">';
-		if (!empty ($GLOBALS['_cid'])) {
-			$introduction_section .=  "<a href=\"".api_get_self()."?".api_get_cidreq()."&amp;intro_cmdEdit=1\">".Display::return_icon('edit.png',get_lang('Modify'),'',ICON_SIZE_SMALL)."</a>";			
-			$introduction_section .=  "<a href=\"".api_get_self()."?".api_get_cidreq()."&amp;intro_cmdDel=1\" onclick=\"javascript:if(!confirm('".addslashes(api_htmlentities(get_lang('ConfirmYourChoice'),ENT_QUOTES,$charset))."')) return false;\">".Display::return_icon('delete.png',get_lang('Delete'),'',ICON_SIZE_SMALL)."</a>";
-		} else {
-			$introduction_section .=  "<a href=\"".api_get_self()."?intro_cmdEdit=1\">".Display::return_icon('edit.png',get_lang('Modify'),'',ICON_SIZE_SMALL)."</a>";			
-			$introduction_section .=  "<a href=\"".api_get_self()."?intro_cmdDel=1\" onclick=\"javascript:if(!confirm('".addslashes(api_htmlentities(get_lang('ConfirmYourChoice'),ENT_QUOTES,$charset))."')) return false;\">".Display::return_icon('delete.png',get_lang('Delete'),'',ICON_SIZE_SMALL)."</a>";
-		}
-		$introduction_section .=  "</div>";
-	}
+    } else {
+    // Displays "edit intro && delete intro" commands
+        $introduction_section .=  '<div id="courseintro_empty">';
+        if (!empty ($GLOBALS['_cid'])) {
+            $introduction_section .=  "<a href=\"".api_get_self()."?".api_get_cidreq()."&amp;intro_cmdEdit=1\">".Display::return_icon('edit.png',get_lang('Modify'),'',ICON_SIZE_SMALL)."</a>";
+            $introduction_section .=  "<a href=\"".api_get_self()."?".api_get_cidreq()."&amp;intro_cmdDel=1\" onclick=\"javascript:if(!confirm('".addslashes(api_htmlentities(get_lang('ConfirmYourChoice'),ENT_QUOTES,$charset))."')) return false;\">".Display::return_icon('delete.png',get_lang('Delete'),'',ICON_SIZE_SMALL)."</a>";
+            $introduction_section .= "<a href=\"".api_get_self()."?".api_get_cidreq()."&amp;editIconsList=1\">".Display::return_icon('wiki.png',get_lang('EditIcons'),'',ICON_SIZE_SMALL)."</a>";
+        } else {
+            $introduction_section .=  "<a href=\"".api_get_self()."?intro_cmdEdit=1\">".Display::return_icon('edit.png',get_lang('Modify'),'',ICON_SIZE_SMALL)."</a>";
+            $introduction_section .=  "<a href=\"".api_get_self()."?intro_cmdDel=1\" onclick=\"javascript:if(!confirm('".addslashes(api_htmlentities(get_lang('ConfirmYourChoice'),ENT_QUOTES,$charset))."')) return false;\">".Display::return_icon('delete.png',get_lang('Delete'),'',ICON_SIZE_SMALL)."</a>";
+        }
+        $introduction_section .=  "</div>";
+    }
 }
 $introduction_section .=  '</div>';

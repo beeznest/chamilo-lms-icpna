@@ -96,7 +96,7 @@
               <div class="column-four">
                         
                         <a href="{{ help_url }}" class="ajax ico-help">
-                          <img src="{{ _p.web_css }}/ICPNA/images/help.png">
+                          <img src="{{ _p.web_css }}/{{ css_style }}/images/help.png">
                         </a>
                         
 

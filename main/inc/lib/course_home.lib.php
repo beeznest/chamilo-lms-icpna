@@ -735,9 +735,10 @@ class CourseHome {
 
                 if (!empty($tool['custom_icon'])) {
                     //self::getCustomIconPath($courseInfo)
+                    $image = api_get_path(REL_COURSE_PATH).api_get_course_path().'/upload/course_home_icons/' . $tool['custom_icon'];
                     $icon = Display::img(
-                        $tool['image'],
-                        null,
+                        $image,
+                        $tool['description'],
                         array('class' => 'tool-icon', 'id' => 'toolimage_'.$tool['id'])
                     );
                 } elseif ($tool['image'] == 'scormbuilder.gif' or $tool['image'] == 'scormbuilder_na.gif') {
@@ -866,6 +867,40 @@ class CourseHome {
             'content' => $html,
             'tool_list' => $items
         );
+    }
+
+    /**
+     * List course homepage tools from authoring and interaction sections
+     * @param   int $cid The course ID (guessed from context if not provided)
+     * @param   int $sid The session ID (guessed from context if not provided)
+     * @return  array List of all tools data from the c_tools table
+     */
+    public function toolsIconsAction($cid = null, $sid = null)
+    {
+        if (empty($cid)) {
+            api_get_course_int_id();
+        } else {
+            $cid = intval($cid);
+        }
+        if (empty($sid)) {
+            api_get_session_id();
+        } else {
+            $sid = intval($sid);
+        }
+        if (empty($cid)) {
+            // We shouldn't get here, but for some reason api_get_course_int_id() doesn't seem to get the course from the context, sometimes
+            return array();
+        }
+        $courseToolTable  = Database::get_course_table(TABLE_TOOL_LIST);
+        $sql = "SELECT * FROM $courseToolTable
+                WHERE category in ('authoring','interaction')
+                AND c_id = $cid
+                AND session_id = $sid
+                ORDER BY id";
+        api_error_log($sql);
+        $result = Database::query($sql);
+        $data = Database::store_result($result);
+        return $data;
     }
 
     /**

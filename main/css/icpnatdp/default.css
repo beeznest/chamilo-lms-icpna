@@ -403,7 +403,7 @@ header #logo {
 
 .row .center:hover{
     background: url(images/estados-iconos-hover.png) no-repeat;
-    background-position: 6px 1px;
+    background-position: 2px 1px;
     cursor: pointer;
 }
 

@@ -214,9 +214,11 @@ class learnpath {
             $res_ins = Database::query($sql_ins);
             $this->lp_view_id = Database :: insert_id();
             //Sequence rule
+            /*
             require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
             $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $lp_id, $course_id, $session_id);
             Sequence::temp_hack_4_insert(1, $row_entity_id, $user_id, 0);
+            */
             if ($this->debug > 2) {
                 error_log('New LP - learnpath::__construct() ' . __LINE__ . ' - inserting new lp_view: ' . $sql_ins, 0);
             }
@@ -707,10 +709,10 @@ class learnpath {
                 if ($id > 0) {
                     $course_info = api_get_course_info();
                     //Sequence rule
-                    require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
+                   /* require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
                     Sequence::temp_hack_2_insert(1, $id, $course_id, $session_id, $name);
                     Sequence::temp_hack_3_insert(1, 1, 0, $id, $course_id, $session_id, 0);
-
+                    */
                     // Insert into item_property.
                     api_item_property_update($course_info, TOOL_LEARNPATH, $id, 'LearnpathAdded', api_get_user_id());
                     api_set_default_visibility($id, TOOL_LEARNPATH);
@@ -3314,7 +3316,8 @@ class learnpath {
             //Sequence rule #7220
             require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
             $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $this->get_id(), $course_id, api_get_session_id());
-            Sequence::temp_hack_4_insert($this->get_total_items_count(), $row_entity_id, $this->get_user_id(), 0);
+            /*Sequence::temp_hack_4_insert($this->get_total_items_count(), $row_entity_id, $this->get_user_id(), 0);
+            */
         }
         return $this->lp_view_id;
     }
@@ -3833,7 +3836,7 @@ class learnpath {
             //Sequence rule
             require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
             $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $this->lp_id, $course_id, $session_id);
-            Sequence::temp_hack_4_insert($this->get_total_items_count(),$row_entity_id,$this->lp_id, $this->get_user_id(), 0);
+            //Sequence::temp_hack_4_insert($this->get_total_items_count(),$row_entity_id,$this->lp_id, $this->get_user_id(), 0);
         } else {
             $this->error = 'Could not insert into item_view table...';
             return false;

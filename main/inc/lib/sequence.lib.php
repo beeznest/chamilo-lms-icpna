@@ -315,9 +315,11 @@ class Sequence {
                     val.sequence_row_entity_id = seq.sequence_row_entity_id AND
                     seq.sequence_row_entity_id_next = $row_entity_id";
         $result = Database::query($sql);
+        var_dump($sql);
         while ($temp = Database::fetch_array($result, 'ASSOC')){
             $pre_req[$temp['user_id']] = $temp['sequence_row_entity_id'];
         }
+        var_dump($pre_req);
         if (empty($pre_req)) {
             if (self::get_value_by_user_id($row_entity_id, $user_id) === false) {
                 self::temp_hack_4_insert(1, $row_entity_id, $user_id, 0);
@@ -376,20 +378,62 @@ class Sequence {
                 if (Database::num_rows($result) > 0) {
                     $ent_table = Database::fetch_array($result, 'ASSOC');
                     $table = $ent_table['ent_table'];
-                    $sql = "SELECT name, prerequisite FROM $table WHERE c_id = $c_id AND session_id = $session_id AND id = $row_id LIMIT 0, 1";
-                    $result = Database::query($sql);
-                    if (Database::num_rows($result)) {
-                        $temp_arr = Database::fetch_array($result, 'ASSOC');
-                        $name = $temp_arr['name'];
-                        $pre = ($temp_arr['prerequisite'] > 0)? self::get_row_entity_id_by_row_id($entity_id, $temp_arr['prerequisite'], $c_id, $session_id) : 0 ;
+                    if ($entity_id !== 2) {
+                        $sql = "SELECT name, prerequisite FROM $table WHERE c_id = $c_id AND session_id = $session_id AND id = $row_id LIMIT 0, 1";
+                        $result = Database::query($sql);
+                        if (Database::num_rows($result)) {
+                            $temp_arr = Database::fetch_array($result, 'ASSOC');
+                            $name = $temp_arr['name'];
+                            $pre = ($temp_arr['prerequisite'] > 0)? self::get_row_entity_id_by_row_id($entity_id, $temp_arr['prerequisite'], $c_id, $session_id) : 0 ;
+                            $sql = "INSERT INTO $row_table (sequence_type_entity_id, c_id, session_id, row_id, name) VALUES
+                            ($entity_id, $c_id, $session_id, $row_id, '$name')";
+                            Database::query($sql);
+                            $id = Database::insert_id();
+                            $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
+                            $sql = "INSERT INTO $seq_table (sequence_row_entity_id, sequence_row_entity_id_next, is_part) VALUES
+                            ($pre, $id, 0)";
+                            Database::query($sql);
+                            if ($pre !== 0) {
+                                $user_id = self::get_user_id_by_row_entity_id($pre);
+                                foreach ($user_id as $us_id) {
+                                    self::action_pre_init($id, $us_id);
+                                }
+                            }
+                            $sql = "SELECT id FROM $row_table WHERE sequence_type_entity_id = 2 AND c_id = $c_id AND session_id = $session_id and name = 'EXAM' LIMIT 0, 1";
+                            $result = Database::query($sql);
+                            if (Database::num_rows($result) > 0) {
+                                $temp_arr = Database::fetch_array($result, 'ASSOC');
+                                $exam_id = $temp_arr['id'];
+                                $sql = "INSERT INTO $seq_table (sequence_row_entity_id, sequence_row_entity_id_next, is_part) VALUES
+                                ($id, $exam_id, 0)";
+                                Database::query($sql);
+                                $user_id = self::get_user_id_by_row_entity_id($id);
+                                foreach ($user_id as $us_id) {
+                                    self::action_pre_init($exam_id, $us_id);
+                                }								
+                            }
+                            return $id;
+                        }
+                    } elseif (strpos(strtolower($name),'exam') !== false) {
+                        $sql = "SELECT id FROM $row_table WHERE c_id = $c_id AND session_id = $session_id";
+                        $result = Database::query($sql);
+                        var_dump($sql);
+                        while ($temp_arr = Database::fetch_array($result, 'ASSOC')) {
+                            $pre_req[] = $temp_arr['id'];
+                        }
+                        var_dump($pre_req);
+                        $name = 'EXAM';
                         $sql = "INSERT INTO $row_table (sequence_type_entity_id, c_id, session_id, row_id, name) VALUES
                         ($entity_id, $c_id, $session_id, $row_id, '$name')";
                         Database::query($sql);
                         $id = Database::insert_id();
                         $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
-                        $sql = "INSERT INTO  $seq_table (sequence_row_entity_id, sequence_row_entity_id_next, is_part) VALUES
-                        ($pre, $id, 0)";
-                        Database::query($sql);
+                        foreach ($pre_req as $pr) {
+                            $sql = "INSERT INTO $seq_table (sequence_row_entity_id, sequence_row_entity_id_next, is_part) VALUES
+                            ($pr, $id, 0)";
+                            Database::query($sql);	
+                            var_dump($sql);
+                        }
                         return $id;
                     }
                 }

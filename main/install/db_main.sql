@@ -3151,3 +3151,188 @@ CREATE TABLE branch_transaction (
 
 -- Do not move this
 UPDATE settings_current SET selected_value = '1.10.0.21309' WHERE variable = 'chamilo_database_version';
+--
+-- Tables for rules like sequence
+--
+
+DROP TABLE IF EXISTS sequence_rule;
+CREATE TABLE sequence_rule (
+    id int unsigned not null auto_increment,
+    description TEXT default '',
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS sequence_condition;
+CREATE TABLE sequence_condition (
+    id int unsigned not null auto_increment,
+    description TEXT default '',
+    mat_op char(2) not null,
+    param float not null,
+    act_true int unsigned,
+    act_false int unsigned,
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS sequence_rule_condition;
+CREATE TABLE sequence_rule_condition (
+    id int unsigned not null auto_increment,
+    sequence_rule_id int unsigned not null,
+    sequence_condition_id int unsigned not null,
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS sequence_method;
+CREATE TABLE sequence_method (
+    id int unsigned not null auto_increment,
+    description TEXT default '',
+    formula TEXT default '',
+    assign int unsigned not null,
+    met_type varchar(50) default '',
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS sequence_rule_method;
+CREATE TABLE sequence_rule_method (
+    id int unsigned not null auto_increment,
+    sequence_rule_id int unsigned not null,
+    sequence_method_id int unsigned not null,
+    method_order int unsigned not null,
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS sequence_variable;
+CREATE TABLE sequence_variable (
+    id int unsigned not null auto_increment,
+    description TEXT default '',
+    name varchar(50),
+    default_val varchar(50) default '',
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS sequence_formula;
+CREATE TABLE sequence_formula (
+    id int unsigned not null auto_increment,
+    sequence_method_id int unsigned not null,
+    sequence_variable_id int unsigned not null,
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS sequence_valid;
+CREATE TABLE sequence_valid (
+    id int unsigned not null auto_increment,
+    sequence_variable_id int unsigned not null,
+    sequence_condition_id int unsigned not null,
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS sequence_type_entity;
+CREATE TABLE sequence_type_entity (
+    id int unsigned not null auto_increment,
+    name varchar(50) not null default '',
+    description TEXT default '',
+    ent_table varchar(50) not null,
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS sequence_row_entity;
+CREATE TABLE sequence_row_entity (
+    id int unsigned not null auto_increment,
+    sequence_type_entity_id int unsigned not null,
+    c_id  int unsigned not null,
+    session_id int unsigned not null default 0,
+    row_id int unsigned not null,
+    name varchar(200) not null default '',
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS sequence;
+CREATE TABLE sequence (
+    id int unsigned not null auto_increment,
+    sequence_row_entity_id int unsigned not null,
+    sequence_row_entity_id_next int unsigned not null,
+    is_part tinyint unsigned not null default 0,
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS sequence_value;
+CREATE TABLE sequence_value (
+    id int unsigned not null auto_increment,
+    user_id int unsigned not null,
+    sequence_row_entity_id int unsigned not null,
+    advance float not null default 0.0,
+    complete_items int not null default 0,
+    total_items int not null default 1,
+    success tinyint not null default 0,
+    success_date datetime not null,
+    available tinyint not null default 0,
+    available_start_date datetime not null,
+    available_end_date datetime not null,
+    PRIMARY KEY (id)
+);
+--
+-- Inserts for sequence rule (whitout lang terms)
+--
+
+INSERT INTO sequence_rule (description) VALUES
+    ('Si el usuario completa un 70% de una entidad o grupo de recursos podrá acceder acceder a otra entidad o grupo de recursos');
+INSERT INTO sequence_condition (description, mat_op, param, act_true, act_false) VALUES
+    ('<= 100%','<=', 100.0, 2, null),
+    ('>= 70%','>=', 70.0, 0, null);
+INSERT INTO sequence_rule_condition VALUES
+    (1,1,1),
+    (2,1,2);
+INSERT INTO sequence_method (description,formula, assign, met_type) VALUES
+    ('Aumenta elemento completado','v#2 + $complete_items;', 2, 'add'),
+    ('Actualiza Avance por división', 'v#2 / v#3 * 100;', 1, 'div'),
+    ('Actualiza total de elementos', '$total_items;', 3,'update'),
+    ('Activa logro', '1;', 4, 'success'),
+    ('Almacena la fecha de logro', '(empty(v#5))? api_get_utc_datetime() : v#5;', 5, 'success'),
+    ('Activa disponibilidad', '1;', 6, 'pre'),
+    ('Almacena la fecha inicio de disponibilidad', '(empty(v#7))? api_get_utc_datetime() : v#7;', 7, 'pre'),
+    ('Almacena la fecha fin de disponibilidad', '(empty($available_end_date))? api_get_utc_datetime($available_end_date) : "0000-00-00 00:00:00";', 8, 'pre'),
+    ('Aumenta el total de elementos', 'v#3 + $total_items;', 3,'add'),
+    ('Actualiza elementos completados', '$complete_items;', 2,'update'),
+    ('Actualiza Avance', '$complete_items / $total_items * 100;', 1, 'update');
+INSERT INTO sequence_rule_method VALUES
+    (1,1,1,1),
+    (2,1,2,3),
+    (3,1,3,0),
+    (4,1,4,0),
+    (5,1,5,0),
+    (6,1,6,0),
+    (7,1,7,0),
+    (8,1,8,0),
+    (9,1,9,2),
+    (10,1,10,0),
+    (11,1,11,0);
+
+INSERT INTO sequence_variable VALUES
+    (1, 'Avance porcentual', 'advance', 0.0),
+    (2, 'Elementos completados', 'complete_items', 0),
+    (3, 'Total de elementos', 'total_items', 0),
+    (4, 'Completado', 'success', 0),
+    (5, 'Fecha de completado', 'success_date', '0000-00-00 00:00:00'),
+    (6, 'Disponible', 'available', 0),
+    (7, 'Fecha de inicio de disponibilidad', 'available_start_date', '0000-00-00 00:00:00'),
+    (8, 'Fecha de fin de disponibilidad', 'available_end_date', '0000-00-00 00:00:00');
+INSERT INTO sequence_formula VALUES
+    (1,1,2),
+    (2,2,2),
+    (3,2,3),
+    (4,2,1),
+    (5,3,3),
+    (6,4,4),
+    (7,5,5),
+    (8,6,6),
+    (9,7,7),
+    (10,8,8),
+    (11,9,3),
+    (12,10,2),
+    (13,11,1);
+INSERT INTO sequence_valid VALUES
+    (1,1,1),
+    (2,1,2);
+INSERT INTO sequence_type_entity VALUES
+    (1,'Lp', 'Learning Path','c_lp'),
+    (2,'Quiz', 'Quiz and Tests','c_quiz'),
+    (3,'LpItem', ' Items of a Learning Path','c_lp_item');

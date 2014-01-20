@@ -373,13 +373,11 @@ class Sequence {
                 $typ_table = Database::get_main_table(TABLE_SEQUENCE_TYPE_ENTITY);
                 $sql = "SELECT ent_table FROM $typ_table WHERE id = $entity_id LIMIT 0, 1";
                 $result =Database::query($sql);
-                var_dump($sql);
                 if (Database::num_rows($result) > 0) {
                     $ent_table = Database::fetch_array($result, 'ASSOC');
                     $table = $ent_table['ent_table'];
                     $sql = "SELECT name, prerequisite FROM $table WHERE c_id = $c_id AND session_id = $session_id AND id = $row_id LIMIT 0, 1";
                     $result = Database::query($sql);
-                    var_dump($sql);
                     if (Database::num_rows($result)) {
                         $temp_arr = Database::fetch_array($result, 'ASSOC');
                         $name = $temp_arr['name'];
@@ -387,13 +385,11 @@ class Sequence {
                         $sql = "INSERT INTO $row_table (sequence_type_entity_id, c_id, session_id, row_id, name) VALUES
                         ($entity_id, $c_id, $session_id, $row_id, '$name')";
                         Database::query($sql);
-                        var_dump($sql);
                         $id = Database::insert_id();
                         $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
                         $sql = "INSERT INTO  $seq_table (sequence_row_entity_id, sequence_row_entity_id_next, is_part) VALUES
                         ($pre, $id, 0)";
                         Database::query($sql);
-                        var_dump($sql);
                         return $id;
                     }
                 }
@@ -503,7 +499,6 @@ class Sequence {
             if ($row_entity_id_prev === 0) {
                 if ($user_id === 0) {
                     $user_id = self::get_user_id_by_row_entity_id($row_entity_id_next);
-                    var_dump($user_id);
                     foreach ($user_id as $us_id) {
                         self::action_pre_init($row_entity_id_next, $us_id);
                     }
@@ -513,7 +508,6 @@ class Sequence {
             } else {
                 if ($user_id === 0) {
                     $user_id = self::get_user_id_by_row_entity_id($row_entity_id_prev);
-                    var_dump($user_id);
                     foreach ($user_id as $us_id) {
                         self::action_pre_init($row_entity_id_next, $us_id);
                     }

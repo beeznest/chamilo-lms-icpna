@@ -20,7 +20,6 @@
 }
 #module-lession .modulo-ico-closed {
     background: url("../images/modulos-ingles.png") no-repeat scroll -75px 10px rgba(0, 0, 0, 0);
-    cursor: pointer;
     height: 95px;
     left: 0;
     margin: auto;
@@ -39,7 +38,6 @@
 #module-lession .state-icon-closed{
     background: transparent url("../images/estados-iconos.png") no-repeat;
     background-position: -210px 0px;
-    cursor: pointer;
     display: block;
     height: 95px;
     width: 100px;
@@ -60,5 +58,8 @@
 .row-fluid .span2 {
     width: 17.5%;
 }
-#module-lession {
+#module-lession .center-items {
+    font-weight: bold;
+    margin-top: 6px;
+    padding-left: 0px;
 }

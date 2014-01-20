@@ -407,9 +407,9 @@ class Sequence {
                                 $sql = "INSERT INTO $seq_table (sequence_row_entity_id, sequence_row_entity_id_next, is_part) VALUES
                                 ($id, $exam_id, 0)";
                                 Database::query($sql);
-                                $user_id = self::get_user_id_by_row_entity_id($id);
+                                $user_id = self::get_user_id_by_row_entity_id($exam_id);
                                 foreach ($user_id as $us_id) {
-                                    self::action_pre_init($exam_id, $us_id);
+                                    self::temp_hack_4_set_aval($exam_id, $us_id, 0);
                                 }								
                             }
                             return $id;

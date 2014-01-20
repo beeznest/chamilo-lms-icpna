@@ -750,3 +750,9 @@ header .row-fluid .span9 {
 .new_actions-fixed {
   top: 0;
 }
+#course_tools .span12 .span2 {
+  width: 143px;
+}
+#course_tools .span12 .span2 .center-items {
+  padding-left: 0px;
+}

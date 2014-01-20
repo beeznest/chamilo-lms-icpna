@@ -360,9 +360,9 @@ class Template {
         //$css[] = api_get_cdn_path(api_get_path(WEB_PATH).'web/css/'.$this->theme.'/style.css');
 
         //Default theme CSS
-        $css[] = api_get_cdn_path(api_get_path(WEB_CSS_PATH).$this->theme.'/default.css');
         $css[] = api_get_cdn_path(api_get_path(WEB_CSS_PATH).'bootstrap-responsive.css');
         $css[] = api_get_cdn_path(api_get_path(WEB_CSS_PATH).'responsive.css');
+        $css[] = api_get_cdn_path(api_get_path(WEB_CSS_PATH).$this->theme.'/default.css');
 
         //Extra CSS files
         $css[] = api_get_path(WEB_LIBRARY_PATH) . 'javascript/thickbox.css';
@@ -1309,7 +1309,7 @@ class Template {
             // progress to show globally from the template (header, breadcrumb, etc)
             require_once api_get_path(LIBRARY_PATH).'tracking.lib.php';
             $progress = tracking::get_avg_student_progress($user_id, $course_code, null, $session_id);
-            $this->assign('course_progress', $progress);
+            $this->assign('course_progress', ceil($progress));
         }
 
         if (!empty($final_navigation)) {

@@ -331,8 +331,12 @@ header #logo {
 }
 .blue-back-bar{
     background-color: #5e92ff;
+    padding-left:30px;
 }
-
+.blue-back-bar span{
+  text-indent:-20px;
+  display:block;
+}
 .header-image-modulo{
     text-align: center;
     clear: both;
@@ -396,7 +400,9 @@ header #logo {
 }
 
 /* FIN DE TIPOS DE EJERCICIOS EN LAS LECCIONES*/
-
+ .description-icons .row .span2 {
+    margin-left:0 !important;
+ }
 .row .state-icon-link{
     position: relative;
 }
@@ -678,62 +684,6 @@ color: #fff;
 
 /*FIN DE PERFIL DE USUARIO 500px y 769*/
 
-@media (min-width: 768px) and (max-width: 980px) {
-.main-inicio {
-    margin-left: 10px;
-}
-.header-image-modulo{
-    max-width: 100%;
-    margin: auto;
-}
-
-.text-vertical {
-  color: #808080;
-  font-size: 1.4em;
-  margin-left: -180px;
-  padding-top: 12em;
-  text-align: center;
-  transform: rotate(270deg);
-}
-.text-vertical-two {
-  color: #808080;
-  font-size: 1.4em;
-  padding-top: -3em;
-  margin-left: -1.8em;
-  text-align: center;
-  transform: rotate(270deg);
-}
-
-.row-fluid .span11 {
-  width: 90%;
-}
-
-#bar-animation {
-  width: 150px;
-}
-.imagen-username{
-    display: none;
-}
-#cssmenu > ul > li > a {
-  padding: 10px 31px;
-}
-
-}
-    
-@media (min-width: 481px) and (max-width: 981px) {
-header .row-fluid .span9 {
-  width: auto;
-}
-
-}
-@media (max-width: 800px) {
-#bar-animation {
-  width: 100px;
-}
-
-
-}
-/*FIN DE ICPNA MODULO*/
 
 /*ESTILO PARA MODULO SCORM*/
 .redimension-scorm{
@@ -756,3 +706,118 @@ header .row-fluid .span9 {
 #course_tools .span12 .span2 .center-items {
   padding-left: 0px;
 }
+.row-fluid .span10 {
+  width: 79%;
+}
+
+@media (min-width: 981px) and (max-width: 1260px) {
+#course_tools .span12 .span2 {
+  width: 120px;
+}
+}
+@media (min-width: 768px) and (max-width: 980px) {
+.main-inicio {
+    margin-left: 10px;
+}
+#course_tools .span12 .span2 {
+  width: 120px;
+}
+.header-image-modulo{
+    max-width: 100%;
+    margin: auto;
+}
+
+#course_tools .span2.text-vertical {
+  color: #808080;
+  font-size: 1.4em;
+  /*margin-left: -180px;*/
+  padding:0.3em 0 0.8em;
+    float:none;
+  width:120px;
+  text-align: center;
+  transform: rotate(0deg);
+
+}
+#course_tools .text-vertical-two {
+  color: #808080;
+  font-size: 1.4em;
+  padding-top: -3em;
+  margin-left: -1.8em;
+  text-align: center;
+  transform: rotate(270deg);
+}
+
+#course_tools .row-fluid .span11 {
+  width: 90%;
+}
+#course_tools .row-fluid .span10 {
+  width: 100%;
+}
+#bar-animation {
+  width: 150px;
+}
+.imagen-username{
+    display: none;
+}
+#cssmenu > ul > li > a {
+  padding: 10px 31px;
+}
+
+}
+    
+@media (min-width: 460px) and (max-width: 981px) {
+header .row-fluid .span9 {
+  width: auto;
+}
+#course_tools .span2.text-vertical {
+  color: #808080;
+  font-size: 1.4em;
+  /*margin-left: -180px;*/
+  padding:0.3em 0 0.8em;
+  float:none;
+  text-align: center;
+  transform: rotate(0deg);
+}
+#course_tools .row-fluid .span10 {
+  width: 100%;
+}
+}
+@media (max-width: 800px) {
+#bar-animation {
+  width: 100px;
+}
+#course_tools .span12 .span2 {
+  width: 116px;
+}
+.ajax.ico-help {
+  display:none;
+}
+#cssmenu {
+  position:absolute;
+  top:0;
+  right:20px;
+}
+}
+@media (max-width: 600px) {
+#logo {
+  display:none;
+}
+}
+@media (max-width: 480px) {
+#course_tools .span2.text-vertical {
+  color: #808080;
+  font-size: 1.4em;
+  /*margin-left: -180px;*/
+  padding:0.3em 0 0.8em;
+  float:none;
+  text-align: center;
+  transform: rotate(0deg);
+}
+#cssmenu {
+  position:absolute;
+  top:0;
+  right:20px;
+}
+}
+/*FIN DE ICPNA MODULO*/
+

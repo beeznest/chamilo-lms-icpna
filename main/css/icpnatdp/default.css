@@ -410,9 +410,6 @@ header #logo {
 }
 
 /* FIN DE TIPOS DE EJERCICIOS EN LAS LECCIONES*/
- .description-icons .row .span2 {
-    margin-left:0 !important;
- }
 .row .state-icon-link{
     position: relative;
 }
@@ -713,6 +710,9 @@ color: #fff;
 }
 #course_tools .span12 .span2 {
   width: 143px;
+}
+#course_tools .row-fluid .span10 .row .span2 {
+  margin-left:0 !important;
 }
 #course_tools .span12 .span2 .center-items {
   padding-left: 0px;

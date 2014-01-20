@@ -306,7 +306,7 @@ header #logo {
 #bar-animation {
     background-color: #fff;
     /*padding: 4px 4px 4px 4px;*/
-    height: 20px;
+    height: 8px;
     border-radius: 8px;
     -moz-border-radius: 8px;
     -webkit-border-radius: 8px;
@@ -314,8 +314,17 @@ header #logo {
     width: 100%;
     display: inline-block;
 }
+#bar-animation span{
+    background: url("images/progress-ticker.png") no-repeat;
+    font-size: 10px;
+    padding: 0 6px 1px;
+    position: absolute;
+    right: 0;
+    top: -23px;
+}
 .color-bar-process {
-    height: 20px;
+    height: 8px;
+    position:absolute;
     /*line-height: 14px;*/
     text-align: right;
     width: 0;
@@ -328,14 +337,15 @@ header #logo {
     padding-right: 5px;
     font-family: "Tahoma", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
     color: #fff;
+    top: -20px;
 }
 .blue-back-bar{
     background-color: #5e92ff;
     padding-left:30px;
 }
 .blue-back-bar span{
-  text-indent:-20px;
-  display:block;
+  /*text-indent:-20px;
+  display:block;*/
 }
 .header-image-modulo{
     text-align: center;
@@ -676,6 +686,7 @@ color: #fff;
 
   width: 21%;
   float: left;
+  position:relative;
 }
 .column-four{
   width: 3%;

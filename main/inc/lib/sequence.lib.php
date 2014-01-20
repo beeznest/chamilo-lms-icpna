@@ -349,24 +349,55 @@ class Sequence {
         }
     }
 
-    public static function get_row_entity_id_by_row_id($entity_id, $row_id, $c_id, $session_id) {
+    public static function get_row_entity_id_by_row_id($entity_id, $row_id, $c_id, $session_id, $name = '') {
         $row_id = intval(Database::escape_string($row_id));
         $entity_id = intval(Database::escape_string($entity_id));
         $c_id = intval(Database::escape_string($c_id));
         $session_id = intval(Database::escape_string($session_id));
+        $name = Database::escape_string($name);
         if ($row_id > 0 && $entity_id > 0 && $c_id > 0 && $session_id >= 0) {
             $row_table = Database::get_main_table(TABLE_SEQUENCE_ROW_ENTITY);
-            $sql = "SELECT row.id FROM $row_table row WHERE 
+            $sql = "SELECT row.id FROM $row_table row WHERE
             row.sequence_type_entity_id = $entity_id AND 
             row.row_id = $row_id AND 
             row.c_id = $c_id AND 
             row.session_id = $session_id 
             LIMIT 0, 1";
             $result = Database::query($sql);
-            while ($temp_row_entity = Database::fetch_array($result, 'ASSOC')) {
-                $row_entity[] = $temp_row_entity;
+            if (Database::num_rows($result) > 0) {
+                while ($temp_row_entity = Database::fetch_array($result, 'ASSOC')) {
+                    $row_entity[] = $temp_row_entity;
+                }
+                return $row_entity[0]['id'];
+            } else {
+                $typ_table = Database::get_main_table(TABLE_SEQUENCE_TYPE_ENTITY);
+                $sql = "SELECT ent_table FROM $typ_table WHERE id = $entity_id LIMIT 0, 1";
+                $result =Database::query($sql);
+                var_dump($sql);
+                if (Database::num_rows($result) > 0) {
+                    $ent_table = Database::fetch_array($result, 'ASSOC');
+                    $table = $ent_table['ent_table'];
+                    $sql = "SELECT name, prerequisite FROM $table WHERE c_id = $c_id AND session_id = $session_id AND id = $row_id LIMIT 0, 1";
+                    $result = Database::query($sql);
+                    var_dump($sql);
+                    if (Database::num_rows($result)) {
+                        $temp_arr = Database::fetch_array($result, 'ASSOC');
+                        $name = $temp_arr['name'];
+                        $pre = ($temp_arr['prerequisite'] > 0)? self::get_row_entity_id_by_row_id($entity_id, $temp_arr['prerequisite'], $c_id, $session_id) : 0 ;
+                        $sql = "INSERT INTO $row_table (sequence_type_entity_id, c_id, session_id, row_id, name) VALUES
+                        ($entity_id, $c_id, $session_id, $row_id, '$name')";
+                        Database::query($sql);
+                        var_dump($sql);
+                        $id = Database::insert_id();
+                        $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
+                        $sql = "INSERT INTO  $seq_table (sequence_row_entity_id, sequence_row_entity_id_next, is_part) VALUES
+                        ($pre, $id, 0)";
+                        Database::query($sql);
+                        var_dump($sql);
+                        return $id;
+                    }
+                }
             }
-            return $row_entity[0]['id'];
         }
         return 0;
     }

@@ -639,8 +639,8 @@ class Sequence {
      * Bool Available for LP
      */
     public static function get_state_lp_by_row_entity_id ($row_entity_id, $user_id) {
-        $row_entity_id = intval(Database::escape_string($row_entity_id));
-        $user_id = intval(Database::escape_string($user_id));
+        $row_entity_id = intval($row_entity_id);
+        $user_id = intval($user_id);
         $seq_val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
         if ($row_entity_id > 0 && $user_id > 0) {
             if (self::get_value_by_user_id($row_entity_id, $user_id) === false) {

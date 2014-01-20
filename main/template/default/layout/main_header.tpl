@@ -79,7 +79,7 @@
               </div>
               <div class="column-two">
                   {% if course_is_set %}
-                  <a href="{{ breadcrumb_course_url }}">{{"Progress"|get_lang}}: {{ breadcrumb_course_title }}</a>
+                  <a href="{{ breadcrumb_course_url }}">{{"Progress"|get_lang}}</a>
                   {% else %}
                     &nbsp;
                   {% endif %}
@@ -96,7 +96,7 @@
               <div class="column-four">
                         
                         <a href="{{ help_url }}" class="ajax ico-help">
-                          <img src="{{ _p.web_css }}/{{ css_style }}/images/help.png">
+                          <img src="{{ _p.web_css }}{{ css_style }}/images/help.png">
                         </a>
                         
 

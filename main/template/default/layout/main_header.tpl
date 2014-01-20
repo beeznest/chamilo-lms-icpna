@@ -53,7 +53,7 @@
                       <span class="username">{{_u.complete_name}}</span></span></a>
                       <ul>
                          <li class="home"><a href='{{ _p.web_main }}social/home.php'><span>{{ "Profile" |get_lang }}</span></a></li>
-                         <li class="email"><a href='{{ _p.web_main }}messages/inbox.php?f=social'><span>{{ "Bandeja de Entrada" |get_lang }}</span></a></li>
+                         <li class="email"><a href='{{ _p.web_main }}messages/inbox.php?f=social'><span>{{ "Inbox" |get_lang }}</span></a></li>
                          <li class="edit"><a href='{{ _p.web_main }}auth/profile.php'><span>{{ "EditProfile" |get_lang }}</span></a></li>
                          <li class="close"><a href='{{ logout_link }}'><span>{{ "Logout" |get_lang }}</span></a></li>
                       </ul>

@@ -341,7 +341,7 @@ header #logo {
 }
 .blue-back-bar{
     background-color: #5e92ff;
-    padding-left:30px;
+    padding-left:0px;
 }
 .blue-back-bar span{
   /*text-indent:-20px;

@@ -673,6 +673,7 @@ switch ($action) {
 
             $_SESSION['oLP']->set_prerequisite($_REQUEST['prerequisites']);
             $_SESSION['oLP']->set_use_max_score($_REQUEST['use_max_score']);
+            $_SESSION['oLP']->set_seriousgame_mode($_REQUEST['seriousgame_mode']);
 
             if (isset($_REQUEST['activate_start_date_check']) && $_REQUEST['activate_start_date_check'] == 1) {
             	$publicated_on  = $_REQUEST['publicated_on'];

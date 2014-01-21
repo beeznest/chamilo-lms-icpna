@@ -64,10 +64,6 @@
     text-decoration: none;
     padding: 0.2em;
 }
-.inner_lp_toc .scorm_item_highlight a:focus{
-   outline: 2px solid #0134A1;
-}
-
 
 .inner_lp_toc .scorm_item {
     font-size: 12px;
@@ -107,7 +103,7 @@
 }
 
 .inner_lp_toc .scorm-level-0 a:focus{
-    outline-offset:5px;
+    outline-offset: 2px;
 }
 
 .inner_lp_toc .scorm-status-not-attempted{

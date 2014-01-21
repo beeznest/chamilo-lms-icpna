@@ -79,7 +79,9 @@ if ($is_allowed_to_edit ) {
 }
 
 //Exercise name
-$html .= Display::page_header( $objExercise->name.' '.$edit_link);
+if ($origin != 'learnpath') {
+    $html .= Display::page_header( $objExercise->name .$edit_link);
+}
 
 //Exercise description
 if (!empty($objExercise->description)) {

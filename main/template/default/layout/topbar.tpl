@@ -65,6 +65,13 @@
                         {% endif %}
                 
                         <ul class="nav pull-right">
+                            {% if course_is_set and _c.user_is_teacher %}
+                                    {% if _c.student_view %}
+                                        <li><a href="{{ _p.web_self }}?{{ _p.web_query_vars }}&isStudentView=false">{{ "StudentView"|get_lang }}</a></li>
+                                    {% else %}
+                                        <li><a href="{{ _p.web_self }}?{{ _p.web_query_vars }}&isStudentView=true">{{ "StudentView"|get_lang }}</a></li>
+                                    {% endif %}
+                            {% endif %}
                             <li><a href="{{ _p.web_main }}social/home.php"><img src="{{ _u.avatar_small }}"/></a></li>
                             <li class="dropdown">
                                 <a class="dropdown-toggle" data-toggle="dropdown"  href="#">{{ _u.complete_name }}<b class="caret"></b></a>

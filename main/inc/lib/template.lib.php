@@ -71,7 +71,10 @@ class Template {
         $this->set_header_parameters();
         $this->set_footer_parameters();
 
+        $this->style = api_get_visual_theme();
         $this->assign('style', $this->style);
+        $this->assign('css_style', $this->style);
+        $this->assign('template', $this->app['template_style']);
 
         //Chamilo plugins
         if ($this->show_header) {
@@ -278,6 +281,8 @@ class Template {
             'language' => $course['language'],
             'directory' => $course['directory'],
             'session_id' => api_get_session_id(),
+            'user_is_teacher' => api_is_course_admin(),
+            'student_view' => (!empty($_GET['isStudentView']) && $_GET['isStudentView'] == 'true'),
         );
         $this->assign('_c',$_c);
     }
@@ -320,6 +325,10 @@ class Template {
             'web_img' => api_get_path(WEB_IMG_PATH),
             'web_plugin' => api_get_path(WEB_PLUGIN_PATH),
             'web_lib' => api_get_path(WEB_LIBRARY_PATH),
+            'web_self' => api_get_self(),
+            'web_query_vars' => api_htmlentities($_SERVER['QUERY_STRING']),
+            'web_self_query_vars' => api_htmlentities($_SERVER['REQUEST_URI']),
+            'web_cid_query' => api_get_cidreq(),
         );
         $this->assign('_p', $_p);
 
@@ -351,9 +360,9 @@ class Template {
         //$css[] = api_get_cdn_path(api_get_path(WEB_PATH).'web/css/'.$this->theme.'/style.css');
 
         //Default theme CSS
-        $css[] = api_get_cdn_path(api_get_path(WEB_CSS_PATH).$this->theme.'/default.css');
         $css[] = api_get_cdn_path(api_get_path(WEB_CSS_PATH).'bootstrap-responsive.css');
         $css[] = api_get_cdn_path(api_get_path(WEB_CSS_PATH).'responsive.css');
+        $css[] = api_get_cdn_path(api_get_path(WEB_CSS_PATH).$this->theme.'/default.css');
 
         //Extra CSS files
         $css[] = api_get_path(WEB_LIBRARY_PATH) . 'javascript/thickbox.css';
@@ -1300,7 +1309,7 @@ class Template {
             // progress to show globally from the template (header, breadcrumb, etc)
             require_once api_get_path(LIBRARY_PATH).'tracking.lib.php';
             $progress = tracking::get_avg_student_progress($user_id, $course_code, null, $session_id);
-            $this->assign('course_progress', $progress);
+            $this->assign('course_progress', ceil($progress));
         }
 
         if (!empty($final_navigation)) {

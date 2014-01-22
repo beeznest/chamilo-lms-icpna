@@ -972,7 +972,7 @@ class Template {
             $html .= '<div id="logo">';
                 $image_url = api_get_path(WEB_CSS_PATH).$theme.'/images/header-logo.png';
                 $logo = Display::img($image_url, $site_name, array('title'=>$site_name));
-                $html .= Display::url($logo, api_get_path(WEB_PATH).'index.php');
+                $html .= Display::url($logo, api_get_path(WEB_PATH).'user_portal.php');
             $html .= '</div>';
         } else {
             $html .= '<a href="'.api_get_path(WEB_PATH).'index.php" target="_top">'.$site_name.'</a>';

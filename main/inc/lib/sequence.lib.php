@@ -315,11 +315,9 @@ class Sequence {
                     val.sequence_row_entity_id = seq.sequence_row_entity_id AND
                     seq.sequence_row_entity_id_next = $row_entity_id";
         $result = Database::query($sql);
-        var_dump($sql);
         while ($temp = Database::fetch_array($result, 'ASSOC')){
             $pre_req[$temp['user_id']] = $temp['sequence_row_entity_id'];
         }
-        var_dump($pre_req);
         if (empty($pre_req)) {
             if (self::get_value_by_user_id($row_entity_id, $user_id) === false) {
                 self::temp_hack_4_insert(1, $row_entity_id, $user_id, 0);
@@ -417,11 +415,9 @@ class Sequence {
                     } elseif (strpos(strtolower($name),'exam') !== false) {
                         $sql = "SELECT id FROM $row_table WHERE c_id = $c_id AND session_id = $session_id";
                         $result = Database::query($sql);
-                        var_dump($sql);
                         while ($temp_arr = Database::fetch_array($result, 'ASSOC')) {
                             $pre_req[] = $temp_arr['id'];
                         }
-                        var_dump($pre_req);
                         $name = 'EXAM';
                         $sql = "INSERT INTO $row_table (sequence_type_entity_id, c_id, session_id, row_id, name) VALUES
                         ($entity_id, $c_id, $session_id, $row_id, '$name')";
@@ -432,7 +428,6 @@ class Sequence {
                             $sql = "INSERT INTO $seq_table (sequence_row_entity_id, sequence_row_entity_id_next, is_part) VALUES
                             ($pr, $id, 0)";
                             Database::query($sql);	
-                            var_dump($sql);
                         }
                         return $id;
                     }

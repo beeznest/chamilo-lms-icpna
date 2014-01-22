@@ -341,17 +341,14 @@ header #logo {
 }
 .blue-back-bar{
     background-color: #5e92ff;
-    padding-left:30px;
-}
+    /*padding-left:30px;
+}*/
 .blue-back-bar span{
   /*text-indent:-20px;
   display:block;*/
 }
-.header-image-modulo{
-    text-align: center;
-    clear: both;
-    background-color: #325DC6;
-}
+
+
 .text-module {
   color: #325DC6;
   font-size: 30px;

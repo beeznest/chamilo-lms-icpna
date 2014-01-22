@@ -341,11 +341,7 @@ header #logo {
 }
 .blue-back-bar{
     background-color: #5e92ff;
-    /*padding-left:30px;
-}*/
-.blue-back-bar span{
-  /*text-indent:-20px;
-  display:block;*/
+    /*padding-left:30px; */
 }
 
 
@@ -380,7 +376,6 @@ header #logo {
     padding-top: 4em;
     text-align: center;
     color: #808080;
-}
 }
 .items-lecciones{
     list-style: none;

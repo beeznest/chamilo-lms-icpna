@@ -78,9 +78,9 @@ class Redirect {
                         break;
                 }
             }
-            $page_after_login = api_get_setting('page_after_login');
+            $page_after_login = api_get_settings_params_simple(array('variable = ? AND access_url = ?' =>  array('page_after_login', api_get_current_access_url_id())));
             if (!empty($page_after_login)) {
-                self::navigate(api_get_path(WEB_PATH) . $page_after_login);
+                self::navigate(api_get_path(WEB_PATH) . $page_after_login['selected_value']);
             }
         }
     }

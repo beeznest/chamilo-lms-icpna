@@ -2485,13 +2485,12 @@ class UserManager {
                                      FROM $tbl_course_user course_rel_user
                                         INNER JOIN $tbl_course course
                                         ON course.code = course_rel_user.course_code
-                                        INNER JOIN $tbl_user_course_category user_course_category
+                                        LEFT JOIN $tbl_user_course_category user_course_category
                                         ON course_rel_user.user_course_cat = user_course_category.id
                                      $join_access_url
                                      WHERE  course_rel_user.user_id = '".$user_id."' AND
                                             course_rel_user.relation_type <> ".COURSE_RELATION_TYPE_RRHH."  $where_access_url
                                      ORDER BY user_course_category.sort, course_rel_user.sort, course.title ASC";
-
         $course_list_sql_result = Database::query($personal_course_list_sql);
 
         $personal_course_list = array();

@@ -358,6 +358,7 @@ header #logo {
   padding-top: 0.3em;
   text-align: right;
 }
+
 .text-message{
     color: #325DC6;
     font-size: 12px;
@@ -383,7 +384,6 @@ header #logo {
     padding-top: 4em;
     text-align: center;
     color: #808080;
-}
 }
 .items-lecciones{
     list-style: none;

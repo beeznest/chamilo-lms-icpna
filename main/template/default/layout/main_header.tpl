@@ -35,7 +35,7 @@
         <div class="span12">
         <div class="span3">
             <div class="home-ico">
-              <a href="{{ _p.web }}">{{"Home"|get_lang}}</a>
+              <a href="{{ _p.web }}user_portal.php">{{"Home"|get_lang}}</a>
             </div>
         </div>
             <div class="span6">

@@ -197,6 +197,7 @@ class IndexController
     function set_login_form(Application $app) {
         $user_id = api_get_user_id();
         $login_form = null;
+        if (empty($_GET['logout'])) {
         if (!$user_id || api_is_anonymous($user_id)) {
 
 			// Only display if the user isn't logged in.
@@ -216,6 +217,7 @@ class IndexController
 				$login_form .= '</ul>';
 			}
 			$app['template']->assign('login_options',  $login_form);
+        }
         }
     }
 

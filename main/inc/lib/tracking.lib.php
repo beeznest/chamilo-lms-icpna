@@ -612,7 +612,7 @@ class Tracking
      * @param    bool        Will return an array of the type: [sum_of_progresses, number] if it is set to true
      * @return double        Average progress of the user in this course
      */
-    public static function get_avg_student_progress($student_id, $course_code, $lp_ids = array(), $session_id = null, $return_array = false)
+    public static function get_avg_student_progress($student_id, $course_code, $lp_ids = array(), $session_id = null, $return_array = false, $only_seriousgame = false)
     {
 
         // get the informations of the course
@@ -629,6 +629,9 @@ class Tracking
                 if (count($lp_ids) > 0) {
                     $condition_lp = "  AND id IN(".implode(',', $lp_ids).") ";
                 }
+            }
+            if ($only_seriousgame) {
+                $condition_lp .= " AND seriousgame_mode = 1 ";
             }
             $session_id = intval($session_id);
             $sql = "SELECT id FROM $tbl_course_lp lp WHERE c_id = {$course_info['real_id']} $condition_lp";

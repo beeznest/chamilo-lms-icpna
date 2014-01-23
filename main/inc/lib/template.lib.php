@@ -972,7 +972,7 @@ class Template {
             $html .= '<div id="logo">';
                 $image_url = api_get_path(WEB_CSS_PATH).$theme.'/images/header-logo.png';
                 $logo = Display::img($image_url, $site_name, array('title'=>$site_name));
-                $html .= Display::url($logo, api_get_path(WEB_PATH).'index.php');
+                $html .= Display::url($logo, api_get_path(WEB_PATH).'user_portal.php');
             $html .= '</div>';
         } else {
             $html .= '<a href="'.api_get_path(WEB_PATH).'index.php" target="_top">'.$site_name.'</a>';
@@ -1308,7 +1308,7 @@ class Template {
             // if we know the user and we are in a course, get the total course
             // progress to show globally from the template (header, breadcrumb, etc)
             require_once api_get_path(LIBRARY_PATH).'tracking.lib.php';
-            $progress = tracking::get_avg_student_progress($user_id, $course_code, null, $session_id);
+            $progress = tracking::get_avg_student_progress($user_id, $course_code, null, $session_id, false, true);
             $this->assign('course_progress', ceil($progress));
         }
 

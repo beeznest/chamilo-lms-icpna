@@ -198,6 +198,8 @@ if (api_is_platform_admin()) {
     $defaults['use_max_score'] = $_SESSION['oLP']->use_max_score;
 }
 
+$form->addElement('checkbox', 'seriousgame_mode', null, get_lang('SeriousGameMode'));
+$defaults['seriousgame_mode'] = $_SESSION['oLP']->seriousgame_mode;
 //Submit button
 $form->addElement('style_submit_button', 'Submit',get_lang('SaveLPSettings'),'class="save"');
 

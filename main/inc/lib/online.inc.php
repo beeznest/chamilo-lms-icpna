@@ -105,8 +105,11 @@ function online_logout($user_id = null, $logout_redirect = false) {
 
     Session::destroy();
     //if ($logout_redirect) {
-
-    header("Location: http://vlearning.icpna.edu.pe/in/web/logout");
+    $logout_path = api_get_path(WEB_PATH);
+    if (!empty($extAuthSource['logout_callback'])) {
+        $logout_path = $extAuthSource['logout_callback'];
+    }
+    header("Location: ".$logout_path);
     exit;
     //}
 }

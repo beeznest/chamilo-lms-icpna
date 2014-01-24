@@ -1,0 +1,87 @@
+{% extends "default/layout/main.tpl" %}
+
+{% block body %}    
+    {# Main content #}
+   
+    {#  Right column  #}
+    <div class="span3 menu-column"> 
+        
+        {# if user is not login show the login form #}
+        {% if _u.logged  == 0 %}
+            {% include "default/layout/login_form.tpl" %}
+        {% endif %}  
+        
+        <img src="{{ _u.avatar}}"/>
+        <div>{{_u.complete_name}}</div>
+    
+               
+    </div>
+    <div class="span9 content-column">
+        
+        {#  Plugin bottom  #}
+        {% if plugin_content_top %}
+            <div id="plugin_content_top">
+                {{ plugin_content_top }}
+            </div>
+        {% endif %}
+        
+        {#  Portal homepage  #}
+        {% if home_page_block %}
+            <section id="homepage">
+                <div class="row">
+                    <div class="span9">
+                    {{ home_page_block }}
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+        
+        {#  ??  #}
+        {{ sniff_notification }}
+        
+        {% include "default/layout/page_body.tpl" %}
+                
+        {#  Welcome to course block  #}
+        {% if welcome_to_course_block %}      
+            <section id="welcome_to_course">
+            {{ welcome_to_course_block }}
+            </section>
+        {% endif %}
+                
+        {% if content is not null %}
+            <section id="main_content">
+                {{ content }}
+            </section>
+        {% endif %}
+                
+        {#  Announcements  #}
+        {% if announcements_block %}      
+            <section id="announcements">
+            {{ announcements_block }}
+            </section>
+        {% endif %}
+        
+        {# Course categories (must be turned on in the admin settings) #}
+        {% if course_category_block %}
+            <section id="course_category">
+                <div class="row">
+                    <div class="span9">
+                    {{ course_category_block }}
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+                    
+        {#  Hot courses template  #}        
+        {% include "default/layout/hot_courses.tpl" %}        
+        
+        {#  Content bottom  #}
+        {% if plugin_content_bottom %}       
+            <div id="plugin_content_bottom">
+                {{plugin_content_bottom}}
+            </div>
+        {% endif %}
+        &nbsp;
+    </div>
+        
+{% endblock %}

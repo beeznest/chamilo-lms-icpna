@@ -10,6 +10,7 @@
 <noscript>{{ "NoJavascript"|get_lang }}</noscript>
 
 {% if show_header == true %}
+
     <div class="skip">
         <ul>
             <li><a href="#menu">{{ "WCAGGoMenu"|get_lang }}</a></li>
@@ -29,6 +30,7 @@
         <div id="main" class="container">
         <header>
         <!-- END HEADER, START USER PROFILE BLOCK -->
+
         {# only show user block and breadcrumb if user is logged in#}
         
         <div class="row-fluid">
@@ -111,6 +113,6 @@
     {% include "default/layout/menu.tpl" %} -->
 </header>
             <div id="top_main_content" class="row">
-                  {# course navigation links/shortcuts need to be activated by the admin #}
+            {# course navigation links/shortcuts need to be activated by the admin #}
             {% include "default/layout/course_navigation.tpl" %}
 {% endif %}

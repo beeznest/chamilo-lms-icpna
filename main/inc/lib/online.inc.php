@@ -104,10 +104,11 @@ function online_logout($user_id = null, $logout_redirect = false) {
     exit_of_chat($user_id);
 
     Session::destroy();
-    if ($logout_redirect) {
-        header("Location: index.php");
-        return;
-    }
+    //if ($logout_redirect) {
+
+    header("Location: http://vlearning.icpna.edu.pe/in/web/logout");
+    exit;
+    //}
 }
 
 /**

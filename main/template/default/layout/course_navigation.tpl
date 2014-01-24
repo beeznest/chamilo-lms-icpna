@@ -1,4 +1,4 @@
-{# Course navigation icons - these are two optional features that have to be enabled through admin settings #}
+{# Course navigation icons #}
 {% if show_header == true %}
 
     {% if show_course_shortcut is not null %}

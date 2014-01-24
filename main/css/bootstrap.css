@@ -5773,23 +5773,3 @@ a.badge:hover {
 .affix {
   position: fixed;
 }
-/*STYLE FOR HEADER COURSE*/
-
-.header-image-modulo{
-    text-align: center;
-    clear: both;
-}
-#course_tools .row .banner-one{
-  background-color: #4377cd;
-}
-#course_tools .row .banner-two{
-  background-color: #273a49;
-}
-#course_tools .row .banner-tree{
-  background-color: #401500;
-}
-#course_tools .row .banner-four{
-  background-color: #0187de;
-}
-
-/*END FOR HEADER COURSE*/

@@ -1,0 +1,745 @@
+/*****************************************************
+ *  MAIN  - CHAMILO CSS
+ *****************************************************/
+
+/* Adding default style for the chamilo_X themes */
+@import url('../base_chamilo.css');
+
+/* the following for regular <a> elements */
+a {
+    text-decoration: none;
+    /*color :#3757f7*/
+}
+a:visited {
+    text-decoration: none;    
+}
+a:hover {
+    text-decoration: none;
+    color: #f3840d;
+}
+a:active {
+    text-decoration: none;
+    color : #3757f7;
+}
+
+.subnav .navbar-inner {
+    background-color: #00AAE3; /* Old browsers */
+    background-repeat: repeat-x; /* Repeat the gradient */
+    background-image: -moz-linear-gradient(top, #028DC2 0%, #00AAE3 100%); /* FF3.6+ */  
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#028DC2), color-stop(100%,#00AAE3)); /* Chrome,Safari4+ */
+    background-image: -webkit-linear-gradient(top, #028DC2 0%, #00AAE3 100%); /* Chrome 10+,Safari 5.1+ */
+    background-image: -ms-linear-gradient(top, #028DC2 0%,#00AAE3 100%); /* IE10+ */
+    background-image: -o-linear-gradient(top, #028DC2 0%,#00AAE3 100%); /* Opera 11.10+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#028DC2', endColorstr='#00AAE3',GradientType=0 ); /* IE6-9 */
+    background-image: linear-gradient(top, #028DC2 0%,#00AAE3 100%); /* W3C */    
+}
+
+.subnav .nav > li > a {
+    border-left: 1px solid #0EA0D4;
+    border-right: 1px solid #0EA0D4;
+    color: white;
+}
+
+.subnav .nav > #current > a,
+.subnav .nav > #current > a:hover {  
+    color: #fff;
+    background-color: #028DC2;
+    border-right-color: #028DC2;  
+}
+
+.subnav li a {
+    color:#fff;
+}
+
+/* Green hover */
+.subnav .navbar-inner li a:hover {
+    background: none repeat scroll 0 0 #8ECB50;
+    color: #fff;
+}
+
+/*****************************************************
+ *  FOOTER STYLES                                    *
+ *****************************************************/
+footer {    
+    background-color: #818181;
+    background-image: url(images/color.png);
+    background-repeat:repeat-x;    
+    color:#ffffff;
+    height: 15em;
+}
+
+footer .container .row{
+    padding-top: 0px;
+}
+footer .container .row .padding-footer{
+    padding-top: 3em;
+}
+footer .container .row .title{
+    font-size: 16px;
+    font-family: "Arial,sans-serif,Sans"
+    padding: 0px;
+    margin: 0px;
+    display: block;
+}
+footer .container .row .listen{
+    list-style: none;
+    padding: 0px;
+    margin: 0px;
+}
+footer .container .row .listen a{
+    color: #fff;
+}
+footer .container .row .listen a:hover{
+    text-decoration: underline;
+}
+footer .container .line{
+    padding-top: 1em;
+    text-align: left;
+}
+footer .container .line a{
+    color: #fff;
+    font-size: 10px;
+}
+footer .container .line a:hover{
+    text-decoration: underline;
+}
+footer .container .row .span4 .span1{
+    width: 30px;
+    margin-left: 5px;
+}
+footer .facebook{
+    background:url(images/social-media.png) no-repeat 0 0;
+    width: 30px;
+    height: 30px;
+}
+footer .facebook:hover{
+    background:url(images/social-media.png) no-repeat 0 -30px;
+}
+footer .facebook a{
+    display: block;
+    width: 30px;
+    height: 30px;
+    text-indent: -9999px;
+}
+footer .twitter{
+    background:url(images/social-media.png) no-repeat -29px 0;
+    width: 30px;
+    height: 30px;
+}
+footer .twitter:hover{
+    background:url(images/social-media.png) no-repeat -29px -30px;
+}
+footer .twitter a{
+    display: block;
+    width: 30px;
+    height: 30px;
+    text-indent: -9999px;
+}
+footer .youtube{
+    background:url(images/social-media.png) no-repeat -60px 0;
+    width: 30px;
+    height: 30px;
+}
+footer .youtube:hover{
+    background:url(images/social-media.png) no-repeat -60px -30px;
+}
+footer .youtube a{
+    display: block;
+    width: 30px;
+    height: 30px;
+    text-indent: -9999px;
+}
+/*****************************************************
+ *  DISPLAY MESSAGES                               *
+ *****************************************************/
+.normal-message {
+    color: #00407F;
+    border: 1px solid #CDE6F5;
+    background: url("images/background_message.png") repeat-x scroll 0 0 #EAF8FE;
+}
+.warning-message {
+    border: 1px solid #FFB30F;
+    color: #000;
+  background: url("images/background_message.png") repeat-x scroll 0 0 #FFEFA7;
+}
+.confirmation-message {
+  border: 1px solid #1F8323;
+    color:#1F8323;
+  background: url("images/background_message.png") repeat-x scroll 0 0 #CAF0C7;
+}
+.error-message {
+    border: 1px solid #FF0000;
+    color: #440000;
+  background: url("images/background_message.png") repeat-x scroll 0 0 #FFD1D1;
+}
+
+.social-menu-title {
+  background-color:#00AAE3;
+}
+
+#social-content-online {
+    background-color:#00AAE3;
+}
+    
+.admin_section li {
+    background-image:url(images/bullet.gif);
+}
+
+.system_announcements {
+    background: transparent url('images/systemenouvelles.jpg') no-repeat top  left;
+}
+
+.topa {
+    background:transparent url('images/logoa4.gif') no-repeat;
+}
+.topb {
+    background:transparent url('images/logob4.gif') no-repeat;
+}
+
+#bottomhellomindfactory {    
+    background:transparent url('images/textologo.jpg') no-repeat;
+}
+
+/*including "login" image*/
+button.login {
+    background-image:url(images/bg-button.gif);
+}
+
+button.login:hover {
+}
+
+/*including "save" image*/
+button.save {
+    background-image:url(images/button_accept.gif);
+}
+/*including "add" image*/
+button.add {
+    background-image:url(images/button_add.gif);
+}
+/*including "cancel" image*/
+button.cancel {
+    background-image:url(images/button_delete.gif);
+}
+/*including "search" image*/
+button.search {
+    background-image:url(images/bg-button.gif);
+}
+/*including "plus" image*/
+button.plus {
+    background-image:url(images/button_plus.gif);
+}
+/*including "minus" image*/
+button.minus {
+    background-image:url(images/button_minus.gif);
+}
+/*including "next" image*/
+button.next {
+    background-image:url(images/button_next.gif) !important;
+}
+/*including "back" image*/
+button.back {
+    background-image:url(images/button_back.gif);
+}
+/*including "refresh" image*/
+button.refresh {
+    background-image:url(images/button_refresh.gif);
+}
+/*including "upload" image*/
+button.upload {
+    background-image:url(images/button_upload.gif);
+}
+
+button.arrowr, input.arrowr {
+  background-image:url(images/2rightarrow.gif); 
+}
+button.arrowl, input.arrowl {
+    background-image:url(images/2leftarrow.gif);  
+}
+.refresh {
+    background-image:url(images/refresh.png);
+}
+
+.portal {
+    background-image:url(images/portal.png);
+}
+
+/* ESTILOS PARA EL THEMPLATE CHAMILO ICPNA MODULO*/
+
+header{
+    background: #0134a1; /* Old browsers */
+}
+header #logo {
+  padding: 1.6em;
+  text-align: center;
+}
+
+.col-lg-4 {
+  width: 33.3333%;
+}
+.col-lg-8 {
+  width: 66.6667%;
+}
+.col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12 {
+  float: left;
+}
+.main-inicio{
+    margin-left: 40px;
+}
+.main-inicio a{
+    color: #fff;
+    font-size: 1.5em;
+}
+.main-inicio a:hover{
+    text-decoration: underline;
+}
+.home-ico {
+  background: url("images/home.png") no-repeat scroll 15px center / 23px 23px rgba(0, 0, 0, 0);
+  font-size: 10px;
+  margin-top: 2.1em;
+  padding-left: 4em;
+  padding-top: 0.7em;
+}
+.text-right{
+  text-align: right;
+}
+
+#bar-animation {
+    background-color: #fff;
+    /*padding: 4px 4px 4px 4px;*/
+    height: 20px;
+    border-radius: 8px;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -khtml-border-radius: 8px;
+    width: 100%;
+    display: inline-block;
+}
+.color-bar-process {
+    height: 20px;
+    /*line-height: 14px;*/
+    text-align: right;
+    width: 0;
+    border-radius: 8px;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -khtml-border-radius: 8px;
+}
+.color-bar-process span {
+    padding-right: 5px;
+    font-family: "Tahoma", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
+    color: #fff;
+}
+.blue-back-bar{
+    background-color: #5e92ff;
+}
+
+.header-image-modulo{
+    text-align: center;
+    clear: both;
+    background-color: #325DC6;
+}
+.text-module {
+  color: #325DC6;
+  font-size: 30px;
+  padding-top: 0.3em;
+  text-align: right;
+}
+.text-message{
+    color: #325DC6;
+    font-size: 12px;
+}
+.padding-text-module{
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+.text-vertical{
+    -webkit-transform: rotate(270deg);
+    -moz-transform: rotate(270deg);
+    -o-transform: rotate(270deg);
+    font-size: 1.4em;
+    padding-top: 4em;
+    text-align: center;
+    color: #808080;
+}
+.text-vertical-two{
+    -webkit-transform: rotate(270deg);
+    -moz-transform: rotate(270deg);
+    -o-transform: rotate(270deg);
+    font-size: 1.4em;
+    padding-top: 4em;
+    text-align: center;
+    color: #808080;
+}
+}
+.items-lecciones{
+    list-style: none;
+}
+.items-lecciones li{
+    display: block;
+    float: left;
+    width: 180px;
+}
+.ancho{
+    width: 900px;
+}
+.alto{
+    height: 9em;
+    padding-top: 2em;
+}
+.center-items{
+    text-align: center;
+}
+/*ICONOS DE ESTADO DE LAS LECCIONES*/
+.center{
+    text-align: center;
+}
+
+/* FIN DE TIPOS DE EJERCICIOS EN LAS LECCIONES*/
+
+.row .state-icon-link{
+    position: relative;
+}
+
+.row .center:hover{
+    background: url(images/estados-iconos-hover.png) no-repeat;
+    background-position: 6px 1px;
+    cursor: pointer;
+}
+
+.row .state-icon-completed{
+    background: transparent url(images/estados-iconos.png) no-repeat;
+    cursor: pointer;
+    display: block;
+    height: 90px;
+    width: 85px;
+    /*position: absolute;*/
+    margin:auto;
+}
+
+.row .state-icon-process{
+    background: transparent url(images/estados-iconos.png) no-repeat;
+    background-position: -85px 0px;
+    cursor: pointer;
+    display: block;
+    height: 90px;
+    width: 85px;
+    /*position: absolute;*/
+    margin:auto;
+    padding-top: 0.5em;
+}
+
+.row .state-icon-closed{
+    background: transparent url(images/estados-iconos.png) no-repeat;
+    background-position: -171px 0px;
+    cursor: pointer;
+    display: block;
+    height: 90px;
+    width: 85px;
+    /*position: absolute;*/
+    margin:auto;
+}
+
+/* FIN DEL ESTADO DE ICONOS DE LAS LECCIONES */
+.helf-header{
+    padding-top: 2.1em;
+}
+.color-border-style{
+    clear: both;
+    height: 1px;
+    background: #ffffff; /* Old browsers */
+background: -moz-linear-gradient(left,  #ffffff 0%, #c4c4c4 19%, #c4c4c4 54%, #c4c4c4 83%, #ffffff 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, right top, color-stop(0%,#ffffff), color-stop(19%,#c4c4c4), color-stop(54%,#c4c4c4), color-stop(83%,#c4c4c4), color-stop(100%,#ffffff)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(left,  #ffffff 0%,#c4c4c4 19%,#c4c4c4 54%,#c4c4c4 83%,#ffffff 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(left,  #ffffff 0%,#c4c4c4 19%,#c4c4c4 54%,#c4c4c4 83%,#ffffff 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(left,  #ffffff 0%,#c4c4c4 19%,#c4c4c4 54%,#c4c4c4 83%,#ffffff 100%); /* IE10+ */
+background: linear-gradient(to right,  #ffffff 0%,#c4c4c4 19%,#c4c4c4 54%,#c4c4c4 83%,#ffffff 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=1 ); /* IE6-9 */
+}
+/* FIN DE LECCIONES */
+
+/*PERFIL DE USUARIO ICPNA*/
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:600);
+/* Menu CSS */#cssmenu,
+#cssmenu > ul {
+  /*background: url(highlight-bg.png) repeat;*/
+  padding-bottom: 3px;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 600;
+}
+#cssmenu .welcome{
+    font-size: 18px;
+    text-transform: capitalize;
+    line-height: 12px;
+
+}
+#cssmenu .username{
+    font-size: 12px;
+    text-transform: capitalize;
+}
+#cssmenu:before,
+#cssmenu:after,
+#cssmenu > ul:before,
+#cssmenu > ul:after {
+  content: '';
+  display: table;
+}
+#cssmenu:after,
+#cssmenu > ul:after {
+  clear: both;
+}
+#cssmenu {
+  width: auto;
+  zoom: 1;
+}
+#cssmenu > ul {
+  /*background: url(images/menu-bg.png) repeat;*/
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+#cssmenu > ul li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+#cssmenu > ul > li {
+  float: left;
+  position: relative;
+}
+#cssmenu > ul > li > a {
+  padding: 10px 41px;
+  display: block;
+  margin-top: 8px;
+  color: white;
+  text-decoration: none;
+  line-height: 18px;
+  text-align: left;
+}
+#cssmenu > ul > li:hover > a {
+  background-color: #1a3270;
+  text-shadow: 0 -1px 0 #97321f;
+  text-shadow: 0 -1px 0 rgba(122, 42, 26, 0.64);
+}
+#cssmenu > ul > li > a {
+  background-color: #325DC6;
+}
+
+#cssmenu > ul > li > a > span {
+  line-height: 10px;
+}
+#cssmenu > ul > li.active > a,
+#cssmenu > ul > li > a:active {
+  background-color: #325DC6;
+}
+/* Childs */
+#cssmenu > ul ul {
+  opacity: 0;
+  visibility: hidden;
+  position: absolute;
+  top: 120px;
+  background-color: #3C71D7;
+  margin: 0;
+  padding: 0;
+  z-index: -1;
+}
+#cssmenu > ul li:hover ul {
+  opacity: 1;
+  visibility: visible;
+  margin: 0;
+  color: #000;
+  z-index: 2;
+  top: 64px;
+  left: 0;
+}
+#cssmenu > ul ul:before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  width: 100%;
+  height: 20px;
+  background: transparent;
+}
+#cssmenu > ul ul li {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+#cssmenu > ul ul li a {
+  padding: 10px 25px;
+  display: block;
+  color: white;
+  font-size: 12px;
+  text-decoration: none;
+  width: 134px;
+  text-align: right;
+  border-left: 4px solid transparent;
+  -webkit-transition: all 0.35s ease-in-out;
+  -moz-transition: all 0.35s ease-in-out;
+  -ms-transition: all 0.35s ease-in-out;
+  transition: all 0.35s ease-in-out;
+}
+#cssmenu > ul ul li a:hover {
+  border-left: 4px solid #1A3270;
+  background: url(images/hover.png) repeat;
+}
+#cssmenu > ul ul li a:active {
+  background: url(images/menu-bg.png) repeat;
+}
+#cssmenu .home{
+    background:url(images/iconos-perfil.png) no-repeat 15px 10px;
+}
+#cssmenu .edit{
+    background:url(images/iconos-perfil.png) no-repeat 15px -30px;
+}
+#cssmenu .close{
+    background:url(images/iconos-perfil.png) no-repeat 15px -75px;
+}
+#cssmenu .email{
+    background:url(images/iconos-perfil.png) no-repeat 15px -120px;
+}
+.user-pic{
+     background-color: #fff;
+     padding: 2px; 
+    -webkit-border-radius: 150px;
+    -moz-border-radius: 150px;
+    /*-webkit-box-shadow: 3px 3px 40px #484848;
+    -moz-box-shadow: 3px 3px 40px #484848;*/
+    border-radius: 150px;
+    width: 42px;
+    height: 42px;
+    float: left;
+    margin-right: 10px;
+    margin-top: -5px;
+    margin-left: -30px; 
+}
+#wrapper{
+    background: url(images/bg-black.png) repeat-x;
+}
+
+/*definimos el ancho del span de las lecciones para que entren 8 en total*/
+#lecciones-curso .span2{
+  width: 95px;
+  margin-bottom: 20px;
+}
+
+.light-blue-bar {
+  background-color: #5ECAD4;
+  padding: 10px;
+  max-height: 40px;
+  font-size: 12px;
+}
+.light-blue-bar a{
+  color: #000;
+}
+.light-blue-bar a:hover{
+  text-decoration: underline;
+}
+.home-ico a {
+font-size: 15px;
+color: #fff;
+}
+.user-profile-block {
+    margin-left: 40px;
+    width: 225px;
+}
+
+/*Fin de la definicion*/
+
+.column-one{
+  width: 55%;
+  float: left;
+}
+.column-two{
+  
+  width: 19%;
+  float: left;
+  text-align: right;
+  padding-right: 1%;
+}
+.column-tree{
+
+  width: 21%;
+  float: left;
+}
+.column-four{
+  width: 3%;
+  float: left;
+}
+.tool-icon{
+padding-top:10px;
+} 
+/*FIN DE PERFIL DE USUARIO 500px y 769*/
+
+@media (min-width: 768px) and (max-width: 980px) {
+.main-inicio {
+    margin-left: 10px;
+}
+.header-image-modulo{
+    max-width: 100%;
+    margin: auto;
+}
+
+.text-vertical {
+  color: #808080;
+  font-size: 1.4em;
+  margin-left: -180px;
+  padding-top: 12em;
+  text-align: center;
+  transform: rotate(270deg);
+}
+.text-vertical-two {
+  color: #808080;
+  font-size: 1.4em;
+  padding-top: -3em;
+  margin-left: -1.8em;
+  text-align: center;
+  transform: rotate(270deg);
+}
+
+.row-fluid .span11 {
+  width: 90%;
+}
+
+#bar-animation {
+  width: 150px;
+}
+.imagen-username{
+    display: none;
+}
+#cssmenu > ul > li > a {
+  padding: 10px 31px;
+}
+
+}
+    
+@media (min-width: 481px) and (max-width: 981px) {
+header .row-fluid .span9 {
+  width: auto;
+}
+
+}
+@media (max-width: 800px) {
+#bar-animation {
+  width: 100px;
+}
+
+
+}
+/*FIN DE ICPNA MODULO*/
+
+/*ESTILO PARA MODULO SCORM*/
+.redimension-scorm{
+  min-height: 800px;
+  width:100%;
+}
+#learning_path_left_zone {
+    float: left;
+    padding-left: 8px;
+    padding-right: 4px;
+    width: 235px;
+}
+/*FIN DEL ESTILO PARA MODULO DE SCROOM*/
+.new_actions-fixed {
+  top: 0;
+}

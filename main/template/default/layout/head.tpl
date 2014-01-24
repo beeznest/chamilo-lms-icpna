@@ -303,10 +303,3 @@ $(function() {
 });
 </script>
 {{ header_extra_content }}
-
-<!-- Animated progress bar -->
-<script type="text/javascript">
-$(document).ready(function(){
-       $(".blue-back-bar").filter(':not(:animated)').animate({width:'{{ course_progress }}%'},{duration:2000});
-});
-</script>

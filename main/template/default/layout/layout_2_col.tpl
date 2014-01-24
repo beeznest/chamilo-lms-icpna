@@ -1,64 +1,22 @@
 {% extends "default/layout/main.tpl" %}
 
-{% block body %}	
-	{# Main content #}
+{% block body %}    
+    {# Main content #}
    
-	{#  Right column  #}
-	<div class="span3 menu-column">		        
-        {% if plugin_menu_top %}
-            <div id="plugin_menu_top">
-                {{plugin_menu_top}}
-            </div>
-        {% endif %}  	
+    {#  Right column  #}
+    <div class="span3 menu-column"> 
         
-	    {# if user is not login show the login form #}
-		{% if _u.logged  == 0 %}
-			{% include "default/layout/login_form.tpl" %}
-		{% endif %}
-
-		{#  User picture  #}
-        {{ user_image_block }}
+        {# if user is not login show the login form #}
+        {% if _u.logged  == 0 %}
+            {% include "default/layout/login_form.tpl" %}
+        {% endif %}  
         
-        {#  User Profile links #}
-		{{ profile_block }}
-        
-        {#  Course block - admin #}
-		{{ course_block }}
-        
-        {#  Course block - teacher #}
-		{{ teacher_block }}
-		
-		{#  Notice  #}
-		{{ notice_block }}
-                    
-        {#  Help #}
-		{{ help_block }}
-		
-		{#  Links that are not added in the tabs #}
-		{{ navigation_course_links }}
-		
-		{#  Reservation block  #}
-		{{ reservation_block }}
-		
-		{#  Search (xapian) #}
-		{{ search_block }}
-		
-		{#  Classes  #}
-		{{ classes_block }}
-		
-		{#  Skills #}
-		{{ skills_block }}
-        	
-		{#  Plugin courses sidebar  #}		
-        {#  Plugins for footer section  #}		
-        
-        {% if plugin_menu_bottom %}
-            <div id="plugin_menu_bottom">
-                {{ plugin_menu_bottom }}
-            </div>
-        {% endif %}        
-	</div>
-	<div class="span9 content-column">
+        <img src="{{ _u.avatar}}"/>
+        <div>{{_u.complete_name}}</div>
+    
+               
+    </div>
+    <div class="span9 content-column">
         
         {#  Plugin bottom  #}
         {% if plugin_content_top %}
@@ -67,7 +25,7 @@
             </div>
         {% endif %}
         
-		{#  Portal homepage  #}
+        {#  Portal homepage  #}
         {% if home_page_block %}
             <section id="homepage">
                 <div class="row">
@@ -78,9 +36,9 @@
             </section>
         {% endif %}
         
-		{#  ??  #}
-		{{ sniff_notification }}
-		
+        {#  ??  #}
+        {{ sniff_notification }}
+        
         {% include "default/layout/page_body.tpl" %}
                 
         {#  Welcome to course block  #}
@@ -95,8 +53,8 @@
                 {{ content }}
             </section>
         {% endif %}
-        		
-		{#  Announcements  #}
+                
+        {#  Announcements  #}
         {% if announcements_block %}      
             <section id="announcements">
             {{ announcements_block }}
@@ -113,9 +71,9 @@
                 </div>
             </section>
         {% endif %}
-                	
-		{#  Hot courses template  #}		
-		{% include "default/layout/hot_courses.tpl" %}        
+                    
+        {#  Hot courses template  #}        
+        {% include "default/layout/hot_courses.tpl" %}        
         
         {#  Content bottom  #}
         {% if plugin_content_bottom %}       
@@ -124,6 +82,6 @@
             </div>
         {% endif %}
         &nbsp;
-	</div>
-		
+    </div>
+        
 {% endblock %}

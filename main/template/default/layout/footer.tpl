@@ -1,58 +1,46 @@
 <footer> <!-- start of #footer section -->	    
     <div class="container">
-        <div class="row">            
-            <div id="footer_left" class="span4">                
-                {% if session_teachers is not null %}
-                    <div id="session_teachers">
-                        {{ session_teachers }}           
-                    </div>
-                {% endif %}
+            <div class="row"> 
+           <!--  Start Logotipo -->
+            <div id="footer-one" class="span6 padding-footer">
+                {# logo #}
+                {{ logo }}
+            </div>
+           <!--  End Logotipo  --> 
+           <!--  Sobre Vlearning -->      
+            <div id="footer_two" class="span3">
 
-                {% if teachers is not null %}
-                    <div id="teachers">
-                        {{ teachers }}            
-                    </div>
-                {% endif %}
-                
-                {#  Plugins for footer section #}                                             
-                {% if plugin_footer_left is not null %}
-                    <div id="plugin_footer_left">
-                        {{ plugin_footer_left }}               
-                    </div>                
-                {% endif %}
-                 &nbsp;
+            <h1 class="title">Sobre V Learning</h1>
+            <ul class="listen">
+                <li><a href="#">¿Quienes Somos?</a></li>
+                <li><a href="#">Nuestro Equipo</a></li>
+                <li><a href="#">Ayuda</a></li>
+            </ul>
+                         
             </div>
+            <!--  End Sobre Vlearning -->
+            <!--  Start Prensa -->
             
-            <div id="footer_center" class="span4">
-                {#   Plugins for footer section  #}		
-                {% if plugin_footer_center is not null %}
-                    <div id="plugin_footer_center">
-                        {{ plugin_footer_center }}                
-                    </div>
-                {% endif %}
-                 &nbsp;
+            <div id="footer_tree" class="span2">
+                 <h1 class="title">Prensa</h1>
+                    <ul class="listen">
+                        <li><a href="#">Cobertura de Actividades</a></li>
+                        <li><a href="#">Noticias</a></li>
+                        <li><a href="#">Otras cosas</a></li>
+                    </ul>
             </div>
-            
-            <div id="footer_right" class="span4">                
-                {% if administrator_name is not null %}
-                    <div id="admin_name">
-                        {{ administrator_name }}          
-                    </div>
-                {% endif %}
-                
-                <div id="software_name">	    	
-                    {{ "Platform"|get_lang }} <a href="{{_p.web}}" target="_blank">{{_s.software_name}} {{_s.system_version}}</a>
-                    &copy; {{ "now"|date("Y") }}   	
-                </div>
-                {#   Plugins for footer section  #}		
-                {% if plugin_footer_right is not null %}                                
-                    <div id="plugin_footer_right">
-                        {{ plugin_footer_right }}                
-                    </div>                
-                {% endif %}
-                &nbsp;
-            </div><!-- end of #footer_right -->
-        </div><!-- end of #row -->        
+            <!--  End Prensa -->
+            <!--  Start contactenos -->
+            <div id="footer_four" class="span1"> 
+
+                    
+            </div><!-- end contactenos -->
+        </div><!-- end of #row --> 
+        <div class="row line">
+            <div class="span3"><a href="#">Terminos del Servicio</a></div>
+            <div class="span3"><a href="#">Politica de Privacidad</a></div> 
+            <div class="span6"><a href="#">Mapa del Sitio</a></div>           
+        </div>       
     </div><!-- end of #container -->
 </footer>
 

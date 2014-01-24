@@ -44,6 +44,18 @@
     /*position: absolute;*/
     margin:auto;
 }
+#module-lession .state-icon-process{
+    background: transparent url(images/estados-iconos.png) no-repeat;
+    background-position: -105px 0px;
+    cursor: pointer;
+    display: block;
+    height: 95px;
+    width: 100px;
+    /*position: absolute;*/
+    margin:auto;
+    padding-top: 1em;
+    z-index:100;
+}
 #module-lession .span2{
     width: 17.3%;
 }

@@ -153,12 +153,20 @@ $gidReset = isset($gidReset) ? $gidReset : '';
 // $gidReset can be set in URL-parameter
 
 // parameters passed via POST
-$login = isset($_POST["login"]) ? $_POST["login"] : '';
+$login = isset($_REQUEST["login"]) ? $_REQUEST["login"] : '';
 // register if the user is just logging in, in order to redirect him
 $logging_in = false;
 
 /*  MAIN CODE  */
 
+// patch for ICPNA
+if (isset($_SESSION['_user']['user_id'])) {
+    if ($logout) {
+        // Make custom redirect after logout
+        online_logout($_SESSION['_user']['user_id'], false);
+
+    }
+}
 if (!empty($_SESSION['_user']['user_id']) && !($login || $logout)) {
     // uid is in session => login already done, continue with this value
     $_user['user_id'] = $_SESSION['_user']['user_id'];
@@ -222,14 +230,14 @@ if (!empty($_SESSION['_user']['user_id']) && !($login || $logout)) {
         require_once api_get_path(SYS_PATH).'main/auth/cas/authcas.php';
         $cas_login = cas_is_authenticated();
     }
-    if ((isset($_POST['login']) AND isset($_POST['password']) ) OR ($cas_login))  {
+    if ((isset($_REQUEST['login']) AND isset($_REQUEST['password']) ) OR ($cas_login))  {
 
         // $login && $password are given to log in
-        if ( $cas_login  && empty($_POST['login']) ) {
+        if ( $cas_login  && empty($_REQUEST['login']) ) {
             $login = $cas_login;
         } else {
-            $login      = $_POST['login'];
-            $password   = $_POST['password'];
+            $login      = $_REQUEST['login'];
+            $password   = $_REQUEST['password'];
         }
 
         //Lookup the user in the main database
@@ -243,7 +251,11 @@ if (!empty($_SESSION['_user']['user_id']) && !($login || $logout)) {
 
             if ($uData['auth_source'] == PLATFORM_AUTH_SOURCE || $uData['auth_source'] == CAS_AUTH_SOURCE) {
                 //The authentification of this user is managed by Chamilo itself
-                $password = api_get_encrypted_password(trim(stripslashes($password)));
+                if (isset($_REQUEST['enc']) && $_REQUEST['enc'] == '1') {
+                    $password = trim(stripslashes($password));
+                } else {
+                    $password = api_get_encrypted_password(trim(stripslashes($password)));
+                }
 
                 // Check the user's password
                 if ( ($password == $uData['password']  OR $cas_login) AND (trim($login) == $uData['username'])) {

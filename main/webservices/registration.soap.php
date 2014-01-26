@@ -65,6 +65,8 @@ function WSHelperVerifyKey($params) {
     } else {
         $security_key = $ip.$_configuration['security_key'];
     }
+    if ($debug)
+        error_log('Security key before sha1: '.$security_key);
 
     $result = api_is_valid_secret_key($secret_key, $security_key);
     if ($debug)
@@ -3174,7 +3176,7 @@ function WSCreateSession($params) {
             $results[] = 0;
             continue;*/
         } else {
-            $rs = Database::query("SELECT 1 FROM $tbl_session WHERE name='".Datanbase::escape_string($name)."'");
+            $rs = Database::query("SELECT 1 FROM $tbl_session WHERE name='".Database::escape_string($name)."'");
             if (Database::num_rows($rs)) {
                 $results[] = 0;
                 continue;
@@ -5064,6 +5066,160 @@ function WSUpdateUserApiKey($params) {
     }
     return $apikey;
 }
+
+/* Register WSEditSessionDates function */
+// Register the data structures used by the service
+$server->wsdl->addComplexType(
+    'editSessionDatesParams',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'year_start' => array('name' => 'year_start', 'type' => 'xsd:string'),
+        'month_start' => array('name' => 'month_start', 'type' => 'xsd:string'),
+        'day_start' => array('name' => 'day_start', 'type' => 'xsd:string'),
+        'year_end' => array('name' => 'year_end', 'type' => 'xsd:string'),
+        'month_end' => array('name' => 'month_end', 'type' => 'xsd:string'),
+        'day_end' => array('name' => 'day_end', 'type' => 'xsd:string'),
+        'original_session_id_name' => array('name' => 'original_session_id_name', 'type' => 'xsd:string'),
+        'original_session_id_value' => array('name' => 'original_session_id_value', 'type' => 'xsd:string'),
+    )
+);
+
+$server->wsdl->addComplexType(
+    'editSessionDatesParamsList',
+    'complexType',
+    'array',
+    '',
+    'SOAP-ENC:Array',
+    array(),
+    array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:editSessionDatesParams[]')),
+    'tns:editSessionDatesParams'
+);
+
+$server->wsdl->addComplexType(
+    'editSessionDates',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'sessions' => array('name' => 'sessions', 'type' => 'tns:editSessionDatesParamsList'),
+        'secret_key' => array('name' => 'secret_key', 'type' => 'xsd:string')
+    )
+);
+
+// Prepare output params, in this case will return an array
+$server->wsdl->addComplexType(
+    'result_editSessionDates',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'original_session_id_value' => array('name' => 'original_session_id_value', 'type' => 'xsd:string'),
+        'result' => array('name' => 'result', 'type' => 'xsd:string')
+    )
+);
+
+$server->wsdl->addComplexType(
+    'results_editSessionDates',
+    'complexType',
+    'array',
+    '',
+    'SOAP-ENC:Array',
+    array(),
+    array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:result_editSessionDates[]')),
+    'tns:result_editSessionDates'
+);
+
+
+// Register the method to expose
+$server->register('WSEditSessionDates',		// method name
+    array('editSessionDates' => 'tns:editSessionDates'),	// input parameters
+    array('return' => 'tns:results_editSessionDates'),				// output parameters
+    'urn:WSRegistration',						// namespace
+    'urn:WSRegistration#WSEditSessionDates',	// soapaction
+    'rpc',										// style
+    'encoded',									// use
+    'This service edits a session\'s start and end dates'				// documentation
+);
+
+// define the method WSEditSessionDates
+function WSEditSessionDates($params) {
+
+    global $_user;
+
+    if(!WSHelperVerifyKey($params)) {
+        return return_error(WS_ERROR_SECRET_KEY);
+    }
+
+    $tbl_user		= Database::get_main_table(TABLE_MAIN_USER);
+    $tbl_session	= Database::get_main_table(TABLE_MAIN_SESSION);
+    $t_sf = Database::get_main_table(TABLE_MAIN_SESSION_FIELD);
+    $t_sfv = Database::get_main_table(TABLE_MAIN_SESSION_FIELD_VALUES);
+
+    $sessions_params = $params['sessions'];
+    $results = array();
+    $orig_session_id_value = array();
+
+    foreach ($sessions_params as $session_param) {
+
+        $year_start = intval($session_param['year_start']);
+        $month_start = intval($session_param['month_start']);
+        $day_start = intval($session_param['day_start']);
+        $year_end = intval($session_param['year_end']);
+        $month_end = intval($session_param['month_end']);
+        $day_end = intval($session_param['day_end']);
+        $original_session_id_value = $session_param['original_session_id_value'];
+        $original_session_id_name = $session_param['original_session_id_name'];
+        $orig_session_id_value[] = $original_session_id_value;
+
+        // Get session id from original session id
+        $sql = "SELECT session_id FROM $t_sf sf,$t_sfv sfv WHERE sfv.field_id=sf.id AND field_variable='$original_session_id_name' AND field_value='$original_session_id_value'";
+        $res = Database::query($sql);
+        $row = Database::fetch_row($res);
+
+        $id = intval($row[0]);
+
+        if (Database::num_rows($res) < 1) {
+            $results[] = 0;
+            continue;
+        }
+
+        $date_start="$year_start-".(($month_start < 10)?"0$month_start":$month_start)."-".(($day_start < 10)?"0$day_start":$day_start);
+        $date_end="$year_end-".(($month_end < 10)?"0$month_end":$month_end)."-".(($day_end < 10)?"0$day_end":$day_end);
+
+        if (!$month_start || !$day_start || !$year_start || !checkdate($month_start, $day_start, $year_start)) {
+            $results[] = 0; //InvalidStartDate
+            continue;
+        } elseif (!$month_end || !$day_end || !$year_end || !checkdate($month_end, $day_end, $year_end)) {
+            $results[] = 0; //InvalidEndDate
+            continue;
+        } elseif (empty($nolimit) && $date_start >= $date_end) {
+            $results[] = 0; //StartDateShouldBeBeforeEndDate
+            continue;
+        } else {
+            $sql = "UPDATE $tbl_session SET " .
+                "date_start='".$date_start."', " .
+                "date_end='".$date_end."' " .
+                " WHERE id='".$id."'";
+            $id_session = Database::insert_id();
+            $results[] = $id_session;
+        }
+
+    } // end main foreach
+
+    $count_results = count($results);
+    $output = array();
+    for($i = 0; $i < $count_results; $i++) {
+        $output[] = array('original_session_id_value' => $orig_session_id_value[$i], 'result' => $results[$i]);
+    }
+
+    return $output;
+}
+
 
 // Use the request to (try to) invoke the service
 $HTTP_RAW_POST_DATA = isset($HTTP_RAW_POST_DATA) ? $HTTP_RAW_POST_DATA : '';

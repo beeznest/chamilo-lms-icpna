@@ -95,7 +95,7 @@ function addlinkcategory($type) {
 		// If the URL is invalid, an error occurs.
 		// Ivan, 13-OCT-2010, Chamilo 1.8.8: Let us still tolerate PHP 5.1.x and avoid a specific bug in filter_var(), see http://bugs.php.net/51192
 		//if (!filter_var($urllink, FILTER_VALIDATE_URL)) {
-		if (!api_valid_url($urllink, true)) { // A check against an absolute URL
+		if (!api_valid_url($urllink, true, true)) { // A check against an absolute URL
 			$msgErr = get_lang('GiveURL');
 			Display :: display_error_message(get_lang('GiveURL'));
 			$ok = false;
@@ -399,7 +399,7 @@ function editlinkcategory($type) {
 			// If the URL is invalid, an error occurs.
 			// Ivan, 13-OCT-2010, Chamilo 1.8.8: Let us still tolerate PHP 5.1.x and avoid a specific bug in filter_var(), see http://bugs.php.net/51192
 			//if (!filter_var($urllink, FILTER_VALIDATE_URL)) {
-			if (!api_valid_url($urllink, true)) { // A check against an absolute URL.
+			if (!api_valid_url($urllink, true, true)) { // A check against an absolute URL.
 				$msgErr = get_lang('GiveURL');
 				Display :: display_error_message(get_lang('GiveURL'));
 				return false;
@@ -617,7 +617,16 @@ function showlinksofcategory($catid) {
     	$i = 1;
     	while ($myrow = Database :: fetch_array($result)) {
 
-
+            $matches = array();
+            $ref = preg_match('/\{\{(.*)?\}\}/', $myrow['url'], $matches);
+            if ($ref) {
+                $match = $matches[1];
+                if (substr($match, 0, 2) == 'u.') {
+                    $field = substr($match, 2);
+                    $value = UserManager::get_extra_user_data_by_field(api_get_user_id(), $field, null, true);
+                    $myrow['url'] = preg_replace('/\{\{'.$match.'\}\}/', $value[$field], $myrow['url']);
+                }
+            }
     		// Validacion when belongs to a session.
     		$session_img = api_get_session_image($myrow['session_id'], $_user['status']);
 

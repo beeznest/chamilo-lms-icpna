@@ -834,13 +834,17 @@ function api_remove_trailing_slash($path) {
  * Checks the RFC 3986 syntax of a given URL.
  * @param string $url       The URL to be checked.
  * @param bool $absolute    Whether the URL is absolute (beginning with a scheme such as "http:").
+ * @param bool $allowTags   Whether to allow special Chamilo tags of the {{tag}} form
  * @return bool             Returns the URL if it is valid, FALSE otherwise.
  * This function is an adaptation from the function valid_url(), Drupal CMS.
  * @link http://drupal.org
  * Note: The built-in function filter_var($urs, FILTER_VALIDATE_URL) has a bug for some versions of PHP.
  * @link http://bugs.php.net/51192
  */
-function api_valid_url($url, $absolute = false) {
+function api_valid_url($url, $absolute = false, $allowTags = false) {
+    if ($allowTags) {
+        $url = preg_replace('/\{\{(.*)?\}\}/','',$url);
+    }
     if ($absolute) {
         if (preg_match("
             /^                                                      # Start at the beginning of the text

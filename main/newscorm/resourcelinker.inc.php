@@ -1646,6 +1646,16 @@ function rl_get_resource_link_for_learnpath($course_id, $learnpath_id, $id_in_pa
             $result= Database::query("SELECT * FROM $TABLETOOLLINK WHERE c_id = $course_id AND id=$id");
             $myrow=Database::fetch_array($result);
             $thelink=$myrow["url"];
+            $matches = array();
+            $ref = preg_match('/\{\{(.*)?\}\}/', $thelink, $matches);
+            if ($ref) {
+                $match = $matches[1];
+                if (substr($match, 0, 2) == 'u.') {
+                    $field = substr($match, 2);
+                    $value = UserManager::get_extra_user_data_by_field(api_get_user_id(), $field, null, true);
+                    $thelink = preg_replace('/\{\{'.$match.'\}\}/', $value[$field], $thelink);
+                }
+            }
             $link .= $thelink;
             break;
         case TOOL_QUIZ:

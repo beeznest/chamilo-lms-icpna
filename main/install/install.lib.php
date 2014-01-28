@@ -2711,6 +2711,8 @@ function create_course_tables($course_db_name = null) {
         target enum('_self','_blank') NOT NULL default '_self',
         category varchar(20) not null default 'authoring',
         session_id int default 0,
+        custom_icon varchar(255) DEFAULT NULL,
+        description text DEFAULT NULL,
         PRIMARY KEY (c_id, id)
         )" . $charset_clause;
     Database::query($sql);

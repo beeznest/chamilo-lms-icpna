@@ -4146,7 +4146,7 @@ class Exercise
         }
     }
 
-    function show_exercise_result_header($user_data, $start_date = null, $duration = null)
+    function show_exercise_result_header($user_data, $start_date = null, $duration = null, $hideDescription = false)
     {
         $array = array();
 
@@ -4154,8 +4154,10 @@ class Exercise
             $array[] = array('title' => get_lang("User"), 'content' => $user_data);
         }
 
-        if (!empty($this->description)) {
-            $array[] = array('title' => get_lang("Description"), 'content' => $this->description);
+        if ($hideDescription == false) {
+            if (!empty($this->description)) {
+                $array[] = array('title' => get_lang("Description"), 'content' => $this->description);
+            }
         }
 
         if (!empty($start_date)) {

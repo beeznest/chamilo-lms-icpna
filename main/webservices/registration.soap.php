@@ -10,7 +10,7 @@ require_once $libpath.'fileManage.lib.php';
 require_once $libpath.'fileUpload.lib.php';
 require_once api_get_path(INCLUDE_PATH).'lib/mail.lib.inc.php';
 
-$debug = false;
+$debug = true;
 
 define('WS_ERROR_SECRET_KEY', 1);
 
@@ -5332,6 +5332,103 @@ $server->register('WSExpireSessions',		// method name
  * @return array|null|soap_fault
  */
 function WSExpireSessions($params) {
+
+    global $_user;
+
+    if(!WSHelperVerifyKey($params)) {
+        return return_error(WS_ERROR_SECRET_KEY);
+    }
+
+    $tbl_user		= Database::get_main_table(TABLE_MAIN_USER);
+    $tbl_session	= Database::get_main_table(TABLE_MAIN_SESSION);
+    $t_sf = Database::get_main_table(TABLE_MAIN_SESSION_FIELD);
+    $t_sfv = Database::get_main_table(TABLE_MAIN_SESSION_FIELD_VALUES);
+
+    $sessions_params = $params['sessions'];
+    $results = array();
+    $orig_session_id_value = array();
+
+    foreach ($sessions_params as $session_param) {
+
+        $original_session_id_value = $session_param['original_session_id_value'];
+        $original_session_id_name = $session_param['original_session_id_name'];
+
+        // Get session id from original session id
+        $sql = "SELECT session_id FROM $t_sf sf,$t_sfv sfv WHERE sfv.field_id=sf.id AND field_variable='$original_session_id_name' AND field_value='$original_session_id_value'";
+        $res = Database::query($sql);
+        $row = Database::fetch_row($res);
+
+        $id = intval($row[0]);
+
+        if (Database::num_rows($res) < 1) {
+            $results[] = 0;
+            continue;
+        }
+        $date_end = api_get_utc_datetime();
+        $sql = "UPDATE $tbl_session SET " .
+            " date_end='".$date_end."' " .
+            " WHERE id='".$id."'";
+        $id_session = Database::insert_id();
+        $results[] = $id_session;
+    } // end main foreach
+
+    $count_results = count($results);
+    $output = array();
+    for($i = 0; $i < $count_results; $i++) {
+        $output[] = array('original_session_id_value' => $orig_session_id_value[$i], 'result' => $results[$i]);
+    }
+    return $output;
+}
+
+/* Register WSGetCourseProgress function */
+// Register the data structures used by the service
+$server->wsdl->addComplexType(
+    'getCourseProgress',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'secret_key' => array('name' => 'secret_key', 'type' => 'xsd:string'),
+        'original_user_id_name' => array('name' => 'original_user_id_name', 'type' => 'xsd:string'),
+        'original_user_id_value' => array('name' => 'original_user_id_value', 'type' => 'xsd:string'),
+        'original_course_id_name' => array('name' => 'original_course_id_name', 'type' => 'xsd:string'),
+        'original_course_id_value' => array('name' => 'original_course_id_value', 'type' => 'xsd:string'),
+        'original_session_id_name' => array('name' => 'original_session_id_name', 'type' => 'xsd:string'),
+        'original_session_id_value' => array('name' => 'original_session_id_value', 'type' => 'xsd:string'),
+    )
+);
+
+// Prepare output params, in this case will return an array
+$server->wsdl->addComplexType(
+    'result_getCourseProgress',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'result' => array('name' => 'result', 'type' => 'xsd:string')
+    )
+);
+
+// Register the method to expose
+$server->register('WSGetCourseProgress',		// method name
+    array('getCourseProgress' => 'tns:getCourseProgress'),	// input parameters
+    array('return' => 'tns:result_getCourseProgress'),				// output parameters
+    'urn:WSRegistration',						// namespace
+    'urn:WSRegistration#WSGetCourseProgress',	// soapaction
+    'rpc',										// style
+    'encoded',									// use
+    'This service returns the course progress for the given student and session'				// documentation
+);
+
+// define the method WSGetCourseProgress
+/**
+ * returns the course progress for the given student and session
+ * @param $params
+ * @return array|null|soap_fault
+ */
+function WSGetCourseProgress($params) {
 
     global $_user;
 

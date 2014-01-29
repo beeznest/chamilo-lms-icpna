@@ -158,6 +158,11 @@ delete_chat_exercise_session($exe_id);
 
 if ($origin != 'learnpath') {
     echo '<hr>';
+    echo '<form>';
+    echo '<label for="ask2trial">Desea pedir otro intento? Pon tu justificación aquí:</label><br/>';
+    echo '<textarea id="ask2trial" name"ask2trial"></textarea><br />';
+    echo '<input type="submit" value="Enviar"></input>';
+    echo '</form>';
     echo Display::url(get_lang('ReturnToCourseHomepage'), api_get_course_url(), array('class' => 'btn btn-large'));
 
     if (api_is_allowed_to_session_edit()) {
@@ -167,6 +172,7 @@ if ($origin != 'learnpath') {
 
     Display::display_footer();
 } else {
+
     $lp_mode = $_SESSION['lp_mode'];
     $url = '../newscorm/lp_controller.php?cidReq='.api_get_course_id().'&action=view&lp_id='.$learnpath_id.'&lp_item_id='.$learnpath_item_id.'&exeId='.$exercise_stat_info['exe_id'].'&fb_type='.$objExercise->feedback_type;
     $href = ($lp_mode == 'fullscreen') ? ' window.opener.location.href="'.$url.'" ' : ' top.location.href="'.$url.'"';

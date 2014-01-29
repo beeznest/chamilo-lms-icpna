@@ -140,8 +140,8 @@ if ($objExercise->selectAttempts() > 0) {
 
 Display :: display_normal_message(get_lang('Saved').'<br />', false);
 
-//Display questions
-display_question_list_by_attempt($objExercise, $exe_id, true);
+// Display questions
+display_question_list_by_attempt($objExercise, $exe_id, true, true);
 
 //If is not valid
 $session_control_key = get_session_time_control_key($objExercise->id, $learnpath_id, $learnpath_item_id);

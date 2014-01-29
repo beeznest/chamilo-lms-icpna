@@ -2216,11 +2216,11 @@ function delete_chat_exercise_session($exe_id)
 
 /**
  * Display the exercise results
- * @param obj   exercise obj
+ * @param obj   Exercise exercise obj
  * @param int   attempt id (exe_id)
  * @param bool  save users results (true) or just show the results (false)
  */
-function display_question_list_by_attempt($objExercise, $exe_id, $save_user_result = false)
+function display_question_list_by_attempt($objExercise, $exe_id, $save_user_result = false, $hideDescription = false)
 {
     global $origin, $debug;
 
@@ -2260,7 +2260,11 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
     if ($show_results || $show_only_score) {
         $user_info = api_get_user_info($exercise_stat_info['exe_user_id']);
         //Shows exercise header
-        echo $objExercise->show_exercise_result_header($user_info['complete_name'], api_convert_and_format_date($exercise_stat_info['start_date'], DATE_TIME_FORMAT_LONG), $exercise_stat_info['duration']);
+        echo $objExercise->show_exercise_result_header(
+            $user_info['complete_name'],
+            api_convert_and_format_date($exercise_stat_info['start_date'], DATE_TIME_FORMAT_LONG), $exercise_stat_info['duration'],
+            $hideDescription
+        );
     }
 
     // Display text when test is finished #4074 and for LP #4227

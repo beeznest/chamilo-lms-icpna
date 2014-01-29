@@ -2463,7 +2463,7 @@ class Exercise
         if ($answerType == ORAL_EXPRESSION) {
             require_once api_get_path(LIBRARY_PATH).'nanogong.lib.php';
             $exe_info = get_exercise_results_by_attempt($exeId);
-            $exe_info = $exe_info[$exeId];
+            $exe_info = isset($exe_info[$exeId]) ? $exe_info[$exeId] : null;
 
             $params = array();
             $params['course_id'] = api_get_course_int_id();
@@ -4146,7 +4146,7 @@ class Exercise
         }
     }
 
-    function show_exercise_result_header($user_data, $start_date = null, $duration = null)
+    function show_exercise_result_header($user_data, $start_date = null, $duration = null, $hideDescription = false)
     {
         $array = array();
 
@@ -4154,8 +4154,10 @@ class Exercise
             $array[] = array('title' => get_lang("User"), 'content' => $user_data);
         }
 
-        if (!empty($this->description)) {
-            $array[] = array('title' => get_lang("Description"), 'content' => $this->description);
+        if ($hideDescription == false) {
+            if (!empty($this->description)) {
+                $array[] = array('title' => get_lang("Description"), 'content' => $this->description);
+            }
         }
 
         if (!empty($start_date)) {

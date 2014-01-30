@@ -312,8 +312,10 @@ class Template {
     }
 
     /** Set system parameters */
-    private function set_system_parameters() {
+    private function set_system_parameters()
+    {
         global $_configuration, $extAuthSource;
+        $modulePath = isset($extAuthSource['modules_path']) ? $extAuthSource['modules_path'] : null;
 
         //Setting app paths/URLs
         $_p = array(
@@ -329,7 +331,7 @@ class Template {
             'web_query_vars' => api_htmlentities($_SERVER['QUERY_STRING']),
             'web_self_query_vars' => api_htmlentities($_SERVER['REQUEST_URI']),
             'web_cid_query' => api_get_cidreq(),
-            'web_modules' => $extAuthSource['modules_path'],
+            'web_modules' => $modulePath,
         );
         $this->assign('_p', $_p);
 

@@ -2387,9 +2387,7 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
 
     if ($origin != 'learnpath') {
         if ($show_results || $show_only_score) {
-            $total_score_text .= '<div class="question_row">';
             $total_score_text .= get_question_ribbon($objExercise, $total_score, $total_weight, true);
-            $total_score_text .= '</div>';
         }
     }
 
@@ -2427,15 +2425,19 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
 
 function get_question_ribbon($objExercise, $score, $weight, $check_pass_percentage = false)
 {
-    $ribbon = '<div class="ribbon">';
+    $eventMessage = null;
+    $ribbon = '<div class="question_row">';
+    $ribbon .= '<div class="ribbon">';
     if ($check_pass_percentage) {
         $is_success = is_success_exercise_result($score, $weight, $objExercise->selectPassPercentage());
         // Color the final test score if pass_percentage activated
         $ribbon_total_success_or_error = "";
         if (is_pass_pourcentage_enabled($objExercise->selectPassPercentage())) {
             if ($is_success) {
+                $eventMessage = $objExercise->getOnSuccessMessage();
                 $ribbon_total_success_or_error = ' ribbon-total-success';
             } else {
+                $eventMessage = $objExercise->getOnFailedMessage();
                 $ribbon_total_success_or_error = ' ribbon-total-error';
             }
         }
@@ -2447,11 +2449,14 @@ function get_question_ribbon($objExercise, $score, $weight, $check_pass_percenta
     $ribbon .= show_score($score, $weight, false, true);
     $ribbon .= '</h3>';
     $ribbon .= '</div>';
+
     if ($check_pass_percentage) {
         $ribbon .= show_success_message($score, $weight, $objExercise->selectPassPercentage());
     }
 
-
     $ribbon .= '</div>';
+    $ribbon .= '</div>';
+
+    $ribbon .= $eventMessage;
     return $ribbon;
 }

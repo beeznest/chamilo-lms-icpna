@@ -61,6 +61,8 @@ class Exercise
     public $exercise_was_added_in_lp = false;
     public $force_edit_exercise_in_lp = false;
     public $endButton = 0;
+    public $onSuccessMessage = null;
+    public $onFailedMessage = null;
 
     /**
      * Constructor of the class
@@ -144,6 +146,8 @@ class Exercise
             $this->pass_percentage = $object->pass_percentage;
             $this->is_gradebook_locked = api_resource_is_locked_by_gradebook($id, LINK_EXERCISE);
             $this->endButton = $object->end_button;
+            $this->onSuccessMessage = $object->on_success_message;
+            $this->onFailedMessage= $object->on_failed_message;
 
             $this->review_answers = (isset($object->review_answers) && $object->review_answers == 1) ? true : false;
             $sql = "SELECT max_score FROM $table_lp_item
@@ -310,6 +314,38 @@ class Exercise
     public function selectEndButton()
     {
         return $this->endButton;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOnSuccessMessage()
+    {
+        return $this->onSuccessMessage;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOnFailedMessage()
+    {
+        return $this->onFailedMessage;
+    }
+
+    /**
+     * @param string $value
+     */
+    public function setOnSuccessMessage($value)
+    {
+        $this->onSuccessMessage = $value;
+    }
+
+    /**
+     * @param string $value
+     */
+    public function setOnFailedMessage($value)
+    {
+        $this->onFailedMessage = $value;
     }
 
     /**
@@ -838,6 +874,8 @@ class Exercise
         	        display_category_name = '".Database::escape_string($display_category_name)."',
                     pass_percentage = '".Database::escape_string($pass_percentage)."',
                     end_button = '".$this->selectEndButton()."',
+                    on_success_message = '".Database::escape_string($this->getOnSuccessMessage())."',
+                    on_failed_message = '".Database::escape_string($this->getOnFailedMessage())."',
 					results_disabled='".Database::escape_string($results_disabled)."'";
             }
             $sql .= " WHERE c_id = ".$this->course_id." AND id='".Database::escape_string($id)."'";
@@ -851,10 +889,31 @@ class Exercise
             }
         } else {
             // creates a new exercise
-            $sql = "INSERT INTO $TBL_EXERCICES (c_id, start_time, end_time, title, description, sound, type, random, random_answers, active,
-                                                results_disabled, max_attempt, feedback_type, expired_time, session_id, review_answers, random_by_category,
-                                                text_when_finished, display_category_name, pass_percentage, end_button)
-					VALUES(
+            $sql = "INSERT INTO $TBL_EXERCICES (
+                        c_id,
+                        start_time,
+                        end_time,
+                        title,
+                        description,
+                        sound,
+                        type,
+                        random,
+                        random_answers,
+                        active,
+                        results_disabled,
+                        max_attempt,
+                        feedback_type,
+                        expired_time,
+                        session_id,
+                        review_answers,
+                        random_by_category,
+                        text_when_finished,
+                        display_category_name,
+                        pass_percentage,
+                        end_button,
+                        on_success_message,
+                        on_failed_message
+                    ) VALUES (
 						".$this->course_id.",
 						'$start_time','$end_time',
 						'".Database::escape_string($exercise)."',
@@ -874,7 +933,9 @@ class Exercise
 						'".Database::escape_string($text_when_finished)."',
 						'".Database::escape_string($display_category_name)."',
                         '".Database::escape_string($pass_percentage)."',
-                        '".Database::escape_string($this->selectEndButton())."'
+                        '".Database::escape_string($this->selectEndButton())."',
+                        '".Database::escape_string($this->getOnSuccessMessage())."',
+                        '".Database::escape_string($this->getOnFailedMessage())."'
 						)";
             Database::query($sql);
             $this->id = Database::insert_id();
@@ -1423,6 +1484,7 @@ class Exercise
             );
             $form->addElement('html', '</div>');
 
+            // Pass percentage.
             $form->addElement(
                 'text',
                 'pass_percentage',
@@ -1430,6 +1492,11 @@ class Exercise
                 array('id' => 'pass_percentage')
             );
             $form->addRule('pass_percentage', get_lang('Numeric'), 'numeric');
+
+            // On success
+            $form->add_html_editor('on_success_message', get_lang('MessageOnSuccess'), false, false, $editor_config);
+            // On failed
+            $form->add_html_editor('on_failed_message', get_lang('MessageOnFailed'), false, false, $editor_config);
 
             // Text when ending an exam
             $form->add_html_editor('text_when_finished', get_lang('TextWhenFinished'), false, false, $editor_config);
@@ -1443,6 +1510,8 @@ class Exercise
             );
             $form->addGroup($group, null, get_lang('ExerciseEndButton'));
             $form->addElement('html', '<div class="clear">&nbsp;</div>');
+
+
 
             $defaults = array();
 
@@ -1515,6 +1584,8 @@ class Exercise
                 $defaults['display_category_name'] = $this->selectDisplayCategoryName();
                 $defaults['pass_percentage'] = $this->selectPassPercentage();
                 $defaults['end_button'] = $this->selectEndButton();
+                $defaults['on_success_message'] = $this->getOnSuccessMessage();
+                $defaults['on_failed_message'] = $this->getOnFailedMessage();
 
                 if (($this->start_time != '0000-00-00 00:00:00')) {
                     $defaults['activate_start_date_check'] = 1;
@@ -1552,6 +1623,8 @@ class Exercise
                 $defaults['end_time'] = date('Y-m-d 12:00:00', time() + 84600);
                 $defaults['pass_percentage'] = '';
                 $defaults['end_button'] = $this->selectEndButton();
+                $defaults['on_success_message'] = null;
+                $defaults['on_failed_message'] = null;
             }
         } else {
             $defaults['exerciseTitle'] = $this->selectTitle();
@@ -1586,6 +1659,8 @@ class Exercise
         $this->updateReviewAnswers($form->getSubmitValue('review_answers'));
         $this->updatePassPercentage($form->getSubmitValue('pass_percentage'));
         $this->updateEndButton($form->getSubmitValue('end_button'));
+        $this->setOnSuccessMessage($form->getSubmitValue('on_success_message'));
+        $this->setOnFailedMessage($form->getSubmitValue('on_failed_message'));
 
         if ($form->getSubmitValue('activate_start_date_check') == 1) {
             $start_time = $form->getSubmitValue('start_time');

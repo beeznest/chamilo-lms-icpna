@@ -2583,6 +2583,8 @@ function create_course_tables($course_db_name = null) {
         display_category_name INT NOT NULL DEFAULT 1,
         pass_percentage INT DEFAULT NULL,
         end_button int NOT NULL default 0,
+        on_success_message longtext,
+        on_failed_message longtext
         PRIMARY KEY (c_id, id)
         )" . $charset_clause;
     Database::query($sql);

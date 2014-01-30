@@ -158,12 +158,15 @@ delete_chat_exercise_session($exe_id);
 
 if ($origin != 'learnpath') {
     echo '<hr>';
+
     echo '<form>';
     echo '<label for="ask2trial">Desea pedir otro intento? Pon tu justificación aquí:</label><br/>';
     echo '<textarea id="ask2trial" name"ask2trial"></textarea><br />';
     echo '<input type="submit" value="Enviar"></input>';
     echo '</form>';
-    echo Display::url(get_lang('ReturnToCourseHomepage'), api_get_course_url(), array('class' => 'btn btn-large'));
+
+    //echo Display::url(get_lang('ReturnToCourseHomepage'), api_get_course_url(), array('class' => 'btn btn-large'));
+    echo $objExercise->returnEndButtonHTML();
 
     if (api_is_allowed_to_session_edit()) {
         Session::erase('objExercise');

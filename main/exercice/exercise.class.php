@@ -60,6 +60,7 @@ class Exercise
     public $is_gradebook_locked = false;
     public $exercise_was_added_in_lp = false;
     public $force_edit_exercise_in_lp = false;
+    public $endButton = 0;
 
     /**
      * Constructor of the class
@@ -88,6 +89,7 @@ class Exercise
         $this->text_when_finished = ""; //
         $this->display_category_name = 0;
         $this->pass_percentage = null;
+        $this->endButton = 0;
 
         if (!empty($course_id)) {
             $course_info = api_get_course_info_by_id($course_id);
@@ -109,7 +111,6 @@ class Exercise
     {
         global $_configuration;
         $TBL_EXERCICES = Database::get_course_table(TABLE_QUIZ_TEST);
-
         $table_lp_item = Database::get_course_table(TABLE_LP_ITEM);
         $id = intval($id);
         if (empty($this->course_id)) {
@@ -142,6 +143,7 @@ class Exercise
             $this->display_category_name = $object->display_category_name;
             $this->pass_percentage = $object->pass_percentage;
             $this->is_gradebook_locked = api_resource_is_locked_by_gradebook($id, LINK_EXERCISE);
+            $this->endButton = $object->end_button;
 
             $this->review_answers = (isset($object->review_answers) && $object->review_answers == 1) ? true : false;
             $sql = "SELECT max_score FROM $table_lp_item
@@ -289,14 +291,25 @@ class Exercise
      * @author - hubert borderiou 30-11-11
      * @return - integer : do we display the question category name for students
      */
-    function selectDisplayCategoryName()
+    public function selectDisplayCategoryName()
     {
         return $this->display_category_name;
     }
 
-    function selectPassPercentage()
+    /**
+     * @return null
+     */
+    public function selectPassPercentage()
     {
         return $this->pass_percentage;
+    }
+
+    /**
+     * @return int
+     */
+    public function selectEndButton()
+    {
+        return $this->endButton;
     }
 
     /**
@@ -617,9 +630,20 @@ class Exercise
         $this->review_answers = (isset($value) && $value) ? true : false;
     }
 
+    /**
+     * @param $value
+     */
     function updatePassPercentage($value)
     {
         $this->pass_percentage = $value;
+    }
+
+    /**
+     * @param int $value
+     */
+    public function updateEndButton($value)
+    {
+        $this->endButton = intval($value);
     }
 
     /**
@@ -813,6 +837,7 @@ class Exercise
         	        text_when_finished = '".Database::escape_string($text_when_finished)."',
         	        display_category_name = '".Database::escape_string($display_category_name)."',
                     pass_percentage = '".Database::escape_string($pass_percentage)."',
+                    end_button = '".$this->selectEndButton()."',
 					results_disabled='".Database::escape_string($results_disabled)."'";
             }
             $sql .= " WHERE c_id = ".$this->course_id." AND id='".Database::escape_string($id)."'";
@@ -828,7 +853,7 @@ class Exercise
             // creates a new exercise
             $sql = "INSERT INTO $TBL_EXERCICES (c_id, start_time, end_time, title, description, sound, type, random, random_answers, active,
                                                 results_disabled, max_attempt, feedback_type, expired_time, session_id, review_answers, random_by_category,
-                                                text_when_finished, display_category_name, pass_percentage)
+                                                text_when_finished, display_category_name, pass_percentage, end_button)
 					VALUES(
 						".$this->course_id.",
 						'$start_time','$end_time',
@@ -848,7 +873,8 @@ class Exercise
 						'".Database::escape_string($randomByCat)."',
 						'".Database::escape_string($text_when_finished)."',
 						'".Database::escape_string($display_category_name)."',
-                        '".Database::escape_string($pass_percentage)."'
+                        '".Database::escape_string($pass_percentage)."',
+                        '".Database::escape_string($this->selectEndButton())."'
 						)";
             Database::query($sql);
             $this->id = Database::insert_id();
@@ -1405,8 +1431,18 @@ class Exercise
             );
             $form->addRule('pass_percentage', get_lang('Numeric'), 'numeric');
 
-            // add the text_when_finished textbox
+            // Text when ending an exam
             $form->add_html_editor('text_when_finished', get_lang('TextWhenFinished'), false, false, $editor_config);
+
+            // Exam end button.
+            $group = array(
+                $form->createElement('radio', 'end_button', null, get_lang('ExerciseEndButtonCourseHome'), '0'),
+                $form->createElement('radio', 'end_button', null, get_lang('ExerciseEndButtonExerciseHome'), '1'),
+                $form->createElement('radio', 'end_button', null, get_lang('ExerciseEndButtonDisconnect'), '2'),
+                $form->createElement('radio', 'end_button', null, get_lang('ExerciseEndButtonNoButton'), '3')
+            );
+            $form->addGroup($group, null, get_lang('ExerciseEndButton'));
+            $form->addElement('html', '<div class="clear">&nbsp;</div>');
 
             $defaults = array();
 
@@ -1474,10 +1510,11 @@ class Exercise
                 $defaults['results_disabled'] = $this->selectResultsDisabled();
                 $defaults['propagate_neg'] = $this->selectPropagateNeg();
                 $defaults['review_answers'] = $this->review_answers;
-                $defaults['randomByCat'] = $this->selectRandomByCat(); //
-                $defaults['text_when_finished'] = $this->selectTextWhenFinished(); //
-                $defaults['display_category_name'] = $this->selectDisplayCategoryName(); //
+                $defaults['randomByCat'] = $this->selectRandomByCat();
+                $defaults['text_when_finished'] = $this->selectTextWhenFinished();
+                $defaults['display_category_name'] = $this->selectDisplayCategoryName();
                 $defaults['pass_percentage'] = $this->selectPassPercentage();
+                $defaults['end_button'] = $this->selectEndButton();
 
                 if (($this->start_time != '0000-00-00 00:00:00')) {
                     $defaults['activate_start_date_check'] = 1;
@@ -1514,6 +1551,7 @@ class Exercise
                 $defaults['display_category_name'] = 1; //
                 $defaults['end_time'] = date('Y-m-d 12:00:00', time() + 84600);
                 $defaults['pass_percentage'] = '';
+                $defaults['end_button'] = $this->selectEndButton();
             }
         } else {
             $defaults['exerciseTitle'] = $this->selectTitle();
@@ -1547,6 +1585,7 @@ class Exercise
         $this->updateDisplayCategoryName($form->getSubmitValue('display_category_name'));
         $this->updateReviewAnswers($form->getSubmitValue('review_answers'));
         $this->updatePassPercentage($form->getSubmitValue('pass_percentage'));
+        $this->updateEndButton($form->getSubmitValue('end_button'));
 
         if ($form->getSubmitValue('activate_start_date_check') == 1) {
             $start_time = $form->getSubmitValue('start_time');
@@ -4708,5 +4747,31 @@ class Exercise
         }
 
         return $list;
+    }
+
+    /**
+     * Returns a HTML link when the exercise ends (exercise result page)
+     * @return string
+     */
+    public function returnEndButtonHTML()
+    {
+        $endButtonSetting = $this->selectEndButton();
+        $html = '';
+        switch ($endButtonSetting) {
+            case '0':
+                $html = Display::url(get_lang('ReturnToCourseHomepage'), api_get_course_url(), array('class' => 'btn btn-large'));
+                break;
+            case '1':
+                $html = Display::url(get_lang('ReturnToExerciseList'), api_get_path(WEB_CODE_PATH).'exercice/exercice.php?'.api_get_cidreq(), array('class' => 'btn btn-large'));
+                break;
+            case '2':
+                $url = api_get_path(WEB_PATH).'?logout=logout&uid='.api_get_user_id();
+                $html = Display::url(get_lang('Logout'), $url, array('class' => 'btn btn-large'));
+                break;
+            case '3':
+                break;
+        }
+        return $html;
+
     }
 }

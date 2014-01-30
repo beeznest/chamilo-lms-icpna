@@ -50,7 +50,14 @@ function showQuestion($questionId, $only_questions = false, $origin = false, $cu
         if (!$only_questions) {
             $questionDescription = $objQuestionTmp->selectDescription();
             if ($show_title) {
+                global $objExercise;
                 echo Testcategory::getCategoryNamesForQuestion($objQuestionTmp->id);
+                if (!empty($objExercise)) {
+                    if ($objExercise->get_count_question_list()) {
+                        $current_item = $current_item.'/'.$objExercise->get_count_question_list();
+                    }
+                }
+
                 echo Display::div($current_item.'. '.$objQuestionTmp->selectTitle(), array('class' => 'question_title'));
             }
             if (!empty($questionDescription)) {

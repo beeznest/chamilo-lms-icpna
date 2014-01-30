@@ -13,7 +13,8 @@
  * @package chamilo.learnpath
  */
 
-class learnpath {
+class learnpath
+{
 
     public $attempt = 0; // The number for the current ID view.
     public $cc; // Course (code) this learnpath is located in. @todo change name for something more comprensible ...
@@ -76,14 +77,6 @@ class learnpath {
     public $course_int_id;
     public $course_info = array();
 
-    public function get_course_int_id() {
-        return isset($this->course_int_id) ? $this->course_int_id : api_get_course_int_id();
-    }
-
-    public function set_course_int_id($course_id) {
-        return $this->course_int_id = intval($course_id);
-    }
-
     /**
      * Class constructor. Needs a database handler, a course code and a learnpath id from the database.
      * Also builds the list of items into $this->items.
@@ -94,9 +87,6 @@ class learnpath {
      */
     public function __construct($course, $lp_id, $user_id) {
         $this->encoding = api_get_system_encoding(); // Chamilo 1.8.8: We intend always to use the system encoding.
-        // Check course code.
-        $course_id = api_get_course_int_id();
-
         if ($this->debug > 0) { error_log('New LP - In learnpath::__construct('.$course.','.$lp_id.','.$user_id.')', 0); }
         if (empty($course)) {
             $this->error = 'Course code is empty';
@@ -108,7 +98,7 @@ class learnpath {
                 $this->course_info  = $course_info;
                 $course_id 	        = $course_info['real_id'];
             } else {
-                $this->error = 'Course code does not exist in database ('.$sql.')';
+                $this->error = 'Course code does not exist in database.';
                 return false;
             }
         }
@@ -386,8 +376,35 @@ class learnpath {
     }
 
     /**
-     * Function rewritten based on old_add_item() from Yannick Warnier. Due the fact that users can decide where the item should come, I had to overlook this function and
-     * I found it better to rewrite it. Old function is still available. Added also the possibility to add a description.
+     * @return string
+     */
+    public function getCourseCode()
+    {
+        return $this->cc;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_course_int_id()
+    {
+        return isset($this->course_int_id) ? $this->course_int_id : api_get_course_int_id();
+    }
+
+    /**
+     * @param $course_id
+     * @return int
+     */
+    public function set_course_int_id($course_id)
+    {
+        return $this->course_int_id = intval($course_id);
+    }
+
+    /**
+     * Function rewritten based on old_add_item() from Yannick Warnier.
+     * Due the fact that users can decide where the item should come, I had to overlook this function and
+     * I found it better to rewrite it. Old function is still available.
+     * Added also the possibility to add a description.
      *
      * @param int $parent
      * @param int $previous
@@ -1105,7 +1122,7 @@ class learnpath {
         $res_select = Database::query($sql_select);
         $row_select = Database :: fetch_array($res_select);
         $audio_update_sql = '';
-	if (is_array($audio) && !empty ($audio['tmp_name']) && $audio['error'] === 0) {
+        if (is_array($audio) && !empty ($audio['tmp_name']) && $audio['error'] === 0) {
             // Create the audio folder if it does not exist yet.
             global $_course;
             $filepath = api_get_path(SYS_COURSE_PATH) . $_course['path'] . '/document/';
@@ -1856,6 +1873,10 @@ class learnpath {
         $package_type = '';
         $at_root = false;
         $manifest = '';
+        $aicc_match_crs = 0;
+        $aicc_match_au = 0;
+        $aicc_match_des = 0;
+        $aicc_match_cst = 0;
 
         // The following loop should be stopped as soon as we found the right imsmanifest.xml (how to recognize it?).
         if (is_array($zipContentArray) && count($zipContentArray) > 0) {
@@ -1868,14 +1889,33 @@ class learnpath {
                     $package_type = 'scorm';
                     break; // Exit the foreach loop.
                 }
-                elseif (preg_match('/aicc\//i', $thisContent['filename'])) {
-                    // If found an aicc directory... (!= false means it cannot be false (error) or 0 (no match)).
-                    $package_type = 'aicc';
+                elseif (preg_match('/aicc\//i', $thisContent['filename'])  || in_array(strtolower(pathinfo($thisContent['filename'], PATHINFO_EXTENSION)), array( 'crs','au','des','cst'))) {
+                    $ext = strtolower(pathinfo($thisContent['filename'], PATHINFO_EXTENSION));
+                    switch ($ext) {
+                        case 'crs':
+                            $aicc_match_crs = 1;
+                            break;
+                        case 'au':
+                            $aicc_match_au = 1;
+                            break;
+                        case 'des':
+                            $aicc_match_des = 1;
+                            break;
+                        case 'cst':
+                            $aicc_match_cst = 1;
+                            break;
+                        default:
+                            break;
+                    }
                     //break; // Don't exit the loop, because if we find an imsmanifest afterwards, we want it, not the AICC.
                 } else {
                     $package_type = '';
                 }
             }
+        }
+        if (empty($package_type) && 4 == ($aicc_match_crs + $aicc_match_au + $aicc_match_des + $aicc_match_cst)) {
+                // If found an aicc directory... (!= false means it cannot be false (error) or 0 (no match)).
+                $package_type = 'aicc';
         }
         return $package_type;
     }
@@ -2010,15 +2050,16 @@ class learnpath {
      * Returns the HTML necessary to print a mediaplayer block inside a page
      * @return string	The mediaplayer HTML
      */
-    public function get_mediaplayer($autostart='true') {
+    public function get_mediaplayer($autostart = 'true')
+    {
         $course_id = api_get_course_int_id();
         global $_course;
         $tbl_lp_item 		= Database :: get_course_table(TABLE_LP_ITEM);
         $tbl_lp_item_view 	= Database :: get_course_table(TABLE_LP_ITEM_VIEW);
 
         // Getting all the information about the item.
-        $sql = "SELECT * FROM " . $tbl_lp_item . " as lp INNER  JOIN " . $tbl_lp_item_view . " as lp_view on lp.id = lp_view.lp_item_id " .
-                "WHERE  lp.id = '" . $_SESSION['oLP']->current . "' AND
+        $sql = "SELECT * FROM ".$tbl_lp_item." as lp INNER  JOIN ".$tbl_lp_item_view." as lp_view on lp.id = lp_view.lp_item_id ".
+                "WHERE  lp.id = '".$_SESSION['oLP']->current."' AND
                         lp.c_id = $course_id AND
                         lp_view.c_id = $course_id";
         $result = Database::query($sql);
@@ -2802,6 +2843,7 @@ class learnpath {
             $toc_list = $this->get_toc();
         }
         //$html = '<div id="scorm_title" class="scorm_title">'.Security::remove_XSS($this->get_name()) . '</div>';
+        $html = null;
 
         $hide_teacher_icons_lp = isset($_configuration['hide_teacher_icons_lp']) ? $_configuration['hide_teacher_icons_lp'] : true;
 
@@ -2837,7 +2879,7 @@ class learnpath {
                 'browsed'       => '../img/completed.png',
             );
 
-         // returns the type of classes by state Lesson                
+         // returns the type of classes by state Lesson
             $class_name = array (
                 'not attempted' => 'scorm-status-not-attempted',
                 'incomplete'    => 'scorm-status-not-attempted',
@@ -2912,7 +2954,7 @@ class learnpath {
                 //<img align="absbottom" width="13" height="13" src="../img/lp_document.png">&nbsp;background:#aaa;
                 $html .= '<a name="atoc_' . $item['id'] . '" href="" onClick="switch_item(' .$mycurrentitemid . ',' .$item['id'] . ');' .'return false;" >' . stripslashes($title) . '</a>';
             } elseif ($item['type'] == 'dokeos_module' || $item['type'] == 'dokeos_chapter') {
-                //$html .= "<img align='absbottom' width='13' height='13' src='../img/lp_dokeos_module.png'>&nbsp;" . 
+                //$html .= "<img align='absbottom' width='13' height='13' src='../img/lp_dokeos_module.png'>&nbsp;" .
                 $html .= stripslashes($title);
             } elseif ($item['type'] == 'dir') {
                 $html .= stripslashes($title);
@@ -3092,8 +3134,12 @@ class learnpath {
                                 $src  = get_youtube_video_id($file);
                                 $file = 'embed.php?type=youtube&src='.$src;
                             }
+                            if (isVimeoLink($file)) {
+                                $src  = getVimeoLinkId($file);
+                                $file = 'embed.php?type=vimeo&src='.$src;
+                            }
                         } else {
-                            // check how much attempts of a exercise exits in lp
+                            // Check how much attempts of a exercise exits in lp
                             $lp_item_id = $this->get_current_item_id();
                             $lp_view_id = $this->get_view_id();
 
@@ -4243,7 +4289,8 @@ class learnpath {
      * @param	 string	Optional string giving the new image of this learnpath
      * @return bool   Returns true if theme name is not empty
      */
-    public function set_preview_image($name = '') {
+    public function set_preview_image($name = '')
+    {
         $course_id = api_get_course_int_id();
         if ($this->debug > 0) {
             error_log('New LP - In learnpath::set_preview_image()', 0);
@@ -4256,7 +4303,7 @@ class learnpath {
         if ($this->debug > 2) {
             error_log('New LP - lp updated with new preview image : ' . $this->preview_image, 0);
         }
-        $res = Database::query($sql);
+        Database::query($sql);
         return true;
     }
 
@@ -4282,7 +4329,7 @@ class learnpath {
 	}
 	/**
 	* Sets the hide_toc_frame parameter of a LP (and save)
-	* @param	int	1 if frame is hiddent 0 thenelse
+	* @param	int	1 if frame is hidden 0 then else
 	* @return   bool    Returns true if author's name is not empty
 	*/
 	public function set_hide_toc_frame($hide) {
@@ -5392,7 +5439,8 @@ class learnpath {
      * This function builds the action menu
      * @return void
      */
-    public function build_action_menu() {
+    public function build_action_menu($returnContent = false)
+    {
         $is_allowed_to_edit = api_is_allowed_to_edit(null,true);
 
         $gradebook = isset($_GET['gradebook']) ? Security :: remove_XSS($_GET['gradebook']) : null;
@@ -5422,6 +5470,10 @@ class learnpath {
         );
         $return .= Display::group_button(get_lang('PrerequisitesOptions'), $buttons);
         $return .= '</div>';
+
+        if ($returnContent) {
+            return $return;
+        }
         echo $return;
     }
 
@@ -5989,15 +6041,20 @@ class learnpath {
         $arrLP = $this->arrMenu;
         unset ($this->arrMenu);
 
-        if ($action == 'add')
+        if ($action == 'add') {
             $legend .= get_lang('CreateTheExercise') . '&nbsp;:';
-        elseif ($action == 'move') $legend .= get_lang('MoveTheCurrentExercise') . '&nbsp;:';
-        else
+        } elseif ($action == 'move') {
+            $legend .= get_lang('MoveTheCurrentExercise') . '&nbsp;:';
+        } else {
             $legend .= get_lang('EditCurrentExecice') . '&nbsp;:';
+        }
+
         if (isset ($_GET['edit']) && $_GET['edit'] == 'true') {
             $legend .= Display :: return_warning_message(get_lang('Warning') . ' ! ' . get_lang('WarningEditingDocument'));
         }
+
         $legend .= '</legend>';
+        $return = '';
         $return .= '<div class="sectioncomment">';
 
         $return .= '<form method="POST">';
@@ -6016,6 +6073,7 @@ class learnpath {
         $return .= '<td class="label"><label for="idParent">' . get_lang('Parent') . '</label></td>';
         $return .= '<td class="input">';
 
+        // Select for Parent item, root or chapter
         $return .= '<select id="idParent" style="width:100%;" name="parent" onChange="javascript: load_cbo(this.value);" size="1">';
 
         $return .= '<option class="top" value="0">' . $this->name . '</option>';
@@ -8035,7 +8093,8 @@ class learnpath {
      */
     public function get_documents() {
     	$course_info = api_get_course_info();
-    	$document_tree = DocumentManager::get_document_preview($course_info, $this->lp_id, null, 0, true);
+        $sessionId = api_get_session_id();
+    	$document_tree = DocumentManager::get_document_preview($course_info, $this->lp_id, null, $sessionId, true);
     	return $document_tree;
     }
 

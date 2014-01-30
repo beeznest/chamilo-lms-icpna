@@ -2959,7 +2959,7 @@ class learnpath
             } elseif ($item['type'] == 'dir') {
                 $html .= stripslashes($title);
             }
-
+            /*
             $tbl_track_e_exercises = Database :: get_statistic_table(TABLE_STATISTIC_TRACK_E_EXERCICES);
             $tbl_lp_item = Database :: get_course_table(TABLE_LP_ITEM);
             $user_id = api_get_user_id();
@@ -2972,7 +2972,7 @@ class learnpath
                             path = exe_exo_id AND
                             status <> 'incomplete'";
             $result = Database::query($sql);
-            $count = Database :: num_rows($result);
+            $count = Database :: num_rows($result);*/
             /*
             if ($item['type'] == 'quiz') {
                 if ($item['status'] == 'completed') {

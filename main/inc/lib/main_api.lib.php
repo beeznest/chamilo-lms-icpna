@@ -1095,9 +1095,12 @@ function api_get_user_courses($userid, $fetch_session = true) {
  */
 function _api_format_user($user, $add_password = false) {
     $result = array();
-    if (api_is_anonymous()) {
+
+    // If user is anonymous we don't have anything to provide
+    if (isset($user['is_anonymous']) && $user['is_anonymous']) {
         return $user;
     }
+
     if (isset($user['firstname']) && isset($user['lastname'])) {
         $firstname = $user['firstname'];
         $lastname = $user['lastname'];

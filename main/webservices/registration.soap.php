@@ -2880,7 +2880,7 @@ function WSEditCourseDescription($params) {
         $res_check_id = Database::query($sql_check_id);
 
         if (Database::num_rows($res_check_id) > 0) {
-            $sql = "UPDATE $t_course_desc SET title='$course_desc_title', content = '$course_desc_content' 
+            $sql = "UPDATE $t_course_desc SET title='$course_desc_title', content = '$course_desc_content'
                     WHERE c_id = {$course_info['real_id']} AND id = '".$course_desc_id."'";
             Database::query($sql);
         } else {
@@ -3135,10 +3135,10 @@ function WSCreateSession($params) {
     foreach ($sessions_params as $session_param) {
 
         $name = trim($session_param['name']);
-        
+
         $access_start_date = $session_param['access_start_date'];
         $access_end_date = $session_param['access_end_date'];
-        
+
         /*
         $year_start = intval($session_param['year_start']);
         $month_start = intval($session_param['month_start']);
@@ -3162,7 +3162,7 @@ function WSCreateSession($params) {
             $results[] = 0;
             continue;
         }
-    
+
         if (empty($name)) {
             $results[] = 0;
             continue;
@@ -3189,9 +3189,9 @@ function WSCreateSession($params) {
                     'access_end_date' => $access_end_date,
                 );
                 $id_session = SessionManager::add($params);
-            
+
                 //Database::query("INSERT INTO $tbl_session(name,date_start,date_end,id_coach,session_admin_id, VALUES('".addslashes($name)."','$date_start','$date_end','$id_coach',".intval($_user['user_id']).",".$nb_days_acess_before.", ".$nb_days_acess_after.")");
-            
+
                 //$id_session = Database::insert_id();
 
                 // Save new fieldlabel into course_field table.
@@ -3875,6 +3875,67 @@ function WSGetUser($params) {
     }
     return $result;
 }
+
+/*   WSSendEmailByOriginalUserId    */
+
+$server->wsdl->addComplexType(
+    'SendEmailArg',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'original_user_id_value'      => array('name' => 'original_user_id_value', 'type' => 'xsd:string'),
+        'original_user_id_name'       => array('name' => 'original_user_id_name',  'type' => 'xsd:string'),
+        'secret_key'                  => array('name' => 'secret_key',             'type' => 'xsd:string'),
+        'subject'                     => array('name' => 'subject',                'type' => 'xsd:string'),
+        'message'                     => array('name' => 'message',                'type' => 'xsd:string')
+    )
+);
+
+// Register the method to expose
+$server->register('WSSendEmailByOriginalUserId',                   // method name
+    array('SendEmail' => 'tns:SendEmailArg'),       // input parameters
+    array('return' => 'xsd:string'),   // output parameters
+    'urn:WSRegistration',                        // namespace
+    'urn:WSRegistration#WSSendEmailByOriginalUserId',                // soapaction
+    'rpc',                                       // style
+    'encoded',                                   // use
+    'This sends an email based in the original_user_id_value'    // documentation
+);
+
+/**
+ * @param $params
+ * @return int 1 if message was sent 0 if not
+ */
+function WSSendEmailByOriginalUserId($params) {
+    global $debug;
+    $debug = true;
+
+    if ($debug) error_log('WSSendEmailByOriginalUserId');
+    if ($debug) error_log('$params: '.print_r($params, 1));
+
+    if (!WSHelperVerifyKey($params)) {
+        return return_error(WS_ERROR_SECRET_KEY);
+    }
+
+    // Get user id
+    $userId = UserManager::get_user_id_from_original_id($params['original_user_id_value'], $params['original_user_id_name']);
+
+    $result = 0;
+    if (!empty($userId)) {
+        $admins = UserManager::get_all_administrators();
+        $senderId = null;
+        if (!empty($admins)) {
+            $admin = current($admins);
+            $senderId = $admin['user_id'];
+        }
+        MessageManager::send_message_simple($userId, $params['subject'], $params['message'], $senderId);
+        $result = 1;
+    }
+    return $result;
+}
+
 
 /* Register WSUnsubscribeUserFromCourse function */
 // Register the data structures used by the service

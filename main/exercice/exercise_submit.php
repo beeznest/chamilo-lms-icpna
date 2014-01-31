@@ -1392,7 +1392,6 @@ function render_question($objExercise, $questionId, $attempt_list, $remind_list,
     echo '<div id="question_div_'.$questionId.'" class="main_question '.$remind_highlight.'" >';
 
         //Shows the question and possible answers
-
         showQuestion($questionId, false, $origin, $i, true, false, $user_choice, false);
 
         //Button save and continue

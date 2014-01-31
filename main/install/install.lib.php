@@ -2584,7 +2584,10 @@ function create_course_tables($course_db_name = null) {
         pass_percentage INT DEFAULT NULL,
         end_button int NOT NULL default 0,
         on_success_message longtext,
-        on_failed_message longtext
+        on_failed_message longtext,
+        email_notification_template longtext default '',
+        email_notification_template_to_user longtext default '',
+        notify_user_by_email int default 0
         PRIMARY KEY (c_id, id)
         )" . $charset_clause;
     Database::query($sql);

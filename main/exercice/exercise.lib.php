@@ -1444,17 +1444,6 @@ function show_score($score, $weight, $show_percentage = true, $use_platform_sett
     return $html;
 }
 
-function is_success_exercise_result($score, $weight, $pass_percentage)
-{
-    $percentage = float_format(($score / ($weight != 0 ? $weight : 1)) * 100, 1);
-    if (isset($pass_percentage) && !empty($pass_percentage)) {
-        if ($percentage >= $pass_percentage) {
-            return true;
-        }
-    }
-    return false;
-}
-
 function show_success_message($score, $weight, $pass_percentage)
 {
     $res = "";
@@ -2223,7 +2212,7 @@ function delete_chat_exercise_session($exe_id)
 
 /**
  * Display the exercise results
- * @param obj   Exercise exercise obj
+ * @param \Exercise   Exercise exercise obj
  * @param int   attempt id (exe_id)
  * @param bool  save users results (true) or just show the results (false)
  */
@@ -2284,6 +2273,8 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
     $question_list_answers = array();
     $media_list = array();
     $category_list = array();
+
+    $exerciseResultInfo = array();
 
     // Loop over all question to show results for each of them, one by one
     if (!empty($question_list)) {
@@ -2363,6 +2354,9 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
                 $score['comments'] = $comnt;
             }
 
+            $exerciseResultInfo[$questionId]['score'] = $score;
+            $exerciseResultInfo[$questionId]['details'] = $result;
+
             $contents = ob_get_clean();
 
             $question_content = '<div class="question_row">';
@@ -2423,11 +2417,30 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
         }
 
         // Send notification ..
-        if (!api_is_allowed_to_edit(null, true)) {
+        //if (!api_is_allowed_to_edit(null, true)) {
+            $isSuccess = is_success_exercise_result($total_score, $total_weight, $objExercise->selectPassPercentage());
+            $objExercise->sendCustomNotification($exe_id, $exerciseResultInfo, $isSuccess);
             $objExercise->send_notification_for_open_questions($question_list_answers, $origin, $exe_id);
             $objExercise->send_notification_for_oral_questions($question_list_answers, $origin, $exe_id);
+        //}
+    }
+}
+
+/**
+ * @param float $score
+ * @param float $weight
+ * @param bool $pass_percentage
+ * @return bool
+ */
+function is_success_exercise_result($score, $weight, $pass_percentage)
+{
+    $percentage = float_format(($score / ($weight != 0 ? $weight : 1)) * 100, 1);
+    if (isset($pass_percentage) && !empty($pass_percentage)) {
+        if ($percentage >= $pass_percentage) {
+            return true;
         }
     }
+    return false;
 }
 
 function get_question_ribbon($objExercise, $score, $weight, $check_pass_percentage = false)

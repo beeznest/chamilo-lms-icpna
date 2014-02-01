@@ -514,4 +514,15 @@ $NoNegativeScore = "No negative score";
 $GlobalMultipleAnswer = "Global multiple answer";
 $AllQuestionsShort = "All";
 $ProblemsRecordingUploadYourOwnAudioFile = "Problem recording? Upload your own audio file.";
-?>
+$MessageOnSuccess = "Message to be shown on finishing above pass percentage";
+$MessageOnFailed = "Message to be shown on finishing under pass percentage";
+$ExerciseEndButton = "Button at end of test";
+$ExerciseEndButtonCourseHome = "Send to course homepage";
+$ExerciseEndButtonExerciseHome = "Send to tests list";
+$ExerciseEndButtonDisconnect = "Logout";
+$ExerciseEndButtonNoButton = "No button at all";
+$EmailNotificationTemplateToTeacher = "Template of e-mail to be sent to the teacher";
+$EmailNotificationTemplateToTeacherDescription = "Define here the template for the e-mail that will be sent to the teacher when a learner finishes the test";
+$NotifyUserByEmail = "Send e-mail to learner";
+$EmailNotificationTemplateToUser = "Learner e-mail template";
+$EmailNotificationTemplateToUserDescription = "Define here the template for the e-mail that will be sent to the learner when (s)he finishes the test";

@@ -19,3 +19,4 @@ $ANewSessionWasCreated="Un programa académico ha sido creado";
 $CopyLabelSuffix="Copia";
 $StudentList="Lista de alumnos";
 $Inbox="Correos";
+$Welcome="Bienvenido/a";

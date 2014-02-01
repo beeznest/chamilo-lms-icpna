@@ -62,7 +62,7 @@ $social_left_content = SocialManager::show_social_menu('home');
 
 $social_right_content = '<div class="span5">';
 $social_right_content .= '<div class="well_border">';
-$social_right_content .= '<h3>'.get_lang('ContactInformation').'</h3>';
+$social_right_content .= '<h3>'.get_lang('Profile').'</h3>';
 
 $list = array(
                 array('title' => get_lang('Name'), 'content' => api_get_person_name($user_info['firstname'], $user_info['lastname'])),
@@ -103,9 +103,9 @@ $social_right_content .= '
     $social_right_content .= '</div>';
 
             //Search box
-			$social_right_content .= '<div class="span4">';
+			/*$social_right_content .= '<div class="span4">';
     			$social_right_content .= UserManager::get_search_form('');
-    			$social_right_content .= '<br />';
+    			$social_right_content .= '<br />';*/
 
     			//Group box by age
     			$results = GroupPortalManager::get_groups_by_age(1,false);

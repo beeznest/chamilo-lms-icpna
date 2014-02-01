@@ -5488,7 +5488,7 @@ $server->register('WSGetCourseFinalScore',		// method name
 /**
  * returns the results of the final exam for the given student, course and session
  * @param $params
- * @return array|null|soap_fault
+ * @return array|null|soap_fault Returns result as a pure integer percentage
  */
 function WSGetCourseFinalScore($params) {
 
@@ -5551,7 +5551,7 @@ function WSGetCourseFinalScore($params) {
     $qid = intval($row[0]);
 
     $tbl_res = Database::get_main_table(TABLE_STATISTIC_TRACK_E_EXERCICES);
-    $sql = "SELECT exe_result
+    $sql = "SELECT exe_result, exe_weighting
         FROM $tbl_res
         WHERE exe_exo_id = $qid
             AND exe_cours_id = $cid
@@ -5563,7 +5563,7 @@ function WSGetCourseFinalScore($params) {
         return array();
     }
     $row = Database::fetch_row($res);
-    $score = $row[0];
+    $score = round(($row[0]/$row[1])*100,0);
 
     $output = array();
     $output[] = array(

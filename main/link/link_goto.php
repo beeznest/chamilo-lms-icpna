@@ -22,6 +22,16 @@ require_once '../inc/global.inc.php';
 $this_section = SECTION_COURSES;
 
 $link_url = html_entity_decode(Security::remove_XSS($_GET['link_url']));
+$matches = array();
+$ref = preg_match('/\{\{(.*)?\}\}/', $link_url, $matches);
+if ($ref) {
+    $match = $matches[1];
+    if (substr($match, 0, 2) == 'u.') {
+        $field = substr($match, 2);
+        $value = UserManager::get_extra_user_data_by_field(api_get_user_id(), $field, null, true);
+        $link_url = preg_replace('/\{\{'.$match.'\}\}/', $value[$field], $link_url);
+    }
+}
 $link_id = intval($_GET['link_id']);
 
 // Launch event

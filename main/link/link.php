@@ -227,7 +227,10 @@ if (api_is_allowed_to_edit(null, true) && isset($_GET['action'])) {
 						<span class="form_required">*</span> URL
 					</label>
 					<div class="controls">
-						<input type="text" name="urllink" class="span6" value="' . (empty($urllink) ? 'http://' : Security::remove_XSS($urllink)) . '" />
+						<input type="text" name="urllink" class="span6" value="' . (empty($urllink) ? 'http://' : Security::remove_XSS($urllink)) . '" /><br />
+				    	<span class="help-block">
+						'.get_lang('LinksUseTagsForUserFields').'
+                        </span>
 					</div>
 				</div>';
 		echo '	<div class="control-group title">

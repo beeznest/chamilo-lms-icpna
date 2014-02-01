@@ -292,7 +292,7 @@ if (isset($_SESSION['status']) && $_SESSION['status'][$course_code] == 5) {
 $_SESSION['loaded_lp_view'] = true;
 
 $display_none = '';
-$margin_left = '257px';
+$margin_left = '270px';
 echo "
     <script>
     var marginLeftIni = '$margin_left'
@@ -364,7 +364,7 @@ echo '<div id="learning_path_main" style="width:100%;height:100%;">';
                 </tr>
             </table>
         </div>';
-    */ 
+    */
 ?>
         <!-- end header -->
 

@@ -1740,7 +1740,7 @@ class UserManager {
 
         // First check wether the login already exists
         if (self::is_extra_field_available($fieldvarname)) {
-            return api_set_failure('login-pass already taken');
+            return api_set_failure('extra field already exists');
         }
         $sql = "SELECT MAX(field_order) FROM $table_field";
         $res = Database::query($sql);

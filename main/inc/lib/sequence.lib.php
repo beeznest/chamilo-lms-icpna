@@ -1,18 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: dbarreto
- * Date: 07/01/14
- * Time: 08:33 AM
- */
 
-class Sequence {
-
-
-    /*
-     *
-     *
-     *
+class Sequence
+{
+    /**
+     * @param $row_entity_id
+     * @return array|bool
      */
     public static function get_pre_req_id_by_row_entity_id($row_entity_id) {
         $row_entity_id = intval(Database::escape_string($row_entity_id));
@@ -358,10 +350,10 @@ class Sequence {
         if ($row_id > 0 && $entity_id > 0 && $c_id > 0 && $session_id >= 0) {
             $row_table = Database::get_main_table(TABLE_SEQUENCE_ROW_ENTITY);
             $sql = "SELECT row.id FROM $row_table row WHERE
-            row.sequence_type_entity_id = $entity_id AND 
-            row.row_id = $row_id AND 
-            row.c_id = $c_id AND 
-            row.session_id = $session_id 
+            row.sequence_type_entity_id = $entity_id AND
+            row.row_id = $row_id AND
+            row.c_id = $c_id AND
+            row.session_id = $session_id
             LIMIT 0, 1";
             $result = Database::query($sql);
             if (Database::num_rows($result) > 0) {
@@ -408,7 +400,7 @@ class Sequence {
                                 $user_id = self::get_user_id_by_row_entity_id($exam_id);
                                 foreach ($user_id as $us_id) {
                                     self::temp_hack_4_set_aval($exam_id, $us_id, 0);
-                                }								
+                                }
                             }
                             return $id;
                         }
@@ -427,7 +419,7 @@ class Sequence {
                         foreach ($pre_req as $pr) {
                             $sql = "INSERT INTO $seq_table (sequence_row_entity_id, sequence_row_entity_id_next, is_part) VALUES
                             ($pr, $id, 0)";
-                            Database::query($sql);	
+                            Database::query($sql);
                         }
                         return $id;
                     }
@@ -690,7 +682,7 @@ class Sequence {
             $result_seq = Database::query($sql_seq);
             $arr_seq = Database::fetch_array($result_seq);
             if (intval($arr_seq['available']) === 1) {
-                if (intval($arr_seq[success]) === 1) {
+                if (intval($arr_seq['success']) === 1) {
                     return "completed";
                 } else {
                     return "process";

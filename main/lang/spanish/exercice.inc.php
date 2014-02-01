@@ -514,4 +514,15 @@ $NoNegativeScore = "Sin puntos negativos";
 $GlobalMultipleAnswer = "Respuesta múltiple global";
 $AllQuestionsShort = "Todas";
 $ProblemsRecordingUploadYourOwnAudioFile = "Tiene problemas para grabar? Mande su propio fichero audio.";
-?>
+$MessageOnSuccess = "Mensaje al alcanzar el puntaje mínimo";
+$MessageOnFailed = "Mensaje al no alcanzar el puntaje mínimo";
+$ExerciseEndButton = "Botón de fin del ejercicio";
+$ExerciseEndButtonCourseHome = "Enviar a la página principal del curso";
+$ExerciseEndButtonExerciseHome = "Enviar a la página de ejercicios";
+$ExerciseEndButtonDisconnect = "Desconectar";
+$ExerciseEndButtonNoButton = "No mostrar ningun botón";
+$EmailNotificationTemplateToTeacher = "Plantilla de correo para el profesor";
+$EmailNotificationTemplateToTeacherDescription = "Puede definir una plantilla de correo por ser enviado al profesor cuando un alumno termine el ejercicio";
+$NotifyUserByEmail = "Mandar un correo al alumno cuando termine el ejercicio";
+$EmailNotificationTemplateToUser = "Plantilla de correo para el alumno";
+$EmailNotificationTemplateToUserDescription = "Puede definir una plantilla de correo por ser enviado al alumno cuando termine el ejercicio";

@@ -10,7 +10,7 @@ require_once $libpath.'fileManage.lib.php';
 require_once $libpath.'fileUpload.lib.php';
 require_once api_get_path(INCLUDE_PATH).'lib/mail.lib.inc.php';
 
-$debug = false;
+$debug = true;
 
 define('WS_ERROR_SECRET_KEY', 1);
 
@@ -65,6 +65,8 @@ function WSHelperVerifyKey($params) {
     } else {
         $security_key = $ip.$_configuration['security_key'];
     }
+    if ($debug)
+        error_log('Security key before sha1: '.$security_key);
 
     $result = api_is_valid_secret_key($secret_key, $security_key);
     if ($debug)
@@ -2878,7 +2880,7 @@ function WSEditCourseDescription($params) {
         $res_check_id = Database::query($sql_check_id);
 
         if (Database::num_rows($res_check_id) > 0) {
-            $sql = "UPDATE $t_course_desc SET title='$course_desc_title', content = '$course_desc_content' 
+            $sql = "UPDATE $t_course_desc SET title='$course_desc_title', content = '$course_desc_content'
                     WHERE c_id = {$course_info['real_id']} AND id = '".$course_desc_id."'";
             Database::query($sql);
         } else {
@@ -3133,10 +3135,10 @@ function WSCreateSession($params) {
     foreach ($sessions_params as $session_param) {
 
         $name = trim($session_param['name']);
-        
+
         $access_start_date = $session_param['access_start_date'];
         $access_end_date = $session_param['access_end_date'];
-        
+
         /*
         $year_start = intval($session_param['year_start']);
         $month_start = intval($session_param['month_start']);
@@ -3160,7 +3162,7 @@ function WSCreateSession($params) {
             $results[] = 0;
             continue;
         }
-    
+
         if (empty($name)) {
             $results[] = 0;
             continue;
@@ -3174,7 +3176,7 @@ function WSCreateSession($params) {
             $results[] = 0;
             continue;*/
         } else {
-            $rs = Database::query("SELECT 1 FROM $tbl_session WHERE name='".Datanbase::escape_string($name)."'");
+            $rs = Database::query("SELECT 1 FROM $tbl_session WHERE name='".Database::escape_string($name)."'");
             if (Database::num_rows($rs)) {
                 $results[] = 0;
                 continue;
@@ -3187,9 +3189,9 @@ function WSCreateSession($params) {
                     'access_end_date' => $access_end_date,
                 );
                 $id_session = SessionManager::add($params);
-            
+
                 //Database::query("INSERT INTO $tbl_session(name,date_start,date_end,id_coach,session_admin_id, VALUES('".addslashes($name)."','$date_start','$date_end','$id_coach',".intval($_user['user_id']).",".$nb_days_acess_before.", ".$nb_days_acess_after.")");
-            
+
                 //$id_session = Database::insert_id();
 
                 // Save new fieldlabel into course_field table.
@@ -3873,6 +3875,67 @@ function WSGetUser($params) {
     }
     return $result;
 }
+
+/*   WSSendEmailByOriginalUserId    */
+
+$server->wsdl->addComplexType(
+    'SendEmailArg',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'original_user_id_value'      => array('name' => 'original_user_id_value', 'type' => 'xsd:string'),
+        'original_user_id_name'       => array('name' => 'original_user_id_name',  'type' => 'xsd:string'),
+        'secret_key'                  => array('name' => 'secret_key',             'type' => 'xsd:string'),
+        'subject'                     => array('name' => 'subject',                'type' => 'xsd:string'),
+        'message'                     => array('name' => 'message',                'type' => 'xsd:string')
+    )
+);
+
+// Register the method to expose
+$server->register('WSSendEmailByOriginalUserId',                   // method name
+    array('SendEmail' => 'tns:SendEmailArg'),       // input parameters
+    array('return' => 'xsd:string'),   // output parameters
+    'urn:WSRegistration',                        // namespace
+    'urn:WSRegistration#WSSendEmailByOriginalUserId',                // soapaction
+    'rpc',                                       // style
+    'encoded',                                   // use
+    'This sends an email based in the original_user_id_value'    // documentation
+);
+
+/**
+ * @param $params
+ * @return int 1 if message was sent 0 if not
+ */
+function WSSendEmailByOriginalUserId($params) {
+    global $debug;
+    $debug = true;
+
+    if ($debug) error_log('WSSendEmailByOriginalUserId');
+    if ($debug) error_log('$params: '.print_r($params, 1));
+
+    if (!WSHelperVerifyKey($params)) {
+        return return_error(WS_ERROR_SECRET_KEY);
+    }
+
+    // Get user id
+    $userId = UserManager::get_user_id_from_original_id($params['original_user_id_value'], $params['original_user_id_name']);
+
+    $result = 0;
+    if (!empty($userId)) {
+        $admins = UserManager::get_all_administrators();
+        $senderId = null;
+        if (!empty($admins)) {
+            $admin = current($admins);
+            $senderId = $admin['user_id'];
+        }
+        MessageManager::send_message_simple($userId, $params['subject'], $params['message'], $senderId);
+        $result = 1;
+    }
+    return $result;
+}
+
 
 /* Register WSUnsubscribeUserFromCourse function */
 // Register the data structures used by the service
@@ -5063,6 +5126,451 @@ function WSUpdateUserApiKey($params) {
         }
     }
     return $apikey;
+}
+
+/* Register WSEditSessionDates function */
+// Register the data structures used by the service
+$server->wsdl->addComplexType(
+    'editSessionDatesParams',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'year_start' => array('name' => 'year_start', 'type' => 'xsd:string'),
+        'month_start' => array('name' => 'month_start', 'type' => 'xsd:string'),
+        'day_start' => array('name' => 'day_start', 'type' => 'xsd:string'),
+        'year_end' => array('name' => 'year_end', 'type' => 'xsd:string'),
+        'month_end' => array('name' => 'month_end', 'type' => 'xsd:string'),
+        'day_end' => array('name' => 'day_end', 'type' => 'xsd:string'),
+        'original_session_id_name' => array('name' => 'original_session_id_name', 'type' => 'xsd:string'),
+        'original_session_id_value' => array('name' => 'original_session_id_value', 'type' => 'xsd:string'),
+    )
+);
+
+$server->wsdl->addComplexType(
+    'editSessionDatesParamsList',
+    'complexType',
+    'array',
+    '',
+    'SOAP-ENC:Array',
+    array(),
+    array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:editSessionDatesParams[]')),
+    'tns:editSessionDatesParams'
+);
+
+$server->wsdl->addComplexType(
+    'editSessionDates',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'sessions' => array('name' => 'sessions', 'type' => 'tns:editSessionDatesParamsList'),
+        'secret_key' => array('name' => 'secret_key', 'type' => 'xsd:string')
+    )
+);
+
+// Prepare output params, in this case will return an array
+$server->wsdl->addComplexType(
+    'result_editSessionDates',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'original_session_id_value' => array('name' => 'original_session_id_value', 'type' => 'xsd:string'),
+        'result' => array('name' => 'result', 'type' => 'xsd:string')
+    )
+);
+
+$server->wsdl->addComplexType(
+    'results_editSessionDates',
+    'complexType',
+    'array',
+    '',
+    'SOAP-ENC:Array',
+    array(),
+    array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:result_editSessionDates[]')),
+    'tns:result_editSessionDates'
+);
+
+
+// Register the method to expose
+$server->register('WSEditSessionDates',		// method name
+    array('editSessionDates' => 'tns:editSessionDates'),	// input parameters
+    array('return' => 'tns:results_editSessionDates'),				// output parameters
+    'urn:WSRegistration',						// namespace
+    'urn:WSRegistration#WSEditSessionDates',	// soapaction
+    'rpc',										// style
+    'encoded',									// use
+    'This service edits a session\'s start and end dates'				// documentation
+);
+
+// define the method WSEditSessionDates
+/**
+ * Updates the dates for a session (or group of sessions)
+ * This function does not allow setting to null (for now)
+ * @param $params
+ * @return array|null|soap_fault
+ */
+function WSEditSessionDates($params) {
+
+    global $_user;
+
+    if(!WSHelperVerifyKey($params)) {
+        return return_error(WS_ERROR_SECRET_KEY);
+    }
+
+    $tbl_user		= Database::get_main_table(TABLE_MAIN_USER);
+    $tbl_session	= Database::get_main_table(TABLE_MAIN_SESSION);
+    $t_sf = Database::get_main_table(TABLE_MAIN_SESSION_FIELD);
+    $t_sfv = Database::get_main_table(TABLE_MAIN_SESSION_FIELD_VALUES);
+
+    $sessions_params = $params['sessions'];
+    $results = array();
+    $orig_session_id_value = array();
+
+    foreach ($sessions_params as $session_param) {
+
+        $year_start = intval($session_param['year_start']);
+        $month_start = intval($session_param['month_start']);
+        $day_start = intval($session_param['day_start']);
+        $year_end = intval($session_param['year_end']);
+        $month_end = intval($session_param['month_end']);
+        $day_end = intval($session_param['day_end']);
+        $original_session_id_value = $session_param['original_session_id_value'];
+        $original_session_id_name = $session_param['original_session_id_name'];
+        $orig_session_id_value[] = $original_session_id_value;
+
+        // Get session id from original session id
+        $sql = "SELECT session_id FROM $t_sf sf,$t_sfv sfv WHERE sfv.field_id=sf.id AND field_variable='$original_session_id_name' AND field_value='$original_session_id_value'";
+        $res = Database::query($sql);
+        $row = Database::fetch_row($res);
+
+        $id = intval($row[0]);
+
+        if (Database::num_rows($res) < 1) {
+            $results[] = 0;
+            continue;
+        }
+
+        $update_start = true;
+        if (empty($year_start) && empty($month_start) && empty ($day_start)) {
+            //There is no change in the start date
+            $update_start = false;
+        } elseif (empty($year_start) || empty($month_start) || empty($day_start)) {
+            $update_start = false;
+            $results[] = 0; //InvalidStartDate
+            continue;
+        } elseif (!checkdate($month_start, $day_start, $year_start)) {
+            $update_start = false;
+            $results[] = 0; //InvalidStartDate
+            continue;
+        } else {
+            $date_start="$year_start-".(($month_start < 10)?"0$month_start":$month_start)."-".(($day_start < 10)?"0$day_start":$day_start);
+        }
+
+        $update_end = true;
+        if (empty($year_end) && empty($month_end) && empty ($day_end)) {
+            //There is no change in the start date
+            $update_end = false;
+        } elseif (empty($year_end) || empty($month_end) || empty($day_end)) {
+            $update_end = false;
+            $results[] = 0; //InvalidEndDate
+            continue;
+        } elseif (!checkdate($month_end, $day_end, $year_end)) {
+            $update_end = false;
+            $results[] = 0; //InvalidEndDate
+            continue;
+        } else {
+            $date_end="$year_end-".(($month_end < 10)?"0$month_end":$month_end)."-".(($day_end < 10)?"0$day_end":$day_end);
+        }
+        // Here we assume that, if the
+        if ($update_start && $update_end && $date_start >= $date_end) {
+            $results[] = 0; //StartDateShouldBeBeforeEndDate
+            continue;
+        } elseif (!$update_start && !$update_end) {
+            $results[] = 0; //NoStartNorEndDatesDefined
+            continue;
+        } else {
+            $sql = "UPDATE $tbl_session SET " .
+                ($update_start ? "date_start='".$date_start."', " : '').
+                ($update_end ? "date_end='".$date_end."' " : '') .
+                " WHERE id='".$id."'";
+            $id_session = Database::insert_id();
+            $results[] = $id_session;
+        }
+
+    } // end main foreach
+
+    $count_results = count($results);
+    $output = array();
+    for($i = 0; $i < $count_results; $i++) {
+        $output[] = array('original_session_id_value' => $orig_session_id_value[$i], 'result' => $results[$i]);
+    }
+    return $output;
+}
+
+/* Register WSExpireSessions function */
+// Register the data structures used by the service
+$server->wsdl->addComplexType(
+    'expireSessionsParams',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'original_session_id_name' => array('name' => 'original_session_id_name', 'type' => 'xsd:string'),
+        'original_session_id_value' => array('name' => 'original_session_id_value', 'type' => 'xsd:string'),
+    )
+);
+
+$server->wsdl->addComplexType(
+    'expireSessionsParamsList',
+    'complexType',
+    'array',
+    '',
+    'SOAP-ENC:Array',
+    array(),
+    array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:expireSessionsParams[]')),
+    'tns:expireSessionsParams'
+);
+
+$server->wsdl->addComplexType(
+    'expireSessions',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'sessions' => array('name' => 'sessions', 'type' => 'tns:expireSessionsParamsList'),
+        'secret_key' => array('name' => 'secret_key', 'type' => 'xsd:string')
+    )
+);
+
+// Prepare output params, in this case will return an array
+$server->wsdl->addComplexType(
+    'result_expireSessions',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'original_session_id_value' => array('name' => 'original_session_id_value', 'type' => 'xsd:string'),
+        'result' => array('name' => 'result', 'type' => 'xsd:string')
+    )
+);
+
+$server->wsdl->addComplexType(
+    'results_expireSessions',
+    'complexType',
+    'array',
+    '',
+    'SOAP-ENC:Array',
+    array(),
+    array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:result_expireSessions[]')),
+    'tns:result_expireSessions'
+);
+
+
+// Register the method to expose
+$server->register('WSExpireSessions',		// method name
+    array('expireSessions' => 'tns:expireSessions'),	// input parameters
+    array('return' => 'tns:results_expireSessions'),				// output parameters
+    'urn:WSRegistration',						// namespace
+    'urn:WSRegistration#WSExpireSessions',	// soapaction
+    'rpc',										// style
+    'encoded',									// use
+    'This service expires sessions by setting their end date to *now*'				// documentation
+);
+
+// define the method WSExpireSessions
+/**
+ * Updates the end date for a session (or group of sessions)
+ * This function does not allow setting to null (for now)
+ * @param $params
+ * @return array|null|soap_fault
+ */
+function WSExpireSessions($params) {
+
+    global $_user;
+
+    if(!WSHelperVerifyKey($params)) {
+        return return_error(WS_ERROR_SECRET_KEY);
+    }
+
+    $tbl_user		= Database::get_main_table(TABLE_MAIN_USER);
+    $tbl_session	= Database::get_main_table(TABLE_MAIN_SESSION);
+    $t_sf = Database::get_main_table(TABLE_MAIN_SESSION_FIELD);
+    $t_sfv = Database::get_main_table(TABLE_MAIN_SESSION_FIELD_VALUES);
+
+    $sessions_params = $params['sessions'];
+    $results = array();
+    $orig_session_id_value = array();
+
+    foreach ($sessions_params as $session_param) {
+
+        $original_session_id_value = $session_param['original_session_id_value'];
+        $original_session_id_name = $session_param['original_session_id_name'];
+
+        // Get session id from original session id
+        $sql = "SELECT session_id FROM $t_sf sf,$t_sfv sfv WHERE sfv.field_id=sf.id AND field_variable='$original_session_id_name' AND field_value='$original_session_id_value'";
+        $res = Database::query($sql);
+        $row = Database::fetch_row($res);
+
+        $id = intval($row[0]);
+
+        if (Database::num_rows($res) < 1) {
+            $results[] = 0;
+            continue;
+        }
+        $date_end = api_get_utc_datetime();
+        $sql = "UPDATE $tbl_session SET " .
+            " date_end='".$date_end."' " .
+            " WHERE id='".$id."'";
+        $id_session = Database::insert_id();
+        $results[] = $id_session;
+    } // end main foreach
+
+    $count_results = count($results);
+    $output = array();
+    for($i = 0; $i < $count_results; $i++) {
+        $output[] = array('original_session_id_value' => $orig_session_id_value[$i], 'result' => $results[$i]);
+    }
+    return $output;
+}
+
+/* Register WSGetCourseFinalScore function */
+// Register the data structures used by the service
+$server->wsdl->addComplexType(
+    'getCourseFinalScore',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'secret_key' => array('name' => 'secret_key', 'type' => 'xsd:string'),
+        'original_user_id_name' => array('name' => 'original_user_id_name', 'type' => 'xsd:string'),
+        'original_user_id_value' => array('name' => 'original_user_id_value', 'type' => 'xsd:string'),
+        'original_course_id_name' => array('name' => 'original_course_id_name', 'type' => 'xsd:string'),
+        'original_course_id_value' => array('name' => 'original_course_id_value', 'type' => 'xsd:string'),
+        'original_session_id_name' => array('name' => 'original_session_id_name', 'type' => 'xsd:string'),
+        'original_session_id_value' => array('name' => 'original_session_id_value', 'type' => 'xsd:string'),
+    )
+);
+
+// Prepare output params, in this case will return an array
+$server->wsdl->addComplexType(
+    'result_getCourseFinalScore',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'original_session_id_value' => array('name' => 'original_session_id_value', 'type' => 'xsd:string'),
+        'result' => array('name' => 'result', 'type' => 'xsd:string')
+    )
+);
+
+// Register the method to expose
+$server->register('WSGetCourseFinalScore',		// method name
+    array('getCourseFinalScore' => 'tns:getCourseFinalScore'),	// input parameters
+    array('return' => 'tns:result_getCourseFinalScore'),				// output parameters
+    'urn:WSRegistration',						// namespace
+    'urn:WSRegistration#WSGetCourseFinalScore',	// soapaction
+    'rpc',										// style
+    'encoded',									// use
+    'This service returns the results of the final exam for the given student, course and session'				// documentation
+);
+
+// define the method WSGetCourseFinalScore
+/**
+ * returns the results of the final exam for the given student, course and session
+ * @param $params
+ * @return array|null|soap_fault
+ */
+function WSGetCourseFinalScore($params) {
+
+    global $_user;
+
+    if(!WSHelperVerifyKey($params)) {
+        return return_error(WS_ERROR_SECRET_KEY);
+    }
+
+    $tbl_user       = Database::get_main_table(TABLE_MAIN_USER);
+    $t_uf = Database::get_main_table(TABLE_MAIN_USER_FIELD);
+    $t_ufv = Database::get_main_table(TABLE_MAIN_USER_FIELD_VALUES);
+    $tbl_course    = Database::get_main_table(TABLE_MAIN_COURSE);
+    $t_cf = Database::get_main_table(TABLE_MAIN_COURSE_FIELD);
+    $t_cfv = Database::get_main_table(TABLE_MAIN_COURSE_FIELD_VALUES);
+    $tbl_session    = Database::get_main_table(TABLE_MAIN_SESSION);
+    $t_sf = Database::get_main_table(TABLE_MAIN_SESSION_FIELD);
+    $t_sfv = Database::get_main_table(TABLE_MAIN_SESSION_FIELD_VALUES);
+
+
+    $original_user_id_value = $params['original_user_id_value'];
+    $original_user_id_name = $params['original_user_id_name'];
+    $original_course_id_value = $params['original_course_id_value'];
+    $original_course_id_name = $params['original_course_id_name'];
+    $original_session_id_value = $params['original_session_id_value'];
+    $original_session_id_name = $params['original_session_id_name'];
+
+    // Get user id from original user id
+    $sql = "SELECT user_id FROM $t_uf uf,$t_ufv ufv WHERE ufv.field_id=uf.id AND field_variable='$original_user_id_name' AND field_value='$original_user_id_value' LIMIT 1";
+    $res = Database::query($sql);
+    $row = Database::fetch_row($res);
+    $uid = intval($row[0]);
+    // Get session id from original session id
+    $sql = "SELECT course_code FROM $t_cf cf,$t_cfv cfv WHERE cfv.field_id=cf.id AND field_variable='$original_course_id_name' AND field_value='$original_course_id_value' LIMIT 1";
+    $res = Database::query($sql);
+    $row = Database::fetch_row($res);
+    $ccode = $row[0];
+    $sql = "SELECT id FROM $tbl_course WHERE code = '$ccode'";
+    $res = Database::query($sql);
+    $row = Database::fetch_row($res);
+    $cid = $row[0];
+    // Get session id from original session id
+    $sql = "SELECT session_id FROM $t_sf sf,$t_sfv sfv WHERE sfv.field_id=sf.id AND field_variable='$original_session_id_name' AND field_value='$original_session_id_value' LIMIT 1";
+    $res = Database::query($sql);
+    $row = Database::fetch_row($res);
+    $sid = intval($row[0]);
+
+    if (empty($uid) or empty($cid)) {
+        return array();
+    }
+
+    $tbl_quiz = Database::get_course_table(TABLE_QUIZ_TEST);
+    $exam_names = "'final exam', 'examen final'";
+    $sql = "SELECT id FROM $tbl_quiz WHERE c_id = $cid AND LOWER(title) IN ($exam_names) ORDER BY id LIMIT 1";
+    $res = Database::query($sql);
+    if (Database::num_rows($res) < 1) {
+        return array();
+    }
+    $row = Database::fetch_row($res);
+    $qid = intval($row[0]);
+
+    $tbl_res = Database::get_main_table(TABLE_STATISTIC_TRACK_E_EXERCICES);
+    $sql = "SELECT exe_result
+        FROM $tbl_res
+        WHERE exe_exo_id = $qid
+            AND exe_cours_id = $cid
+            AND session_id = $sid
+        ORDER BY start_date
+        DESC LIMIT 1";
+    $res = Database::query($sql);
+    if (Database::num_rows($res) < 1) {
+        return array();
+    }
+    $row = Database::fetch_row($res);
+    $score = $row[0];
+
+    $output = array();
+    $output[] = array(
+        'original_session_id_value' => $params['original_session_id_value'],
+        'result' => $score,
+    );
+    return $output;
 }
 
 // Use the request to (try to) invoke the service

@@ -1158,6 +1158,7 @@ class CourseRestorer
                         'propagate_neg' => $quiz->propagate_neg,
                         'text_when_finished' => $quiz->text_when_finished,
                         'expired_time' => (int) $quiz->expired_time,
+                        'end_button' => (int)$quiz->end_button
                     );
 
                     if ($respect_base_content) {

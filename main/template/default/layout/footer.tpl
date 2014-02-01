@@ -1,13 +1,13 @@
-<footer> <!-- start of #footer section -->	    
+<footer> <!-- start of #footer section -->
     <div class="container">
-            <div class="row"> 
+            <div class="row">
            <!--  Start Logotipo -->
             <div id="footer-one" class="span6 padding-footer">
                 {# logo #}
                 {{ logo }}
             </div>
-           <!--  End Logotipo  --> 
-           <!--  Sobre Vlearning -->      
+           <!--  End Logotipo  -->
+           <!--  Sobre Vlearning -->
             <div id="footer_two" class="span3">
 
             <h1 class="title">Sobre V Learning</h1>
@@ -16,11 +16,11 @@
                 <li><a href="#">Nuestro Equipo</a></li>
                 <li><a href="#">Ayuda</a></li>
             </ul>
-                         
+
             </div>
             <!--  End Sobre Vlearning -->
             <!--  Start Prensa -->
-            
+
             <div id="footer_tree" class="span2">
                  <h1 class="title">Prensa</h1>
                     <ul class="listen">
@@ -31,16 +31,16 @@
             </div>
             <!--  End Prensa -->
             <!--  Start contactenos -->
-            <div id="footer_four" class="span1"> 
+            <div id="footer_four" class="span1">
 
-                    
+
             </div><!-- end contactenos -->
-        </div><!-- end of #row --> 
+        </div><!-- end of #row -->
         <div class="row line">
             <div class="span3"><a href="#">Terminos del Servicio</a></div>
-            <div class="span3"><a href="#">Politica de Privacidad</a></div> 
-            <div class="span6"><a href="#">Mapa del Sitio</a></div>           
-        </div>       
+            <div class="span3"><a href="#">Politica de Privacidad</a></div>
+            <div class="span6"><a href="#">Mapa del Sitio</a></div>
+        </div>
     </div><!-- end of #container -->
 </footer>
 
@@ -50,33 +50,61 @@
 <script>
 /* Makes row highlighting possible */
 $(document).ready( function() {
+
+    /**
+     * Advanced options
+     * Usage
+     * <a id="link" href="url">Advanced</a>
+     * <div id="link_options" style="display:none">
+     *     hidden content :)
+     * </div>
+     * */
+
+    $(".advanced_options").on("click", function() {
+        var id = $(this).attr('id') + '_options';
+        var button = $(this);
+        $("#"+id).toggle(function() {
+            button.toggleClass('active');
+        });
+    });
+
+    $(".advanced_options_open").on("click", function() {
+        var id = $(this).attr('rel');
+        $("#"+id).show();
+    });
+
+    $(".advanced_options_close").on("click", function() {
+        var id = $(this).attr('rel');
+        $("#"+id).hide();
+    });
+
     //Chosen select
-    $(".chzn-select").chosen();     
-    
+    $(".chzn-select").chosen();
+
     //Table highlight
     $("form .data_table input:checkbox").click(function() {
         if ($(this).is(":checked")) {
             $(this).parentsUntil("tr").parent().addClass("row_selected");
-                        
+
         } else {
             $(this).parentsUntil("tr").parent().removeClass("row_selected");
-        }    
+        }
     });
-    
+
     /* For non HTML5 browsers */
     if ($("#formLogin".length > 1)) {
         $("input[name=login]").focus();
     }
-    
+
     /* For IOS users */
     $('.autocapitalize_off').attr('autocapitalize', 'off');
-    
+
     //Tool tip (in exercises)
     var tip_options = {
         placement : 'right'
     }
     $('.boot-tooltip').tooltip(tip_options);
-   
+
 });
 </script>
 {% endraw %}

@@ -73,6 +73,6 @@ if ($show_headers) {
 	Display::display_reduced_header();
 }
 
-display_question_list_by_attempt($objExercise, $id, false);
+display_question_list_by_attempt($objExercise, $id, false, true);
 
 Display::display_footer();

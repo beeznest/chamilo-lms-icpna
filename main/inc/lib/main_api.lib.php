@@ -834,13 +834,17 @@ function api_remove_trailing_slash($path) {
  * Checks the RFC 3986 syntax of a given URL.
  * @param string $url       The URL to be checked.
  * @param bool $absolute    Whether the URL is absolute (beginning with a scheme such as "http:").
+ * @param bool $allowTags   Whether to allow special Chamilo tags of the {{tag}} form
  * @return bool             Returns the URL if it is valid, FALSE otherwise.
  * This function is an adaptation from the function valid_url(), Drupal CMS.
  * @link http://drupal.org
  * Note: The built-in function filter_var($urs, FILTER_VALIDATE_URL) has a bug for some versions of PHP.
  * @link http://bugs.php.net/51192
  */
-function api_valid_url($url, $absolute = false) {
+function api_valid_url($url, $absolute = false, $allowTags = false) {
+    if ($allowTags) {
+        $url = preg_replace('/\{\{(.*)?\}\}/','',$url);
+    }
     if ($absolute) {
         if (preg_match("
             /^                                                      # Start at the beginning of the text
@@ -1091,9 +1095,12 @@ function api_get_user_courses($userid, $fetch_session = true) {
  */
 function _api_format_user($user, $add_password = false) {
     $result = array();
-    if (api_is_anonymous()) {
+
+    // If user is anonymous we don't have anything to provide
+    if (isset($user['is_anonymous']) && $user['is_anonymous']) {
         return $user;
     }
+
     if (isset($user['firstname']) && isset($user['lastname'])) {
         $firstname = $user['firstname'];
         $lastname = $user['lastname'];
@@ -2988,7 +2995,7 @@ function api_not_found($print_headers = false) {
  * @version dokeos 1.8, August 2006
  */
 function api_not_allowed($print_headers = false, $message = null) {
-    global $app;
+    global $app, $extAuthSource;
     if (api_get_setting('sso_authentication') === 'true') {
         global $osso;
         if ($osso) {
@@ -2996,7 +3003,8 @@ function api_not_allowed($print_headers = false, $message = null) {
         }
     }
     Header::response_code(403);
-    $home_url   = api_get_path(WEB_PATH);
+
+    $home_url   = isset($extAuthSource['login_link']) ? $extAuthSource['login_link'] : api_get_path(WEB_PATH);
     $user_id    = api_get_user_id();
     $course     = api_get_course_id();
 

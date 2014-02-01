@@ -50,7 +50,14 @@ function showQuestion($questionId, $only_questions = false, $origin = false, $cu
         if (!$only_questions) {
             $questionDescription = $objQuestionTmp->selectDescription();
             if ($show_title) {
+                global $objExercise;
                 echo Testcategory::getCategoryNamesForQuestion($objQuestionTmp->id);
+                if (!empty($objExercise)) {
+                    if ($objExercise->get_count_question_list()) {
+                        $current_item = $current_item.'/'.$objExercise->get_count_question_list();
+                    }
+                }
+
                 echo Display::div($current_item.'. '.$objQuestionTmp->selectTitle(), array('class' => 'question_title'));
             }
             if (!empty($questionDescription)) {
@@ -1437,17 +1444,6 @@ function show_score($score, $weight, $show_percentage = true, $use_platform_sett
     return $html;
 }
 
-function is_success_exercise_result($score, $weight, $pass_percentage)
-{
-    $percentage = float_format(($score / ($weight != 0 ? $weight : 1)) * 100, 1);
-    if (isset($pass_percentage) && !empty($pass_percentage)) {
-        if ($percentage >= $pass_percentage) {
-            return true;
-        }
-    }
-    return false;
-}
-
 function show_success_message($score, $weight, $pass_percentage)
 {
     $res = "";
@@ -2216,11 +2212,11 @@ function delete_chat_exercise_session($exe_id)
 
 /**
  * Display the exercise results
- * @param obj   exercise obj
+ * @param \Exercise   Exercise exercise obj
  * @param int   attempt id (exe_id)
  * @param bool  save users results (true) or just show the results (false)
  */
-function display_question_list_by_attempt($objExercise, $exe_id, $save_user_result = false)
+function display_question_list_by_attempt($objExercise, $exe_id, $save_user_result = false, $hideDescription = false)
 {
     global $origin, $debug;
 
@@ -2260,7 +2256,11 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
     if ($show_results || $show_only_score) {
         $user_info = api_get_user_info($exercise_stat_info['exe_user_id']);
         //Shows exercise header
-        echo $objExercise->show_exercise_result_header($user_info['complete_name'], api_convert_and_format_date($exercise_stat_info['start_date'], DATE_TIME_FORMAT_LONG), $exercise_stat_info['duration']);
+        echo $objExercise->show_exercise_result_header(
+            $user_info['complete_name'],
+            api_convert_and_format_date($exercise_stat_info['start_date'], DATE_TIME_FORMAT_LONG), $exercise_stat_info['duration'],
+            $hideDescription
+        );
     }
 
     // Display text when test is finished #4074 and for LP #4227
@@ -2273,6 +2273,8 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
     $question_list_answers = array();
     $media_list = array();
     $category_list = array();
+
+    $exerciseResultInfo = array();
 
     // Loop over all question to show results for each of them, one by one
     if (!empty($question_list)) {
@@ -2352,6 +2354,9 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
                 $score['comments'] = $comnt;
             }
 
+            $exerciseResultInfo[$questionId]['score'] = $score;
+            $exerciseResultInfo[$questionId]['details'] = $result;
+
             $contents = ob_get_clean();
 
             $question_content = '<div class="question_row">';
@@ -2383,9 +2388,7 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
 
     if ($origin != 'learnpath') {
         if ($show_results || $show_only_score) {
-            $total_score_text .= '<div class="question_row">';
             $total_score_text .= get_question_ribbon($objExercise, $total_score, $total_weight, true);
-            $total_score_text .= '</div>';
         }
     }
 
@@ -2414,24 +2417,47 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
         }
 
         // Send notification ..
-        if (!api_is_allowed_to_edit(null, true)) {
+        //if (!api_is_allowed_to_edit(null, true)) {
+            $isSuccess = is_success_exercise_result($total_score, $total_weight, $objExercise->selectPassPercentage());
+            $objExercise->sendCustomNotification($exe_id, $exerciseResultInfo, $isSuccess);
             $objExercise->send_notification_for_open_questions($question_list_answers, $origin, $exe_id);
             $objExercise->send_notification_for_oral_questions($question_list_answers, $origin, $exe_id);
+        //}
+    }
+}
+
+/**
+ * @param float $score
+ * @param float $weight
+ * @param bool $pass_percentage
+ * @return bool
+ */
+function is_success_exercise_result($score, $weight, $pass_percentage)
+{
+    $percentage = float_format(($score / ($weight != 0 ? $weight : 1)) * 100, 1);
+    if (isset($pass_percentage) && !empty($pass_percentage)) {
+        if ($percentage >= $pass_percentage) {
+            return true;
         }
     }
+    return false;
 }
 
 function get_question_ribbon($objExercise, $score, $weight, $check_pass_percentage = false)
 {
-    $ribbon = '<div class="ribbon">';
+    $eventMessage = null;
+    $ribbon = '<div class="question_row">';
+    $ribbon .= '<div class="ribbon">';
     if ($check_pass_percentage) {
         $is_success = is_success_exercise_result($score, $weight, $objExercise->selectPassPercentage());
         // Color the final test score if pass_percentage activated
         $ribbon_total_success_or_error = "";
         if (is_pass_pourcentage_enabled($objExercise->selectPassPercentage())) {
             if ($is_success) {
+                $eventMessage = $objExercise->getOnSuccessMessage();
                 $ribbon_total_success_or_error = ' ribbon-total-success';
             } else {
+                $eventMessage = $objExercise->getOnFailedMessage();
                 $ribbon_total_success_or_error = ' ribbon-total-error';
             }
         }
@@ -2443,11 +2469,14 @@ function get_question_ribbon($objExercise, $score, $weight, $check_pass_percenta
     $ribbon .= show_score($score, $weight, false, true);
     $ribbon .= '</h3>';
     $ribbon .= '</div>';
+
     if ($check_pass_percentage) {
         $ribbon .= show_success_message($score, $weight, $objExercise->selectPassPercentage());
     }
 
-
     $ribbon .= '</div>';
+    $ribbon .= '</div>';
+
+    $ribbon .= $eventMessage;
     return $ribbon;
 }

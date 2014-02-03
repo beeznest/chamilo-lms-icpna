@@ -673,6 +673,23 @@ if (isset($cidReset) && $cidReset) {
                 $sql = 'SELECT name FROM '.$tbl_session . ' WHERE id="'.intval($_SESSION['id_session']) . '"';
                 $rs = Database::query($sql);
                 list($_SESSION['session_name']) = Database::fetch_array($rs);
+            } elseif (!empty($_GET['xs'])) {
+                $tbl_session_field = Database::get_main_table(TABLE_MAIN_SESSION_FIELD);
+                $tbl_session_field_values = Database::get_main_table(TABLE_MAIN_SESSION_FIELD_VALUES);
+                $sql = "SELECT v.session_id
+                FROM $tbl_session_field_values v LEFT JOIN $tbl_session_field f ON f.id = v.field_id
+                WHERE f.field_variable = 'cs_session_id' AND v.field_value = ".intval($_GET['xs']);
+                $res = Database::query($sql);
+                if (Database::num_rows($res) < 1) {
+                    Session::erase('session_name');
+                    Session::erase('id_session');
+                } else {
+                    $row = Database::fetch_row($res);
+                    $_SESSION['id_session'] = $row[0];
+                    $sql = 'SELECT name FROM '.$tbl_session . ' WHERE id="'.intval($_SESSION['id_session']) . '"';
+                    $rs = Database::query($sql);
+                    list($_SESSION['session_name']) = Database::fetch_array($rs);
+                }
             } else {
                 Session::erase('session_name');
                 Session::erase('id_session');
@@ -751,6 +768,23 @@ if (isset($cidReset) && $cidReset) {
             $rs = Database::query($sql);
             list($_SESSION['session_name']) = Database::fetch_array($rs);
             $_SESSION['id_session']         = intval($_GET['id_session']);
+        } elseif (!empty($_GET['xs'])) {
+            $tbl_session_field = Database::get_main_table(TABLE_MAIN_SESSION_FIELD);
+            $tbl_session_field_values = Database::get_main_table(TABLE_MAIN_SESSION_FIELD_VALUES);
+            $sql = "SELECT v.session_id
+                    FROM $tbl_session_field_values v LEFT JOIN $tbl_session_field f ON f.id = v.field_id
+                    WHERE f.field_variable = 'cs_session_id' AND v.field_value = ".intval($_GET['xs']);
+            $res = Database::query($sql);
+            if (Database::num_rows($res) < 1) {
+                Session::erase('session_name');
+                Session::erase('id_session');
+            } else {
+                $row = Database::fetch_row($res);
+                $_SESSION['id_session'] = $row[0];
+                $sql = 'SELECT name FROM '.$tbl_session . ' WHERE id="'.intval($_SESSION['id_session']) . '"';
+                $rs = Database::query($sql);
+                list($_SESSION['session_name']) = Database::fetch_array($rs);
+            }
         }
 
         if (isset($_REQUEST['gidReq'])) {

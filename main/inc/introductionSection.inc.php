@@ -119,8 +119,9 @@ if ($intro_editAllowed) {
 
 /* Retrieves the module introduction text, if exist */
 
-$sql = "SELECT intro_text FROM $TBL_INTRODUCTION 
-        WHERE c_id = $course_id AND id='".Database::escape_string($moduleId)."' AND session_id = '".intval($session_id)."'";
+// Force re-use of the main introduction - ICPNA-specific
+$sql = "SELECT intro_text FROM $TBL_INTRODUCTION
+        WHERE c_id = $course_id AND id='".Database::escape_string($moduleId)."' AND session_id = 0";
 $intro_dbQuery = Database::query($sql);
 if (Database::num_rows($intro_dbQuery) > 0) {
 	$intro_dbResult = Database::fetch_array($intro_dbQuery);    

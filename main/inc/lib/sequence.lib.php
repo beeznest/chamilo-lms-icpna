@@ -352,9 +352,9 @@ class Sequence
             $sql = "SELECT row.id FROM $row_table row WHERE
             row.sequence_type_entity_id = $entity_id AND
             row.row_id = $row_id AND
-            row.c_id = $c_id AND
-            row.session_id = $session_id
-            LIMIT 0, 1";
+            row.c_id = $c_id ".
+            // AND row.session_id = $session_id
+            "LIMIT 0, 1";
             $result = Database::query($sql);
             if (Database::num_rows($result) > 0) {
                 while ($temp_row_entity = Database::fetch_array($result, 'ASSOC')) {
@@ -405,7 +405,7 @@ class Sequence
                             return $id;
                         }
                     } elseif (strpos(strtolower($name),'exam') !== false) {
-                        $sql = "SELECT id FROM $row_table WHERE c_id = $c_id AND session_id = $session_id";
+                        $sql = "SELECT id FROM $row_table WHERE c_id = $c_id ";//" AND session_id = $session_id";
                         $result = Database::query($sql);
                         while ($temp_arr = Database::fetch_array($result, 'ASSOC')) {
                             $pre_req[] = $temp_arr['id'];
@@ -679,6 +679,7 @@ class Sequence
                 return self::get_state_lp_by_row_entity_id($row_entity_id, $user_id);
             }
             $sql_seq = "SELECT val.available, val.success FROM $seq_val_table val WHERE val.sequence_row_entity_id = $row_entity_id AND val.user_id = $user_id LIMIT 0, 1";
+            error_log($sql_seq);
             $result_seq = Database::query($sql_seq);
             $arr_seq = Database::fetch_array($result_seq);
             if (intval($arr_seq['available']) === 1) {

@@ -65,90 +65,23 @@ footer {
     background-image: url(images/color.png);
     background-repeat:repeat-x;    
     color:#ffffff;
-    height: 15em;
-}
-
-footer .container .row{
-    padding-top: 0px;
-}
-footer .container .row .padding-footer{
+    height: 10em;
+    margin-top: 5px;
     padding-top: 3em;
 }
-footer .container .row .title{
-    font-size: 16px;
-    font-family: "Arial,sans-serif,Sans"
-    padding: 0px;
-    margin: 0px;
-    display: block;
+footer .topline{
+  padding-top: 1em;
+  font-size: 13px;
 }
-footer .container .row .listen{
-    list-style: none;
-    padding: 0px;
-    margin: 0px;
+footer .centerline{
+  font-size: 10px;
+  text-align: center;
 }
-footer .container .row .listen a{
-    color: #fff;
+footer .container .row {
+  padding-top: 10px;
+  padding-left: 4em;
 }
-footer .container .row .listen a:hover{
-    text-decoration: underline;
-}
-footer .container .line{
-    padding-top: 1em;
-    text-align: left;
-}
-footer .container .line a{
-    color: #fff;
-    font-size: 10px;
-}
-footer .container .line a:hover{
-    text-decoration: underline;
-}
-footer .container .row .span4 .span1{
-    width: 30px;
-    margin-left: 5px;
-}
-footer .facebook{
-    background:url(images/social-media.png) no-repeat 0 0;
-    width: 30px;
-    height: 30px;
-}
-footer .facebook:hover{
-    background:url(images/social-media.png) no-repeat 0 -30px;
-}
-footer .facebook a{
-    display: block;
-    width: 30px;
-    height: 30px;
-    text-indent: -9999px;
-}
-footer .twitter{
-    background:url(images/social-media.png) no-repeat -29px 0;
-    width: 30px;
-    height: 30px;
-}
-footer .twitter:hover{
-    background:url(images/social-media.png) no-repeat -29px -30px;
-}
-footer .twitter a{
-    display: block;
-    width: 30px;
-    height: 30px;
-    text-indent: -9999px;
-}
-footer .youtube{
-    background:url(images/social-media.png) no-repeat -60px 0;
-    width: 30px;
-    height: 30px;
-}
-footer .youtube:hover{
-    background:url(images/social-media.png) no-repeat -60px -30px;
-}
-footer .youtube a{
-    display: block;
-    width: 30px;
-    height: 30px;
-    text-indent: -9999px;
-}
+
 /*****************************************************
  *  DISPLAY MESSAGES                               *
  *****************************************************/

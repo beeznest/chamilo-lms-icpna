@@ -252,7 +252,7 @@ if (!empty($_SESSION['_user']['user_id']) && !($login || $logout)) {
             if ($uData['auth_source'] == PLATFORM_AUTH_SOURCE || $uData['auth_source'] == CAS_AUTH_SOURCE) {
                 //The authentification of this user is managed by Chamilo itself
                 if (isset($_REQUEST['enc']) && $_REQUEST['enc'] == '1') {
-                    $password = trim(stripslashes($password));
+                    $password = trim(stripslashes(urldecode($password)));
                 } else {
                     $password = api_get_encrypted_password(trim(stripslashes($password)));
                 }

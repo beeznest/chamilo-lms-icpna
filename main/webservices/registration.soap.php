@@ -5487,6 +5487,7 @@ $server->register('WSGetCourseFinalScore',		// method name
 // define the method WSGetCourseFinalScore
 /**
  * returns the results of the final exam for the given student, course and session
+ * This service does *not* provide the score for the PLACEMENTTEST (see next service for that)
  * @param $params
  * @return array|null|soap_fault Returns result as a pure integer percentage
  */
@@ -5542,28 +5543,90 @@ function WSGetCourseFinalScore($params) {
 
     $tbl_quiz = Database::get_course_table(TABLE_QUIZ_TEST);
     $exam_names = "'final exam', 'examen final'";
-    $sql = "SELECT id FROM $tbl_quiz WHERE c_id = $cid AND LOWER(title) IN ($exam_names) ORDER BY id LIMIT 1";
+    $sql = "SELECT id, max_attempt FROM $tbl_quiz WHERE c_id = $cid AND LOWER(title) IN ($exam_names) ORDER BY id LIMIT 1";
     $res = Database::query($sql);
     if (Database::num_rows($res) < 1) {
         return array();
     }
     $row = Database::fetch_row($res);
     $qid = intval($row[0]);
+    $maxAttempt = intval($row[1]);
 
+    // From the results table, we have to check the latest attempt.
+    // There is a special case for exams where only one attempt is allowed: if
+    // the first attempt failed but was not finished, the user gets a second
+    // attempt. As such, in the case where only one attempt is allowed
+    // (c_quiz.max_attempt = 1) and we have more than one attempt, of which the
+    // first was not finished (track_e_exercices.status != ''), we have to
+    // take the results from the second attempt (but not more)
     $tbl_res = Database::get_main_table(TABLE_STATISTIC_TRACK_E_EXERCICES);
-    $sql = "SELECT exe_result, exe_weighting
-        FROM $tbl_res
-        WHERE exe_exo_id = $qid
-            AND exe_cours_id = $cid
-            AND session_id = $sid
-        ORDER BY start_date
-        DESC LIMIT 1";
-    $res = Database::query($sql);
-    if (Database::num_rows($res) < 1) {
-        return array();
+    $score = 0;
+    if ($maxAttempt == 1) {
+        // Adults case, only one attempt but if first unfinished, we take the
+        // second one
+        $sql = "SELECT exe_result, exe_weighting, status
+            FROM $tbl_res
+            WHERE exe_exo_id = $qid
+                AND exe_cours_id = $cid
+                AND session_id = $sid
+            ORDER BY start_date ASC LIMIT 2";
+        $res = Database::query($sql);
+        if (Database::num_rows($res) < 1) {
+            return array();
+        } elseif (Database::num_rows($res) == 1) {
+            $row = Database::fetch_row($res);
+            $tempScore = round(($row[0]/$row[1])*100,0);
+            if ($tempScore < 70 && $row[2]!= '') {
+                // return empty array so this score is not taken into account
+                return array();
+            }
+            $score = $tempScore;
+        } else {
+            $lastScore = 0;
+            // only scan 2 rows, thanks to the LIMIT 2 above
+            while ($row = Database::fetch_row($res)) {
+                $tempScore = round(($row[0]/$row[1])*100,0);
+                if ($tempScore > $lastScore) {
+                    $lastScore = $tempScore;
+                }
+            }
+            // return the best score
+            $score = $lastScore;
+        }
+    } else {
+        // There are 3 attempts to these tests. As soon as one is > 70, send result
+        $sql = "SELECT exe_result, exe_weighting, status
+            FROM $tbl_res
+            WHERE exe_exo_id = $qid
+                AND exe_cours_id = $cid
+                AND session_id = $sid
+            ORDER BY start_date ASC LIMIT 3";
+        $res = Database::query($sql);
+        if (Database::num_rows($res) < 1) {
+            return array();
+        }
+        $lastScore = 0;
+        $count = 0;
+        // only scan max 3 rows, thanks to the LIMIT 2 above
+        while ($row = Database::fetch_row($res)) {
+            $tempScore = round(($row[0]/$row[1])*100,0);
+            if ($tempScore > $lastScore) {
+                $lastScore = $tempScore;
+            }
+            $count++;
+        }
+        if ($lastScore >= 70) {
+            // return the success score
+            $score = $lastScore;
+        } else {
+            if ($count == 3) {
+                // reached maximum attempts, return bad result
+                $score = $lastScore;
+            } else {
+                return array();
+            }
+        }
     }
-    $row = Database::fetch_row($res);
-    $score = round(($row[0]/$row[1])*100,0);
 
     $output = array();
     $output[] = array(

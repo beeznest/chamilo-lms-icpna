@@ -3,11 +3,13 @@
             <div class="row">
                 <div class="span12">
                     <div class="span2">{# logo #} {{ logo }}</div>
-                    <div class="span2 topline">Preguntas frecuentes</div>
-                    <div class="span2 topline">Política de privacidad</div>
-                    <div class="span2 topline">Término y condiciones</div>
+                    <div class="span2 topline"><a href="#">Preguntas frecuentes</a></div>
+                    <div class="span2 topline"><a href="#">Política de privacidad</a></div>
+                    <div class="span2 topline"><a href="#">Término y condiciones</a></div>
                     <div class="span2">
+                        <a href="http://www.icpna.edu.pe/" target="_blank">
                         <img src="/main/css/icpnatdp/images/logo-icpna.png">
+                        </a>
                     </div>
 
                 </div>

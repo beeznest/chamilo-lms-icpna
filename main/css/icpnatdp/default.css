@@ -81,7 +81,12 @@ footer .container .row {
   padding-top: 10px;
   padding-left: 4em;
 }
-
+footer .container .row a{
+  color: #ffffff
+}
+footer .container .row a:hover{
+  text-decoration: underline;
+}
 /*****************************************************
  *  DISPLAY MESSAGES                               *
  *****************************************************/

@@ -19,9 +19,10 @@ $help_name = Security::remove_XSS($_GET['open']);
 <a class="btn" href="<?php echo api_get_path(WEB_CODE_PATH); ?>help/faq.php"><?php echo get_lang('AccessToFaq'); ?></a>
 
 <div class="page-header">
-    <h3><?php echo get_lang('H'.$help_name); ?></h3>
+    <h3>Preguntas Frecuentes de Afiliación</h3>
 </div>
 
-<?php echo get_lang($help_name.'Content'); ?>    
-<hr>    
-<a class="btn" href="<?php echo api_get_path(WEB_CODE_PATH); ?>help/faq.php"><?php echo get_lang('AccessToFaq'); ?></a>
+<?php 
+$faq_content = @(string)file_get_contents(api_get_path(SYS_PATH).'home/faq.html');
+	$faq_content = api_to_system_encoding($faq_content, api_detect_encoding(strip_tags($faq_content)));
+	echo $faq_content;

@@ -317,9 +317,9 @@ header #logo {
 #bar-animation span{
     background: url("images/progress-ticker.png") no-repeat;
     font-size: 10px;
-    padding: 0 2px 1px;
+    padding: 0 6px 1px;
     position: absolute;
-    right: -10px;
+    right: 0;
     top: -23px;
 }
 .color-bar-process {
@@ -341,10 +341,17 @@ header #logo {
 }
 .blue-back-bar{
     background-color: #5e92ff;
-    /*padding-left:30px; */
+    padding-left:30px;
 }
-
-
+.blue-back-bar span{
+  /*text-indent:-20px;
+  display:block;*/
+}
+.header-image-modulo{
+    text-align: center;
+    clear: both;
+    background-color: #325DC6;
+}
 .text-module {
   color: #325DC6;
   font-size: 30px;

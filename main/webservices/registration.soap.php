@@ -5499,12 +5499,13 @@ $server->register('WSGetCourseFinalScore',		// method name
  */
 function WSGetCourseFinalScore($params) {
 
-    global $_user;
+    global $_user, $debug;
 
     if(!WSHelperVerifyKey($params)) {
         return return_error(WS_ERROR_SECRET_KEY);
     }
 
+    if ($debug) { error_log(__FUNCTION__.', params: '.print_r($params,1)); }
     $tbl_user       = Database::get_main_table(TABLE_MAIN_USER);
     $t_uf = Database::get_main_table(TABLE_MAIN_USER_FIELD);
     $t_ufv = Database::get_main_table(TABLE_MAIN_USER_FIELD_VALUES);
@@ -5573,7 +5574,7 @@ function WSGetCourseFinalScore($params) {
         $sql = "SELECT exe_result, exe_weighting, status
             FROM $tbl_res
             WHERE exe_exo_id = $qid
-                AND exe_cours_id = $cid
+                AND exe_cours_id = '$ccode'
                 AND session_id = $sid
             ORDER BY start_date ASC LIMIT 2";
         $res = Database::query($sql);
@@ -5634,8 +5635,7 @@ function WSGetCourseFinalScore($params) {
         }
     }
 
-    $output = array();
-    $output[] = array(
+    $output = array(
         'original_session_id_value' => $params['original_session_id_value'],
         'result' => $score,
     );

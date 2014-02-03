@@ -769,6 +769,7 @@ if (isset($cidReset) && $cidReset) {
             list($_SESSION['session_name']) = Database::fetch_array($rs);
             $_SESSION['id_session']         = intval($_GET['id_session']);
         } elseif (!empty($_GET['xs'])) {
+            $tbl_session                 = Database::get_main_table(TABLE_MAIN_SESSION);
             $tbl_session_field = Database::get_main_table(TABLE_MAIN_SESSION_FIELD);
             $tbl_session_field_values = Database::get_main_table(TABLE_MAIN_SESSION_FIELD_VALUES);
             $sql = "SELECT v.session_id

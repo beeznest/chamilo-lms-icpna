@@ -679,7 +679,6 @@ class Sequence
                 return self::get_state_lp_by_row_entity_id($row_entity_id, $user_id);
             }
             $sql_seq = "SELECT val.available, val.success FROM $seq_val_table val WHERE val.sequence_row_entity_id = $row_entity_id AND val.user_id = $user_id LIMIT 0, 1";
-            error_log($sql_seq);
             $result_seq = Database::query($sql_seq);
             $arr_seq = Database::fetch_array($result_seq);
             if (intval($arr_seq['available']) === 1) {

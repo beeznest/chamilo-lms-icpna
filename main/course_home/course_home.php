@@ -38,7 +38,7 @@ $use_anonymous = true;
 
 // Inlcuding the global initialization file.
 require dirname(__FILE__).'/../inc/global.inc.php';
-$msg = (isset($_GET['msg'])) ? api_htmlentities($_GET['msg']) : null ; 
+$msg = (isset($_GET['msg'])) ? api_htmlentities($_GET['msg']) : null ;
 
 // Delete LP sessions - commented out after seeing that normal
 // users in their first learnpath step (1st SCO of a SCORM)
@@ -101,7 +101,7 @@ $(document).ready(function() {
 		});
 	});
 });
-        
+
 /* toogle for post-it in course home */
 $(function() {
     $("#course_tools img").tooltip({

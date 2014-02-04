@@ -1140,7 +1140,6 @@ function update_toc(update_action, update_id, change_ids) {
     var myelem = $("#toc_"+update_id);
     var myelemimg = $("#toc_img_"+update_id);
     logit_lms('update_toc("'+update_action+'", '+update_id+')',2);
-
     if (update_id != 0) {
         switch (update_action) {
             case 'unhighlight':

@@ -2328,6 +2328,12 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
             //No category for this question!
             if ($category_was_added_for_this_test == false) {
                 $category_list['none'] = array();
+                if (!isset($category_list['none']['score'])) {
+                    $category_list['none']['score'] = 0;
+                }
+                if (!isset($category_list['none']['total'])) {
+                    $category_list['none']['total'] = 0;
+                }
                 $category_list['none']['score'] += $my_total_score;
                 $category_list['none']['total'] += $my_total_weight;
             }

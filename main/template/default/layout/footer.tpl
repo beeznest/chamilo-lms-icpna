@@ -5,7 +5,7 @@
                     <div class="span2">{# logo #} {{ logo }}</div>
                     <div class="span2 topline"><a href="#">Preguntas frecuentes</a></div>
                     <div class="span2 topline"><a href="#">Política de privacidad</a></div>
-                    <div class="span2 topline"><a href="#">Término y condiciones</a></div>
+                    <div class="span2 topline"><a href="#">Término del servicios</a></div>
                     <div class="span2">
                         <a href="http://www.icpna.edu.pe/" target="_blank">
                         <img src="/main/css/icpnatdp/images/logo-icpna.png">

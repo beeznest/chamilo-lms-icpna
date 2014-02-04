@@ -71,11 +71,12 @@ footer {
 }
 footer .topline{
   padding-top: 1em;
-  font-size: 13px;
+  font-size: 16px;
 }
 footer .centerline{
-  font-size: 10px;
+  font-size: 11px;
   text-align: center;
+  padding-top: 1em;
 }
 footer .container .row {
   padding-top: 10px;
@@ -83,6 +84,9 @@ footer .container .row {
 }
 footer .container .row a{
   color: #ffffff
+}
+footer .container .row .span12{
+  padding-left: 4em;
 }
 footer .container .row a:hover{
   text-decoration: underline;
@@ -349,13 +353,8 @@ header #logo {
 /* FIN DE TIPOS DE EJERCICIOS EN LAS LECCIONES*/
 .row .state-icon-link{
     position: relative;
-}s
+}
 
-/*.row .center:hover{
-    background: url(images/estados-iconos-hover.png) no-repeat;
-    background-position: 2px 1px;
-    cursor: pointer;
-}*/
 
 .row .state-icon-completed{
     background: transparent url(images/estados-iconos.png) no-repeat;

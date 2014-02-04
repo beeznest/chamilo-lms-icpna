@@ -4371,7 +4371,11 @@ class learnpath
         if ($this->debug > 0) {
             error_log('New LP - In learnpath::set_prerequisite()', 0);
         }
+        if (empty($prerequisite)) {
+            return false;
+        }
         $this->prerequisite = intval($prerequisite);
+
         $lp_table = Database :: get_course_table(TABLE_LP_MAIN);
         $lp_id = $this->get_id();
         $sql = "UPDATE $lp_table SET prerequisite = '".$this->prerequisite."'
@@ -4384,6 +4388,24 @@ class learnpath
         require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
         Sequence::temp_hack_3_update(1, 1, $this->prerequisite, $lp_id, $course_id, api_get_session_id());
         return true;
+    }
+
+    /**
+     * Sets the prerequisite of a LP (and save)
+     * @param	int		integer giving the new prerequisite of this learnpath
+     * @return 	bool 	returns true if prerequisite is not empty
+     */
+    public function setPrerequisites($prerequisites) {
+        if ($this->debug > 0) {
+            error_log('New LP - In learnpath::set_prerequisite()', 0);
+        }
+        require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
+        Sequence::cleanPrerequisites($this->get_id(), api_get_course_int_id(), api_get_session_id());
+        if (!empty($prerequisites)) {
+            foreach ($prerequisites as $prerequisite) {
+                $this->set_prerequisite($prerequisite);
+            }
+        }
     }
 
     /**
@@ -5310,21 +5332,21 @@ class learnpath
                 // No edit for this item types
                 if (!in_array($arrLP[$i]['item_type'], array('sco', 'asset'))) {
                     if (!in_array($arrLP[$i]['item_type'], array('dokeos_chapter', 'dokeos_module'))) {
-                        $edit_icon .= '<a href="' . api_get_self() . '?cidReq=' . Security :: remove_XSS($_GET['cidReq']) . '&amp;action=edit_item&amp;view=build&amp;id=' . $arrLP[$i]['id'] . '&amp;lp_id=' . $this->lp_id . '&amp;path_item=' . $arrLP[$i]['path'] . '">';
+                        $edit_icon .= '<a href="' . api_get_self() . '?'.api_get_cidreq().'&amp;action=edit_item&amp;view=build&amp;id=' . $arrLP[$i]['id'] . '&amp;lp_id=' . $this->lp_id . '&amp;path_item=' . $arrLP[$i]['path'] . '">';
                         $edit_icon .= Display::return_icon('edit.png', get_lang('LearnpathEditModule'), array(), ICON_SIZE_TINY);
                         $edit_icon .= '</a>';
                     } else {
-                        $edit_icon .= '<a href="' . api_get_self() . '?cidReq=' . Security :: remove_XSS($_GET['cidReq']) . '&amp;action=edit_item&amp;id=' . $arrLP[$i]['id'] . '&amp;lp_id=' . $this->lp_id . '&amp;path_item=' . $arrLP[$i]['path'] . '">';
+                        $edit_icon .= '<a href="' . api_get_self() . '?' . api_get_cidreq() . '&amp;action=edit_item&amp;id=' . $arrLP[$i]['id'] . '&amp;lp_id=' . $this->lp_id . '&amp;path_item=' . $arrLP[$i]['path'] . '">';
                         $edit_icon .= Display::return_icon('edit.png', get_lang('LearnpathEditModule'), array(), ICON_SIZE_TINY);
                         $edit_icon .= '</a>';
                     }
                 }
 
-                $delete_icon .= ' <a href="' . api_get_self() . '?cidReq=' . Security :: remove_XSS($_GET['cidReq']) . '&amp;action=delete_item&amp;id=' . $arrLP[$i]['id'] . '&amp;lp_id=' . $this->lp_id . '" onClick="return confirmation(\'' . addslashes($title) . '\');">';
+                $delete_icon .= ' <a href="' . api_get_self() . '?' . api_get_cidreq() . '&amp;action=delete_item&amp;id=' . $arrLP[$i]['id'] . '&amp;lp_id=' . $this->lp_id . '" onClick="return confirmation(\'' . addslashes($title) . '\');">';
                 $delete_icon .= Display::return_icon('delete.png', get_lang('LearnpathDeleteModule'), array(), ICON_SIZE_TINY);
                 $delete_icon .= '</a>';
 
-                $url = api_get_self() . '?cidReq='.Security::remove_XSS($_GET['cidReq']).'&view=build&id='.$arrLP[$i]['id'] .'&lp_id='.$this->lp_id;
+                $url = api_get_self() . '?'.api_get_cidreq().'&view=build&id='.$arrLP[$i]['id'] .'&lp_id='.$this->lp_id;
 
                 if (!in_array($arrLP[$i]['item_type'], array('dokeos_chapter', 'dokeos_module', 'dir'))) {
                     $prerequisities_icon = Display::url(Display::return_icon('accept.png', get_lang('LearnpathPrerequisites'), array(), ICON_SIZE_TINY), $url.'&action=edit_item_prereq');
@@ -8067,7 +8089,8 @@ class learnpath
      * @param	integer Item ID
      * @return	string	HTML form
      */
-    public function display_lp_prerequisites_list() {
+    public function display_lp_prerequisites_list()
+    {
         $course_id = api_get_course_int_id();
         $lp_id = $this->lp_id;
         $tbl_lp = Database :: get_course_table(TABLE_LP_MAIN);
@@ -8079,17 +8102,29 @@ class learnpath
         $preq_id = $row['prerequisite'];
         $session_id = api_get_session_id();
         $session_condition = api_get_session_condition($session_id);
-        $sql 	= "SELECT * FROM $tbl_lp WHERE c_id = $course_id $session_condition ORDER BY display_order ";
+        $sql 	= "SELECT * FROM $tbl_lp
+                   WHERE c_id = $course_id $session_condition ORDER BY display_order ";
         $rs = Database::query($sql);
         $return = '';
-        $return .= '<select name="prerequisites" >';
+
+        $selectedPrerequisites = array($row['prerequisite']);
+        $entities = Sequence::getAllRowEntityIdByRowId(1, 1, $this->course_int_id, $this->get_lp_session_id());
+        if (!empty($entities)) {
+            foreach($entities as $data) {
+                $selectedPrerequisites[] = $data['row_id'];
+            }
+        }
+
+        $return .= '<select name="prerequisites[]" multiple="multiple">';
         $return .= '<option value="0">'.get_lang('None').'</option>';
         if (Database::num_rows($rs) > 0) {
             while ($row = Database::fetch_array($rs)) {
                 if ($row['id'] == $lp_id) {
                     continue;
                 }
-                $return .= '<option value="'.$row['id'].'" '.(($row['id']==$preq_id)?' selected ' : '').'>'.$row['name'].'</option>';
+                $selected = in_array($row['id'], $selectedPrerequisites);
+                $return .= '<option value="'.$row['id'].'" '.($selected ? ' selected ' : '').'>'.
+                        $row['name'].'</option>';
             }
         }
         $return .= '</select>';

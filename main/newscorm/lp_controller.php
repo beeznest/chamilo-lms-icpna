@@ -671,7 +671,9 @@ switch ($action) {
             }
             $_SESSION['oLP']->set_hide_toc_frame($hide_toc_frame);
 
-            $_SESSION['oLP']->set_prerequisite($_REQUEST['prerequisites']);
+            //$_SESSION['oLP']->set_prerequisite($_REQUEST['prerequisites']);
+            $_SESSION['oLP']->setPrerequisites($_REQUEST['prerequisites']);
+
             $_SESSION['oLP']->set_use_max_score($_REQUEST['use_max_score']);
             $_SESSION['oLP']->set_seriousgame_mode($_REQUEST['seriousgame_mode']);
 

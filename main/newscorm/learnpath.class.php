@@ -4371,7 +4371,11 @@ class learnpath
         if ($this->debug > 0) {
             error_log('New LP - In learnpath::set_prerequisite()', 0);
         }
+        if (empty($prerequisite)) {
+            return false;
+        }
         $this->prerequisite = intval($prerequisite);
+
         $lp_table = Database :: get_course_table(TABLE_LP_MAIN);
         $lp_id = $this->get_id();
         $sql = "UPDATE $lp_table SET prerequisite = '".$this->prerequisite."'

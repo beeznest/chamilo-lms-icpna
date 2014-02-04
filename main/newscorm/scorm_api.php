@@ -40,6 +40,8 @@ $oItem 	= $oLP->items[$oLP->current];
 $user_extra = api_get_user_info($_user['user_id'], null, null, true);
 //now we get EDO/ELL ID in $user_extra['extra_scorm_user_id']
 
+$extraScormUserId = isset($user_extra['extra_scorm_user_id']) ? $user_extra['extra_scorm_user_id'] : null;
+
 if (!is_object($oItem)) {
     error_log('New LP - scorm_api - Could not load oItem item',0);
     exit;
@@ -408,7 +410,7 @@ function LMSGetValue(param) {
         }
     } else if(param == 'cmi.core.student_id'){
         // ---- cmi.core.student_id
-        result='<?php echo $user_extra['extra_scorm_user_id']; ?>';
+        result='<?php echo $extraScormUserId; ?>';
     } else if(param == 'cmi.core.student_name'){
         // ---- cmi.core.student_name
         <?php

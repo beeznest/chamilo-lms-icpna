@@ -40,6 +40,8 @@ $oItem 	= $oLP->items[$oLP->current];
 $user_extra = api_get_user_info($_user['user_id'], null, null, true);
 //now we get EDO/ELL ID in $user_extra['extra_scorm_user_id']
 
+$extraScormUserId = isset($user_extra['extra_scorm_user_id']) ? $user_extra['extra_scorm_user_id'] : null;
+
 if (!is_object($oItem)) {
     error_log('New LP - scorm_api - Could not load oItem item',0);
     exit;
@@ -396,19 +398,19 @@ function LMSGetValue(param) {
         // ---- cmi.core.exit
         result='';
         olms.G_LastError = G_ElementIsWriteOnly;
-    } else if(param == 'cmi.core.session_time'){
+    } else if(param == 'cmi.core.session_time') {
         result='';
         olms.G_LastError = G_ElementIsWriteOnly;
-    } else if(param == 'cmi.core.lesson_status'){
+    } else if(param == 'cmi.core.lesson_status') {
         // ---- cmi.core.lesson_status
-        if(olms.lesson_status != '') {
+        if (olms.lesson_status != '') {
             result=olms.lesson_status;
         } else {
             //result='not attempted';
         }
-    } else if(param == 'cmi.core.student_id'){
+    } else if(param == 'cmi.core.student_id') {
         // ---- cmi.core.student_id
-        result='<?php echo $user_extra['extra_scorm_user_id']; ?>';
+        result='<?php echo $extraScormUserId; ?>';
     } else if(param == 'cmi.core.student_name'){
         // ---- cmi.core.student_name
         <?php

@@ -85,7 +85,8 @@ class Sequence
                 if ($go === 0) {
                     return true;
                 } else {
-                    $con = $condition[--$go];
+                    --$go;
+                    $con = isset($condition[$go]) ? $condition[$go] : null;
                 }
             }
         }

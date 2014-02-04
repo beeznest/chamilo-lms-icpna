@@ -267,5 +267,7 @@ $tpl = new Template(null);
 
 $tpl->assign('message', $show_message);
 $tpl->assign('content', $content);
+$tpl->set_help('abc');
+
 $tpl->display_one_col_template();
 Session::erase('_gid');

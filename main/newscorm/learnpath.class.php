@@ -85,7 +85,8 @@ class learnpath
      * @param	integer		User ID
      * @return	boolean		True on success, false on error
      */
-    public function __construct($course, $lp_id, $user_id) {
+    public function __construct($course, $lp_id, $user_id)
+    {
         $this->encoding = api_get_system_encoding(); // Chamilo 1.8.8: We intend always to use the system encoding.
         if ($this->debug > 0) { error_log('New LP - In learnpath::__construct('.$course.','.$lp_id.','.$user_id.')', 0); }
         if (empty($course)) {
@@ -412,9 +413,12 @@ class learnpath
      * @param int  resource ID (ref)
      * @param string $title
      * @param string $description
+     * @param int $prerequisites
+     * @param int $max_time_allowed
      * @return int
      */
-    public function add_item($parent, $previous, $type = 'dokeos_chapter', $id, $title, $description, $prerequisites = 0, $max_time_allowed = 0) {
+    public function add_item($parent, $previous, $type = 'dokeos_chapter', $id, $title, $description, $prerequisites = 0, $max_time_allowed = 0)
+    {
         $course_id = api_get_course_int_id();
         if ($this->debug > 0) {
             error_log('New LP - In learnpath::add_item(' . $parent . ',' . $previous . ',' . $type . ',' . $id . ',' . $title . ')', 0);
@@ -645,7 +649,8 @@ class learnpath
      * @param	string	Zip file containing the learnpath or directory containing the learnpath
      * @return	integer	The new learnpath ID on success, 0 on failure
      */
-    public static function add_lp($course, $name, $description = '', $learnpath = 'guess', $origin = 'zip', $zipname = '', $publicated_on = '', $expired_on = '') {
+    public static function add_lp($course, $name, $description = '', $learnpath = 'guess', $origin = 'zip', $zipname = '', $publicated_on = '', $expired_on = '')
+    {
         global $charset;
         $course_id = api_get_course_int_id();
         $tbl_lp = Database :: get_course_table(TABLE_LP_MAIN);

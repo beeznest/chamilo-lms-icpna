@@ -4387,6 +4387,24 @@ class learnpath
     }
 
     /**
+     * Sets the prerequisite of a LP (and save)
+     * @param	int		integer giving the new prerequisite of this learnpath
+     * @return 	bool 	returns true if prerequisite is not empty
+     */
+    public function setPrerequisites($prerequisites) {
+        if ($this->debug > 0) {
+            error_log('New LP - In learnpath::set_prerequisite()', 0);
+        }
+        require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
+        Sequence::cleanPrerequisites($this->get_id(), api_get_course_int_id(), api_get_session_id());
+        if (!empty($prerequisites)) {
+            foreach ($prerequisites as $prerequisite) {
+                $this->set_prerequisite($prerequisite);
+            }
+        }
+    }
+
+    /**
      * Sets the location/proximity of the LP (local/remote) (and save)
      * @param	string	Optional string giving the new location of this learnpath
      * @return  boolean True on success / False on error
@@ -8067,7 +8085,8 @@ class learnpath
      * @param	integer Item ID
      * @return	string	HTML form
      */
-    public function display_lp_prerequisites_list() {
+    public function display_lp_prerequisites_list()
+    {
         $course_id = api_get_course_int_id();
         $lp_id = $this->lp_id;
         $tbl_lp = Database :: get_course_table(TABLE_LP_MAIN);
@@ -8079,17 +8098,29 @@ class learnpath
         $preq_id = $row['prerequisite'];
         $session_id = api_get_session_id();
         $session_condition = api_get_session_condition($session_id);
-        $sql 	= "SELECT * FROM $tbl_lp WHERE c_id = $course_id $session_condition ORDER BY display_order ";
+        $sql 	= "SELECT * FROM $tbl_lp
+                   WHERE c_id = $course_id $session_condition ORDER BY display_order ";
         $rs = Database::query($sql);
         $return = '';
-        $return .= '<select name="prerequisites" >';
+
+        $selectedPrerequisites = array($row['prerequisite']);
+        $entities = Sequence::getAllRowEntityIdByRowId(1, 1, $this->course_int_id, $this->get_lp_session_id());
+        if (!empty($entities)) {
+            foreach($entities as $data) {
+                $selectedPrerequisites[] = $data['row_id'];
+            }
+        }
+
+        $return .= '<select name="prerequisites[]" multiple="multiple">';
         $return .= '<option value="0">'.get_lang('None').'</option>';
         if (Database::num_rows($rs) > 0) {
             while ($row = Database::fetch_array($rs)) {
                 if ($row['id'] == $lp_id) {
                     continue;
                 }
-                $return .= '<option value="'.$row['id'].'" '.(($row['id']==$preq_id)?' selected ' : '').'>'.$row['name'].'</option>';
+                $selected = in_array($row['id'], $selectedPrerequisites);
+                $return .= '<option value="'.$row['id'].'" '.($selected ? ' selected ' : '').'>'.
+                        $row['name'].'</option>';
             }
         }
         $return .= '</select>';

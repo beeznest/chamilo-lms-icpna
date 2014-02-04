@@ -7,7 +7,7 @@
 */
 
 require_once api_get_path(LIBRARY_PATH).'specific_fields_manager.lib.php';
-
+require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
 global $charset;
 
 $show_description_field = false; //for now

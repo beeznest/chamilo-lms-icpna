@@ -398,17 +398,17 @@ function LMSGetValue(param) {
         // ---- cmi.core.exit
         result='';
         olms.G_LastError = G_ElementIsWriteOnly;
-    } else if(param == 'cmi.core.session_time'){
+    } else if(param == 'cmi.core.session_time') {
         result='';
         olms.G_LastError = G_ElementIsWriteOnly;
-    } else if(param == 'cmi.core.lesson_status'){
+    } else if(param == 'cmi.core.lesson_status') {
         // ---- cmi.core.lesson_status
-        if(olms.lesson_status != '') {
+        if (olms.lesson_status != '') {
             result=olms.lesson_status;
         } else {
             //result='not attempted';
         }
-    } else if(param == 'cmi.core.student_id'){
+    } else if(param == 'cmi.core.student_id') {
         // ---- cmi.core.student_id
         result='<?php echo $extraScormUserId; ?>';
     } else if(param == 'cmi.core.student_name'){

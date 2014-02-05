@@ -4879,13 +4879,27 @@ class learnpath
         $this->set_attempt_mode($next_mode);
     }
 
-  /**
-   * Swithc the lp in ktm mode. This is a special scorm mode with unique attempt but possibility to do again a completed item.
-   *
-   * @return boolean true if seriousgame_mode has been set to 1, false otherwise
-   * @author ndiechburg <noel@cblue.be>
-   **/
-    public function set_seriousgame_mode() {
+    /**
+     * @param int $seriousGames
+     */
+    public function setSeriousGames($value)
+    {
+        $course_id = api_get_course_int_id();
+        $value = intval($value);
+        $lp_table = Database :: get_course_table(TABLE_LP_MAIN);
+        $sql = "UPDATE $lp_table SET seriousgame_mode = $value WHERE c_id = ".$course_id." AND id = " . $this->get_id();
+        Database::query($sql);
+        $this->seriousgame_mode = $value;
+    }
+
+    /**
+    * Switch the lp in ktm mode. This is a special scorm mode with unique attempt but possibility to do again a completed item.
+    *
+    * @return boolean true if seriousgame_mode has been set to 1, false otherwise
+    * @author ndiechburg <noel@cblue.be>
+    **/
+    public function set_seriousgame_mode()
+    {
         $course_id = api_get_course_int_id();
 		if ($this->debug > 0) {
 			error_log('New LP - In learnpath::set_seriousgame_mode()', 0);
@@ -4902,7 +4916,7 @@ class learnpath
 				$force = 1;
 			}
 			$sql = "UPDATE $lp_table SET seriousgame_mode = $force WHERE c_id = ".$course_id." AND id = " . $this->get_id();
-			$res = Database::query($sql);
+			Database::query($sql);
 			$this->seriousgame_mode = $force;
 			return $force;
 		} else {

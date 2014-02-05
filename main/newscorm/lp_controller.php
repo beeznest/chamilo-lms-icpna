@@ -672,10 +672,12 @@ switch ($action) {
             $_SESSION['oLP']->set_hide_toc_frame($hide_toc_frame);
 
             //$_SESSION['oLP']->set_prerequisite($_REQUEST['prerequisites']);
-            $_SESSION['oLP']->setPrerequisites($_REQUEST['prerequisites']);
+            $preRequisites = isset($_REQUEST['prerequisites']) ? $_REQUEST['prerequisites'] : null;
+            $_SESSION['oLP']->setPrerequisites($preRequisites);
 
             $_SESSION['oLP']->set_use_max_score($_REQUEST['use_max_score']);
-            $_SESSION['oLP']->set_seriousgame_mode($_REQUEST['seriousgame_mode']);
+            $seriousGames = isset($_REQUEST['seriousgame_mode']) ? 1 : 0;
+            $_SESSION['oLP']->setSeriousGames($seriousGames);
 
             if (isset($_REQUEST['activate_start_date_check']) && $_REQUEST['activate_start_date_check'] == 1) {
             	$publicated_on  = $_REQUEST['publicated_on'];

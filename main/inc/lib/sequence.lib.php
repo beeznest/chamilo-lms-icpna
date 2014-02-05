@@ -589,7 +589,7 @@ class Sequence
      * @param int $c_id
      * @param int $session_id
      */
-    public function cleanPrerequisites($id, $c_id, $session_id)
+    public static function cleanPrerequisites($id, $c_id, $session_id)
     {
         $table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
         $row_entity_id_next = self::get_row_entity_id_by_row_id(1, $id, $c_id, $session_id);

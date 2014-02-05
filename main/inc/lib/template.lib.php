@@ -965,6 +965,7 @@ class Template {
     }
 
     function return_logo($theme) {
+        global $extAuthSource;
         $_course = api_get_course_info();
         $html = '';
         $logo = api_get_path(SYS_CODE_PATH).'css/'.$theme.'/images/header-logo.png';
@@ -974,6 +975,9 @@ class Template {
             $site_name = api_get_setting('Institution').' - '.$site_name;
             $html .= '<div id="logo">';
                 $image_url = api_get_path(WEB_CSS_PATH).$theme.'/images/header-logo.png';
+                if (!empty($extAuthSource['modules_path'])) {
+                    $image_url = $extAuthSource['modules_path'];
+                }
                 $logo = Display::img($image_url, $site_name, array('title'=>$site_name));
                 $html .= Display::url($logo, api_get_path(WEB_PATH).'user_portal.php');
             $html .= '</div>';

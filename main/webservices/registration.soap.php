@@ -5598,7 +5598,7 @@ function WSGetCourseFinalScore($params) {
         $sql = "SELECT exe_result, exe_weighting, status
             FROM $tbl_res
             WHERE exe_exo_id = $qid
-                AND exe_cours_id = $cid
+                AND exe_cours_id = '$ccode'
                 AND session_id = $sid
             ORDER BY start_date ASC LIMIT 3";
         $res = Database::query($sql);

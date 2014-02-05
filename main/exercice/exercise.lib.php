@@ -2392,11 +2392,11 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
 
     $total_score_text = null;
 
-    if ($origin != 'learnpath') {
+//    if ($origin != 'learnpath') {
         if ($show_results || $show_only_score) {
             $total_score_text .= get_question_ribbon($objExercise, $total_score, $total_weight, true);
         }
-    }
+//    }
 
     if (!empty($category_list) && ($show_results || $show_only_score)) {
         //Adding total

@@ -104,10 +104,14 @@ function online_logout($user_id = null, $logout_redirect = false) {
     exit_of_chat($user_id);
 
     Session::destroy();
-    if ($logout_redirect) {
-        header("Location: index.php");
-        return;
+    //if ($logout_redirect) {
+    $logout_path = api_get_path(WEB_PATH);
+    if (!empty($extAuthSource['logout_callback'])) {
+        $logout_path = $extAuthSource['logout_callback'];
     }
+    header("Location: ".$logout_path);
+    exit;
+    //}
 }
 
 /**

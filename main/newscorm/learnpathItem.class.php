@@ -73,7 +73,8 @@ class learnpathItem {
      * @param	integer	course int id
 	 * @return	boolean	True on success, false on failure
 	 */
-	public function __construct($id, $user_id = null, $course_id = null, $item_content = null) {
+	public function __construct($id, $user_id = null, $course_id = null, $item_content = null)
+    {
 		// Get items table.
 		if (!isset($user_id)) { $user_id = api_get_user_id(); }
 		if (self::debug > 0) { error_log("learnpathItem constructor: id: $id user_id: $user_id course_id: $course_id item_content: $item_content", 0); }
@@ -1844,7 +1845,8 @@ class learnpathItem {
 	 * @return  void
 	 * @todo //todo insert into lp_item_view if lp_view not exists
 	 */
-	public function set_lp_view($lp_view_id, $course_id = null) {
+	public function set_lp_view($lp_view_id, $course_id = null)
+    {
 	    if (empty($course_id)) {
 	        $course_id = api_get_course_int_id();
 	    } else {
@@ -1935,7 +1937,8 @@ class learnpathItem {
 	 * @param	float	Score
 	 * @return	boolean	True on success, false otherwise
 	 */
-	public function set_score($score) {
+	public function set_score($score)
+    {
         //$possible_status = array('not attempted','incomplete','completed','passed','failed','browsed');
         $debug = self::debug;
    		if ($debug > 0) { error_log('learnpathItem::set_score('.$score.')', 0); }
@@ -1944,7 +1947,7 @@ class learnpathItem {
    			$master = $this->get_mastery_score();
    			$current_status = $this->get_status(false);
 
-            //Fixes bug when SCORM doesn't send a mastery score even if they sent a score!
+            // Fixes bug when SCORM doesn't send a mastery score even if they sent a score!
             if ($master == -1) {
                 $master = $this->max_score;
             }
@@ -1989,7 +1992,8 @@ class learnpathItem {
 	 * @param	string	Status - must be one of the values defined in $this->possible_status
 	 * @return	boolean	True on success, false on error
 	 */
-	public function set_status($status) {
+	public function set_status($status)
+    {
    		if (self::debug > 0) { error_log('learnpathItem::set_status('.$status.')', 0); }
 	 	$found = false;
 	 	foreach ($this->possible_status  as $possible) {
@@ -2588,7 +2592,11 @@ class learnpathItem {
 	 	return true;
 	 }
 
-     function add_audio() {
+    /**
+     * @return bool|null|string
+     */
+    public function add_audio()
+    {
         $course_info = api_get_course_info();
         $filepath = api_get_path(SYS_COURSE_PATH).$course_info['path'].'/document/';
 

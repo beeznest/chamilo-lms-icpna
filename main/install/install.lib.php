@@ -2582,6 +2582,12 @@ function create_course_tables($course_db_name = null) {
         text_when_finished TEXT default NULL,
         display_category_name INT NOT NULL DEFAULT 1,
         pass_percentage INT DEFAULT NULL,
+        end_button int NOT NULL default 0,
+        on_success_message longtext,
+        on_failed_message longtext,
+        email_notification_template longtext default '',
+        email_notification_template_to_user longtext default '',
+        notify_user_by_email int default 0
         PRIMARY KEY (c_id, id)
         )" . $charset_clause;
     Database::query($sql);
@@ -2711,6 +2717,8 @@ function create_course_tables($course_db_name = null) {
         target enum('_self','_blank') NOT NULL default '_self',
         category varchar(20) not null default 'authoring',
         session_id int default 0,
+        custom_icon varchar(255) DEFAULT NULL,
+        description text DEFAULT NULL,
         PRIMARY KEY (c_id, id)
         )" . $charset_clause;
     Database::query($sql);

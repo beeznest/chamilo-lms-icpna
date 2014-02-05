@@ -643,6 +643,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
 #lecciones-curso .span2{
   width: 95px;
   margin-bottom: 20px;
+  margin-left: auto;
 }
 
 .light-blue-bar {
@@ -689,6 +690,35 @@ color: #fff;
   width: 3%;
   float: left;
 }
+
+/*STYLE FOR HEADER COURSE*/
+
+.header-image-modulo{
+    text-align: center;
+    clear: both;
+}
+#course_tools .row .banner-azul{
+  background-color: #4377cd;
+}
+#course_tools .row .banner-plomo{
+  background-color: #273a49;
+}
+#course_tools .row .banner-marron{
+  background-color: #401500;
+}
+#course_tools .row .banner-celeste{
+  background-color: #0187de;
+}
+#course_tools .row .banner-orange{
+  background-color: #ffb86a;
+}
+
+#course_tools .row .banner-rojo{
+  background-color: #ff4745;
+}
+
+
+/*END FOR HEADER COURSE*/
 
 /*FIN DE PERFIL DE USUARIO 500px y 769*/
 

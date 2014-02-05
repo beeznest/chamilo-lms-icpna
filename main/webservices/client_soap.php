@@ -70,7 +70,7 @@ $params = array(
 );
 
 //1. Create user webservice
-$user_id = $client->call('WSCreateUserPasswordCrypted', array('createUserPasswordCrypted' => $params));
+$user_id = @$client->call('WSCreateUserPasswordCrypted', array('createUserPasswordCrypted' => $params));
 
 if (!empty($user_id) && is_numeric($user_id)) {
 
@@ -84,7 +84,7 @@ if (!empty($user_id) && is_numeric($user_id)) {
         'secret_key'                => $secret_key
     );
 
-    $result = $client->call('WSGetUser', array('GetUser' => $params));
+    $result = @$client->call('WSGetUser', array('GetUser' => $params));
 
     if ($result) {
         echo "Random user was created user_id: $user_id <br /><br />";
@@ -115,7 +115,7 @@ if (!empty($user_id) && is_numeric($user_id)) {
             array('field_name' => 'DNI', 'field_value' => '888 edited')
         ),
     );
-    $result = $client->call('WSEditUserPasswordCrypted', array('editUserPasswordCrypted' => $params));
+    $result = @$client->call('WSEditUserPasswordCrypted', array('editUserPasswordCrypted' => $params));
 
     if ($result) {
         echo "Random user was update user_id: $user_id <br /><br />";
@@ -138,12 +138,24 @@ if (!empty($user_id) && is_numeric($user_id)) {
         'secret_key' => $secret_key
     );
 
-    //Disable user
-    $result = $client->call('WSDisableUsers', array('user_ids' => $params));
+    // Disable user.
+    $result = @$client->call('WSDisableUsers', array('user_ids' => $params));
 
-    //Enable user
-    $result = $client->call('WSEnableUsers', array('user_ids' => $params));
+    // Enable user.
+    $result = @$client->call('WSEnableUsers', array('user_ids' => $params));
 
+    $userEmailParams = array(
+        'original_user_id_value'    => $random_user_id, // third party user id
+        'original_user_id_name'     => $user_field, // the system field in the user profile (See Profiling)
+        'secret_key'                => $secret_key,
+        'subject' => 'hi there',
+        'message' => 'great'
+    );
+
+    // Send message
+    $result = $client->call('WSSendEmailByOriginalUserId', array('SendEmail' => $userEmailParams));
+
+    $err = $client->getError();
 
     //4 Creating course TEST123
 
@@ -161,7 +173,7 @@ if (!empty($user_id) && is_numeric($user_id)) {
         'secret_key'=> $secret_key,
     );
 
-    $result = $client->call('WSCreateCourse', array('createCourse' => $params));
+    $result = @$client->call('WSCreateCourse', array('createCourse' => $params));
 
     //5 .Adding user to the course TEST. The course TEST must be created manually in Chamilo
     echo '<h2>Trying to add user to a course called TEST via webservices</h2>';

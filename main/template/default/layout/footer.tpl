@@ -5,9 +5,9 @@
                     <div class="span2">
                         <img src="/main/css/icpnatdp/images/header-logo.png">
                     </div>
-                    <div class="span2 topline"><a href="#">Preguntas frecuentes</a></div>
-                    <div class="span2 topline"><a href="#">Política de privacidad</a></div>
-                    <div class="span2 topline"><a href="#">Término del servicios</a></div>
+                    <div class="span2 topline"><a href="#" data-toggle="modal" data-target="#FAQ">Preguntas frecuentes</a></div>
+                    <div class="span2 topline"><a href="#" data-toggle="modal" data-target="#privacidad">Política de privacidad</a></div>
+                    <div class="span2 topline"><a href="#" data-toggle="modal" data-target="#terminos">Término del servicios</a></div>
                     <div class="span2">
                        
                         <img src="/main/css/icpnatdp/images/logo-icpna.png">
@@ -23,7 +23,7 @@
         </div>
     </div><!-- end of #container -->
 </footer>
-
+{%include 'default/layout/modal_footer.tpl'%}
 {{ footer_extra_content }}
 
 {% raw %}

@@ -674,7 +674,6 @@ switch ($action) {
             //$_SESSION['oLP']->set_prerequisite($_REQUEST['prerequisites']);
             $preRequisites = isset($_REQUEST['prerequisites']) ? $_REQUEST['prerequisites'] : null;
             $_SESSION['oLP']->setPrerequisites($preRequisites);
-
             $_SESSION['oLP']->set_use_max_score($_REQUEST['use_max_score']);
             $seriousGames = isset($_REQUEST['seriousgame_mode']) ? 1 : 0;
             $_SESSION['oLP']->setSeriousGames($seriousGames);
@@ -722,6 +721,7 @@ switch ($action) {
                     }
                 }
             }
+
             $url = api_get_self().'?action=add_item&type=step&lp_id='.intval($_SESSION['oLP']->lp_id).'&'.api_get_cidreq();
             header('Location: '.$url);
             exit;

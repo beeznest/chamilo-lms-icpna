@@ -4371,20 +4371,19 @@ class learnpath
         if ($this->debug > 0) {
             error_log('New LP - In learnpath::set_prerequisite()', 0);
         }
-        if (empty($prerequisite)) {
-            return false;
-        }
         $this->prerequisite = intval($prerequisite);
 
         $lp_table = Database :: get_course_table(TABLE_LP_MAIN);
         $lp_id = $this->get_id();
         $sql = "UPDATE $lp_table SET prerequisite = '".$this->prerequisite."'
                 WHERE c_id = ".$course_id." AND id = '$lp_id'";
+        Database::query($sql);
+
         if ($this->debug > 2) {
             error_log('New LP - lp updated with new preview requisite : ' . $this->prerequisite, 0);
         }
-        Database::query($sql);
-        //Rule sequence 70% of pre-req #7220
+
+        // Rule sequence 70% of pre-req #7220
         require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
         Sequence::temp_hack_3_update(1, 1, $this->prerequisite, $lp_id, $course_id, api_get_session_id());
         return true;
@@ -4400,7 +4399,10 @@ class learnpath
             error_log('New LP - In learnpath::set_prerequisite()', 0);
         }
         require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
+
         Sequence::cleanPrerequisites($this->get_id(), api_get_course_int_id(), api_get_session_id());
+        $this->set_prerequisite(null);
+
         if (!empty($prerequisites)) {
             foreach ($prerequisites as $prerequisite) {
                 $this->set_prerequisite($prerequisite);
@@ -4879,13 +4881,27 @@ class learnpath
         $this->set_attempt_mode($next_mode);
     }
 
-  /**
-   * Swithc the lp in ktm mode. This is a special scorm mode with unique attempt but possibility to do again a completed item.
-   *
-   * @return boolean true if seriousgame_mode has been set to 1, false otherwise
-   * @author ndiechburg <noel@cblue.be>
-   **/
-    public function set_seriousgame_mode() {
+    /**
+     * @param int $seriousGames
+     */
+    public function setSeriousGames($value)
+    {
+        $course_id = api_get_course_int_id();
+        $value = intval($value);
+        $lp_table = Database :: get_course_table(TABLE_LP_MAIN);
+        $sql = "UPDATE $lp_table SET seriousgame_mode = $value WHERE c_id = ".$course_id." AND id = " . $this->get_id();
+        Database::query($sql);
+        $this->seriousgame_mode = $value;
+    }
+
+    /**
+    * Switch the lp in ktm mode. This is a special scorm mode with unique attempt but possibility to do again a completed item.
+    *
+    * @return boolean true if seriousgame_mode has been set to 1, false otherwise
+    * @author ndiechburg <noel@cblue.be>
+    **/
+    public function set_seriousgame_mode()
+    {
         $course_id = api_get_course_int_id();
 		if ($this->debug > 0) {
 			error_log('New LP - In learnpath::set_seriousgame_mode()', 0);
@@ -4902,7 +4918,7 @@ class learnpath
 				$force = 1;
 			}
 			$sql = "UPDATE $lp_table SET seriousgame_mode = $force WHERE c_id = ".$course_id." AND id = " . $this->get_id();
-			$res = Database::query($sql);
+			Database::query($sql);
 			$this->seriousgame_mode = $force;
 			return $force;
 		} else {
@@ -4934,7 +4950,7 @@ class learnpath
                 $force = 1;
             }
             $sql = "UPDATE $lp_table SET debug = $force WHERE c_id = ".$course_id." AND id = " . $this->get_id();
-            $res = Database::query($sql);
+            Database::query($sql);
             $this->scorm_debug = $force;
             return $force;
         } else {
@@ -8108,7 +8124,8 @@ class learnpath
         $return = '';
 
         $selectedPrerequisites = array($row['prerequisite']);
-        $entities = Sequence::getAllRowEntityIdByRowId(1, 1, $this->course_int_id, $this->get_lp_session_id());
+        $entities = Sequence::getAllRowEntityIdByRowId(1, $this->get_id(), $this->course_int_id, $this->get_lp_session_id());
+
         if (!empty($entities)) {
             foreach($entities as $data) {
                 $selectedPrerequisites[] = $data['row_id'];
@@ -8124,7 +8141,7 @@ class learnpath
                 }
                 $selected = in_array($row['id'], $selectedPrerequisites);
                 $return .= '<option value="'.$row['id'].'" '.($selected ? ' selected ' : '').'>'.
-                        $row['name'].'</option>';
+                $row['name'].'</option>';
             }
         }
         $return .= '</select>';

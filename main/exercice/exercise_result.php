@@ -128,7 +128,7 @@ $i = $total_score = $total_weight = 0;
 //We check if the user attempts before sending to the exercise_result.php
 if ($objExercise->selectAttempts() > 0) {
     $attempt_count = get_attempt_count(api_get_user_id(), $objExercise->id, $learnpath_id, $learnpath_item_id, $learnpath_item_view_id);
-    if ($attempt_count >= $objExercise->selectAttempts()) {
+    if ($attempt_count >= $objExercise->selectAttempts() && !isset($_SESSION['try_once']) ) {
         Display :: display_warning_message(sprintf(get_lang('ReachedMaxAttempts'), $objExercise->selectTitle(), $objExercise->selectAttempts()), false);
         if ($origin != 'learnpath') {
             //we are not in learnpath tool

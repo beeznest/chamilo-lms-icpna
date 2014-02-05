@@ -107,6 +107,34 @@ if ($time_control && !empty($clock_expired_time) || !empty($attempt_list)) {
 
 if (!empty($attempt_list)) {
 	$message = Display::return_message(get_lang('YouTriedToResolveThisExerciseEarlier'));
+
+    if (!empty($exercise_stat_info['start_date'])) {
+        $startedDate = api_strtotime($exercise_stat_info['start_date']);
+        $current_timestamp = time();
+        $expected_time = $startedDate + $objExercise->expired_time*60;
+        $diff = $current_timestamp - $expected_time;
+        var_dump($diff);
+        if ($diff > 0) {
+            $objExercise->attempts = 2;
+
+            update_event_exercice($exercise_stat_info['exe_id'],
+                $exercise_stat_info['exe_exo_id'],
+                $exercise_stat_info['exe_result'],
+                $exercise_stat_info['exe_weighting'],
+                $exercise_stat_info['session_id'],
+                $learnpath_id,
+                $learnpath_item_id,
+                $learnpath_item_view_id,
+                $exercise_stat_info['exe_duration'],
+                '', //status
+                array(),
+                null
+            );
+
+            $_SESSION['try_once'] = true;
+
+        }
+    }
 }
 
 //2. Exercise button
@@ -129,6 +157,8 @@ if ($visible_return['value'] == false) {
 
 $attempts = get_exercise_results_by_user(api_get_user_id(), $objExercise->id, api_get_course_id(), api_get_session_id(), $learnpath_id, $learnpath_item_id, 'desc');
 $counter = count($attempts);
+
+$exercise_stat_info = $objExercise->get_stat_track_exercise_info($learnpath_id, $learnpath_item_id, 0, '');
 
 $my_attempt_array = array();
 $table_content = '';

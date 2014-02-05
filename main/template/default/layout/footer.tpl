@@ -7,7 +7,7 @@
                     </div>
                     <div class="span2 topline"><a href="#" data-toggle="modal" data-target="#FAQ">Preguntas frecuentes</a></div>
                     <!-- <div class="span2 topline"><a href="#">Política de privacidad</a></div> -->
-                    <div class="span2 topline"><a href="#" data-toggle="modal" data-target="#terminos">Término del servicios</a></div>
+                    <div class="span2 topline"><a href="#" data-toggle="modal" data-target="#terminos">Términos del servicios</a></div>
                     <div class="span3">
                        
                         <center><img src="/main/css/icpnatdp/images/logo-icpna.png"></center>

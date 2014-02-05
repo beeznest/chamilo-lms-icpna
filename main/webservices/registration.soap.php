@@ -3117,12 +3117,12 @@ $server->register('WSCreateSession',			// method name
 // define the method WSCreateSession
 function WSCreateSession($params) {
 
-    global $_user;
+    global $_user, $debug;
 
     if(!WSHelperVerifyKey($params)) {
         return return_error(WS_ERROR_SECRET_KEY);
     }
-
+    if ($debug) error_log('WSCreateSession params: '.print_r($params,1));
     $tbl_user		= Database::get_main_table(TABLE_MAIN_USER);
     $tbl_session	= Database::get_main_table(TABLE_MAIN_SESSION);
     $t_sf 			= Database::get_main_table(TABLE_MAIN_SESSION_FIELD);
@@ -3418,14 +3418,14 @@ function WSEditSession($params) {
 /* Register WSSubscribeUserToCourse function */
 // Register the data structures used by the service
 $server->wsdl->addComplexType(
-'originalUsersList',
-'complexType',
-'array',
-'',
-'SOAP-ENC:Array',
-array(),
-array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:deleteSessionParams[]')),
-'tns:originalUsersList'
+    'originalUsersList',
+    'complexType',
+    'array',
+    '',
+    'SOAP-ENC:Array',
+    array(),
+    array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:deleteSessionParams[]')),
+    'tns:originalUsersList'
 );
 
 $server->wsdl->addComplexType(
@@ -4111,7 +4111,7 @@ $server->wsdl->addComplexType(
     'all',
     '',
     array(
-        'original_user_id_values' => array('name' => 'original_user_id_values', 'type' => 'tns:originalUsersList'),
+        'original_user_id_value' => array('name' => 'original_user_id_value', 'type' => 'xsd:string'),
         'original_user_id_name' => array('name' => 'original_user_id_name', 'type' => 'xsd:string'),
         'original_session_id_value' => array('name' => 'original_session_id_value', 'type' => 'xsd:string'),
         'original_session_id_name' => array('name' => 'original_session_id_name', 'type' => 'xsd:string')
@@ -4178,33 +4178,37 @@ $server->register('WSSuscribeUsersToSession',						// method name
 );
 
 // define the method WSSuscribeUsersToSession
-function WSSuscribeUsersToSession($params){
+function WSSuscribeUsersToSession($params) {
 
-     if(!WSHelperVerifyKey($params)) {
+    global $debug;
+
+    if(!WSHelperVerifyKey($params)) {
         return return_error(WS_ERROR_SECRET_KEY);
     }
+    if ($debug) error_log('WSSuscribeUsersToSession');
+    if ($debug) error_log('$params: '.print_r($params, 1));
 
     $user_table = Database::get_main_table(TABLE_MAIN_USER);
-     $t_uf = Database::get_main_table(TABLE_MAIN_USER_FIELD);
+    $t_uf = Database::get_main_table(TABLE_MAIN_USER_FIELD);
     $t_ufv = Database::get_main_table(TABLE_MAIN_USER_FIELD_VALUES);
     $t_sf = Database::get_main_table(TABLE_MAIN_SESSION_FIELD);
     $t_sfv = Database::get_main_table(TABLE_MAIN_SESSION_FIELD_VALUES);
     $tbl_session_rel_course				= Database::get_main_table(TABLE_MAIN_SESSION_COURSE);
     $tbl_session_rel_course_rel_user	= Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
-       $tbl_session_rel_user 				= Database::get_main_table(TABLE_MAIN_SESSION_USER);
-       $tbl_session						= Database::get_main_table(TABLE_MAIN_SESSION);
+    $tbl_session_rel_user 				= Database::get_main_table(TABLE_MAIN_SESSION_USER);
+    $tbl_session						= Database::get_main_table(TABLE_MAIN_SESSION);
 
-       $userssessions_params = $params['userssessions'];
+    $userssessions_params = $params['userssessions'];
     $results = array();
     $orig_user_id_value = array();
     $orig_session_id_value = array();
     foreach($userssessions_params as $usersession_params) {
 
-           $original_session_id_value = $usersession_params['original_session_id_value'];
+        $original_session_id_value = $usersession_params['original_session_id_value'];
         $original_session_id_name = $usersession_params['original_session_id_name'];
         $original_user_id_name = $usersession_params['original_user_id_name'];
-        $original_user_id_values = $usersession_params['original_user_id_values'];
-           $orig_session_id_value[] = $original_session_id_value;
+        $original_user_id_value = $usersession_params['original_user_id_value'];
+        $orig_session_id_value[] = $original_session_id_value;
         // get session id from original session id
         $sql_session = "SELECT session_id FROM $t_sf sf,$t_sfv sfv WHERE sfv.field_id=sf.id AND field_variable='$original_session_id_name' AND field_value='$original_session_id_value'";
         $res_session = Database::query($sql_session);
@@ -4212,26 +4216,24 @@ function WSSuscribeUsersToSession($params){
 
          $id_session = $row_session[0];
 
-         if (Database::num_rows($res_session) < 1) {
+        if (Database::num_rows($res_session) < 1) {
             $results[] = 0;
             continue;
         }
 
-         $usersList = array();
-         foreach ($original_user_id_values as $key => $row_original_user_list) {
-             $user_id = UserManager::get_user_id_from_original_id($original_user_id_values[$key], $original_user_id_name[$key]);
-             if ($user_id == 0) {
-                continue; // user_id doesn't exist.
-            } else {
-                $sql = "SELECT user_id FROM $user_table WHERE user_id ='".$user_id."' AND active= '0'";
-                $resu = Database::query($sql);
-                $r_check_user = Database::fetch_row($resu);
-                if (!empty($r_check_user[0])) {
-                    continue; // user_id is not active.
-                }
+        $usersList = array();
+        $user_id = UserManager::get_user_id_from_original_id($original_user_id_value, $original_user_id_name);
+        if ($user_id == 0) {
+            continue; // user_id doesn't exist.
+        } else {
+            $sql = "SELECT user_id FROM $user_table WHERE user_id ='".$user_id."' AND active= '0'";
+            $resu = Database::query($sql);
+            $r_check_user = Database::fetch_row($resu);
+            if (!empty($r_check_user[0])) {
+                continue; // user_id is not active.
             }
-            $usersList[] = $user_id;
-         }
+        }
+        $usersList[] = $user_id;
 
         if (empty($usersList)) {
             $results[] = 0;
@@ -4303,8 +4305,12 @@ function WSSuscribeUsersToSession($params){
 
     $count_results = count($results);
     $output = array();
-    for($i = 0; $i < $count_results; $i++) {
-        $output[] = array('original_user_id_values' => $orig_user_id_value[$i], 'original_session_id_value' => $orig_session_id_value[$i], 'result' => $results[$i]);
+    for ($i = 0; $i < $count_results; $i++) {
+        $output[] = array(
+            'original_user_id_values' => $orig_user_id_value[$i],
+            'original_session_id_value' => $orig_session_id_value[$i],
+            'result' => $results[$i]
+        );
     }
 
     return $output;
@@ -5493,12 +5499,13 @@ $server->register('WSGetCourseFinalScore',		// method name
  */
 function WSGetCourseFinalScore($params) {
 
-    global $_user;
+    global $_user, $debug;
 
     if(!WSHelperVerifyKey($params)) {
         return return_error(WS_ERROR_SECRET_KEY);
     }
 
+    if ($debug) { error_log(__FUNCTION__.', params: '.print_r($params,1)); }
     $tbl_user       = Database::get_main_table(TABLE_MAIN_USER);
     $t_uf = Database::get_main_table(TABLE_MAIN_USER_FIELD);
     $t_ufv = Database::get_main_table(TABLE_MAIN_USER_FIELD_VALUES);
@@ -5567,7 +5574,7 @@ function WSGetCourseFinalScore($params) {
         $sql = "SELECT exe_result, exe_weighting, status
             FROM $tbl_res
             WHERE exe_exo_id = $qid
-                AND exe_cours_id = $cid
+                AND exe_cours_id = '$ccode'
                 AND session_id = $sid
             ORDER BY start_date ASC LIMIT 2";
         $res = Database::query($sql);
@@ -5628,8 +5635,7 @@ function WSGetCourseFinalScore($params) {
         }
     }
 
-    $output = array();
-    $output[] = array(
+    $output = array(
         'original_session_id_value' => $params['original_session_id_value'],
         'result' => $score,
     );

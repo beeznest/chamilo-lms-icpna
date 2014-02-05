@@ -29,7 +29,6 @@
     padding-bottom: 2px;
     text-decoration: none;
     font-family: Helvetica,Arial,sans-serif;
-   
 }
 
 .inner_lp_toc .scorm_item a.chapter_module {
@@ -39,13 +38,13 @@
 
 .inner_lp_toc .scorm-status-completed{
     background-color: #666573;
-    background-image: url("images/check.png");
-    background-position: 190px center;
+    background-image: url("images/check.png") !important;
+    background-position: 190px center !important;
     background-repeat: no-repeat;
 }
 
-.inner_lp_toc .scorm_item_highlight {   
-    /*background-color: #d80100; */ /* Color Rojo */ 
+.inner_lp_toc .scorm_item_highlight {
+    /*background-color: #d80100; */ /* Color Rojo */
     background-color: #0134A1;  /* Color Azul */
     padding: 10px 10px 10px 35px;
     margin-top: 5px;
@@ -74,7 +73,7 @@
 }
 
 .inner_lp_toc .scorm_item_1 {
-    /*background-color:#CCCCCC;*/   
+    /*background-color:#CCCCCC;*/
     padding: 10px 35px;
     font-weight: normal;
     margin-top: 5px;
@@ -82,10 +81,10 @@
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px;
-    /* background:#FDFDFD; */   
+    /* background:#FDFDFD; */
 }
 
-.inner_lp_toc .scorm_item_2 {    
+.inner_lp_toc .scorm_item_2 {
     /*background-color: #CCCCCC; */
     padding: 10px 35px;
     text-decoration: none;

@@ -470,17 +470,18 @@ $current_expired_time_key = get_time_control_key($objExercise->id, $learnpath_id
 $_SESSION['duration_time'][$current_expired_time_key] = $current_timestamp;
 
 if ($time_control) {
-	//Get the expired time of the current exercice in track_e_exercices
+	// Get the expired time of the current exercice in track_e_exercices
 	$total_seconds = $objExercise->expired_time*60;
 }
 
 $show_clock = true;
 $user_id = api_get_user_id();
+
 if ($objExercise->selectAttempts() > 0) {
 	$attempt_html = '';
 	$attempt_count = get_attempt_count($user_id, $exerciseId, $learnpath_id, $learnpath_item_id, $learnpath_item_view_id);
 
-	if ($attempt_count >= $objExercise->selectAttempts()) {
+    if ($attempt_count >= $objExercise->selectAttempts() && !isset($_SESSION['try_once']) ) {
 		$show_clock = false;
 		if (!api_is_allowed_to_edit(null,true)) {
 

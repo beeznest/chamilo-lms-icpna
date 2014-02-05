@@ -1,6 +1,6 @@
 <?php
 
-class SessionModel extends model {
+class SessionModel extends Model {
        
     public $columns = array(
         'id', 

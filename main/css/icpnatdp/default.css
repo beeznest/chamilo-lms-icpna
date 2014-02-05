@@ -65,89 +65,32 @@ footer {
     background-image: url(images/color.png);
     background-repeat:repeat-x;    
     color:#ffffff;
-    height: 15em;
-}
-
-footer .container .row{
-    padding-top: 0px;
-}
-footer .container .row .padding-footer{
+    height: 10em;
+    margin-top: 5px;
     padding-top: 3em;
 }
-footer .container .row .title{
-    font-size: 16px;
-    font-family: "Arial,sans-serif,Sans"
-    padding: 0px;
-    margin: 0px;
-    display: block;
+footer .topline{
+  padding-top: 1em;
+  font-size: 16px;
 }
-footer .container .row .listen{
-    list-style: none;
-    padding: 0px;
-    margin: 0px;
+footer .centerline{
+  font-size: 11px;
+  text-align: center;
+  padding-top: 1em;
+  padding-left: 2em;
 }
-footer .container .row .listen a{
-    color: #fff;
+footer .container .row {
+  padding-top: 10px;
+  padding-left: 4em;
 }
-footer .container .row .listen a:hover{
-    text-decoration: underline;
+footer .container .row a{
+  color: #ffffff
 }
-footer .container .line{
-    padding-top: 1em;
-    text-align: left;
+footer .container .row .span12{
+  padding-left: 4em;
 }
-footer .container .line a{
-    color: #fff;
-    font-size: 10px;
-}
-footer .container .line a:hover{
-    text-decoration: underline;
-}
-footer .container .row .span4 .span1{
-    width: 30px;
-    margin-left: 5px;
-}
-footer .facebook{
-    background:url(images/social-media.png) no-repeat 0 0;
-    width: 30px;
-    height: 30px;
-}
-footer .facebook:hover{
-    background:url(images/social-media.png) no-repeat 0 -30px;
-}
-footer .facebook a{
-    display: block;
-    width: 30px;
-    height: 30px;
-    text-indent: -9999px;
-}
-footer .twitter{
-    background:url(images/social-media.png) no-repeat -29px 0;
-    width: 30px;
-    height: 30px;
-}
-footer .twitter:hover{
-    background:url(images/social-media.png) no-repeat -29px -30px;
-}
-footer .twitter a{
-    display: block;
-    width: 30px;
-    height: 30px;
-    text-indent: -9999px;
-}
-footer .youtube{
-    background:url(images/social-media.png) no-repeat -60px 0;
-    width: 30px;
-    height: 30px;
-}
-footer .youtube:hover{
-    background:url(images/social-media.png) no-repeat -60px -30px;
-}
-footer .youtube a{
-    display: block;
-    width: 30px;
-    height: 30px;
-    text-indent: -9999px;
+footer .container .row a:hover{
+  text-decoration: underline;
 }
 /*****************************************************
  *  DISPLAY MESSAGES                               *
@@ -341,7 +284,7 @@ header #logo {
 }
 .blue-back-bar{
     background-color: #5e92ff;
-    padding-left:30px;
+    /*padding-left:30px;*/
 }
 .blue-back-bar span{
   /*text-indent:-20px;
@@ -414,11 +357,6 @@ header #logo {
     position: relative;
 }
 
-.row .center:hover{
-    background: url(images/estados-iconos-hover.png) no-repeat;
-    background-position: 2px 1px;
-    cursor: pointer;
-}
 
 .row .state-icon-completed{
     background: transparent url(images/estados-iconos.png) no-repeat;
@@ -448,7 +386,7 @@ header #logo {
 .row .state-icon-closed{
     background: transparent url(images/estados-iconos.png) no-repeat;
     background-position: -210px 0px;
-    cursor: pointer;
+    cursor: default;
     display: block;
     height: 95px;
     width: 100px;
@@ -701,10 +639,10 @@ color: #fff;
   background-color: #4377cd;
 }
 #course_tools .row .banner-plomo{
-  background-color: #273a49;
+  background-color: #465167;
 }
 #course_tools .row .banner-marron{
-  background-color: #401500;
+  background-color: #000000;
 }
 #course_tools .row .banner-celeste{
   background-color: #0187de;
@@ -805,7 +743,97 @@ color: #fff;
 }
 
 }
-    
+
+/*STYLE INBOX*/
+.siderbar-social{
+  background-color:#EFEFEF;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  padding:1em;
+}
+.nav-list > li > a, .nav-list .nav-header {
+  margin-left: -15px;
+  margin-right: -15px;
+  text-shadow: none;
+}
+.siderbar-social .sidebar-nav .nav li a{
+  padding-top: 10px;
+  padding-bottom: 10px;
+  color: #424242;
+  text-shadow:none;
+}
+.siderbar-social .sidebar-nav .nav li a:hover{
+  background-color: #E5EDF9;
+}
+.sidebar-nav .nav-list > .active > a, .nav-list > .active > a:hover {
+  background-color: #FAFAFA;
+}
+.social-background-content img{
+  border: 3px solid #ffffff;
+  -webkit-box-shadow: 0px 1px 4px 0px rgba(50, 50, 50, 0.78);
+  -moz-box-shadow:    0px 1px 4px 0px rgba(50, 50, 50, 0.78);
+  box-shadow:         0px 1px 4px 0px rgba(50, 50, 50, 0.78);
+}
+.perfil_edit{
+  padding: 5px;
+  margin-top: 10px;
+}
+.perfil_edit a{
+  color: #424242;
+}
+.perfil_edit a:hover{
+  color: #424242;
+  text-decoration: underline;
+}
+
+.actions {
+  background: none repeat scroll 0 0 #818181;
+  height: 32px;
+  margin-bottom: 11px;
+  padding: 5px 5px 5px 14px;
+  vertical-align: middle;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  border: none;
+}
+.well_border {
+   -webkit-border-radius: none;
+  -moz-border-radius: none;
+  border-radius: none;
+  box-shadow: none;
+  margin-bottom: 20px;
+  min-height: 20px;
+  padding: 19px;
+  border: none;
+}
+.actions a{
+  color: #ffffff;
+}
+.actions a:hover{
+  color: #FFCC00;
+}
+.data_table {
+  border: none;
+  margin-bottom: 18px;
+  width: 100%;
+}
+.data_table th, .data_table td {
+  border-top: none;
+  line-height: 18px;
+  padding: 6px;
+  text-align: left;
+  vertical-align: top;
+}
+.actions a img {
+  margin-right: 10px;
+  padding: 0;
+  float: none;
+}
+/*END STYLE IBOX*/
+
+
 @media (min-width: 460px) and (max-width: 981px) {
 header .row-fluid .span9 {
   width: auto;

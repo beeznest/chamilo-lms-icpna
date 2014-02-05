@@ -2994,7 +2994,8 @@ function api_not_found($print_headers = false) {
  * @version 1.0, February 2004
  * @version dokeos 1.8, August 2006
  */
-function api_not_allowed($print_headers = false, $message = null) {
+function api_not_allowed($print_headers = false, $message = null)
+{
     global $app, $extAuthSource;
     if (api_get_setting('sso_authentication') === 'true') {
         global $osso;
@@ -6499,7 +6500,6 @@ function api_get_js_simple($file) {
     return '<script type="text/javascript" src="'.$file.'"></script>'."\n";
 }
 
-
 function api_set_settings_and_plugins() {
     global $_configuration;
     //error_log('Loading settings from DB');
@@ -6587,6 +6587,64 @@ function api_set_settings_and_plugins() {
 function api_set_setting_last_update() {
     //Saving latest refresh
     api_set_setting('settings_latest_update', api_get_utc_datetime());
+}
+
+/**
+ * Tries to set memory limit, if authorized and new limit is higher than current
+ * @param string New memory limit
+ * @return bool True on success, false on failure or current is higher than suggested
+ * @assert (null) === false
+ * @assert (-1) === false
+ * @assert (0) === true
+ * @assert ('1G') === true
+ */
+function api_set_memory_limit($mem){
+    //if ini_set() not available, this function is useless
+    if (!function_exists('ini_set') || is_null($mem) || $mem == -1) {
+        return false;
+    }
+
+    $memory_limit = ini_get('memory_limit');
+    if (api_get_bytes_memory_limit($mem) > api_get_bytes_memory_limit($memory_limit)){
+        ini_set('memory_limit', $mem);
+        return true;
+    }
+    return false;
+}
+
+
+/**
+ * Gets memory limit in bytes
+ * @param string The memory size (128M, 1G, 1000K, etc)
+ * @return int
+ * @assert (null) === false
+ * @assert ('1t')  === 1099511627776
+ * @assert ('1g')  === 1073741824
+ * @assert ('1m')  === 1048576
+ * @assert ('100k') === 102400
+ */
+function api_get_bytes_memory_limit($mem){
+    $size = strtolower(substr($mem,-1));
+
+    switch ($size) {
+        case 't':
+            $mem = intval(substr($mem,-1))*1024*1024*1024*1024;
+            break;
+        case 'g':
+            $mem = intval(substr($mem,0,-1))*1024*1024*1024;
+            break;
+        case 'm':
+            $mem = intval(substr($mem,0,-1))*1024*1024;
+            break;
+        case 'k':
+            $mem = intval(substr($mem,0,-1))*1024;
+            break;
+        default:
+            // we assume it's integer only
+            $mem = intval($mem);
+            break;
+    }
+    return $mem;
 }
 
 /**

@@ -326,6 +326,7 @@ if (Database::num_rows($res_media) > 0) {
         if (!empty($row_media['audio'])) {$show_audioplayer = true; break;}
     }
 }
+
 echo '<div id="learning_path_main" style="width:100%;height:100%;">';
     $is_allowed_to_edit = api_is_allowed_to_edit(null, true, false, false);
     /*
@@ -436,6 +437,13 @@ echo '<div id="learning_path_main" style="width:100%;height:100%;">';
 </div>
 
 <script>
+    $(function() {
+        // Return to the course home. icp-tdp
+        $('.column-one a').on('click', function() {
+            window.parent.API.save_asset();
+        });
+    });
+
     // Resize right and left pane to full height (HUB 20-05-2010).
 //    function updateContentHeight() {
 //        document.body.style.overflow = 'hidden';

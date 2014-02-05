@@ -343,29 +343,20 @@ class GDWrapper extends ImageWrapper {
      */
     function convert2bw() {
         if (!$this->image_validated) return false;
-        // Transform to BW
-        $dest_img = imagecreate($this->width, $this->height);
-        @imagealphablending($dest_img, false);
-        @imagesavealpha($dest_img, true);
-        $palette = array();
-        for ($c = 0; $c < 256; $c++) {
-            $palette[$c] = imagecolorallocate($dest_img, $c, $c, $c);
-        }
-        //Read the original colors pixel by pixel
-        for ($y=0; $y < $this->height; $y++) {
-            for ($x=0; $x < $this->width; $x++) {
-                $rgb = imagecolorat($this->bg, $x, $y);
-                $r = ($rgb >> 16) & 0xFF;
-                $g = ($rgb >> 8) & 0xFF;
-                $b = $rgb & 0xFF;
-                //This is where we actually use yiq to modify our rbg values, and then convert them to our grayscale palette
-                $gs = $this->yiq($r, $g, $b);
-                imagesetpixel($dest_img, $x, $y, $palette[$gs]);
-            }
-        }
-        @ImageCopyResampled($dest_img, $this->bg, 0, 0, 0, 0, $this->width, $this->height, ImageSX($this->bg), ImageSY($this->bg));
+        
+        $dest_img = imagecreatetruecolor(imagesx($this->bg), imagesy($this->bg));
+        /* copy ignore the transparent color
+         * so that we can use black (0,0,0) as transparent, which is what 
+         * the image is filled with when created.
+         */
+        $transparent = imagecolorallocate($dest_img, 0,0,0);
+        imagealphablending($dest_img, false);
+        imagesavealpha($dest_img, true);
+        imagecolortransparent($dest_img, $transparent);
+        imagecopy($dest_img, $this->bg, 0,0, 0, 0,imagesx($this->bg), imagesx($this->bg));
+        imagefilter($dest_img, IMG_FILTER_GRAYSCALE);
         $this->bg = $dest_img;
-
+        
         return true;
     }
 	

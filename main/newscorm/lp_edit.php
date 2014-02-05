@@ -7,7 +7,7 @@
 */
 
 require_once api_get_path(LIBRARY_PATH).'specific_fields_manager.lib.php';
-
+require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
 global $charset;
 
 $show_description_field = false; //for now
@@ -23,9 +23,9 @@ if (isset($_SESSION['gradebook'])) {
 
 if (!empty($gradebook) && $gradebook == 'view') {
     $interbreadcrumb[] = array (
-            'url' => '../gradebook/'.$_SESSION['gradebook_dest'],
-            'name' => get_lang('ToolGradebook')
-        );
+        'url' => '../gradebook/'.$_SESSION['gradebook_dest'],
+        'name' => get_lang('ToolGradebook')
+    );
 }
 $interbreadcrumb[] = array('url' => 'lp_controller.php?action=list', 'name' => get_lang('LearningPaths'));
 $interbreadcrumb[] = array('url' => api_get_self()."?action=build&lp_id=".$_SESSION['oLP']->get_id(), 'name' => $_SESSION['oLP']->get_name());
@@ -206,7 +206,6 @@ $form->addElement('style_submit_button', 'Submit',get_lang('SaveLPSettings'),'cl
 // Hidden fields
 $form->addElement('hidden', 'action', 'update_lp');
 $form->addElement('hidden', 'lp_id', $_SESSION['oLP']->get_id());
-
 
 $defaults['publicated_on']  = ($publicated_on!='0000-00-00 00:00:00' && !empty($publicated_on))? api_get_local_time($publicated_on) : date('Y-m-d 12:00:00');
 $defaults['expired_on']     = ($expired_on   !='0000-00-00 00:00:00' && !empty($expired_on) )? api_get_local_time($expired_on): date('Y-m-d 12:00:00',time()+84600);

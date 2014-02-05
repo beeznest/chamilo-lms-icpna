@@ -5100,15 +5100,16 @@ class Exercise
             $twig->addGlobal('course', $courseInfo);
 
             if ($exerciseWasPassed) {
-                $twig->addGlobal('exercise_result_message', $this->getOnSuccessMessage());
+                $twig->addGlobal('exercise_result_message', 1); #$this->getOnSuccessMessage());
             } else {
-                $twig->addGlobal('exercise_result_message', $this->getOnFailedMessage());
+                $twig->addGlobal('exercise_result_message', 0); #$this->getOnFailedMessage());
             }
 
             $resultInfo = array();
             $resultInfoToString = null;
             $countCorrectToString = null;
 
+            $twigScore = '';
             if (!empty($exerciseResult)) {
 
                 $countCorrect = array();
@@ -5116,6 +5117,7 @@ class Exercise
                 $countCorrect['total'] = 0;
                 $counter = 1;
                 foreach ($exerciseResult as $questionId => $result) {
+                    $twigScore += $result['score']['score'];
                     $resultInfo[$questionId] = isset($result['details']['user_choices']) ? $result['details']['user_choices'] : null;
                     $correct = $result['score']['pass'] ? 1 : 0;
                     $countCorrect['correct'] += $correct;
@@ -5131,6 +5133,10 @@ class Exercise
                     $countCorrectToString = json_encode($countCorrect);
                 }
             }
+            global $extAuthSource;
+            $twig->addGlobal('score', $twigScore);
+            $twig->addGlobal('modules_path', $modules_path);
+
 
             try {
                 $twig->parse($twig->tokenize($template));

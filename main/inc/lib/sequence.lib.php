@@ -332,6 +332,7 @@ class Sequence
                 $row_entity_id_prev = $val['sequence_row_entity_id'];
                 $sql = "SELECT seq.sequence_row_entity_id_next FROM $seq_table seq WHERE seq.sequence_row_entity_id = $row_entity_id_prev";
                 $result = Database::query($sql);
+                $next = array();
                 while ($temp_next = Database::fetch_array($result, 'ASSOC')) {
                     $next[] = $temp_next['sequence_row_entity_id_next'];
                 }

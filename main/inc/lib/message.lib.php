@@ -704,7 +704,7 @@ class MessageManager
 		$user_image = Display::img($user_image['file'], $name, array('title'=>$name));
 
 		$message_content =  Display::page_subheader(str_replace("\\","",$title));
-
+/*
 		if (api_get_setting('allow_social_tool') == 'true') {
             $message_content .= $user_image.' ';
         }
@@ -722,10 +722,9 @@ class MessageManager
     			$message_content .= get_lang('From').':&nbsp;'.$name.'</b> '.api_strtolower(get_lang('To')).' <b>'.get_lang('Me').'</b>';
     		}
     	}
+*/
+		$message_content .=' <div style="float:right">'.get_lang('Date').':  '.api_get_local_time($row['send_date']).'</div>';
 
-		$message_content .=' '.get_lang('Date').':  '.api_get_local_time($row['send_date']);
-
-        $message_content .= '<br />';
         $message_content .= '<br />';
 
         $message_content .= str_replace("\\","",$content);
@@ -738,7 +737,7 @@ class MessageManager
 		    	$social_link = 'f=social';
 		    }
 
-
+/*
 		    if ($source == 'outbox') {
 		    	$message_content .= '<a href="outbox.php?'.$social_link.'">'.Display::return_icon('back.png',get_lang('ReturnToOutbox')).'</a> &nbsp';
 		    } else {
@@ -746,7 +745,7 @@ class MessageManager
 		    	$message_content .= '<a href="new_message.php?re_id='.$message_id.'&'.$social_link.'">'.Display::return_icon('message_reply.png',get_lang('ReplyToMessage')).'</a> &nbsp';
 		    }
 			$message_content .= '<a href="inbox.php?action=deleteone&id='.$message_id.'&'.$social_link.'" >'.Display::return_icon('delete.png',get_lang('DeleteMessage')).'</a>&nbsp';
-
+*/
 
 		return $message_content;
 	}

@@ -175,8 +175,8 @@ if ($origin != 'learnpath') {
     Display::display_footer();
 } else {
 
-    $lp_mode = $_SESSION['lp_mode'];
-    $url = '../newscorm/lp_controller.php?cidReq='.api_get_course_id().'&action=view&lp_id='.$learnpath_id.'&lp_item_id='.$learnpath_item_id.'&exeId='.$exercise_stat_info['exe_id'].'&fb_type='.$objExercise->feedback_type;
+    $lp_mode = isset($_SESSION['lp_mode']) ? $_SESSION['lp_mode'] : null;
+    $url = api_get_path(WEB_CODE_PATH).'newscorm/lp_controller.php?cidReq='.api_get_course_id().'&action=view&lp_id='.$learnpath_id.'&lp_item_id='.$learnpath_item_id.'&exeId='.$exercise_stat_info['exe_id'].'&fb_type='.$objExercise->feedback_type;
     $href = ($lp_mode == 'fullscreen') ? ' window.opener.location.href="'.$url.'" ' : ' top.location.href="'.$url.'"';
 
     if (api_is_allowed_to_session_edit()) {
@@ -185,6 +185,12 @@ if ($origin != 'learnpath') {
     }
     //record the results in the learning path, using the SCORM interface (API)
     echo "<script>window.parent.API.void_save_asset('$total_score', '$total_weight', 0, 'completed');</script>";
-//    echo '<script type="text/javascript">'.$href.'</script>';
+    echo "
+    <span id='result' style='display:none'></span>
+    <script>
+        $( '#result' ).load('$url', function() {
+        });
+    </script>";
+    //echo '<script type="text/javascript">'.$href.'</script>';
     echo '</body></html>';
 }

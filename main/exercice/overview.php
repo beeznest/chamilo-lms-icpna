@@ -113,7 +113,7 @@ if (!empty($attempt_list)) {
         $current_timestamp = time();
         $expected_time = $startedDate + $objExercise->expired_time*60;
         $diff = $current_timestamp - $expected_time;
-        var_dump($diff);
+
         if ($diff > 0) {
             $objExercise->attempts = 2;
 
@@ -130,7 +130,6 @@ if (!empty($attempt_list)) {
                 array(),
                 null
             );
-
             $_SESSION['try_once'] = true;
 
         }

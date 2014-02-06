@@ -9496,6 +9496,18 @@ EOD;
         $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $lp_id, api_get_course_int_id());
         return Sequence::get_state_lp_by_row_entity_id($row_entity_id, api_get_user_id(), api_get_session_id());
     }
+    /**
+     * @param int $seriousGames
+     */
+    public function setSeriousGames($value)
+    {
+        $course_id = api_get_course_int_id();
+        $value = intval($value);
+        $lp_table = Database :: get_course_table(TABLE_LP_MAIN);
+        $sql = "UPDATE $lp_table SET seriousgame_mode = $value WHERE c_id = ".$course_id." AND id = " . $this->get_id();
+        Database::query($sql);
+        $this->seriousgame_mode = $value;
+    }
 }
 
 if (!function_exists('trim_value')) {

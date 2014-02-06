@@ -4988,14 +4988,18 @@ class Exercise
      */
     public function sendCustomNotification($exeId, $exerciseResult = array(), $exerciseWasPassed = false)
     {
+        if (empty($exeId)) {
+            return false;
+        }
+
         if (!empty($this->emailNotificationTemplate) or !empty($this->emailNotificationTemplateToUser)) {
 
             // Getting attempt info
             $trackExerciseInfo = get_exercise_track_exercise_info($exeId);
+        }
 
-            if (empty($trackExerciseInfo)) {
-                return false;
-            }
+        if (empty($trackExerciseInfo)) {
+            return false;
         }
 
         if ($this->emailAlert) {

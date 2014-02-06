@@ -3905,6 +3905,7 @@ $server->register('WSSendEmailByOriginalUserId',                   // method nam
 );
 
 /**
+ * Receives a message subject and body url-encoded and adds them to the user's inbox
  * @param $params
  * @return int 1 if message was sent 0 if not
  */
@@ -3930,7 +3931,7 @@ function WSSendEmailByOriginalUserId($params) {
             $admin = current($admins);
             $senderId = $admin['user_id'];
         }
-        MessageManager::send_message_simple($userId, $params['subject'], $params['message'], $senderId);
+        MessageManager::send_message_simple($userId, urldecode($params['subject']), urldecode($params['message']), $senderId);
         $result = 1;
     }
     return $result;
@@ -5605,7 +5606,7 @@ function WSGetCourseFinalScore($params) {
         $sql = "SELECT exe_result, exe_weighting, status
             FROM $tbl_res
             WHERE exe_exo_id = $qid
-                AND exe_cours_id = $cid
+                AND exe_cours_id = '$ccode'
                 AND session_id = $sid
             ORDER BY start_date ASC LIMIT 3";
         $res = Database::query($sql);

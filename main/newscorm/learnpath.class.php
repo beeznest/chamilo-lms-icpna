@@ -15,6 +15,7 @@
 
 class learnpath
 {
+
     public $attempt = 0; // The number for the current ID view.
     public $cc; // Course (code) this learnpath is located in. @todo change name for something more comprensible ...
     public $current; // Id of the current item the user is viewing.
@@ -2135,8 +2136,8 @@ class learnpath
             }
             */
             require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
-            $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $lp_id, api_get_course_int_id(), api_get_session_id());
-            $state = Sequence::get_state_lp_by_row_entity_id($row_entity_id, $student_id);
+            $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $lp_id, api_get_course_int_id());
+            $state = Sequence::get_state_lp_by_row_entity_id($row_entity_id, $student_id, api_get_session_id());
             if ($state === 'process' || $state === 'completed') {
                 $is_visible = true;
             }
@@ -3370,7 +3371,7 @@ class learnpath
 
             //Sequence rule #7220
             require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
-            $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $this->get_id(), $course_id, api_get_session_id());
+            $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $this->get_id(), $course_id);
             /*Sequence::temp_hack_4_insert($this->get_total_items_count(), $row_entity_id, $this->get_user_id(), 0);
             */
         }
@@ -3890,7 +3891,7 @@ class learnpath
             $this->attempt = $this->attempt + 1;
             //Sequence rule
             require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
-            $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $this->lp_id, $course_id, $session_id);
+            $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $this->lp_id, $course_id);
             //Sequence::temp_hack_4_insert($this->get_total_items_count(),$row_entity_id,$this->lp_id, $this->get_user_id(), 0);
         } else {
             $this->error = 'Could not insert into item_view table...';
@@ -4372,21 +4373,26 @@ class learnpath
         if ($this->debug > 0) {
             error_log('New LP - In learnpath::set_prerequisite()', 0);
         }
+
+        /*
+         * Needs the zero for the sequence logic
+        if (empty($prerequisite)) {
+            return false;
+        }
+        */
         $this->prerequisite = intval($prerequisite);
 
         $lp_table = Database :: get_course_table(TABLE_LP_MAIN);
         $lp_id = $this->get_id();
         $sql = "UPDATE $lp_table SET prerequisite = '".$this->prerequisite."'
                 WHERE c_id = ".$course_id." AND id = '$lp_id'";
-        Database::query($sql);
-
         if ($this->debug > 2) {
             error_log('New LP - lp updated with new preview requisite : ' . $this->prerequisite, 0);
         }
-
-        // Rule sequence 70% of pre-req #7220
+        Database::query($sql);
+        //Rule sequence 70% of pre-req #7220
         require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
-        Sequence::temp_hack_3_update(1, 1, $this->prerequisite, $lp_id, $course_id, api_get_session_id());
+        Sequence::temp_hack_3_update(1, 1, $this->prerequisite, $lp_id, $course_id, 0);
         return true;
     }
 
@@ -4400,10 +4406,7 @@ class learnpath
             error_log('New LP - In learnpath::set_prerequisite()', 0);
         }
         require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
-
-        Sequence::cleanPrerequisites($this->get_id(), api_get_course_int_id(), api_get_session_id());
-        $this->set_prerequisite(null);
-
+        Sequence::cleanPrerequisites($this->get_id(), api_get_course_int_id());
         if (!empty($prerequisites)) {
             foreach ($prerequisites as $prerequisite) {
                 $this->set_prerequisite($prerequisite);
@@ -4882,27 +4885,13 @@ class learnpath
         $this->set_attempt_mode($next_mode);
     }
 
-    /**
-     * @param int $seriousGames
-     */
-    public function setSeriousGames($value)
-    {
-        $course_id = api_get_course_int_id();
-        $value = intval($value);
-        $lp_table = Database :: get_course_table(TABLE_LP_MAIN);
-        $sql = "UPDATE $lp_table SET seriousgame_mode = $value WHERE c_id = ".$course_id." AND id = " . $this->get_id();
-        Database::query($sql);
-        $this->seriousgame_mode = $value;
-    }
-
-    /**
-    * Switch the lp in ktm mode. This is a special scorm mode with unique attempt but possibility to do again a completed item.
-    *
-    * @return boolean true if seriousgame_mode has been set to 1, false otherwise
-    * @author ndiechburg <noel@cblue.be>
-    **/
-    public function set_seriousgame_mode()
-    {
+  /**
+   * Swithc the lp in ktm mode. This is a special scorm mode with unique attempt but possibility to do again a completed item.
+   *
+   * @return boolean true if seriousgame_mode has been set to 1, false otherwise
+   * @author ndiechburg <noel@cblue.be>
+   **/
+    public function set_seriousgame_mode() {
         $course_id = api_get_course_int_id();
 		if ($this->debug > 0) {
 			error_log('New LP - In learnpath::set_seriousgame_mode()', 0);
@@ -4919,7 +4908,7 @@ class learnpath
 				$force = 1;
 			}
 			$sql = "UPDATE $lp_table SET seriousgame_mode = $force WHERE c_id = ".$course_id." AND id = " . $this->get_id();
-			Database::query($sql);
+			$res = Database::query($sql);
 			$this->seriousgame_mode = $force;
 			return $force;
 		} else {
@@ -4951,7 +4940,7 @@ class learnpath
                 $force = 1;
             }
             $sql = "UPDATE $lp_table SET debug = $force WHERE c_id = ".$course_id." AND id = " . $this->get_id();
-            Database::query($sql);
+            $res = Database::query($sql);
             $this->scorm_debug = $force;
             return $force;
         } else {
@@ -8125,8 +8114,7 @@ class learnpath
         $return = '';
 
         $selectedPrerequisites = array($row['prerequisite']);
-        $entities = Sequence::getAllRowEntityIdByRowId(1, $this->get_id(), $this->course_int_id, $this->get_lp_session_id());
-
+        $entities = Sequence::getAllRowEntityIdByRowId(1, 1, $this->course_int_id);
         if (!empty($entities)) {
             foreach($entities as $data) {
                 $selectedPrerequisites[] = $data['row_id'];
@@ -8142,7 +8130,7 @@ class learnpath
                 }
                 $selected = in_array($row['id'], $selectedPrerequisites);
                 $return .= '<option value="'.$row['id'].'" '.($selected ? ' selected ' : '').'>'.
-                $row['name'].'</option>';
+                        $row['name'].'</option>';
             }
         }
         $return .= '</select>';
@@ -9471,7 +9459,7 @@ EOD;
 
         //Rule sequence 70% of pre-req #7220
         require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
-        Sequence::temp_hack_3_update(1, 1, 0, $lp_id, $course_id, api_get_session_id());
+        Sequence::temp_hack_3_update(1, 1, 0, $lp_id, $course_id, 0);
         //Cleaning mastery score for exercises
         $sql = "UPDATE $tbl_lp_item SET mastery_score = ''
                 WHERE c_id = ".$course_id." AND lp_id = '$lp_id' AND item_type = 'quiz'";
@@ -9506,8 +9494,8 @@ EOD;
 
     public static function get_state_by_lp_id($lp_id) {
         require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
-        $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $lp_id, api_get_course_int_id(), api_get_session_id());
-        return Sequence::get_state_lp_by_row_entity_id($row_entity_id, api_get_user_id());
+        $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $lp_id, api_get_course_int_id());
+        return Sequence::get_state_lp_by_row_entity_id($row_entity_id, api_get_user_id(), api_get_session_id());
     }
 }
 

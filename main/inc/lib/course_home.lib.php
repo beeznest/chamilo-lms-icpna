@@ -1185,8 +1185,8 @@ class CourseHome {
             $toolName = $tool['tool']['name'];
             if ($type_entity_id > 0 && $id > 0) {
                 require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
-                $row_entity_id = Sequence::get_row_entity_id_by_row_id($type_entity_id, $id, api_get_course_int_id(), api_get_session_id(), $toolName);
-                $stateTemp = Sequence::get_state_lp_by_row_entity_id($row_entity_id, api_get_user_id());
+                $row_entity_id = Sequence::get_row_entity_id_by_row_id($type_entity_id, $id, api_get_course_int_id(), $toolName);
+                $stateTemp = Sequence::get_state_lp_by_row_entity_id($row_entity_id, api_get_user_id(), api_get_session_id());
                 if (!empty($stateTemp)) { $state = $stateTemp; }
                 $courseInfo = api_get_course_info();
                 $regex ='/src=\"\S*\.(gif|png|jpg)/';

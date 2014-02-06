@@ -24,7 +24,6 @@ class Sequence
     }
 
     public static function get_next_by_row_id($entity_id, $row_entity_id, $course_id = null) {
-        error_log(__LINE__);
         $row_entity_id = Database::escape_string($row_entity_id);
         $entity_id = Database::escape_string($entity_id);
         $course_id = Database::escape_string($course_id);
@@ -73,7 +72,6 @@ class Sequence
 
 
     public static function validate_rule_by_row_id($row_entity_id, $user_id = null, $session_id, $rule_id = 1) {
-        error_log(__LINE__);
         $condition = self::get_condition_by_rule_id($rule_id);
         if ($condition !== false) {
             $con = $condition[0];
@@ -175,7 +173,6 @@ class Sequence
     }
 
     public static function execute_formulas_by_user_id($row_entity_id = null ,$user_id = null, $session_id, $met_type = '', $available = 1, $complete_items = 1, $total_items = 1, $available_end_date =null) {
-        error_log(__LINE__);
         $value = self::get_value_by_user_id($row_entity_id, $user_id, $session_id, $available);
         if ($value !== false) {
             if (empty($met_type)) {
@@ -354,7 +351,6 @@ class Sequence
                 $row_entity_id_prev = $val['sequence_row_entity_id'];
                 $sql = "SELECT seq.sequence_row_entity_id_next FROM $seq_table seq WHERE seq.sequence_row_entity_id = $row_entity_id_prev";
                 $result = Database::query($sql);
-                $next = array();
                 while ($temp_next = Database::fetch_array($result, 'ASSOC')) {
                     $next[] = $temp_next['sequence_row_entity_id_next'];
                 }
@@ -624,8 +620,10 @@ class Sequence
      * @param int $id
      * @param int $c_id
      */
+
     public function cleanPrerequisites($id, $c_id)
     {
+        error_log(__LINE__);
         $table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
         $row_entity_id_next = self::get_row_entity_id_by_row_id(1, $id, $c_id);
         $sql = "DELETE FROM $table WHERE sequence_row_entity_id_next = $row_entity_id_next";

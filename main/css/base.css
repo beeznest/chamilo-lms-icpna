@@ -2370,6 +2370,23 @@ div.admin_section h4 {
     margin-bottom:10px !important;
     margin-top: -6px !important;
 }
+.ques-num-bg {
+    float: left;
+    color: white;
+    height: 24px;
+    width: 26px;
+    padding: 5px;
+    border-radius:7px;
+    -moz-border-radius:7px; //Firefox
+    -webkit-border-radius:7px; //Safari y navegadores que usen WebKit
+    color: white;
+    background: #4c4644;
+    background: -webkit-gradient(linear, 0 0, 0 bottom, from(#CCCCCC), to(#4c4644));
+    background: -moz-linear-gradient(#CCCCCC, #4c4644);
+    background: linear-gradient(#CCCCCC, #4c4644);
+    -pie-background: linear-gradient(#CCCCCC, #4c4644);
+    margin: 5px 5px 15px 0;
+}
 
 .thematic_advance_content {
     padding:10px;
@@ -2542,7 +2559,9 @@ div.admin_section h4 {
 .question_title {
     font-size: 1.2em;
     font-weight: bold;
-    margin: 15px 0px;
+    margin-bottom: 15px;
+    clear: both;
+    height: 40px;
 }
 
 .question_no_answer {

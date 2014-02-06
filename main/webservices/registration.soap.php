@@ -916,7 +916,10 @@ function WSCreateUserPasswordCrypted($params) {
     $phone                  = '';
     $picture_uri            = '';
     $auth_source            = PLATFORM_AUTH_SOURCE;
-    $expiration_date        = '0000-00-00 00:00:00'; $active = 1; $hr_dept_id = 0; $extra = null;
+    $expiration_date        = '0000-00-00 00:00:00';
+    $active = 1;
+    $hr_dept_id = 0;
+    $extra = null;
     $original_user_id_name  = $params['original_user_id_name'];
     $original_user_id_value = $params['original_user_id_value'];
     $orig_user_id_value[]   = $params['original_user_id_value'];
@@ -948,6 +951,7 @@ function WSCreateUserPasswordCrypted($params) {
     if (!empty($params['language'])) { $language = $params['language'];}
     if (!empty($params['phone'])) { $phone = $params['phone'];}
     if (!empty($params['expiration_date'])) { $expiration_date = $params['expiration_date'];}
+    if (strlen($expiration_date) == 10) { $expiration_date .= ' 00:00:00'; }
 
     // Check whether x_user_id exists into user_field_values table.
     $user_id = UserManager::get_user_id_from_original_id($original_user_id_value, $original_user_id_name);
@@ -3905,6 +3909,7 @@ $server->register('WSSendEmailByOriginalUserId',                   // method nam
 );
 
 /**
+ * Receives a message subject and body url-encoded and adds them to the user's inbox
  * @param $params
  * @return int 1 if message was sent 0 if not
  */
@@ -3930,7 +3935,7 @@ function WSSendEmailByOriginalUserId($params) {
             $admin = current($admins);
             $senderId = $admin['user_id'];
         }
-        MessageManager::send_message_simple($userId, $params['subject'], $params['message'], $senderId);
+        MessageManager::send_message_simple($userId, urldecode($params['subject']), urldecode($params['message']), $senderId);
         $result = 1;
     }
     return $result;
@@ -5549,8 +5554,8 @@ function WSGetCourseFinalScore($params) {
     }
 
     $tbl_quiz = Database::get_course_table(TABLE_QUIZ_TEST);
-    $exam_names = "'final exam', 'examen final'";
-    $sql = "SELECT id, max_attempt FROM $tbl_quiz WHERE c_id = $cid AND LOWER(title) IN ($exam_names) ORDER BY id LIMIT 1";
+    $exam_names = "'final exam', 'examen final', 'placement test'";
+    $sql = "SELECT id, max_attempt FROM $tbl_quiz WHERE c_id = $cid AND LOWER(title) IN ($exam_names) ORDER BY id DESC LIMIT 1";
     $res = Database::query($sql);
     if (Database::num_rows($res) < 1) {
         return array();
@@ -5605,7 +5610,7 @@ function WSGetCourseFinalScore($params) {
         $sql = "SELECT exe_result, exe_weighting, status
             FROM $tbl_res
             WHERE exe_exo_id = $qid
-                AND exe_cours_id = $cid
+                AND exe_cours_id = '$ccode'
                 AND session_id = $sid
             ORDER BY start_date ASC LIMIT 3";
         $res = Database::query($sql);

@@ -392,6 +392,18 @@ function update_event_exercice($exeid, $exo_id, $score, $weighting, $session_id,
     }
 }
 
+function completeExerciseAttempt($exeid)
+{
+    $TABLETRACK_EXERCICES = Database::get_statistic_table(TABLE_STATISTIC_TRACK_E_EXERCICES);
+    $end_date = api_get_utc_datetime();
+
+    $sql = "UPDATE $TABLETRACK_EXERCICES SET
+                status = '',
+                exe_date = '$end_date'
+            WHERE exe_id = '".Database::escape_string($exeid)."'";
+    Database::query($sql);
+}
+
 /**
  * This function creates an empty Exercise in STATISTIC_TRACK_E_EXERCICES table.
  * After that in exercise_result.php we call the update_event_exercice() to update the exercise
@@ -889,7 +901,7 @@ function get_attempt_count($user_id, $exerciseId, $lp_id, $lp_item_id, $lp_item_
     }
 }
 
-function get_attempt_count_not_finished($user_id, $exerciseId, $lp_id, $lp_item_id)
+function get_attempt_count_not_finished($user_id, $exerciseId, $lp_id, $lp_item_id, $lp_item_view_id = 0)
 {
     $stat_table = Database :: get_statistic_table(TABLE_STATISTIC_TRACK_E_EXERCICES);
     $user_id = intval($user_id);
@@ -1080,16 +1092,24 @@ function get_all_exercise_results_by_course($course_code, $session_id = 0, $get_
  * @return  array   with the results
  *
  */
-function get_all_exercise_results_by_user($user_id, $course_code, $session_id = 0)
+function get_all_exercise_results_by_user($user_id, $course_code, $session_id = 0, $status = '')
 {
     $table_track_exercises = Database::get_statistic_table(TABLE_STATISTIC_TRACK_E_EXERCICES);
     $table_track_attempt = Database::get_statistic_table(TABLE_STATISTIC_TRACK_E_ATTEMPT);
     $course_code = Database::escape_string($course_code);
-    $exercise_id = intval($exercise_id);
     $session_id = intval($session_id);
     $user_id = intval($user_id);
+    $status = Database::escape_string($status);
 
-    $sql = "SELECT * FROM $table_track_exercises WHERE status = '' AND exe_user_id = $user_id AND exe_cours_id = '$course_code' AND session_id = $session_id AND orig_lp_id = 0 AND orig_lp_item_id = 0   ORDER by exe_id";
+    $sql = "SELECT * FROM $table_track_exercises
+            WHERE
+                status = '$status' AND
+                exe_user_id = $user_id AND
+                exe_cours_id = '$course_code' AND
+                session_id = $session_id AND
+                orig_lp_id = 0 AND
+                orig_lp_item_id = 0
+            ORDER by exe_id";
 
     $res = Database::query($sql);
     $list = array();
@@ -1101,7 +1121,48 @@ function get_all_exercise_results_by_user($user_id, $course_code, $session_id = 
             $list[$row['exe_id']]['question_list'][$row_q['question_id']] = $row_q;
         }
     }
-    //echo '<pre>'; print_r($list);
+    return $list;
+}
+
+/**
+ * @param int $user_id
+ * @param string $course_code
+ * @param int $session_id
+ * @param int $lp_id
+ * @param int $lp_item_id
+ * @return array
+ */
+function getAllExerciseAttemptResultByUserNoStatusFilter($exerciseId, $user_id, $course_code, $session_id = 0, $lp_id = 0, $lp_item_id = 0)
+{
+    $table_track_exercises = Database::get_statistic_table(TABLE_STATISTIC_TRACK_E_EXERCICES);
+    $table_track_attempt = Database::get_statistic_table(TABLE_STATISTIC_TRACK_E_ATTEMPT);
+    $course_code = Database::escape_string($course_code);
+    $session_id = intval($session_id);
+    $user_id = intval($user_id);
+    $lp_id = intval($lp_id);
+    $lp_item_id = intval($lp_item_id);
+    $exerciseId = intval($exerciseId);
+
+    $sql = "SELECT * FROM $table_track_exercises
+            WHERE
+                exe_exo_id = $exerciseId AND
+                exe_user_id = $user_id AND
+                exe_cours_id = '$course_code' AND
+                session_id = $session_id AND
+                orig_lp_id = $lp_id AND
+                orig_lp_item_id = $lp_item_id
+            ORDER by exe_id";
+
+    $res = Database::query($sql);
+    $list = array();
+    while ($row = Database::fetch_array($res, 'ASSOC')) {
+        $list[$row['exe_id']] = $row;
+        $sql = "SELECT * FROM $table_track_attempt WHERE exe_id = {$row['exe_id']}";
+        $res_question = Database::query($sql);
+        while ($row_q = Database::fetch_array($res_question, 'ASSOC')) {
+            $list[$row['exe_id']]['question_list'][$row_q['question_id']] = $row_q;
+        }
+    }
     return $list;
 }
 

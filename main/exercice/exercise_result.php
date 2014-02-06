@@ -114,21 +114,21 @@ $learnpath_item_id = $exercise_stat_info['orig_lp_item_id'];
 $learnpath_item_view_id = $exercise_stat_info['orig_lp_item_view_id'];
 
 if ($origin == 'learnpath') {
-    ?>
-    <form method="GET" action="exercice.php?<?php echo api_get_cidreq() ?>">
-        <input type="hidden" name="origin" 					value="<?php echo $origin; ?>" />
-        <input type="hidden" name="learnpath_id" 			value="<?php echo $learnpath_id; ?>" />
-        <input type="hidden" name="learnpath_item_id" 		value="<?php echo $learnpath_item_id; ?>" />
-        <input type="hidden" name="learnpath_item_view_id"  value="<?php echo $learnpath_item_view_id; ?>" />
-        <?php
-    }
+?>
+<form method="GET" action="exercice.php?<?php echo api_get_cidreq() ?>">
+    <input type="hidden" name="origin" 					value="<?php echo $origin; ?>" />
+    <input type="hidden" name="learnpath_id" 			value="<?php echo $learnpath_id; ?>" />
+    <input type="hidden" name="learnpath_item_id" 		value="<?php echo $learnpath_item_id; ?>" />
+    <input type="hidden" name="learnpath_item_view_id"  value="<?php echo $learnpath_item_view_id; ?>" />
+    <?php
+}
 
 $i = $total_score = $total_weight = 0;
 
 //We check if the user attempts before sending to the exercise_result.php
 if ($objExercise->selectAttempts() > 0) {
     $attempt_count = get_attempt_count(api_get_user_id(), $objExercise->id, $learnpath_id, $learnpath_item_id, $learnpath_item_view_id);
-    if ($attempt_count >= $objExercise->selectAttempts()) {
+    if ($attempt_count >= $objExercise->selectAttempts() && !isset($_SESSION['try_once']) ) {
         Display :: display_warning_message(sprintf(get_lang('ReachedMaxAttempts'), $objExercise->selectTitle(), $objExercise->selectAttempts()), false);
         if ($origin != 'learnpath') {
             //we are not in learnpath tool
@@ -160,9 +160,8 @@ if ($origin != 'learnpath') {
     echo '<hr>';
 
     echo '<form>';
-    echo '<label for="ask2trial">Desea pedir otro intento? Pon tu justificación aquí:</label><br/>';
-    echo '<textarea id="ask2trial" name"ask2trial"></textarea><br />';
-    echo '<input type="submit" value="Enviar"></input>';
+    echo '<label for="ask2trial">Lista de módulos:</label><br/>';
+    echo '<input type="submit" value="Ir"></input>';
     echo '</form>';
 
     //echo Display::url(get_lang('ReturnToCourseHomepage'), api_get_course_url(), array('class' => 'btn btn-large'));
@@ -172,12 +171,10 @@ if ($origin != 'learnpath') {
         Session::erase('objExercise');
         Session::erase('exe_id');
     }
-
     Display::display_footer();
 } else {
-
-    $lp_mode = $_SESSION['lp_mode'];
-    $url = '../newscorm/lp_controller.php?cidReq='.api_get_course_id().'&action=view&lp_id='.$learnpath_id.'&lp_item_id='.$learnpath_item_id.'&exeId='.$exercise_stat_info['exe_id'].'&fb_type='.$objExercise->feedback_type;
+    $lp_mode = isset($_SESSION['lp_mode']) ? $_SESSION['lp_mode'] : null;
+    $url = api_get_path(WEB_CODE_PATH).'newscorm/lp_controller.php?cidReq='.api_get_course_id().'&action=view&lp_id='.$learnpath_id.'&lp_item_id='.$learnpath_item_id.'&exeId='.$exercise_stat_info['exe_id'].'&fb_type='.$objExercise->feedback_type;
     $href = ($lp_mode == 'fullscreen') ? ' window.opener.location.href="'.$url.'" ' : ' top.location.href="'.$url.'"';
 
     if (api_is_allowed_to_session_edit()) {
@@ -186,6 +183,14 @@ if ($origin != 'learnpath') {
     }
     //record the results in the learning path, using the SCORM interface (API)
     echo "<script>window.parent.API.void_save_asset('$total_score', '$total_weight', 0, 'completed');</script>";
-    echo '<script type="text/javascript">'.$href.'</script>';
+    echo "
+    <span id='result' style='display:none'></span>
+    <script>
+        $(function() {
+            $( '#result' ).load('$url', function() {
+            });
+        });
+    </script>";
+    //echo '<script type="text/javascript">'.$href.'</script>';
     echo '</body></html>';
 }

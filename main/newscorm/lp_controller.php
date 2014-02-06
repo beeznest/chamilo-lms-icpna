@@ -672,10 +672,11 @@ switch ($action) {
             $_SESSION['oLP']->set_hide_toc_frame($hide_toc_frame);
 
             //$_SESSION['oLP']->set_prerequisite($_REQUEST['prerequisites']);
-            $_SESSION['oLP']->setPrerequisites($_REQUEST['prerequisites']);
-
+            $preRequisites = isset($_REQUEST['prerequisites']) ? $_REQUEST['prerequisites'] : null;
+            $_SESSION['oLP']->setPrerequisites($preRequisites);
             $_SESSION['oLP']->set_use_max_score($_REQUEST['use_max_score']);
-            $_SESSION['oLP']->set_seriousgame_mode($_REQUEST['seriousgame_mode']);
+            $seriousGames = isset($_REQUEST['seriousgame_mode']) ? 1 : 0;
+            $_SESSION['oLP']->setSeriousGames($seriousGames);
 
             if (isset($_REQUEST['activate_start_date_check']) && $_REQUEST['activate_start_date_check'] == 1) {
             	$publicated_on  = $_REQUEST['publicated_on'];
@@ -720,6 +721,7 @@ switch ($action) {
                     }
                 }
             }
+
             $url = api_get_self().'?action=add_item&type=step&lp_id='.intval($_SESSION['oLP']->lp_id).'&'.api_get_cidreq();
             header('Location: '.$url);
             exit;
@@ -838,7 +840,7 @@ switch ($action) {
             require 'lp_list.php';
         } else {
             if ($debug > 0) {error_log('New LP - Trying to set current item to ' . $_REQUEST['item_id'], 0); }
-            if ( !empty($_REQUEST['item_id']) ) {
+            if (!empty($_REQUEST['item_id']) ) {
                 $_SESSION['oLP']->set_current_item($_REQUEST['item_id']);
             }
             require 'lp_view.php';

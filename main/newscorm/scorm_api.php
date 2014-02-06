@@ -46,6 +46,7 @@ if (!is_object($oItem)) {
     error_log('New LP - scorm_api - Could not load oItem item',0);
     exit;
 }
+$path = api_get_path(WEB_CODE_PATH).'newscorm/';
 $autocomplete_when_80pct = 0;
 $user = api_get_user_info();
 header('Content-type: text/javascript');
@@ -269,7 +270,7 @@ function LMSInitialize() {
 
         $.ajax({
             type: "POST",
-            url: "lp_ajax_initialize.php",
+            url: "<?php echo $path; ?>lp_ajax_initialize.php",
             data: params,
             dataType: 'script',
             async: false
@@ -1139,7 +1140,7 @@ function update_toc(update_action, update_id, change_ids) {
     }
     var myelem = $("#toc_"+update_id);
     var myelemimg = $("#toc_img_"+update_id);
-    logit_lms('update_toc("'+update_action+'", '+update_id+')',2);
+    logit_lms('update_toc("'+update_action+'", '+update_id+')', 2);
 
     if (update_id != 0) {
         switch (update_action) {
@@ -1181,7 +1182,7 @@ function update_toc(update_action, update_id, change_ids) {
                       .removeClass("scorm-status-failed")
                       .addClass("scorm-status-completed")
                       .removeAttr("alt")
-                      .attr("alt","c");
+                      .attr("alt", "c");
                 break;
             case 'passed':
                 myelem.removeClass("scorm-status-not-attempted")
@@ -1631,7 +1632,7 @@ function xajax_start_timer() {
     logit_lms('xajax_start_timer() called');
     $.ajax({
         type: "GET",
-        url: "lp_ajax_start_timer.php",
+        url: "<?php echo $path; ?>lp_ajax_start_timer.php",
         dataType: "script",
         async: false,
         success: function(time) {

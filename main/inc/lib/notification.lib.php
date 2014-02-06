@@ -242,17 +242,17 @@ class Notification extends Model {
 
         // You have received a new message text
         if (!empty($new_message_text)) {
-            $content = $new_message_text.'<br /><hr><br />'.$content;
+            #$content = $new_message_text.'<br /><hr><br />'.$content;
         }
 
         // See message with link text
         if (!empty($link_to_new_message)) {
-            $content = $content.'<br /><br />'.$link_to_new_message;
+            #$content = $content.'<br /><br />'.$link_to_new_message;
         }
 
         // You have received this message because you are subscribed text
-        $content = $content.'<br /><hr><i>'.
-                          sprintf(get_lang('YouHaveReceivedThisNotificationBecauseYouAreSubscribedOrInvolvedInItToChangeYourNotificationPreferencesPleaseClickHereX'), Display::url($preference_url, $preference_url)).'</i>';
-        return $content;
+        #$content = $content.'<br /><hr><i>'.
+                          #sprintf(get_lang('YouHaveReceivedThisNotificationBecauseYouAreSubscribedOrInvolvedInItToChangeYourNotificationPreferencesPleaseClickHereX'), Display::url($preference_url, $preference_url)).'</i>';
+        return trim($content);
     }
 }

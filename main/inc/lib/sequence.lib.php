@@ -354,6 +354,7 @@ class Sequence
                 $row_entity_id_prev = $val['sequence_row_entity_id'];
                 $sql = "SELECT seq.sequence_row_entity_id_next FROM $seq_table seq WHERE seq.sequence_row_entity_id = $row_entity_id_prev";
                 $result = Database::query($sql);
+                $next = array();
                 while ($temp_next = Database::fetch_array($result, 'ASSOC')) {
                     $next[] = $temp_next['sequence_row_entity_id_next'];
                 }
@@ -622,11 +623,9 @@ class Sequence
      * Cleans the sequence table by sequence_row_entity_id_next
      * @param int $id
      * @param int $c_id
-     * @param int $session_id
      */
     public function cleanPrerequisites($id, $c_id)
     {
-        error_log(__LINE__);
         $table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
         $row_entity_id_next = self::get_row_entity_id_by_row_id(1, $id, $c_id);
         $sql = "DELETE FROM $table WHERE sequence_row_entity_id_next = $row_entity_id_next";

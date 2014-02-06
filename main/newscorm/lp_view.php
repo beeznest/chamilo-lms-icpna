@@ -121,14 +121,14 @@ $htmlHeadXtra[] = '<script>
 chamilo_courseCode = "'.$course_code.'";
 </script>';
 // Document API
-$htmlHeadXtra[] = '<script src="js/documentapi.js" type="text/javascript" language="javascript"></script>';
+$htmlHeadXtra[] = '<script src="'.api_get_path(WEB_CODE_PATH).'newscorm/js/documentapi.js" type="text/javascript" language="javascript"></script>';
 // Storage API
 $htmlHeadXtra[] = '<script>
 var sv_user = \''.api_get_user_id().'\';
 var sv_course = chamilo_courseCode;
 var sv_sco = \''.intval($_REQUEST['lp_id']).'\';
 </script>'; // FIXME fetch sco and userid from a more reliable source directly in sotrageapi.js
-$htmlHeadXtra[] = '<script type="text/javascript" src="js/storageapi.js"></script>';
+$htmlHeadXtra[] = '<script type="text/javascript" src="'.api_get_path(WEB_CODE_PATH).'newscorm/js/storageapi.js"></script>';
 
 /**
  * Get a link to the corresponding document.
@@ -153,7 +153,7 @@ if (!isset($src)) {
     switch ($lp_type) {
         case 1:
             $_SESSION['oLP']->stop_previous_item();
-            $htmlHeadXtra[] = '<script src="scorm_api.php" type="text/javascript" language="javascript"></script>';
+            $htmlHeadXtra[] = '<script src="'.api_get_path(WEB_CODE_PATH).'newscorm/scorm_api.php" type="text/javascript" language="javascript"></script>';
             $prereq_check = $_SESSION['oLP']->prerequisites_match($lp_item_id);
             if ($prereq_check === true) {
                 $src = $_SESSION['oLP']->get_link('http', $lp_item_id, $get_toc_list);

@@ -2,26 +2,28 @@
     <div class="container">
             <div class="row">
                 <div class="span12">
-                    <div class="span2">{# logo #} {{ logo }}</div>
-                    <div class="span2 topline"><a href="#">Preguntas frecuentes</a></div>
-                    <div class="span2 topline"><a href="#">Política de privacidad</a></div>
-                    <div class="span2 topline"><a href="#">Término y condiciones</a></div>
-                    <div class="span2">
-                        <a href="http://www.icpna.edu.pe/" target="_blank">
-                        <img src="/main/css/icpnatdp/images/logo-icpna.png">
-                        </a>
+                    <div class="span3">
+                        <img src="/main/css/icpnatdp/images/header-logo.png">
+                    </div>
+                    <div class="span2 topline"><a href="#" data-toggle="modal" data-target="#FAQ">Preguntas frecuentes</a></div>
+                    <!-- <div class="span2 topline"><a href="#">Política de privacidad</a></div> -->
+                    <div class="span2 topline"><a href="#" data-toggle="modal" data-target="#terminos">Términos del servicios</a></div>
+                    <div class="span3">
+                       
+                        <center><img src="/main/css/icpnatdp/images/logo-icpna.png"></center>
+                       
                     </div>
 
                 </div>
             </div><!-- end of #row -->
         <div class="row footertop">
-            <div class="span12 centerline">
+            <div class="span11 centerline">
                 Programa V-learning ICPNA / Copyright 2014 ICPNA - Todos los derechos reservados
             </div>
         </div>
     </div><!-- end of #container -->
 </footer>
-
+{%include 'default/layout/modal_footer.tpl'%}
 {{ footer_extra_content }}
 
 {% raw %}

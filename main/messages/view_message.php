@@ -31,6 +31,7 @@ if (isset($_GET['f']) && $_GET['f']=='social') {
 	$social_parameter = '?f=social';
 } else {
 	if (api_get_setting('extended_profile') == 'true') {
+
 		$social_right_content .= '<div class="actions">';
 
 		if (api_get_setting('allow_social_tool') == 'true' && api_get_setting('allow_message_tool') == 'true') {

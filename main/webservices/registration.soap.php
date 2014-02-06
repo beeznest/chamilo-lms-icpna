@@ -3905,6 +3905,7 @@ $server->register('WSSendEmailByOriginalUserId',                   // method nam
 );
 
 /**
+ * Receives a message subject and body url-encoded and adds them to the user's inbox
  * @param $params
  * @return int 1 if message was sent 0 if not
  */
@@ -3930,7 +3931,7 @@ function WSSendEmailByOriginalUserId($params) {
             $admin = current($admins);
             $senderId = $admin['user_id'];
         }
-        MessageManager::send_message_simple($userId, $params['subject'], $params['message'], $senderId);
+        MessageManager::send_message_simple($userId, urldecode($params['subject']), urldecode($params['message']), $senderId);
         $result = 1;
     }
     return $result;

@@ -333,17 +333,20 @@ class UniqueAnswer extends Question {
 	}
 
 	function return_header($feedback_type = null, $counter = null, $score = null, $show_media = false) {
+
 	    $header = parent::return_header($feedback_type, $counter, $score, $show_media);
+
 	    $header .= '<table class="'.$this->question_table_class .'">
 			<tr>
 				<th>'.get_lang("Choice").'</th>
 				<th>'. get_lang("ExpectedChoice").'</th>
 				<th>'. get_lang("Answer").'</th>';
-				if ($feedback_type != EXERCISE_FEEDBACK_TYPE_EXAM) {
-    				$header .= '<th>'.get_lang("Comment").'</th>';
-				} else {
-					$header .= '<th>&nbsp;</th>';
-				}
+
+        if ($feedback_type != EXERCISE_FEEDBACK_TYPE_EXAM) {
+            $header .= '<th>'.get_lang("Comment").'</th>';
+        } else {
+            $header .= '<th>&nbsp;</th>';
+        }
         $header .= '</tr>';
         return $header;
     }

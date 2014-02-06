@@ -889,7 +889,7 @@ function get_attempt_count($user_id, $exerciseId, $lp_id, $lp_item_id, $lp_item_
     }
 }
 
-function get_attempt_count_not_finished($user_id, $exerciseId, $lp_id, $lp_item_id)
+function get_attempt_count_not_finished($user_id, $exerciseId, $lp_id, $lp_item_id, $lp_item_view_id = 0)
 {
     $stat_table = Database :: get_statistic_table(TABLE_STATISTIC_TRACK_E_EXERCICES);
     $user_id = intval($user_id);

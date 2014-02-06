@@ -1338,8 +1338,7 @@ abstract class Question
 					if (document.getElementById(in_id+"Img")) {
 						document.getElementById(in_id+"Img").src = "../img/div_hide.gif";
 					}
-				}
-				else {
+				} else {
 					document.getElementById(in_id).style.display = "none";
 					if (document.getElementById(in_id+"Img")) {
 						document.getElementById(in_id+"Img").src = "../img/div_show.gif";
@@ -1647,7 +1646,7 @@ abstract class Question
         }
 
         if ($this->type == FREE_ANSWER || $this->type == ORAL_EXPRESSION) {
-            if ($score['revised'] == true) {
+            if (isset($score['revised']) && $score['revised'] == true) {
                 $score_label = get_lang('Revised');
                 $class = '';
             } else {
@@ -1666,7 +1665,10 @@ abstract class Question
         }
         $header .= Display::page_subheader2($counter_label.". ".$question_title);
         $header .= Display::div(
-            '<div class="rib rib-'.$class.'"><h3>'.$score_label.'</h3></div> <h4>'.$score['result'].' </h4>',
+            '<div class="rib rib-'.$class.'">
+                <h3>'.$score_label.'</h3>
+            </div>
+            <h4>'.$score['result'].' </h4>',
             array('class' => 'ribbon')
         );
         $header .= Display::div($this->description, array('id' => 'question_description'));

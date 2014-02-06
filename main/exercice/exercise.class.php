@@ -2631,7 +2631,7 @@ class Exercise
         global $feedback_type, $debug;
         global $learnpath_id, $learnpath_item_id; //needed in order to use in the exercise_attempt() for the time
         require_once api_get_path(LIBRARY_PATH).'geometry.lib.php';
-
+        $htmlContent = null;
         if ($debug) {
             error_log("<------ manage_answer ------> ");
             error_log('called exe_id: '.$exeId);
@@ -2800,7 +2800,7 @@ class Exercise
                     }
                     break;
                 // for multiple answers
-                case MULTIPLE_ANSWER_TRUE_FALSE :
+                case MULTIPLE_ANSWER_TRUE_FALSE:
                     if ($from_database) {
                         $choice = array();
                         $queryans = "SELECT answer FROM ".$TBL_TRACK_ATTEMPT." where exe_id = ".$exeId." and question_id = ".$questionId;
@@ -2808,13 +2808,15 @@ class Exercise
                         while ($row = Database::fetch_array($resultans)) {
                             $ind = $row['answer'];
                             $result = explode(':', $ind);
-                            $my_answer_id = $result[0];
-                            $option = $result[1];
-                            $choice[$my_answer_id] = $option;
+                            if (is_array($result)) {
+                                $my_answer_id = $result[0];
+                                $option = $result[1];
+                                $choice[$my_answer_id] = $option;
+                            }
                         }
-                        $studentChoice = $choice[$numAnswer];
+                        $studentChoice = isset($choice[$numAnswer]) ? $choice[$numAnswer] : null;
                     } else {
-                        $studentChoice = $choice[$numAnswer];
+                        $studentChoice = isset($choice[$numAnswer]) ? $choice[$numAnswer] : null;
                     }
 
                     if (!empty($studentChoice)) {
@@ -2931,7 +2933,7 @@ class Exercise
                             $choice[$ind] = 1;
                         }
                         $numAnswer = $objAnswerTmp->selectAutoId($answerId);
-                        $studentChoice = $choice[$numAnswer];
+                        $studentChoice = isset($choice[$numAnswer]) ? $choice[$numAnswer] : null;
 
                         if ($answerCorrect == 1) {
                             if ($studentChoice) {
@@ -2947,7 +2949,7 @@ class Exercise
                             }
                         }
                     } else {
-                        $studentChoice = $choice[$numAnswer];
+                        $studentChoice = isset($choice[$numAnswer]) ? $choice[$numAnswer] : null;
                         if ($answerCorrect == 1) {
                             if ($studentChoice) {
                                 $real_answers[$answerId] = true;
@@ -3215,14 +3217,14 @@ class Exercise
                             }
 
                             if ($show_result) {
-                                echo '<tr>';
-                                echo '<td>'.$s_answer_label.'</td>';
-                                echo '<td>'.$user_answer.'';
+                                $htmlContent .= '<tr>';
+                                $htmlContent .= '<td>'.$s_answer_label.'</td>';
+                                $htmlContent .= '<td>'.$user_answer.'';
                                 if ($answerType == MATCHING) {
-                                    echo '<b><span style="color: #008000;">'.$real_list[$i_answer_correct_answer].'</span></b>';
+                                    $htmlContent .= '<b><span style="color: #008000;">'.$real_list[$i_answer_correct_answer].'</span></b>';
                                 }
-                                echo '</td>';
-                                echo '</tr>';
+                                $htmlContent .= '</td>';
+                                $htmlContent .= '</tr>';
                             }
                         }
                         break(2); //break the switch and the "for" condition
@@ -3325,7 +3327,6 @@ class Exercise
                 if ($debug) {
                     error_log('show result '.$show_result);
                 }
-
                 if ($from == 'exercise_result') {
                     if ($debug) {
                         error_log('Showing questions $from '.$from);
@@ -3345,21 +3346,19 @@ class Exercise
                             )
                         )
                         ) {
-
-                                ExerciseShowFunctions::display_unique_or_multiple_answer(
-                                    $answerType,
-                                    $studentChoice,
-                                    $answer,
-                                    $answerComment,
-                                    $answerCorrect,
-                                    0,
-                                    0,
-                                    0
-                                );
+                            $htmlContent .= ExerciseShowFunctions::display_unique_or_multiple_answer(
+                                $answerType,
+                                $studentChoice,
+                                $answer,
+                                $answerComment,
+                                $answerCorrect,
+                                0,
+                                0,
+                                0
+                            );
 
                         } elseif ($answerType == MULTIPLE_ANSWER_TRUE_FALSE) {
-
-                                ExerciseShowFunctions::display_multiple_answer_true_false(
+                            $htmlContent .= ExerciseShowFunctions::display_multiple_answer_true_false(
                                     $answerType,
                                     $studentChoice,
                                     $answer,
@@ -3372,7 +3371,7 @@ class Exercise
 
                         } elseif ($answerType == MULTIPLE_ANSWER_COMBINATION_TRUE_FALSE) {
 
-                                ExerciseShowFunctions::display_multiple_answer_combination_true_false(
+                                $htmlContent .= ExerciseShowFunctions::display_multiple_answer_combination_true_false(
                                     $answerType,
                                     $studentChoice,
                                     $answer,
@@ -3384,35 +3383,29 @@ class Exercise
                                 );
 
                         } elseif ($answerType == FILL_IN_BLANKS) {
-
-                                ExerciseShowFunctions::display_fill_in_blanks_answer($answer, 0, 0);
-
+                            $htmlContent .= ExerciseShowFunctions::display_fill_in_blanks_answer($answer, 0, 0);
                         } elseif ($answerType == FREE_ANSWER) {
-
-                                ExerciseShowFunctions::display_free_answer(
-                                    $choice,
-                                    $exeId,
-                                    $questionId,
-                                    $questionScore
-                                );
-
+                            $htmlContent .= ExerciseShowFunctions::display_free_answer(
+                                $choice,
+                                $exeId,
+                                $questionId,
+                                $questionScore
+                            );
                         } elseif ($answerType == ORAL_EXPRESSION) {
                             // to store the details of open questions in an array to be used in mail
-
-                                ExerciseShowFunctions::display_oral_expression_answer($choice, 0, 0, $nano);
-
+                            $htmlContent .= ExerciseShowFunctions::display_oral_expression_answer($choice, 0, 0, $nano);
                         } elseif ($answerType == HOT_SPOT) {
 //                            if ($origin != 'learnpath') {
-                                ExerciseShowFunctions::display_hotspot_answer(
-                                    $answerId,
-                                    $answer,
-                                    $studentChoice,
-                                    $answerComment
-                                );
+                            $htmlContent .= ExerciseShowFunctions::display_hotspot_answer(
+                                $answerId,
+                                $answer,
+                                $studentChoice,
+                                $answerComment
+                            );
 //                            }
                         } elseif ($answerType == HOT_SPOT_ORDER) {
 //                            if ($origin != 'learnpath') {
-                                ExerciseShowFunctions::display_hotspot_order_answer(
+                                $htmlContent .= ExerciseShowFunctions::display_hotspot_order_answer(
                                     $answerId,
                                     $answer,
                                     $studentChoice,
@@ -3576,11 +3569,11 @@ class Exercise
                             }
                         } elseif ($answerType == MATCHING) {
                             //if ($origin != 'learnpath') {
-                                echo '<tr>';
-                                echo '<td>'.$answer_matching[$answerId].'</td><td>'.$user_answer.' / <b><span style="color: #008000;">'.text_filter(
+                            $htmlContent .= '<tr>';
+                            $htmlContent .= '<td>'.$answer_matching[$answerId].'</td><td>'.$user_answer.' / <b><span style="color: #008000;">'.text_filter(
                                     $answer_matching[$answerCorrect]
                                 ).'</span></b></td>';
-                                echo '</tr>';
+                            $htmlContent .= '</tr>';
                             //}
                         }
                     }
@@ -3596,8 +3589,9 @@ class Exercise
                         case MULTIPLE_ANSWER :
                         case GLOBAL_MULTIPLE_ANSWER :
                         case MULTIPLE_ANSWER_COMBINATION :
+
                             if ($answerId == 1) {
-                                ExerciseShowFunctions::display_unique_or_multiple_answer(
+                                $htmlContent .= ExerciseShowFunctions::display_unique_or_multiple_answer(
                                     $answerType,
                                     $studentChoice,
                                     $answer,
@@ -3607,8 +3601,9 @@ class Exercise
                                     $questionId,
                                     $answerId
                                 );
+
                             } else {
-                                ExerciseShowFunctions::display_unique_or_multiple_answer(
+                                $htmlContent .= ExerciseShowFunctions::display_unique_or_multiple_answer(
                                     $answerType,
                                     $studentChoice,
                                     $answer,
@@ -3622,7 +3617,7 @@ class Exercise
                             break;
                         case MULTIPLE_ANSWER_COMBINATION_TRUE_FALSE:
                             if ($answerId == 1) {
-                                ExerciseShowFunctions::display_multiple_answer_combination_true_false(
+                                $htmlContent .= ExerciseShowFunctions::display_multiple_answer_combination_true_false(
                                     $answerType,
                                     $studentChoice,
                                     $answer,
@@ -3633,7 +3628,7 @@ class Exercise
                                     $answerId
                                 );
                             } else {
-                                ExerciseShowFunctions::display_multiple_answer_combination_true_false(
+                                $htmlContent .= ExerciseShowFunctions::display_multiple_answer_combination_true_false(
                                     $answerType,
                                     $studentChoice,
                                     $answer,
@@ -3647,7 +3642,7 @@ class Exercise
                             break;
                         case MULTIPLE_ANSWER_TRUE_FALSE :
                             if ($answerId == 1) {
-                                ExerciseShowFunctions::display_multiple_answer_true_false(
+                                $htmlContent .= ExerciseShowFunctions::display_multiple_answer_true_false(
                                     $answerType,
                                     $studentChoice,
                                     $answer,
@@ -3658,7 +3653,7 @@ class Exercise
                                     $answerId
                                 );
                             } else {
-                                ExerciseShowFunctions::display_multiple_answer_true_false(
+                                $htmlContent .= ExerciseShowFunctions::display_multiple_answer_true_false(
                                     $answerType,
                                     $studentChoice,
                                     $answer,
@@ -3671,10 +3666,10 @@ class Exercise
                             }
                             break;
                         case FILL_IN_BLANKS:
-                            ExerciseShowFunctions::display_fill_in_blanks_answer($answer, $exeId, $questionId);
+                            $htmlContent .= ExerciseShowFunctions::display_fill_in_blanks_answer($answer, $exeId, $questionId);
                             break;
                         case FREE_ANSWER:
-                            echo ExerciseShowFunctions::display_free_answer(
+                            $htmlContent .= ExerciseShowFunctions::display_free_answer(
                                 $choice,
                                 $exeId,
                                 $questionId,
@@ -3682,18 +3677,20 @@ class Exercise
                             );
                             break;
                         case ORAL_EXPRESSION:
-                            echo '<tr>
-		                            <td valign="top">'.ExerciseShowFunctions::display_oral_expression_answer(
+                            $htmlContent .= ExerciseShowFunctions::display_oral_expression_answer(
                                 $choice,
                                 $exeId,
                                 $questionId,
                                 $nano
-                            ).'</td>
+                            );
+
+                            $htmlContent .= '<tr>
+		                            <td valign="top">'.$htmlContent.'</td>
 		                            </tr>
 		                            </table>';
                             break;
                         case HOT_SPOT:
-                            ExerciseShowFunctions::display_hotspot_answer(
+                            $htmlContent .= ExerciseShowFunctions::display_hotspot_answer(
                                 $answerId,
                                 $answer,
                                 $studentChoice,
@@ -3847,7 +3844,7 @@ class Exercise
                             }
                             break;
                         case HOT_SPOT_ORDER:
-                            ExerciseShowFunctions::display_hotspot_order_answer(
+                            $htmlContent .= ExerciseShowFunctions::display_hotspot_order_answer(
                                 $answerId,
                                 $answer,
                                 $studentChoice,
@@ -3857,9 +3854,9 @@ class Exercise
                         case DRAGGABLE:
                         case MATCHING:
                             //if ($origin != 'learnpath') {
-                                echo '<tr>';
-                                echo '<td>'.$answer_matching[$answerId].'</td><td>'.$user_answer.' / <b><span style="color: #008000;">'.$answer_matching[$answerCorrect].'</span></b></td>';
-                                echo '</tr>';
+                        $htmlContent .= '<tr>';
+                        $htmlContent .= '<td>'.$answer_matching[$answerId].'</td><td>'.$user_answer.' / <b><span style="color: #008000;">'.$answer_matching[$answerCorrect].'</span></b></td>';
+                        $htmlContent .=  '</tr>';
                             //}
                             break;
                     }
@@ -4024,7 +4021,7 @@ class Exercise
                             $answerDestination = $objAnswerTmp->selectDestination($nbrAnswers);
                         }
 
-                        echo '<h1><div style="color:#333;">'.get_lang('Feedback').'</div></h1>
+                        $htmlContent .= '<h1><div style="color:#333;">'.get_lang('Feedback').'</div></h1>
         				<p style="text-align:center">';
 
                         $message = '<p>'.get_lang('YourDelineation').'</p>';
@@ -4034,9 +4031,9 @@ class Exercise
                             $message .= '<p><b>'.get_lang('OARHit').'</b></p>';
                         }
                         $message .= '<p>'.$comment.'</p>';
-                        echo $message;
+                        $htmlContent .= $message;
                     } else {
-                        echo $hotspot_delineation_result[0]; //prints message
+                        $htmlContent .= $hotspot_delineation_result[0]; //prints message
                         $from_database = 1; // the hotspot_solution.swf needs this variable
                     }
 
@@ -4090,12 +4087,12 @@ class Exercise
 
                 if ($show_result) {
                     //if ($origin != 'learnpath') {
-                        echo '</table></td></tr>';
-                        echo '<tr>
+                    $htmlContent .= '</table></td></tr>';
+                    $htmlContent .= '<tr>
                             <td colspan="2">';
-                        echo '<i>'.get_lang('HotSpot').'</i><br /><br />';
+                    $htmlContent .= '<i>'.get_lang('HotSpot').'</i><br /><br />';
 
-                        echo '<object type="application/x-shockwave-flash" data="'.api_get_path(
+                    $htmlContent .= '<object type="application/x-shockwave-flash" data="'.api_get_path(
                             WEB_CODE_PATH
                         ).'plugin/hotspot/hotspot_solution.swf?modifyAnswers='.Security::remove_XSS(
                             $questionId
@@ -4104,17 +4101,17 @@ class Exercise
                             $questionId
                         ).'&exe_id='.$exeId.'&from_db=1" />
 							</object>';
-                        echo '</td>
+                    $htmlContent .= '</td>
                         </tr>';
                     //}
                 }
             }
 
-            if ($origin != 'learnpath') {
+            //if ($origin != 'learnpath') {
                 if ($show_result) {
-                    echo '</table>';
+                    $htmlContent .= '</table>';
                 }
-            }
+            //}
         }
         unset($objAnswerTmp);
 
@@ -4218,7 +4215,8 @@ class Exercise
             'extra' => $extra_data,
             'open_question' => $arrques,
             'open_answer' => $arrans,
-            'answer_type' => $answerType
+            'answer_type' => $answerType,
+            'html' => $htmlContent
         );
 
         return $return_array;

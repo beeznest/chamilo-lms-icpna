@@ -54,9 +54,9 @@ function showQuestion($questionId, $only_questions = false, $origin = false, $cu
                 echo Testcategory::getCategoryNamesForQuestion($objQuestionTmp->id);
                 if (!empty($objExercise)) {
                     if ($objExercise->get_count_question_list()) {
-                        $current_item = "<div class='ques-num-bg'>" . 
-                                        "<b>" . 
-                                        $current_item . '/' . 
+                        $current_item = "<div class='ques-num-bg'>" .
+                                        "<b>" .
+                                        $current_item . '/' .
                                         $objExercise->get_count_question_list() .
                                         "</b>" .
                                         "</div>";
@@ -2278,7 +2278,6 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
     $question_list_answers = array();
     $media_list = array();
     $category_list = array();
-
     $exerciseResultInfo = array();
 
     // Loop over all question to show results for each of them, one by one
@@ -2286,17 +2285,26 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
         if ($debug) {
             error_log('Looping question_list '.print_r($question_list, 1));
         }
-        foreach ($question_list as $questionId) {
 
+        foreach ($question_list as $questionId) {
             // creates a temporary Question object
             $objQuestionTmp = Question :: read($questionId);
-
-            ob_start();
             $hotspot_delineation_result = null;
 
             // We're inside *one* question. Go through each possible answer for this question
-            $result = $objExercise->manage_answer($exercise_stat_info['exe_id'], $questionId, null, 'exercise_result', array(), $save_user_result, true, $show_results, $objExercise->selectPropagateNeg(), $hotspot_delineation_result);
 
+            $result = $objExercise->manage_answer(
+                $exercise_stat_info['exe_id'],
+                $questionId,
+                null,
+                'exercise_result',
+                array(),
+                $save_user_result,
+                true,
+                $show_results,
+                $objExercise->selectPropagateNeg(),
+                $hotspot_delineation_result
+            );
             if (empty($result)) {
                 continue;
             }
@@ -2368,30 +2376,27 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
             $exerciseResultInfo[$questionId]['score'] = $score;
             $exerciseResultInfo[$questionId]['details'] = $result;
 
-            $contents = ob_get_clean();
-
             $question_content = '<div class="question_row">';
 
             if ($show_results) {
-
                 $show_media = false;
                 if ($objQuestionTmp->parent_id != 0 && !in_array($objQuestionTmp->parent_id, $media_list)) {
                     $show_media = true;
                     $media_list[] = $objQuestionTmp->parent_id;
                 }
 
-                //Shows question title an description
+                // Shows question title an description
                 $question_content .= $objQuestionTmp->return_header(null, $counter, $score, $show_media);
 
                 // display question category, if any
                 $question_content .= Testcategory::getCategoryNamesForQuestion($questionId);
             }
+
             $counter++;
-
-            $question_content .= $contents;
+            $question_content .= $result['html'];
             $question_content .= '</div>';
-
             $exercise_content .= $question_content;
+
         } // end foreach() block that loops over all questions
     }
 
@@ -2479,15 +2484,14 @@ function get_question_ribbon($objExercise, $score, $weight, $check_pass_percenta
     $ribbon .= '<h3>'.get_lang('YourTotalScore').":&nbsp;";
     $ribbon .= show_score($score, $weight, false, true);
     $ribbon .= '</h3>';
+
     $ribbon .= '</div>';
 
     if ($check_pass_percentage) {
         $ribbon .= show_success_message($score, $weight, $objExercise->selectPassPercentage());
     }
-
     $ribbon .= '</div>';
     $ribbon .= '</div>';
-
     $ribbon .= $eventMessage;
     return $ribbon;
 }

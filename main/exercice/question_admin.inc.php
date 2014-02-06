@@ -49,8 +49,22 @@ if (is_object($objQuestion)) {
 	$objQuestion->createAnswersForm($form);
 
 	// this variable  $show_quiz_edition comes from admin.php blocks the exercise/quiz modifications
-	if ($objExercise->edit_exercise_in_lp == false) {
-		$form->freeze();
+	if ($objExercise->exercise_was_added_in_lp == true) {
+        $elements = $form->getElements();
+        /** @var HTML_QuickForm_element $element */
+        foreach ($elements as $element) {
+            $name = $element->getAttribute('name');
+            if (!empty($name)) {
+                if (strpos($name, 'comment') === false &&
+                    strpos($name, 'answer') === false &&
+                    strpos($name, 'questionName') === false &&
+                    strpos($name, 'questionDescription') === false
+                ) {
+                    $element->freeze();
+                }
+            }
+        }
+		//$form->freeze();
 	}
 
 	// FORM VALIDATION

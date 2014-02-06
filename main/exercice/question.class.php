@@ -11,7 +11,6 @@
  * Code
  */
 
-
 // Question types
 define('UNIQUE_ANSWER', 1);
 define('MULTIPLE_ANSWER', 2);
@@ -59,7 +58,7 @@ abstract class Question
     public $exerciseList; // array with the list of exercises which this question is in
     public $category_list;
     public $parent_id;
-    private $isContent;
+    public $isContent;
     public $course;
     static $typePicture = 'new_question.png';
     static $explanationLangVar = '';
@@ -1339,8 +1338,7 @@ abstract class Question
 					if (document.getElementById(in_id+"Img")) {
 						document.getElementById(in_id+"Img").src = "../img/div_hide.gif";
 					}
-				}
-				else {
+				} else {
 					document.getElementById(in_id).style.display = "none";
 					if (document.getElementById(in_id+"Img")) {
 						document.getElementById(in_id+"Img").src = "../img/div_show.gif";
@@ -1648,7 +1646,7 @@ abstract class Question
         }
 
         if ($this->type == FREE_ANSWER || $this->type == ORAL_EXPRESSION) {
-            if ($score['revised'] == true) {
+            if (isset($score['revised']) && $score['revised'] == true) {
                 $score_label = get_lang('Revised');
                 $class = '';
             } else {
@@ -1667,7 +1665,10 @@ abstract class Question
         }
         $header .= Display::page_subheader2($counter_label.". ".$question_title);
         $header .= Display::div(
-            '<div class="rib rib-'.$class.'"><h3>'.$score_label.'</h3></div> <h4>'.$score['result'].' </h4>',
+            '<div class="rib rib-'.$class.'">
+                <h3>'.$score_label.'</h3>
+            </div>
+            <h4>'.$score['result'].' </h4>',
             array('class' => 'ribbon')
         );
         $header .= Display::div($this->description, array('id' => 'question_description'));
@@ -1835,5 +1836,37 @@ abstract class Question
         }
 
         return $html;
+    }
+
+    /**
+     * @param Exercise $exercise
+     * @param FormValidator $form
+     * @param array $renderer
+     * @param string $text
+     * @param string $class
+     */
+    public function setQuestionButtons($exercise, $form, $renderer, $text, $class)
+    {
+        $navigatorInfo = api_get_navigator();
+        if ($exercise->exercise_was_added_in_lp == true) {
+            $form->addElement('style_submit_button','submitQuestion', $text, 'class="'.$class.'"');
+        } else {
+
+            //ie6 fix
+            if ($navigatorInfo['name']=='Internet Explorer' &&  $navigatorInfo['version']=='6') {
+                $form->addElement('submit', 'lessAnswers', get_lang('LessAnswer'),'class="btn minus"');
+                $form->addElement('submit', 'moreAnswers', get_lang('PlusAnswer'),'class="btn plus"');
+                $form->addElement('submit','submitQuestion',$text, 'class="'.$class.'"');
+            } else {
+                // setting the save button here and not in the question class.php
+                $form->addElement('style_submit_button', 'lessAnswers', get_lang('LessAnswer'),'class="btn minus"');
+                $form->addElement('style_submit_button', 'moreAnswers', get_lang('PlusAnswer'),'class="btn plus"');
+                $form->addElement('style_submit_button','submitQuestion', $text, 'class="'.$class.'"');
+            }
+        }
+        $renderer->setElementTemplate('{element}&nbsp;','lessAnswers');
+        $renderer->setElementTemplate('{element}&nbsp;','submitQuestion');
+        $renderer->setElementTemplate('{element}&nbsp;','moreAnswers');
+
     }
 }

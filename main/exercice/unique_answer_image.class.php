@@ -263,26 +263,8 @@ class UniqueAnswerImage extends UniqueAnswer
         $form->addElement('html', '</table>');
         $form->addElement('html', '<br />');
 
-        $navigator_info = api_get_navigator();
-
         global $text, $class;
-
-        //ie6 fix
-        if ($obj_ex->edit_exercise_in_lp == true) {
-            if ($navigator_info['name'] == 'Internet Explorer' && $navigator_info['version'] == '6') {
-                $form->addElement('submit', 'lessAnswers', get_lang('LessAnswer'), 'class="btn minus"');
-                $form->addElement('submit', 'moreAnswers', get_lang('PlusAnswer'), 'class="btn plus"');
-                $form->addElement('submit', 'submitQuestion', $text, 'class="'.$class.'"');
-            } else {
-                //setting the save button here and not in the question class.php
-                $form->addElement('style_submit_button', 'lessAnswers', get_lang('LessAnswer'), 'class="btn minus"');
-                $form->addElement('style_submit_button', 'moreAnswers', get_lang('PlusAnswer'), 'class="btn plus"');
-                $form->addElement('style_submit_button', 'submitQuestion', $text, 'class="'.$class.'"');
-            }
-        }
-        $renderer->setElementTemplate('{element}&nbsp;', 'submitQuestion');
-        $renderer->setElementTemplate('{element}&nbsp;', 'lessAnswers');
-        $renderer->setElementTemplate('{element}&nbsp;', 'moreAnswers');
+        $this->setQuestionButtons($obj_ex, $form, $renderer, $text, $class);
 
         $form->addElement('html', '</div></div>');
 

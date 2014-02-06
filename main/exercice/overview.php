@@ -105,34 +105,25 @@ if ($time_control && !empty($clock_expired_time) || !empty($attempt_list)) {
 	$label = get_lang('ContinueTest');
 }
 
-if (!empty($attempt_list)) {
+if (!empty($attempt_list) && $objExercise->attempts > 0 || isset($_SESSION['try_once'])) {
 	$message = Display::return_message(get_lang('YouTriedToResolveThisExerciseEarlier'));
 
-    if (!empty($exercise_stat_info['start_date'])) {
+    if (!empty($exercise_stat_info['start_date']) && $exercise_stat_info['status'] == 'incomplete') {
         $startedDate = api_strtotime($exercise_stat_info['start_date']);
         $current_timestamp = time();
-        $expected_time = $startedDate + $objExercise->expired_time*60;
+        $expected_time = $startedDate + $objExercise->expired_time * 60;
         $diff = $current_timestamp - $expected_time;
-        var_dump($diff);
-        if ($diff > 0) {
-            $objExercise->attempts = 2;
+        //$countNotFinished = get_attempt_count_not_finished(api_get_user_id(), $objExercise->id, $learnpath_id, $learnpath_item_id);
 
-            update_event_exercice($exercise_stat_info['exe_id'],
-                $exercise_stat_info['exe_exo_id'],
-                $exercise_stat_info['exe_result'],
-                $exercise_stat_info['exe_weighting'],
-                $exercise_stat_info['session_id'],
-                $learnpath_id,
-                $learnpath_item_id,
-                $learnpath_item_view_id,
-                $exercise_stat_info['exe_duration'],
-                '', //status
-                array(),
-                null
-            );
+        $attempts = getAllExerciseAttemptResultByUserNoStatusFilter($objExercise->id, api_get_user_id(), api_get_course_id(), api_get_session_id(), $learnpath_id, $learnpath_item_id);
+        $attempts = is_array($attempts) ? count($attempts) : 0;
 
+        if ($diff > 0 && $objExercise->attempts == $attempts) {
+            $objExercise->attempts = $objExercise->attempts + 1;
+            $learnpath_item_view_id = isset($learnpath_item_view_id) ? $learnpath_item_view_id : 0;
+
+            completeExerciseAttempt($exercise_stat_info['exe_id']);
             $_SESSION['try_once'] = true;
-
         }
     }
 }
@@ -260,7 +251,7 @@ if ($objExercise->selectAttempts()) {
 }
 
 if ($time_control) {
-    $html.= $objExercise->return_time_left_div();
+    //$html.= $objExercise->return_time_left_div();
 }
 
 $html .=  $message;

@@ -165,9 +165,9 @@ if (!$inATest) {
         $styleCat = "width:22%; float:left; padding-top:8px; text-align:center;";
         $styleLevel = "width:6%; float:left; padding-top:8px; text-align:center;";
         $styleScore = "width:4%; float:left; padding-top:8px; text-align:center;";
-        
+
         $category_list = Testcategory::getCategoryListName();
-        
+
         if (is_array($questionList)) {
 			foreach ($questionList as $id) {
 				//To avoid warning messages
@@ -177,7 +177,11 @@ if (!$inATest) {
 				$objQuestionTmp = Question :: read($id);
 				$question_class = get_class($objQuestionTmp);
 
-				$clone_link = '<a href="'.api_get_self().'?'.api_get_cidreq().'&clone_question='.$id.'">'.Display::return_icon('cd.gif',get_lang('Copy'), array(), ICON_SIZE_SMALL).'</a>';
+                $clone_link = null;
+                $delete_link = null;
+                if ($objExercise->exercise_was_added_in_lp == false) {
+				    $clone_link = '<a href="'.api_get_self().'?'.api_get_cidreq().'&clone_question='.$id.'">'.Display::return_icon('cd.gif',get_lang('Copy'), array(), ICON_SIZE_SMALL).'</a>';
+                }
 				$edit_link  = '<a href="'.api_get_self().'?'.api_get_cidreq().'&type='.$objQuestionTmp->selectType().'&myid=1&editQuestion='.$id.'">'.Display::return_icon('edit.png',get_lang('Modify'), array(), ICON_SIZE_SMALL).'</a>';
 				if ($objExercise->edit_exercise_in_lp == true) {
 				     $delete_link = '<a id="delete_'.$id.'" class="opener"  href="'.api_get_self().'?'.api_get_cidreq().'&exerciseId='.$exerciseId.'&deleteQuestion='.$id.'" >'.Display::return_icon('delete.png',get_lang('RemoveFromTest'), array(), ICON_SIZE_SMALL).'</a>';
@@ -195,13 +199,13 @@ if (!$inATest) {
 
 				// Question type
 				list($typeImg, $typeExpl) = $objQuestionTmp->get_type_icon_html();
-                
+
                 $question_media = null;
                 if (!empty($objQuestionTmp->parent_id)) {
                     $objQuestionMedia = Question::read($objQuestionTmp->parent_id);
                     $question_media  = Display::label($objQuestionMedia->question, 'info');
                 }
-                
+
 				$questionType = Display::tag('div', Display::return_icon($typeImg, $typeExpl, array(), ICON_SIZE_MEDIUM).$question_media, array('style' => $styleType));
 
 				// Question category
@@ -226,7 +230,7 @@ if (!$inATest) {
                     echo '<div class="header_operations">';
                         echo $questionName;
                         echo $questionType;
-                        
+
                         echo $questionCategory;
                         echo $questionLevel;
                         echo $questionScore;
@@ -247,7 +251,7 @@ if (!$inATest) {
 			}
 		}
 	}
-    
+
 	if (!$nbrQuestions) {
 	  	echo Display::display_warning_message(get_lang('NoQuestion'));
 	}

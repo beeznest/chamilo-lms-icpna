@@ -31,8 +31,7 @@
                             ser cliente de Movistar Internet. 
                         </p></li>
                     <li><p STYLE="margin-bottom: 0cm; line-height: 100%">Ingrese a su
-                            cuenta en “Mi Movistar”
-                            (<a HREF="http://www.movistar.com.pe/atencionenlinea">http://www.movistar.com.pe/atencionenlinea</a>).
+                            cuenta en “Mi Movistar” <a HREF="http://www.movistar.com.pe/atencionenlinea">http://www.movistar.com.pe/atencionenlinea</a>).
                             De no tener una licencia debe crearse una (instrucciones de
                             afiliación a “Mi Movistar”).</p></li>
                     <li><p AliGN=JUSTIFY STYLE="margin-bottom: 0cm; line-height: 100%">Dar
@@ -49,11 +48,7 @@
                     <li><p AliGN=JUSTIFY STYLE="margin-bottom: 0cm; line-height: 100%"><b>¿Cómo
                                 se obtiene la certificación del curso?</b></p>
                         <ol TYPE=a>
-                            <li><p AliGN=JUSTIFY STYLE="margin-bottom: 0cm; line-height: 100%">Se
-                                    tiene que concluir un sub-nivel de enseñanza (adultos: 5 módulos,
-                                    niños: 6 módulos) y podrás recibir el certificado digital del
-                                    ICPNA que avale tu nivel de conocimiento de inglés a través del
-                                    programa a distancia.</p>
+                            <li><p AliGN=JUSTIFY STYLE="margin-bottom: 0cm; line-height: 100%">En el programa de jóvenes/adultos, una vez que el alumno culmine 5 módulos de aprendizaje, podrá acceder a una certificación. En el programa de niños, esta certificación se puede dar cada 6 módulos. Adicionalmente, al finalizar el programa, se podrá obtener una certificación por ello.</p>
                         </ol>
                 </ol>
                 <p AliGN=JUSTIFY STYLE="margin-left: 1.27cm; margin-bottom: 0cm; line-height: 100%">
@@ -102,8 +97,7 @@
                     <li><p AliGN=JUSTIFY STYLE="margin-bottom: 0cm; line-height: 100%"><b>¿Puedo
                                 afiliarme a través del 104?</b></p>
                         <ol TYPE=a>
-                            <li><p AliGN=JUSTIFY STYLE="margin-bottom: 0cm; line-height: 100%">No,
-                                    la afiliación es únicamente a través del canal online.</p>
+                            <li><p AliGN=JUSTIFY STYLE="margin-bottom: 0cm; line-height: 100%">No, la afiliación es únicamente a través del canal online de Movistar.</p>
                         </ol>
                 </ol>
                 <p AliGN=JUSTIFY STYLE="margin-left: 1.27cm; margin-bottom: 0cm; line-height: 100%">
@@ -397,49 +391,31 @@
                 </p>
                 <ol>
                     <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                            En el primer acceso
-                            al Curso, el alumno tendrá la opción (por única vez) de rendir un
-                            examen de clasificación para ubicarlo en el nivel que le
-                            corresponde de inglés o podrá optar por empezar el curso desde el
-                            primer módulo.</p>
+                        En el primer acceso al curso, el alumno tendrá la opción (por única vez) de rendir un examen de clasificación o podrá optar por empezar el curso desde el primer módulo.</p>
                 </ol>
                 <p ALIGN=JUSTIFY STYLE="margin-left: 0.5cm; margin-bottom: 0.11cm; line-height: 100%">
                 </p>
                 <ol START=2>
                     <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                            Para avanzar de un
-                            módulo a otro es necesario atender el total de horas de dictado
-                            obligatorio y haber aprobado el examen final con
-                            una nota de 70% equivalente a 14/20. El estudiante tendrá 3
-                            oportunidades para aprobar el examen final en el Programa de Niños
-                            en un tiempo máximo de 30 minutos y 1 oportunidad en el Programa de
-                            Jóvenes-Adultos en un tiempo máximo de 20 minutos.</p>
+                         Para avanzar de un módulo a otro, el alumno deberá acceder al total de horas obligatorias, y haber aprobado el examen final con una nota de 70%, equivalente a 14/20. En el programa de niños, el alumno tendrá 3 oportunidades para aprobar el examen final, en un tiempo máximo de 30 minutos. En el programa de jóvenes/adultos, habrá 1 oportunidad en un tiempo máximo de 20 minutos. </p>
                 </ol>
                 <p STYLE="margin-left: 1.27cm; margin-bottom: 0.35cm; line-height: 100%">
                 </p>
                 <ol START=3>
                     <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                            Si el estudiante
-                            reprueba el examen final o no finaliza las horas de dictado en el
-                            plazo de 60 días (2 meses) no podrá acceder al siguiente módulo y
-                            se considerará reprobado.</p>
+                          Si el estudiante reprueba el examen final o no finaliza las horas de dictado en el plazo de 60 días (2 meses), no podrá acceder al siguiente módulo y se considerará reprobado.</p>
                 </ol>
                 <p ALIGN=JUSTIFY STYLE="margin-left: 0.5cm; margin-bottom: 0.11cm; line-height: 100%">
                 </p>
                 <ol START=4>
                     <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                            El alumno podrá
-                            imprimir un certificado digital de finalización de cada nivel y/o
-                            finalización del Curso si: Concluye el 70% de las horas del módulo
-                            y aprueba el examen final.</p>
+                         El alumno podrá imprimir un certificado digital de finalización de cada nivel y/o finalización del curso si concluye el 70% de las horas del módulo y aprueba el examen final.</p>
                 </ol>
                 <p ALIGN=JUSTIFY STYLE="margin-left: 1cm; margin-bottom: 0.11cm; line-height: 100%">
                 </p>
                 <ol START=5>
                     <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                            El ritmo de avance
-                            en el Curso es flexible y depende de la programación del tiempo del
-                            alumno. Se puede avanzar como máximo tres (3) módulos al mes.</p>
+                        El ritmo de avance en el curso es flexible y depende de la programación del tiempo del alumno. Se puede avanzar como máximo tres (3) módulos al mes.</p>
                 </ol>
                 <p ALIGN=JUSTIFY STYLE="margin-left: 0.5cm; margin-bottom: 0.11cm; line-height: 100%">
                 </p>
@@ -452,13 +428,9 @@
                 <p CLASS="western" STYLE="margin-bottom: 0.35cm">
                 </p>
                 <p CLASS="western" ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                <u><B>Características
-                        del Curso</B></u></p>
+                <u><b>Requerimientos técnicos para acceder al curso</b></u></p>
                 <p CLASS="western" ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                    Para acceder al
-                    Curso, el alumno deberá contar con acceso a Internet y con una
-                    laptop o PC con acceso a Internet, con las siguientes
-                    características: 
+                   El alumno deberá contar con una PC o Laptop con acceso a Internet, con las siguientes características:
                 </p>
                 <p CLASS="western" ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
                 </p>

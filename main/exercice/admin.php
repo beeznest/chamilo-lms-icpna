@@ -441,14 +441,14 @@ function DetectFlashVer(reqMajorVer, reqMinorVer, reqRevision)
 </script>";
 
 Display::display_header($nameTools, 'Exercise');
-
+/*
 if ($objExercise->exercise_was_added_in_lp) {
     if ($objExercise->force_edit_exercise_in_lp == true) {
         Display::display_warning_message(get_lang('ForceEditingExerciseInLPWarning'));
     } else {
         Display::display_warning_message(get_lang('EditingExerciseCauseProblemsInLP'));
     }
-}
+}*/
 
 // If we are in a test
 $inATest = isset($exerciseId) && $exerciseId > 0;
@@ -483,22 +483,8 @@ if ($inATest) {
         'exercise_report.php?'.api_get_cidReq().'&exerciseId='.$objExercise->id
     );
 
-    if ($objExercise->edit_exercise_in_lp == false) {
-        echo '<a href="">'.Display::return_icon(
-            'settings_na.png',
-            get_lang('ModifyExercise'),
-            '',
-            ICON_SIZE_MEDIUM
-        ).'</a>';
-    } else {
-        echo '<a href="exercise_admin.php?'.api_get_cidreq(
-        ).'&modifyExercise=yes&exerciseId='.$objExercise->id.'">'.Display::return_icon(
-            'settings.png',
-            get_lang('ModifyExercise'),
-            '',
-            ICON_SIZE_MEDIUM
-        ).'</a>';
-    }
+    echo '<a href="exercise_admin.php?'.api_get_cidreq().'&modifyExercise=yes&exerciseId='.$objExercise->id.'">'.
+        Display::return_icon('settings.png', get_lang('ModifyExercise'),'',ICON_SIZE_MEDIUM).'</a>';
 
     $maxScoreAllQuestions = 0;
     if (!empty($objExercise->questionList)) {

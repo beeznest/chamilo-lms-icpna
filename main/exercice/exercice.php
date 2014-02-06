@@ -654,18 +654,20 @@ if (!empty($exercise_list)) {
                             ICON_SIZE_SMALL
                         ).'</a>';
 
-                        //Export
-                        $actions .= Display::url(
-                            Display::return_icon('cd.gif', get_lang('CopyExercise')),
-                            '',
-                            array(
-                                'onclick' => "javascript:if(!confirm('".addslashes(
-                                    api_htmlentities(get_lang('AreYouSureToCopy'), ENT_QUOTES, $charset)
-                                )." ".addslashes($row['title'])."?"."')) return false;",
-                                'href' => 'exercice.php?'.api_get_cidreq(
-                                ).'&choice=copy_exercise&sec_token='.$token.'&exerciseId='.$row['id']
-                            )
-                        );
+                        if ($exercise_obj->exercise_was_added_in_lp == false) {
+                            //Export
+                            $actions .= Display::url(
+                                Display::return_icon('cd.gif', get_lang('CopyExercise')),
+                                '',
+                                array(
+                                    'onclick' => "javascript:if(!confirm('".addslashes(
+                                        api_htmlentities(get_lang('AreYouSureToCopy'), ENT_QUOTES, $charset)
+                                    )." ".addslashes($row['title'])."?"."')) return false;",
+                                    'href' => 'exercice.php?'.api_get_cidreq(
+                                    ).'&choice=copy_exercise&sec_token='.$token.'&exerciseId='.$row['id']
+                                )
+                            );
+                        }
 
                         //Clean exercise
                         if ($locked == false) {
@@ -732,17 +734,19 @@ if (!empty($exercise_list)) {
                             '',
                             ICON_SIZE_SMALL
                         ).'</a>';
-                        $actions .= Display::url(
-                            Display::return_icon('cd.gif', get_lang('CopyExercise')),
-                            '',
-                            array(
-                                'onclick' => "javascript:if(!confirm('".addslashes(
-                                    api_htmlentities(get_lang('AreYouSureToCopy'), ENT_QUOTES, $charset)
-                                )." ".addslashes($row['title'])."?"."')) return false;",
-                                'href' => 'exercice.php?'.api_get_cidreq(
-                                ).'&choice=copy_exercise&sec_token='.$token.'&exerciseId='.$row['id']
-                            )
-                        );
+                        if ($exercise_obj->exercise_was_added_in_lp == false) {
+                            $actions .= Display::url(
+                                Display::return_icon('cd.gif', get_lang('CopyExercise')),
+                                '',
+                                array(
+                                    'onclick' => "javascript:if(!confirm('".addslashes(
+                                        api_htmlentities(get_lang('AreYouSureToCopy'), ENT_QUOTES, $charset)
+                                    )." ".addslashes($row['title'])."?"."')) return false;",
+                                    'href' => 'exercice.php?'.api_get_cidreq(
+                                    ).'&choice=copy_exercise&sec_token='.$token.'&exerciseId='.$row['id']
+                                )
+                            );
+                        }
                     }
 
                     //Delete

@@ -171,7 +171,11 @@ class Exercise
             $this->force_edit_exercise_in_lp = isset($_configuration['force_edit_exercise_in_lp']) ? $_configuration['force_edit_exercise_in_lp'] : false;
 
             if ($this->exercise_was_added_in_lp) {
-                $this->edit_exercise_in_lp = $this->force_edit_exercise_in_lp == true;
+                if ($this->force_edit_exercise_in_lp) {
+                    $this->edit_exercise_in_lp = true;
+                } else {
+                    $this->edit_exercise_in_lp = true;
+                }
             } else {
                 $this->edit_exercise_in_lp = true;
             }
@@ -1443,7 +1447,7 @@ class Exercise
             );
             $radiocat[] = $form->createElement('radio', 'randomByCat', null, get_lang('YesWithCategoriesSorted'), '2');
             $radiocat[] = $form->createElement('radio', 'randomByCat', null, get_lang('No'), '0');
-            $form->addGroup($radiocat, null, get_lang('RandomQuestionByCategory'), '');
+            $radioCatGroup = $form->addGroup($radiocat, null, get_lang('RandomQuestionByCategory'), '');
             $form->addElement('html', '<div class="clear">&nbsp;</div>');
 
             // add the radio display the category name for student
@@ -1743,6 +1747,28 @@ class Exercise
             $defaults['index_document'] = 'checked="checked"';
         }
         $form->setDefaults($defaults);
+
+        // Freeze some elements.
+        if ($this->id != 0 && $this->edit_exercise_in_lp == false) {
+            $elementsToFreeze = array(
+                'randomQuestions',
+                //'randomByCat',
+                'exerciseAttempts',
+                'propagate_neg',
+                'enabletimercontrol',
+                'review_answers'
+            );
+
+            foreach ($elementsToFreeze as $elementName) {
+                /** @var HTML_QuickForm_element $element */
+                $element = $form->getElement($elementName);
+                $element->freeze();
+            }
+
+            $radioCatGroup->freeze();
+
+            //$form->freeze();
+        }
     }
 
     /**

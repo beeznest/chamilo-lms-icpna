@@ -2136,8 +2136,8 @@ class learnpath
             }
             */
             require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
-            $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $lp_id, api_get_course_int_id(), api_get_session_id());
-            $state = Sequence::get_state_lp_by_row_entity_id($row_entity_id, $student_id);
+            $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $lp_id, api_get_course_int_id());
+            $state = Sequence::get_state_lp_by_row_entity_id($row_entity_id, $student_id, api_get_session_id());
             if ($state === 'process' || $state === 'completed') {
                 $is_visible = true;
             }
@@ -3369,7 +3369,7 @@ class learnpath
 
             //Sequence rule #7220
             require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
-            $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $this->get_id(), $course_id, api_get_session_id());
+            $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $this->get_id(), $course_id);
             /*Sequence::temp_hack_4_insert($this->get_total_items_count(), $row_entity_id, $this->get_user_id(), 0);
             */
         }
@@ -3889,7 +3889,7 @@ class learnpath
             $this->attempt = $this->attempt + 1;
             //Sequence rule
             require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
-            $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $this->lp_id, $course_id, $session_id);
+            $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $this->lp_id, $course_id);
             //Sequence::temp_hack_4_insert($this->get_total_items_count(),$row_entity_id,$this->lp_id, $this->get_user_id(), 0);
         } else {
             $this->error = 'Could not insert into item_view table...';
@@ -4386,7 +4386,7 @@ class learnpath
         Database::query($sql);
         //Rule sequence 70% of pre-req #7220
         require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
-        Sequence::temp_hack_3_update(1, 1, $this->prerequisite, $lp_id, $course_id, api_get_session_id());
+        Sequence::temp_hack_3_update(1, 1, $this->prerequisite, $lp_id, $course_id, 0);
         return true;
     }
 
@@ -4400,7 +4400,7 @@ class learnpath
             error_log('New LP - In learnpath::set_prerequisite()', 0);
         }
         require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
-        Sequence::cleanPrerequisites($this->get_id(), api_get_course_int_id(), api_get_session_id());
+        Sequence::cleanPrerequisites($this->get_id(), api_get_course_int_id());
         if (!empty($prerequisites)) {
             foreach ($prerequisites as $prerequisite) {
                 $this->set_prerequisite($prerequisite);
@@ -8108,7 +8108,7 @@ class learnpath
         $return = '';
 
         $selectedPrerequisites = array($row['prerequisite']);
-        $entities = Sequence::getAllRowEntityIdByRowId(1, 1, $this->course_int_id, $this->get_lp_session_id());
+        $entities = Sequence::getAllRowEntityIdByRowId(1, 1, $this->course_int_id);
         if (!empty($entities)) {
             foreach($entities as $data) {
                 $selectedPrerequisites[] = $data['row_id'];
@@ -9453,7 +9453,7 @@ EOD;
 
         //Rule sequence 70% of pre-req #7220
         require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
-        Sequence::temp_hack_3_update(1, 1, 0, $lp_id, $course_id, api_get_session_id());
+        Sequence::temp_hack_3_update(1, 1, 0, $lp_id, $course_id, 0);
         //Cleaning mastery score for exercises
         $sql = "UPDATE $tbl_lp_item SET mastery_score = ''
                 WHERE c_id = ".$course_id." AND lp_id = '$lp_id' AND item_type = 'quiz'";
@@ -9488,8 +9488,8 @@ EOD;
 
     public static function get_state_by_lp_id($lp_id) {
         require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
-        $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $lp_id, api_get_course_int_id(), api_get_session_id());
-        return Sequence::get_state_lp_by_row_entity_id($row_entity_id, api_get_user_id());
+        $row_entity_id = Sequence::get_row_entity_id_by_row_id(1, $lp_id, api_get_course_int_id());
+        return Sequence::get_state_lp_by_row_entity_id($row_entity_id, api_get_user_id(), api_get_session_id());
     }
 }
 

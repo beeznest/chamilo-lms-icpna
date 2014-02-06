@@ -2374,7 +2374,7 @@ div.admin_section h4 {
     float: left;
     color: white;
     height: 24px;
-    width: 26px;
+    width: auto;
     padding: 5px;
     border-radius:7px;
     -moz-border-radius:7px; //Firefox

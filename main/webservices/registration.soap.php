@@ -916,7 +916,10 @@ function WSCreateUserPasswordCrypted($params) {
     $phone                  = '';
     $picture_uri            = '';
     $auth_source            = PLATFORM_AUTH_SOURCE;
-    $expiration_date        = '0000-00-00 00:00:00'; $active = 1; $hr_dept_id = 0; $extra = null;
+    $expiration_date        = '0000-00-00 00:00:00';
+    $active = 1;
+    $hr_dept_id = 0;
+    $extra = null;
     $original_user_id_name  = $params['original_user_id_name'];
     $original_user_id_value = $params['original_user_id_value'];
     $orig_user_id_value[]   = $params['original_user_id_value'];
@@ -948,6 +951,7 @@ function WSCreateUserPasswordCrypted($params) {
     if (!empty($params['language'])) { $language = $params['language'];}
     if (!empty($params['phone'])) { $phone = $params['phone'];}
     if (!empty($params['expiration_date'])) { $expiration_date = $params['expiration_date'];}
+    if (strlen($expiration_date) == 10) { $expiration_date .= ' 00:00:00'; }
 
     // Check whether x_user_id exists into user_field_values table.
     $user_id = UserManager::get_user_id_from_original_id($original_user_id_value, $original_user_id_name);

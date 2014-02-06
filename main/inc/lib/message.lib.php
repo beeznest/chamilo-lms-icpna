@@ -124,7 +124,7 @@ class MessageManager
                 $link = '&f=social';
             }
             $message[1] = '<a '.$class.' href="view_message.php?id='.$result[0].$link.'">'.$result[2].'</a><br />'.GetFullUserName(($result[1]));
-            $message[3] = '<a href="new_message.php?re_id='.$result[0].$link.'">'.Display::return_icon('message_reply.png',get_lang('ReplyToMessage')).'</a>'.
+            $message[3] = //'<a href="new_message.php?re_id='.$result[0].$link.'">'.Display::return_icon('message_reply.png',get_lang('ReplyToMessage')).'</a>'.
                       '&nbsp;&nbsp;<a onclick="javascript:if(!confirm('."'".addslashes(api_htmlentities(get_lang('ConfirmDeleteMessage')))."'".')) return false;" href="inbox.php?action=deleteone&id='.$result[0].$link.'">'.Display::return_icon('delete.png',get_lang('DeleteMessage')).'</a>';
 
 			$message[2] = api_convert_and_format_date($result[3], DATE_TIME_FORMAT_LONG); //date stays the same

@@ -1158,7 +1158,11 @@ class CourseRestorer
                         'propagate_neg' => $quiz->propagate_neg,
                         'text_when_finished' => $quiz->text_when_finished,
                         'expired_time' => (int) $quiz->expired_time,
-                        'end_button' => (int)$quiz->end_button
+                        'end_button' => isset($quiz->end_button) ? (int) $quiz->end_button : null,
+                        'on_success_message' => isset($quiz->on_success_message) ? $quiz->on_success_message : null,
+                        'on_failed_message' => isset($quiz->on_failed_message) ? $quiz->on_failed_message : null,
+                        'email_notification_template' => isset($quiz->email_notification_template) ? $quiz->email_notification_template : null,
+                        'email_notification_template_to_user' => isset($quiz->email_notification_template_to_user) ? $quiz->email_notification_template_to_user : null
                     );
 
                     if ($respect_base_content) {

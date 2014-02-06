@@ -54,11 +54,16 @@ function showQuestion($questionId, $only_questions = false, $origin = false, $cu
                 echo Testcategory::getCategoryNamesForQuestion($objQuestionTmp->id);
                 if (!empty($objExercise)) {
                     if ($objExercise->get_count_question_list()) {
-                        $current_item = $current_item.'/'.$objExercise->get_count_question_list();
+                        $current_item = "<div class='ques-num-bg'>" . 
+                                        "<b>" . 
+                                        $current_item . '/' . 
+                                        $objExercise->get_count_question_list() .
+                                        "</b>" .
+                                        "</div>";
                     }
                 }
-
-                echo Display::div($current_item.'. '.$objQuestionTmp->selectTitle(), array('class' => 'question_title'));
+                $txtDesc = "<div style='padding-top: 15px;'>" . str_replace("-", "", $objQuestionTmp->selectTitle()) . "</div>";
+                echo Display::div($current_item . ' ' . $txtDesc, array('class' => 'question_title'));
             }
             if (!empty($questionDescription)) {
                 echo Display::div($questionDescription, array('class' => 'question_description'));

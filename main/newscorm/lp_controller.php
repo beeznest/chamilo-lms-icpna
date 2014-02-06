@@ -840,7 +840,7 @@ switch ($action) {
             require 'lp_list.php';
         } else {
             if ($debug > 0) {error_log('New LP - Trying to set current item to ' . $_REQUEST['item_id'], 0); }
-            if ( !empty($_REQUEST['item_id']) ) {
+            if (!empty($_REQUEST['item_id']) ) {
                 $_SESSION['oLP']->set_current_item($_REQUEST['item_id']);
             }
             require 'lp_view.php';

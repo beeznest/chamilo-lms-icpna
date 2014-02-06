@@ -7,6 +7,7 @@ class Sequence
      * @return array|bool
      */
     public static function get_pre_req_id_by_row_entity_id($row_entity_id) {
+        error_log(__LINE__);
         $row_entity_id = intval(Database::escape_string($row_entity_id));
         if ($row_entity_id > 0) {
             $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
@@ -52,6 +53,7 @@ class Sequence
      *
      */
     public static function get_entity_by_id($entity_id) {
+        error_log(__LINE__);
         $entity_id = Database::escape_string($entity_id);
         if (is_numeric($entity_id)) {
             $entity_id = intval($entity_id);
@@ -94,6 +96,7 @@ class Sequence
     }
 
     public static function get_condition_by_rule_id($rule_id = 1) {
+        error_log(__LINE__);
         $rule_id = Database::escape_string($rule_id);
         if (is_numeric($rule_id)) {
             $rule_id = intval($rule_id);
@@ -113,6 +116,7 @@ class Sequence
     }
 
     public static function get_method_by_rule_id($rule_id =1 ) {
+        error_log(__LINE__);
         $rule_id = Database::escape_string($rule_id);
         if (is_numeric($rule_id)) {
             $rule_id = intval($rule_id);
@@ -132,6 +136,7 @@ class Sequence
     }
 
     public static function get_value_by_row_entity_id($row_entity_id) {
+        error_log(__LINE__);
         $row_entity_id = intval(Database::escape_string($row_entity_id));
         if ($row_entity_id > 0) {
             $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
@@ -148,6 +153,7 @@ class Sequence
     }
 
     public static function get_variable_by_condition_id($condition_id) {
+        error_log(__LINE__);
         $condition_id = Database::escape_string($condition_id);
         if (is_numeric($condition_id)) {
             $condition_id = intval($condition_id);
@@ -613,9 +619,9 @@ class Sequence
      * Cleans the sequence table by sequence_row_entity_id_next
      * @param int $id
      * @param int $c_id
-     * @param int $session_id
      */
-    public function cleanPrerequisites($id, $c_id, $session_id)
+
+    public function cleanPrerequisites($id, $c_id)
     {
         error_log(__LINE__);
         $table = Database::get_main_table(TABLE_MAIN_SEQUENCE);

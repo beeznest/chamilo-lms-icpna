@@ -4373,7 +4373,6 @@ class learnpath
         if ($this->debug > 0) {
             error_log('New LP - In learnpath::set_prerequisite()', 0);
         }
-
         /*
          * Needs the zero for the sequence logic
         if (empty($prerequisite)) {
@@ -8114,7 +8113,7 @@ class learnpath
         $return = '';
 
         $selectedPrerequisites = array($row['prerequisite']);
-        $entities = Sequence::getAllRowEntityIdByRowId(1, 1, $this->course_int_id);
+        $entities = Sequence::getAllRowEntityIdByRowId(1, $this->get_id(), $this->course_int_id);
         if (!empty($entities)) {
             foreach($entities as $data) {
                 $selectedPrerequisites[] = $data['row_id'];

@@ -4371,9 +4371,13 @@ class learnpath
         if ($this->debug > 0) {
             error_log('New LP - In learnpath::set_prerequisite()', 0);
         }
+
+        /*
+         * Needs the zero for the sequence logic
         if (empty($prerequisite)) {
             return false;
         }
+        */
         $this->prerequisite = intval($prerequisite);
 
         $lp_table = Database :: get_course_table(TABLE_LP_MAIN);

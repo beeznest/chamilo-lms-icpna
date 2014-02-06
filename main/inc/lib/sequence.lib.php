@@ -445,13 +445,20 @@ class Sequence
                 $sql = "SELECT sequence_row_entity_id FROM $seq_table
                     WHERE sequence_row_entity_id_next = $row_entity_id";
                 $result = Database::query($sql);
+                $available = 0;
                 if (Database::num_rows($result)) {
+                    while ($temp_row_entity = Database::fetch_row($result)) {
+                        if ($temp_row_entity[0] == 0) {
+                            $available = 1;
+                            break;
+                        }
+                    }
                     //Val row starts not available
-                    return self::temp_hack_4_insert(1, $row_entity_id, $user_id, 0, $session_id);
                 } else {
                     //Val row starts available
-                    return self::temp_hack_4_insert(1, $row_entity_id, $user_id, 1, $session_id);
+                    $available = 1;
                 }
+                return self::temp_hack_4_insert(1, $row_entity_id, $user_id, $available, $session_id);
             }
         }
         return 0;
@@ -576,14 +583,14 @@ class Sequence
         return false;
     }
 
-    public static function temp_hack_4_insert($total_items, $row_entity_id, $user_id = 0, $available = 0, $session_id) {
+    public static function temp_hack_4_insert($total_items, $row_entity_id, $user_id = 0, $available = -1, $session_id) {
         error_log(__LINE__);
         $user_id = intval(Database::escape_string($user_id));
         $session_id = intval(Database::escape_string($session_id));
         $total_items = intval(Database::escape_string($total_items));
         $available = intval(Database::escape_string($available));
 
-        if ($available === 0) {
+        if ($available === -1) {
             $pre_req = self::get_pre_req_id_by_row_entity_id($row_entity_id);
             foreach ($pre_req as $pr) {
                 if($pr === 0) {
@@ -828,14 +835,10 @@ class Sequence
         $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
 
         if ($row_entity_id > 0 && $user_id > 0 && $session_id >= 0) {
-            if (self::get_value_by_user_id($row_entity_id, $user_id, $session_id) === false) {
-                self::temp_hack_4_insert(1,$row_entity_id,$user_id, 0, $session_id);
-                return self::get_state_lp_by_row_entity_id($row_entity_id, $user_id, $session_id);
-            }
+
+            $val_id = self::getValIdByRowEntityId($row_entity_id, $user_id, $session_id);
             $sql_seq = "SELECT val.available, val.success FROM $val_table val
-            WHERE val.sequence_row_entity_id = $row_entity_id
-            AND val.user_id = $user_id
-            AND val.session_id = $session_id
+            WHERE val.id = $val_id
             LIMIT 0, 1";
             $result_seq = Database::query($sql_seq);
             $arr_seq = Database::fetch_array($result_seq, 'ASSOC');

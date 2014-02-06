@@ -114,14 +114,14 @@ $learnpath_item_id = $exercise_stat_info['orig_lp_item_id'];
 $learnpath_item_view_id = $exercise_stat_info['orig_lp_item_view_id'];
 
 if ($origin == 'learnpath') {
-    ?>
-    <form method="GET" action="exercice.php?<?php echo api_get_cidreq() ?>">
-        <input type="hidden" name="origin" 					value="<?php echo $origin; ?>" />
-        <input type="hidden" name="learnpath_id" 			value="<?php echo $learnpath_id; ?>" />
-        <input type="hidden" name="learnpath_item_id" 		value="<?php echo $learnpath_item_id; ?>" />
-        <input type="hidden" name="learnpath_item_view_id"  value="<?php echo $learnpath_item_view_id; ?>" />
-        <?php
-    }
+?>
+<form method="GET" action="exercice.php?<?php echo api_get_cidreq() ?>">
+    <input type="hidden" name="origin" 					value="<?php echo $origin; ?>" />
+    <input type="hidden" name="learnpath_id" 			value="<?php echo $learnpath_id; ?>" />
+    <input type="hidden" name="learnpath_item_id" 		value="<?php echo $learnpath_item_id; ?>" />
+    <input type="hidden" name="learnpath_item_view_id"  value="<?php echo $learnpath_item_view_id; ?>" />
+    <?php
+}
 
 $i = $total_score = $total_weight = 0;
 
@@ -171,10 +171,8 @@ if ($origin != 'learnpath') {
         Session::erase('objExercise');
         Session::erase('exe_id');
     }
-
     Display::display_footer();
 } else {
-
     $lp_mode = isset($_SESSION['lp_mode']) ? $_SESSION['lp_mode'] : null;
     $url = api_get_path(WEB_CODE_PATH).'newscorm/lp_controller.php?cidReq='.api_get_course_id().'&action=view&lp_id='.$learnpath_id.'&lp_item_id='.$learnpath_item_id.'&exeId='.$exercise_stat_info['exe_id'].'&fb_type='.$objExercise->feedback_type;
     $href = ($lp_mode == 'fullscreen') ? ' window.opener.location.href="'.$url.'" ' : ' top.location.href="'.$url.'"';
@@ -188,7 +186,9 @@ if ($origin != 'learnpath') {
     echo "
     <span id='result' style='display:none'></span>
     <script>
-        $( '#result' ).load('$url', function() {
+        $(function() {
+            $( '#result' ).load('$url', function() {
+            });
         });
     </script>";
     //echo '<script type="text/javascript">'.$href.'</script>';

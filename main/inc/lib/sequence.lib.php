@@ -7,6 +7,7 @@ class Sequence
      * @return array|bool
      */
     public static function get_pre_req_id_by_row_entity_id($row_entity_id) {
+        error_log(__LINE__);
         $row_entity_id = intval(Database::escape_string($row_entity_id));
         if ($row_entity_id > 0) {
             $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
@@ -22,19 +23,19 @@ class Sequence
         return false;
     }
 
-    public static function get_next_by_row_id($entity_id, $row_entity_id, $course_id = null, $session_id =null) {
+    public static function get_next_by_row_id($entity_id, $row_entity_id, $course_id = null) {
         $row_entity_id = Database::escape_string($row_entity_id);
         $entity_id = Database::escape_string($entity_id);
         $course_id = Database::escape_string($course_id);
-        $session_id = Database::escape_string($session_id);
+
         if (is_numeric($row_entity_id) && is_numeric($entity_id)) {
             $row_entity_id = intval($row_entity_id);
             $entity_id = intval($entity_id);
             $course_id = is_numeric($course_id) ? intval($course_id) : api_get_course_int_id();
-            $session_id = is_numeric($session_id) ? intval($session_id) : api_get_session_id();
+
             $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
             $row_table = Database::get_main_table(TABLE_SEQUENCE_ROW_ENTITY);
-            $sql = "SELECT row.id FROM $row_table row WHERE row.sequence_type_entity_id = $entity_id AND row.row_id = $row_entity_id AND row.c_id = $course_id  AND row. session_id = $session_id LIMIT 0, 1";
+            $sql = "SELECT row.id FROM $row_table row WHERE row.sequence_type_entity_id = $entity_id AND row.row_id = $row_entity_id AND row.c_id = $course_id LIMIT 0, 1";
             $sql = "SELECT main.sequence_row_entity_id_next FROM $seq_table main WHERE main.sequence_row_entity_id_next IN ($sql)";
             $sql = "SELECT * FROM $row_table res WHERE res.id IN ($sql)";
             $result = Database::query($sql);
@@ -52,6 +53,7 @@ class Sequence
      *
      */
     public static function get_entity_by_id($entity_id) {
+        error_log(__LINE__);
         $entity_id = Database::escape_string($entity_id);
         if (is_numeric($entity_id)) {
             $entity_id = intval($entity_id);
@@ -69,13 +71,13 @@ class Sequence
     }
 
 
-    public static function validate_rule_by_row_id($row_entity_id, $user_id = null, $rule_id = 1) {
+    public static function validate_rule_by_row_id($row_entity_id, $user_id = null, $session_id, $rule_id = 1) {
         $condition = self::get_condition_by_rule_id($rule_id);
         if ($condition !== false) {
             $con = $condition[0];
             while(isset($con)) {
                 $var = self::get_variable_by_condition_id($con['id']);
-                $val = self::get_value_by_user_id($row_entity_id, $user_id, 1);
+                $val = self::get_value_by_user_id($row_entity_id, $user_id, $session_id, 1);
                 $statement = 'return ('.floatval($val[0][$var[0]["name"]]).' '.$con["mat_op"].' '.$con["param"].');';
                 if (eval($statement)) {
                     $go = (!isset($con['act_true']))? -1 : intval($con['act_true']);
@@ -94,6 +96,7 @@ class Sequence
     }
 
     public static function get_condition_by_rule_id($rule_id = 1) {
+        error_log(__LINE__);
         $rule_id = Database::escape_string($rule_id);
         if (is_numeric($rule_id)) {
             $rule_id = intval($rule_id);
@@ -113,6 +116,7 @@ class Sequence
     }
 
     public static function get_method_by_rule_id($rule_id =1 ) {
+        error_log(__LINE__);
         $rule_id = Database::escape_string($rule_id);
         if (is_numeric($rule_id)) {
             $rule_id = intval($rule_id);
@@ -132,6 +136,7 @@ class Sequence
     }
 
     public static function get_value_by_row_entity_id($row_entity_id) {
+        error_log(__LINE__);
         $row_entity_id = intval(Database::escape_string($row_entity_id));
         if ($row_entity_id > 0) {
             $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
@@ -148,6 +153,7 @@ class Sequence
     }
 
     public static function get_variable_by_condition_id($condition_id) {
+        error_log(__LINE__);
         $condition_id = Database::escape_string($condition_id);
         if (is_numeric($condition_id)) {
             $condition_id = intval($condition_id);
@@ -166,8 +172,8 @@ class Sequence
         return false;
     }
 
-    public static function execute_formulas_by_user_id($row_entity_id = null ,$user_id = null, $met_type = '', $available = 1, $complete_items = 1, $total_items = 1, $available_end_date =null) {
-        $value = self::get_value_by_user_id($row_entity_id, $user_id, $available);
+    public static function execute_formulas_by_user_id($row_entity_id = null ,$user_id = null, $session_id, $met_type = '', $available = 1, $complete_items = 1, $total_items = 1, $available_end_date =null) {
+        $value = self::get_value_by_user_id($row_entity_id, $user_id, $session_id, $available);
         if ($value !== false) {
             if (empty($met_type)) {
                 $met_filter = " AND met.met_type NOT IN ('success', 'pre', 'update') ";
@@ -224,7 +230,8 @@ class Sequence
         return false;
     }
 
-    public static function get_value_by_user_id($row_entity_id = null,$user_id = null, $available = -1, $success = -1) {
+    public static function get_value_by_user_id($row_entity_id = null, $user_id = null, $session_id = null, $available = -1, $success = -1) {
+        error_log(__LINE__);
         $user_id = (isset($user_id))? intval(Database::escape_string($user_id)) : api_get_user_id();
         if ($user_id > 0) {
             $available = Database::escape_string($available);
@@ -248,9 +255,15 @@ class Sequence
             } else {
                 $row_entity_filter = '';
             }
-            $user_id = intval($user_id);
+            $session_id = Database::escape_string($session_id);
+            $session_id = (is_numeric($session_id))? intval($session_id) : -1;
+            if ($session_id < 0) {
+                $session_filter = '';
+            } else {
+                $session_filter = " AND session_id = $session_id ";
+            }
             $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
-            $sql = "SELECT * FROM $val_table WHERE user_id = $user_id $available_filter $success_filter $row_entity_filter";
+            $sql = "SELECT * FROM $val_table WHERE user_id = $user_id $available_filter $success_filter $row_entity_filter $session_filter";
             $result = Database::query($sql);
             if (Database::num_rows($result) > 0) {
                 while($temp_value = Database::fetch_array($result,'ASSOC')){
@@ -263,6 +276,7 @@ class Sequence
     }
 
     public static function find_variables_in_formula($formula) {
+        error_log(__LINE__);
         $formula = Database::escape_string($formula);
         if (isset($formula)) {
             $pat = "/v#(\d+)/";
@@ -278,6 +292,7 @@ class Sequence
 
     public static function get_user_id_by_row_entity_id($row_entity_id = 0)
     {
+        error_log(__LINE__);
         $row_entity_id = intval(Database::escape_string($row_entity_id));
         if ($row_entity_id > 0) {
             $row_entity_filter = "WHERE sequence_row_entity_id = $row_entity_id";
@@ -285,59 +300,62 @@ class Sequence
             $row_entity_filter = '';
         }
             $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
-            $sql = "SELECT DISTINCT user_id FROM $val_table $row_entity_filter";
+            $sql = "SELECT DISTINCT user_id, session_id FROM $val_table $row_entity_filter";
             $result = Database::query($sql);
             if (Database::num_rows($result) > 0) {
                 while ($temp_user = Database::fetch_array($result, 'ASSOC')) {
-                    $user[] = $temp_user['user_id'];
+                    $user[] = $temp_user;
                 }
                 return $user;
             }
         return false;
     }
 
-    public static function action_pre_init($row_entity_id, $user_id, $available_end_date = null) {
+    public static function action_pre_init($row_entity_id, $user_id, $session_id, $available_end_date = null) {
+        error_log(__LINE__);
         $user_id = intval(Database::escape_string($user_id));
+        $session_id = intval(Database::escape_string($session_id));
         $row_entity_id = intval(Database::escape_string($row_entity_id));
         $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
         $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
-        $sql = "SELECT DISTINCT seq.sequence_row_entity_id, val.user_id FROM $seq_table seq, $val_table val WHERE
-                    seq.is_part != 1 AND
-                    val.success = 0 AND
-                    val.user_id = $user_id AND
-                    val.sequence_row_entity_id = seq.sequence_row_entity_id AND
-                    seq.sequence_row_entity_id_next = $row_entity_id";
+        $sql = "SELECT DISTINCT seq.sequence_row_entity_id, val.user_id FROM $seq_table seq, $val_table val
+            WHERE seq.is_part != 1
+            AND val.success = 0
+            AND val.user_id = $user_id
+            AND val.session_id = $session_id
+            AND val.sequence_row_entity_id = seq.sequence_row_entity_id
+            AND seq.sequence_row_entity_id_next = $row_entity_id";
         $result = Database::query($sql);
         while ($temp = Database::fetch_array($result, 'ASSOC')){
             $pre_req[$temp['user_id']] = $temp['sequence_row_entity_id'];
         }
         if (empty($pre_req)) {
-            if (self::get_value_by_user_id($row_entity_id, $user_id) === false) {
-                self::temp_hack_4_insert(1, $row_entity_id, $user_id, 0);
+            if (self::get_value_by_user_id($row_entity_id, $user_id, $session_id) === false) {
+                self::temp_hack_4_insert(1, $row_entity_id, $user_id, 0, $session_id);
             }
-            self::execute_formulas_by_user_id($row_entity_id, $user_id, 'pre', 0, null, null, $available_end_date);
+            self::execute_formulas_by_user_id($row_entity_id, $user_id, $session_id, 'pre', 0, null, null, $available_end_date);
             return true;
         } else {
-            self::temp_hack_4_set_aval($row_entity_id, $user_id, 0);
+            self::temp_hack_4_set_aval($row_entity_id, $user_id, $session_id, 0);
         }
         return false;
     }
 
-    public static function action_post_success_by_user_id($row_entity_id, $user_id, $available_end_date = null) {
-        if (self::execute_formulas_by_user_id($row_entity_id, $user_id, 'success', 1, null, null, null)) {
+    public static function action_post_success_by_user_id($row_entity_id, $user_id, $session_id, $available_end_date = null) {
+        error_log(__LINE__);
+        if (self::execute_formulas_by_user_id($row_entity_id, $user_id, $session_id, 'success', 1, null, null, null)) {
             $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
-            $value = self::get_value_by_user_id($row_entity_id, $user_id, 1, 1);
+            $value = self::get_value_by_user_id($row_entity_id, $user_id, $session_id, 1, 1);
             //$check_array = []; Update later
             foreach ($value as $val) {
                 $row_entity_id_prev = $val['sequence_row_entity_id'];
                 $sql = "SELECT seq.sequence_row_entity_id_next FROM $seq_table seq WHERE seq.sequence_row_entity_id = $row_entity_id_prev";
                 $result = Database::query($sql);
-                $next = array();
                 while ($temp_next = Database::fetch_array($result, 'ASSOC')) {
                     $next[] = $temp_next['sequence_row_entity_id_next'];
                 }
                 foreach ($next as $nx) {
-                    self::action_pre_init($nx, $user_id, $available_end_date);
+                    self::action_pre_init($nx, $user_id, $session_id, $available_end_date);
                 }
             }
         }
@@ -347,18 +365,17 @@ class Sequence
      * @param int $entity_id
      * @param int $row_id
      * @param int $c_id
-     * @param int $session_id
      */
-    public static function getAllRowEntityIdByRowId($entity_id, $row_id, $c_id, $session_id)
+    public static function getAllRowEntityIdByRowId($entity_id, $row_id, $c_id)
     {
+        error_log(__LINE__);
         $row_id = intval(Database::escape_string($row_id));
         $entity_id = intval(Database::escape_string($entity_id));
         $c_id = intval(Database::escape_string($c_id));
-        $session_id = intval(Database::escape_string($session_id));
 
-        $row_entity_id_prev = self::get_row_entity_id_by_row_id($entity_id, $row_id, $c_id, $session_id);
+        $row_entity_id_prev = self::get_row_entity_id_by_row_id($entity_id, $row_id, $c_id);
 
-        if ($row_id > 0 && $entity_id > 0 && $c_id > 0 && $session_id >= 0) {
+        if ($row_id > 0 && $entity_id > 0 && $c_id > 0) {
             $table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
             $tableRow = Database::get_main_table(TABLE_SEQUENCE_ROW_ENTITY);
             $sql = "SELECT DISTINCT r.* FROM $table s INNER JOIN $tableRow r ON (r.id = s.sequence_row_entity_id)
@@ -380,23 +397,20 @@ class Sequence
      * @param int $entity_id
      * @param int $row_id
      * @param int $c_id
-     * @param int $session_id
      * @return array
      */
-    public static function getRowEntityByRowId($entity_id, $row_id, $c_id, $session_id)
+    public static function getRowEntityByRowId($entity_id, $row_id, $c_id)
     {
+        error_log(__LINE__);
         $row_id = intval(Database::escape_string($row_id));
         $entity_id = intval(Database::escape_string($entity_id));
         $c_id = intval(Database::escape_string($c_id));
-        $session_id = intval(Database::escape_string($session_id));
-        if ($row_id > 0 && $entity_id > 0 && $c_id > 0 && $session_id >= 0) {
+        if ($row_id > 0 && $entity_id > 0 && $c_id > 0) {
             $row_table = Database::get_main_table(TABLE_SEQUENCE_ROW_ENTITY);
             $sql = "SELECT row.* FROM $row_table row WHERE
             row.sequence_type_entity_id = $entity_id AND
             row.row_id = $row_id AND
-            row.c_id = $c_id ".
-                // AND row.session_id = $session_id
-                "LIMIT 0, 1";
+            row.c_id = $c_id LIMIT 0, 1";
             $result = Database::query($sql);
             if (Database::num_rows($result) > 0) {
                 return Database::fetch_array($result, 'ASSOC');
@@ -405,88 +419,96 @@ class Sequence
         return array();
     }
 
-    public static function get_row_entity_id_by_row_id($entity_id, $row_id, $c_id, $session_id, $name = '') {
+    /**
+     * @param $row_entity_id
+     * @param $user_id
+     * @param $session_id
+     * @return mixed
+     */
+    public static function getValIdByRowEntityId ($row_entity_id, $user_id, $session_id)
+    {
+        $row_entity_id = intval(Database::escape_string($row_entity_id));
+        $user_id = intval(Database::escape_string($user_id));
+        $session_id = intval(Database::escape_string($session_id));
+
+        if ($row_entity_id > 0 && $user_id > 0 && $session_id >= 0) {
+            $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
+            $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
+
+            //check if exists value row
+            $sql = "SELECT val.id FROM $val_table val
+                WHERE val.sequence_row_entity_id = $row_entity_id
+                AND val.user_id = $user_id
+                AND val.session_id = $session_id
+                LIMIT 0, 1";
+
+            $result = Database::query($sql);
+
+            if (Database::num_rows($result) > 0) {
+                $temp_row_entity = Database::fetch_array($result, 'ASSOC');
+                return $temp_row_entity['id'];
+            } else {
+                $sql = "SELECT sequence_row_entity_id FROM $seq_table
+                    WHERE sequence_row_entity_id_next = $row_entity_id";
+                $result = Database::query($sql);
+                $available = 0;
+                if (Database::num_rows($result)) {
+                    while ($temp_row_entity = Database::fetch_row($result)) {
+                        if ($temp_row_entity[0] == 0) {
+                            $available = 1;
+                            break;
+                        }
+                    }
+                    //Val row starts not available
+                } else {
+                    //Val row starts available
+                    $available = 1;
+                }
+                return self::temp_hack_4_insert(1, $row_entity_id, $user_id, $available, $session_id);
+            }
+        }
+        return 0;
+    }
+
+
+    public static function get_row_entity_id_by_row_id($entity_id, $row_id, $c_id, $name = '') {
         $row_id = intval(Database::escape_string($row_id));
         $entity_id = intval(Database::escape_string($entity_id));
         $c_id = intval(Database::escape_string($c_id));
-        $session_id = intval(Database::escape_string($session_id));
         $name = Database::escape_string($name);
-        if ($row_id > 0 && $entity_id > 0 && $c_id > 0 && $session_id >= 0) {
+        if ($row_id > 0 && $entity_id > 0 && $c_id > 0) {
             $row_table = Database::get_main_table(TABLE_SEQUENCE_ROW_ENTITY);
+            $clp_table = Database::get_course_table(TABLE_LP_MAIN);
             $sql = "SELECT row.id FROM $row_table row WHERE
-            row.sequence_type_entity_id = $entity_id AND
-            row.row_id = $row_id AND
-            row.c_id = $c_id ".
-            // AND row.session_id = $session_id
-            "LIMIT 0, 1";
+                row.sequence_type_entity_id = $entity_id AND
+                row.row_id = $row_id AND
+                row.c_id = $c_id
+                LIMIT 0, 1";
             $result = Database::query($sql);
             if (Database::num_rows($result) > 0) {
                 while ($temp_row_entity = Database::fetch_array($result, 'ASSOC')) {
                     $row_entity[] = $temp_row_entity;
                 }
                 return $row_entity[0]['id'];
-            } else {
-                $typ_table = Database::get_main_table(TABLE_SEQUENCE_TYPE_ENTITY);
-                $sql = "SELECT ent_table FROM $typ_table WHERE id = $entity_id LIMIT 0, 1";
-                $result =Database::query($sql);
-                if (Database::num_rows($result) > 0) {
-                    $ent_table = Database::fetch_array($result, 'ASSOC');
-                    $table = $ent_table['ent_table'];
-                    if ($entity_id !== 2) {
-                        $sql = "SELECT name, prerequisite FROM $table WHERE c_id = $c_id AND session_id = $session_id AND id = $row_id LIMIT 0, 1";
-                        $result = Database::query($sql);
-                        if (Database::num_rows($result)) {
-                            $temp_arr = Database::fetch_array($result, 'ASSOC');
-                            $name = $temp_arr['name'];
-                            $pre = ($temp_arr['prerequisite'] > 0)? self::get_row_entity_id_by_row_id($entity_id, $temp_arr['prerequisite'], $c_id, $session_id) : 0 ;
-                            $sql = "INSERT INTO $row_table (sequence_type_entity_id, c_id, session_id, row_id, name) VALUES
-                            ($entity_id, $c_id, $session_id, $row_id, '$name')";
-                            Database::query($sql);
-                            $id = Database::insert_id();
-                            $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
-                            $sql = "INSERT INTO $seq_table (sequence_row_entity_id, sequence_row_entity_id_next, is_part) VALUES
-                            ($pre, $id, 0)";
-                            Database::query($sql);
-                            if ($pre !== 0) {
-                                $user_id = self::get_user_id_by_row_entity_id($pre);
-                                foreach ($user_id as $us_id) {
-                                    self::action_pre_init($id, $us_id);
-                                }
-                            }
-                            $sql = "SELECT id FROM $row_table WHERE sequence_type_entity_id = 2 AND c_id = $c_id AND session_id = $session_id and name = 'EXAM' LIMIT 0, 1";
-                            $result = Database::query($sql);
-                            if (Database::num_rows($result) > 0) {
-                                $temp_arr = Database::fetch_array($result, 'ASSOC');
-                                $exam_id = $temp_arr['id'];
-                                $sql = "INSERT INTO $seq_table (sequence_row_entity_id, sequence_row_entity_id_next, is_part) VALUES
-                                ($id, $exam_id, 0)";
-                                Database::query($sql);
-                                $user_id = self::get_user_id_by_row_entity_id($exam_id);
-                                foreach ($user_id as $us_id) {
-                                    self::temp_hack_4_set_aval($exam_id, $us_id, 0);
-                                }
-                            }
-                            return $id;
-                        }
-                    } elseif (strpos(strtolower($name),'exam') !== false) {
-                        $sql = "SELECT id FROM $row_table WHERE c_id = $c_id ";//" AND session_id = $session_id";
-                        $result = Database::query($sql);
-                        while ($temp_arr = Database::fetch_array($result, 'ASSOC')) {
-                            $pre_req[] = $temp_arr['id'];
-                        }
-                        $name = 'EXAM';
-                        $sql = "INSERT INTO $row_table (sequence_type_entity_id, c_id, session_id, row_id, name) VALUES
-                        ($entity_id, $c_id, $session_id, $row_id, '$name')";
-                        Database::query($sql);
-                        $id = Database::insert_id();
-                        $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
-                        foreach ($pre_req as $pr) {
-                            $sql = "INSERT INTO $seq_table (sequence_row_entity_id, sequence_row_entity_id_next, is_part) VALUES
-                            ($pr, $id, 0)";
-                            Database::query($sql);
-                        }
-                        return $id;
-                    }
+            } elseif ($entity_id == 1) {
+                $sql = "SELECT name, prerequisite FROM $clp_table
+                    WHERE c_id = $c_id
+                    AND id = $row_id
+                    LIMIT 0, 1";
+                $result = Database::query($sql);
+                if (Database::num_rows($result)) {
+                    $temp_arr = Database::fetch_array($result, 'ASSOC');
+                    $name = $temp_arr['name'];
+                    $pre = ($temp_arr['prerequisite'] > 0)? self::get_row_entity_id_by_row_id($entity_id, $temp_arr['prerequisite'], $c_id) : 0 ;
+                    $sql = "INSERT INTO $row_table (sequence_type_entity_id, c_id, row_id, name) VALUES
+                        ($entity_id, $c_id, $row_id, '$name')";
+                    Database::query($sql);
+                    $id = Database::insert_id();
+                    $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
+                    $sql = "INSERT INTO $seq_table (sequence_row_entity_id, sequence_row_entity_id_next, is_part) VALUES
+                        ($pre, $id, 0)";
+                    Database::query($sql);
+                    return $id;
                 }
             }
         }
@@ -494,13 +516,16 @@ class Sequence
     }
 
     public static function temp_hack_4_update($entity_id, $row_id, $c_id, $session_id, $user_id, $rule_id, $items_completed = 1, $total_items = 1, $available_end_date =null ){
-        $row_entity_id = self::get_row_entity_id_by_row_id($entity_id, $row_id, $c_id, $session_id);
-        self::execute_formulas_by_user_id($row_entity_id, $user_id, 'update', 1, $items_completed, $total_items);
-        if (self::validate_rule_by_row_id($row_entity_id, $user_id, $rule_id) && self::get_value_by_user_id($row_entity_id, $user_id, 1, 1 === false)) {
-            self::action_post_success_by_user_id($row_entity_id, $user_id, $available_end_date);
+        error_log(__LINE__);
+        $row_entity_id = self::get_row_entity_id_by_row_id($entity_id, $row_id, $c_id);
+        self::execute_formulas_by_user_id($row_entity_id, $user_id, $session_id, 'update', 1, $items_completed, $total_items);
+        if (self::validate_rule_by_row_id($row_entity_id, $user_id, $session_id, $rule_id) && (self::get_value_by_user_id($row_entity_id, $user_id, $session_id, 1, 1) === false)) {
+            self::action_post_success_by_user_id($row_entity_id, $user_id, $session_id, $available_end_date);
         }
     }
+
     public static function get_table_by_entity_name($entity_name){
+        error_log(__LINE__);
         $entity_name = Database::escape_string($entity_name);
         $ety_table = Database::get_main_table(TABLE_SEQUENCE_TYPE_ENTITY);
         $sql = "SELECT ety.ent_table FROM $ety_table ety WHERE ety.name = $entity_name LIMIT 0, 1";
@@ -515,6 +540,7 @@ class Sequence
     }
 
     public static function get_entity_by_entity_name($entity_name){
+        error_log(__LINE__);
         $entity_name = Database::escape_string($entity_name);
         $ety_table = Database::get_main_table(TABLE_SEQUENCE_TYPE_ENTITY);
         $sql = "SELECT ety.* FROM $ety_table ety WHERE ety.name = $entity_name LIMIT 0, 1";
@@ -528,16 +554,17 @@ class Sequence
         return false;
     }
 
-    public static function temp_hack_2_insert($entity_id, $row_id, $c_id, $session_id = 0, $name = '') {
+    public static function temp_hack_2_insert($entity_id, $row_id, $c_id, $name = '') {
+        error_log(__LINE__);
         $row_id = intval(Database::escape_string($row_id));
         $c_id = intval(Database::escape_string($c_id));
-        $session_id = intval(Database::escape_string($session_id));
         $entity_id = intval(Database::escape_string($entity_id));
         $name = Database::escape_string($name);
-        if ($entity_id > 0 && $row_id > 0 && $c_id >0 && $session_id >= 0) {
+
+        if ($entity_id > 0 && $row_id > 0 && $c_id >0) {
             $row_table = Database::get_main_table(TABLE_SEQUENCE_ROW_ENTITY);
-            $sql = "INSERT INTO $row_table (sequence_type_entity_id, c_id, session_id, row_id, name) VALUES
-            ($entity_id, $c_id, $session_id, $row_id, '$name')";
+            $sql = "INSERT INTO $row_table (sequence_type_entity_id, c_id, row_id, name) VALUES
+            ($entity_id, $c_id, $row_id, '$name')";
             Database::query($sql);
             if (Database::affected_rows() > 0) {
                 return Database::insert_id();
@@ -545,16 +572,16 @@ class Sequence
         }
         return false;
     }
-    public static function temp_hack_3_insert($entity_id_prev, $entity_id_next, $row_id_prev = 0, $row_id_next = 0, $c_id = 1, $session_id = 0, $is_part = 0) {
+    public static function temp_hack_3_insert($entity_id_prev, $entity_id_next, $row_id_prev = 0, $row_id_next = 0, $c_id = 1, $is_part = 0) {
+        error_log(__LINE__);
         $is_part = intval(Database::escape_string($is_part));
         $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
-        $prev = self::get_row_entity_id_by_row_id($entity_id_prev, $row_id_prev, $c_id, $session_id);
-        $next = self::get_row_entity_id_by_row_id($entity_id_next, $row_id_next, $c_id, $session_id);
+        $prev = self::get_row_entity_id_by_row_id($entity_id_prev, $row_id_prev, $c_id);
+        $next = self::get_row_entity_id_by_row_id($entity_id_next, $row_id_next, $c_id);
         if ($prev != 0 || $next != 0) {
-
             $sql = "INSERT INTO  $seq_table (sequence_row_entity_id, sequence_row_entity_id_next, is_part) VALUES
             ($prev, $next, $is_part)";
-            $result = Database::query($sql);
+            Database::query($sql);
             if (Database::affected_rows() > 0) {
                 return Database::insert_id();
             }
@@ -562,11 +589,14 @@ class Sequence
         return false;
     }
 
-    public static function temp_hack_4_insert($total_items, $row_entity_id, $user_id = 0, $available = 0) {
+    public static function temp_hack_4_insert($total_items, $row_entity_id, $user_id = 0, $available = -1, $session_id) {
+        error_log(__LINE__);
         $user_id = intval(Database::escape_string($user_id));
+        $session_id = intval(Database::escape_string($session_id));
         $total_items = intval(Database::escape_string($total_items));
         $available = intval(Database::escape_string($available));
-        if ($available === 0) {
+
+        if ($available === -1) {
             $pre_req = self::get_pre_req_id_by_row_entity_id($row_entity_id);
             foreach ($pre_req as $pr) {
                 if($pr === 0) {
@@ -575,10 +605,11 @@ class Sequence
                 }
             }
         }
-        if (self::get_value_by_user_id($row_entity_id, $user_id) === false) {
+
+        if (self::get_value_by_user_id($row_entity_id, $user_id, $session_id) === false) {
             $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
-            $sql = "INSERT INTO $val_table (user_id, sequence_row_entity_id, total_items, available) VALUES
-            ($user_id, $row_entity_id, $total_items, $available)";
+            $sql = "INSERT INTO $val_table (user_id, sequence_row_entity_id, total_items, available, session_id) VALUES
+            ($user_id, $row_entity_id, $total_items, $available, $session_id)";
             Database::query($sql);
             return Database::insert_id();
         }
@@ -588,22 +619,23 @@ class Sequence
      * Cleans the sequence table by sequence_row_entity_id_next
      * @param int $id
      * @param int $c_id
-     * @param int $session_id
      */
-    public static function cleanPrerequisites($id, $c_id, $session_id)
-    {
-        $table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
 
-        $row_entity_id_next = self::get_row_entity_id_by_row_id(1, $id, $c_id, $session_id);
+    public function cleanPrerequisites($id, $c_id)
+    {
+        error_log(__LINE__);
+        $table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
+        $row_entity_id_next = self::get_row_entity_id_by_row_id(1, $id, $c_id);
         $sql = "DELETE FROM $table WHERE sequence_row_entity_id_next = $row_entity_id_next";
         Database::query($sql);
     }
 
-    public static function temp_hack_3_update($entity_id_prev, $entity_id_next, $row_id_prev = 0, $row_id_next = 0, $c_id = 0, $session_id = 0, $user_id = 0) {
+    public static function temp_hack_3_update($entity_id_prev, $entity_id_next, $row_id_prev = 0, $row_id_next = 0, $c_id = 0, $user_id = 0) {
+        error_log(__LINE__);
         $user_id = intval($user_id);
 
-        $row_entity_id_prev = self::get_row_entity_id_by_row_id($entity_id_prev, $row_id_prev, $c_id, $session_id);
-        $row_entity_id_next = self::get_row_entity_id_by_row_id($entity_id_next, $row_id_next, $c_id, $session_id);
+        $row_entity_id_prev = self::get_row_entity_id_by_row_id($entity_id_prev, $row_id_prev, $c_id);
+        $row_entity_id_next = self::get_row_entity_id_by_row_id($entity_id_next, $row_id_next, $c_id);
 
         if ($row_entity_id_prev !== 0 || $row_entity_id_next !== 0) {
             $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
@@ -625,7 +657,7 @@ class Sequence
                 Database::query($sql);
             } else {
                 // Update.
-                $data = self::getRowEntityByRowId($entity_id_next, $row_id_next, $c_id, $session_id);
+                $data = self::getRowEntityByRowId($entity_id_next, $row_id_next, $c_id);
                 $sql = "UPDATE $seq_table SET sequence_row_entity_id = $row_entity_id_prev
                        WHERE sequence_row_entity_id_next = $row_entity_id_next AND id = {$data['id']}";
                 Database::query($sql);
@@ -635,27 +667,46 @@ class Sequence
                 if ($user_id === 0) {
                     $user_id = self::get_user_id_by_row_entity_id($row_entity_id_next);
                     foreach ($user_id as $us_id) {
-                        self::action_pre_init($row_entity_id_next, $us_id);
+                        self::action_pre_init($row_entity_id_next, $us_id['user_id'], $us_id['session_id']);
                     }
                 } else {
-                    self::temp_hack_4_set_aval($row_entity_id_next, $user_id, 1);
+                    $sessions = self::get_sessions_by_user_id($user_id,$row_entity_id_next);
+                    foreach ($sessions as $session) {
+                        self::action_pre_init($row_entity_id_next, $user_id, $session);
+                    }
                 }
             } else {
                 if ($user_id === 0) {
                     $user_id = self::get_user_id_by_row_entity_id($row_entity_id_prev);
                     foreach ($user_id as $us_id) {
-                        self::action_pre_init($row_entity_id_next, $us_id);
+                        self::action_pre_init($row_entity_id_next, $us_id['user_id'], $us_id['session_id'], 0);
                     }
                 } else {
-
-                    self::action_pre_init($row_entity_id_next, $user_id);
+                    $sessions = self::get_sessions_by_user_id($user_id,$row_entity_id_next);
+                    foreach ($sessions as $session) {
+                        self::action_pre_init($row_entity_id_next, $user_id, $session['session_id']);
+                    }
                 }
             }
         }
     }
 
-    public static function temp_hack_4_delete($entity_id, $row_id, $c_id, $session_id) {
-        $row_entity_id = self::get_row_entity_id_by_row_id($entity_id, $row_id, $c_id, $session_id);
+    public static function get_sessions_by_user_id ($user_id, $row_entity_id) {
+        $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
+        $sessions = [];
+        $sql = "SELECT session_id FROM $val_table
+            WHERE user_id = $user_id
+            AND row_entity_id = $row_entity_id";
+        $res = Database::query($sql);
+        while ($temp_array = Database::fetch_array($res, 'ASSOC')) {
+            $sessions[] = $temp_array;
+        }
+        return $sessions;
+    }
+
+    public static function temp_hack_4_delete($entity_id, $row_id, $c_id) {
+        error_log(__LINE__);
+        $row_entity_id = self::get_row_entity_id_by_row_id($entity_id, $row_id, $c_id);
         if ($row_entity_id !== false) {
             $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
             $sql = "DELETE FROM $val_table WHERE sequence_row_entity_id = $row_entity_id";
@@ -666,8 +717,9 @@ class Sequence
         }
         return false;
     }
-    public static function temp_hack_3_delete($entity_id, $row_id, $c_id, $session_id, $rule_id) {
-        $row_entity_id = self::get_row_entity_id_by_row_id($entity_id, $row_id, $c_id, $session_id);
+    public static function temp_hack_3_delete($entity_id, $row_id, $c_id, $rule_id) {
+        error_log(__LINE__);
+        $row_entity_id = self::get_row_entity_id_by_row_id($entity_id, $row_id, $c_id);
         if ($row_entity_id !== false) {
             $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
             $sql = "SELECT * FROM $seq_table WHERE sequence_row_entity_id = $row_entity_id";
@@ -683,10 +735,10 @@ class Sequence
                         $value = self::get_value_by_row_entity_id($seq['sequence_row_entity_id_next']);
                         foreach ($value as $val) {
                             if ($seq['is_part'] === 1) {
-                                self::execute_formulas_by_user_id($seq['sequence_row_entity_id_next'], $val['user_id'], '', 1, 0, -1, null);
+                                self::execute_formulas_by_user_id($seq['sequence_row_entity_id_next'], $val['user_id'], $val['session_id'], '', 1, 0, -1, null);
                             }
-                            if (self::validate_rule_by_row_id($seq['sequence_row_entity_id_next'], $val['user_id'], $rule_id) && $val['success'] !== 1) {
-                                self::action_post_success_by_user_id($seq['sequence_row_entity_id_next'], $val['user_id'], null);
+                            if (self::validate_rule_by_row_id($seq['sequence_row_entity_id_next'], $val['user_id'], $val['session_id'], $rule_id) && $val['success'] !== 1) {
+                                self::action_post_success_by_user_id($seq['sequence_row_entity_id_next'], $val['user_id'], $val['session_id'], null);
                             }
                         }
                     } else {
@@ -694,7 +746,7 @@ class Sequence
                         Database::query($sql);
                         $user = self::get_user_id_by_row_entity_id($seq['sequence_row_entity_id_next']);
                         foreach ($user as $us) {
-                            self::temp_hack_4_set_aval($seq['sequence_row_entity_id_next'], $us['user_id'], 1);
+                            self::temp_hack_4_set_aval($seq['sequence_row_entity_id_next'], $us['user_id'], $us['session_id'], 1);
                         }
                     }
                 }
@@ -710,8 +762,9 @@ class Sequence
         return false;
     }
 
-    public static function temp_hack_2_delete($entity_id, $row_id, $c_id, $session_id) {
-        $row_entity_id = self::get_row_entity_id_by_row_id($entity_id, $row_id, $c_id, $session_id);
+    public static function temp_hack_2_delete($entity_id, $row_id, $c_id) {
+        error_log(__LINE__);
+        $row_entity_id = self::get_row_entity_id_by_row_id($entity_id, $row_id, $c_id);
         if ($row_entity_id !== false) {
             $row_table = Database::get_main_table(TABLE_SEQUENCE_ROW_ENTITY);
             $sql = "DELETE FROM $row_table WHERE id = $row_entity_id";
@@ -722,17 +775,19 @@ class Sequence
         }
         return false;
     }
-    public static function temp_hack_5($entity_id, $row_id, $c_id, $session_id, $rule_id) {
-        if (self::temp_hack_3_delete($entity_id, $row_id, $c_id, $session_id, $rule_id)) {
-            if (self::temp_hack_4_delete($entity_id, $row_id, $c_id, $session_id)) {
-                if (self::temp_hack_2_delete($entity_id, $row_id, $c_id, $session_id)) {
+    public static function temp_hack_5($entity_id, $row_id, $c_id, $rule_id) {
+        error_log(__LINE__);
+        if (self::temp_hack_3_delete($entity_id, $row_id, $c_id, $rule_id)) {
+            if (self::temp_hack_4_delete($entity_id, $row_id, $c_id)) {
+                if (self::temp_hack_2_delete($entity_id, $row_id, $c_id)) {
                     return true;
                 }
             }
         }
         return false;
     }
-    public static function temp_hack_4_set_aval($row_entity_id, $user_id, $available, $available_end_date = null) {
+    public static function temp_hack_4_set_aval($row_entity_id, $user_id, $session_id, $available, $available_end_date = null) {
+        error_log(__LINE__);
         $available_end_date = Database::escape_string($available_end_date);
         $available = intval(Database::escape_string($available));
         $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
@@ -746,12 +801,16 @@ class Sequence
         } else {
             $available_date = '';
         }
-        $sql = "UPDATE $val_table SET available = $available $available_date
-                WHERE sequence_row_entity_id = $row_entity_id AND user_id = $user_id";
+        $sql = "UPDATE $val_table SET available = $available
+                $available_date
+                WHERE sequence_row_entity_id = $row_entity_id
+                AND user_id = $user_id
+                AND session_id = $session_id";
         Database::query($sql);
     }
 
     public static function get_row_entity_id_by_user_id($user_id) {
+        error_log(__LINE__);
         $user_id = intval(Database::escape_string($user_id));
         if ($user_id > 0) {
             $user_filter = "WHERE user_id = $user_id";
@@ -759,7 +818,7 @@ class Sequence
             $user_filter = '';
         }
             $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
-            $sql = "SELECT sequence_row_entity_id FROM $val_table $$user_filter";
+            $sql = "SELECT sequence_row_entity_id FROM $val_table $user_filter";
             $result = Database::query($sql);
             if (Database::num_rows($result) > 0) {
                 while ($temp = Database::fetch_array($result, 'ASSOC')) {
@@ -773,18 +832,22 @@ class Sequence
     /**
      * Bool Available for LP
      */
-    public static function get_state_lp_by_row_entity_id ($row_entity_id, $user_id) {
-        $row_entity_id = intval($row_entity_id);
-        $user_id = intval($user_id);
-        $seq_val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
-        if ($row_entity_id > 0 && $user_id > 0) {
-            if (self::get_value_by_user_id($row_entity_id, $user_id) === false) {
-                self::temp_hack_4_insert(1,$row_entity_id,$user_id, 0);
-                return self::get_state_lp_by_row_entity_id($row_entity_id, $user_id);
-            }
-            $sql_seq = "SELECT val.available, val.success FROM $seq_val_table val WHERE val.sequence_row_entity_id = $row_entity_id AND val.user_id = $user_id LIMIT 0, 1";
+    public static function get_state_lp_by_row_entity_id ($row_entity_id, $user_id, $session_id) {
+        error_log(__LINE__);
+        $row_entity_id = intval(Database::escape_string($row_entity_id));
+        $user_id = intval(Database::escape_string($user_id));
+        $session_id = intval(Database::escape_string($session_id));
+
+        $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
+
+        if ($row_entity_id > 0 && $user_id > 0 && $session_id >= 0) {
+
+            $val_id = self::getValIdByRowEntityId($row_entity_id, $user_id, $session_id);
+            $sql_seq = "SELECT val.available, val.success FROM $val_table val
+            WHERE val.id = $val_id
+            LIMIT 0, 1";
             $result_seq = Database::query($sql_seq);
-            $arr_seq = Database::fetch_array($result_seq);
+            $arr_seq = Database::fetch_array($result_seq, 'ASSOC');
             if (intval($arr_seq['available']) === 1) {
                 if (intval($arr_seq['success']) === 1) {
                     return "completed";

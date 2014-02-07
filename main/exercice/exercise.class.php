@@ -63,6 +63,7 @@ class Exercise
     public $endButton = 0;
     public $onSuccessMessage = null;
     public $onFailedMessage = null;
+    public $onRemainingMessage = null;
     public $emailNotificationTemplate = null;
     // Notification send to the student.
     public $emailNotificationTemplateToUser = null;
@@ -372,6 +373,15 @@ class Exercise
     }
 
     /**
+     * @return string
+     */
+    public function getOnRemainingMessage()
+    {
+        return $this->onRemainingMessage;
+    }
+
+
+    /**
      * @param string $value
      */
     public function setOnSuccessMessage($value)
@@ -385,6 +395,14 @@ class Exercise
     public function setOnFailedMessage($value)
     {
         $this->onFailedMessage = $value;
+    }
+
+    /**
+     * @param string $value
+     */
+    public function setOnRemainingMessage($value)
+    {
+        $this->onRemainingMessage = $value;
     }
 
     /**
@@ -1007,6 +1025,7 @@ class Exercise
                         '".Database::escape_string($this->selectEndButton())."',
                         '".Database::escape_string($this->getOnSuccessMessage())."',
                         '".Database::escape_string($this->getOnFailedMessage())."',
+                        '".Database::escape_string($this->getOnRemainingMessage())."',
                         '".Database::escape_string($this->selectEmailNotificationTemplate())."',
                         '".Database::escape_string($this->selectEmailNotificationTemplateToUser())."',
                         '".Database::escape_string($this->getNotifyUserByEmail())."'

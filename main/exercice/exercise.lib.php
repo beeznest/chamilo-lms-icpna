@@ -2473,7 +2473,12 @@ function get_question_ribbon($objExercise, $score, $weight, $check_pass_percenta
                 $eventMessage = $objExercise->getOnSuccessMessage();
                 $ribbon_total_success_or_error = ' ribbon-total-success';
             } else {
+                error_log(print_r($objExercise,1));
                 $eventMessage = $objExercise->getOnFailedMessage();
+                /*if ($objExercise->attempt()) {
+                } else {
+                    $eventMessage = $objExercise->getOnRemainingMessage();
+                }*/
                 $ribbon_total_success_or_error = ' ribbon-total-error';
             }
         }

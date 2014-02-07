@@ -241,23 +241,25 @@ if (!empty($attempts)) {
 	}
 	$table_content = $table->toHtml();
 }
-
+$attempt_message = '';
 if ($objExercise->selectAttempts()) {
 	if ($is_allowed_to_edit) {
 		//$options.= Display::div(get_lang('ExerciseAttempts').' '.$objExercise->selectAttempts(), array('class'=>'right_option'));
 	}
-    $attempt_message = 'No has alcanzado el puntaje mínimo para aprobar el módulo. Intentos restantes: ' . ($objExercise->selectAttempts() - $counter);
-    //$attempt_message = get_lang('Attempts').' '.$counter.' / '.$objExercise->selectAttempts();
+    if ($counter > 0) {
+        $attempt_message = 'No has alcanzado el puntaje mínimo para aprobar el módulo. Intentos restantes: ' . ($objExercise->selectAttempts() - $counter);
+        //$attempt_message = get_lang('Attempts').' '.$counter.' / '.$objExercise->selectAttempts();
 
-	if ($counter == $objExercise->selectAttempts()) {
-		$attempt_message = Display::return_message($attempt_message, 'error');
-	} else {
-        $attempt_message = Display::return_message($attempt_message, 'info');
+        if ($counter == $objExercise->selectAttempts()) {
+            $attempt_message = Display::return_message($attempt_message, 'error');
+        } else {
+            $attempt_message = Display::return_message($attempt_message, 'info');
+        }
+        if ($visible_return['value'] == true) {
+            $message .=   $attempt_message;
+        }
+    	//$options.= $attempt_message; //Display::div($attempt_message, array('class'=>"offset2 span2"));
     }
-    if ($visible_return['value'] == true) {
-        $message .=   $attempt_message;
-    }
-	//$options.= $attempt_message; //Display::div($attempt_message, array('class'=>"offset2 span2"));
 }
 
 if ($time_control) {

@@ -104,11 +104,7 @@ $(document).ready(function() {
 
 /* toogle for post-it in course home */
 $(function() {
-    $("#course_tools img").tooltip({
-            placement: "left",
-            show: 500,
-            hide: 500
-        });
+  $(\'[title]\').removeAttr(\'title\');
 	$(".thematic-postit-head").click(function() {
 		$(".thematic-postit-center").slideToggle("fast");
 	});

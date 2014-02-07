@@ -645,7 +645,7 @@ if (isset($uidReset) && $uidReset) {    // session data refresh requested
 }
 
 /*  COURSE INIT */
-
+$GLOBALS['NotAllowedClickBack'] = 'El acceso a esta p&aacute;gina no est&aacute; habilitado. Por favor regrese a la p&aacute;gina anterior';
 if (isset($cidReset) && $cidReset) {
     // Course session data refresh requested or empty data
     if ($cidReq) {
@@ -683,6 +683,7 @@ if (isset($cidReset) && $cidReset) {
                 if (Database::num_rows($res) < 1) {
                     Session::erase('session_name');
                     Session::erase('id_session');
+                    api_not_allowed(true);
                 } else {
                     $row = Database::fetch_row($res);
                     $_SESSION['id_session'] = $row[0];
@@ -779,6 +780,7 @@ if (isset($cidReset) && $cidReset) {
             if (Database::num_rows($res) < 1) {
                 Session::erase('session_name');
                 Session::erase('id_session');
+                api_not_allowed(true);
             } else {
                 $row = Database::fetch_row($res);
                 $_SESSION['id_session'] = $row[0];

@@ -4428,7 +4428,7 @@ class Exercise
         $array = array();
 
         if (!empty($user_data)) {
-            $array[] = array('title' => get_lang("User"), 'content' => $user_data);
+            #$array[] = array('title' => get_lang("User"), 'content' => $user_data);
         }
 
         if ($hideDescription == false) {
@@ -4438,15 +4438,15 @@ class Exercise
         }
 
         if (!empty($start_date)) {
-            $array[] = array('title' => get_lang("StartDate"), 'content' => $start_date);
+            #$array[] = array('title' => get_lang("StartDate"), 'content' => $start_date);
         }
 
         if (!empty($duration)) {
-            $array[] = array('title' => get_lang("Duration"), 'content' => $duration);
+            #$array[] = array('title' => get_lang("Duration"), 'content' => $duration);
         }
 
         $html = Display::page_header(
-            Display::return_icon('quiz_big.png', get_lang('Result')).' '.$this->exercise.' : '.get_lang('Result')
+           $this->exercise.' : '.get_lang('Result', null, 'spanish')
         );
         $html .= Display::description($array);
 
@@ -4640,7 +4640,10 @@ class Exercise
             }
         }
         if (!empty($message)) {
-            $message = Display :: return_message($message, 'warning', false);
+            global $extAuthSource;
+            $path = $extAuthSource['modules_path'];
+            $link = '<a href="' . $path . '">Regresa a la lista de módulos</a>';
+            $message = Display :: return_message('Lo sentimos, no has alcanzado el puntaje mínimo para aprobar el módulo. ' . $link, 'warning', false);
         }
 
         return array('value' => $is_visible, 'message' => $message);

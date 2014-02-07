@@ -125,7 +125,18 @@ if (!empty($attempt_list) && $objExercise->attempts > 0 || isset($_SESSION['try_
             completeExerciseAttempt($exercise_stat_info['exe_id']);
             $_SESSION['try_once'] = true;
         }
+    } elseif (count($attempts)) {
+        $attempts = getAllExerciseAttemptResultByUserNoStatusFilter($objExercise->id, api_get_user_id(), api_get_course_id(), api_get_session_id(), $learnpath_id, $learnpath_item_id);
     }
+
+}
+
+$attempts = get_exercise_results_by_user(api_get_user_id(), $objExercise->id, api_get_course_id(), api_get_session_id(), $learnpath_id, $learnpath_item_id, 'desc');
+$counter = count($attempts);
+
+if ($counter < $objExercise->attempts) {
+    $label = 'Nuevo intento';
+
 }
 
 //2. Exercise button
@@ -146,8 +157,6 @@ if ($visible_return['value'] == false) {
     }
 }
 
-$attempts = get_exercise_results_by_user(api_get_user_id(), $objExercise->id, api_get_course_id(), api_get_session_id(), $learnpath_id, $learnpath_item_id, 'desc');
-$counter = count($attempts);
 
 $exercise_stat_info = $objExercise->get_stat_track_exercise_info($learnpath_id, $learnpath_item_id, 0, '');
 
@@ -237,7 +246,8 @@ if ($objExercise->selectAttempts()) {
 	if ($is_allowed_to_edit) {
 		//$options.= Display::div(get_lang('ExerciseAttempts').' '.$objExercise->selectAttempts(), array('class'=>'right_option'));
 	}
-    $attempt_message = get_lang('Attempts').' '.$counter.' / '.$objExercise->selectAttempts();
+    $attempt_message = 'No has alcanzado el puntaje mínimo para aprobar el módulo. Intentos restantes: ' . ($objExercise->selectAttempts() - $counter);
+    //$attempt_message = get_lang('Attempts').' '.$counter.' / '.$objExercise->selectAttempts();
 
 	if ($counter == $objExercise->selectAttempts()) {
 		$attempt_message = Display::return_message($attempt_message, 'error');

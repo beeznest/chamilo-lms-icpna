@@ -2537,12 +2537,17 @@ function get_question_ribbon($objExercise, $score, $weight, $check_pass_percenta
 
     $ribbon .= '</div>';
 
+    /*
     $tmpEventMessage = strip_tags($eventMessage);
     $tmpEventMessage = trim(str_replace("&nbsp;", "", $tmpEventMessage));
    
     if ($check_pass_percentage && !empty($tmpEventMessage)) {
         $ribbon .= show_success_message($score, $weight, $objExercise->selectPassPercentage(), $tmpEventMessage);
         $eventMessage = "";
+    }
+    */
+    if ($check_pass_percentage) {
+        $ribbon .= show_success_message($score, $weight, $objExercise->selectPassPercentage());
     }
     $ribbon .= '</div>';
     $ribbon .= '</div>';

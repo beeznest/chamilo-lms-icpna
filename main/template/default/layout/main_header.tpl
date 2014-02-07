@@ -95,7 +95,7 @@
               </div>
               <div class="column-four">
                         
-                        <a href="{{ help_url }}" class="ajax ico-help">
+                        <a href="#" data-toggle="modal" data-target="#FAQ" class="ico-help">
                           <img src="{{ _p.web_css }}{{ css_style }}/images/help.png">
                         </a>
                         

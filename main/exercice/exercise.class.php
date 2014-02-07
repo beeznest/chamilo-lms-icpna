@@ -153,6 +153,7 @@ class Exercise
             $this->endButton = $object->end_button;
             $this->onSuccessMessage = $object->on_success_message;
             $this->onFailedMessage= $object->on_failed_message;
+            $this->onRemainingMessage= $object->on_remaining_message;
             $this->emailNotificationTemplate = $object->email_notification_template;
             $this->emailNotificationTemplateToUser = $object->email_notification_template_to_user;
             $this->notifyUserByEmail = $object->notify_user_by_email;
@@ -938,6 +939,7 @@ class Exercise
                     end_button = '".$this->selectEndButton()."',
                     on_success_message = '".Database::escape_string($this->getOnSuccessMessage())."',
                     on_failed_message = '".Database::escape_string($this->getOnFailedMessage())."',
+                    on_remaining_message = '".Database::escape_string($this->getOnRemainingMessage())."',
                     email_notification_template = '".Database::escape_string($this->selectEmailNotificationTemplate())."',
                     email_notification_template_to_user = '".Database::escape_string($this->selectEmailNotificationTemplateToUser())."',
                     notify_user_by_email = '".Database::escape_string($this->getNotifyUserByEmail())."',
@@ -978,6 +980,7 @@ class Exercise
                         end_button,
                         on_success_message,
                         on_failed_message,
+                        on_remaining_message,
                         email_notification_template,
                         email_notification_template_to_user,
                         notify_user_by_email
@@ -1568,6 +1571,8 @@ class Exercise
             $form->add_html_editor('on_success_message', get_lang('MessageOnSuccess'), false, false, $editor_config);
             // On failed
             $form->add_html_editor('on_failed_message', get_lang('MessageOnFailed'), false, false, $editor_config);
+            // On Remaining attempt
+            $form->add_html_editor('on_remaining_message', get_lang('MessageOnRemaining'), false, false, $editor_config);
 
             // Text when ending an exam
             $form->add_html_editor('text_when_finished', get_lang('TextWhenFinished'), false, false, $editor_config);
@@ -1696,6 +1701,7 @@ class Exercise
                 $defaults['end_button'] = $this->selectEndButton();
                 $defaults['on_success_message'] = $this->getOnSuccessMessage();
                 $defaults['on_failed_message'] = $this->getOnFailedMessage();
+                $defaults['on_remaining_message'] = $this->getOnRemainingMessage();
                 $defaults['email_notification_template'] = $this->selectEmailNotificationTemplate();
                 $defaults['email_notification_template_to_user'] = $this->selectEmailNotificationTemplateToUser();
                 $defaults['notify_user_by_email'] = $this->getNotifyUserByEmail();
@@ -1738,6 +1744,7 @@ class Exercise
                 $defaults['end_button'] = $this->selectEndButton();
                 $defaults['on_success_message'] = null;
                 $defaults['on_failed_message'] = null;
+                $defaults['on_remaining_message'] = null;
             }
         } else {
             $defaults['exerciseTitle'] = $this->selectTitle();
@@ -1796,6 +1803,7 @@ class Exercise
         $this->updateEndButton($form->getSubmitValue('end_button'));
         $this->setOnSuccessMessage($form->getSubmitValue('on_success_message'));
         $this->setOnFailedMessage($form->getSubmitValue('on_failed_message'));
+        $this->setOnRemainingMessage($form->getSubmitValue('on_remaining_message'));
         $this->updateEmailNotificationTemplate($form->getSubmitValue('email_notification_template'));
         $this->updateEmailNotificationTemplateToUser($form->getSubmitValue('email_notification_template_to_user'));
         $this->setNotifyUserByEmail($form->getSubmitValue('notify_user_by_email'));

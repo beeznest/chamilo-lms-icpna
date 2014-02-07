@@ -138,7 +138,7 @@ if ($objExercise->selectAttempts() > 0) {
     }
 }
 
-Display :: display_normal_message(get_lang('Saved').'<br />', false);
+//Display :: display_normal_message(get_lang('Saved').'<br />', false);
 
 // Display questions
 display_question_list_by_attempt($objExercise, $exe_id, true, true);
@@ -157,12 +157,6 @@ exercise_time_control_delete($objExercise->id, $learnpath_id, $learnpath_item_id
 delete_chat_exercise_session($exe_id);
 
 if ($origin != 'learnpath') {
-    echo '<hr>';
-
-    echo '<form>';
-    echo '<label for="ask2trial">Lista de módulos:</label><br/>';
-    echo '<input type="submit" value="Ir"></input>';
-    echo '</form>';
 
     //echo Display::url(get_lang('ReturnToCourseHomepage'), api_get_course_url(), array('class' => 'btn btn-large'));
     echo $objExercise->returnEndButtonHTML();

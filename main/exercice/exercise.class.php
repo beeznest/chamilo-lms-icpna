@@ -63,6 +63,7 @@ class Exercise
     public $endButton = 0;
     public $onSuccessMessage = null;
     public $onFailedMessage = null;
+    public $onRemainingMessage = null;
     public $emailNotificationTemplate = null;
     // Notification send to the student.
     public $emailNotificationTemplateToUser = null;
@@ -153,6 +154,7 @@ class Exercise
             $this->endButton = $object->end_button;
             $this->onSuccessMessage = $object->on_success_message;
             $this->onFailedMessage= $object->on_failed_message;
+            $this->onRemainingMessage= $object->on_remaining_message;
             $this->emailNotificationTemplate = $object->email_notification_template;
             $this->emailNotificationTemplateToUser = $object->email_notification_template_to_user;
             $this->notifyUserByEmail = $object->notify_user_by_email;
@@ -371,6 +373,15 @@ class Exercise
     }
 
     /**
+     * @return string
+     */
+    public function getOnRemainingMessage()
+    {
+        return $this->onRemainingMessage;
+    }
+
+
+    /**
      * @param string $value
      */
     public function setOnSuccessMessage($value)
@@ -384,6 +395,14 @@ class Exercise
     public function setOnFailedMessage($value)
     {
         $this->onFailedMessage = $value;
+    }
+
+    /**
+     * @param string $value
+     */
+    public function setOnRemainingMessage($value)
+    {
+        $this->onRemainingMessage = $value;
     }
 
     /**
@@ -938,6 +957,7 @@ class Exercise
                     end_button = '".$this->selectEndButton()."',
                     on_success_message = '".Database::escape_string($this->getOnSuccessMessage())."',
                     on_failed_message = '".Database::escape_string($this->getOnFailedMessage())."',
+                    on_remaining_message = '".Database::escape_string($this->getOnRemainingMessage())."',
                     email_notification_template = '".Database::escape_string($this->selectEmailNotificationTemplate())."',
                     email_notification_template_to_user = '".Database::escape_string($this->selectEmailNotificationTemplateToUser())."',
                     notify_user_by_email = '".Database::escape_string($this->getNotifyUserByEmail())."',
@@ -978,6 +998,7 @@ class Exercise
                         end_button,
                         on_success_message,
                         on_failed_message,
+                        on_remaining_message,
                         email_notification_template,
                         email_notification_template_to_user,
                         notify_user_by_email
@@ -1004,6 +1025,7 @@ class Exercise
                         '".Database::escape_string($this->selectEndButton())."',
                         '".Database::escape_string($this->getOnSuccessMessage())."',
                         '".Database::escape_string($this->getOnFailedMessage())."',
+                        '".Database::escape_string($this->getOnRemainingMessage())."',
                         '".Database::escape_string($this->selectEmailNotificationTemplate())."',
                         '".Database::escape_string($this->selectEmailNotificationTemplateToUser())."',
                         '".Database::escape_string($this->getNotifyUserByEmail())."'
@@ -1568,6 +1590,8 @@ class Exercise
             $form->add_html_editor('on_success_message', get_lang('MessageOnSuccess'), false, false, $editor_config);
             // On failed
             $form->add_html_editor('on_failed_message', get_lang('MessageOnFailed'), false, false, $editor_config);
+            // On Remaining attempt
+            $form->add_html_editor('on_remaining_message', get_lang('MessageOnRemaining'), false, false, $editor_config);
 
             // Text when ending an exam
             $form->add_html_editor('text_when_finished', get_lang('TextWhenFinished'), false, false, $editor_config);
@@ -1696,6 +1720,7 @@ class Exercise
                 $defaults['end_button'] = $this->selectEndButton();
                 $defaults['on_success_message'] = $this->getOnSuccessMessage();
                 $defaults['on_failed_message'] = $this->getOnFailedMessage();
+                $defaults['on_remaining_message'] = $this->getOnRemainingMessage();
                 $defaults['email_notification_template'] = $this->selectEmailNotificationTemplate();
                 $defaults['email_notification_template_to_user'] = $this->selectEmailNotificationTemplateToUser();
                 $defaults['notify_user_by_email'] = $this->getNotifyUserByEmail();
@@ -1738,6 +1763,7 @@ class Exercise
                 $defaults['end_button'] = $this->selectEndButton();
                 $defaults['on_success_message'] = null;
                 $defaults['on_failed_message'] = null;
+                $defaults['on_remaining_message'] = null;
             }
         } else {
             $defaults['exerciseTitle'] = $this->selectTitle();
@@ -1796,6 +1822,7 @@ class Exercise
         $this->updateEndButton($form->getSubmitValue('end_button'));
         $this->setOnSuccessMessage($form->getSubmitValue('on_success_message'));
         $this->setOnFailedMessage($form->getSubmitValue('on_failed_message'));
+        $this->setOnRemainingMessage($form->getSubmitValue('on_remaining_message'));
         $this->updateEmailNotificationTemplate($form->getSubmitValue('email_notification_template'));
         $this->updateEmailNotificationTemplateToUser($form->getSubmitValue('email_notification_template_to_user'));
         $this->setNotifyUserByEmail($form->getSubmitValue('notify_user_by_email'));
@@ -2161,15 +2188,15 @@ class Exercise
         $session_id = intval($session_id);
         $course_id = intval($course_id);
 
-        //Check if order exists and matchs the current status
-        $sql = "SELECT iid FROM $TBL_EXERCICES WHERE c_id = $course_id AND active = '1' AND session_id = $session_id ORDER BY title";
+        // Check if order exists and matchs the current status
+        $sql = "SELECT id FROM $TBL_EXERCICES WHERE c_id = $course_id AND active = '1' AND session_id = $session_id ORDER BY title";
         $result = Database::query($sql);
         $unordered_count = Database::num_rows($result);
 
         if ($unordered_count != $ordered_count) {
             $exercise_list = array();
             while ($row = Database::fetch_array($result)) {
-                $exercise_list[] = $row['iid'];
+                $exercise_list[] = $row['id'];
             }
             $this->update_exercise_list_order($exercise_list, $course_id, $session_id);
         }
@@ -4401,7 +4428,7 @@ class Exercise
         $array = array();
 
         if (!empty($user_data)) {
-            $array[] = array('title' => get_lang("User"), 'content' => $user_data);
+            #$array[] = array('title' => get_lang("User"), 'content' => $user_data);
         }
 
         if ($hideDescription == false) {
@@ -4411,15 +4438,15 @@ class Exercise
         }
 
         if (!empty($start_date)) {
-            $array[] = array('title' => get_lang("StartDate"), 'content' => $start_date);
+            #$array[] = array('title' => get_lang("StartDate"), 'content' => $start_date);
         }
 
         if (!empty($duration)) {
-            $array[] = array('title' => get_lang("Duration"), 'content' => $duration);
+            #$array[] = array('title' => get_lang("Duration"), 'content' => $duration);
         }
 
         $html = Display::page_header(
-            Display::return_icon('quiz_big.png', get_lang('Result')).' '.$this->exercise.' : '.get_lang('Result')
+           $this->exercise.' : '.get_lang('Result', null, 'spanish')
         );
         $html .= Display::description($array);
 
@@ -4613,7 +4640,10 @@ class Exercise
             }
         }
         if (!empty($message)) {
-            $message = Display :: return_message($message, 'warning', false);
+            global $extAuthSource;
+            $path = $extAuthSource['modules_path'];
+            $link = '<a href="' . $path . '">Regresa a la lista de módulos</a>';
+            $message = Display :: return_message('Lo sentimos, no has alcanzado el puntaje mínimo para aprobar el módulo. ' . $link, 'warning', false);
         }
 
         return array('value' => $is_visible, 'message' => $message);

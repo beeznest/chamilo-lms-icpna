@@ -1457,19 +1457,13 @@ function show_success_message($score, $weight, $pass_percentage, $htmlMssg = '')
 
         $icon = '';
         if ($is_success) {
-            if (!empty($htmlMssg)) {
-                $html = $htmlMssg;
-            } else {
-                $html = get_lang('CongratulationsYouPassedTheTest');
-            }
-            $icon = Display::return_icon('completed.png', get_lang('Correct'), array(), ICON_SIZE_MEDIUM);
+            $html = get_lang('CongratulationsYouPassedTheTest');
+            #$icon = Display::return_icon('completed.png', get_lang('Correct'), array(), ICON_SIZE_MEDIUM);
+            $icon = '';
         } else {
-            if (!empty($htmlMssg)) {
-                $html = $htmlMssg;
-            } else {
-                $html = get_lang('YouDidNotReachTheMinimumScore');
-            }
-            $icon = Display::return_icon('warning.png', get_lang('Wrong'), array(), ICON_SIZE_MEDIUM);
+            //$html .= Display::return_message(get_lang('YouDidNotReachTheMinimumScore'), 'warning');
+            $html = get_lang('YouDidNotReachTheMinimumScore');
+            $icon = '';
         }
         $html = Display::tag('h4', $html);
         $html .= Display::tag('h5', $icon, array('style' => 'width:40px; padding:2px 10px 0px 0px'));
@@ -2466,8 +2460,43 @@ function is_success_exercise_result($score, $weight, $pass_percentage)
     return false;
 }
 
+function get_total_attempts_by_user($user_id, $exercise_id, $course_code, $session_id = 0)
+{
+
+    $exe_id = isset($_REQUEST['exe_id']) ? intval($_REQUEST['exe_id']) : 0;
+    $objExercise = new Exercise();
+    $exercise_stat_info = $objExercise->get_stat_track_exercise_info_by_exe_id($exe_id);
+    $learnpath_id = $exercise_stat_info['orig_lp_id'];
+    $learnpath_item_id = $exercise_stat_info['orig_lp_item_id'];
+
+    $TABLETRACK_EXERCICES = Database::get_statistic_table(TABLE_STATISTIC_TRACK_E_EXERCICES);
+    $course_code = Database::escape_string($course_code);
+    $exercise_id = intval($exercise_id);
+    $session_id = intval($session_id);
+
+    $user_condition = null;
+    if (!empty($user_id)) {
+        $user_id = intval($user_id);
+        $user_condition = "AND exe_user_id = $user_id ";
+    }
+
+    $sql = "SELECT * FROM $TABLETRACK_EXERCICES
+            WHERE   status = ''  AND
+                    exe_cours_id = '$course_code' AND
+                    exe_exo_id = '$exercise_id' AND
+                    session_id = $session_id  AND
+                    orig_lp_id = $learnpath_id AND
+                    orig_lp_item_id = $learnpath_item_id
+                    $user_condition
+            ORDER BY exe_id";
+    $rs = Database::query($sql);
+    $count_rows = Database::num_rows($rs);
+    return $count_rows;
+}
+
 function get_question_ribbon($objExercise, $score, $weight, $check_pass_percentage = false)
 {
+    $user = api_get_user_info();
     $eventMessage = null;
     $ribbon = '<div class="question_row">';
     $ribbon .= '<div class="ribbon">';
@@ -2480,7 +2509,21 @@ function get_question_ribbon($objExercise, $score, $weight, $check_pass_percenta
                 $eventMessage = $objExercise->getOnSuccessMessage();
                 $ribbon_total_success_or_error = ' ribbon-total-success';
             } else {
-                $eventMessage = $objExercise->getOnFailedMessage();
+                $attempts = get_total_attempts_by_user($user['user_id'], $objExercise->id, $objExercise->course['id'], 0);
+                //If we have attempts left tell the user so
+                if ($objExercise->attempts == ($attempts + 1)) {
+                    $eventMessage = $objExercise->getOnFailedMessage();
+                } else {
+                    $eventMessage = $objExercise->getOnRemainingMessage();
+                }
+                global $extAuthSource;
+                $eventMessage = preg_replace('/{{attempt.max}}/', $objExercise->attempts, $eventMessage);
+                $eventMessage = preg_replace('/{{attempt.next}}/', $attempts + 1, $eventMessage);
+                $eventMessage = preg_replace('/{{attempt.current}}/', $attempts, $eventMessage);
+                $course = api_get_course_info($objExercise->course['id']);
+                $eventMessage = preg_replace('/{{course.link}}/', api_get_path(WEB_COURSE_PATH) . $course['directory'] . '/index.php', $eventMessage);
+                $eventMessage = preg_replace('/{{modules.link}}/', $extAuthSource['modules_path'], $eventMessage);
+
                 $ribbon_total_success_or_error = ' ribbon-total-error';
             }
         }
@@ -2494,12 +2537,17 @@ function get_question_ribbon($objExercise, $score, $weight, $check_pass_percenta
 
     $ribbon .= '</div>';
 
+    /*
     $tmpEventMessage = strip_tags($eventMessage);
     $tmpEventMessage = trim(str_replace("&nbsp;", "", $tmpEventMessage));
    
     if ($check_pass_percentage && !empty($tmpEventMessage)) {
         $ribbon .= show_success_message($score, $weight, $objExercise->selectPassPercentage(), $tmpEventMessage);
         $eventMessage = "";
+    }
+    */
+    if ($check_pass_percentage) {
+        $ribbon .= show_success_message($score, $weight, $objExercise->selectPassPercentage());
     }
     $ribbon .= '</div>';
     $ribbon .= '</div>';

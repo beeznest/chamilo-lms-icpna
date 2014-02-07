@@ -5554,7 +5554,7 @@ function WSGetCourseFinalScore($params) {
     }
 
     $tbl_quiz = Database::get_course_table(TABLE_QUIZ_TEST);
-    $exam_names = "'final exam', 'examen final', 'placement test'";
+    $exam_names = "'final exam', 'examen final', 'placement test', 'final test', 'examen de clasificación'";
     $sql = "SELECT id, max_attempt FROM $tbl_quiz WHERE c_id = $cid AND LOWER(title) IN ($exam_names) ORDER BY id DESC LIMIT 1";
     $res = Database::query($sql);
     if (Database::num_rows($res) < 1) {

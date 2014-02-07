@@ -146,7 +146,7 @@ class Template {
                 $help = Security::remove_XSS($help);
                 $help_content = '<li class="help">';
                 $help_url = api_get_path(WEB_CODE_PATH) . 'help/help.php?open=' . $help . '&height=400&width=600';
-                $help_content .= '<a href="' . $help_url . '" class="ajax" title="' . get_lang('Help') . '">';
+                $help_content .= '<a href="#" data-toggle="modal" data-target="#FAQ" title="' . get_lang('Help') . '">';
                 $help_content .= '<img src="' . api_get_path(WEB_IMG_PATH) . 'help.large.png" alt="' . get_lang('Help') . '" title="' . get_lang('Help') . '" />';
                 $help_content .= '</a></li>';
             }

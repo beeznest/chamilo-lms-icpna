@@ -637,6 +637,10 @@ if ($time_control) {
 			// First we update the attempt to today
 			// How the expired time is changed into "track_e_exercices" table,then the last attempt for this student should be changed too,so
 	        $sql_track_e_exe = "UPDATE $exercice_attemp_table SET tms = '".api_get_utc_datetime()."' WHERE exe_id = '".$exercise_stat_info['exe_id']."' AND tms = '".$last_attempt_date."' ";
+
+            completeExerciseAttempt($_SESSION['try_once_exe_id']);
+            $_SESSION['try_once_exe_id'] = null;
+
 	        if ($debug) {error_log('7.10. $sql_track_e_exe2: '.$sql_track_e_exe); }
 	        Database::query($sql_track_e_exe);
 
@@ -970,8 +974,8 @@ if (isset($_custom['exercises_hidden_when_no_start_date']) && $_custom['exercise
 
 //Timer control
 if ($time_control) {
-    echo $objExercise->return_time_left_div();
-	echo '<div style="display:none" class="warning-message" id="expired-message-id">'.get_lang('ExerciceExpiredTimeMessage').'</div>';
+    //echo $objExercise->return_time_left_div();
+	//echo '<div style="display:none" class="warning-message" id="expired-message-id">'.get_lang('ExerciceExpiredTimeMessage').'</div>';
 }
 
 

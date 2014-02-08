@@ -102,33 +102,34 @@ if (isset($exercise_stat_info['exe_id'])) {
 //1. Check if this is a new attempt or a previous
 $label = get_lang('StartTest');
 if ($time_control && !empty($clock_expired_time) || !empty($attempt_list)) {
-	$label = get_lang('ContinueTest');
+    //This is been overwrite later
+    $label = get_lang('ContinueTest');
 }
 
 if (!empty($attempt_list) && $objExercise->attempts > 0 || isset($_SESSION['try_once'])) {
 	$message = Display::return_message(get_lang('YouTriedToResolveThisExerciseEarlier'));
+    $attempts = getAllExerciseAttemptResultByUserNoStatusFilter($objExercise->id, api_get_user_id(), api_get_course_id(), api_get_session_id(), $learnpath_id, $learnpath_item_id);
 
     if (!empty($exercise_stat_info['start_date']) && $exercise_stat_info['status'] == 'incomplete') {
-        $startedDate = api_strtotime($exercise_stat_info['start_date']);
-        $current_timestamp = time();
-        $expected_time = $startedDate + $objExercise->expired_time * 60;
-        $diff = $current_timestamp - $expected_time;
-        //$countNotFinished = get_attempt_count_not_finished(api_get_user_id(), $objExercise->id, $learnpath_id, $learnpath_item_id);
+        if ($objExercise->selectAttempts() == 30) {
+            $startedDate = api_strtotime($exercise_stat_info['start_date']);
+            $current_timestamp = time();
+            $expected_time = $startedDate + $objExercise->expired_time * 60;
+            $diff = $current_timestamp - $expected_time;
+            //$countNotFinished = get_attempt_count_not_finished(api_get_user_id(), $objExercise->id, $learnpath_id, $learnpath_item_id);
 
-        $attempts = getAllExerciseAttemptResultByUserNoStatusFilter($objExercise->id, api_get_user_id(), api_get_course_id(), api_get_session_id(), $learnpath_id, $learnpath_item_id);
-        $attempts = is_array($attempts) ? count($attempts) : 0;
+            $attempts = is_array($attempts) ? count($attempts) : 0;
 
-        if ($diff > 0 && $objExercise->attempts == $attempts) {
-            $objExercise->attempts = $objExercise->attempts + 1;
-            $learnpath_item_view_id = isset($learnpath_item_view_id) ? $learnpath_item_view_id : 0;
+            if ($diff > 0 && $objExercise->attempts == $attempts) {
+                $objExercise->attempts = $objExercise->attempts + 1;
+                $learnpath_item_view_id = isset($learnpath_item_view_id) ? $learnpath_item_view_id : 0;
 
-            completeExerciseAttempt($exercise_stat_info['exe_id']);
-            $_SESSION['try_once'] = true;
+                //completeExerciseAttempt($exercise_stat_info['exe_id']);
+                $_SESSION['try_once'] = true;
+                $_SESSION['try_once_exe_id'] = $exercise_stat_info['exe_id'];
+            }
         }
-    } elseif (count($attempts)) {
-        $attempts = getAllExerciseAttemptResultByUserNoStatusFilter($objExercise->id, api_get_user_id(), api_get_course_id(), api_get_session_id(), $learnpath_id, $learnpath_item_id);
     }
-
 }
 
 $attempts = get_exercise_results_by_user(api_get_user_id(), $objExercise->id, api_get_course_id(), api_get_session_id(), $learnpath_id, $learnpath_item_id, 'desc');

@@ -2188,15 +2188,15 @@ class Exercise
         $session_id = intval($session_id);
         $course_id = intval($course_id);
 
-        //Check if order exists and matchs the current status
-        $sql = "SELECT iid FROM $TBL_EXERCICES WHERE c_id = $course_id AND active = '1' AND session_id = $session_id ORDER BY title";
+        // Check if order exists and matchs the current status
+        $sql = "SELECT id FROM $TBL_EXERCICES WHERE c_id = $course_id AND active = '1' AND session_id = $session_id ORDER BY title";
         $result = Database::query($sql);
         $unordered_count = Database::num_rows($result);
 
         if ($unordered_count != $ordered_count) {
             $exercise_list = array();
             while ($row = Database::fetch_array($result)) {
-                $exercise_list[] = $row['iid'];
+                $exercise_list[] = $row['id'];
             }
             $this->update_exercise_list_order($exercise_list, $course_id, $session_id);
         }

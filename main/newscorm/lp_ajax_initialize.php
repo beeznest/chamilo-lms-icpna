@@ -65,8 +65,12 @@ function initialize_item($lp_id, $user_id, $view_id, $next_item) {
     } else {
         if ($debug) {
             error_log("lpobject was not set");
+            error_log("Creating learnpath");
         }
+        $code = api_get_course_id();
+        $mylp = new learnpath($code, $lp_id, $user_id);
     }
+    if (!is_object($mylp)) { return ''; }
     $mylp->set_current_item($next_item);
     if ($debug > 1) { error_log('In initialize_item() - new item is '.$next_item, 0); }
     $mylp->start_current_item(true);

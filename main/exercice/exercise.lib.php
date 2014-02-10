@@ -2516,16 +2516,16 @@ function get_question_ribbon($objExercise, $score, $weight, $check_pass_percenta
                 } else {
                     $eventMessage = $objExercise->getOnRemainingMessage();
                 }
-                global $extAuthSource;
-                $eventMessage = preg_replace('/{{attempt.max}}/', $objExercise->attempts, $eventMessage);
-                $eventMessage = preg_replace('/{{attempt.next}}/', $attempts + 1, $eventMessage);
-                $eventMessage = preg_replace('/{{attempt.current}}/', $attempts, $eventMessage);
-                $course = api_get_course_info($objExercise->course['id']);
-                $eventMessage = preg_replace('/{{course.link}}/', api_get_path(WEB_COURSE_PATH) . $course['directory'] . '/index.php', $eventMessage);
-                $eventMessage = preg_replace('/{{modules.link}}/', $extAuthSource['modules_path'], $eventMessage);
 
                 $ribbon_total_success_or_error = ' ribbon-total-error';
             }
+            global $extAuthSource;
+            $eventMessage = preg_replace('/{{attempt.max}}/', $objExercise->attempts, $eventMessage);
+            $eventMessage = preg_replace('/{{attempt.next}}/', $attempts + 1, $eventMessage);
+            $eventMessage = preg_replace('/{{attempt.current}}/', $attempts, $eventMessage);
+            $course = api_get_course_info($objExercise->course['id']);
+            $eventMessage = preg_replace('/{{course.link}}/', api_get_path(WEB_COURSE_PATH) . $course['directory'] . '/index.php', $eventMessage);
+            $eventMessage = preg_replace('/{{modules.link}}/', $extAuthSource['modules_path'], $eventMessage);
         }
         $ribbon .= '<div class="rib rib-total '.$ribbon_total_success_or_error.'">';
     } else {

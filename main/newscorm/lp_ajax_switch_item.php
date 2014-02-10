@@ -60,6 +60,16 @@ function switch_item_details($lp_id, $user_id, $view_id, $current_item, $next_it
             $mylp = $oLP;
         }
     }
+    $iPath = $mylp->items[$current_item]->get_path();
+    $matches = array();
+    $m = preg_match('/code=(\w*)/', $iPath, $matches);
+    if ($m) {
+        $code = $matches[1];
+        $url = 'http://edo.engdis.com/runtime/customincludes/icpna/HTML5.html?code='.$code;
+        error_log($url);
+        $res = @file_get_contents($url);
+        error_log(print_r($res,1));
+    }
     $new_item_id = 0;
     switch ($next_item) {
         case 'next':

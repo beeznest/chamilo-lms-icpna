@@ -2285,7 +2285,7 @@ class Exercise
 					   status 				= '."'".Database::escape_string($status)."'".' AND
 					   orig_lp_id 			= '."'".$lp_id."'".' AND
 					   orig_lp_item_id 		= '."'".$lp_item_id."'".' AND
-                       orig_lp_item_view_id = '."'".$lp_item_view_id."'".' AND
+					   orig_lp_item_view_id = '."'".$lp_item_view_id."'".' AND
 					   session_id 			= '."'".api_get_session_id()."' LIMIT 1"; //Adding limit 1 just in case
 
         $sql_track = 'SELECT * FROM '.$track_exercises.$condition;

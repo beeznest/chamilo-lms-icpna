@@ -81,7 +81,7 @@ if (isset($_GET['form_reply']) || isset($_GET['form_delete'])) {
             $user_id_by_email = $info_reply[2];
         }
         if (isset($user_reply) && !is_null($user_id_by_email) && strlen($info_reply[0]) > 0) {
-            MessageManager::send_message($user_id_by_email, $title, $content);
+            //MessageManager::send_message($user_id_by_email, $title, $content);
             $show_message .= MessageManager::return_message($user_id_by_email, 'confirmation');
             $social_right_content .= MessageManager::inbox_display();
             exit;

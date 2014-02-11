@@ -130,12 +130,13 @@ $form->addElement('text', 'lastname',  get_lang('Apellido Paterno'),  array('siz
 
 $form->addElement('text', 'extra_middlename',  get_lang('Apellido Materno'),  array('size' => 40));
 
+$form->addElement('text', 'extra_DNI',  get_lang('DNI'),  array('size' => 40));
+
 $form->applyFilter(array('lastname', 'firstname'), 'stripslashes');
 $form->applyFilter(array('lastname', 'firstname'), 'trim');
 
 $form->addRule('lastname' , get_lang('ThisFieldIsRequired'), 'required');
 $form->addRule('firstname', get_lang('ThisFieldIsRequired'), 'required');
-
 
 //	EMAIL
 $form->addElement('email', 'email', get_lang('Email'), array('size' => 40));

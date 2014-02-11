@@ -71,18 +71,18 @@ $list = array(
     ),
     array(
         'title' => 'Apellido Paterno',
-        'content' => $user_info['extra']['middlename']
-    ),
-    array(
-        'title' => 'Apellido Materno',
         'content' => $user_info['lastname']
     ),
     array(
-        'title' => get_lang('DNI'),
+        'title' => 'Apellido Materno',
+        'content' => $user_info['extra']['middlename']
+    ),
+    array(
+        'title' => 'DNI',
         'content' => $user_info['extra']['DNI']
     ),
     array(
-        'title' => get_lang('Email'),
+        'title' => 'Correo electrónico',
         'content' => $user_info['email']
     ),
     array(

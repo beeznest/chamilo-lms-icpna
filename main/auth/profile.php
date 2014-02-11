@@ -124,22 +124,39 @@ if ($user_data !== false) {
  */
 $form = new FormValidator('profile', 'post', api_get_self()."?".str_replace('&fe=1', '', $_SERVER['QUERY_STRING']), null, array('style' => 'width: 70%; float: '.($text_dir == 'rtl' ? 'right;' : 'left;')));
 
-if (api_is_western_name_order()) {
-	//	FIRST NAME and LAST NAME
-	$form->addElement('text', 'firstname', get_lang('FirstName'), array('size' => 40));
-	$form->addElement('text', 'lastname',  get_lang('LastName'),  array('size' => 40));
-} else {
-	//	LAST NAME and FIRST NAME
-	$form->addElement('text', 'lastname',  get_lang('LastName'),  array('size' => 40));
-	$form->addElement('text', 'firstname', get_lang('FirstName'), array('size' => 40));
-}
-if (api_get_setting('profile', 'name') !== 'true') {
-	$form->freeze(array('lastname', 'firstname'));
-}
+$form->addElement('text', 'firstname', get_lang('FirstName'), array('size' => 40));
+
+$form->addElement('text', 'lastname',  get_lang('Apellido Paterno'),  array('size' => 40));
+
+$form->addElement('text', 'extra_middlename',  get_lang('Apellido Materno'),  array('size' => 40));
+
 $form->applyFilter(array('lastname', 'firstname'), 'stripslashes');
 $form->applyFilter(array('lastname', 'firstname'), 'trim');
+
 $form->addRule('lastname' , get_lang('ThisFieldIsRequired'), 'required');
 $form->addRule('firstname', get_lang('ThisFieldIsRequired'), 'required');
+
+
+//	EMAIL
+$form->addElement('email', 'email', get_lang('Email'), array('size' => 40));
+if (api_get_setting('profile', 'email') !== 'true') {
+    $form->freeze('email');
+}
+
+//	PASSWORD, if auth_source is platform
+if (is_platform_authentication() && is_profile_editable() && api_get_setting('profile', 'password') == 'true') {
+    $form->addElement('password', 'password0', array(get_lang('Pass'), get_lang('Enter2passToChange')), array('size' => 40));
+    $form->addElement('password', 'password1', get_lang('NewPass'), array('size' => 40));
+    $form->addElement('password', 'password2', get_lang('Confirmation'), array('size' => 40));
+    //	user must enter identical password twice so we can prevent some user errors
+    $form->addRule(array('password1', 'password2'), get_lang('PassTwo'), 'compare');
+    if (CHECK_PASS_EASY_TO_FIND) {
+        $form->addRule('password1', get_lang('CurrentPasswordEmptyOrIncorrect'), 'callback', 'api_check_password');
+    }
+}
+
+
+
 
 //	USERNAME
 $form->addElement('text', 'username', get_lang('UserName'), array('maxlength' => USERNAME_MAX_LENGTH, 'size' => USERNAME_MAX_LENGTH));
@@ -163,12 +180,6 @@ if (CONFVAL_ASK_FOR_OFFICIAL_CODE) {
 	if (api_get_setting('registration', 'officialcode') == 'true' && api_get_setting('profile', 'officialcode') == 'true') {
 		$form->addRule('official_code', get_lang('ThisFieldIsRequired'), 'required');
 	}
-}
-
-//	EMAIL
-$form->addElement('email', 'email', get_lang('Email'), array('size' => 40));
-if (api_get_setting('profile', 'email') !== 'true') {
-	$form->freeze('email');
 }
 
 if (api_get_setting('registration', 'email') == 'true' &&  api_get_setting('profile', 'email') == 'true') {
@@ -252,21 +263,10 @@ if (api_get_setting('extended_profile') == 'true') {
 	}
 }
 
-//	PASSWORD, if auth_source is platform
-if (is_platform_authentication() && is_profile_editable() && api_get_setting('profile', 'password') == 'true') {
-	$form->addElement('password', 'password0', array(get_lang('Pass'), get_lang('Enter2passToChange')), array('size' => 40));
-	$form->addElement('password', 'password1', get_lang('NewPass'), array('size' => 40));
-	$form->addElement('password', 'password2', get_lang('Confirmation'), array('size' => 40));
-	//	user must enter identical password twice so we can prevent some user errors
-	$form->addRule(array('password1', 'password2'), get_lang('PassTwo'), 'compare');
-	if (CHECK_PASS_EASY_TO_FIND) {
-		$form->addRule('password1', get_lang('CurrentPasswordEmptyOrIncorrect'), 'callback', 'api_check_password');
-	}
-}
 
 // EXTRA FIELDS
 $extra_data = UserManager::get_extra_user_data(api_get_user_id(), true);
-$return_params = ExtraField::set_extra_fields_in_form($form, $extra_data, 'profile', false, api_get_user_id(), 'user');
+$return_params = ExtraField::set_extra_fields_in_form($form, $extra_data, 'profile', false, api_get_user_id(), 'user', null, array('middlename'));
 $jquery_ready_content = $return_params['jquery_ready_content'];
 
 // the $jquery_ready_content variable collects all functions that will be load in the $(document).ready javascript function

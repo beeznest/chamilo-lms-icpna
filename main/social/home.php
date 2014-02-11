@@ -65,9 +65,31 @@ $social_right_content .= '<div class="well_border">';
 $social_right_content .= '<h3>'.get_lang('Profile').'</h3>';
 
 $list = array(
-                array('title' => get_lang('Name'), 'content' => api_get_person_name($user_info['firstname'], $user_info['lastname'])),
-                array('title' => get_lang('Email'), 'content' => $user_info['email']),
-        );
+    array(
+        'title' => get_lang('Firstname'),
+        'content' => $user_info['firstname']
+    ),
+    array(
+        'title' => 'Apellido Paterno',
+        'content' => $user_info['extra']['middlename']
+    ),
+    array(
+        'title' => 'Apellido Materno',
+        'content' => $user_info['lastname']
+    ),
+    array(
+        'title' => get_lang('DNI'),
+        'content' => $user_info['extra']['DNI']
+    ),
+    array(
+        'title' => get_lang('Email'),
+        'content' => $user_info['email']
+    ),
+    array(
+        //'title' => get_lang('Password'),
+        //'content' => api_get_person_name($user_info['firstname'], $user_info['lastname'])
+    ),
+);
 // information current user
 $social_right_content .= '<div>'.Display::description($list).'</div>';
 $social_right_content .= '

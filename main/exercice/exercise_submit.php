@@ -406,6 +406,8 @@ $current_question = isset($_REQUEST['num']) ? intval($_REQUEST['num']) : null;
 //Error message
 $error = '';
 
+$params ="&exerciseId=$exerciseId&origin=$origin&learnpath_id=$learnpath_id&learnpath_item_id=$learnpath_item_id&learnpath_item_view_id=$learnpath_item_view_id&".api_get_cidreq();
+
 //Table calls
 $exercice_attemp_table = Database :: get_statistic_table(TABLE_STATISTIC_TRACK_E_ATTEMPT);
 
@@ -440,7 +442,6 @@ if (!isset($objExercise) && isset($_SESSION['objExercise'])) {
     $objExercise = $_SESSION['objExercise'];
 }
 
-
 //3. $objExercise is not set, then return to the exercise list
 if (!is_object($objExercise)) {
 	if ($debug) {error_log('3. $objExercise was not set, kill the script'); };
@@ -455,6 +456,59 @@ if ($objExercise->review_answers) {
 		exit;
 	}
 }
+
+//----
+
+$exercise_stat_info = $objExercise->get_stat_track_exercise_info($learnpath_id, $learnpath_item_id, 0);
+//var_dump($exercise_stat_info);
+$attempt_list = null;
+if (isset($exercise_stat_info['exe_id'])) {
+    $attempt_list = get_all_exercise_event_by_exe_id($exercise_stat_info['exe_id']);
+    //var_dump($attempt_list);
+
+    if (!empty($attempt_list) && $objExercise->attempts > 0) {
+        $message = Display::return_message(get_lang('YouTriedToResolveThisExerciseEarlier'));
+
+        if (!empty($exercise_stat_info['start_date']) && $exercise_stat_info['status'] == 'incomplete') {
+            $attempts = getAllExerciseAttemptResultByUserNoStatusFilter(
+                $objExercise->id,
+                api_get_user_id(),
+                api_get_course_id(),
+                api_get_session_id(),
+                $learnpath_id,
+                $learnpath_item_id
+            );
+
+            //var_dump($attempts);
+
+            //if ($objExercise->selectAttempts() == 30) {
+            $startedDate = api_strtotime($exercise_stat_info['start_date']);
+            $current_timestamp = api_strtotime(api_get_utc_datetime());
+
+            $expected_time = $startedDate + $objExercise->expired_time * 60;
+            $diff = $current_timestamp - $expected_time;
+            $countNotFinished = get_attempt_count_not_finished(api_get_user_id(), $objExercise->id, $learnpath_id, $learnpath_item_id);
+            $attempts = is_array($attempts) ? count($attempts) : 0;
+            //exit;
+            //var_dump($objExercise->attempts, $attempts);
+
+            if ($diff > 0 && $objExercise->attempts == $attempts) {
+                $objExercise->attempts = $objExercise->attempts + 1;
+                $learnpath_item_view_id = isset($learnpath_item_view_id) ? $learnpath_item_view_id : 0;
+
+                completeExerciseAttempt($exercise_stat_info['exe_id']);
+                //$_SESSION['try_once'] = true;
+                $redirectTo = 'Location: '.api_get_self().'?'.api_get_cidreq().$params;
+                header($redirectTo);
+                exit;
+            }
+            //}
+        }
+    }
+}
+
+
+
 
 $current_timestamp 	= time();
 $my_remind_list 	= array();
@@ -585,7 +639,8 @@ if (!empty($exercise_stat_info['questions_to_check'])) {
 	$my_remind_list = array_filter($my_remind_list);
 }
 
-$params = "exe_id=$exe_id&exerciseId=$exerciseId&origin=$origin&learnpath_id=$learnpath_id&learnpath_item_id=$learnpath_item_id&learnpath_item_view_id=$learnpath_item_view_id&".api_get_cidreq();
+$params .= "&exe_id=$exe_id";
+
 if ($debug) { error_log("6.1 params: ->  $params"); };
 
 if ($reminder == 2 && empty($my_remind_list)) {
@@ -637,6 +692,10 @@ if ($time_control) {
 			// First we update the attempt to today
 			// How the expired time is changed into "track_e_exercices" table,then the last attempt for this student should be changed too,so
 	        $sql_track_e_exe = "UPDATE $exercice_attemp_table SET tms = '".api_get_utc_datetime()."' WHERE exe_id = '".$exercise_stat_info['exe_id']."' AND tms = '".$last_attempt_date."' ";
+
+            completeExerciseAttempt($_SESSION['try_once_exe_id']);
+            $_SESSION['try_once_exe_id'] = null;
+
 	        if ($debug) {error_log('7.10. $sql_track_e_exe2: '.$sql_track_e_exe); }
 	        Database::query($sql_track_e_exe);
 

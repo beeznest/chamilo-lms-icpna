@@ -53,7 +53,6 @@ class Sequence
      *
      */
     public static function get_entity_by_id($entity_id) {
-        error_log(__LINE__);
         $entity_id = Database::escape_string($entity_id);
         if (is_numeric($entity_id)) {
             $entity_id = intval($entity_id);
@@ -96,7 +95,6 @@ class Sequence
     }
 
     public static function get_condition_by_rule_id($rule_id = 1) {
-        error_log(__LINE__);
         $rule_id = Database::escape_string($rule_id);
         if (is_numeric($rule_id)) {
             $rule_id = intval($rule_id);
@@ -116,7 +114,6 @@ class Sequence
     }
 
     public static function get_method_by_rule_id($rule_id =1 ) {
-        error_log(__LINE__);
         $rule_id = Database::escape_string($rule_id);
         if (is_numeric($rule_id)) {
             $rule_id = intval($rule_id);
@@ -136,7 +133,6 @@ class Sequence
     }
 
     public static function get_value_by_row_entity_id($row_entity_id) {
-        error_log(__LINE__);
         $row_entity_id = intval(Database::escape_string($row_entity_id));
         if ($row_entity_id > 0) {
             $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
@@ -153,7 +149,6 @@ class Sequence
     }
 
     public static function get_variable_by_condition_id($condition_id) {
-        error_log(__LINE__);
         $condition_id = Database::escape_string($condition_id);
         if (is_numeric($condition_id)) {
             $condition_id = intval($condition_id);
@@ -231,7 +226,6 @@ class Sequence
     }
 
     public static function get_value_by_user_id($row_entity_id = null, $user_id = null, $session_id = null, $available = -1, $success = -1) {
-        error_log(__LINE__);
         $user_id = (isset($user_id))? intval(Database::escape_string($user_id)) : api_get_user_id();
         if ($user_id > 0) {
             $available = Database::escape_string($available);
@@ -276,7 +270,6 @@ class Sequence
     }
 
     public static function find_variables_in_formula($formula) {
-        error_log(__LINE__);
         $formula = Database::escape_string($formula);
         if (isset($formula)) {
             $pat = "/v#(\d+)/";
@@ -292,7 +285,6 @@ class Sequence
 
     public static function get_user_id_by_row_entity_id($row_entity_id = 0)
     {
-        error_log(__LINE__);
         $row_entity_id = intval(Database::escape_string($row_entity_id));
         if ($row_entity_id > 0) {
             $row_entity_filter = "WHERE sequence_row_entity_id = $row_entity_id";
@@ -312,7 +304,6 @@ class Sequence
     }
 
     public static function action_pre_init($row_entity_id, $user_id, $session_id, $available_end_date = null) {
-        error_log(__LINE__);
         $user_id = intval(Database::escape_string($user_id));
         $session_id = intval(Database::escape_string($session_id));
         $row_entity_id = intval(Database::escape_string($row_entity_id));
@@ -342,7 +333,6 @@ class Sequence
     }
 
     public static function action_post_success_by_user_id($row_entity_id, $user_id, $session_id, $available_end_date = null) {
-        error_log(__LINE__);
         if (self::execute_formulas_by_user_id($row_entity_id, $user_id, $session_id, 'success', 1, null, null, null)) {
             $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
             $value = self::get_value_by_user_id($row_entity_id, $user_id, $session_id, 1, 1);
@@ -368,7 +358,6 @@ class Sequence
      */
     public static function getAllRowEntityIdByRowId($entity_id, $row_id, $c_id)
     {
-        error_log(__LINE__);
         $row_id = intval(Database::escape_string($row_id));
         $entity_id = intval(Database::escape_string($entity_id));
         $c_id = intval(Database::escape_string($c_id));
@@ -401,7 +390,6 @@ class Sequence
      */
     public static function getRowEntityByRowId($entity_id, $row_id, $c_id)
     {
-        error_log(__LINE__);
         $row_id = intval(Database::escape_string($row_id));
         $entity_id = intval(Database::escape_string($entity_id));
         $c_id = intval(Database::escape_string($c_id));
@@ -516,7 +504,6 @@ class Sequence
     }
 
     public static function temp_hack_4_update($entity_id, $row_id, $c_id, $session_id, $user_id, $rule_id, $items_completed = 1, $total_items = 1, $available_end_date =null ){
-        error_log(__LINE__);
         $row_entity_id = self::get_row_entity_id_by_row_id($entity_id, $row_id, $c_id);
         self::execute_formulas_by_user_id($row_entity_id, $user_id, $session_id, 'update', 1, $items_completed, $total_items);
         if (self::validate_rule_by_row_id($row_entity_id, $user_id, $session_id, $rule_id) && (self::get_value_by_user_id($row_entity_id, $user_id, $session_id, 1, 1) === false)) {
@@ -525,7 +512,6 @@ class Sequence
     }
 
     public static function get_table_by_entity_name($entity_name){
-        error_log(__LINE__);
         $entity_name = Database::escape_string($entity_name);
         $ety_table = Database::get_main_table(TABLE_SEQUENCE_TYPE_ENTITY);
         $sql = "SELECT ety.ent_table FROM $ety_table ety WHERE ety.name = $entity_name LIMIT 0, 1";
@@ -540,7 +526,6 @@ class Sequence
     }
 
     public static function get_entity_by_entity_name($entity_name){
-        error_log(__LINE__);
         $entity_name = Database::escape_string($entity_name);
         $ety_table = Database::get_main_table(TABLE_SEQUENCE_TYPE_ENTITY);
         $sql = "SELECT ety.* FROM $ety_table ety WHERE ety.name = $entity_name LIMIT 0, 1";
@@ -555,7 +540,6 @@ class Sequence
     }
 
     public static function temp_hack_2_insert($entity_id, $row_id, $c_id, $name = '') {
-        error_log(__LINE__);
         $row_id = intval(Database::escape_string($row_id));
         $c_id = intval(Database::escape_string($c_id));
         $entity_id = intval(Database::escape_string($entity_id));
@@ -573,7 +557,6 @@ class Sequence
         return false;
     }
     public static function temp_hack_3_insert($entity_id_prev, $entity_id_next, $row_id_prev = 0, $row_id_next = 0, $c_id = 1, $is_part = 0) {
-        error_log(__LINE__);
         $is_part = intval(Database::escape_string($is_part));
         $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
         $prev = self::get_row_entity_id_by_row_id($entity_id_prev, $row_id_prev, $c_id);
@@ -590,7 +573,6 @@ class Sequence
     }
 
     public static function temp_hack_4_insert($total_items, $row_entity_id, $user_id = 0, $available = -1, $session_id) {
-        error_log(__LINE__);
         $user_id = intval(Database::escape_string($user_id));
         $session_id = intval(Database::escape_string($session_id));
         $total_items = intval(Database::escape_string($total_items));
@@ -623,7 +605,6 @@ class Sequence
 
     public function cleanPrerequisites($id, $c_id)
     {
-        error_log(__LINE__);
         $table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
         $row_entity_id_next = self::get_row_entity_id_by_row_id(1, $id, $c_id);
         $sql = "DELETE FROM $table WHERE sequence_row_entity_id_next = $row_entity_id_next";
@@ -631,7 +612,6 @@ class Sequence
     }
 
     public static function temp_hack_3_update($entity_id_prev, $entity_id_next, $row_id_prev = 0, $row_id_next = 0, $c_id = 0, $user_id = 0) {
-        error_log(__LINE__);
         $user_id = intval($user_id);
 
         $row_entity_id_prev = self::get_row_entity_id_by_row_id($entity_id_prev, $row_id_prev, $c_id);
@@ -705,7 +685,6 @@ class Sequence
     }
 
     public static function temp_hack_4_delete($entity_id, $row_id, $c_id) {
-        error_log(__LINE__);
         $row_entity_id = self::get_row_entity_id_by_row_id($entity_id, $row_id, $c_id);
         if ($row_entity_id !== false) {
             $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
@@ -718,7 +697,6 @@ class Sequence
         return false;
     }
     public static function temp_hack_3_delete($entity_id, $row_id, $c_id, $rule_id) {
-        error_log(__LINE__);
         $row_entity_id = self::get_row_entity_id_by_row_id($entity_id, $row_id, $c_id);
         if ($row_entity_id !== false) {
             $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
@@ -763,7 +741,6 @@ class Sequence
     }
 
     public static function temp_hack_2_delete($entity_id, $row_id, $c_id) {
-        error_log(__LINE__);
         $row_entity_id = self::get_row_entity_id_by_row_id($entity_id, $row_id, $c_id);
         if ($row_entity_id !== false) {
             $row_table = Database::get_main_table(TABLE_SEQUENCE_ROW_ENTITY);
@@ -776,7 +753,6 @@ class Sequence
         return false;
     }
     public static function temp_hack_5($entity_id, $row_id, $c_id, $rule_id) {
-        error_log(__LINE__);
         if (self::temp_hack_3_delete($entity_id, $row_id, $c_id, $rule_id)) {
             if (self::temp_hack_4_delete($entity_id, $row_id, $c_id)) {
                 if (self::temp_hack_2_delete($entity_id, $row_id, $c_id)) {
@@ -787,7 +763,6 @@ class Sequence
         return false;
     }
     public static function temp_hack_4_set_aval($row_entity_id, $user_id, $session_id, $available, $available_end_date = null) {
-        error_log(__LINE__);
         $available_end_date = Database::escape_string($available_end_date);
         $available = intval(Database::escape_string($available));
         $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
@@ -810,7 +785,6 @@ class Sequence
     }
 
     public static function get_row_entity_id_by_user_id($user_id) {
-        error_log(__LINE__);
         $user_id = intval(Database::escape_string($user_id));
         if ($user_id > 0) {
             $user_filter = "WHERE user_id = $user_id";
@@ -833,7 +807,6 @@ class Sequence
      * Bool Available for LP
      */
     public static function get_state_lp_by_row_entity_id ($row_entity_id, $user_id, $session_id) {
-        error_log(__LINE__);
         $row_entity_id = intval(Database::escape_string($row_entity_id));
         $user_id = intval(Database::escape_string($user_id));
         $session_id = intval(Database::escape_string($session_id));

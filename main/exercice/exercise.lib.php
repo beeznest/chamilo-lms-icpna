@@ -2551,6 +2551,7 @@ function get_question_ribbon($objExercise, $score, $weight, $check_pass_percenta
     }
     $ribbon .= '</div>';
     $ribbon .= '</div>';
+
     $ribbon .= $eventMessage;
     return $ribbon;
 }

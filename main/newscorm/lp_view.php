@@ -222,18 +222,40 @@ if ($type_quiz && !empty($_REQUEST['exeId']) && isset($lp_id) && isset($_GET['lp
 
     if ($safe_id == strval(intval($safe_id)) && $safe_item_id == strval(intval($safe_item_id))) {
 
-        $sql = 'SELECT start_date, exe_date, exe_result, exe_weighting FROM ' . $TBL_TRACK_EXERCICES . ' WHERE exe_id = '.$safe_exe_id;
+        $sql = 'SELECT start_date, exe_date, exe_result, exe_weighting, exe_exo_id FROM ' . $TBL_TRACK_EXERCICES . ' WHERE exe_id = '.$safe_exe_id;
         if ($debug) error_log($sql);
         $res = Database::query($sql);
         $row_dates = Database::fetch_array($res);
-
+        
         $time_start_date = api_strtotime($row_dates['start_date'],'UTC');
         $time_exe_date   = api_strtotime($row_dates['exe_date'],'UTC');
 
         $mytime 	= ((int)$time_exe_date-(int)$time_start_date);
         $score 		= (float)$row_dates['exe_result'];
         $max_score 	= (float)$row_dates['exe_weighting'];
-
+        
+        $scorePerc = round((($score/$max_score) * 100), 2);
+        
+        $TBL_EXERCICES = Database::get_course_table(TABLE_QUIZ_TEST);
+        $TBL_COURSE = Database::get_main_table(TABLE_MAIN_COURSE);
+                
+        $sql = "SELECT * FROM $TBL_EXERCICES cq " . 
+               "INNER JOIN $TBL_COURSE c ON c.id = cq.c_id " .
+               "INNER JOIN $TBL_TRACK_EXERCICES te ON te.exe_cours_id = c.code " .
+               "AND te.exe_exo_id = cq.id " .
+               "WHERE te.exe_id = " . $safe_exe_id;
+        
+        $cQuizResult = Database::query($sql);
+        $cQuizData = Database::fetch_array($cQuizResult);
+        
+        $minScore = round((float)$cQuizData['pass_percentage'], 2);
+        
+        if($scorePerc >= $minScore) {
+            $status = 'completed';
+        } else {
+            $status = 'incomplete';
+        }
+        
         $sql_upd_max_score = "UPDATE $TBL_LP_ITEM SET max_score = '$max_score' WHERE c_id = $course_id AND id = '".$safe_item_id."'";
         if ($debug) error_log($sql_upd_max_score);
         Database::query($sql_upd_max_score);
@@ -241,11 +263,11 @@ if ($type_quiz && !empty($_REQUEST['exeId']) && isset($lp_id) && isset($_GET['lp
         $sql_last_attempt = "SELECT id FROM $TBL_LP_ITEM_VIEW  WHERE c_id = $course_id AND lp_item_id = '$safe_item_id' AND lp_view_id = '".$_SESSION['oLP']->lp_view_id."' order by id desc limit 1";
         $res_last_attempt = Database::query($sql_last_attempt);
         if ($debug) error_log($sql_last_attempt);
-
+        
         if (Database::num_rows($res_last_attempt)) {
         	$row_last_attempt = Database::fetch_row($res_last_attempt);
         	$lp_item_view_id  = $row_last_attempt[0];
-            $sql_upd_score = "UPDATE $TBL_LP_ITEM_VIEW SET status = 'completed' , score = $score, total_time = $mytime
+            $sql_upd_score = "UPDATE $TBL_LP_ITEM_VIEW SET status = '$status' , score = $score, total_time = $mytime
                               WHERE id='".$lp_item_view_id."' AND c_id = $course_id ";
 
             if ($debug) error_log($sql_upd_score);

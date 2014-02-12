@@ -66,7 +66,7 @@ $social_right_content .= '<h3>'.get_lang('Profile').'</h3>';
 
 $list = array(
     array(
-        'title' => get_lang('Firstname'),
+        'title' => 'Nombre',
         'content' => $user_info['firstname']
     ),
     array(

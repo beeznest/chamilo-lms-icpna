@@ -124,13 +124,13 @@ if ($user_data !== false) {
  */
 $form = new FormValidator('profile', 'post', api_get_self()."?".str_replace('&fe=1', '', $_SERVER['QUERY_STRING']), null, array('style' => 'width: 70%; float: '.($text_dir == 'rtl' ? 'right;' : 'left;')));
 
-$form->addElement('text', 'firstname', get_lang('FirstName'), array('size' => 40));
+$form->addElement('text', 'firstname', 'Nombre', array('size' => 40));
 
-$form->addElement('text', 'lastname',  get_lang('Apellido Paterno'),  array('size' => 40));
+$form->addElement('text', 'lastname',  'Apellido Paterno',  array('size' => 40));
 
-$form->addElement('text', 'extra_middlename',  get_lang('Apellido Materno'),  array('size' => 40));
+$form->addElement('text', 'extra_middlename',  'Apellido Materno',  array('size' => 40));
 
-$form->addElement('text', 'extra_DNI',  get_lang('DNI'),  array('size' => 40));
+$form->addElement('text', 'extra_DNI',  'DNI',  array('size' => 40));
 
 $form->applyFilter(array('lastname', 'firstname'), 'stripslashes');
 $form->applyFilter(array('lastname', 'firstname'), 'trim');

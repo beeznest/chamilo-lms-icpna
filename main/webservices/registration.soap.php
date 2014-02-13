@@ -5554,9 +5554,11 @@ function WSGetCourseFinalScore($params) {
     }
 
     $tbl_quiz = Database::get_course_table(TABLE_QUIZ_TEST);
+
     // Limited list of terms that will be considered as exams that classify the user to move to next course
     // @todo add a checkbox for this and a database field (c_quiz.classification_exam)
-    $exam_names = "'final exam', 'examen final', 'placement test', 'examen de clasificación'";
+    $exam_names = "'final exam', 'examen final', 'placement test', 'final test', 'examen de clasificación'";
+
     $sql = "SELECT id, max_attempt FROM $tbl_quiz WHERE c_id = $cid AND LOWER(title) IN ($exam_names) ORDER BY id DESC LIMIT 1";
     $res = Database::query($sql);
     if (Database::num_rows($res) < 1) {

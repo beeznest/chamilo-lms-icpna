@@ -458,9 +458,8 @@ if ($objExercise->review_answers) {
 }
 
 //----
-
 $exercise_stat_info = $objExercise->get_stat_track_exercise_info($learnpath_id, $learnpath_item_id, 0);
-if ($exercise_stat_info['exe_cours_id'] == 'PLACEMENTTEST') {
+if ($exercise_stat_info['exe_cours_id'] == 'PLACEMENTTEST' && $objExercise->attempts == 1) {
 
     //var_dump($exercise_stat_info);
     $attempt_list = null;

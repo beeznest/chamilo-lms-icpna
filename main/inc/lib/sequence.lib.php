@@ -607,9 +607,11 @@ class Sequence
             error_log('Entering '.__FUNCTION__.' in '.__FILE__);
         }
         $row_entity_id = self::get_row_entity_id_by_row_id($entity_id, $row_id, $c_id);
-        self::execute_formulas_by_user_id($row_entity_id, $user_id, $session_id, 'update', 1, $items_completed, $total_items);
-        if (self::validate_rule_by_row_id($row_entity_id, $user_id, $session_id, $rule_id) && (self::get_value_by_user_id($row_entity_id, $user_id, $session_id, 1, 1) === false)) {
-            self::action_post_success_by_user_id($row_entity_id, $user_id, $session_id, $available_end_date);
+        if (!empty($row_entity_id)) {
+            self::execute_formulas_by_user_id($row_entity_id, $user_id, $session_id, 'update', 1, $items_completed, $total_items);
+            if (self::validate_rule_by_row_id($row_entity_id, $user_id, $session_id, $rule_id) && (self::get_value_by_user_id($row_entity_id, $user_id, $session_id, 1, 1) === false)) {
+                self::action_post_success_by_user_id($row_entity_id, $user_id, $session_id, $available_end_date);
+            }
         }
     }
 

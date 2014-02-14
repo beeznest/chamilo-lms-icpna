@@ -1237,9 +1237,25 @@ if (!empty($error)) {
                     data: "'.$params.'&type=simple&question_id="+question_id+"&"+my_choice+"&"+hotspot+"&"+remind_list,
                     success: function(return_value) {
                         if (return_value == "ok") {
-                            $("#save_for_now_"+question_id).html("'.addslashes(Display::return_icon('save.png', get_lang('Saved'), array(), ICON_SIZE_SMALL)).'");
+                            //$("#save_for_now_"+question_id).html("' . addslashes(
+            Display::return_icon(
+                'save.png',
+                get_lang('Saved'),
+                array(),
+                ICON_SIZE_SMALL
+            )
+        ) . '");
+                            $("#save_for_now_"+question_id).html("<a href=# class=\"btn btn-link\"><div class=save_image_div></div></a>");
                         } else if (return_value == "error") {
-                            $("#save_for_now_"+question_id).html("'.addslashes(Display::return_icon('error.png', get_lang('Error'), array(), ICON_SIZE_SMALL)).'");
+                            //$("#save_for_now_"+question_id).html("' . addslashes(
+            Display::return_icon(
+                'error.png',
+                get_lang('Error'),
+                array(),
+                ICON_SIZE_SMALL
+            )
+        ) . '");
+                            $("#save_for_now_"+question_id).html("<a href=# class=\"btn btn-link\"><div class=error_image_div></div></a>");
                         } else if (return_value == "one_per_page") {
 
                             var url = "";
@@ -1255,15 +1271,30 @@ if (!empty($error)) {
                                 url = url_extra;
                             }
 
-                            $("#save_for_now_"+question_id).html("'.addslashes(Display::return_icon('save.png', get_lang('Saved'), array(), ICON_SIZE_SMALL)).'");
-
+                            //$("#save_for_now_"+question_id).html("' . addslashes(
+            Display::return_icon(
+                'save.png',
+                get_lang('Saved'),
+                array(),
+                ICON_SIZE_SMALL
+            )
+        ) . '");
+                            $("#save_for_now_"+question_id).html("<a href=# class=\"btn btn-link\"><div class=save_image_div></div></a>");
                             if (redirect) {
                                 window.location = url;
                             }
                         }
                     },
                     error: function() {
-                        $("#save_for_now_"+question_id).html("'.addslashes(Display::return_icon('error.png', get_lang('Error'), array(), ICON_SIZE_SMALL)).'");
+                        //$("#save_for_now_"+question_id).html("' . addslashes(
+            Display::return_icon(
+                'error.png',
+                get_lang('Error'),
+                array(),
+                ICON_SIZE_SMALL
+            )
+        ) . '");
+                        $("#save_for_now_"+question_id).html("<a href=# class=\"btn btn-link\"><div class=error_image_div></div></a>");
                     }
                     });
                 return false;

@@ -2,12 +2,15 @@
 
 class Sequence
 {
+    const _debug = false;
     /**
      * @param $row_entity_id
      * @return array|bool
      */
     public static function get_pre_req_id_by_row_entity_id($row_entity_id) {
-        error_log(__LINE__);
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $row_entity_id = intval(Database::escape_string($row_entity_id));
         if ($row_entity_id > 0) {
             $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
@@ -24,6 +27,9 @@ class Sequence
     }
 
     public static function get_next_by_row_id($entity_id, $row_entity_id, $course_id = null) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $row_entity_id = Database::escape_string($row_entity_id);
         $entity_id = Database::escape_string($entity_id);
         $course_id = Database::escape_string($course_id);
@@ -53,6 +59,9 @@ class Sequence
      *
      */
     public static function get_entity_by_id($entity_id) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $entity_id = Database::escape_string($entity_id);
         if (is_numeric($entity_id)) {
             $entity_id = intval($entity_id);
@@ -71,6 +80,9 @@ class Sequence
 
 
     public static function validate_rule_by_row_id($row_entity_id, $user_id = null, $session_id, $rule_id = 1) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $condition = self::get_condition_by_rule_id($rule_id);
         if ($condition !== false) {
             $con = $condition[0];
@@ -95,6 +107,9 @@ class Sequence
     }
 
     public static function get_condition_by_rule_id($rule_id = 1) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $rule_id = Database::escape_string($rule_id);
         if (is_numeric($rule_id)) {
             $rule_id = intval($rule_id);
@@ -114,6 +129,9 @@ class Sequence
     }
 
     public static function get_method_by_rule_id($rule_id =1 ) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $rule_id = Database::escape_string($rule_id);
         if (is_numeric($rule_id)) {
             $rule_id = intval($rule_id);
@@ -133,6 +151,9 @@ class Sequence
     }
 
     public static function get_value_by_row_entity_id($row_entity_id) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $row_entity_id = intval(Database::escape_string($row_entity_id));
         if ($row_entity_id > 0) {
             $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
@@ -149,6 +170,9 @@ class Sequence
     }
 
     public static function get_variable_by_condition_id($condition_id) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $condition_id = Database::escape_string($condition_id);
         if (is_numeric($condition_id)) {
             $condition_id = intval($condition_id);
@@ -168,6 +192,9 @@ class Sequence
     }
 
     public static function execute_formulas_by_user_id($row_entity_id = null ,$user_id = null, $session_id, $met_type = '', $available = 1, $complete_items = 1, $total_items = 1, $available_end_date =null) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $value = self::get_value_by_user_id($row_entity_id, $user_id, $session_id, $available);
         if ($value !== false) {
             if (empty($met_type)) {
@@ -226,6 +253,9 @@ class Sequence
     }
 
     public static function get_value_by_user_id($row_entity_id = null, $user_id = null, $session_id = null, $available = -1, $success = -1) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $user_id = (isset($user_id))? intval(Database::escape_string($user_id)) : api_get_user_id();
         if ($user_id > 0) {
             $available = Database::escape_string($available);
@@ -270,6 +300,9 @@ class Sequence
     }
 
     public static function find_variables_in_formula($formula) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $formula = Database::escape_string($formula);
         if (isset($formula)) {
             $pat = "/v#(\d+)/";
@@ -285,6 +318,9 @@ class Sequence
 
     public static function get_user_id_by_row_entity_id($row_entity_id = 0)
     {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $row_entity_id = intval(Database::escape_string($row_entity_id));
         if ($row_entity_id > 0) {
             $row_entity_filter = "WHERE sequence_row_entity_id = $row_entity_id";
@@ -304,6 +340,9 @@ class Sequence
     }
 
     public static function action_pre_init($row_entity_id, $user_id, $session_id, $available_end_date = null) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $user_id = intval(Database::escape_string($user_id));
         $session_id = intval(Database::escape_string($session_id));
         $row_entity_id = intval(Database::escape_string($row_entity_id));
@@ -333,6 +372,9 @@ class Sequence
     }
 
     public static function action_post_success_by_user_id($row_entity_id, $user_id, $session_id, $available_end_date = null) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         if (self::execute_formulas_by_user_id($row_entity_id, $user_id, $session_id, 'success', 1, null, null, null)) {
             $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
             $value = self::get_value_by_user_id($row_entity_id, $user_id, $session_id, 1, 1);
@@ -358,6 +400,9 @@ class Sequence
      */
     public static function getAllRowEntityIdByRowId($entity_id, $row_id, $c_id)
     {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $row_id = intval(Database::escape_string($row_id));
         $entity_id = intval(Database::escape_string($entity_id));
         $c_id = intval(Database::escape_string($c_id));
@@ -390,6 +435,9 @@ class Sequence
      */
     public static function getRowEntityByRowId($entity_id, $row_id, $c_id)
     {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $row_id = intval(Database::escape_string($row_id));
         $entity_id = intval(Database::escape_string($entity_id));
         $c_id = intval(Database::escape_string($c_id));
@@ -415,6 +463,9 @@ class Sequence
      */
     public static function getValIdByRowEntityId ($row_entity_id, $user_id, $session_id)
     {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $row_entity_id = intval(Database::escape_string($row_entity_id));
         $user_id = intval(Database::escape_string($user_id));
         $session_id = intval(Database::escape_string($session_id));
@@ -460,6 +511,13 @@ class Sequence
 
 
     public static function get_row_entity_id_by_row_id($entity_id, $row_id, $c_id, $name = '') {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+            error_log('......................................');
+            error_log('entity_id: '.$entity_id.'.............');
+            error_log('row_id: '.$row_id.'...................');
+            error_log('c_id: '.$c_id.'.......................');
+        }
         $row_id = intval(Database::escape_string($row_id));
         $entity_id = intval(Database::escape_string($entity_id));
         $c_id = intval(Database::escape_string($c_id));
@@ -477,6 +535,10 @@ class Sequence
                 while ($temp_row_entity = Database::fetch_array($result, 'ASSOC')) {
                     $row_entity[] = $temp_row_entity;
                 }
+                if (self::_debug) {
+                    error_log('Return in '.__FUNCTION__.' in '.__FILE__);
+                    error_log('...............................'.$row_entity[0]['id']);
+                }
                 return $row_entity[0]['id'];
             } elseif ($entity_id == 1) {
                 $sql = "SELECT name, prerequisite FROM $clp_table
@@ -484,34 +546,79 @@ class Sequence
                     AND id = $row_id
                     LIMIT 0, 1";
                 $result = Database::query($sql);
-                if (Database::num_rows($result)) {
+                if (Database::num_rows($result) > 0) {
                     $temp_arr = Database::fetch_array($result, 'ASSOC');
                     $name = $temp_arr['name'];
+                    $name = Database::escape_string($name);
                     $pre = ($temp_arr['prerequisite'] > 0)? self::get_row_entity_id_by_row_id($entity_id, $temp_arr['prerequisite'], $c_id) : 0 ;
                     $sql = "INSERT INTO $row_table (sequence_type_entity_id, c_id, row_id, name) VALUES
                         ($entity_id, $c_id, $row_id, '$name')";
                     Database::query($sql);
                     $id = Database::insert_id();
-                    $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
-                    $sql = "INSERT INTO $seq_table (sequence_row_entity_id, sequence_row_entity_id_next, is_part) VALUES
+                    if ($id != 0) {
+                        $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
+                        $sql = "INSERT INTO $seq_table (sequence_row_entity_id, sequence_row_entity_id_next, is_part) VALUES
                         ($pre, $id, 0)";
-                    Database::query($sql);
-                    return $id;
+                        Database::query($sql);
+                        if (self::_debug) {
+                            error_log('Return in '.__FUNCTION__.' in '.__FILE__);
+                            error_log('................................'.$id);
+                        }
+                        return $id;
+                    } else {
+                        if (self::_debug) {
+                            error_log('Fail and Return in '.__FUNCTION__.' in '.__FILE__);
+                            error_log('................................');
+                            error_log($sql);
+                            error_log('................................');
+                            error_log('......................................0');
+                        }
+                    }
+                } else {
+                    if (self::_debug) {
+                        error_log('No result for query in '.__FUNCTION__.' in '.__FILE__);
+                        error_log('................................');
+                        error_log($sql);
+                    }
+                }
+            } else {
+                if (self::_debug) {
+                    error_log('Fail and Return in '.__FUNCTION__.' in '.__FILE__);
+                    error_log('................................');
+                    error_log($sql);
+                    error_log('................................');
+                    error_log('......................................0');
                 }
             }
+        }
+        if (self::_debug) {
+            error_log('Fail and Return in '.__FUNCTION__.' in '.__FILE__);
+            error_log('......................................');
+            error_log('entity_id: '.$entity_id.'.............');
+            error_log('row_id: '.$row_id.'...................');
+            error_log('c_id: '.$c_id.'.......................');
+            error_log('......................................0');
         }
         return 0;
     }
 
     public static function temp_hack_4_update($entity_id, $row_id, $c_id, $session_id, $user_id, $rule_id, $items_completed = 1, $total_items = 1, $available_end_date =null ){
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $row_entity_id = self::get_row_entity_id_by_row_id($entity_id, $row_id, $c_id);
-        self::execute_formulas_by_user_id($row_entity_id, $user_id, $session_id, 'update', 1, $items_completed, $total_items);
-        if (self::validate_rule_by_row_id($row_entity_id, $user_id, $session_id, $rule_id) && (self::get_value_by_user_id($row_entity_id, $user_id, $session_id, 1, 1) === false)) {
-            self::action_post_success_by_user_id($row_entity_id, $user_id, $session_id, $available_end_date);
+        if (!empty($row_entity_id)) {
+            self::execute_formulas_by_user_id($row_entity_id, $user_id, $session_id, 'update', 1, $items_completed, $total_items);
+            if (self::validate_rule_by_row_id($row_entity_id, $user_id, $session_id, $rule_id) && (self::get_value_by_user_id($row_entity_id, $user_id, $session_id, 1, 1) === false)) {
+                self::action_post_success_by_user_id($row_entity_id, $user_id, $session_id, $available_end_date);
+            }
         }
     }
 
     public static function get_table_by_entity_name($entity_name){
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $entity_name = Database::escape_string($entity_name);
         $ety_table = Database::get_main_table(TABLE_SEQUENCE_TYPE_ENTITY);
         $sql = "SELECT ety.ent_table FROM $ety_table ety WHERE ety.name = $entity_name LIMIT 0, 1";
@@ -526,6 +633,9 @@ class Sequence
     }
 
     public static function get_entity_by_entity_name($entity_name){
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $entity_name = Database::escape_string($entity_name);
         $ety_table = Database::get_main_table(TABLE_SEQUENCE_TYPE_ENTITY);
         $sql = "SELECT ety.* FROM $ety_table ety WHERE ety.name = $entity_name LIMIT 0, 1";
@@ -540,6 +650,9 @@ class Sequence
     }
 
     public static function temp_hack_2_insert($entity_id, $row_id, $c_id, $name = '') {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $row_id = intval(Database::escape_string($row_id));
         $c_id = intval(Database::escape_string($c_id));
         $entity_id = intval(Database::escape_string($entity_id));
@@ -557,6 +670,9 @@ class Sequence
         return false;
     }
     public static function temp_hack_3_insert($entity_id_prev, $entity_id_next, $row_id_prev = 0, $row_id_next = 0, $c_id = 1, $is_part = 0) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $is_part = intval(Database::escape_string($is_part));
         $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
         $prev = self::get_row_entity_id_by_row_id($entity_id_prev, $row_id_prev, $c_id);
@@ -573,6 +689,9 @@ class Sequence
     }
 
     public static function temp_hack_4_insert($total_items, $row_entity_id, $user_id = 0, $available = -1, $session_id) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $user_id = intval(Database::escape_string($user_id));
         $session_id = intval(Database::escape_string($session_id));
         $total_items = intval(Database::escape_string($total_items));
@@ -605,6 +724,9 @@ class Sequence
 
     public function cleanPrerequisites($id, $c_id)
     {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
         $row_entity_id_next = self::get_row_entity_id_by_row_id(1, $id, $c_id);
         $sql = "DELETE FROM $table WHERE sequence_row_entity_id_next = $row_entity_id_next";
@@ -612,6 +734,9 @@ class Sequence
     }
 
     public static function temp_hack_3_update($entity_id_prev, $entity_id_next, $row_id_prev = 0, $row_id_next = 0, $c_id = 0, $user_id = 0) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $user_id = intval($user_id);
 
         $row_entity_id_prev = self::get_row_entity_id_by_row_id($entity_id_prev, $row_id_prev, $c_id);
@@ -672,6 +797,9 @@ class Sequence
     }
 
     public static function get_sessions_by_user_id ($user_id, $row_entity_id) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
         $sessions = [];
         $sql = "SELECT session_id FROM $val_table
@@ -685,6 +813,9 @@ class Sequence
     }
 
     public static function temp_hack_4_delete($entity_id, $row_id, $c_id) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $row_entity_id = self::get_row_entity_id_by_row_id($entity_id, $row_id, $c_id);
         if ($row_entity_id !== false) {
             $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
@@ -697,6 +828,9 @@ class Sequence
         return false;
     }
     public static function temp_hack_3_delete($entity_id, $row_id, $c_id, $rule_id) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $row_entity_id = self::get_row_entity_id_by_row_id($entity_id, $row_id, $c_id);
         if ($row_entity_id !== false) {
             $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
@@ -741,6 +875,9 @@ class Sequence
     }
 
     public static function temp_hack_2_delete($entity_id, $row_id, $c_id) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $row_entity_id = self::get_row_entity_id_by_row_id($entity_id, $row_id, $c_id);
         if ($row_entity_id !== false) {
             $row_table = Database::get_main_table(TABLE_SEQUENCE_ROW_ENTITY);
@@ -753,6 +890,9 @@ class Sequence
         return false;
     }
     public static function temp_hack_5($entity_id, $row_id, $c_id, $rule_id) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         if (self::temp_hack_3_delete($entity_id, $row_id, $c_id, $rule_id)) {
             if (self::temp_hack_4_delete($entity_id, $row_id, $c_id)) {
                 if (self::temp_hack_2_delete($entity_id, $row_id, $c_id)) {
@@ -763,6 +903,9 @@ class Sequence
         return false;
     }
     public static function temp_hack_4_set_aval($row_entity_id, $user_id, $session_id, $available, $available_end_date = null) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $available_end_date = Database::escape_string($available_end_date);
         $available = intval(Database::escape_string($available));
         $val_table = Database::get_main_table(TABLE_SEQUENCE_VALUE);
@@ -785,6 +928,9 @@ class Sequence
     }
 
     public static function get_row_entity_id_by_user_id($user_id) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $user_id = intval(Database::escape_string($user_id));
         if ($user_id > 0) {
             $user_filter = "WHERE user_id = $user_id";
@@ -807,6 +953,9 @@ class Sequence
      * Bool Available for LP
      */
     public static function get_state_lp_by_row_entity_id ($row_entity_id, $user_id, $session_id) {
+        if (self::_debug) {
+            error_log('Entering '.__FUNCTION__.' in '.__FILE__);
+        }
         $row_entity_id = intval(Database::escape_string($row_entity_id));
         $user_id = intval(Database::escape_string($user_id));
         $session_id = intval(Database::escape_string($session_id));

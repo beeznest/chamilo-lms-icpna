@@ -146,6 +146,8 @@ if (is_platform_authentication() && is_profile_editable() && api_get_setting('pr
     $form->addElement('password', 'password2', get_lang('Confirmation'), array('size' => 40));
     //	user must enter identical password twice so we can prevent some user errors
     $form->addRule(array('password1', 'password2'), get_lang('PassTwo'), 'compare');
+
+    $form->addRule('password1', get_lang('TooShort'), 'minlength', 6);
     if (CHECK_PASS_EASY_TO_FIND) {
         $form->addRule('password1', get_lang('CurrentPasswordEmptyOrIncorrect'), 'callback', 'api_check_password');
     }
@@ -562,24 +564,26 @@ if ($form->validate()) {
             $sql = rtrim($sql, ',');
         }
     } else {
-        //normal behaviour
-        if(empty($changeemail) && isset($password)) {
-            $sql .= " email = y@u.com";
+        $add = array();
+
+        // normal behaviour
+        if (empty($changeemail) && isset($password)) {
+            $add[] = " email = 'y@u.com' ";
         }
         if (isset($changeemail) && !isset($password) && in_array('email', $available_values_to_modify)) {
-            $sql .= " email = '".Database::escape_string($changeemail)."'";
+            $add[] = " email = '" . Database::escape_string($changeemail) . "'";
         } elseif (isset($password) && isset($changeemail) && in_array('email', $available_values_to_modify) && in_array('password', $available_values_to_modify)) {
-            $sql .= " email = '".Database::escape_string($changeemail)."',";
+            $add[] = " email = '" . Database::escape_string($changeemail) . "'";
             $password = api_get_encrypted_password($password);
-            $sql .= " password = '".Database::escape_string($password)."'";
+            $add[] = " password = '" . Database::escape_string($password) . "'";
         } elseif (isset($password) && in_array('password', $available_values_to_modify)) {
             $password = api_get_encrypted_password($password);
-            $sql .= " password = '".Database::escape_string($password)."'";
-        } else {
-            // remove trailing , from the query we have so far
-            $sql = rtrim($sql, ',');
+            $add[] = " password = '" . Database::escape_string($password) . "'";
         }
+        $sql = rtrim($sql, ',');
+        $sql .= implode(',', $add);
     }
+
     if (api_get_setting('profile', 'officialcode') == 'true' && isset($user_data['official_code'])) {
         $sql .= ", official_code = '".Database::escape_string($user_data['official_code'])."'";
     }
@@ -631,15 +635,18 @@ if ($form->validate()) {
             $apiKeys = UserManager::get_api_keys(api_get_user_id(), 'subs');
             $apiKey = $apiKeys[$apiKeyId];
         }
-
-        try {
-            $response = $client->put(
-                $_configuration['course_subscriber_url'].'students/'.$externalUserId.'.json?apikey='.$apiKey,
-                array(),
-                json_encode($body)
-            )->send();
-        } catch (Exception $e) {
-            //var_dump($e->getMessage());
+        if (!empty($apiKey)) {
+            try {
+                $response = $client->put(
+                    $_configuration['course_subscriber_url'] . 'students/' . $externalUserId . '.json?apikey=' . $apiKey,
+                    array(),
+                    json_encode($body)
+                )->send();
+            } catch (Exception $e) {
+                //var_dump($e->getMessage());
+            }
+        } else {
+            error_log('missing api_key user_id: ' . api_get_user_id());
         }
     }
 

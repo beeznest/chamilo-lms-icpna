@@ -145,6 +145,9 @@ function save_item($lp_id, $user_id, $view_id, $item_id, $score = -1, $max = -1,
                 $mylpi->set_status($mystatus);
                 if ($debug > 1) { error_log('Done calling set_status for hotpotatoes - now '.$mylpi->get_status(false), 0); }
             }
+        } elseif ($my_type == 'sco') {
+            error_log('Setting status to completed');
+            $mylpi->set_status('completed');
         }
 
         if (isset($time) && $time != '' && $time != 'undefined') {
@@ -223,6 +226,8 @@ function save_item($lp_id, $user_id, $view_id, $item_id, $score = -1, $max = -1,
     if ($mylpi->get_type() != 'sco') {
         // If this object's JS status has not been updated by the SCORM API, update now.
         $return .= "olms.lesson_status='".$mystatus."';";
+    } else {
+        $return .= "olms.lesson_status='completed'";
     }
     $return .= "update_toc('".$mystatus."','".$item_id."');";
     $update_list = $mylp->get_update_queue();

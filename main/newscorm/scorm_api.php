@@ -1371,6 +1371,7 @@ function switch_item(current_item, next_item){
             xajax_switch_item_details(olms.lms_lp_id,olms.lms_user_id,olms.lms_view_id,olms.lms_item_id,next_item);
         }
     } else {
+        orig_lesson_status  = olms.lesson_status = 'completed';
         if (next_item_type != 'sco') {
             logit_lms('Case 3');
             //case 3
@@ -1459,6 +1460,7 @@ function switch_item(current_item, next_item){
             break;
     }
 
+
     var mysrc = 'lp_controller.php?action=content&lp_id='+olms.lms_lp_id+'&item_id='+next_item;
     var cont_f = $("#content_id");
 
@@ -1490,6 +1492,8 @@ function switch_item(current_item, next_item){
             }
         }
     });
+
+    window.frames['content_id'].GetRemoteTrackingAndSaveIt();
     return true;
 }
 

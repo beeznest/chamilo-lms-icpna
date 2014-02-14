@@ -458,51 +458,53 @@ if ($objExercise->review_answers) {
 }
 
 //----
-
 $exercise_stat_info = $objExercise->get_stat_track_exercise_info($learnpath_id, $learnpath_item_id, 0);
-//var_dump($exercise_stat_info);
-$attempt_list = null;
-if (isset($exercise_stat_info['exe_id'])) {
-    $attempt_list = get_all_exercise_event_by_exe_id($exercise_stat_info['exe_id']);
-    //var_dump($attempt_list);
+if ($exercise_stat_info['exe_cours_id'] == 'PLACEMENTTEST' && $objExercise->attempts == 1) {
 
-    if (!empty($attempt_list) && $objExercise->attempts > 0) {
-        $message = Display::return_message(get_lang('YouTriedToResolveThisExerciseEarlier'));
+    //var_dump($exercise_stat_info);
+    $attempt_list = null;
+    if (isset($exercise_stat_info['exe_id'])) {
+        $attempt_list = get_all_exercise_event_by_exe_id($exercise_stat_info['exe_id']);
+        //var_dump($attempt_list);
 
-        if (!empty($exercise_stat_info['start_date']) && $exercise_stat_info['status'] == 'incomplete') {
-            $attempts = getAllExerciseAttemptResultByUserNoStatusFilter(
-                $objExercise->id,
-                api_get_user_id(),
-                api_get_course_id(),
-                api_get_session_id(),
-                $learnpath_id,
-                $learnpath_item_id
-            );
+        if (!empty($attempt_list) && $objExercise->attempts > 0) {
+            $message = Display::return_message(get_lang('YouTriedToResolveThisExerciseEarlier'));
 
-            //var_dump($attempts);
+            if (!empty($exercise_stat_info['start_date']) && $exercise_stat_info['status'] == 'incomplete') {
+                $attempts = getAllExerciseAttemptResultByUserNoStatusFilter(
+                    $objExercise->id,
+                    api_get_user_id(),
+                    api_get_course_id(),
+                    api_get_session_id(),
+                    $learnpath_id,
+                    $learnpath_item_id
+                );
 
-            //if ($objExercise->selectAttempts() == 30) {
-            $startedDate = api_strtotime($exercise_stat_info['start_date']);
-            $current_timestamp = api_strtotime(api_get_utc_datetime());
+                //var_dump($attempts);
 
-            $expected_time = $startedDate + $objExercise->expired_time * 60;
-            $diff = $current_timestamp - $expected_time;
-            $countNotFinished = get_attempt_count_not_finished(api_get_user_id(), $objExercise->id, $learnpath_id, $learnpath_item_id);
-            $attempts = is_array($attempts) ? count($attempts) : 0;
-            //exit;
-            //var_dump($objExercise->attempts, $attempts);
+                //if ($objExercise->selectAttempts() == 30) {
+                $startedDate = api_strtotime($exercise_stat_info['start_date']);
+                $current_timestamp = api_strtotime(api_get_utc_datetime());
 
-            if ($diff > 0 && $objExercise->attempts == $attempts) {
-                $objExercise->attempts = $objExercise->attempts + 1;
-                $learnpath_item_view_id = isset($learnpath_item_view_id) ? $learnpath_item_view_id : 0;
+                $expected_time = $startedDate + $objExercise->expired_time * 60;
+                $diff = $current_timestamp - $expected_time;
+                $countNotFinished = get_attempt_count_not_finished(api_get_user_id(), $objExercise->id, $learnpath_id, $learnpath_item_id);
+                $attempts = is_array($attempts) ? count($attempts) : 0;
+                //exit;
+                //var_dump($objExercise->attempts, $attempts);
 
-                completeExerciseAttempt($exercise_stat_info['exe_id']);
-                //$_SESSION['try_once'] = true;
-                $redirectTo = 'Location: '.api_get_self().'?'.api_get_cidreq().$params;
-                header($redirectTo);
-                exit;
+                if ($diff > 0 && $objExercise->attempts == $attempts) {
+                    $objExercise->attempts = $objExercise->attempts + 1;
+                    $learnpath_item_view_id = isset($learnpath_item_view_id) ? $learnpath_item_view_id : 0;
+
+                    completeExerciseAttempt($exercise_stat_info['exe_id']);
+                    //$_SESSION['try_once'] = true;
+                    $redirectTo = 'Location: '.api_get_self().'?'.api_get_cidreq().$params;
+                    header($redirectTo);
+                    exit;
+                }
+                //}
             }
-            //}
         }
     }
 }

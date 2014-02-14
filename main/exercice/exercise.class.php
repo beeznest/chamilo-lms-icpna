@@ -4641,7 +4641,7 @@ class Exercise
         }
         if (!empty($message)) {
             global $extAuthSource;
-            $path = $extAuthSource['modules_path'];
+            $path = isset($extAuthSource['modules_path']) ? $extAuthSource['modules_path'] : null;
             $link = '<a href="' . $path . '">Regresa a la lista de módulos</a>';
             $message = Display :: return_message('Lo sentimos, no has alcanzado el puntaje mínimo para aprobar el módulo. ' . $link, 'warning', false);
         }

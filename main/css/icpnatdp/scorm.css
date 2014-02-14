@@ -24,6 +24,7 @@
 }
 
 .inner_lp_toc .scorm_item a {
+    color: #FFF;
     font-size: 12px;
     margin-right: 1px;
     padding-bottom: 2px;
@@ -46,7 +47,10 @@
 .inner_lp_toc .scorm_item_highlight {
     /*background-color: #d80100; */ /* Color Rojo */
     background-color: #0134A1;  /* Color Azul */
-    padding: 10px 10px 10px 35px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 35px;
+    padding-left: 40px;
     margin-top: 5px;
     margin-bottom: 5px;
     -webkit-border-radius: 5px;
@@ -74,7 +78,10 @@
 
 .inner_lp_toc .scorm_item_1 {
     /*background-color:#CCCCCC;*/
-    padding: 10px 35px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 35px;
+    padding-left: 40px;
     font-weight: normal;
     margin-top: 5px;
     margin-bottom: 5px;
@@ -86,7 +93,10 @@
 
 .inner_lp_toc .scorm_item_2 {
     /*background-color: #CCCCCC; */
-    padding: 10px 35px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 35px;
+    padding-left: 40px;
     text-decoration: none;
     font-weight: normal;
     margin-top: 5px;

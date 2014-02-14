@@ -489,6 +489,14 @@ $app->register(new Silex\Provider\SwiftmailerServiceProvider(), array(
     )
 ));
 
+use Guzzle\GuzzleServiceProvider;
+if (file_exists( api_get_path(SYS_CODE_PATH).'inc/conf/rest_services.json')) {
+    $app->register(new GuzzleServiceProvider(), array(
+        'guzzle.services' => api_get_path(SYS_CODE_PATH).'inc/conf/rest_services.json',
+        'guzzle.base_url' => $_configuration['course_subscriber_url']
+    ));
+}
+
 //if (isset($platform_email['SMTP_MAILER']) && $platform_email['SMTP_MAILER'] == 'smtp') {
 $app['mailer'] = $app->share(function ($app) {
     return new \Swift_Mailer($app['swiftmailer.transport']);

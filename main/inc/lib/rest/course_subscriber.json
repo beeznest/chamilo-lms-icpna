@@ -1,0 +1,12 @@
+{
+    "name": "Course subscriber",
+    "apiVersion": "1.1",
+    "description": "REST API client",
+    "operations": {
+        "UpdateUser": {
+            "httpMethod": "PUT",
+            "uri": "students",
+            "summary": "Updates a user"
+        }
+    }
+}

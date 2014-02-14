@@ -123,15 +123,10 @@ if ($user_data !== false) {
  * Initialize the form.
  */
 $form = new FormValidator('profile', 'post', api_get_self()."?".str_replace('&fe=1', '', $_SERVER['QUERY_STRING']), null, array('style' => 'width: 70%; float: '.($text_dir == 'rtl' ? 'right;' : 'left;')));
-
 $form->addElement('text', 'firstname', 'Nombre', array('size' => 40));
-
 $form->addElement('text', 'lastname',  'Apellido Paterno',  array('size' => 40));
-
 $form->addElement('text', 'extra_middlename',  'Apellido Materno',  array('size' => 40));
-
 $form->addElement('text', 'extra_DNI',  'DNI',  array('size' => 40));
-
 $form->applyFilter(array('lastname', 'firstname'), 'stripslashes');
 $form->applyFilter(array('lastname', 'firstname'), 'trim');
 
@@ -292,7 +287,6 @@ $form->setDefaults($user_data);
 
 /*		FUNCTIONS   */
 
-
 /**
  * Is user auth_source is platform ?
  *
@@ -429,7 +423,6 @@ if ($form->validate()) {
 
     //If user sending the email to be changed (input available and not frozen )
     if (api_get_setting('profile', 'email') == 'true') {
-
         if ($allow_users_to_change_email_with_no_password) {
             if (!check_user_email($user_data['email'])) {
                 $changeemail = $user_data['email'];
@@ -593,31 +586,6 @@ if ($form->validate()) {
 	$sql .= " WHERE user_id  = '".api_get_user_id()."'";
 	Database::query($sql);
 
-    /** @var Guzzle\Service\Client $client */
-    /*global $app;
-    $client = new $app['guzzle']['client'];
-    $externalUserId = $extra_data['extra_cs_user_id'];
-
-    $body = array(
-        'id' => $externalUserId,
-        'firstname' => $user_data['firstname'],
-        'lastname' => $user_data['lastname'],
-        'middlename' => $extra_data['extra_middlename']
-        //'email' => $user_data['email']
-    );
-    try {
-    $response = $client->put(
-        $_configuration['course_subscriber_url'].'students/'.$externalUserId.'.json',
-        array(),
-        json_encode($body)
-    )->send();
-    var_dump($response);
-    var_dump( $response->getBody());
-    } catch (Exception $e) {
-        var_dump($e->getMessage());
-    }
-    exit;*/
-
     //var_dump($command);
 
     //$responseModel = $client->execute($command);
@@ -640,6 +608,40 @@ if ($form->validate()) {
 			UserManager::update_extra_field_value(api_get_user_id(), $key, $value);
 		}
 	}
+
+    /** @var Guzzle\Service\Client $client */
+    global $app;
+    $client = new $app['guzzle']['client'];
+    $extra_data = UserManager::get_extra_user_data(api_get_user_id(), true);
+    $externalUserId = $extra_data['extra_cs_user_id'];
+
+    $body = array(
+        'id' => $externalUserId,
+        'firstname' => $user_data['firstname'],
+        'lastname' => $user_data['lastname'],
+        'middlename' => $extra_data['extra_middlename'],
+        //'email' => $user_data['email']
+    );
+
+    global $_configuration;
+    if (isset($_configuration['course_subscriber_url'])) {
+
+        $apiKeyId = UserManager::get_api_key_id(api_get_user_id(), 'subs');
+        if (!empty($apiKeyId)) {
+            $apiKeys = UserManager::get_api_keys(api_get_user_id(), 'subs');
+            $apiKey = $apiKeys[$apiKeyId];
+        }
+
+        try {
+            $response = $client->put(
+                $_configuration['course_subscriber_url'].'students/'.$externalUserId.'.json?apikey='.$apiKey,
+                array(),
+                json_encode($body)
+            )->send();
+        } catch (Exception $e) {
+            //var_dump($e->getMessage());
+        }
+    }
 
     // re-init the system to take new settings into account
     $_SESSION['_user']['uidReset'] = true;

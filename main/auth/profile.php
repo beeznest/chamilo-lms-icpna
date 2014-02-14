@@ -413,7 +413,8 @@ if ($form->validate()) {
 			$_SESSION['is_not_password'] = 'success';
 		}
 	}
-	if (empty($user_data['password0']) && !empty($user_data['password1'])) {
+
+    if (empty($user_data['password0']) && !empty($user_data['password1'])) {
 		$wrong_current_password = true;
 		$_SESSION['is_not_password'] = 'success';
 	}
@@ -424,6 +425,7 @@ if ($form->validate()) {
     }
 
     //If user sending the email to be changed (input available and not frozen )
+
     if (api_get_setting('profile', 'email') == 'true') {
         if ($allow_users_to_change_email_with_no_password) {
             if (!check_user_email($user_data['email'])) {
@@ -432,6 +434,7 @@ if ($form->validate()) {
             }
         } else {
             //Normal behaviour
+            //var_dump(!check_user_email($user_data['email']) ,  !empty($user_data['password0']) , !$wrong_current_password);
             if (!check_user_email($user_data['email']) && !empty($user_data['password0']) && !$wrong_current_password) {
                 $changeemail = $user_data['email'];
             }
@@ -552,23 +555,23 @@ if ($form->validate()) {
 	}
 
 	//change email
-	if ($allow_users_to_change_email_with_no_password) {
+    $add = array();
+
+    if ($allow_users_to_change_email_with_no_password) {
         if (isset($changeemail) && in_array('email', $available_values_to_modify)) {
-            $sql .= " email = '".Database::escape_string($changeemail)."',";
+            $add[] = " email = '" . Database::escape_string(
+                    $changeemail
+                ) . "',";
         }
         if (isset($password) && in_array('password', $available_values_to_modify)) {
             $password = api_get_encrypted_password($password);
-            $sql .= " password = '".Database::escape_string($password)."'";
-        } else {
-            // remove trailing , from the query we have so far
-            $sql = rtrim($sql, ',');
+            $add[] = " password = '" . Database::escape_string($password) . "'";
         }
     } else {
-        $add = array();
 
         // normal behaviour
         if (empty($changeemail) && isset($password)) {
-            $add[] = " email = 'y@u.com' ";
+            //$add[] = " email = 'y@u.com' ";
         }
         if (isset($changeemail) && !isset($password) && in_array('email', $available_values_to_modify)) {
             $add[] = " email = '" . Database::escape_string($changeemail) . "'";
@@ -580,9 +583,13 @@ if ($form->validate()) {
             $password = api_get_encrypted_password($password);
             $add[] = " password = '" . Database::escape_string($password) . "'";
         }
-        $sql = rtrim($sql, ',');
-        $sql .= implode(',', $add);
     }
+    if (!empty($add)) {
+        $sql .= implode(',', $add);
+    } else {
+        $sql = rtrim($sql, ',');
+    }
+
 
     if (api_get_setting('profile', 'officialcode') == 'true' && isset($user_data['official_code'])) {
         $sql .= ", official_code = '".Database::escape_string($user_data['official_code'])."'";
@@ -624,7 +631,8 @@ if ($form->validate()) {
         'firstname' => $user_data['firstname'],
         'lastname' => $user_data['lastname'],
         'middlename' => $extra_data['extra_middlename'],
-        //'email' => $user_data['email']
+        'email' => $changeemail,
+        'password' => $password
     );
 
     global $_configuration;

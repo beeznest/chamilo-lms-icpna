@@ -591,10 +591,7 @@ if ($form->validate()) {
         $sql .= ", official_code = '".Database::escape_string($user_data['official_code'])."'";
     }
 	$sql .= " WHERE user_id  = '".api_get_user_id()."'";
-    var_dump($sql);
 	Database::query($sql);
-
-
 
     /** @var Guzzle\Service\Client $client */
     /*global $app;

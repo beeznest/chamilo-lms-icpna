@@ -156,11 +156,8 @@ if (is_platform_authentication() && is_profile_editable() && api_get_setting('pr
     }
 }
 
-
-
-
 //	USERNAME
-$form->addElement('text', 'username', get_lang('UserName'), array('maxlength' => USERNAME_MAX_LENGTH, 'size' => USERNAME_MAX_LENGTH));
+/*$form->addElement('text', 'username', get_lang('UserName'), array('maxlength' => USERNAME_MAX_LENGTH, 'size' => USERNAME_MAX_LENGTH));
 if (api_get_setting('profile', 'login') !== 'true') {
 	$form->freeze('username');
 }
@@ -168,7 +165,7 @@ $form->applyFilter('username', 'stripslashes');
 $form->applyFilter('username', 'trim');
 $form->addRule('username', get_lang('ThisFieldIsRequired'), 'required');
 $form->addRule('username', get_lang('UsernameWrong'), 'username');
-$form->addRule('username', get_lang('UserTaken'), 'username_available', $user_data['username']);
+$form->addRule('username', get_lang('UserTaken'), 'username_available', $user_data['username']);*/
 
 //	OFFICIAL CODE
 if (CONFVAL_ASK_FOR_OFFICIAL_CODE) {
@@ -450,7 +447,6 @@ if ($form->validate()) {
         }
     }
 
-
 	// Upload picture if a new one is provided
 	if ($_FILES['picture']['size']) {
 		if ($new_picture = UserManager::update_user_picture(api_get_user_id(), $_FILES['picture']['name'], $_FILES['picture']['tmp_name'])) {
@@ -464,7 +460,7 @@ if ($form->validate()) {
 	}
 
 	//Remove production
-	if (is_array($user_data['remove_production'])) {
+	if (isset($user_data['remove_production']) && is_array($user_data['remove_production'])) {
 		foreach (array_keys($user_data['remove_production']) as $production) {
 			UserManager::remove_user_production(api_get_user_id(), urldecode($production));
 		}
@@ -476,7 +472,7 @@ if ($form->validate()) {
 	}
 
 	// upload production if a new one is provided
-	if ($_FILES['production']['size']) {
+	if (isset($_FILES['production']['size']) && $_FILES['production']['size']) {
 		$res = upload_user_production(api_get_user_id());
 		if (!$res) {
 			//it's a bit excessive to assume the extension is the reason why upload_user_production() returned false, but it's true in most cases
@@ -510,7 +506,7 @@ if ($form->validate()) {
 	//Adding missing variables
 
 	$available_values_to_modify = array();
-	foreach($profile_list as $key => $status) {
+	foreach ($profile_list as $key => $status) {
 	    if ($status == 'true') {
             switch($key) {
                 case 'login':
@@ -595,8 +591,39 @@ if ($form->validate()) {
         $sql .= ", official_code = '".Database::escape_string($user_data['official_code'])."'";
     }
 	$sql .= " WHERE user_id  = '".api_get_user_id()."'";
+    var_dump($sql);
 	Database::query($sql);
 
+
+
+    /** @var Guzzle\Service\Client $client */
+    /*global $app;
+    $client = new $app['guzzle']['client'];
+    $externalUserId = $extra_data['extra_cs_user_id'];
+
+    $body = array(
+        'id' => $externalUserId,
+        'firstname' => $user_data['firstname'],
+        'lastname' => $user_data['lastname'],
+        'middlename' => $extra_data['extra_middlename']
+        //'email' => $user_data['email']
+    );
+    try {
+    $response = $client->put(
+        $_configuration['course_subscriber_url'].'students/'.$externalUserId.'.json',
+        array(),
+        json_encode($body)
+    )->send();
+    var_dump($response);
+    var_dump( $response->getBody());
+    } catch (Exception $e) {
+        var_dump($e->getMessage());
+    }
+    exit;*/
+
+    //var_dump($command);
+
+    //$responseModel = $client->execute($command);
 
 	// User tag process
 	//1. Deleting all user tags

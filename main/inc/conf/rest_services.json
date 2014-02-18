@@ -1,0 +1,10 @@
+{
+    "services": {
+        "client": {
+            "class": "SubscriberClient",
+            "params": {
+                "version": "1.0"
+            }
+        }
+    }
+}

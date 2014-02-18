@@ -276,6 +276,19 @@ $(document).ready(function(){
 });
 </script>';
 
+$apiKeys = UserManager::get_all_api_keys($user_id);
+$keysToString = null;
+if (!empty($apiKeys)) {
+    $keys = array();
+    foreach ($apiKeys as $keyData) {
+        $keys[] = $keyData['api_service'].': '.$keyData['api_key'];
+    }
+    if (!empty($keys)) {
+        $keysToString = implode(',', $keys);
+    }
+}
+
+$form->addElement('static', 'api_key', get_lang('ApiKeys'), $keysToString);
 
 // Submit button
 $form->addElement('style_submit_button', 'submit', get_lang('ModifyInformation'), 'class="save"');

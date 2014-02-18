@@ -123,15 +123,10 @@ if ($user_data !== false) {
  * Initialize the form.
  */
 $form = new FormValidator('profile', 'post', api_get_self()."?".str_replace('&fe=1', '', $_SERVER['QUERY_STRING']), null, array('style' => 'width: 70%; float: '.($text_dir == 'rtl' ? 'right;' : 'left;')));
-
 $form->addElement('text', 'firstname', 'Nombre', array('size' => 40));
-
 $form->addElement('text', 'lastname',  'Apellido Paterno',  array('size' => 40));
-
 $form->addElement('text', 'extra_middlename',  'Apellido Materno',  array('size' => 40));
-
 $form->addElement('text', 'extra_DNI',  'DNI',  array('size' => 40));
-
 $form->applyFilter(array('lastname', 'firstname'), 'stripslashes');
 $form->applyFilter(array('lastname', 'firstname'), 'trim');
 
@@ -151,16 +146,15 @@ if (is_platform_authentication() && is_profile_editable() && api_get_setting('pr
     $form->addElement('password', 'password2', get_lang('Confirmation'), array('size' => 40));
     //	user must enter identical password twice so we can prevent some user errors
     $form->addRule(array('password1', 'password2'), get_lang('PassTwo'), 'compare');
+
+    $form->addRule('password1', get_lang('TooShort'), 'minlength', 6);
     if (CHECK_PASS_EASY_TO_FIND) {
         $form->addRule('password1', get_lang('CurrentPasswordEmptyOrIncorrect'), 'callback', 'api_check_password');
     }
 }
 
-
-
-
 //	USERNAME
-$form->addElement('text', 'username', get_lang('UserName'), array('maxlength' => USERNAME_MAX_LENGTH, 'size' => USERNAME_MAX_LENGTH));
+/*$form->addElement('text', 'username', get_lang('UserName'), array('maxlength' => USERNAME_MAX_LENGTH, 'size' => USERNAME_MAX_LENGTH));
 if (api_get_setting('profile', 'login') !== 'true') {
 	$form->freeze('username');
 }
@@ -168,7 +162,7 @@ $form->applyFilter('username', 'stripslashes');
 $form->applyFilter('username', 'trim');
 $form->addRule('username', get_lang('ThisFieldIsRequired'), 'required');
 $form->addRule('username', get_lang('UsernameWrong'), 'username');
-$form->addRule('username', get_lang('UserTaken'), 'username_available', $user_data['username']);
+$form->addRule('username', get_lang('UserTaken'), 'username_available', $user_data['username']);*/
 
 //	OFFICIAL CODE
 if (CONFVAL_ASK_FOR_OFFICIAL_CODE) {
@@ -295,7 +289,6 @@ $form->setDefaults($user_data);
 
 /*		FUNCTIONS   */
 
-
 /**
  * Is user auth_source is platform ?
  *
@@ -420,7 +413,8 @@ if ($form->validate()) {
 			$_SESSION['is_not_password'] = 'success';
 		}
 	}
-	if (empty($user_data['password0']) && !empty($user_data['password1'])) {
+
+    if (empty($user_data['password0']) && !empty($user_data['password1'])) {
 		$wrong_current_password = true;
 		$_SESSION['is_not_password'] = 'success';
 	}
@@ -431,8 +425,8 @@ if ($form->validate()) {
     }
 
     //If user sending the email to be changed (input available and not frozen )
-    if (api_get_setting('profile', 'email') == 'true') {
 
+    if (api_get_setting('profile', 'email') == 'true') {
         if ($allow_users_to_change_email_with_no_password) {
             if (!check_user_email($user_data['email'])) {
                 $changeemail = $user_data['email'];
@@ -440,6 +434,7 @@ if ($form->validate()) {
             }
         } else {
             //Normal behaviour
+            //var_dump(!check_user_email($user_data['email']) ,  !empty($user_data['password0']) , !$wrong_current_password);
             if (!check_user_email($user_data['email']) && !empty($user_data['password0']) && !$wrong_current_password) {
                 $changeemail = $user_data['email'];
             }
@@ -449,7 +444,6 @@ if ($form->validate()) {
             }
         }
     }
-
 
 	// Upload picture if a new one is provided
 	if ($_FILES['picture']['size']) {
@@ -464,7 +458,7 @@ if ($form->validate()) {
 	}
 
 	//Remove production
-	if (is_array($user_data['remove_production'])) {
+	if (isset($user_data['remove_production']) && is_array($user_data['remove_production'])) {
 		foreach (array_keys($user_data['remove_production']) as $production) {
 			UserManager::remove_user_production(api_get_user_id(), urldecode($production));
 		}
@@ -476,7 +470,7 @@ if ($form->validate()) {
 	}
 
 	// upload production if a new one is provided
-	if ($_FILES['production']['size']) {
+	if (isset($_FILES['production']['size']) && $_FILES['production']['size']) {
 		$res = upload_user_production(api_get_user_id());
 		if (!$res) {
 			//it's a bit excessive to assume the extension is the reason why upload_user_production() returned false, but it's true in most cases
@@ -510,7 +504,7 @@ if ($form->validate()) {
 	//Adding missing variables
 
 	$available_values_to_modify = array();
-	foreach($profile_list as $key => $status) {
+	foreach ($profile_list as $key => $status) {
 	    if ($status == 'true') {
             switch($key) {
                 case 'login':
@@ -561,42 +555,51 @@ if ($form->validate()) {
 	}
 
 	//change email
-	if ($allow_users_to_change_email_with_no_password) {
+    $add = array();
+
+    if ($allow_users_to_change_email_with_no_password) {
         if (isset($changeemail) && in_array('email', $available_values_to_modify)) {
-            $sql .= " email = '".Database::escape_string($changeemail)."',";
+            $add[] = " email = '" . Database::escape_string(
+                    $changeemail
+                ) . "',";
         }
         if (isset($password) && in_array('password', $available_values_to_modify)) {
             $password = api_get_encrypted_password($password);
-            $sql .= " password = '".Database::escape_string($password)."'";
-        } else {
-            // remove trailing , from the query we have so far
-            $sql = rtrim($sql, ',');
+            $add[] = " password = '" . Database::escape_string($password) . "'";
         }
     } else {
-        //normal behaviour
-        if(empty($changeemail) && isset($password)) {
-            $sql .= " email = y@u.com";
+
+        // normal behaviour
+        if (empty($changeemail) && isset($password)) {
+            //$add[] = " email = 'y@u.com' ";
         }
         if (isset($changeemail) && !isset($password) && in_array('email', $available_values_to_modify)) {
-            $sql .= " email = '".Database::escape_string($changeemail)."'";
+            $add[] = " email = '" . Database::escape_string($changeemail) . "'";
         } elseif (isset($password) && isset($changeemail) && in_array('email', $available_values_to_modify) && in_array('password', $available_values_to_modify)) {
-            $sql .= " email = '".Database::escape_string($changeemail)."',";
+            $add[] = " email = '" . Database::escape_string($changeemail) . "'";
             $password = api_get_encrypted_password($password);
-            $sql .= " password = '".Database::escape_string($password)."'";
+            $add[] = " password = '" . Database::escape_string($password) . "'";
         } elseif (isset($password) && in_array('password', $available_values_to_modify)) {
             $password = api_get_encrypted_password($password);
-            $sql .= " password = '".Database::escape_string($password)."'";
-        } else {
-            // remove trailing , from the query we have so far
-            $sql = rtrim($sql, ',');
+            $add[] = " password = '" . Database::escape_string($password) . "'";
         }
     }
+    if (!empty($add)) {
+        $sql .= implode(',', $add);
+    } else {
+        $sql = rtrim($sql, ',');
+    }
+
+
     if (api_get_setting('profile', 'officialcode') == 'true' && isset($user_data['official_code'])) {
         $sql .= ", official_code = '".Database::escape_string($user_data['official_code'])."'";
     }
 	$sql .= " WHERE user_id  = '".api_get_user_id()."'";
 	Database::query($sql);
 
+    //var_dump($command);
+
+    //$responseModel = $client->execute($command);
 
 	// User tag process
 	//1. Deleting all user tags
@@ -616,6 +619,44 @@ if ($form->validate()) {
 			UserManager::update_extra_field_value(api_get_user_id(), $key, $value);
 		}
 	}
+
+    /** @var Guzzle\Service\Client $client */
+    global $app;
+    $client = new $app['guzzle']['client'];
+    $extra_data = UserManager::get_extra_user_data(api_get_user_id(), true);
+    $externalUserId = $extra_data['extra_cs_user_id'];
+
+    $body = array(
+        'id' => $externalUserId,
+        'firstname' => $user_data['firstname'],
+        'lastname' => $user_data['lastname'],
+        'middlename' => $extra_data['extra_middlename'],
+        'email' => $changeemail,
+        'password' => $password
+    );
+
+    global $_configuration;
+    if (isset($_configuration['course_subscriber_url'])) {
+
+        $apiKeyId = UserManager::get_api_key_id(api_get_user_id(), 'subs');
+        if (!empty($apiKeyId)) {
+            $apiKeys = UserManager::get_api_keys(api_get_user_id(), 'subs');
+            $apiKey = $apiKeys[$apiKeyId];
+        }
+        if (!empty($apiKey)) {
+            try {
+                $response = $client->put(
+                    $_configuration['course_subscriber_url'] . 'students/' . $externalUserId . '.json?apikey=' . $apiKey,
+                    array(),
+                    json_encode($body)
+                )->send();
+            } catch (Exception $e) {
+                //var_dump($e->getMessage());
+            }
+        } else {
+            error_log('missing api_key user_id: ' . api_get_user_id());
+        }
+    }
 
     // re-init the system to take new settings into account
     $_SESSION['_user']['uidReset'] = true;

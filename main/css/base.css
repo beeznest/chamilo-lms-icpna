@@ -4126,7 +4126,7 @@ footer {
     padding: 10px 0px 10px 0px;
     text-decoration: none;
     font-weight: normal;
-    /* background:#FDFDFD; 
+    /* background:#FDFDFD;
 }
 
 .inner_lp_toc .scorm_item_2 {
@@ -4749,9 +4749,9 @@ i.size-32.icon-new-work{
     z-index: 1005 !important;
 }
 
-
 .exercise_save_mini_message {
-    padding-left: 5px;
+    width: 22px;
+    height: 22px;
 }
 
 .xdebug-error {
@@ -4761,13 +4761,9 @@ i.size-32.icon-new-work{
     height: 35px;
     margin-bottom: 15px;
 }
-.exercise_save_mini_message {
-    margin-left: 5px;
-}
 #learning_path_left_zone .no-border {
     border: 0px;
 }
-
 
 .highlight_image_selected img {
     border: 5px solid #0088cc;
@@ -4834,11 +4830,19 @@ i.size-32.icon-new-work{
     color: #000;
 }
 
-
 .item_added {
     float:left;
 }
 
+.save_image_div {
+    background-image: url('../img/icons/22/save.png');
+    height: 24px;
+    width: 24px;
+}
 
-
+.error_image_div {
+    background-image: url('../img/icons/22/error.png');
+    height: 24px;
+    width: 24px;
+}
 

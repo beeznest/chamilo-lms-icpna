@@ -877,10 +877,22 @@ $server->wsdl->addComplexType(
     )
 );
 
+$server->wsdl->addComplexType(
+    'result_create_user_password_crypted',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'user_id' => array('name' => 'user_id', 'type' => 'xsd:string'),
+        'api_key' => array('name' => 'api_key', 'type' => 'xsd:string')
+    )
+);
+
 // Register the method to expose
 $server->register('WSCreateUserPasswordCrypted',                            // method name
     array('createUserPasswordCrypted' => 'tns:createUserPasswordCrypted'),	// input parameters
-    array('return' => 'xsd:string'),								        // output parameters
+    array('return' => 'tns:result_create_user_password_crypted'),								        // output parameters
     'urn:WSRegistration',													// namespace
     'urn:WSRegistration#WSCreateUserPasswordCrypted',                       // soapaction
     'rpc',																	// style
@@ -1046,7 +1058,7 @@ function WSCreateUserPasswordCrypted($params) {
     if ($debug) error_log($sql);
 
     $result = Database::query($sql);
-
+    $apiKey = null;
     if ($result) {
         $return = Database::insert_id();
 
@@ -1071,12 +1083,29 @@ function WSCreateUserPasswordCrypted($params) {
                 $res = UserManager::update_extra_field_value($return, $extra_field_name, $extra_field_value);
             }
         }
+
+        // Creating api keys:
+        $service = 'subs';
+        $apiExists = Usermanager::get_api_key_id($return, $service);
+        if (!$apiExists) {
+            $apiId = UserManager::add_api_key($return, $service);
+            if ($apiId) {
+                $apiKeys = Usermanager::get_api_keys($return, $service);
+                $apiKey = isset($apiKeys[$apiId]) ? $apiKeys[$apiId] : null;
+            }
+        }
+
     } else {
         $error = Database::error();
         if ($debug) error_log($error);
         return 0;
     }
-    return $return;
+
+    return array(
+        'user_id' => $return,
+        'api_key' => $apiKey
+    );
+
 }
 
 /* Register WSEditUsers function */

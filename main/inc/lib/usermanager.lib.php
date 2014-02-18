@@ -184,7 +184,7 @@ class UserManager {
         if (empty($params['user_id'])) {
             return false;
         }
-        
+
         if (isset($params['password'])) {
             if (empty($params['encrypt_method'])) {
                 $params['password'] = api_get_encrypted_password($params['password']);
@@ -2337,7 +2337,7 @@ class UserManager {
             }
         }
         if (Database::num_rows($result1) > 0) {
-            // Now add the diff with $row1, ordering elements as planned by 
+            // Now add the diff with $row1, ordering elements as planned by
             //   query
             $i = 0;
             while ($row1 = Database::fetch_array($result1)) {
@@ -2381,7 +2381,7 @@ class UserManager {
 
                 $session_id = $row['id'];
                 //$session_info = api_get_session_info($session_id);
-                // The only usage of $session_info is to call 
+                // The only usage of $session_info is to call
                 // api_get_session_date_valudation, which only needs id and
                 // dates from the session itself, so really no need to query
                 // the session table again
@@ -2717,8 +2717,8 @@ class UserManager {
         if ($user_id != strval(intval($user_id))) return false;
         if (empty($user_id)) { $user_id = api_get_user_id(); }
         if ($user_id === false) return false;
-        $service_name = Database::escape_string($api_service);
-        if (is_string($service_name) === false) { return false;}
+        $api_service = Database::escape_string($api_service);
+        if (is_string($api_service) === false) { return false;}
         $t_api = Database::get_main_table(TABLE_MAIN_USER_API_KEY);
         $sql = "SELECT * FROM $t_api WHERE user_id = $user_id AND api_service='$api_service';";
         $res = Database::query($sql);
@@ -2728,6 +2728,23 @@ class UserManager {
         $list = array();
         while ($row = Database::fetch_array($res)) {
             $list[$row['id']] = $row['api_key'];
+        }
+        return $list;
+    }
+
+    public static function get_all_api_keys($user_id = null) {
+        if ($user_id != strval(intval($user_id))) return false;
+        if (empty($user_id)) { $user_id = api_get_user_id(); }
+        if ($user_id === false) return false;
+        $t_api = Database::get_main_table(TABLE_MAIN_USER_API_KEY);
+        $sql = "SELECT * FROM $t_api WHERE user_id = $user_id";
+        $res = Database::query($sql);
+        if ($res === false) return false; //error during query
+        $num = Database::num_rows($res);
+        if ($num == 0) return false;
+        $list = array();
+        while ($row = Database::fetch_array($res, 'ASSOC')) {
+            $list[$row['id']] = $row;
         }
         return $list;
     }
@@ -2805,14 +2822,14 @@ class UserManager {
     public static function get_api_key_id($user_id, $api_service) {
         if ($user_id != strval(intval($user_id))) return false;
         if ($user_id === false) return false;
-    if (empty($api_service)) return false;
+        if (empty($api_service)) return false;
         $t_api = Database::get_main_table(TABLE_MAIN_USER_API_KEY);
-        $service_name = Database::escape_string($api_service);
+        $api_service = Database::escape_string($api_service);
         $sql = "SELECT id FROM $t_api WHERE user_id=".$user_id." AND api_service='".$api_service."'";
         $res = Database::query($sql);
-    if (Database::num_rows($res)<1) {
-        return false;
-    }
+        if (Database::num_rows($res)<1) {
+            return false;
+        }
         $row = Database::fetch_array($res, 'ASSOC');
         return $row['id'];
     }

@@ -141,7 +141,7 @@ if (api_get_setting('profile', 'email') !== 'true') {
 
 //	PASSWORD, if auth_source is platform
 if (is_platform_authentication() && is_profile_editable() && api_get_setting('profile', 'password') == 'true') {
-    $form->addElement('password', 'password0', array(get_lang('Pass'), get_lang('Enter2passToChange')), array('size' => 40));
+    $form->addElement('password', 'password0', array(get_lang('CurrentPass')), array('size' => 40));
     $form->addElement('password', 'password1', get_lang('NewPass'), array('size' => 40));
     $form->addElement('password', 'password2', get_lang('Confirmation'), array('size' => 40));
     //	user must enter identical password twice so we can prevent some user errors
@@ -267,7 +267,18 @@ $jquery_ready_content = $return_params['jquery_ready_content'];
 // the $jquery_ready_content variable collects all functions that will be load in the $(document).ready javascript function
 $htmlHeadXtra[] ='<script>
 $(document).ready(function(){
+
+        if ($(\'[name="password0"]\').parent().parent()) {
+            $(\'[name="password0"]\').parent()
+            .parent().html("<div class=\'alert alert-warning alert-dismissable\'> " +
+            "<button type=\'button\' class=\'close\' data-dismiss=\'alert\' aria-hidden=\'true\'>&times;</button><b>' .  
+            get_lang('Enter2passToChange') . ' </b></div>" + 
+            $(\'[name="password0"]\').parent().parent().html());
+        }
+
 	'.$jquery_ready_content.'
+            
+
 });
 </script>';
 

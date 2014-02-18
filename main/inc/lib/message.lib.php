@@ -1226,7 +1226,7 @@ class MessageManager
 
         $table->set_header(1,get_lang('Messages'),false);
         $table->set_header(2,get_lang('Date'),true, array('style' => 'width:180px;'));
-        $table->set_header(3,get_lang('Modify'),false,array ('style' => 'width:70px;'));
+        $table->set_header(3,get_lang('DeleteInbox'),false,array ('style' => 'width:70px;'));
 
         if (isset($_REQUEST['f']) && $_REQUEST['f']=='social') {
             $parameters['f'] = 'social';

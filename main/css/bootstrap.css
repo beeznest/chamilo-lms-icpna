@@ -2997,12 +2997,12 @@ table [class*=span],
 .close {
   float: right;
   font-size: 20px;
-  font-weight: bold;
   line-height: 20px;
   color: #000000;
+/*font-weight: bold;
   text-shadow: 0 1px 0 #ffffff;
   opacity: 0.2;
-  filter: alpha(opacity=20);
+  filter: alpha(opacity=20);*/
 }
 
 .close:hover {

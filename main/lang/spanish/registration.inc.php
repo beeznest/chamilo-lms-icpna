@@ -4,7 +4,7 @@ for more information: see languages.txt in the lang folder.
 */
 $langShouldBeCSVFormat = "El archivo debe estar formato CSV. No añada espacios. La estructura debe ser exactamente :";
 $langTracking = "Seguimiento";
-$langEnter2passToChange = "Para cambiar la contraseña, introduzca la nueva contraseña en estos dos campos. Si desea mantener la actual, deje vacíos los dos campos.";
+$langEnter2passToChange = "Para cambiar su contraseña, introduzca la contraseña actual y luego dos veces su nueva contraseña. Recuerde que su nueva contraseña no debe tener menos de 6 caracteres. Si no desea cambiar su contraseña deje los tres campos vacios.";
 $langAuthInfo = "Autentificación";
 $langUpdateImage = "Cambiar foto";
 $langImageWrong = "El archivo debe tener un tamaño menor de";
@@ -187,4 +187,5 @@ $TheTeacherCanQualifyEvaluateAndKeepTrackOfAllStudentsEnrolledInTheCourse = "El 
 $LoginOrEmailAddress = "Nombre de usuario o dirección e-mail";
 $AtOnce = "Inmediatamente";
 $Daily = "A diario";
+$langCurrentPass = "Contraseña actual";
 ?>

@@ -1414,5 +1414,7 @@ $DataTableSearch = "Buscar";
 $HideColumn = "Ocultar columna";
 $DisplayColumn = "Mostrar columna";
 $LegalAgreementAccepted = "Condiciones legales aceptadas";
-$Welcome="Bienvenido";
+$Welcome = "Bienvenido";
+$MyAccount = "Mi cuenta";
+$DeleteInbox = "Borrar";
 ?>

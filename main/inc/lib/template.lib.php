@@ -535,7 +535,7 @@ class Template {
         $this->assign('text_direction', api_get_text_direction());
         $this->assign('section_name', 'section-' . $this_section);
 
-        $favico = '<link rel="shortcut icon" href="' . api_get_path(WEB_PATH) . 'favicon.ico" type="image/x-icon" />';
+        $favico = '<link rel="shortcut icon" href="' . api_get_path(WEB_PATH) . 'favicon.ico?v1" type="image/x-icon" />';
 
         if (isset($_configuration['multiple_access_urls']) && $_configuration['multiple_access_urls']) {
             $access_url_id = api_get_current_access_url_id();

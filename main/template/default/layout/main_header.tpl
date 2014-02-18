@@ -52,9 +52,9 @@
                       <span class="welcome">{{"Welcome"|get_lang}}</span><br />
                       <span class="username">{{_u.firstname}}</span></span></a>
                       <ul>
-                         <li class="home"><a href='{{ _p.web_main }}social/home.php'><span>{{ "Profile" |get_lang }}</span></a></li>
-                         <li class="email"><a href='{{ _p.web_main }}messages/inbox.php?f=social'><span>{{ "Inbox" |get_lang }}</span></a></li>
-                         <li class="edit"><a href='{{ _p.web_main }}auth/profile.php'><span>{{ "EditProfile" |get_lang }}</span></a></li>
+                         <!-- <li class="home"><a href='{{ _p.web_main }}social/home.php'><span>{{ "Profile" |get_lang }}</span></a></li>
+                         <li class="email"><a href='{{ _p.web_main }}messages/inbox.php?f=social'><span>{{ "Inbox" |get_lang }}</span></a></li> -->
+                         <li class="edit"><a href='{{ _p.web_main }}social/home.php'><span>{{ "MyAccount" |get_lang }}</span></a></li>
                          <li class="close"><a href='{{ logout_link }}'><span>{{ "Logout" |get_lang }}</span></a></li>
                       </ul>
                       </li>

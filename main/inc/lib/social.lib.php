@@ -489,8 +489,8 @@ class SocialManager extends UserManager {
                 }
                 if (api_get_user_id() == $user_id) {
                     $html .= '<div id="edit_image" class="perfil_edit">';
-                    $html.='<div>'.get_lang('Welcome').': '.$user_info['lastname'].', '.$user_info['firstname'].'</div>';
-                    $html .= '<a href="'.api_get_path(WEB_PATH).'main/auth/profile.php">('.get_lang('EditProfile').')</a></div>';
+                    $html.='<div>'.get_lang('Welcome').': '.$user_info['lastname'].', '.$user_info['firstname'].'</div></div>';
+//                    $html .= '<a href="'.api_get_path(WEB_PATH).'main/auth/profile.php">('.get_lang('EditProfile').')</a>';
                 }
             $html .= '</div>';
             $htm .='</div>';
@@ -500,7 +500,7 @@ class SocialManager extends UserManager {
 
             $html .= '<div class="sidebar-nav"><ul class="nav nav-list">';
             $active = $show=='home' ? 'active' : null;
-            $html .= '<li class="'.$active.'"><a href="'.api_get_path(WEB_PATH).'main/social/home.php">'.Display::return_icon('home-new.png',get_lang('Home'),array()).get_lang('Home').'</a></li>';
+            $html .= '<li class="'.$active.'"><a href="'.api_get_path(WEB_PATH).'main/auth/profile.php">'.Display::return_icon('profile.png',get_lang('Home'),array()). get_lang('Profile') .'</a></li>';
             $active = $show=='messages' ? 'active' : null;
             $html .= '<li class="'.$active.'"><a href="'.api_get_path(WEB_PATH).'main/messages/inbox.php?f=social">'.Display::return_icon('instant_message-new.png',get_lang('Messages'),array()).get_lang('Messages').$count_unread_message.'</a></li>';
 /*

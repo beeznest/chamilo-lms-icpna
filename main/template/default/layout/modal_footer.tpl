@@ -272,6 +272,28 @@
                                     PC o laptop, tablet y smartphone.</p>
                         </ol>
                 </ol>
+                <p AliGN=JUSTIFY STYLE="margin-left: 1.27cm; margin-bottom: 0cm; line-height: 100%; page-break-before: always">
+                    <br>
+                </p>
+                <ol START=20>
+                    <li><p AliGN=JUSTIFY STYLE="margin-bottom: 0cm; line-height: 100%"><b>¿Desde qué dispositivos se recomienda llevar el programa?</b></p>
+                        <ol TYPE=a>
+                            <li><p AliGN=JUSTIFY STYLE="margin-bottom: 0cm; line-height: 100%">La Lección A debe trabajarse en la PC o Laptop. Para
+                                    seguir practicando donde desees, la Lección B se puede trabajar en cualquier dispositivo móvil.</p>
+                        </ol>
+                </ol>
+                <p AliGN=JUSTIFY STYLE="margin-left: 1.27cm; margin-bottom: 0cm; line-height: 100%; page-break-before: always">
+                    <br>
+                </p>
+                <ol START=20>
+                    <li><p AliGN=JUSTIFY STYLE="margin-bottom: 0cm; line-height: 100%"><b>¿Existe equivalencia entre el certificado del programa
+                                V-Learning y el certificado del programa presencial ICPNA?</b></p>
+                        <ol TYPE=a>
+                            <li><p AliGN=JUSTIFY STYLE="margin-bottom: 0cm; line-height: 100%">No existe equivalencia alguna entre los dos certificados.
+                                    Ya que el programa V-Learning no sustituye al certificado del programa
+                                    presencial ICPNA, puesto que se trata de dos entornos diferentes.</p>
+                        </ol>
+                </ol>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
@@ -424,6 +446,10 @@
                             Si el alumno no
                             registra avance en el Curso en 60 días, se procederá a su
                             desafiliación de manera automática</p>
+                </ol>
+                <ol START=7>
+                    <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
+                            El alumno deberá tener en cuenta que la Lección A debe trabajarse en una PC o Laptop. Para seguir practicando donde lo desee, la Lección B se puede trabajar en cualquier dispositivo móvil.</p>
                 </ol>
                 <p CLASS="western" STYLE="margin-bottom: 0.35cm">
                 </p>

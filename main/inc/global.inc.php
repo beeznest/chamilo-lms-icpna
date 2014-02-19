@@ -366,11 +366,11 @@ if (!($conn_return = @Database::connect(
         'password'      => $_configuration['db_password'],
         'persistent'    => $_configuration['db_persistent_connection'] // When $_configuration['db_persistent_connection'] is set, it is expected to be a boolean type.
     )))) {
-    $app->abort(500, "Database is unavailable"); //error 3
+    $app->abort(500, "La base de datos se encuentra bajo alta carga en este momento. Por favor, recargue este sitio dentro de un momento"); //error 3
 }
 
 if (!$_configuration['db_host']) {
-    $app->abort(500, "Database is unavailable"); //error 3
+    $app->abort(500, "La base de datos se encuentra bajo alta carga en este momento. Por favor, recargue este sitio dentro de un momento"); //error 3
 }
 
 
@@ -396,7 +396,7 @@ if (!empty($_configuration['multiple_access_urls'])) {
 Database::query("set session sql_mode='';");
 
 if (!Database::select_db($_configuration['main_database'], $database_connection)) {
-    $app->abort(500, "Database is unavailable"); //error 3
+    $app->abort(500, "La base de datos se encuentra bajo alta carga en este momento. Por favor, recargue este sitio dentro de un momento"); //error 3
 }
 
 /*   Initialization of the default encodings */

@@ -66,6 +66,10 @@ $social_right_content .= '<h3>'.get_lang('Profile').'</h3>';
 
 $list = array(
     array(
+        'title' => 'DNI',
+        'content' => $user_info['extra']['DNI']
+    ),
+    array(
         'title' => 'Nombre',
         'content' => $user_info['firstname']
     ),
@@ -76,10 +80,6 @@ $list = array(
     array(
         'title' => 'Apellido Materno',
         'content' => $user_info['extra']['middlename']
-    ),
-    array(
-        'title' => 'DNI',
-        'content' => $user_info['extra']['DNI']
     ),
     array(
         'title' => 'Correo electrónico',

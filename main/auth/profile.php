@@ -123,10 +123,10 @@ if ($user_data !== false) {
  * Initialize the form.
  */
 $form = new FormValidator('profile', 'post', api_get_self()."?".str_replace('&fe=1', '', $_SERVER['QUERY_STRING']), null, array('style' => 'width: 70%; float: '.($text_dir == 'rtl' ? 'right;' : 'left;')));
+$form->addElement('text', 'extra_DNI',  'DNI o CE',  array('size' => 40, 'disabled' => 'disabled'));
 $form->addElement('text', 'firstname', 'Nombre', array('size' => 40));
 $form->addElement('text', 'lastname',  'Apellido Paterno',  array('size' => 40));
 $form->addElement('text', 'extra_middlename',  'Apellido Materno',  array('size' => 40));
-$form->addElement('text', 'extra_DNI',  'DNI',  array('size' => 40));
 $form->applyFilter(array('lastname', 'firstname'), 'stripslashes');
 $form->applyFilter(array('lastname', 'firstname'), 'trim');
 
@@ -210,7 +210,7 @@ $form->addRule('phone', get_lang('EmailWrong'), 'email');*/
 
 //	PICTURE
 if (is_profile_editable() && api_get_setting('profile', 'picture') == 'true') {
-	$form->addElement('file', 'picture', ($user_data['picture_uri'] != '' ? get_lang('UpdateImage') : get_lang('AddImage')));
+	$form->addElement('file', 'picture', ($user_data['picture_uri'] != '' ? get_lang('UpdateImage') : get_lang('AddImage')), ' accept="image/*"');
 	$form->add_progress_bar();
 	if (!empty($user_data['picture_uri'])) {
 		$form->addElement('checkbox', 'remove_picture', null, get_lang('DelImage'));

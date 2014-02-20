@@ -15,9 +15,6 @@ use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 * relation changes
 *
 * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
-* @package Gedmo.Sluggable.Handler
-* @subpackage InversedRelativeSlugHandler
-* @link http://www.gediminasm.org
 * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
 */
 class InversedRelativeSlugHandler implements SlugHandlerInterface
@@ -48,7 +45,7 @@ class InversedRelativeSlugHandler implements SlugHandlerInterface
     /**
      * {@inheritDoc}
      */
-    public function onChangeDecision(SluggableAdapter $ea, $slugFieldConfig, $object, &$slug, &$needToChangeSlug)
+    public function onChangeDecision(SluggableAdapter $ea, array &$config, $object, &$slug, &$needToChangeSlug)
     {}
 
     /**

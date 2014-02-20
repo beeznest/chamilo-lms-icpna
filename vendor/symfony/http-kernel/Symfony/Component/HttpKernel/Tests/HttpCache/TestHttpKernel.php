@@ -23,9 +23,10 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
     protected $body;
     protected $status;
     protected $headers;
-    protected $called;
+    protected $called = false;
     protected $customizer;
-    protected $catch;
+    protected $catch = false;
+    protected $backendRequest;
 
     public function __construct($body, $status, $headers, \Closure $customizer = null)
     {
@@ -33,15 +34,19 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
         $this->status = $status;
         $this->headers = $headers;
         $this->customizer = $customizer;
-        $this->called = false;
-        $this->catch = false;
 
         parent::__construct(new EventDispatcher(), $this);
+    }
+
+    public function getBackendRequest()
+    {
+        return $this->backendRequest;
     }
 
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = false)
     {
         $this->catch = $catch;
+        $this->backendRequest = $request;
 
         return parent::handle($request, $type, $catch);
     }

@@ -15,11 +15,9 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 
-abstract class AbstractLayoutTest extends FormIntegrationTestCase
+abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormIntegrationTestCase
 {
-    protected $csrfProvider;
-
-    protected $factory;
+    protected $csrfTokenManager;
 
     protected function setUp()
     {
@@ -29,7 +27,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         \Locale::setDefault('en');
 
-        $this->csrfProvider = $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface');
+        $this->csrfTokenManager = $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface');
 
         parent::setUp();
     }
@@ -37,14 +35,15 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     protected function getExtensions()
     {
         return array(
-            new CsrfExtension($this->csrfProvider),
+            new CsrfExtension($this->csrfTokenManager),
         );
     }
 
     protected function tearDown()
     {
-        $this->csrfProvider = null;
-        $this->factory = null;
+        $this->csrfTokenManager = null;
+
+        parent::tearDown();
     }
 
     protected function assertXpathNodeValue(\DomElement $element, $expression, $nodeValue)
@@ -77,8 +76,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             $this->fail(sprintf(
                 "Failed asserting that \n\n%s\n\nmatches exactly %s. Matches %s in \n\n%s",
                 $expression,
-                $count == 1 ? 'once' : $count . ' times',
-                $nodeList->length == 1 ? 'once' : $nodeList->length . ' times',
+                $count == 1 ? 'once' : $count.' times',
+                $nodeList->length == 1 ? 'once' : $nodeList->length.' times',
                 // strip away <root> and </root>
                 substr($dom->saveHTML(), 6, -8)
             ));
@@ -100,6 +99,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertMatchesXpath($html, $xpath);
     }
 
+    abstract protected function renderForm(FormView $view, array $vars = array());
+
     abstract protected function renderEnctype(FormView $view);
 
     abstract protected function renderLabel(FormView $view, $label = null, array $vars = array());
@@ -111,6 +112,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     abstract protected function renderRow(FormView $view, array $vars = array());
 
     abstract protected function renderRest(FormView $view, array $vars = array());
+
+    abstract protected function renderStart(FormView $view, array $vars = array());
+
+    abstract protected function renderEnd(FormView $view, array $vars = array());
 
     abstract protected function setTheme(FormView $view, array $themes);
 
@@ -281,8 +286,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testErrors()
     {
         $form = $this->factory->createNamed('name', 'text');
-        $form->addError(new FormError('Error 1'));
-        $form->addError(new FormError('Error 2'));
+        $form->addError(new FormError('[trans]Error 1[/trans]'));
+        $form->addError(new FormError('[trans]Error 2[/trans]'));
         $view = $form->createView();
         $html = $this->renderErrors($view);
 
@@ -297,8 +302,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         );
     }
 
-    public function testWidgetById()
+    public function testOverrideWidgetBlock()
     {
+        // see custom_widgets.html.twig
         $form = $this->factory->createNamed('text_id', 'text');
         $html = $this->renderWidget($form->createView());
 
@@ -364,10 +370,22 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             'expanded' => false,
         ));
 
+        // If the field is collapsed, has no "multiple" attribute, is required but
+        // has *no* empty value, the "required" must not be added, otherwise
+        // the resulting HTML is invalid.
+        // https://github.com/symfony/symfony/issues/8942
+
+        // HTML 5 spec
+        // http://www.w3.org/html/wg/drafts/html/master/forms.html#placeholder-label-option
+
+        // "If a select element has a required attribute specified, does not
+        //  have a multiple attribute specified, and has a display size of 1,
+        //  then the select element must have a placeholder label option."
+
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
     [@name="name"]
-    [@required="required"]
+    [not(@required)]
     [
         ./option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
@@ -389,7 +407,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertWidgetMatchesXpath($form->createView(), array('separator' => '-- sep --'),
 '/select
     [@name="name"]
-    [@required="required"]
+    [not(@required)]
     [
         ./option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
         /following-sibling::option[@disabled="disabled"][not(@selected)][.="-- sep --"]
@@ -412,7 +430,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertWidgetMatchesXpath($form->createView(), array('separator' => null),
 '/select
     [@name="name"]
-    [@required="required"]
+    [not(@required)]
     [
         ./option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
@@ -434,7 +452,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertWidgetMatchesXpath($form->createView(), array('separator' => ''),
 '/select
     [@name="name"]
-    [@required="required"]
+    [not(@required)]
     [
         ./option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
         /following-sibling::option[@disabled="disabled"][not(@selected)][.=""]
@@ -522,7 +540,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [@name="name"]
     [not(@required)]
     [
-        ./option[@value=""][not(@selected)][.="[trans]Select&Anything&Not&Me[/trans]"]
+        ./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Select&Anything&Not&Me[/trans]"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
@@ -541,12 +559,15 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             'empty_value' => 'Test&Me'
         ));
 
+        // The "disabled" attribute was removed again due to a bug in the
+        // BlackBerry 10 browser.
+        // See https://github.com/symfony/symfony/pull/7678
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
     [@name="name"]
     [@required="required"]
     [
-        ./option[@value=""][.="[trans]Test&Me[/trans]"]
+        ./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Test&Me[/trans]"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
@@ -564,12 +585,15 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             'expanded' => false,
         ));
 
+        // The "disabled" attribute was removed again due to a bug in the
+        // BlackBerry 10 browser.
+        // See https://github.com/symfony/symfony/pull/7678
         $this->assertWidgetMatchesXpath($form->createView(), array('empty_value' => ''),
 '/select
     [@name="name"]
     [@required="required"]
     [
-        ./option[@value=""][.="[trans][/trans]"]
+        ./option[@value=""][not(@selected)][not(@disabled)][.="[trans][/trans]"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
@@ -629,7 +653,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         );
     }
 
-    public function testMultipleChoiceSkipEmptyValue()
+    public function testMultipleChoiceSkipsEmptyValue()
     {
         $form = $this->factory->createNamed('name', 'choice', array('&a'), array(
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
@@ -695,7 +719,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         );
     }
 
-    public function testSingleChoiceExpandedSkipEmptyValue()
+    public function testSingleChoiceExpandedWithEmptyValue()
     {
         $form = $this->factory->createNamed('name', 'choice', '&a', array(
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
@@ -707,13 +731,15 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./input[@type="radio"][@name="name"][@id="name_0"][@checked]
+        ./input[@type="radio"][@name="name"][@id="name_placeholder"][not(@checked)]
+        /following-sibling::label[@for="name_placeholder"][.="[trans]Test&Me[/trans]"]
+        /following-sibling::input[@type="radio"][@name="name"][@id="name_0"][@checked]
         /following-sibling::label[@for="name_0"][.="[trans]Choice&A[/trans]"]
         /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][not(@checked)]
         /following-sibling::label[@for="name_1"][.="[trans]Choice&B[/trans]"]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-    [count(./input)=3]
+    [count(./input)=4]
 '
         );
     }
@@ -788,7 +814,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
     [@name="name"]
-    [./option[@value=""][not(@selected)][.="[trans]Select&Country[/trans]"]]
+    [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Select&Country[/trans]"]]
     [./option[@value="AT"][@selected="selected"][.="[trans]Austria[/trans]"]]
     [count(./option)>201]
 '
@@ -850,13 +876,13 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             [
                 ./select
                     [@id="name_date_month"]
-                    [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+                    [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Change&Me[/trans]"]]
                 /following-sibling::select
                     [@id="name_date_day"]
-                    [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+                    [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Change&Me[/trans]"]]
                 /following-sibling::select
                     [@id="name_date_year"]
-                    [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+                    [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Change&Me[/trans]"]]
             ]
         /following-sibling::div
             [@id="name_time"]
@@ -874,13 +900,12 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         );
     }
 
-    public function testDateTimeWithEmptyValueOnTime()
+    public function testDateTimeWithHourAndMinute()
     {
-        $data = array('year' => '2011', 'month' => '2', 'day' => '3', 'hour' => '', 'minute' => '');
+        $data = array('year' => '2011', 'month' => '2', 'day' => '3', 'hour' => '4', 'minute' => '5');
 
         $form = $this->factory->createNamed('name', 'datetime', $data, array(
             'input' => 'array',
-            'empty_value' => array('hour' => 'Change&Me', 'minute' => 'Change&Me'),
             'required' => false,
         ));
 
@@ -905,10 +930,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             [
                 ./select
                     [@id="name_time_hour"]
-                    [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+                    [./option[@value="4"][@selected="selected"]]
                 /following-sibling::select
                     [@id="name_time_minute"]
-                    [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+                    [./option[@value="5"][@selected="selected"]]
             ]
     ]
     [count(.//select)=5]
@@ -1061,13 +1086,13 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [
         ./select
             [@id="name_month"]
-            [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+            [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Change&Me[/trans]"]]
         /following-sibling::select
             [@id="name_day"]
-            [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+            [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Change&Me[/trans]"]]
         /following-sibling::select
             [@id="name_year"]
-            [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+            [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Change&Me[/trans]"]]
     ]
     [count(./select)=3]
 '
@@ -1094,7 +1119,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             [./option[@value="1"]]
         /following-sibling::select
             [@id="name_year"]
-            [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+            [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Change&Me[/trans]"]]
     ]
     [count(./select)=3]
 '
@@ -1147,9 +1172,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testDateErrorBubbling()
     {
-        $child = $this->factory->createNamed('date', 'date');
-        $form = $this->factory->createNamed('form', 'form')->add($child);
-        $child->addError(new FormError('Error!'));
+        $form = $this->factory->createNamedBuilder('form', 'form')
+            ->add('date', 'date')
+            ->getForm();
+        $form->get('date')->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
 
         $this->assertEmpty($this->renderErrors($view));
@@ -1193,15 +1219,15 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [
         ./select
             [@id="name_month"]
-            [./option[@value=""][.="[trans][/trans]"]]
+            [./option[@value=""][not(@selected)][not(@disabled)][.="[trans][/trans]"]]
             [./option[@value="1"][@selected="selected"]]
         /following-sibling::select
             [@id="name_day"]
-            [./option[@value=""][.="[trans][/trans]"]]
+            [./option[@value=""][not(@selected)][not(@disabled)][.="[trans][/trans]"]]
             [./option[@value="1"][@selected="selected"]]
         /following-sibling::select
             [@id="name_year"]
-            [./option[@value=""][.="[trans][/trans]"]]
+            [./option[@value=""][not(@selected)][not(@disabled)][.="[trans][/trans]"]]
             [./option[@value="1950"][@selected="selected"]]
     ]
     [count(./select)=3]
@@ -1373,12 +1399,12 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         );
     }
 
-    public function testPasswordBoundNotAlwaysEmpty()
+    public function testPasswordSubmittedWithNotAlwaysEmpty()
     {
         $form = $this->factory->createNamed('name', 'password', null, array(
             'always_empty' => false,
         ));
-        $form->bind('foo&bar');
+        $form->submit('foo&bar');
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
@@ -1531,11 +1557,11 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [
         ./select
             [@id="name_hour"]
-            [@size="1"]
+            [not(@size)]
             [./option[@value="4"][@selected="selected"]]
         /following-sibling::select
             [@id="name_minute"]
-            [@size="1"]
+            [not(@size)]
             [./option[@value="5"][@selected="selected"]]
     ]
     [count(./select)=2]
@@ -1555,17 +1581,17 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [
         ./select
             [@id="name_hour"]
-            [@size="1"]
+            [not(@size)]
             [./option[@value="4"][@selected="selected"]]
             [count(./option)>23]
         /following-sibling::select
             [@id="name_minute"]
-            [@size="1"]
+            [not(@size)]
             [./option[@value="5"][@selected="selected"]]
             [count(./option)>59]
         /following-sibling::select
             [@id="name_second"]
-            [@size="1"]
+            [not(@size)]
             [./option[@value="6"][@selected="selected"]]
             [count(./option)>59]
     ]
@@ -1616,6 +1642,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [@type="time"]
     [@name="name"]
     [@value="04:05"]
+    [not(@size)]
 '
         );
     }
@@ -1633,11 +1660,11 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [
         ./select
             [@id="name_hour"]
-            [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+            [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Change&Me[/trans]"]]
             [count(./option)>24]
         /following-sibling::select
             [@id="name_minute"]
-            [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+            [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Change&Me[/trans]"]]
             [count(./option)>60]
     ]
     [count(./select)=2]
@@ -1658,7 +1685,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [
         ./select
             [@id="name_hour"]
-            [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+            [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Change&Me[/trans]"]]
             [count(./option)>24]
         /following-sibling::select
             [@id="name_minute"]
@@ -1672,9 +1699,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testTimeErrorBubbling()
     {
-        $child = $this->factory->createNamed('time', 'time');
-        $form = $this->factory->createNamed('form', 'form')->add($child);
-        $child->addError(new FormError('Error!'));
+        $form = $this->factory->createNamedBuilder('form', 'form')
+            ->add('time', 'time')
+            ->getForm();
+        $form->get('time')->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
 
         $this->assertEmpty($this->renderErrors($view));
@@ -1688,7 +1716,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
     [@name="name"]
-    [@required="required"]
+    [not(@required)]
     [./optgroup
         [@label="[trans]Europe[/trans]"]
         [./option[@value="Europe/Vienna"][@selected="selected"][.="[trans]Vienna[/trans]"]]
@@ -1708,7 +1736,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
-    [./option[@value=""][.="[trans]Select&Timezone[/trans]"]]
+    [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Select&Timezone[/trans]"]]
     [count(./optgroup)>10]
     [count(.//option)>201]
 '
@@ -1741,9 +1769,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertMatchesXpath($html,
             '//div[@id="name_items"][@data-prototype]
             |
-             //table[@id="name_items"][@data-prototype]
-
-'
+            //table[@id="name_items"][@data-prototype]'
         );
     }
 
@@ -1758,5 +1784,189 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             |
              //input[@type="text"][@id="child"][@name="child"]'
         , 2);
+    }
+
+    public function testButton()
+    {
+        $form = $this->factory->createNamed('name', 'button');
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+            '/button[@type="button"][@name="name"][.="[trans]Name[/trans]"]'
+        );
+    }
+
+    public function testButtonLabelIsEmpty()
+    {
+        $form = $this->factory->createNamed('name', 'button');
+
+        $this->assertSame('', $this->renderLabel($form->createView()));
+    }
+
+    public function testSubmit()
+    {
+        $form = $this->factory->createNamed('name', 'submit');
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+            '/button[@type="submit"][@name="name"]'
+        );
+    }
+
+    public function testReset()
+    {
+        $form = $this->factory->createNamed('name', 'reset');
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+            '/button[@type="reset"][@name="name"]'
+        );
+    }
+
+    public function testStartTag()
+    {
+        $form = $this->factory->create('form', null, array(
+            'method' => 'get',
+            'action' => 'http://example.com/directory'
+        ));
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertSame('<form name="form" method="get" action="http://example.com/directory">', $html);
+    }
+
+    public function testStartTagForPutRequest()
+    {
+        $form = $this->factory->create('form', null, array(
+            'method' => 'put',
+            'action' => 'http://example.com/directory'
+        ));
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertMatchesXpath($html . '</form>',
+'/form
+    [./input[@type="hidden"][@name="_method"][@value="PUT"]]
+    [@method="post"]
+    [@action="http://example.com/directory"]'
+        );
+    }
+
+    public function testStartTagWithOverriddenVars()
+    {
+        $form = $this->factory->create('form', null, array(
+            'method' => 'put',
+            'action' => 'http://example.com/directory',
+        ));
+
+        $html = $this->renderStart($form->createView(), array(
+            'method' => 'post',
+            'action' => 'http://foo.com/directory'
+        ));
+
+        $this->assertSame('<form name="form" method="post" action="http://foo.com/directory">', $html);
+    }
+
+    public function testStartTagForMultipartForm()
+    {
+        $form = $this->factory->createBuilder('form', null, array(
+                'method' => 'get',
+                'action' => 'http://example.com/directory'
+            ))
+            ->add('file', 'file')
+            ->getForm();
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertSame('<form name="form" method="get" action="http://example.com/directory" enctype="multipart/form-data">', $html);
+    }
+
+    public function testStartTagWithExtraAttributes()
+    {
+        $form = $this->factory->create('form', null, array(
+            'method' => 'get',
+            'action' => 'http://example.com/directory'
+        ));
+
+        $html = $this->renderStart($form->createView(), array(
+            'attr' => array('class' => 'foobar'),
+        ));
+
+        $this->assertSame('<form name="form" method="get" action="http://example.com/directory" class="foobar">', $html);
+    }
+
+    public function testWidgetAttributes()
+    {
+        $form = $this->factory->createNamed('text', 'text', 'value', array(
+            'required' => true,
+            'disabled' => true,
+            'read_only' => true,
+            'max_length' => 10,
+            'pattern' => '\d+',
+            'attr' => array('class' => 'foobar', 'data-foo' => 'bar'),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        // compare plain HTML to check the whitespace
+        $this->assertSame('<input type="text" id="text" name="text" readonly="readonly" disabled="disabled" required="required" maxlength="10" pattern="\d+" class="foobar" data-foo="bar" value="value" />', $html);
+    }
+
+    public function testWidgetAttributeNameRepeatedIfTrue()
+    {
+        $form = $this->factory->createNamed('text', 'text', 'value', array(
+            'attr' => array('foo' => true),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        // foo="foo"
+        $this->assertSame('<input type="text" id="text" name="text" required="required" foo="foo" value="value" />', $html);
+    }
+
+    public function testWidgetAttributeHiddenIfFalse()
+    {
+        $form = $this->factory->createNamed('text', 'text', 'value', array(
+            'attr' => array('foo' => false),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        // no foo
+        $this->assertSame('<input type="text" id="text" name="text" required="required" value="value" />', $html);
+    }
+
+    public function testButtonAttributes()
+    {
+        $form = $this->factory->createNamed('button', 'button', null, array(
+            'disabled' => true,
+            'attr' => array('class' => 'foobar', 'data-foo' => 'bar'),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        // compare plain HTML to check the whitespace
+        $this->assertSame('<button type="button" id="button" name="button" disabled="disabled" class="foobar" data-foo="bar">[trans]Button[/trans]</button>', $html);
+    }
+
+    public function testButtonAttributeNameRepeatedIfTrue()
+    {
+        $form = $this->factory->createNamed('button', 'button', null, array(
+            'attr' => array('foo' => true),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        // foo="foo"
+        $this->assertSame('<button type="button" id="button" name="button" foo="foo">[trans]Button[/trans]</button>', $html);
+    }
+
+    public function testButtonAttributeHiddenIfFalse()
+    {
+        $form = $this->factory->createNamed('button', 'button', null, array(
+            'attr' => array('foo' => false),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        // no foo
+        $this->assertSame('<button type="button" id="button" name="button">[trans]Button[/trans]</button>', $html);
     }
 }

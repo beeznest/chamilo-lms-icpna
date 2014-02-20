@@ -134,7 +134,8 @@ class QueryBuilder
      * This producer method is intended for convenient inline usage. Example:
      *
      * <code>
-     *     $qb = $em->createQueryBuilder()
+     *     $qb = $em->createQueryBuilder();
+     *     $qb
      *         ->select('u')
      *         ->from('User', 'u')
      *         ->where($qb->expr()->eq('u.id', 1));
@@ -186,7 +187,7 @@ class QueryBuilder
      * <code>
      *     $qb = $em->createQueryBuilder()
      *         ->select('u')
-     *         ->from('User', 'u')
+     *         ->from('User', 'u');
      *     echo $qb->getDql(); // SELECT u FROM User u
      * </code>
      *
@@ -197,8 +198,6 @@ class QueryBuilder
         if ($this->_dql !== null && $this->_state === self::STATE_CLEAN) {
             return $this->_dql;
         }
-
-        $dql = '';
 
         switch ($this->_type) {
             case self::DELETE:
@@ -284,12 +283,18 @@ class QueryBuilder
      * </code>
      *
      * @deprecated Please use $qb->getRootAliases() instead.
+     * @throws RuntimeException
      *
      * @return string
      */
     public function getRootAlias()
     {
         $aliases = $this->getRootAliases();
+
+        if ( ! isset($aliases[0])) {
+            throw new \RuntimeException('No alias was set before invoking getRootAlias().');
+        }
+
         return $aliases[0];
     }
 
@@ -656,7 +661,7 @@ class QueryBuilder
      * <code>
      *     $qb = $em->createQueryBuilder()
      *         ->delete('User', 'u')
-     *         ->where('u.id = :user_id');
+     *         ->where('u.id = :user_id')
      *         ->setParameter('user_id', 1);
      * </code>
      *
@@ -710,7 +715,7 @@ class QueryBuilder
      * <code>
      *     $qb = $em->createQueryBuilder()
      *         ->select('u')
-     *         ->from('User', 'u')
+     *         ->from('User', 'u');
      * </code>
      *
      * @param string $from    The class name.
@@ -895,8 +900,8 @@ class QueryBuilder
      */
     public function andWhere($where)
     {
-        $where = $this->getDQLPart('where');
         $args  = func_get_args();
+        $where = $this->getDQLPart('where');
 
         if ($where instanceof Expr\Andx) {
             $where->addMultiple($args);
@@ -928,8 +933,8 @@ class QueryBuilder
      */
     public function orWhere($where)
     {
-        $where = $this->getDqlPart('where');
         $args  = func_get_args();
+        $where = $this->getDqlPart('where');
 
         if ($where instanceof Expr\Orx) {
             $where->addMultiple($args);
@@ -968,8 +973,8 @@ class QueryBuilder
      *     $qb = $em->createQueryBuilder()
      *         ->select('u')
      *         ->from('User', 'u')
-     *         ->groupBy('u.lastLogin');
-     *         ->addGroupBy('u.createdAt')
+     *         ->groupBy('u.lastLogin')
+     *         ->addGroupBy('u.createdAt');
      * </code>
      *
      * @param string $groupBy The grouping expression.
@@ -1008,8 +1013,8 @@ class QueryBuilder
      */
     public function andHaving($having)
     {
-        $having = $this->getDqlPart('having');
         $args   = func_get_args();
+        $having = $this->getDqlPart('having');
 
         if ($having instanceof Expr\Andx) {
             $having->addMultiple($args);
@@ -1031,8 +1036,8 @@ class QueryBuilder
      */
     public function orHaving($having)
     {
-        $having = $this->getDqlPart('having');
         $args   = func_get_args();
+        $having = $this->getDqlPart('having');
 
         if ($having instanceof Expr\Orx) {
             $having->addMultiple($args);
@@ -1048,8 +1053,8 @@ class QueryBuilder
      * Specifies an ordering for the query results.
      * Replaces any previously specified orderings, if any.
      *
-     * @param string $sort  The ordering expression.
-     * @param string $order The ordering direction.
+     * @param string|Expr\OrderBy $sort  The ordering expression.
+     * @param string              $order The ordering direction.
      *
      * @return QueryBuilder This QueryBuilder instance.
      */
@@ -1063,14 +1068,16 @@ class QueryBuilder
     /**
      * Adds an ordering to the query results.
      *
-     * @param string $sort  The ordering expression.
-     * @param string $order The ordering direction.
+     * @param string|Expr\OrderBy $sort  The ordering expression.
+     * @param string              $order The ordering direction.
      *
      * @return QueryBuilder This QueryBuilder instance.
      */
     public function addOrderBy($sort, $order = null)
     {
-        return $this->add('orderBy', new Expr\OrderBy($sort, $order), true);
+        $orderBy = ($sort instanceof Expr\OrderBy) ? $sort : new Expr\OrderBy($sort, $order);
+
+        return $this->add('orderBy', $orderBy, true);
     }
 
     /**
@@ -1086,7 +1093,8 @@ class QueryBuilder
      */
     public function addCriteria(Criteria $criteria)
     {
-        $visitor = new QueryExpressionVisitor();
+        $rootAlias = $this->getRootAlias();
+        $visitor = new QueryExpressionVisitor($rootAlias);
 
         if ($whereExpression = $criteria->getWhereExpression()) {
             $this->andWhere($visitor->dispatch($whereExpression));
@@ -1097,7 +1105,7 @@ class QueryBuilder
 
         if ($criteria->getOrderings()) {
             foreach ($criteria->getOrderings() as $sort => $order) {
-                $this->addOrderBy($sort, $order);
+                $this->addOrderBy($rootAlias . '.' . $sort, $order);
             }
         }
 

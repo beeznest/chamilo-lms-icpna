@@ -69,8 +69,8 @@ class XmlExporter extends AbstractExporter
             $root->addAttribute('schema', $metadata->table['schema']);
         }
 
-        if (isset($metadata->table['inheritance-type'])) {
-            $root->addAttribute('inheritance-type', $metadata->table['inheritance-type']);
+        if ($metadata->inheritanceType && $metadata->inheritanceType !== ClassMetadataInfo::INHERITANCE_TYPE_NONE) {
+            $root->addAttribute('inheritance-type', $this->_getInheritanceTypeString($metadata->inheritanceType));
         }
 
         if ($metadata->discriminatorColumn) {
@@ -129,6 +129,15 @@ class XmlExporter extends AbstractExporter
             }
         }
 
+        foreach ($metadata->associationMappings as $name => $assoc) {
+            if (isset($assoc['id']) && $assoc['id']) {
+                $id[$name] = array(
+                    'fieldName' => $name,
+                    'associationKey' => true
+                );
+            }
+        }
+
         if ( ! $metadata->isIdentifierComposite && $idGeneratorType = $this->_getIdGeneratorTypeString($metadata->generatorType)) {
             $id[$metadata->getSingleIdentifierFieldName()]['generator']['strategy'] = $idGeneratorType;
         }
@@ -137,10 +146,17 @@ class XmlExporter extends AbstractExporter
             foreach ($id as $field) {
                 $idXml = $root->addChild('id');
                 $idXml->addAttribute('name', $field['fieldName']);
-                $idXml->addAttribute('type', $field['type']);
+
+                if (isset($field['type'])) {
+                    $idXml->addAttribute('type', $field['type']);
+                }
 
                 if (isset($field['columnName'])) {
                     $idXml->addAttribute('column', $field['columnName']);
+                }
+
+                if (isset($field['length'])) {
+                    $idXml->addAttribute('length', $field['length']);
                 }
 
                 if (isset($field['associationKey']) && $field['associationKey']) {
@@ -244,6 +260,39 @@ class XmlExporter extends AbstractExporter
             if (isset($associationMapping['orphanRemoval']) && $associationMapping['orphanRemoval'] !== false) {
                 $associationMappingXml->addAttribute('orphan-removal', 'true');
             }
+            
+            $cascade = array();
+            if ($associationMapping['isCascadeRemove']) {
+                $cascade[] = 'cascade-remove';
+            }
+
+            if ($associationMapping['isCascadePersist']) {
+                $cascade[] = 'cascade-persist';
+            }
+
+            if ($associationMapping['isCascadeRefresh']) {
+                $cascade[] = 'cascade-refresh';
+            }
+
+            if ($associationMapping['isCascadeMerge']) {
+                $cascade[] = 'cascade-merge';
+            }
+
+            if ($associationMapping['isCascadeDetach']) {
+                $cascade[] = 'cascade-detach';
+            }
+
+            if (count($cascade) === 5) {
+                $cascade  = array('cascade-all');
+            }
+
+            if ($cascade) {
+                $cascadeXml = $associationMappingXml->addChild('cascade');
+
+                foreach ($cascade as $type) {
+                    $cascadeXml->addChild($type);
+                }
+            }
 
             if (isset($associationMapping['joinTable']) && $associationMapping['joinTable']) {
                 $joinTableXml = $associationMappingXml->addChild('join-table');
@@ -312,39 +361,6 @@ class XmlExporter extends AbstractExporter
                     $orderByFieldXml = $orderByXml->addChild('order-by-field');
                     $orderByFieldXml->addAttribute('name', $name);
                     $orderByFieldXml->addAttribute('direction', $direction);
-                }
-            }
-            $cascade = array();
-
-            if ($associationMapping['isCascadeRemove']) {
-                $cascade[] = 'cascade-remove';
-            }
-
-            if ($associationMapping['isCascadePersist']) {
-                $cascade[] = 'cascade-persist';
-            }
-
-            if ($associationMapping['isCascadeRefresh']) {
-                $cascade[] = 'cascade-refresh';
-            }
-
-            if ($associationMapping['isCascadeMerge']) {
-                $cascade[] = 'cascade-merge';
-            }
-
-            if ($associationMapping['isCascadeDetach']) {
-                $cascade[] = 'cascade-detach';
-            }
-
-            if (count($cascade) === 5) {
-                $cascade  = array('cascade-all');
-            }
-
-            if ($cascade) {
-                $cascadeXml = $associationMappingXml->addChild('cascade');
-
-                foreach ($cascade as $type) {
-                    $cascadeXml->addChild($type);
                 }
             }
         }

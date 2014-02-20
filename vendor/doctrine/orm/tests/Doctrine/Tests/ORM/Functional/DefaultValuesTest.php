@@ -23,6 +23,9 @@ class DefaultValuesTest extends \Doctrine\Tests\OrmFunctionalTestCase
         }
     }
 
+    /**
+     * @group non-cacheable
+     */
     public function testSimpleDetachMerge() {
         $user = new DefaultValueUser;
         $user->name = 'romanb';
@@ -58,7 +61,7 @@ class DefaultValuesTest extends \Doctrine\Tests\OrmFunctionalTestCase
     /**
      * @group DDC-1386
      */
-    public function testGetPartialReferenceWithDefaultValueNotEvalutedInFlush()
+    public function testGetPartialReferenceWithDefaultValueNotEvaluatedInFlush()
     {
         $user = new DefaultValueUser;
         $user->name = 'romanb';

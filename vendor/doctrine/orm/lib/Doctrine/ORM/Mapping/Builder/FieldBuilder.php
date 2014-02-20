@@ -22,7 +22,7 @@ namespace Doctrine\ORM\Mapping\Builder;
 /**
  * Field Builder
  *
- * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @license     http://www.opensource.org/licenses/mit-license.php MIT
  * @link        www.doctrine-project.com
  * @since       2.2
  * @author      Benjamin Eberlei <kontakt@beberlei.de>
@@ -150,6 +150,20 @@ class FieldBuilder
     public function isPrimaryKey()
     {
         $this->mapping['id'] = true;
+        return $this;
+    }
+
+    /**
+     * Sets an option.
+     *
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return FieldBuilder
+     */
+    public function option($name, $value)
+    {
+        $this->mapping['options'][$name] = $value;
         return $this;
     }
 

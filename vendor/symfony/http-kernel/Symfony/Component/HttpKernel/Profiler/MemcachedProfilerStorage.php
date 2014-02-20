@@ -20,7 +20,6 @@ use Memcached;
  */
 class MemcachedProfilerStorage extends BaseMemcacheProfilerStorage
 {
-
     /**
      * @var Memcached
      */
@@ -30,6 +29,8 @@ class MemcachedProfilerStorage extends BaseMemcacheProfilerStorage
      * Internal convenience method that returns the instance of the Memcached
      *
      * @return Memcached
+     *
+     * @throws \RuntimeException
      */
     protected function getMemcached()
     {
@@ -41,7 +42,7 @@ class MemcachedProfilerStorage extends BaseMemcacheProfilerStorage
             $host = $matches[1] ?: $matches[2];
             $port = $matches[3];
 
-            $memcached = new Memcached;
+            $memcached = new Memcached();
 
             //disable compression to allow appending
             $memcached->setOption(Memcached::OPT_COMPRESSION, false);
@@ -101,5 +102,4 @@ class MemcachedProfilerStorage extends BaseMemcacheProfilerStorage
 
         return $result;
     }
-
 }

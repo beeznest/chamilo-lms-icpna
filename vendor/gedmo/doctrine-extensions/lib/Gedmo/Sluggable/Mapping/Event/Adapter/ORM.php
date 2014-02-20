@@ -12,12 +12,9 @@ use Gedmo\Tool\Wrapper\AbstractWrapper;
  * for sluggable behavior
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo\Sluggable\Mapping\Event\Adapter
- * @subpackage ORM
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
-final class ORM extends BaseAdapterORM implements SluggableAdapter
+class ORM extends BaseAdapterORM implements SluggableAdapter
 {
     /**
      * {@inheritDoc}
@@ -31,9 +28,24 @@ final class ORM extends BaseAdapterORM implements SluggableAdapter
             ->from($config['useObjectClass'], 'rec')
             ->where($qb->expr()->like(
                 'rec.' . $config['slug'],
-                $qb->expr()->literal($slug . '%'))
-        )
+                ':slug')
+            )
         ;
+        $qb->setParameter('slug',$slug . '%');
+
+        // use the unique_base to restrict the uniqueness check
+        if ($config['unique'] && isset($config['unique_base'])) {
+            if (($ubase = $wrapped->getPropertyValue($config['unique_base'])) && !array_key_exists($config['unique_base'], $wrapped->getMetadata()->getAssociationMappings())) {
+                $qb->andWhere('rec.' . $config['unique_base'] . ' = :unique_base');
+                $qb->setParameter(':unique_base', $ubase);
+            } elseif (array_key_exists($config['unique_base'], $wrapped->getMetadata()->getAssociationMappings())){
+                $associationMappings = $wrapped->getMetadata()->getAssociationMappings();
+                $qb->join($associationMappings[$config['unique_base']]['targetEntity'], 'unique_'.$config['unique_base']);
+            } else {
+                $qb->andWhere($qb->expr()->isNull('rec.' . $config['unique_base']));
+            }
+        }
+
         // include identifiers
         foreach ((array)$wrapped->getIdentifier(false) as $id => $value) {
             if (!$meta->isIdentifier($config['slug'])) {

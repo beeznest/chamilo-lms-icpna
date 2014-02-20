@@ -6,6 +6,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 require_once __DIR__ . '/../../../TestInit.php';
 
+/**
+ * @group non-cacheable
+ */
 class DDC742Test extends \Doctrine\Tests\OrmFunctionalTestCase
 {
     private $userCm;
@@ -15,7 +18,7 @@ class DDC742Test extends \Doctrine\Tests\OrmFunctionalTestCase
     {
         parent::setUp();
 
-        if (\extension_loaded('memcache')) {
+        if (\extension_loaded('memcache') && @fsockopen('localhost', 11211)) {
             $memcache = new \Memcache();
             $memcache->addServer('localhost');
             $memcache->flush();
@@ -26,6 +29,8 @@ class DDC742Test extends \Doctrine\Tests\OrmFunctionalTestCase
             $this->_em->getMetadataFactory()->setCacheDriver($cacheDriver);
         } else if (\extension_loaded('apc')) {
             $this->_em->getMetadataFactory()->setCacheDriver(new \Doctrine\Common\Cache\ApcCache());
+        } else {
+            $this->markTestSkipped('Test only works with a cache enabled.');
         }
 
         try {

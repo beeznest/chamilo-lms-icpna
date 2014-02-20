@@ -76,6 +76,21 @@ class Logger implements LoggerInterface
      */
     const EMERGENCY = 600;
 
+    /**
+     * Monolog API version
+     *
+     * This is only bumped when API breaks are done and should
+     * follow the major version of the library
+     *
+     * @var int
+     */
+    const API = 1;
+
+    /**
+     * Logging levels from syslog protocol defined in RFC 5424
+     *
+     * @var array $levels Logging levels
+     */
     protected static $levels = array(
         100 => 'DEBUG',
         200 => 'INFO',
@@ -92,27 +107,37 @@ class Logger implements LoggerInterface
      */
     protected static $timezone;
 
+    /**
+     * @var string
+     */
     protected $name;
 
     /**
      * The handler stack
      *
-     * @var array of Monolog\Handler\HandlerInterface
+     * @var HandlerInterface[]
      */
-    protected $handlers = array();
-
-    protected $processors = array();
+    protected $handlers;
 
     /**
-     * @param string $name The logging channel
+     * Processors that will process all log records
+     *
+     * To process records of a single handler instead, add the processor on that specific handler
+     *
+     * @var callable[]
      */
-    public function __construct($name)
+    protected $processors;
+
+    /**
+     * @param string             $name       The logging channel
+     * @param HandlerInterface[] $handlers   Optional stack of handlers, the first one in the array is called first, etc.
+     * @param callable[]         $processors Optional array of processors
+     */
+    public function __construct($name, array $handlers = array(), array $processors = array())
     {
         $this->name = $name;
-
-        if (!static::$timezone) {
-            static::$timezone = new \DateTimeZone(date_default_timezone_get() ?: 'UTC');
-        }
+        $this->handlers = $handlers;
+        $this->processors = $processors;
     }
 
     /**
@@ -187,6 +212,11 @@ class Logger implements LoggerInterface
         if (!$this->handlers) {
             $this->pushHandler(new StreamHandler('php://stderr', static::DEBUG));
         }
+
+        if (!static::$timezone) {
+            static::$timezone = new \DateTimeZone(date_default_timezone_get() ?: 'UTC');
+        }
+
         $record = array(
             'message' => (string) $message,
             'context' => $context,
@@ -314,7 +344,17 @@ class Logger implements LoggerInterface
      */
     public function addEmergency($message, array $context = array())
     {
-      return $this->addRecord(static::EMERGENCY, $message, $context);
+        return $this->addRecord(static::EMERGENCY, $message, $context);
+    }
+
+    /**
+     * Gets all supported logging levels.
+     *
+     * @return array Assoc array with human-readable level names => level codes.
+     */
+    public static function getLevels()
+    {
+        return array_flip(static::$levels);
     }
 
     /**
@@ -344,7 +384,7 @@ class Logger implements LoggerInterface
             'level' => $level,
         );
 
-        foreach ($this->handlers as $key => $handler) {
+        foreach ($this->handlers as $handler) {
             if ($handler->isHandling($record)) {
                 return true;
             }

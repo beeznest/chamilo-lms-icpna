@@ -10,7 +10,6 @@ use Tree\Fixture\RootCategory;
  * These are tests for Tree behavior
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.Tree
  * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
@@ -290,26 +289,21 @@ class NestedTreeRootRepositoryTest extends BaseTestCaseORM
         $this->assertTrue($repo->verify());
 
         $dql = 'UPDATE ' . self::CATEGORY . ' node';
-        $dql .= ' SET node.lft = 1';
+        $dql .= ' SET node.lft = 5';
         $dql .= ' WHERE node.id = 4';
         $this->em->createQuery($dql)->getSingleScalarResult();
 
         $this->em->clear(); // must clear cached entities
         $errors = $repo->verify();
         $this->assertCount(2, $errors);
-        $this->assertEquals('index [1], duplicate on tree root: 1', $errors[0]);
-        $this->assertEquals('index [4], missing on tree root: 1', $errors[1]);
+        $this->assertEquals('index [4], missing on tree root: 1', $errors[0]);
+        $this->assertEquals('index [5], duplicate on tree root: 1', $errors[1]);
 
-        $dql = 'UPDATE ' . self::CATEGORY . ' node';
-        $dql .= ' SET node.lft = 4';
-        $dql .= ' WHERE node.id = 4';
-        $this->em->createQuery($dql)->getSingleScalarResult();
+        // test recover functionality
+        $repo->recover();
+        $this->em->flush();
 
-        //@todo implement
-        //$this->em->clear();
-        //$repo->recover();
-        //$this->em->clear();
-        //$this->assertTrue($repo->verify());
+        $this->assertTrue($repo->verify());
 
         $this->em->clear();
         $onions = $repo->findOneByTitle('Onions');

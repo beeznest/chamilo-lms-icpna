@@ -201,15 +201,19 @@ Configuration
 
      Each mapping definition should be an array with the following
      options:
-     * **type**: Mapping driver type, one of `annotation`, `xml`, or `yml`.
+     * **type**: Mapping driver type, one of `annotation`, `xml`, `yml` or `php`.
      * **namespace**: Namespace in which the entities reside.
 
      Additionally, each mapping definition should contain one of the
      following options:
      * **path**: Path to where the mapping files are located. This should
-       be an actual filesystem path.
+       be an actual filesystem path. For the php driver it can be an array
+       of paths
      * **resources_namespace**: A namespaceish path to where the mapping
        files are located. Example: `Path\To\Foo\Resources\mappings`
+
+     Each mapping definition can have the following optional options:
+     * **alias** (Default: null): Set the alias for the entity namespace.
 
      Each **annotation** mapping may also specify the following options:
      * **use_simple_annotation_reader** (Default: true):
@@ -226,6 +230,8 @@ Configuration
      String or array describing metadata cache implementation.
    * **result_cache** (Default: setting specified by orm.default_cache):
      String or array describing result cache implementation.
+   * **types**
+     An array of custom types in the format of 'typeName' => 'Namespace\To\Type\Class'
  * **orm.ems.options**:
    Array of Entity Manager configuration sets indexed by each Entity Manager's
    name. Each value should look like **orm.em.options**.

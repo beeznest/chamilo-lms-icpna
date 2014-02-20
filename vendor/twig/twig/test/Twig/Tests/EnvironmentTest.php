@@ -11,6 +11,16 @@
 
 class Twig_Tests_EnvironmentTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedException        LogicException
+     * @expectedExceptionMessage You must set a loader first.
+     */
+    public function testRenderNoLoader()
+    {
+        $env = new Twig_Environment();
+        $env->render('test');
+    }
+
     public function testAutoescapeOption()
     {
         $loader = new Twig_Loader_Array(array(
@@ -70,6 +80,12 @@ class Twig_Tests_EnvironmentTest extends PHPUnit_Framework_TestCase
         $twig->addGlobal('foo', 'bar');
         $globals = $twig->getGlobals();
         $this->assertEquals('bar', $globals['foo']);
+
+        $twig = new Twig_Environment(new Twig_Loader_String());
+        $twig->getGlobals();
+        $twig->addGlobal('foo', 'bar');
+        $template = $twig->loadTemplate('{{foo}}');
+        $this->assertEquals('bar', $template->render(array()));
 
         /* to be uncomment in Twig 2.0
         // globals cannot be added after runtime init
@@ -170,7 +186,7 @@ class Twig_Tests_EnvironmentTest extends PHPUnit_Framework_TestCase
     {
         $twig = new Twig_Environment(new Twig_Loader_String());
         $twig->addExtension(new Twig_Tests_EnvironmentTest_Extension());
-        $twig->removeExtension('test');
+        $twig->removeExtension('environment_test');
 
         $this->assertFalse(array_key_exists('test', $twig->getTags()));
         $this->assertFalse(array_key_exists('foo_filter', $twig->getFilters()));
@@ -202,21 +218,21 @@ class Twig_Tests_EnvironmentTest_Extension extends Twig_Extension
     public function getFilters()
     {
         return array(
-            'foo_filter' => new Twig_Filter_Function('foo_filter'),
+            new Twig_SimpleFilter('foo_filter', 'foo_filter'),
         );
     }
 
     public function getTests()
     {
         return array(
-            'foo_test' => new Twig_Test_Function('foo_test'),
+            new Twig_SimpleTest('foo_test', 'foo_test'),
         );
     }
 
     public function getFunctions()
     {
         return array(
-            'foo_function' => new Twig_Function_Function('foo_function'),
+            new Twig_SimpleFunction('foo_function', 'foo_function'),
         );
     }
 
@@ -237,7 +253,7 @@ class Twig_Tests_EnvironmentTest_Extension extends Twig_Extension
 
     public function getName()
     {
-        return 'test';
+        return 'environment_test';
     }
 }
 

@@ -8,9 +8,6 @@ namespace Gedmo\Blameable;
  * Blameable
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.Blameable
- * @subpackage Blameable
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 interface Blameable
@@ -19,30 +16,35 @@ interface Blameable
 
     /**
      * @gedmo:Blameable(on="create")
-     * dates which should be updated on insert only
+     * fields which should be updated on insert only
      */
 
     /**
      * @gedmo:Blameable(on="update")
-     * dates which should be updated on update and insert
+     * fields which should be updated on update and insert
      */
 
     /**
      * @gedmo:Blameable(on="change", field="field", value="value")
-     * dates which should be updated on changed "property"
+     * fields which should be updated on changed "property"
      * value and become equal to given "value"
      */
 
     /**
      * @gedmo:Blameable(on="change", field="field")
-     * dates which should be updated on changed "property"
+     * fields which should be updated on changed "property"
+     */
+
+    /**
+     * @gedmo:Blameable(on="change", fields={"field1", "field2"})
+     * fields which should be updated if at least one of the given fields changed
      */
 
     /**
      * example
      *
      * @gedmo:Blameable(on="create")
-     * @Column(type="date")
+     * @Column(type="string")
      * $created
      */
 }

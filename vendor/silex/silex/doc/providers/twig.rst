@@ -14,7 +14,8 @@ Parameters
   template contents. Use this if you want to define your templates inline.
 
 * **twig.options** (optional): An associative array of twig
-  options. Check out the twig documentation for more information.
+  options. Check out the `twig documentation <http://twig.sensiolabs.org/doc/api.html#environment-options>`_
+  for more information.
 
 * **twig.form.templates** (optional): An array of templates used to render
   forms (only available when the ``FormServiceProvider`` is enabled).
@@ -60,7 +61,7 @@ some Symfony2 components and Twig. Add it as a dependency to your
 .. code-block:: json
 
     "require": {
-        "symfony/twig-bridge": "2.1.*",
+        "symfony/twig-bridge": "~2.3"
     }
 
 When present, the ``TwigServiceProvider`` will provide you with the following
@@ -117,7 +118,7 @@ from a template:
 
     {{ render(app.request.baseUrl ~ '/sidebar') }}
 
-    {# or if you are also using UrlGeneratorServiceProvider with the SymfonyBridgesServiceProvider #}
+    {# or if you are also using the UrlGeneratorServiceProvider #}
     {{ render(url('sidebar')) }}
 
 .. note::
@@ -162,5 +163,5 @@ You can configure the Twig environment before using it by extending the
         return $twig;
     }));
 
-For more information, check out the `Twig documentation
+For more information, check out the `official Twig documentation
 <http://twig.sensiolabs.org>`_.

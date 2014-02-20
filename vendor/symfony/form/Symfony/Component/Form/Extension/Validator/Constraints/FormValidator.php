@@ -51,18 +51,12 @@ class FormValidator extends ConstraintValidator
 
         if ($form->isSynchronized()) {
             // Validate the form data only if transformation succeeded
-            $path = $this->context->getPropertyPath();
-            $graphWalker = $this->context->getGraphWalker();
             $groups = self::getValidationGroups($form);
-
-            if (!empty($path)) {
-                $path .= '.';
-            }
 
             // Validate the data against its own constraints
             if (self::allowDataWalking($form)) {
                 foreach ($groups as $group) {
-                    $graphWalker->walkReference($form->getData(), $group, $path . 'data', true);
+                    $this->context->validate($form->getData(), 'data', $group, true);
                 }
             }
 
@@ -72,7 +66,7 @@ class FormValidator extends ConstraintValidator
             foreach ($constraints as $constraint) {
                 foreach ($groups as $group) {
                     if (in_array($group, $constraint->groups)) {
-                        $graphWalker->walkConstraint($constraint, $form->getData(), $group, $path . 'data');
+                        $this->context->validateValue($form->getData(), $constraint, 'data', $group);
 
                         // Prevent duplicate validation
                         continue 2;
@@ -126,7 +120,7 @@ class FormValidator extends ConstraintValidator
         if ($form->isRoot() && null !== $length) {
             $max = $this->serverParams->getPostMaxSize();
 
-            if (null !== $max && $length > $max) {
+            if (!empty($max) && $length > $max) {
                 $this->context->addViolation(
                     $config->getOption('post_max_size_message'),
                     array('{{ max }}' => $this->serverParams->getNormalizedIniPostMaxSize()),
@@ -177,20 +171,48 @@ class FormValidator extends ConstraintValidator
      */
     private static function getValidationGroups(FormInterface $form)
     {
+        // Determine the clicked button of the complete form tree
+        $clickedButton = null;
+
+        if (method_exists($form, 'getClickedButton')) {
+            $clickedButton = $form->getClickedButton();
+        }
+
+        if (null !== $clickedButton) {
+            $groups = $clickedButton->getConfig()->getOption('validation_groups');
+
+            if (null !== $groups) {
+                return self::resolveValidationGroups($groups, $form);
+            }
+        }
+
         do {
             $groups = $form->getConfig()->getOption('validation_groups');
 
             if (null !== $groups) {
-                if (is_callable($groups)) {
-                    $groups = call_user_func($groups, $form);
-                }
-
-                return (array) $groups;
+                return self::resolveValidationGroups($groups, $form);
             }
 
             $form = $form->getParent();
         } while (null !== $form);
 
         return array(Constraint::DEFAULT_GROUP);
+    }
+
+    /**
+     * Post-processes the validation groups option for a given form.
+     *
+     * @param array|callable $groups The validation groups.
+     * @param FormInterface  $form   The validated form.
+     *
+     * @return array The validation groups.
+     */
+    private static function resolveValidationGroups($groups, FormInterface $form)
+    {
+        if (!is_string($groups) && is_callable($groups)) {
+            $groups = call_user_func($groups, $form);
+        }
+
+        return (array) $groups;
     }
 }

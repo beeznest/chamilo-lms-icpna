@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\DataCollector;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Debug\ErrorHandler;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
@@ -20,7 +21,7 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class LoggerDataCollector extends DataCollector
+class LoggerDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     private $logger;
 
@@ -36,10 +37,19 @@ class LoggerDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
+        // everything is done as late as possible
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function lateCollect()
+    {
         if (null !== $this->logger) {
             $this->data = array(
-                'error_count' => $this->logger->countErrors(),
-                'logs'        => $this->sanitizeLogs($this->logger->getLogs()),
+                'error_count'       => $this->logger->countErrors(),
+                'logs'              => $this->sanitizeLogs($this->logger->getLogs()),
+                'deprecation_count' => $this->computeDeprecationCount()
             );
         }
     }
@@ -64,6 +74,11 @@ class LoggerDataCollector extends DataCollector
     public function getLogs()
     {
         return isset($this->data['logs']) ? $this->data['logs'] : array();
+    }
+
+    public function countDeprecations()
+    {
+        return isset($this->data['deprecation_count']) ? $this->data['deprecation_count'] : 0;
     }
 
     /**
@@ -102,5 +117,17 @@ class LoggerDataCollector extends DataCollector
         }
 
         return $context;
+    }
+
+    private function computeDeprecationCount()
+    {
+        $count = 0;
+        foreach ($this->logger->getLogs() as $log) {
+            if (isset($log['context']['type']) && ErrorHandler::TYPE_DEPRECATION === $log['context']['type']) {
+                $count++;
+            }
+        }
+
+        return $count;
     }
 }

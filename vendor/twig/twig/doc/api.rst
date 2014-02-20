@@ -312,9 +312,9 @@ Twig comes bundled with the following extensions:
   to escape/unescape blocks of code.
 
 * *Twig_Extension_Sandbox*: Adds a sandbox mode to the default Twig
-  environment, making it safe to evaluated untrusted code.
+  environment, making it safe to evaluate untrusted code.
 
-* *Twig_Extension_Optimizer*: Optimizers the node tree before compilation.
+* *Twig_Extension_Optimizer*: Optimizes the node tree before compilation.
 
 The core, escaper, and optimizer extensions do not need to be added to the
 Twig environment, as they are registered by default.
@@ -334,80 +334,10 @@ Core Extension
 
 The ``core`` extension defines all the core features of Twig:
 
-* Tags:
-
-  * ``for``
-  * ``if``
-  * ``extends``
-  * ``include``
-  * ``block``
-  * ``filter``
-  * ``macro``
-  * ``import``
-  * ``from``
-  * ``set``
-  * ``spaceless``
-  * ``autoescape``
-  * ``do``
-  * ``embed``
-  * ``flush``
-  * ``verbatim``
-  * ``sandbox``
-  * ``use``
-
-* Filters:
-
-  * ``date``
-  * ``format``
-  * ``replace``
-  * ``url_encode``
-  * ``json_encode``
-  * ``title``
-  * ``capitalize``
-  * ``upper``
-  * ``lower``
-  * ``striptags``
-  * ``join``
-  * ``reverse``
-  * ``length``
-  * ``sort``
-  * ``merge``
-  * ``default``
-  * ``keys``
-  * ``escape``
-  * ``e``
-  * ``abs``
-  * ``convert_encoding``
-  * ``date_modify``
-  * ``nl2br``
-  * ``number_format``
-  * ``raw``
-  * ``slice``
-  * ``trim``
-
-* Functions:
-
-  * ``range``
-  * ``constant``
-  * ``cycle``
-  * ``parent``
-  * ``block``
-  * ``attribute``
-  * ``date``
-  * ``dump``
-  * ``random``
-
-* Tests:
-
-  * ``even``
-  * ``odd``
-  * ``defined``
-  * ``sameas``
-  * ``null``
-  * ``divisibleby``
-  * ``constant``
-  * ``empty``
-  * ``iterable``
+* :doc:`Tags <tags/index>`;
+* :doc:`Filters <filters/index>`;
+* :doc:`Functions <functions/index>`;
+* :doc:`Tests <tests/index>`.
 
 Escaper Extension
 ~~~~~~~~~~~~~~~~~
@@ -418,10 +348,10 @@ tag, ``autoescape``, and a filter, ``raw``.
 When creating the escaper extension, you can switch on or off the global
 output escaping strategy::
 
-    $escaper = new Twig_Extension_Escaper(true);
+    $escaper = new Twig_Extension_Escaper('html');
     $twig->addExtension($escaper);
 
-If set to ``true``, all variables in templates are escaped (using the ``html``
+If set to ``html``, all variables in templates are escaped (using the ``html``
 escaping strategy), except those using the ``raw`` filter:
 
 .. code-block:: jinja
@@ -487,15 +417,15 @@ The escaping rules are implemented as follows:
         {{ var|upper|raw }} {# won't be escaped #}
 
 * Automatic escaping is not applied if the last filter in the chain is marked
-  safe for the current context (e.g. ``html`` or ``js``). ``escaper`` and
-  ``escaper('html')`` are marked safe for html, ``escaper('js')`` is marked
-  safe for javascript, ``raw`` is marked safe for everything.
+  safe for the current context (e.g. ``html`` or ``js``). ``escape`` and
+  ``escape('html')`` are marked safe for HTML, ``escape('js')`` is marked
+  safe for JavaScript, ``raw`` is marked safe for everything.
 
   .. code-block:: jinja
 
         {% autoescape 'js' %}
-            {{ var|escape('html') }} {# will be escaped for html and javascript #}
-            {{ var }} {# will be escaped for javascript #}
+            {{ var|escape('html') }} {# will be escaped for HTML and JavaScript #}
+            {{ var }} {# will be escaped for JavaScript #}
             {{ var|escape('js') }} {# won't be double-escaped #}
         {% endautoescape %}
 
@@ -565,6 +495,20 @@ to enable by passing them to the constructor::
     $optimizer = new Twig_Extension_Optimizer(Twig_NodeVisitor_Optimizer::OPTIMIZE_FOR);
 
     $twig->addExtension($optimizer);
+
+Twig supports the following optimizations:
+
+* ``Twig_NodeVisitor_Optimizer::OPTIMIZE_ALL``, enables all optimizations
+  (this is the default value).
+* ``Twig_NodeVisitor_Optimizer::OPTIMIZE_NONE``, disables all optimizations.
+  This reduces the compilation time, but it can increase the execution time
+  and the consumed memory.
+* ``Twig_NodeVisitor_Optimizer::OPTIMIZE_FOR``, optimizes the ``for`` tag by
+  removing the ``loop`` variable creation whenever possible.
+* ``Twig_NodeVisitor_Optimizer::OPTIMIZE_RAW_FILTER``, removes the ``raw``
+  filter whenever possible.
+* ``Twig_NodeVisitor_Optimizer::OPTIMIZE_VAR_ACCESS``, simplifies the creation
+  and access of variables in the compiled templates whenever possible.
 
 Exceptions
 ----------

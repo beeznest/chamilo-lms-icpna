@@ -31,7 +31,7 @@ class Twig_Tests_Node_ForTest extends Twig_Test_NodeTestCase
         $this->assertTrue($node->getAttribute('ifexpr'));
         $this->assertEquals('Twig_Node_If', get_class($node->getNode('body')));
         $this->assertEquals($body, $node->getNode('body')->getNode('tests')->getNode(1)->getNode(0));
-        $this->assertEquals(null, $node->getNode('else'));
+        $this->assertNull($node->getNode('else'));
 
         $else = new Twig_Node_Print(new Twig_Node_Expression_Name('foo', 1), 1);
         $node = new Twig_Node_For($keyTarget, $valueTarget, $seq, $ifexpr, $body, $else, 1);
@@ -70,7 +70,7 @@ foreach (\$context['_seq'] as \$context["key"] => \$context["item"]) {
 }
 \$_parent = \$context['_parent'];
 unset(\$context['_seq'], \$context['_iterated'], \$context['key'], \$context['item'], \$context['_parent'], \$context['loop']);
-\$context = array_merge(\$_parent, array_intersect_key(\$context, \$_parent));
+\$context = array_intersect_key(\$context, \$_parent) + \$_parent;
 EOF
         );
 
@@ -113,7 +113,7 @@ foreach (\$context['_seq'] as \$context["k"] => \$context["v"]) {
 }
 \$_parent = \$context['_parent'];
 unset(\$context['_seq'], \$context['_iterated'], \$context['k'], \$context['v'], \$context['_parent'], \$context['loop']);
-\$context = array_merge(\$_parent, array_intersect_key(\$context, \$_parent));
+\$context = array_intersect_key(\$context, \$_parent) + \$_parent;
 EOF
         );
 
@@ -146,7 +146,7 @@ foreach (\$context['_seq'] as \$context["k"] => \$context["v"]) {
 }
 \$_parent = \$context['_parent'];
 unset(\$context['_seq'], \$context['_iterated'], \$context['k'], \$context['v'], \$context['_parent'], \$context['loop']);
-\$context = array_merge(\$_parent, array_intersect_key(\$context, \$_parent));
+\$context = array_intersect_key(\$context, \$_parent) + \$_parent;
 EOF
         );
 
@@ -194,7 +194,7 @@ if (!\$context['_iterated']) {
 }
 \$_parent = \$context['_parent'];
 unset(\$context['_seq'], \$context['_iterated'], \$context['k'], \$context['v'], \$context['_parent'], \$context['loop']);
-\$context = array_merge(\$_parent, array_intersect_key(\$context, \$_parent));
+\$context = array_intersect_key(\$context, \$_parent) + \$_parent;
 EOF
         );
 

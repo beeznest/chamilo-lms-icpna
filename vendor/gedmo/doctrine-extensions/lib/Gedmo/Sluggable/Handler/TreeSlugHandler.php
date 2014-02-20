@@ -15,9 +15,6 @@ use Gedmo\Exception\InvalidMappingException;
  * category tree slug could look like "food/fruits/apples"
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.Sluggable.Handler
- * @subpackage TreeSlugHandler
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class TreeSlugHandler implements SlugHandlerInterface
@@ -35,12 +32,14 @@ class TreeSlugHandler implements SlugHandlerInterface
     protected $sluggable;
 
     /**
-     * Callable of original transliterator
-     * which is used by sluggable
-     *
-     * @var callable
+     * @var string
      */
-    private $originalTransliterator;
+    private $prefix;
+
+    /**
+     * @var string
+     */
+    private $suffix;
 
     /**
      * True if node is being inserted
@@ -74,12 +73,16 @@ class TreeSlugHandler implements SlugHandlerInterface
     /**
      * {@inheritDoc}
      */
-    public function onChangeDecision(SluggableAdapter $ea, $config, $object, &$slug, &$needToChangeSlug)
+    public function onChangeDecision(SluggableAdapter $ea, array &$config, $object, &$slug, &$needToChangeSlug)
     {
         $this->om = $ea->getObjectManager();
         $this->isInsert = $this->om->getUnitOfWork()->isScheduledForInsert($object);
         $options = $config['handlers'][get_called_class()];
+
         $this->usedPathSeparator = isset($options['separator']) ? $options['separator'] : self::SEPARATOR;
+        $this->prefix = isset($options['prefix']) ? $options['prefix'] : '';
+        $this->suffix = isset($options['suffix']) ? $options['suffix'] : '';
+
         if (!$this->isInsert && !$needToChangeSlug) {
             $changeSet = $ea->getObjectChangeSet($this->om->getUnitOfWork(), $object);
             if (isset($changeSet[$options['parentRelationField']])) {
@@ -94,14 +97,21 @@ class TreeSlugHandler implements SlugHandlerInterface
     public function postSlugBuild(SluggableAdapter $ea, array &$config, $object, &$slug)
     {
         $options = $config['handlers'][get_called_class()];
-        $this->originalTransliterator = $this->sluggable->getTransliterator();
-        $this->sluggable->setTransliterator(array($this, 'transliterate'));
         $this->parentSlug = '';
 
         $wrapped = AbstractWrapper::wrap($object, $this->om);
         if ($parent = $wrapped->getPropertyValue($options['parentRelationField'])) {
             $parent = AbstractWrapper::wrap($parent, $this->om);
             $this->parentSlug = $parent->getPropertyValue($config['slug']);
+
+            // if needed, remove suffix from parentSlug, so we can use it to prepend it to our slug
+            if(isset($options['suffix'])) {
+                $suffix = $options['suffix'];
+
+                if(substr($this->parentSlug, -strlen($suffix)) === $suffix) { //endsWith
+                    $this->parentSlug = substr_replace($this->parentSlug, '', -1 * strlen($suffix));
+                }
+            }
         }
     }
 
@@ -120,6 +130,8 @@ class TreeSlugHandler implements SlugHandlerInterface
      */
     public function onSlugCompletion(SluggableAdapter $ea, array &$config, $object, &$slug)
     {
+        $slug = $this->transliterate($slug, $config['separator'], $object);
+
         if (!$this->isInsert) {
             $wrapped = AbstractWrapper::wrap($object, $this->om);
             $meta = $wrapped->getMetadata();
@@ -160,14 +172,16 @@ class TreeSlugHandler implements SlugHandlerInterface
      */
     public function transliterate($text, $separator, $object)
     {
-        $slug = call_user_func_array(
-            $this->originalTransliterator,
-            array($text, $separator, $object)
-        );
+        $slug = $text;
+
         if (strlen($this->parentSlug)) {
-            $slug = $this->parentSlug . $this->usedPathSeparator . $slug;
+            $slug = $this->parentSlug . $this->usedPathSeparator . $slug . $this->suffix;
         }
-        $this->sluggable->setTransliterator($this->originalTransliterator);
+        else {
+            // if no parentSlug, apply our prefix
+            $slug = $this->prefix . $slug;
+        }
+
         return $slug;
     }
 
@@ -176,6 +190,6 @@ class TreeSlugHandler implements SlugHandlerInterface
      */
     public function handlesUrlization()
     {
-        return true;
+        return false;
     }
 }

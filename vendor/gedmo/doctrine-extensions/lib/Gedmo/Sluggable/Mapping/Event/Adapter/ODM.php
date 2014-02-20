@@ -12,9 +12,6 @@ use Gedmo\Tool\Wrapper\AbstractWrapper;
  * for sluggable behavior
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo\Sluggable\Mapping\Event\Adapter
- * @subpackage ODM
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 final class ODM extends BaseAdapterODM implements SluggableAdapter
@@ -31,6 +28,18 @@ final class ODM extends BaseAdapterODM implements SluggableAdapter
             $qb->field($meta->identifier)->notEqual($identifier);
         }
         $qb->field($config['slug'])->equals(new \MongoRegex('/^' . preg_quote($slug, '/') . '/'));
+
+        // use the unique_base to restrict the uniqueness check
+        if ($config['unique'] && isset($config['unique_base'])) {
+            if (is_object($ubase = $wrapped->getPropertyValue($config['unique_base']))) {
+                $qb->field($config['unique_base'] . '.$id')->equals(new \MongoId($ubase->getId()));
+            } elseif ($ubase) {
+                $qb->where('/^' . preg_quote($ubase, '/') . '/.test(this.' . $config['unique_base'] . ')');
+            } else {
+                $qb->field($config['unique_base'])->equals(null);
+            }
+        }
+
         $q = $qb->getQuery();
         $q->setHydrate(false);
 
@@ -42,8 +51,8 @@ final class ODM extends BaseAdapterODM implements SluggableAdapter
     }
 
     /**
-     * This query can couse some data integrity failures since it does not
-     * execute atomicaly
+     * This query can cause some data integrity failures since it does not
+     * execute automatically
      *
      * {@inheritDoc}
      */
@@ -78,8 +87,8 @@ final class ODM extends BaseAdapterODM implements SluggableAdapter
     }
 
     /**
-     * This query can couse some data integrity failures since it does not
-     * execute atomicaly
+     * This query can cause some data integrity failures since it does not
+     * execute atomically
      *
      * {@inheritDoc}
      */

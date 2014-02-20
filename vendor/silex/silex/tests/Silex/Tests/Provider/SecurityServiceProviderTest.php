@@ -15,6 +15,7 @@ use Silex\Application;
 use Silex\WebTestCase;
 use Silex\Provider\SecurityServiceProvider;
 use Silex\Provider\SessionServiceProvider;
+use Silex\Provider\ValidatorServiceProvider;
 use Symfony\Component\HttpKernel\Client;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -25,13 +26,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class SecurityServiceProviderTest extends WebTestCase
 {
-    public function setUp()
-    {
-        if (!is_dir(__DIR__.'/../../../../vendor/symfony/security')) {
-            $this->markTestSkipped('Security dependency was not installed.');
-        }
-    }
-
     /**
      * @expectedException \LogicException
      */
@@ -123,6 +117,65 @@ class SecurityServiceProviderTest extends WebTestCase
         $this->assertEquals('adminAUTHENTICATEDADMIN', $client->getResponse()->getContent());
         $client->request('get', '/admin');
         $this->assertEquals('admin', $client->getResponse()->getContent());
+    }
+
+    public function testUserPasswordValidatorIsRegistered()
+    {
+        $app = new Application();
+
+        $app->register(new ValidatorServiceProvider());
+        $app->register(new SecurityServiceProvider(), array(
+            'security.firewalls' => array(
+                'admin' => array(
+                    'pattern' => '^/admin',
+                    'http' => true,
+                    'users' => array(
+                        'admin' => array('ROLE_ADMIN', '513aeb0121909'),
+                    )
+                ),
+            ),
+        ));
+
+        $app->boot();
+
+        $this->assertInstanceOf('Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator', $app['security.validator.user_password_validator']);
+    }
+
+    public function testExposedExceptions()
+    {
+        $app = $this->createApplication('form');
+        $app['security.hide_user_not_found'] = false;
+
+        $client = new Client($app);
+
+        $client->request('get', '/');
+        $this->assertEquals('ANONYMOUS', $client->getResponse()->getContent());
+
+        $client->request('post', '/login_check', array('_username' => 'fabien', '_password' => 'bar'));
+        $this->assertEquals('The presented password is invalid.', $app['security.last_error']($client->getRequest()));
+        $client->getRequest()->getSession()->save();
+
+        $client->request('post', '/login_check', array('_username' => 'unknown', '_password' => 'bar'));
+        $this->assertEquals('Username "unknown" does not exist.', $app['security.last_error']($client->getRequest()));
+        $client->getRequest()->getSession()->save();
+    }
+
+    public function testFakeRoutesAreSerializable()
+    {
+        $app = new Application();
+
+        $app->register(new SecurityServiceProvider(), array(
+            'security.firewalls' => array(
+                'admin' => array(
+                    'logout' => true,
+                ),
+            ),
+        ));
+
+        $app->boot();
+        $app->flush();
+
+        $this->assertCount(1, unserialize(serialize($app['routes'])));
     }
 
     public function createApplication($authenticationMethod = 'form')

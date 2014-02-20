@@ -9,15 +9,12 @@ use Gedmo\Mapping\Driver\Xml as BaseXml,
 /**
  * This is a xml mapping driver for SoftDeleteable
  * behavioral extension. Used for extraction of extended
- * metadata from xml specificaly for SoftDeleteable
+ * metadata from xml specifically for SoftDeleteable
  * extension.
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @author Miha Vrhovnik <miha.vrhovnik@gmail.com>
- * @package Gedmo.Timestampable.Mapping.Driver
- * @subpackage Xml
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class Xml extends BaseXml
@@ -34,7 +31,7 @@ class Xml extends BaseXml
         $xmlDoctrine = $xml;
         $xml = $xml->children(self::GEDMO_NAMESPACE_URI);
 
-        if ($xmlDoctrine->getName() == 'entity' || $xmlDoctrine->getName() == 'mapped-superclass') {
+        if (in_array($xmlDoctrine->getName(), array('mapped-superclass', 'entity', 'document', 'embedded-document'))) {
             if (isset($xml->{'soft-deleteable'})) {
                 $field = $this->_getAttribute($xml->{'soft-deleteable'}, 'field-name');
 
@@ -46,6 +43,11 @@ class Xml extends BaseXml
 
                 $config['softDeleteable'] = true;
                 $config['fieldName'] = $field;
+
+                $config['timeAware'] = false;
+                if($this->_isAttributeSet($xml->{'soft-deleteable'}, 'time-aware')) {
+                    $config['timeAware'] = $this->_getBooleanAttribute($xml->{'soft-deleteable'}, 'time-aware');
+                }
             }
         }
     }

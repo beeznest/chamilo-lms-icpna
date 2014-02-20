@@ -13,11 +13,11 @@ namespace Silex\Provider;
 
 use Silex\Application;
 use Silex\ServiceProviderInterface;
-
+use Silex\ConstraintValidatorFactory;
 use Symfony\Component\Validator\Validator;
+use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
-use Symfony\Component\Validator\ConstraintValidatorFactory;
 
 /**
  * Symfony Validator component Provider.
@@ -29,14 +29,16 @@ class ValidatorServiceProvider implements ServiceProviderInterface
     public function register(Application $app)
     {
         $app['validator'] = $app->share(function ($app) {
+            $r = new \ReflectionClass('Symfony\Component\Validator\Validator');
+
             if (isset($app['translator'])) {
-                $r = new \ReflectionClass('Symfony\Component\Validator\Validator');
                 $app['translator']->addResource('xliff', dirname($r->getFilename()).'/Resources/translations/validators.'.$app['locale'].'.xlf', $app['locale'], 'validators');
             }
 
             return new Validator(
                 $app['validator.mapping.class_metadata_factory'],
-                $app['validator.validator_factory']
+                $app['validator.validator_factory'],
+                isset($app['translator']) ? $app['translator'] : new DefaultTranslator()
             );
         });
 
@@ -44,16 +46,14 @@ class ValidatorServiceProvider implements ServiceProviderInterface
             return new ClassMetadataFactory(new StaticMethodLoader());
         });
 
-        $app['validator.validator_factory'] = $app->share(function () {
-            return new ConstraintValidatorFactory();
+        $app['validator.validator_factory'] = $app->share(function () use ($app) {
+            $validators = isset($app['validator.validator_service_ids']) ? $app['validator.validator_service_ids'] : array();
+
+            return new ConstraintValidatorFactory($app, $validators);
         });
     }
 
     public function boot(Application $app)
     {
-        // BC: to be removed before 1.0
-        if (isset($app['validator.class_path'])) {
-            throw new \RuntimeException('You have provided the validator.class_path parameter. The autoloader has been removed from Silex. It is recommended that you use Composer to manage your dependencies and handle your autoloading. If you are already using Composer, you can remove the parameter. See http://getcomposer.org for more information.');
-        }
     }
 }

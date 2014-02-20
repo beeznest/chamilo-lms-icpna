@@ -13,7 +13,6 @@ use Doctrine\Common\Util\Debug,
  * These are tests for loggable behavior
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.Loggable
  * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
@@ -37,6 +36,30 @@ class LoggableEntityTest extends BaseTestCaseORM
         $evm->addEventSubscriber($this->LoggableListener);
 
         $this->em = $this->getMockSqliteEntityManager($evm);
+    }
+
+    /**
+     * @test
+     */
+    function shouldHandleClonedEntity()
+    {
+        $art0 = new Article();
+        $art0->setTitle('Title');
+
+        $this->em->persist($art0);
+        $this->em->flush();
+
+        $art1 = clone $art0;
+        $art1->setTitle('Cloned');
+        $this->em->persist($art1);
+        $this->em->flush();
+
+        $logRepo = $this->em->getRepository('Gedmo\Loggable\Entity\LogEntry');
+        $logs = $logRepo->findAll();
+        $this->assertSame(2, count($logs));
+        $this->assertSame('create', $logs[0]->getAction());
+        $this->assertSame('create', $logs[1]->getAction());
+        $this->assertTrue($logs[0]->getObjectId() !== $logs[1]->getObjectId());
     }
 
     public function testLoggable()

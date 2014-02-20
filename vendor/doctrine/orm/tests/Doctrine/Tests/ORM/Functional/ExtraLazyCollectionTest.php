@@ -14,8 +14,12 @@ require_once __DIR__ . '/../../TestInit.php';
 class ExtraLazyCollectionTest extends \Doctrine\Tests\OrmFunctionalTestCase
 {
     private $userId;
+    private $userId2;
     private $groupId;
     private $articleId;
+
+    private $topic;
+    private $phonenumber;
 
     public function setUp()
     {
@@ -24,10 +28,15 @@ class ExtraLazyCollectionTest extends \Doctrine\Tests\OrmFunctionalTestCase
 
         $class = $this->_em->getClassMetadata('Doctrine\Tests\Models\CMS\CmsUser');
         $class->associationMappings['groups']['fetch'] = ClassMetadataInfo::FETCH_EXTRA_LAZY;
+        $class->associationMappings['groups']['indexBy'] = 'name';
         $class->associationMappings['articles']['fetch'] = ClassMetadataInfo::FETCH_EXTRA_LAZY;
+        $class->associationMappings['articles']['indexBy'] = 'topic';
+        $class->associationMappings['phonenumbers']['fetch'] = ClassMetadataInfo::FETCH_EXTRA_LAZY;
+        $class->associationMappings['phonenumbers']['indexBy'] = 'phonenumber';
 
         $class = $this->_em->getClassMetadata('Doctrine\Tests\Models\CMS\CmsGroup');
         $class->associationMappings['users']['fetch'] = ClassMetadataInfo::FETCH_EXTRA_LAZY;
+        $class->associationMappings['users']['indexBy'] = 'username';
 
         $this->loadFixture();
     }
@@ -39,6 +48,11 @@ class ExtraLazyCollectionTest extends \Doctrine\Tests\OrmFunctionalTestCase
         $class = $this->_em->getClassMetadata('Doctrine\Tests\Models\CMS\CmsUser');
         $class->associationMappings['groups']['fetch'] = ClassMetadataInfo::FETCH_LAZY;
         $class->associationMappings['articles']['fetch'] = ClassMetadataInfo::FETCH_LAZY;
+        $class->associationMappings['phonenumbers']['fetch'] = ClassMetadataInfo::FETCH_LAZY;
+
+        unset($class->associationMappings['groups']['indexBy']);
+        unset($class->associationMappings['articles']['indexBy']);
+        unset($class->associationMappings['phonenumbers']['indexBy']);
 
         $class = $this->_em->getClassMetadata('Doctrine\Tests\Models\CMS\CmsGroup');
         $class->associationMappings['users']['fetch'] = ClassMetadataInfo::FETCH_LAZY;
@@ -46,6 +60,7 @@ class ExtraLazyCollectionTest extends \Doctrine\Tests\OrmFunctionalTestCase
 
     /**
      * @group DDC-546
+     * @group non-cacheable
      */
     public function testCountNotInitializesCollection()
     {
@@ -81,6 +96,7 @@ class ExtraLazyCollectionTest extends \Doctrine\Tests\OrmFunctionalTestCase
 
     /**
      * @group DDC-546
+     * @group non-cacheable
      */
     public function testCountWhenInitialized()
     {
@@ -91,7 +107,7 @@ class ExtraLazyCollectionTest extends \Doctrine\Tests\OrmFunctionalTestCase
 
         $this->assertTrue($user->groups->isInitialized());
         $this->assertEquals(3, count($user->groups));
-        $this->assertEquals($queryCount + 1, $this->getCurrentQueryCount(), "Should only execute one query to initialize colleciton, no extra query for count() more.");
+        $this->assertEquals($queryCount + 1, $this->getCurrentQueryCount(), "Should only execute one query to initialize collection, no extra query for count() more.");
     }
 
     /**
@@ -131,6 +147,7 @@ class ExtraLazyCollectionTest extends \Doctrine\Tests\OrmFunctionalTestCase
 
     /**
      * @group DDC-546
+     * @group non-cacheable
      */
     public function testSlice()
     {
@@ -161,6 +178,7 @@ class ExtraLazyCollectionTest extends \Doctrine\Tests\OrmFunctionalTestCase
 
     /**
      * @group DDC-546
+     * @group non-cacheable
      */
     public function testSliceInitializedCollection()
     {
@@ -174,8 +192,8 @@ class ExtraLazyCollectionTest extends \Doctrine\Tests\OrmFunctionalTestCase
         $this->assertEquals($queryCount + 1, $this->getCurrentQueryCount());
 
         $this->assertEquals(2, count($someGroups));
-        $this->assertTrue($user->groups->contains($someGroups[0]));
-        $this->assertTrue($user->groups->contains($someGroups[1]));
+        $this->assertTrue($user->groups->contains(array_shift($someGroups)));
+        $this->assertTrue($user->groups->contains(array_shift($someGroups)));
     }
 
     /**
@@ -493,6 +511,7 @@ class ExtraLazyCollectionTest extends \Doctrine\Tests\OrmFunctionalTestCase
 
     /**
      * @group DDC-1462
+     * @group non-cacheable
      */
     public function testSliceOnDirtyCollection()
     {
@@ -510,6 +529,152 @@ class ExtraLazyCollectionTest extends \Doctrine\Tests\OrmFunctionalTestCase
 
         $this->assertEquals(4, count($groups));
         $this->assertEquals($qc + 1, $this->getCurrentQueryCount());
+    }
+
+    /**
+     * @group DDC-1398
+     * @group non-cacheable
+     */
+    public function testGetIndexByIdentifier()
+    {
+        $user = $this->_em->find('Doctrine\Tests\Models\CMS\CmsUser', $this->userId);
+        /* @var $user CmsUser */
+
+        $queryCount = $this->getCurrentQueryCount();
+        $phonenumber = $user->phonenumbers->get($this->phonenumber);
+
+        $this->assertFalse($user->phonenumbers->isInitialized());
+        $this->assertEquals($queryCount + 1, $this->getCurrentQueryCount());
+        $this->assertSame($phonenumber, $this->_em->find('Doctrine\Tests\Models\CMS\CmsPhonenumber', $this->phonenumber));
+
+        $article = $user->phonenumbers->get($this->phonenumber);
+        $this->assertEquals($queryCount + 1, $this->getCurrentQueryCount(), "Getting the same entity should not cause an extra query to be executed");
+    }
+
+    /**
+     * @group DDC-1398
+     */
+    public function testGetIndexByOneToMany()
+    {
+        $user = $this->_em->find('Doctrine\Tests\Models\CMS\CmsUser', $this->userId);
+        /* @var $user CmsUser */
+
+        $queryCount = $this->getCurrentQueryCount();
+
+        $article = $user->articles->get($this->topic);
+
+        $this->assertFalse($user->articles->isInitialized());
+        $this->assertEquals($queryCount + 1, $this->getCurrentQueryCount());
+        $this->assertSame($article, $this->_em->find('Doctrine\Tests\Models\CMS\CmsArticle', $this->articleId));
+    }
+
+    /**
+     * @group DDC-1398
+     */
+    public function testGetNonExistentIndexBy()
+    {
+        $user = $this->_em->find('Doctrine\Tests\Models\CMS\CmsUser', $this->userId);
+        $this->assertNull($user->articles->get(-1));
+    }
+
+    public function testContainsKeyIndexByOneToMany()
+    {
+        $user = $this->_em->find('Doctrine\Tests\Models\CMS\CmsUser', $this->userId);
+        /* @var $user CmsUser */
+
+        $queryCount = $this->getCurrentQueryCount();
+
+        $contains = $user->articles->containsKey($this->topic);
+
+        $this->assertTrue($contains);
+        $this->assertFalse($user->articles->isInitialized());
+        $this->assertEquals($queryCount + 1, $this->getCurrentQueryCount());
+    }
+
+    public function testContainsKeyIndexByManyToMany()
+    {
+        $user = $this->_em->find('Doctrine\Tests\Models\CMS\CmsUser', $this->userId2);
+
+        $group = $this->_em->find('Doctrine\Tests\Models\CMS\CmsGroup', $this->groupId);
+
+        $queryCount = $this->getCurrentQueryCount();
+
+        $contains = $user->groups->containsKey($group->name);
+
+        $this->assertTrue($contains, "The item is not into collection");
+        $this->assertFalse($user->groups->isInitialized(), "The collection must not be initialized");
+        $this->assertEquals($queryCount + 1, $this->getCurrentQueryCount());
+    }
+    public function testContainsKeyIndexByManyToManyNonOwning()
+    {
+        $user = $this->_em->find('Doctrine\Tests\Models\CMS\CmsUser', $this->userId2);
+        $group = $this->_em->find('Doctrine\Tests\Models\CMS\CmsGroup', $this->groupId);
+
+        $queryCount = $this->getCurrentQueryCount();
+
+        $contains = $group->users->containsKey($user->username);
+
+        $this->assertTrue($contains, "The item is not into collection");
+        $this->assertFalse($group->users->isInitialized(), "The collection must not be initialized");
+        $this->assertEquals($queryCount + 1, $this->getCurrentQueryCount());
+    }
+
+    public function testContainsKeyIndexByWithPkManyToMany()
+    {
+        $class = $this->_em->getClassMetadata('Doctrine\Tests\Models\CMS\CmsUser');
+        $class->associationMappings['groups']['indexBy'] = 'id';
+
+        $user = $this->_em->find('Doctrine\Tests\Models\CMS\CmsUser', $this->userId2);
+
+        $queryCount = $this->getCurrentQueryCount();
+
+        $contains = $user->groups->containsKey($this->groupId);
+
+        $this->assertTrue($contains, "The item is not into collection");
+        $this->assertFalse($user->groups->isInitialized(), "The collection must not be initialized");
+        $this->assertEquals($queryCount + 1, $this->getCurrentQueryCount());
+    }
+    public function testContainsKeyIndexByWithPkManyToManyNonOwning()
+    {
+        $class = $this->_em->getClassMetadata('Doctrine\Tests\Models\CMS\CmsGroup');
+        $class->associationMappings['users']['indexBy'] = 'id';
+
+        $group = $this->_em->find('Doctrine\Tests\Models\CMS\CmsGroup', $this->groupId);
+
+        $queryCount = $this->getCurrentQueryCount();
+
+        $contains = $group->users->containsKey($this->userId2);
+
+        $this->assertTrue($contains, "The item is not into collection");
+        $this->assertFalse($group->users->isInitialized(), "The collection must not be initialized");
+        $this->assertEquals($queryCount + 1, $this->getCurrentQueryCount());
+    }
+
+    public function testContainsKeyNonExistentIndexByOneToMany()
+    {
+        $user = $this->_em->find('Doctrine\Tests\Models\CMS\CmsUser', $this->userId2);
+
+        $queryCount = $this->getCurrentQueryCount();
+
+        $contains = $user->articles->containsKey("NonExistentTopic");
+
+        $this->assertFalse($contains);
+        $this->assertFalse($user->articles->isInitialized());
+        $this->assertEquals($queryCount + 1, $this->getCurrentQueryCount());
+    }
+
+    public function testContainsKeyNonExistentIndexByManyToMany()
+    {
+        $user = $this->_em->find('Doctrine\Tests\Models\CMS\CmsUser', $this->userId2);
+
+
+        $queryCount = $this->getCurrentQueryCount();
+
+        $contains = $user->groups->containsKey("NonExistentTopic");
+
+        $this->assertFalse($contains);
+        $this->assertFalse($user->groups->isInitialized());
+        $this->assertEquals($queryCount + 1, $this->getCurrentQueryCount());
     }
 
     private function loadFixture()
@@ -561,23 +726,39 @@ class ExtraLazyCollectionTest extends \Doctrine\Tests\OrmFunctionalTestCase
         $this->_em->persist($group3);
 
         $article1 = new \Doctrine\Tests\Models\CMS\CmsArticle();
-        $article1->topic = "Test";
-        $article1->text = "Test";
+        $article1->topic = "Test1";
+        $article1->text = "Test1";
         $article1->setAuthor($user1);
 
         $article2 = new \Doctrine\Tests\Models\CMS\CmsArticle();
-        $article2->topic = "Test";
-        $article2->text = "Test";
+        $article2->topic = "Test2";
+        $article2->text = "Test2";
         $article2->setAuthor($user1);
 
         $this->_em->persist($article1);
         $this->_em->persist($article2);
+
+        $phonenumber1 = new \Doctrine\Tests\Models\CMS\CmsPhonenumber();
+        $phonenumber1->phonenumber = '12345';
+
+        $phonenumber2 = new \Doctrine\Tests\Models\CMS\CmsPhonenumber();
+        $phonenumber2->phonenumber = '67890';
+
+        $this->_em->persist($phonenumber1);
+        $this->_em->persist($phonenumber2);
+
+        $user1->addPhonenumber($phonenumber1);
 
         $this->_em->flush();
         $this->_em->clear();
 
         $this->articleId = $article1->id;
         $this->userId = $user1->getId();
+        $this->userId2 = $user2->getId();
         $this->groupId = $group1->id;
+
+        $this->topic = $article1->topic;
+        $this->phonenumber = $phonenumber1->phonenumber;
+
     }
 }

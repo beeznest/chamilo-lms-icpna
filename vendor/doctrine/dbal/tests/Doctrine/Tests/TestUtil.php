@@ -17,6 +17,8 @@ class TestUtil
      * 'db_username' : The username to use for connecting.
      * 'db_password' : The password to use for connecting.
      * 'db_host' : The hostname of the database to connect to.
+     * 'db_server' : The server name of the database to connect to
+     *               (optional, some vendors allow multiple server instances with different names on the same host).
      * 'db_name' : The name of the database to connect to.
      * 'db_port' : The port of the database to connect to.
      *
@@ -35,7 +37,7 @@ class TestUtil
         if (isset($GLOBALS['db_type'], $GLOBALS['db_username'], $GLOBALS['db_password'],
                 $GLOBALS['db_host'], $GLOBALS['db_name'], $GLOBALS['db_port']) &&
            isset($GLOBALS['tmpdb_type'], $GLOBALS['tmpdb_username'], $GLOBALS['tmpdb_password'],
-                $GLOBALS['tmpdb_host'], $GLOBALS['tmpdb_name'], $GLOBALS['tmpdb_port'])) {
+                $GLOBALS['tmpdb_host'], $GLOBALS['tmpdb_port'])) {
             $realDbParams = array(
                 'driver' => $GLOBALS['db_type'],
                 'user' => $GLOBALS['db_username'],
@@ -49,12 +51,24 @@ class TestUtil
                 'user' => $GLOBALS['tmpdb_username'],
                 'password' => $GLOBALS['tmpdb_password'],
                 'host' => $GLOBALS['tmpdb_host'],
-                'dbname' => $GLOBALS['tmpdb_name'],
+                'dbname' => null,
                 'port' => $GLOBALS['tmpdb_port']
             );
 
+            if (isset($GLOBALS['db_server'])) {
+                $realDbParams['server'] = $GLOBALS['db_server'];
+            }
+
             if (isset($GLOBALS['db_unix_socket'])) {
                 $realDbParams['unix_socket'] = $GLOBALS['db_unix_socket'];
+            }
+
+            if (isset($GLOBALS['tmpdb_name'])) {
+                $tmpDbParams['dbname'] = $GLOBALS['tmpdb_name'];
+            }
+
+            if (isset($GLOBALS['tmpdb_server'])) {
+                $tmpDbParams['server'] = $GLOBALS['tmpdb_server'];
             }
 
             if (isset($GLOBALS['tmpdb_unix_socket'])) {
@@ -63,12 +77,13 @@ class TestUtil
 
             $realConn = \Doctrine\DBAL\DriverManager::getConnection($realDbParams);
 
-            $platform  = $realConn->getDatabasePlatform();
+            // Connect to tmpdb in order to drop and create the real test db.
+            $tmpConn = \Doctrine\DBAL\DriverManager::getConnection($tmpDbParams);
+
+            $platform  = $tmpConn->getDatabasePlatform();
 
             if ($platform->supportsCreateDropDatabase()) {
                 $dbname = $realConn->getDatabase();
-                // Connect to tmpdb in order to drop and create the real test db.
-                $tmpConn = \Doctrine\DBAL\DriverManager::getConnection($tmpDbParams);
                 $realConn->close();
 
                 $tmpConn->getSchemaManager()->dropAndCreateDatabase($dbname);
@@ -123,6 +138,10 @@ class TestUtil
             'dbname' => $GLOBALS['tmpdb_name'],
             'port' => $GLOBALS['tmpdb_port']
         );
+
+        if (isset($GLOBALS['tmpdb_server'])) {
+            $tmpDbParams['server'] = $GLOBALS['tmpdb_server'];
+        }
 
         // Connect to tmpdb in order to drop and create the real test db.
         return \Doctrine\DBAL\DriverManager::getConnection($tmpDbParams);

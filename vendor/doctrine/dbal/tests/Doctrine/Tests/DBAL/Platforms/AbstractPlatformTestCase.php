@@ -4,8 +4,12 @@ namespace Doctrine\Tests\DBAL\Platforms;
 
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Events;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Schema\ForeignKeyConstraint;
+use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\TableDiff;
+use Doctrine\DBAL\Types\Type;
 
 abstract class AbstractPlatformTestCase extends \Doctrine\Tests\DbalTestCase
 {
@@ -153,7 +157,7 @@ abstract class AbstractPlatformTestCase extends \Doctrine\Tests\DbalTestCase
 
         $fk = new \Doctrine\DBAL\Schema\ForeignKeyConstraint(array('fk_name'), 'foreign', array('id'), 'constraint_fk');
         $sql = $this->_platform->getCreateConstraintSQL($fk, 'test');
-        $this->assertEquals($this->getGenerateConstraintForeignKeySql(), $sql);
+        $this->assertEquals($this->getGenerateConstraintForeignKeySql($fk), $sql);
     }
 
     public function testGeneratesForeignKeySqlOnlyWhenSupportingForeignKeys()
@@ -209,9 +213,11 @@ abstract class AbstractPlatformTestCase extends \Doctrine\Tests\DbalTestCase
         return 'ALTER TABLE test ADD CONSTRAINT constraint_name PRIMARY KEY (test)';
     }
 
-    public function getGenerateConstraintForeignKeySql()
+    public function getGenerateConstraintForeignKeySql(ForeignKeyConstraint $fk)
     {
-        return 'ALTER TABLE test ADD CONSTRAINT constraint_fk FOREIGN KEY (fk_name) REFERENCES foreign (id)';
+        $quotedForeignTable = $fk->getQuotedForeignTableName($this->_platform);
+
+        return "ALTER TABLE test ADD CONSTRAINT constraint_fk FOREIGN KEY (fk_name) REFERENCES $quotedForeignTable (id)";
     }
 
     abstract public function getGenerateAlterTableSql();
@@ -371,6 +377,12 @@ abstract class AbstractPlatformTestCase extends \Doctrine\Tests\DbalTestCase
     {
         $tableDiff = new TableDiff('mytable');
         $tableDiff->addedColumns['quota'] = new \Doctrine\DBAL\Schema\Column('quota', \Doctrine\DBAL\Types\Type::getType('integer'), array('comment' => 'A comment'));
+        $tableDiff->changedColumns['foo'] = new \Doctrine\DBAL\Schema\ColumnDiff(
+            'foo', new \Doctrine\DBAL\Schema\Column(
+                'foo', \Doctrine\DBAL\Types\Type::getType('string')
+            ),
+            array('comment')
+        );
         $tableDiff->changedColumns['bar'] = new \Doctrine\DBAL\Schema\ColumnDiff(
             'bar', new \Doctrine\DBAL\Schema\Column(
                 'baz', \Doctrine\DBAL\Types\Type::getType('string'), array('comment' => 'B comment')
@@ -423,8 +435,8 @@ abstract class AbstractPlatformTestCase extends \Doctrine\Tests\DbalTestCase
     public function testQuotedColumnInPrimaryKeyPropagation()
     {
         $table = new Table('`quoted`');
-        $table->addColumn('`key`', 'string');
-        $table->setPrimaryKey(array('key'));
+        $table->addColumn('create', 'string');
+        $table->setPrimaryKey(array('create'));
 
         $sql = $this->_platform->getCreateTableSQL($table);
         $this->assertEquals($this->getQuotedColumnInPrimaryKeySQL(), $sql);
@@ -432,19 +444,225 @@ abstract class AbstractPlatformTestCase extends \Doctrine\Tests\DbalTestCase
 
     abstract protected function getQuotedColumnInPrimaryKeySQL();
     abstract protected function getQuotedColumnInIndexSQL();
+    abstract protected function getQuotedColumnInForeignKeySQL();
 
     /**
      * @group DBAL-374
      */
     public function testQuotedColumnInIndexPropagation()
     {
-        $this->markTestSkipped('requires big refactoring of Platforms');
-
         $table = new Table('`quoted`');
-        $table->addColumn('`key`', 'string');
-        $table->addIndex(array('key'));
+        $table->addColumn('create', 'string');
+        $table->addIndex(array('create'));
 
         $sql = $this->_platform->getCreateTableSQL($table);
         $this->assertEquals($this->getQuotedColumnInIndexSQL(), $sql);
+    }
+
+    /**
+     * @group DBAL-374
+     */
+    public function testQuotedColumnInForeignKeyPropagation()
+    {
+        $table = new Table('`quoted`');
+        $table->addColumn('create', 'string');
+        $table->addColumn('foo', 'string');
+        $table->addColumn('`bar`', 'string');
+
+        // Foreign table with reserved keyword as name (needs quotation).
+        $foreignTable = new Table('foreign');
+        $foreignTable->addColumn('create', 'string');    // Foreign column with reserved keyword as name (needs quotation).
+        $foreignTable->addColumn('bar', 'string');       // Foreign column with non-reserved keyword as name (does not need quotation).
+        $foreignTable->addColumn('`foo-bar`', 'string'); // Foreign table with special character in name (needs quotation on some platforms, e.g. Sqlite).
+
+        $table->addForeignKeyConstraint($foreignTable, array('create', 'foo', '`bar`'), array('create', 'bar', '`foo-bar`'), array(), 'FK_WITH_RESERVED_KEYWORD');
+
+        // Foreign table with non-reserved keyword as name (does not need quotation).
+        $foreignTable = new Table('foo');
+        $foreignTable->addColumn('create', 'string');    // Foreign column with reserved keyword as name (needs quotation).
+        $foreignTable->addColumn('bar', 'string');       // Foreign column with non-reserved keyword as name (does not need quotation).
+        $foreignTable->addColumn('`foo-bar`', 'string'); // Foreign table with special character in name (needs quotation on some platforms, e.g. Sqlite).
+
+        $table->addForeignKeyConstraint($foreignTable, array('create', 'foo', '`bar`'), array('create', 'bar', '`foo-bar`'), array(), 'FK_WITH_NON_RESERVED_KEYWORD');
+
+        // Foreign table with special character in name (needs quotation on some platforms, e.g. Sqlite).
+        $foreignTable = new Table('`foo-bar`');
+        $foreignTable->addColumn('create', 'string');    // Foreign column with reserved keyword as name (needs quotation).
+        $foreignTable->addColumn('bar', 'string');       // Foreign column with non-reserved keyword as name (does not need quotation).
+        $foreignTable->addColumn('`foo-bar`', 'string'); // Foreign table with special character in name (needs quotation on some platforms, e.g. Sqlite).
+
+        $table->addForeignKeyConstraint($foreignTable, array('create', 'foo', '`bar`'), array('create', 'bar', '`foo-bar`'), array(), 'FK_WITH_INTENDED_QUOTATION');
+
+        $sql = $this->_platform->getCreateTableSQL($table, AbstractPlatform::CREATE_FOREIGNKEYS);
+        $this->assertEquals($this->getQuotedColumnInForeignKeySQL(), $sql);
+    }
+
+    /**
+     * @expectedException \Doctrine\DBAL\DBALException
+     */
+    public function testGetCreateSchemaSQL()
+    {
+        $this->_platform->getCreateSchemaSQL('schema');
+    }
+
+    /**
+     * @expectedException \Doctrine\DBAL\DBALException
+     */
+    public function testSchemaNeedsCreation()
+    {
+        $this->_platform->schemaNeedsCreation('schema');
+    }
+
+    /**
+     * @group DBAL-585
+     */
+    public function testAlterTableChangeQuotedColumn()
+    {
+        $tableDiff = new \Doctrine\DBAL\Schema\TableDiff('mytable');
+        $tableDiff->fromTable = new \Doctrine\DBAL\Schema\Table('mytable');
+        $tableDiff->changedColumns['foo'] = new \Doctrine\DBAL\Schema\ColumnDiff(
+            'select', new \Doctrine\DBAL\Schema\Column(
+                'select', \Doctrine\DBAL\Types\Type::getType('string')
+            ),
+            array('type')
+        );
+
+        $this->assertContains(
+            $this->_platform->quoteIdentifier('select'),
+            implode(';', $this->_platform->getAlterTableSQL($tableDiff))
+        );
+    }
+
+    /**
+     * @group DBAL-563
+     */
+    public function testUsesSequenceEmulatedIdentityColumns()
+    {
+        $this->assertFalse($this->_platform->usesSequenceEmulatedIdentityColumns());
+    }
+
+    /**
+     * @group DBAL-563
+     * @expectedException \Doctrine\DBAL\DBALException
+     */
+    public function testReturnsIdentitySequenceName()
+    {
+        $this->_platform->getIdentitySequenceName('mytable', 'mycolumn');
+    }
+
+    public function testReturnsBinaryDefaultLength()
+    {
+        $this->assertSame($this->getBinaryDefaultLength(), $this->_platform->getBinaryDefaultLength());
+    }
+
+    protected function getBinaryDefaultLength()
+    {
+        return 255;
+    }
+
+    public function testReturnsBinaryMaxLength()
+    {
+        $this->assertSame($this->getBinaryMaxLength(), $this->_platform->getBinaryMaxLength());
+    }
+
+    protected function getBinaryMaxLength()
+    {
+        return 4000;
+    }
+
+    /**
+     * @expectedException \Doctrine\DBAL\DBALException
+     */
+    public function testReturnsBinaryTypeDeclarationSQL()
+    {
+        $this->_platform->getBinaryTypeDeclarationSQL(array());
+    }
+
+    /**
+     * @group DBAL-553
+     */
+    public function hasNativeJsonType()
+    {
+        $this->assertFalse($this->_platform->hasNativeJsonType());
+    }
+
+    /**
+     * @group DBAL-553
+     */
+    public function testReturnsJsonTypeDeclarationSQL()
+    {
+        $column = array(
+            'length'  => 666,
+            'notnull' => true,
+            'type'    => Type::getType('json_array'),
+        );
+
+        $this->assertSame(
+            $this->_platform->getClobTypeDeclarationSQL($column),
+            $this->_platform->getJsonTypeDeclarationSQL($column)
+        );
+    }
+
+    /**
+     * @group DBAL-234
+     */
+    public function testAlterTableRenameIndex()
+    {
+        $tableDiff = new TableDiff('mytable');
+        $tableDiff->fromTable = new Table('mytable');
+        $tableDiff->fromTable->addColumn('id', 'integer');
+        $tableDiff->fromTable->setPrimaryKey(array('id'));
+        $tableDiff->renamedIndexes = array(
+            'idx_foo' => new Index('idx_bar', array('id'))
+        );
+
+        $this->assertSame(
+            $this->getAlterTableRenameIndexSQL(),
+            $this->_platform->getAlterTableSQL($tableDiff)
+        );
+    }
+
+    /**
+     * @group DBAL-234
+     */
+    protected function getAlterTableRenameIndexSQL()
+    {
+        return array(
+            'DROP INDEX idx_foo',
+            'CREATE INDEX idx_bar ON mytable (id)',
+        );
+    }
+
+    /**
+     * @group DBAL-234
+     */
+    public function testQuotesAlterTableRenameIndex()
+    {
+        $tableDiff = new TableDiff('table');
+        $tableDiff->fromTable = new Table('table');
+        $tableDiff->fromTable->addColumn('id', 'integer');
+        $tableDiff->fromTable->setPrimaryKey(array('id'));
+        $tableDiff->renamedIndexes = array(
+            'create' => new Index('select', array('id')),
+            '`foo`'  => new Index('`bar`', array('id')),
+        );
+
+        $this->assertSame(
+            $this->getQuotedAlterTableRenameIndexSQL(),
+            $this->_platform->getAlterTableSQL($tableDiff)
+        );
+    }
+
+    /**
+     * @group DBAL-234
+     */
+    protected function getQuotedAlterTableRenameIndexSQL()
+    {
+        return array(
+            'DROP INDEX "create"',
+            'CREATE INDEX "select" ON "table" (id)',
+            'DROP INDEX "foo"',
+            'CREATE INDEX "bar" ON "table" (id)',
+        );
     }
 }

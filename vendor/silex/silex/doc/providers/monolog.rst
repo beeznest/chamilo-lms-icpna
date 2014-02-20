@@ -19,6 +19,10 @@ Parameters
   everything, ``INFO`` will log everything except ``DEBUG``,
   etc.
 
+  In addition to the ``Logger::`` constants, it is also possible to supply the
+  level in string form, for example: ``"DEBUG"``, ``"INFO"``, ``"WARNING"``,
+  ``"ERROR"``.
+
 * **monolog.name** (optional): Name of the monolog channel,
   defaults to ``myapp``.
 
@@ -49,7 +53,7 @@ Registering
     .. code-block:: json
 
         "require": {
-            "monolog/monolog": ">=1.0.0",
+            "monolog/monolog": ">=1.0.0"
         }
 
 Usage
@@ -80,6 +84,12 @@ it by extending the ``monolog`` service::
 
         return $monolog;
     }));
+
+By default, all requests are logged through a ``before`` and ``after``
+middleware at boot time. You can disable or customize this behavior by
+overriding the ``monolog.boot.before`` and ``monolog.boot.after`` services
+respectively. The provider also registers a default ``error`` handler which
+logs errors; it can be customized via the ``monolog.boot.error`` service.
 
 Traits
 ------

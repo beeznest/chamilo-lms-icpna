@@ -189,6 +189,21 @@ class ClassMetadataInfo implements ClassMetadata
     const TO_MANY = 12;
 
     /**
+     * ReadOnly cache can do reads, inserts and deletes, cannot perform updates or employ any locks,
+     */
+    const CACHE_USAGE_READ_ONLY = 1;
+
+    /**
+     * Nonstrict Read Write Cache doesn’t employ any locks but can do inserts, update and deletes.
+     */
+    const CACHE_USAGE_NONSTRICT_READ_WRITE = 2;
+
+    /**
+     * Read Write Attempts to lock the entity before update/delete.
+     */
+    const CACHE_USAGE_READ_WRITE = 3;
+
+    /**
      * READ-ONLY: The name of the entity class.
      *
      * @var string
@@ -246,6 +261,13 @@ class ClassMetadataInfo implements ClassMetadata
     public $isMappedSuperclass = false;
 
     /**
+     * READ-ONLY: Whether this class describes the mapping of an embeddable class.
+     *
+     * @var boolean
+     */
+    public $isEmbeddedClass = false;
+
+    /**
      * READ-ONLY: The names of the parent classes (ancestors).
      *
      * @var array
@@ -258,6 +280,13 @@ class ClassMetadataInfo implements ClassMetadata
      * @var array
      */
     public $subClasses = array();
+
+    /**
+     * READ-ONLY: The names of all embedded classes based on properties.
+     *
+     * @var array
+     */
+    public $embeddedClasses = array();
 
     /**
      * READ-ONLY: The named queries allowed to be called directly from Repository.
@@ -357,7 +386,7 @@ class ClassMetadataInfo implements ClassMetadata
      * - <b>scale</b> (integer, optional, schema-only)
      * The scale of a decimal column. Only valid if the column type is decimal.
      *
-     [* - <b>'unique'] (string, optional, schema-only)</b>
+     * - <b>'unique'</b> (string, optional, schema-only)
      * Whether a unique constraint should be generated for the column.
      *
      * @var array
@@ -437,6 +466,13 @@ class ClassMetadataInfo implements ClassMetadata
     public $lifecycleCallbacks = array();
 
     /**
+     * READ-ONLY: The registered entity listeners.
+     *
+     * @var array
+     */
+    public $entityListeners = array();
+
+    /**
      * READ-ONLY: The association mappings of this class.
      *
      * The mapping definition array supports the following keys:
@@ -501,7 +537,7 @@ class ClassMetadataInfo implements ClassMetadata
     public $isIdentifierComposite = false;
 
     /**
-     * READ-ONLY: Flag indicating wheather the identifier/primary key contains at least one foreign key association.
+     * READ-ONLY: Flag indicating whether the identifier/primary key contains at least one foreign key association.
      *
      * This flag is necessary because some code blocks require special treatment of this cases.
      *
@@ -570,6 +606,11 @@ class ClassMetadataInfo implements ClassMetadata
     public $versionField;
 
     /**
+     * @var array
+     */
+    public $cache = null;
+
+    /**
      * The ReflectionClass instance of the mapped class.
      *
      * @var ReflectionClass
@@ -597,7 +638,7 @@ class ClassMetadataInfo implements ClassMetadata
     /**
      * The ReflectionProperty instances of the mapped class.
      *
-     * @var array
+     * @var \ReflectionProperty[]
      */
     public $reflFields = array();
 
@@ -623,7 +664,7 @@ class ClassMetadataInfo implements ClassMetadata
     }
 
     /**
-     * Gets the ReflectionPropertys of the mapped class.
+     * Gets the ReflectionProperties of the mapped class.
      *
      * @return array An array of ReflectionProperty instances.
      */
@@ -685,13 +726,14 @@ class ClassMetadataInfo implements ClassMetadata
             return $id;
         }
 
-        $value = $this->reflFields[$this->identifier[0]]->getValue($entity);
+        $id = $this->identifier[0];
+        $value = $this->reflFields[$id]->getValue($entity);
 
-        if ($value !== null) {
-            return array($this->identifier[0] => $value);
+        if (null === $value) {
+            return array();
         }
 
-        return array();
+        return array($id => $value);
     }
 
     /**
@@ -771,6 +813,7 @@ class ClassMetadataInfo implements ClassMetadata
             'columnNames', //TODO: Not really needed. Can use fieldMappings[$fieldName]['columnName']
             'fieldMappings',
             'fieldNames',
+            'embeddedClasses',
             'identifier',
             'isIdentifierComposite', // TODO: REMOVE
             'name',
@@ -822,6 +865,10 @@ class ClassMetadataInfo implements ClassMetadata
             $serialized[] = 'lifecycleCallbacks';
         }
 
+        if ($this->entityListeners) {
+            $serialized[] = 'entityListeners';
+        }
+
         if ($this->namedQueries) {
             $serialized[] = 'namedQueries';
         }
@@ -840,6 +887,10 @@ class ClassMetadataInfo implements ClassMetadata
 
         if ($this->customGeneratorDefinition) {
             $serialized[] = "customGeneratorDefinition";
+        }
+
+        if ($this->cache) {
+            $serialized[] = 'cache';
         }
 
         return $serialized;
@@ -871,6 +922,18 @@ class ClassMetadataInfo implements ClassMetadata
         $this->reflClass = $reflService->getClass($this->name);
 
         foreach ($this->fieldMappings as $field => $mapping) {
+            if (isset($mapping['declaredField'])) {
+                $declaringClass = isset($this->embeddedClasses[$mapping['declaredField']]['declared'])
+                                      ? $this->embeddedClasses[$mapping['declaredField']]['declared'] : $this->name;
+
+                $this->reflFields[$field] = new ReflectionEmbeddedProperty(
+                    $reflService->getAccessibleProperty($declaringClass, $mapping['declaredField']),
+                    $reflService->getAccessibleProperty($this->embeddedClasses[$mapping['declaredField']]['class'], $mapping['originalField']),
+                    $this->embeddedClasses[$mapping['declaredField']]['class']
+                );
+                continue;
+            }
+
             $this->reflFields[$field] = isset($mapping['declared'])
                 ? $reflService->getAccessibleProperty($mapping['declared'], $field)
                 : $reflService->getAccessibleProperty($this->name, $field);
@@ -912,8 +975,12 @@ class ClassMetadataInfo implements ClassMetadata
      */
     public function validateIdentifier()
     {
+        if ($this->isMappedSuperclass || $this->isEmbeddedClass) {
+            return;
+        }
+
         // Verify & complete identifier mapping
-        if ( ! $this->identifier && ! $this->isMappedSuperclass) {
+        if ( ! $this->identifier) {
             throw MappingException::identifierRequired($this->name);
         }
 
@@ -929,7 +996,7 @@ class ClassMetadataInfo implements ClassMetadata
      *
      * @throws MappingException
      */
-    public function validateAssocations()
+    public function validateAssociations()
     {
         foreach ($this->associationMappings as $mapping) {
             if ( ! ClassLoader::classExists($mapping['targetEntity']) ) {
@@ -964,6 +1031,45 @@ class ClassMetadataInfo implements ClassMetadata
     public function getReflectionClass()
     {
         return $this->reflClass;
+    }
+
+    /**
+     * @param array $cache
+     *
+     * @return void
+     */
+    public function enableCache(array $cache)
+    {
+        if ( ! isset($cache['usage'])) {
+            $cache['usage'] = self::CACHE_USAGE_READ_ONLY;
+        }
+
+        if ( ! isset($cache['region'])) {
+            $cache['region'] = strtolower(str_replace('\\', '_', $this->rootEntityName));
+        }
+
+        $this->cache = $cache;
+    }
+
+    /**
+     * @param string $fieldName
+     * @param array  $cache
+     *
+     * @return void
+     */
+    public function enableAssociationCache($fieldName, array $cache)
+    {
+        if ( ! isset($cache['usage'])) {
+            $cache['usage'] = isset($this->cache['usage'])
+                ? $this->cache['usage']
+                : self::CACHE_USAGE_READ_ONLY;
+        }
+
+        if ( ! isset($cache['region'])) {
+            $cache['region'] = strtolower(str_replace('\\', '_', $this->rootEntityName)) . '__' . $fieldName;
+        }
+
+        $this->associationMappings[$fieldName]['cache'] = $cache;
     }
 
     /**
@@ -1018,9 +1124,14 @@ class ClassMetadataInfo implements ClassMetadata
      */
     public function isIdentifier($fieldName)
     {
+        if ( ! $this->identifier) {
+            return false;
+        }
+
         if ( ! $this->isIdentifierComposite) {
             return $fieldName === $this->identifier[0];
         }
+
         return in_array($fieldName, $this->identifier);
     }
 
@@ -1313,10 +1424,7 @@ class ClassMetadataInfo implements ClassMetadata
         $mapping['sourceEntity'] = $this->name;
 
         if (isset($mapping['targetEntity'])) {
-            if (strlen($this->namespace) > 0 && strpos($mapping['targetEntity'], '\\') === false) {
-                $mapping['targetEntity'] = $this->namespace . '\\' . $mapping['targetEntity'];
-            }
-
+            $mapping['targetEntity'] = $this->fullyQualifiedClassName($mapping['targetEntity']);
             $mapping['targetEntity'] = ltrim($mapping['targetEntity'], '\\');
         }
 
@@ -1371,7 +1479,7 @@ class ClassMetadataInfo implements ClassMetadata
         }
 
         if (isset($mapping['id']) && $mapping['id'] === true && $mapping['type'] & self::TO_MANY) {
-            throw MappingException::illegalToManyIdentifierAssoaction($this->name, $mapping['fieldName']);
+            throw MappingException::illegalToManyIdentifierAssociation($this->name, $mapping['fieldName']);
         }
 
         // Fetch mode. Default fetch mode to LAZY, if not set.
@@ -1431,7 +1539,7 @@ class ClassMetadataInfo implements ClassMetadata
                 ));
             }
 
-            $uniqueContraintColumns = array();
+            $uniqueConstraintColumns = array();
             foreach ($mapping['joinColumns'] as &$joinColumn) {
                 if ($mapping['type'] === self::ONE_TO_ONE && ! $this->isInheritanceTypeSingleTable()) {
                     if (count($mapping['joinColumns']) == 1) {
@@ -1439,7 +1547,7 @@ class ClassMetadataInfo implements ClassMetadata
                             $joinColumn['unique'] = true;
                         }
                     } else {
-                        $uniqueContraintColumns[] = $joinColumn['name'];
+                        $uniqueConstraintColumns[] = $joinColumn['name'];
                     }
                 }
 
@@ -1466,12 +1574,12 @@ class ClassMetadataInfo implements ClassMetadata
                         ? $joinColumn['fieldName'] : $joinColumn['name'];
             }
 
-            if ($uniqueContraintColumns) {
+            if ($uniqueConstraintColumns) {
                 if ( ! $this->table) {
                     throw new RuntimeException("ClassMetadataInfo::setTable() has to be called before defining a one to one relationship.");
                 }
                 $this->table['uniqueConstraints'][$mapping['fieldName']."_uniq"] = array(
-                    'columns' => $uniqueContraintColumns
+                    'columns' => $uniqueConstraintColumns
                 );
             }
 
@@ -1481,8 +1589,12 @@ class ClassMetadataInfo implements ClassMetadata
         $mapping['orphanRemoval']   = isset($mapping['orphanRemoval']) ? (bool) $mapping['orphanRemoval'] : false;
         $mapping['isCascadeRemove'] = $mapping['orphanRemoval'] ? true : $mapping['isCascadeRemove'];
 
+        if ($mapping['orphanRemoval']) {
+            unset($mapping['unique']);
+        }
+
         if (isset($mapping['id']) && $mapping['id'] === true && !$mapping['isOwningSide']) {
-            throw MappingException::illegalInverseIdentifierAssocation($this->name, $mapping['fieldName']);
+            throw MappingException::illegalInverseIdentifierAssociation($this->name, $mapping['fieldName']);
         }
 
         return $mapping;
@@ -1537,15 +1649,18 @@ class ClassMetadataInfo implements ClassMetadata
                 $mapping['joinTable']['name'] = $this->namingStrategy->joinTableName($mapping['sourceEntity'], $mapping['targetEntity'], $mapping['fieldName']);
             }
 
+            $selfReferencingEntityWithoutJoinColumns = $mapping['sourceEntity'] == $mapping['targetEntity']
+                && (! (isset($mapping['joinTable']['joinColumns']) || isset($mapping['joinTable']['inverseJoinColumns'])));
+
             if ( ! isset($mapping['joinTable']['joinColumns'])) {
                 $mapping['joinTable']['joinColumns'] = array(array(
-                        'name' => $this->namingStrategy->joinKeyColumnName($mapping['sourceEntity']),
+                        'name' => $this->namingStrategy->joinKeyColumnName($mapping['sourceEntity'], $selfReferencingEntityWithoutJoinColumns ? 'source' : null),
                         'referencedColumnName' => $this->namingStrategy->referenceColumnName(),
                         'onDelete' => 'CASCADE'));
             }
             if ( ! isset($mapping['joinTable']['inverseJoinColumns'])) {
                 $mapping['joinTable']['inverseJoinColumns'] = array(array(
-                        'name' => $this->namingStrategy->joinKeyColumnName($mapping['targetEntity']),
+                        'name' => $this->namingStrategy->joinKeyColumnName($mapping['targetEntity'], $selfReferencingEntityWithoutJoinColumns ? 'target' : null),
                         'referencedColumnName' => $this->namingStrategy->referenceColumnName(),
                         'onDelete' => 'CASCADE'));
             }
@@ -1671,9 +1786,7 @@ class ClassMetadataInfo implements ClassMetadata
     }
 
     /**
-     * Gets the mapped identifier field of this class.
-     *
-     * @return array|string
+     * {@inheritDoc}
      */
     public function getIdentifier()
     {
@@ -1904,11 +2017,7 @@ class ClassMetadataInfo implements ClassMetadata
     public function setSubclasses(array $subclasses)
     {
         foreach ($subclasses as $subclass) {
-            if (strpos($subclass, '\\') === false && strlen($this->namespace)) {
-                $this->subClasses[] = $this->namespace . '\\' . $subclass;
-            } else {
-                $this->subClasses[] = $subclass;
-            }
+            $this->subClasses[] = $this->fullyQualifiedClassName($subclass);
         }
     }
 
@@ -2051,7 +2160,7 @@ class ClassMetadataInfo implements ClassMetadata
     }
 
     /**
-     * Checks if this entity is the root in any entity-inheritance-hierachy.
+     * Checks if this entity is the root in any entity-inheritance-hierarchy.
      *
      * @return bool
      */
@@ -2070,6 +2179,11 @@ class ClassMetadataInfo implements ClassMetadata
     public function isInheritedAssociation($fieldName)
     {
         return isset($this->associationMappings[$fieldName]['inherited']);
+    }
+
+    public function isInheritedEmbeddedClass($fieldName)
+    {
+        return isset($this->embeddedClasses[$fieldName]['inherited']);
     }
 
     /**
@@ -2151,9 +2265,8 @@ class ClassMetadataInfo implements ClassMetadata
     public function mapField(array $mapping)
     {
         $this->_validateAndCompleteFieldMapping($mapping);
-        if (isset($this->fieldMappings[$mapping['fieldName']]) || isset($this->associationMappings[$mapping['fieldName']])) {
-            throw MappingException::duplicateFieldMapping($this->name, $mapping['fieldName']);
-        }
+        $this->assertFieldNotMapped($mapping['fieldName']);
+
         $this->fieldMappings[$mapping['fieldName']] = $mapping;
     }
 
@@ -2257,15 +2370,13 @@ class ClassMetadataInfo implements ClassMetadata
         $queryMapping['isSelfClass'] = false;
         if (isset($queryMapping['resultClass'])) {
 
-            if($queryMapping['resultClass'] === '__CLASS__') {
+            if ($queryMapping['resultClass'] === '__CLASS__') {
 
                 $queryMapping['isSelfClass'] = true;
                 $queryMapping['resultClass'] = $this->name;
-
-            } else if (strlen($this->namespace) > 0 && strpos($queryMapping['resultClass'], '\\') === false) {
-                $queryMapping['resultClass'] = $this->namespace . '\\' . $queryMapping['resultClass'];
             }
 
+            $queryMapping['resultClass'] = $this->fullyQualifiedClassName($queryMapping['resultClass']);
             $queryMapping['resultClass'] = ltrim($queryMapping['resultClass'], '\\');
         }
 
@@ -2299,14 +2410,14 @@ class ClassMetadataInfo implements ClassMetadata
                 }
 
                 $entityResult['isSelfClass'] = false;
-                if($entityResult['entityClass'] === '__CLASS__') {
+                if ($entityResult['entityClass'] === '__CLASS__') {
 
                     $entityResult['isSelfClass'] = true;
                     $entityResult['entityClass'] = $this->name;
 
-                } else if (strlen($this->namespace) > 0 && strpos($entityResult['entityClass'], '\\') === false) {
-                    $entityResult['entityClass'] = $this->namespace . '\\' . $entityResult['entityClass'];
                 }
+
+                $entityResult['entityClass'] = $this->fullyQualifiedClassName($entityResult['entityClass']);
 
                 $resultMapping['entities'][$key]['entityClass'] = ltrim($entityResult['entityClass'], '\\');
                 $resultMapping['entities'][$key]['isSelfClass'] = $entityResult['isSelfClass'];
@@ -2319,7 +2430,7 @@ class ClassMetadataInfo implements ClassMetadata
 
                         if (!isset($field['column'])) {
                             $fieldName = $field['name'];
-                            if(strpos($fieldName, '.')){
+                            if (strpos($fieldName, '.')) {
                                 list(, $fieldName) = explode('.', $fieldName);
                             }
 
@@ -2403,9 +2514,7 @@ class ClassMetadataInfo implements ClassMetadata
     {
         $sourceFieldName = $assocMapping['fieldName'];
 
-        if (isset($this->fieldMappings[$sourceFieldName]) || isset($this->associationMappings[$sourceFieldName])) {
-            throw MappingException::duplicateFieldMapping($this->name, $sourceFieldName);
-        }
+        $this->assertFieldNotMapped($sourceFieldName);
 
         $this->associationMappings[$sourceFieldName] = $assocMapping;
     }
@@ -2419,19 +2528,17 @@ class ClassMetadataInfo implements ClassMetadata
      */
     public function setCustomRepositoryClass($repositoryClassName)
     {
-        if ($repositoryClassName !== null && strpos($repositoryClassName, '\\') === false
-                && strlen($this->namespace) > 0) {
-            $repositoryClassName = $this->namespace . '\\' . $repositoryClassName;
-        }
-        $this->customRepositoryClassName = $repositoryClassName;
+        $this->customRepositoryClassName = $this->fullyQualifiedClassName($repositoryClassName);
     }
 
     /**
      * Dispatches the lifecycle event of the given entity to the registered
      * lifecycle callbacks and lifecycle listeners.
      *
+     * @deprecated Deprecated since version 2.4 in favor of \Doctrine\ORM\Event\ListenersInvoker
+     *
      * @param string $lifecycleEvent The lifecycle event.
-     * @param object $entity         The Entity on which the event occured.
+     * @param object $entity         The Entity on which the event occurred.
      *
      * @return void
      */
@@ -2476,6 +2583,10 @@ class ClassMetadataInfo implements ClassMetadata
      */
     public function addLifecycleCallback($callback, $event)
     {
+        if (isset($this->lifecycleCallbacks[$event]) && in_array($callback, $this->lifecycleCallbacks[$event])) {
+            return;
+        }
+
         $this->lifecycleCallbacks[$event][] = $callback;
     }
 
@@ -2490,6 +2601,38 @@ class ClassMetadataInfo implements ClassMetadata
     public function setLifecycleCallbacks(array $callbacks)
     {
         $this->lifecycleCallbacks = $callbacks;
+    }
+
+    /**
+     * Adds a entity listener for entities of this class.
+     *
+     * @param string $eventName The entity lifecycle event.
+     * @param string $class     The listener class.
+     * @param string $method    The listener callback method.
+     *
+     * @throws \Doctrine\ORM\Mapping\MappingException
+     */
+    public function addEntityListener($eventName, $class, $method)
+    {
+        $class    = $this->fullyQualifiedClassName($class);
+        $listener = array(
+            'class'  => $class,
+            'method' => $method
+        );
+
+        if ( ! class_exists($class)) {
+            throw MappingException::entityListenerClassNotFound($class, $this->name);
+        }
+
+        if ( ! method_exists($class, $method)) {
+            throw MappingException::entityListenerMethodNotFound($class, $method, $this->name);
+        }
+
+        if (isset($this->entityListeners[$eventName]) && in_array($listener, $this->entityListeners[$eventName])) {
+            throw MappingException::duplicateEntityListener($class, $method, $this->name);
+        }
+
+        $this->entityListeners[$eventName][] = $listener;
     }
 
     /**
@@ -2557,10 +2700,7 @@ class ClassMetadataInfo implements ClassMetadata
      */
     public function addDiscriminatorMapClass($name, $className)
     {
-        if (strlen($this->namespace) > 0 && strpos($className, '\\') === false) {
-            $className = $this->namespace . '\\' . $className;
-        }
-
+        $className = $this->fullyQualifiedClassName($className);
         $className = ltrim($className, '\\');
         $this->discriminatorMap[$name] = $className;
 
@@ -2759,8 +2899,12 @@ class ClassMetadataInfo implements ClassMetadata
      */
     public function setSequenceGeneratorDefinition(array $definition)
     {
-        if (isset($definition['name']) && $definition['name'] == '`') {
-            $definition['name']   = trim($definition['name'], '`');
+        if ( ! isset($definition['sequenceName'])) {
+            throw MappingException::missingSequenceName($this->name);
+        }
+
+        if ($definition['sequenceName'][0] == '`') {
+            $definition['sequenceName']   = trim($definition['sequenceName'], '`');
             $definition['quoted'] = true;
         }
 
@@ -2981,5 +3125,87 @@ class ClassMetadataInfo implements ClassMetadata
             }
         }
         return $relations;
+    }
+
+    /**
+     * @param   string $className
+     * @return  string
+     */
+    public function fullyQualifiedClassName($className)
+    {
+        if ($className !== null && strpos($className, '\\') === false && strlen($this->namespace) > 0) {
+            return $this->namespace . '\\' . $className;
+        }
+
+        return $className;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function getMetadataValue($name) {
+
+        if (isset($this->$name)) {
+            return $this->$name;
+        }
+
+        return null;
+    }
+
+    /**
+     * Map Embedded Class
+     *
+     * @array $mapping
+     * @return void
+     */
+    public function mapEmbedded(array $mapping)
+    {
+        if ($this->isEmbeddedClass) {
+            throw MappingException::noEmbeddablesInEmbeddable($this->name);
+        }
+
+        $this->assertFieldNotMapped($mapping['fieldName']);
+
+        $this->embeddedClasses[$mapping['fieldName']] = array(
+            'class' => $this->fullyQualifiedClassName($mapping['class']),
+            'columnPrefix' => $mapping['columnPrefix'],
+        );
+    }
+
+    /**
+     * Inline the embeddable class
+     *
+     * @param string $property
+     * @param ClassMetadataInfo $embeddable
+     */
+    public function inlineEmbeddable($property, ClassMetadataInfo $embeddable)
+    {
+        foreach ($embeddable->fieldMappings as $fieldMapping) {
+            $fieldMapping['declaredField'] = $property;
+            $fieldMapping['originalField'] = $fieldMapping['fieldName'];
+            $fieldMapping['fieldName'] = $property . "." . $fieldMapping['fieldName'];
+
+            $fieldMapping['columnName'] = ! empty($this->embeddedClasses[$property]['columnPrefix'])
+                    ? $this->embeddedClasses[$property]['columnPrefix'] . $fieldMapping['columnName']
+                        : $this->namingStrategy->embeddedFieldToColumnName($property, $fieldMapping['columnName'], $this->reflClass->name, $embeddable->reflClass->name);
+
+            $this->mapField($fieldMapping);
+        }
+    }
+
+    /**
+     * @param string $fieldName
+     * @throws MappingException
+     */
+    private function assertFieldNotMapped($fieldName)
+    {
+        if (isset($this->fieldMappings[$fieldName]) ||
+            isset($this->associationMappings[$fieldName]) ||
+            isset($this->embeddedClasses[$fieldName])) {
+
+            throw MappingException::duplicateFieldMapping($this->name, $fieldName);
+        }
     }
 }

@@ -26,17 +26,6 @@ use Symfony\Component\HttpKernel\Tests\Logger;
  */
 class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
-
     public function testConstruct()
     {
         $logger = new TestLogger();
@@ -93,7 +82,7 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertEquals(3, $logger->countErrors());
-        $this->assertCount(3, $logger->getLogs('crit'));
+        $this->assertCount(3, $logger->getLogs('critical'));
     }
 
     public function provider()
@@ -112,13 +101,31 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testSubRequestFormat()
+    {
+        $listener = new ExceptionListener('foo', $this->getMock('Psr\Log\LoggerInterface'));
+
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel->expects($this->once())->method('handle')->will($this->returnCallback(function (Request $request) {
+            return new Response($request->getRequestFormat());
+        }));
+
+        $request = Request::create('/');
+        $request->setRequestFormat('xml');
+
+        $event = new GetResponseForExceptionEvent($kernel, $request, 'foo', new \Exception('foo'));
+        $listener->onKernelException($event);
+
+        $response = $event->getResponse();
+        $this->assertEquals('xml', $response->getContent());
+    }
 }
 
 class TestLogger extends Logger implements DebugLoggerInterface
 {
     public function countErrors()
     {
-        return count($this->logs['crit']);
+        return count($this->logs['critical']);
     }
 }
 

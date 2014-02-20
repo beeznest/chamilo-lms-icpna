@@ -13,9 +13,17 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
-class TimeTypeTest extends LocalizedTestCase
+class TimeTypeTest extends TypeTestCase
 {
+    protected function setUp()
+    {
+        IntlTestHelper::requireIntl($this);
+
+        parent::setUp();
+    }
+
     public function testSubmitDateTime()
     {
         $form = $this->factory->create('time', null, array(
@@ -29,7 +37,7 @@ class TimeTypeTest extends LocalizedTestCase
             'minute' => '4',
         );
 
-        $form->bind($input);
+        $form->submit($input);
 
         $dateTime = new \DateTime('1970-01-01 03:04:00 UTC');
 
@@ -50,7 +58,7 @@ class TimeTypeTest extends LocalizedTestCase
             'minute' => '4',
         );
 
-        $form->bind($input);
+        $form->submit($input);
 
         $this->assertEquals('03:04:00', $form->getData());
         $this->assertEquals($input, $form->getViewData());
@@ -69,7 +77,7 @@ class TimeTypeTest extends LocalizedTestCase
             'minute' => '4',
         );
 
-        $form->bind($input);
+        $form->submit($input);
 
         $dateTime = new \DateTime('1970-01-01 03:04:00 UTC');
 
@@ -90,7 +98,7 @@ class TimeTypeTest extends LocalizedTestCase
             'minute' => '4',
         );
 
-        $form->bind($input);
+        $form->submit($input);
 
         $this->assertEquals($input, $form->getData());
         $this->assertEquals($input, $form->getViewData());
@@ -105,10 +113,26 @@ class TimeTypeTest extends LocalizedTestCase
             'widget' => 'single_text',
         ));
 
-        $form->bind('03:04');
+        $form->submit('03:04');
 
         $this->assertEquals(new \DateTime('1970-01-01 03:04:00 UTC'), $form->getData());
         $this->assertEquals('03:04', $form->getViewData());
+    }
+
+    public function testSubmitDatetimeSingleTextWithoutMinutes()
+    {
+        $form = $this->factory->create('time', null, array(
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'input' => 'datetime',
+            'widget' => 'single_text',
+            'with_minutes' => false,
+        ));
+
+        $form->submit('03');
+
+        $this->assertEquals(new \DateTime('1970-01-01 03:00:00 UTC'), $form->getData());
+        $this->assertEquals('03', $form->getViewData());
     }
 
     public function testSubmitArraySingleText()
@@ -125,10 +149,30 @@ class TimeTypeTest extends LocalizedTestCase
             'minute' => '4',
         );
 
-        $form->bind('03:04');
+        $form->submit('03:04');
 
         $this->assertEquals($data, $form->getData());
         $this->assertEquals('03:04', $form->getViewData());
+    }
+
+    public function testSubmitArraySingleTextWithoutMinutes()
+    {
+        $form = $this->factory->create('time', null, array(
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'input' => 'array',
+            'widget' => 'single_text',
+            'with_minutes' => false,
+        ));
+
+        $data = array(
+            'hour' => '3',
+        );
+
+        $form->submit('03');
+
+        $this->assertEquals($data, $form->getData());
+        $this->assertEquals('03', $form->getViewData());
     }
 
     public function testSubmitArraySingleTextWithSeconds()
@@ -147,7 +191,7 @@ class TimeTypeTest extends LocalizedTestCase
             'second' => '5',
         );
 
-        $form->bind('03:04:05');
+        $form->submit('03:04:05');
 
         $this->assertEquals($data, $form->getData());
         $this->assertEquals('03:04:05', $form->getViewData());
@@ -162,10 +206,40 @@ class TimeTypeTest extends LocalizedTestCase
             'widget' => 'single_text',
         ));
 
-        $form->bind('03:04');
+        $form->submit('03:04');
 
         $this->assertEquals('03:04:00', $form->getData());
         $this->assertEquals('03:04', $form->getViewData());
+    }
+
+    public function testSubmitStringSingleTextWithoutMinutes()
+    {
+        $form = $this->factory->create('time', null, array(
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'input' => 'string',
+            'widget' => 'single_text',
+            'with_minutes' => false,
+        ));
+
+        $form->submit('03');
+
+        $this->assertEquals('03:00:00', $form->getData());
+        $this->assertEquals('03', $form->getViewData());
+    }
+
+    public function testSetDataWithoutMinutes()
+    {
+        $form = $this->factory->create('time', null, array(
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'input' => 'datetime',
+            'with_minutes' => false,
+        ));
+
+        $form->setData(new \DateTime('03:04:05 UTC'));
+
+        $this->assertEquals(array('hour' => 3), $form->getViewData());
     }
 
     public function testSetDataWithSeconds()
@@ -191,7 +265,7 @@ class TimeTypeTest extends LocalizedTestCase
             'with_seconds' => true,
         ));
 
-        $dateTime = new \DateTime('12:04:05');
+        $dateTime = new \DateTime('2013-01-01 12:04:05');
         $dateTime->setTimezone(new \DateTimeZone('America/New_York'));
 
         $form->setData($dateTime->format('H:i:s'));
@@ -286,7 +360,7 @@ class TimeTypeTest extends LocalizedTestCase
             'widget' => 'choice',
         ));
 
-        $form->bind(array(
+        $form->submit(array(
             'hour' => '',
             'minute' => '',
         ));
@@ -303,7 +377,7 @@ class TimeTypeTest extends LocalizedTestCase
             'with_seconds' => true,
         ));
 
-        $form->bind(array(
+        $form->submit(array(
             'hour' => '',
             'minute' => '',
             'second' => '',
@@ -320,7 +394,7 @@ class TimeTypeTest extends LocalizedTestCase
             'widget' => 'choice',
         ));
 
-        $form->bind(array(
+        $form->submit(array(
             'hour' => '0',
             'minute' => '0',
         ));
@@ -337,7 +411,7 @@ class TimeTypeTest extends LocalizedTestCase
             'with_seconds' => true,
         ));
 
-        $form->bind(array(
+        $form->submit(array(
             'hour' => '0',
             'minute' => '0',
             'second' => '0',
@@ -355,7 +429,7 @@ class TimeTypeTest extends LocalizedTestCase
             'with_seconds' => true,
         ));
 
-        $form->bind(array(
+        $form->submit(array(
             'hour' => '',
             'minute' => '0',
             'second' => '0',
@@ -373,7 +447,7 @@ class TimeTypeTest extends LocalizedTestCase
             'with_seconds' => true,
         ));
 
-        $form->bind(array(
+        $form->submit(array(
             'hour' => '0',
             'minute' => '',
             'second' => '0',
@@ -391,7 +465,7 @@ class TimeTypeTest extends LocalizedTestCase
             'with_seconds' => true,
         ));
 
-        $form->bind(array(
+        $form->submit(array(
             'hour' => '0',
             'minute' => '0',
             'second' => '',
@@ -560,5 +634,16 @@ class TimeTypeTest extends LocalizedTestCase
 
         $this->assertSame(array(), $form['second']->getErrors());
         $this->assertSame(array($error), $form->getErrors());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\InvalidConfigurationException
+     */
+    public function testInitializeWithSecondsAndWithoutMinutes()
+    {
+        $this->factory->create('time', null, array(
+            'with_minutes' => false,
+            'with_seconds' => true,
+        ));
     }
 }

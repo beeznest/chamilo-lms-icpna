@@ -19,18 +19,23 @@
 
 namespace Doctrine\ORM;
 
-use Doctrine\Common\Cache\Cache;
-use Doctrine\Common\Cache\ArrayCache;
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Persistence\Mapping\Driver\MappingDriver;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\ORM\Mapping\QuoteStrategy;
-use Doctrine\ORM\Mapping\DefaultQuoteStrategy;
-use Doctrine\ORM\Mapping\NamingStrategy;
-use Doctrine\ORM\Mapping\DefaultNamingStrategy;
-use Doctrine\Common\Annotations\SimpleAnnotationReader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\CachedReader;
+use Doctrine\Common\Annotations\SimpleAnnotationReader;
+use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\Cache as CacheDriver;
+use Doctrine\ORM\Cache\CacheConfiguration;
+use Doctrine\Common\Persistence\Mapping\Driver\MappingDriver;
+use Doctrine\ORM\Mapping\DefaultEntityListenerResolver;
+use Doctrine\ORM\Mapping\DefaultNamingStrategy;
+use Doctrine\ORM\Mapping\DefaultQuoteStrategy;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\EntityListenerResolver;
+use Doctrine\ORM\Mapping\NamingStrategy;
+use Doctrine\ORM\Mapping\QuoteStrategy;
+use Doctrine\ORM\Repository\DefaultRepositoryFactory;
+use Doctrine\ORM\Repository\RepositoryFactory;
 
 /**
  * Configuration container for all configuration options of Doctrine.
@@ -86,7 +91,7 @@ class Configuration extends \Doctrine\DBAL\Configuration
      * Sets a boolean flag that indicates whether proxy classes should always be regenerated
      * during each script execution.
      *
-     * @param boolean $bool
+     * @param boolean|int $bool Possible values are constants of Doctrine\Common\Proxy\AbstractProxyFactory
      *
      * @return void
      */
@@ -248,7 +253,7 @@ class Configuration extends \Doctrine\DBAL\Configuration
      *
      * @return void
      */
-    public function setQueryCacheImpl(Cache $cacheImpl)
+    public function setQueryCacheImpl(CacheDriver $cacheImpl)
     {
         $this->_attributes['queryCacheImpl'] = $cacheImpl;
     }
@@ -272,7 +277,7 @@ class Configuration extends \Doctrine\DBAL\Configuration
      *
      * @return void
      */
-    public function setHydrationCacheImpl(Cache $cacheImpl)
+    public function setHydrationCacheImpl(CacheDriver $cacheImpl)
     {
         $this->_attributes['hydrationCacheImpl'] = $cacheImpl;
     }
@@ -296,7 +301,7 @@ class Configuration extends \Doctrine\DBAL\Configuration
      *
      * @return void
      */
-    public function setMetadataCacheImpl(Cache $cacheImpl)
+    public function setMetadataCacheImpl(CacheDriver $cacheImpl)
     {
         $this->_attributes['metadataCacheImpl'] = $cacheImpl;
     }
@@ -633,24 +638,12 @@ class Configuration extends \Doctrine\DBAL\Configuration
     /**
      * Adds a filter to the list of possible filters.
      *
-     * @param string                        $name   The name of the filter.
-     * @param string|Query\Filter\SQLFilter $filter The filter class name or an SQLFilter instance.
-     *
-     * @return void
-     *
-     * @throws \InvalidArgumentException If the filter is an object and it doesn't
-     *                                   extend the Query\Filter\SQLFilter class.
+     * @param string $name      The name of the filter.
+     * @param string $className The class name of the filter.
      */
-    public function addFilter($name, $filter)
+    public function addFilter($name, $className)
     {
-        if (is_object($filter) && ! $filter instanceof Query\Filter\SQLFilter) {
-            throw new \InvalidArgumentException(
-                "A filter can be either a class name or an object extending \Doctrine\ORM\Query\Filter\SQLFilter," .
-                " instance of '" . get_class($filter) . "' given."
-            );
-        }
-
-        $this->_attributes['filters'][$name] = $filter;
+        $this->_attributes['filters'][$name] = $className;
     }
 
     /**
@@ -658,10 +651,10 @@ class Configuration extends \Doctrine\DBAL\Configuration
      *
      * @param string $name The name of the filter.
      *
-     * @return null|string|Query\Filter\SQLFilter The class name of the filter, an
-     *                                            SQLFilter instance or null of it is not defined.
+     * @return string The class name of the filter, or null of it is not
+     *  defined.
      */
-    public function getFilter($name)
+    public function getFilterClassName($name)
     {
         return isset($this->_attributes['filters'][$name])
             ? $this->_attributes['filters'][$name]
@@ -762,5 +755,107 @@ class Configuration extends \Doctrine\DBAL\Configuration
         }
 
         return $this->_attributes['quoteStrategy'];
+    }
+
+    /**
+     * Set the entity listener resolver.
+     *
+     * @since 2.4
+     * @param \Doctrine\ORM\Mapping\EntityListenerResolver $resolver
+     */
+    public function setEntityListenerResolver(EntityListenerResolver $resolver)
+    {
+        $this->_attributes['entityListenerResolver'] = $resolver;
+    }
+
+    /**
+     * Get the entity listener resolver.
+     *
+     * @since 2.4
+     * @return \Doctrine\ORM\Mapping\EntityListenerResolver
+     */
+    public function getEntityListenerResolver()
+    {
+        if ( ! isset($this->_attributes['entityListenerResolver'])) {
+            $this->_attributes['entityListenerResolver'] = new DefaultEntityListenerResolver();
+        }
+
+        return $this->_attributes['entityListenerResolver'];
+    }
+
+    /**
+     * Set the entity repository factory.
+     *
+     * @since 2.4
+     * @param \Doctrine\ORM\Repository\RepositoryFactory $repositoryFactory
+     */
+    public function setRepositoryFactory(RepositoryFactory $repositoryFactory)
+    {
+        $this->_attributes['repositoryFactory'] = $repositoryFactory;
+    }
+
+    /**
+     * Get the entity repository factory.
+     *
+     * @since 2.4
+     * @return \Doctrine\ORM\Repository\RepositoryFactory
+     */
+    public function getRepositoryFactory()
+    {
+        return isset($this->_attributes['repositoryFactory'])
+            ? $this->_attributes['repositoryFactory']
+            : new DefaultRepositoryFactory();
+    }
+
+    /**
+     * @since 2.5
+     *
+     * @return boolean
+     */
+    public function isSecondLevelCacheEnabled()
+    {
+        return isset($this->_attributes['isSecondLevelCacheEnabled'])
+            ? $this->_attributes['isSecondLevelCacheEnabled']
+            : false;
+    }
+
+    /**
+     * @since 2.5
+     *
+     * @param boolean $flag
+     *
+     * @return void
+     */
+    public function setSecondLevelCacheEnabled($flag = true)
+    {
+        $this->_attributes['isSecondLevelCacheEnabled'] = (boolean) $flag;
+    }
+
+    /**
+     * @since 2.5
+     *
+     * @param \Doctrine\ORM\Cache\CacheConfiguration $cacheConfig
+     *
+     * @return void
+     */
+    public function setSecondLevelCacheConfiguration(CacheConfiguration $cacheConfig)
+    {
+        $this->_attributes['secondLevelCacheConfiguration'] = $cacheConfig;
+    }
+
+    /**
+     * @since 2.5
+     *
+     * @return  \Doctrine\ORM\Cache\CacheConfiguration|null
+     */
+    public function getSecondLevelCacheConfiguration()
+    {
+        if ( ! isset($this->_attributes['secondLevelCacheConfiguration']) && $this->isSecondLevelCacheEnabled()) {
+            $this->_attributes['secondLevelCacheConfiguration'] = new CacheConfiguration();
+        }
+
+        return isset($this->_attributes['secondLevelCacheConfiguration'])
+            ? $this->_attributes['secondLevelCacheConfiguration']
+            : null;
     }
 }

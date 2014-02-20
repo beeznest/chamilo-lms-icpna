@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Controller;
 
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -40,17 +40,10 @@ class ControllerResolver implements ControllerResolverInterface
     }
 
     /**
-     * Returns the Controller instance associated with a Request.
+     * {@inheritdoc}
      *
      * This method looks for a '_controller' request attribute that represents
      * the controller name (a string like ClassName::MethodName).
-     *
-     * @param Request $request A Request instance
-     *
-     * @return mixed|Boolean A PHP callable representing the Controller,
-     *                       or false if this resolver is not able to determine the controller
-     *
-     * @throws \InvalidArgumentException|\LogicException If the controller can't be found
      *
      * @api
      */
@@ -58,7 +51,7 @@ class ControllerResolver implements ControllerResolverInterface
     {
         if (!$controller = $request->attributes->get('_controller')) {
             if (null !== $this->logger) {
-                $this->logger->warn('Unable to look for the controller as the "_controller" parameter is missing');
+                $this->logger->warning('Unable to look for the controller as the "_controller" parameter is missing');
             }
 
             return false;
@@ -70,28 +63,23 @@ class ControllerResolver implements ControllerResolverInterface
 
         if (false === strpos($controller, ':')) {
             if (method_exists($controller, '__invoke')) {
-                return new $controller;
+                return new $controller();
             } elseif (function_exists($controller)) {
                 return $controller;
             }
         }
 
-        list($controller, $method) = $this->createController($controller);
+        $callable = $this->createController($controller);
 
-        if (!method_exists($controller, $method)) {
-            throw new \InvalidArgumentException(sprintf('Method "%s::%s" does not exist.', get_class($controller), $method));
+        if (!is_callable($callable)) {
+            throw new \InvalidArgumentException(sprintf('The controller for URI "%s" is not callable.', $request->getPathInfo()));
         }
 
-        return array($controller, $method);
+        return $callable;
     }
 
     /**
-     * Returns the arguments to pass to the controller.
-     *
-     * @param Request $request    A Request instance
-     * @param mixed   $controller A PHP callable
-     *
-     * @throws \RuntimeException When value for argument given is not provided
+     * {@inheritdoc}
      *
      * @api
      */
@@ -142,6 +130,8 @@ class ControllerResolver implements ControllerResolverInterface
      * @param string $controller A Controller string
      *
      * @return mixed A PHP callable
+     *
+     * @throws \InvalidArgumentException
      */
     protected function createController($controller)
     {

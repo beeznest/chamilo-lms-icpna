@@ -7,6 +7,7 @@ use Doctrine\Common\Persistence\Mapping\Driver\SymfonyFileLocator;
 use Doctrine\Common\Persistence\Mapping\Driver\MappingDriver;
 use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Version as CommonLibVer;
 use Gedmo\Mapping\Driver\File as FileDriver;
 use Gedmo\Mapping\Driver\AnnotationDriverInterface;
 use Doctrine\ORM\Tools\DisconnectedClassMetadataFactory;
@@ -16,38 +17,35 @@ use Doctrine\ORM\Tools\DisconnectedClassMetadataFactory;
  * initialization and fully reading the extension metadata
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.Mapping
- * @subpackage ExtensionMetadataFactory
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
-final class ExtensionMetadataFactory
+class ExtensionMetadataFactory
 {
     /**
      * Extension driver
      * @var \Gedmo\Mapping\Driver
      */
-    private $driver;
+    protected $driver;
 
     /**
      * Object manager, entity or document
      * @var object
      */
-    private $objectManager;
+    protected $objectManager;
 
     /**
      * Extension namespace
      *
      * @var string
      */
-    private $extensionNamespace;
+    protected $extensionNamespace;
 
     /**
      * Custom annotation reader
      *
      * @var object
      */
-    private $annotationReader;
+    protected $annotationReader;
 
     /**
      * Initializes extension driver
@@ -128,10 +126,10 @@ final class ExtensionMetadataFactory
      * read the metadata required by extension
      *
      * @param object $omDriver
-     * @throws DriverException if driver was not found in extension
+     * @throws \Gedmo\Exception\RuntimeException if driver was not found in extension
      * @return \Gedmo\Mapping\Driver
      */
-    private function getDriver($omDriver)
+    protected function getDriver($omDriver)
     {
         $driver = null;
         $className = get_class($omDriver);
@@ -140,6 +138,9 @@ final class ExtensionMetadataFactory
             $driver = new Driver\Chain();
             foreach ($omDriver->getDrivers() as $namespace => $nestedOmDriver) {
                 $driver->addDriver($this->getDriver($nestedOmDriver), $namespace);
+            }
+            if (version_compare(CommonLibVer::VERSION, '2.3.0', '>=') && $omDriver->getDefaultDriver() !== null) {
+                $driver->setDefaultDriver($this->getDriver($omDriver->getDefaultDriver()));
             }
         } else {
             $driverName = substr($driverName, 0, strpos($driverName, 'Driver'));

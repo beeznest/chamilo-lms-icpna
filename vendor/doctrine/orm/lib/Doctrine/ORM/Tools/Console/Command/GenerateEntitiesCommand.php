@@ -47,6 +47,7 @@ class GenerateEntitiesCommand extends Command
     {
         $this
         ->setName('orm:generate-entities')
+        ->setAliases(array('orm:generate:entities'))
         ->setDescription('Generate entity classes and method stubs from your mapping information.')
         ->setDefinition(array(
             new InputOption(
@@ -73,12 +74,16 @@ class GenerateEntitiesCommand extends Command
                 'Flag to define if generator should only update entity if it exists.', true
             ),
             new InputOption(
-                'extend', null, InputOption::VALUE_OPTIONAL,
+                'extend', null, InputOption::VALUE_REQUIRED,
                 'Defines a base class to be extended by generated entity classes.'
             ),
             new InputOption(
-                'num-spaces', null, InputOption::VALUE_OPTIONAL,
+                'num-spaces', null, InputOption::VALUE_REQUIRED,
                 'Defines the number of indentation spaces', 4
+            ),
+            new InputOption(
+                'no-backup', null, InputOption::VALUE_NONE,
+                'Flag to define if generator should avoid backuping existing entity file if it exists.'
             )
         ))
         ->setHelp(<<<EOT
@@ -91,7 +96,7 @@ to error and we suggest you use code repositories such as GIT or SVN to make
 backups of your code.
 
 It makes sense to generate the entity code if you are using entities as Data
-Access Objects only and dont put much additional logic on them. If you are
+Access Objects only and don't put much additional logic on them. If you are
 however putting much more logic on the entities you should refrain from using
 the entity-generator and code your entities manually.
 
@@ -140,6 +145,7 @@ EOT
             $entityGenerator->setRegenerateEntityIfExists($input->getOption('regenerate-entities'));
             $entityGenerator->setUpdateEntityIfExists($input->getOption('update-entities'));
             $entityGenerator->setNumSpaces($input->getOption('num-spaces'));
+            $entityGenerator->setBackupExisting(!$input->getOption('no-backup'));
 
             if (($extend = $input->getOption('extend')) !== null) {
                 $entityGenerator->setClassToExtend($extend);

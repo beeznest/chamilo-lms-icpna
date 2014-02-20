@@ -3,16 +3,14 @@
 namespace Gedmo\Mapping\Driver;
 
 use Gedmo\Mapping\Driver\AnnotationDriverInterface;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
 /**
  * This is an abstract class to implement common functionality
  * for extension annotation mapping drivers.
  *
- * @package    Gedmo.Mapping.Driver
- * @subpackage AnnotationDriverInterface
  * @author     Derek J. Lambert <dlambert@dereklambert.com>
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
- * @link       http://www.gediminasm.org
  */
 abstract class AbstractAnnotationDriver implements AnnotationDriverInterface
 {
@@ -56,7 +54,7 @@ abstract class AbstractAnnotationDriver implements AnnotationDriverInterface
     /**
      * @param object $meta
      *
-     * @return array
+     * @return \ReflectionClass
      */
     public function getMetaReflectionClass($meta)
     {
@@ -87,10 +85,10 @@ abstract class AbstractAnnotationDriver implements AnnotationDriverInterface
     }
 
     /**
-     * @param Doctrine\ORM\Mapping\ClassMetadata $meta
+     * @param \Doctrine\Common\Persistence\Mapping\ClassMetaData $meta
      * @param array         $config
      */
-    public function validateFullMetadata(\Doctrine\ORM\Mapping\ClassMetadata $meta, array $config)
+    public function validateFullMetadata(ClassMetadata $meta, array $config)
     {
     }
 

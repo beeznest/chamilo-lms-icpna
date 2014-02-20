@@ -2,6 +2,8 @@
 
 namespace Doctrine\Tests\DBAL\Functional\Schema;
 
+use Doctrine\DBAL\Schema\Comparator;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type,
     Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
@@ -87,9 +89,9 @@ class SchemaManagerFunctionalTestCase extends \Doctrine\Tests\DbalFunctionalTest
         $this->_sm->dropAndCreateDatabase('test_create_database');
         $databases = $this->_sm->listDatabases();
 
-        $databases = \array_map('strtolower', $databases);
+        $databases = array_map('strtolower', $databases);
 
-        $this->assertEquals(true, \in_array('test_create_database', $databases));
+        $this->assertContains('test_create_database', $databases);
     }
 
     public function testListTables()
@@ -248,6 +250,7 @@ class SchemaManagerFunctionalTestCase extends \Doctrine\Tests\DbalFunctionalTest
         }
 
         $offlineTable = $this->createListTableColumns();
+        $this->_sm->dropAndCreateTable($offlineTable);
         $onlineTable = $this->_sm->listTableDetails('list_table_columns');
 
         $comparator = new \Doctrine\DBAL\Schema\Comparator();
@@ -273,12 +276,12 @@ class SchemaManagerFunctionalTestCase extends \Doctrine\Tests\DbalFunctionalTest
         $this->assertTrue($tableIndexes['primary']->isUnique());
         $this->assertTrue($tableIndexes['primary']->isPrimary());
 
-        $this->assertEquals('test_index_name', $tableIndexes['test_index_name']->getName());
+        $this->assertEquals('test_index_name', strtolower($tableIndexes['test_index_name']->getName()));
         $this->assertEquals(array('test'), array_map('strtolower', $tableIndexes['test_index_name']->getColumns()));
         $this->assertTrue($tableIndexes['test_index_name']->isUnique());
         $this->assertFalse($tableIndexes['test_index_name']->isPrimary());
 
-        $this->assertEquals('test_composite_idx', $tableIndexes['test_composite_idx']->getName());
+        $this->assertEquals('test_composite_idx', strtolower($tableIndexes['test_composite_idx']->getName()));
         $this->assertEquals(array('id', 'test'), array_map('strtolower', $tableIndexes['test_composite_idx']->getColumns()));
         $this->assertFalse($tableIndexes['test_composite_idx']->isUnique());
         $this->assertFalse($tableIndexes['test_composite_idx']->isPrimary());
@@ -423,7 +426,21 @@ class SchemaManagerFunctionalTestCase extends \Doctrine\Tests\DbalFunctionalTest
 
         $tableDiff = new \Doctrine\DBAL\Schema\TableDiff("alter_table");
         $tableDiff->fromTable = $table;
-        $tableDiff->removedIndexes[] = new \Doctrine\DBAL\Schema\Index('foo_idx', array('foo', 'foreign_key_test'));
+        $tableDiff->renamedIndexes['foo_idx'] = new \Doctrine\DBAL\Schema\Index('bar_idx', array('foo', 'foreign_key_test'));
+
+        $this->_sm->alterTable($tableDiff);
+
+        $table = $this->_sm->listTableDetails('alter_table');
+        $this->assertEquals(2, count($table->getIndexes()));
+        $this->assertTrue($table->hasIndex('bar_idx'));
+        $this->assertFalse($table->hasIndex('foo_idx'));
+        $this->assertEquals(array('foo', 'foreign_key_test'), array_map('strtolower', $table->getIndex('bar_idx')->getColumns()));
+        $this->assertFalse($table->getIndex('bar_idx')->isPrimary());
+        $this->assertFalse($table->getIndex('bar_idx')->isUnique());
+
+        $tableDiff = new \Doctrine\DBAL\Schema\TableDiff("alter_table");
+        $tableDiff->fromTable = $table;
+        $tableDiff->removedIndexes[] = new \Doctrine\DBAL\Schema\Index('bar_idx', array('foo', 'foreign_key_test'));
         $fk = new \Doctrine\DBAL\Schema\ForeignKeyConstraint(array('foreign_key_test'), 'alter_table_foreign', array('id'));
         $tableDiff->addedForeignKeys[] = $fk;
 
@@ -431,7 +448,7 @@ class SchemaManagerFunctionalTestCase extends \Doctrine\Tests\DbalFunctionalTest
         $table = $this->_sm->listTableDetails('alter_table');
 
         // dont check for index size here, some platforms automatically add indexes for foreign keys.
-        $this->assertFalse($table->hasIndex('foo_idx'));
+        $this->assertFalse($table->hasIndex('bar_idx'));
 
         if ($this->_sm->getDatabasePlatform()->supportsForeignKeyConstraints()) {
             $fks = $table->getForeignKeys();
@@ -480,6 +497,28 @@ class SchemaManagerFunctionalTestCase extends \Doctrine\Tests\DbalFunctionalTest
     }
 
     /**
+     * @group DBAL-792
+     */
+    public function testAutoincrementDetectionMulticolumns()
+    {
+        if (!$this->_sm->getDatabasePlatform()->supportsIdentityColumns()) {
+            $this->markTestSkipped('This test is only supported on platforms that have autoincrement');
+        }
+
+        $table = new \Doctrine\DBAL\Schema\Table('test_not_autoincrement');
+        $table->setSchemaConfig($this->_sm->createSchemaConfig());
+        $table->addColumn('id', 'integer');
+        $table->addColumn('other_id', 'integer');
+        $table->setPrimaryKey(array('id', 'other_id'));
+
+        $this->_sm->createTable($table);
+
+        $inferredTable = $this->_sm->listTableDetails('test_not_autoincrement');
+        $this->assertTrue($inferredTable->hasColumn('id'));
+        $this->assertFalse($inferredTable->getColumn('id')->getAutoincrement());
+    }
+
+    /**
      * @group DDC-887
      */
     public function testUpdateSchemaWithForeignKeyRenaming()
@@ -522,7 +561,9 @@ class SchemaManagerFunctionalTestCase extends \Doctrine\Tests\DbalFunctionalTest
      */
     public function testGetColumnComment()
     {
-        if (!$this->_conn->getDatabasePlatform()->supportsInlineColumnComments() && !$this->_conn->getDatabasePlatform()->supportsCommentOnStatement()) {
+        if ( ! $this->_conn->getDatabasePlatform()->supportsInlineColumnComments() &&
+             ! $this->_conn->getDatabasePlatform()->supportsCommentOnStatement() &&
+            $this->_conn->getDatabasePlatform()->getName() != 'mssql') {
             $this->markTestSkipped('Database does not support column comments.');
         }
 
@@ -535,6 +576,23 @@ class SchemaManagerFunctionalTestCase extends \Doctrine\Tests\DbalFunctionalTest
         $columns = $this->_sm->listTableColumns("column_comment_test");
         $this->assertEquals(1, count($columns));
         $this->assertEquals('This is a comment', $columns['id']->getComment());
+
+        $tableDiff = new \Doctrine\DBAL\Schema\TableDiff('column_comment_test');
+        $tableDiff->changedColumns['id'] = new \Doctrine\DBAL\Schema\ColumnDiff(
+            'id', new \Doctrine\DBAL\Schema\Column(
+                'id', \Doctrine\DBAL\Types\Type::getType('integer'), array('primary' => true)
+            ),
+            array('comment'),
+            new \Doctrine\DBAL\Schema\Column(
+                'id', \Doctrine\DBAL\Types\Type::getType('integer'), array('comment' => 'This is a comment')
+            )
+        );
+
+        $this->_sm->alterTable($tableDiff);
+
+        $columns = $this->_sm->listTableColumns("column_comment_test");
+        $this->assertEquals(1, count($columns));
+        $this->assertEmpty($columns['id']->getComment());
     }
 
     /**
@@ -542,7 +600,9 @@ class SchemaManagerFunctionalTestCase extends \Doctrine\Tests\DbalFunctionalTest
      */
     public function testAutomaticallyAppendCommentOnMarkedColumns()
     {
-        if (!$this->_conn->getDatabasePlatform()->supportsInlineColumnComments() && !$this->_conn->getDatabasePlatform()->supportsCommentOnStatement()) {
+        if ( ! $this->_conn->getDatabasePlatform()->supportsInlineColumnComments() &&
+             ! $this->_conn->getDatabasePlatform()->supportsCommentOnStatement() &&
+            $this->_conn->getDatabasePlatform()->getName() != 'mssql') {
             $this->markTestSkipped('Database does not support column comments.');
         }
 
@@ -639,7 +699,7 @@ class SchemaManagerFunctionalTestCase extends \Doctrine\Tests\DbalFunctionalTest
         $this->_sm->createTable($this->getTestCompositeTable('test_create_fk4'));
 
         $foreignKey = new \Doctrine\DBAL\Schema\ForeignKeyConstraint(
-            array('id', 'foreign_key_test'), 'test_create_fk4', array('id', 'other_id'), 'foreign_key_test_fk'
+            array('id', 'foreign_key_test'), 'test_create_fk4', array('id', 'other_id'), 'foreign_key_test_fk2'
         );
 
         $this->_sm->createForeignKey($foreignKey, 'test_create_fk3');
@@ -651,5 +711,116 @@ class SchemaManagerFunctionalTestCase extends \Doctrine\Tests\DbalFunctionalTest
         $this->assertInstanceOf('Doctrine\DBAL\Schema\ForeignKeyConstraint', $fkeys[0]);
         $this->assertEquals(array('id', 'foreign_key_test'), array_map('strtolower', $fkeys[0]->getLocalColumns()));
         $this->assertEquals(array('id', 'other_id'),         array_map('strtolower', $fkeys[0]->getForeignColumns()));
+    }
+
+    /**
+     * @group DBAL-44
+     */
+    public function testColumnDefaultLifecycle()
+    {
+        $table = new Table("col_def_lifecycle");
+        $table->addColumn('id', 'integer', array('primary' => true, 'autoincrement' => true));
+        $table->addColumn('column1', 'string', array('default' => null));
+        $table->addColumn('column2', 'string', array('default' => false));
+        $table->addColumn('column3', 'string', array('default' => true));
+        $table->addColumn('column4', 'string', array('default' => 0));
+        $table->addColumn('column5', 'string', array('default' => ''));
+        $table->addColumn('column6', 'string', array('default' => 'def'));
+        $table->setPrimaryKey(array('id'));
+
+        $this->_sm->dropAndCreateTable($table);
+
+        $columns = $this->_sm->listTableColumns('col_def_lifecycle');
+
+        $this->assertNull($columns['id']->getDefault());
+        $this->assertNull($columns['column1']->getDefault());
+        $this->assertSame('', $columns['column2']->getDefault());
+        $this->assertSame('1', $columns['column3']->getDefault());
+        $this->assertSame('0', $columns['column4']->getDefault());
+        $this->assertSame('', $columns['column5']->getDefault());
+        $this->assertSame('def', $columns['column6']->getDefault());
+
+        $diffTable = clone $table;
+
+        $diffTable->changeColumn('column1', array('default' => false));
+        $diffTable->changeColumn('column2', array('default' => null));
+        $diffTable->changeColumn('column3', array('default' => false));
+        $diffTable->changeColumn('column4', array('default' => null));
+        $diffTable->changeColumn('column5', array('default' => false));
+        $diffTable->changeColumn('column6', array('default' => 666));
+
+        $comparator = new Comparator();
+
+        $this->_sm->alterTable($comparator->diffTable($table, $diffTable));
+
+        $columns = $this->_sm->listTableColumns('col_def_lifecycle');
+
+        $this->assertSame('', $columns['column1']->getDefault());
+        $this->assertNull($columns['column2']->getDefault());
+        $this->assertSame('', $columns['column3']->getDefault());
+        $this->assertNull($columns['column4']->getDefault());
+        $this->assertSame('', $columns['column5']->getDefault());
+        $this->assertSame('666', $columns['column6']->getDefault());
+    }
+
+    public function testListTableWithBinary()
+    {
+        $tableName = 'test_binary_table';
+
+        $table = new \Doctrine\DBAL\Schema\Table($tableName);
+        $table->addColumn('id', 'integer');
+        $table->addColumn('column_varbinary', 'binary', array());
+        $table->addColumn('column_binary', 'binary', array('fixed' => true));
+        $table->setPrimaryKey(array('id'));
+
+        $this->_sm->createTable($table);
+
+        $table = $this->_sm->listTableDetails($tableName);
+
+        $this->assertInstanceOf('Doctrine\DBAL\Types\BinaryType', $table->getColumn('column_varbinary')->getType());
+        $this->assertFalse($table->getColumn('column_varbinary')->getFixed());
+
+        $this->assertInstanceOf('Doctrine\DBAL\Types\BinaryType', $table->getColumn('column_binary')->getType());
+        $this->assertTrue($table->getColumn('column_binary')->getFixed());
+    }
+
+    public function testListTableDetailsWithFullQualifiedTableName()
+    {
+        if ( ! $this->_sm->getDatabasePlatform()->supportsSchemas()) {
+            $this->markTestSkipped('Test only works on platforms that support schemas.');
+        }
+
+        $defaultSchemaName = $this->_sm->getDatabasePlatform()->getDefaultSchemaName();
+        $primaryTableName  = 'primary_table';
+        $foreignTableName  = 'foreign_table';
+
+        $table = new Table($foreignTableName);
+        $table->addColumn('id', 'integer', array('autoincrement' => true));
+        $table->setPrimaryKey(array('id'));
+
+        $this->_sm->dropAndCreateTable($table);
+
+        $table = new Table($primaryTableName);
+        $table->addColumn('id', 'integer', array('autoincrement' => true));
+        $table->addColumn('foo', 'integer');
+        $table->addColumn('bar', 'string');
+        $table->addForeignKeyConstraint($foreignTableName, array('foo'), array('id'));
+        $table->addIndex(array('bar'));
+        $table->setPrimaryKey(array('id'));
+
+        $this->_sm->dropAndCreateTable($table);
+
+        $this->assertEquals(
+            $this->_sm->listTableColumns($primaryTableName),
+            $this->_sm->listTableColumns($defaultSchemaName . '.' . $primaryTableName)
+        );
+        $this->assertEquals(
+            $this->_sm->listTableIndexes($primaryTableName),
+            $this->_sm->listTableIndexes($defaultSchemaName . '.' . $primaryTableName)
+        );
+        $this->assertEquals(
+            $this->_sm->listTableForeignKeys($primaryTableName),
+            $this->_sm->listTableForeignKeys($defaultSchemaName . '.' . $primaryTableName)
+        );
     }
 }

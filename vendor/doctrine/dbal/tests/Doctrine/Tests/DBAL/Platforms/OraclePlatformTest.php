@@ -3,6 +3,8 @@
 namespace Doctrine\Tests\DBAL\Platforms;
 
 use Doctrine\DBAL\Platforms\OraclePlatform;
+use Doctrine\DBAL\Schema\Comparator;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 
 require_once __DIR__ . '/../../TestInit.php';
@@ -61,13 +63,13 @@ class OraclePlatformTest extends AbstractPlatformTestCase
 
     public function getGenerateTableSql()
     {
-        return 'CREATE TABLE test (id NUMBER(10) NOT NULL, test VARCHAR2(255) DEFAULT NULL, PRIMARY KEY(id))';
+        return 'CREATE TABLE test (id NUMBER(10) NOT NULL, test VARCHAR2(255) DEFAULT NULL NULL, PRIMARY KEY(id))';
     }
 
     public function getGenerateTableWithMultiColumnUniqueIndexSql()
     {
         return array(
-            'CREATE TABLE test (foo VARCHAR2(255) DEFAULT NULL, bar VARCHAR2(255) DEFAULT NULL)',
+            'CREATE TABLE test (foo VARCHAR2(255) DEFAULT NULL NULL, bar VARCHAR2(255) DEFAULT NULL NULL)',
             'CREATE UNIQUE INDEX UNIQ_D87F7E0C8C73652176FF8CAA ON test (foo, bar)',
         );
     }
@@ -75,8 +77,8 @@ class OraclePlatformTest extends AbstractPlatformTestCase
     public function getGenerateAlterTableSql()
     {
         return array(
-            'ALTER TABLE mytable ADD (quota NUMBER(10) DEFAULT NULL)',
-            "ALTER TABLE mytable MODIFY (baz  VARCHAR2(255) DEFAULT 'def' NOT NULL, bloo  NUMBER(1) DEFAULT '0' NOT NULL)",
+            'ALTER TABLE mytable ADD (quota NUMBER(10) DEFAULT NULL NULL)',
+            "ALTER TABLE mytable MODIFY (baz VARCHAR2(255) DEFAULT 'def' NOT NULL, bloo NUMBER(1) DEFAULT '0' NOT NULL)",
             "ALTER TABLE mytable DROP (foo)",
             "ALTER TABLE mytable RENAME TO userlist",
         );
@@ -114,14 +116,6 @@ class OraclePlatformTest extends AbstractPlatformTestCase
             'SET TRANSACTION ISOLATION LEVEL SERIALIZABLE',
             $this->_platform->getSetTransactionIsolationSQL(\Doctrine\DBAL\Connection::TRANSACTION_SERIALIZABLE)
         );
-    }
-
-    /**
-     * @expectedException Doctrine\DBAL\DBALException
-     */
-    public function testShowDatabasesThrowsException()
-    {
-        $this->assertEquals('SHOW DATABASES', $this->_platform->getShowDatabasesSQL());
     }
 
     /**
@@ -232,6 +226,30 @@ class OraclePlatformTest extends AbstractPlatformTestCase
         $this->assertEquals('SELECT a.* FROM (SELECT * FROM user ORDER BY username DESC) a WHERE ROWNUM <= 10', $sql);
     }
 
+    public function testGenerateTableWithAutoincrement()
+    {
+        $columnName = strtoupper('id' . uniqid());
+        $tableName = strtoupper('table' . uniqid());
+        $table = new \Doctrine\DBAL\Schema\Table($tableName);
+        $column = $table->addColumn($columnName, 'integer');
+        $column->setAutoincrement(true);
+        $targets = array(
+          "CREATE TABLE {$tableName} ({$columnName} NUMBER(10) NOT NULL)",
+          "DECLARE constraints_Count NUMBER; BEGIN SELECT COUNT(CONSTRAINT_NAME) INTO constraints_Count FROM USER_CONSTRAINTS WHERE TABLE_NAME = '{$tableName}' AND CONSTRAINT_TYPE = 'P'; IF constraints_Count = 0 OR constraints_Count = '' THEN EXECUTE IMMEDIATE 'ALTER TABLE {$tableName} ADD CONSTRAINT {$tableName}_AI_PK PRIMARY KEY ({$columnName})'; END IF; END;",
+          "CREATE SEQUENCE {$tableName}_{$columnName}_SEQ START WITH 1 MINVALUE 1 INCREMENT BY 1",
+          "CREATE TRIGGER {$tableName}_AI_PK BEFORE INSERT ON {$tableName} FOR EACH ROW DECLARE last_Sequence NUMBER; last_InsertID NUMBER; BEGIN SELECT {$tableName}_{$columnName}_SEQ.NEXTVAL INTO :NEW.{$columnName} FROM DUAL; IF (:NEW.{$columnName} IS NULL OR :NEW.{$columnName} = 0) THEN SELECT {$tableName}_{$columnName}_SEQ.NEXTVAL INTO :NEW.{$columnName} FROM DUAL; ELSE SELECT NVL(Last_Number, 0) INTO last_Sequence FROM User_Sequences WHERE Sequence_Name = '{$tableName}_{$columnName}_SEQ'; SELECT :NEW.{$columnName} INTO last_InsertID FROM DUAL; WHILE (last_InsertID > last_Sequence) LOOP SELECT {$tableName}_{$columnName}_SEQ.NEXTVAL INTO last_Sequence FROM DUAL; END LOOP; END IF; END;"
+        );
+        $statements = $this->_platform->getCreateTableSQL($table);
+        //strip all the whitespace from the statements
+        array_walk($statements, function(&$value){
+          $value = preg_replace('/\s+/', ' ',$value);
+        });
+        foreach($targets as $key => $sql){
+          $this->assertArrayHasKey($key,$statements);
+          $this->assertEquals($sql, $statements[$key]);
+        }
+    }
+
     public function getCreateTableColumnCommentsSQL()
     {
         return array(
@@ -252,8 +270,8 @@ class OraclePlatformTest extends AbstractPlatformTestCase
     {
         return array(
             "ALTER TABLE mytable ADD (quota NUMBER(10) NOT NULL)",
-            "ALTER TABLE mytable MODIFY (baz  VARCHAR2(255) NOT NULL)",
             "COMMENT ON COLUMN mytable.quota IS 'A comment'",
+            "COMMENT ON COLUMN mytable.foo IS ''",
             "COMMENT ON COLUMN mytable.baz IS 'B comment'",
         );
     }
@@ -272,14 +290,152 @@ class OraclePlatformTest extends AbstractPlatformTestCase
 
     protected function getQuotedColumnInPrimaryKeySQL()
     {
-        return array('CREATE TABLE "quoted" ("key" VARCHAR2(255) NOT NULL, PRIMARY KEY("key"))');
+        return array('CREATE TABLE "quoted" ("create" VARCHAR2(255) NOT NULL, PRIMARY KEY("create"))');
     }
 
     protected function getQuotedColumnInIndexSQL()
     {
         return array(
-            'CREATE TABLE "quoted" ("key" VARCHAR2(255) NOT NULL)',
-            'CREATE INDEX IDX_22660D028A90ABA9 ON "quoted" ("key")',
+            'CREATE TABLE "quoted" ("create" VARCHAR2(255) NOT NULL)',
+            'CREATE INDEX IDX_22660D028FD6E0FB ON "quoted" ("create")',
+        );
+    }
+
+    protected function getQuotedColumnInForeignKeySQL()
+    {
+        return array(
+            'CREATE TABLE "quoted" ("create" VARCHAR2(255) NOT NULL, foo VARCHAR2(255) NOT NULL, "bar" VARCHAR2(255) NOT NULL)',
+            'ALTER TABLE "quoted" ADD CONSTRAINT FK_WITH_RESERVED_KEYWORD FOREIGN KEY ("create", foo, "bar") REFERENCES foreign ("create", bar, "foo-bar")',
+            'ALTER TABLE "quoted" ADD CONSTRAINT FK_WITH_NON_RESERVED_KEYWORD FOREIGN KEY ("create", foo, "bar") REFERENCES foo ("create", bar, "foo-bar")',
+            'ALTER TABLE "quoted" ADD CONSTRAINT FK_WITH_INTENDED_QUOTATION FOREIGN KEY ("create", foo, "bar") REFERENCES "foo-bar" ("create", bar, "foo-bar")',
+        );
+    }
+
+    public function testAlterTableNotNULL()
+    {
+        $tableDiff = new \Doctrine\DBAL\Schema\TableDiff('mytable');
+        $tableDiff->changedColumns['foo'] = new \Doctrine\DBAL\Schema\ColumnDiff(
+            'foo', new \Doctrine\DBAL\Schema\Column(
+                'foo', \Doctrine\DBAL\Types\Type::getType('string'), array('default' => 'bla', 'notnull' => true)
+            ),
+            array('type')
+        );
+        $tableDiff->changedColumns['bar'] = new \Doctrine\DBAL\Schema\ColumnDiff(
+            'bar', new \Doctrine\DBAL\Schema\Column(
+                'baz', \Doctrine\DBAL\Types\Type::getType('string'), array('default' => 'bla', 'notnull' => true)
+            ),
+            array('type', 'notnull')
+        );
+        $tableDiff->changedColumns['metar'] = new \Doctrine\DBAL\Schema\ColumnDiff(
+            'metar', new \Doctrine\DBAL\Schema\Column(
+                'metar', \Doctrine\DBAL\Types\Type::getType('string'), array('length' => 2000, 'notnull' => false)
+            ),
+            array('notnull')
+        );
+
+        $expectedSql = array(
+            "ALTER TABLE mytable MODIFY (foo VARCHAR2(255) DEFAULT 'bla' NULL, baz VARCHAR2(255) DEFAULT 'bla' NOT NULL, metar VARCHAR2(2000) DEFAULT NULL NULL)",
+	);
+        $this->assertEquals($expectedSql, $this->_platform->getAlterTableSQL($tableDiff));
+    }
+
+    public function testInitializesDoctrineTypeMappings()
+    {
+        $this->assertTrue($this->_platform->hasDoctrineTypeMappingFor('long raw'));
+        $this->assertSame('blob', $this->_platform->getDoctrineTypeMapping('long raw'));
+
+        $this->assertTrue($this->_platform->hasDoctrineTypeMappingFor('raw'));
+        $this->assertSame('binary', $this->_platform->getDoctrineTypeMapping('raw'));
+    }
+
+    protected function getBinaryMaxLength()
+    {
+        return 2000;
+    }
+
+    public function testReturnsBinaryTypeDeclarationSQL()
+    {
+        $this->assertSame('RAW(255)', $this->_platform->getBinaryTypeDeclarationSQL(array()));
+        $this->assertSame('RAW(2000)', $this->_platform->getBinaryTypeDeclarationSQL(array('length' => 0)));
+        $this->assertSame('RAW(2000)', $this->_platform->getBinaryTypeDeclarationSQL(array('length' => 2000)));
+        $this->assertSame('BLOB', $this->_platform->getBinaryTypeDeclarationSQL(array('length' => 2001)));
+
+        $this->assertSame('RAW(255)', $this->_platform->getBinaryTypeDeclarationSQL(array('fixed' => true)));
+        $this->assertSame('RAW(2000)', $this->_platform->getBinaryTypeDeclarationSQL(array('fixed' => true, 'length' => 0)));
+        $this->assertSame('RAW(2000)', $this->_platform->getBinaryTypeDeclarationSQL(array('fixed' => true, 'length' => 2000)));
+        $this->assertSame('BLOB', $this->_platform->getBinaryTypeDeclarationSQL(array('fixed' => true, 'length' => 2001)));
+    }
+
+    public function testDoesNotPropagateUnnecessaryTableAlterationOnBinaryType()
+    {
+        $table1 = new Table('mytable');
+        $table1->addColumn('column_varbinary', 'binary');
+        $table1->addColumn('column_binary', 'binary', array('fixed' => true));
+
+        $table2 = new Table('mytable');
+        $table2->addColumn('column_varbinary', 'binary', array('fixed' => true));
+        $table2->addColumn('column_binary', 'binary');
+
+        $comparator = new Comparator();
+
+        // VARBINARY -> BINARY
+        // BINARY    -> VARBINARY
+        $this->assertEmpty($this->_platform->getAlterTableSQL($comparator->diffTable($table1, $table2)));
+    }
+
+    /**
+     * @group DBAL-563
+     */
+    public function testUsesSequenceEmulatedIdentityColumns()
+    {
+        $this->assertTrue($this->_platform->usesSequenceEmulatedIdentityColumns());
+    }
+
+    /**
+     * @group DBAL-563
+     */
+    public function testReturnsIdentitySequenceName()
+    {
+        $this->assertSame('mytable_mycolumn_SEQ', $this->_platform->getIdentitySequenceName('mytable', 'mycolumn'));
+    }
+
+    /**
+     * @dataProvider dataCreateSequenceWithCache
+     * @group DBAL-139
+     */
+    public function testCreateSequenceWithCache($cacheSize, $expectedSql)
+    {
+        $sequence = new \Doctrine\DBAL\Schema\Sequence('foo', 1, 1, $cacheSize);
+        $this->assertContains($expectedSql, $this->_platform->getCreateSequenceSQL($sequence));
+    }
+
+    public function dataCreateSequenceWithCache()
+    {
+        return array(
+            array(1, 'NOCACHE'),
+            array(0, 'NOCACHE'),
+            array(3, 'CACHE 3')
+        );
+    }
+
+    /**
+     * @group DBAL-234
+     */
+    protected function getAlterTableRenameIndexSQL()
+    {
+        return array(
+            'ALTER INDEX idx_foo RENAME TO idx_bar',
+        );
+    }
+
+    /**
+     * @group DBAL-234
+     */
+    protected function getQuotedAlterTableRenameIndexSQL()
+    {
+        return array(
+            'ALTER INDEX "create" RENAME TO "select"',
+            'ALTER INDEX "foo" RENAME TO "bar"',
         );
     }
 }

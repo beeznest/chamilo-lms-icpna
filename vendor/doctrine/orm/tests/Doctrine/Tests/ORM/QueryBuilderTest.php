@@ -142,6 +142,19 @@ class QueryBuilderTest extends \Doctrine\Tests\OrmTestCase
         );
     }
 
+    public function testComplexInnerJoinWithIndexBy()
+    {
+        $qb = $this->_em->createQueryBuilder()
+            ->select('u', 'a')
+            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u')
+            ->innerJoin('u.articles', 'a', 'ON', 'u.id = a.author_id', 'a.name');
+
+        $this->assertValidQueryBuilder(
+            $qb,
+            'SELECT u, a FROM Doctrine\Tests\Models\CMS\CmsUser u INNER JOIN u.articles a INDEX BY a.name ON u.id = a.author_id'
+        );
+    }
+
     public function testLeftJoin()
     {
         $qb = $this->_em->createQueryBuilder()
@@ -375,33 +388,147 @@ class QueryBuilderTest extends \Doctrine\Tests\OrmTestCase
         $this->assertValidQueryBuilder($qb, 'SELECT u FROM Doctrine\Tests\Models\CMS\CmsUser u ORDER BY u.username ASC, u.username DESC');
     }
 
+    public function testAddOrderByWithExpression()
+    {
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('u')
+            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u')
+            ->orderBy('u.username', 'ASC')
+            ->addOrderBy($qb->expr()->desc('u.username'));
+
+        $this->assertValidQueryBuilder($qb, 'SELECT u FROM Doctrine\Tests\Models\CMS\CmsUser u ORDER BY u.username ASC, u.username DESC');
+    }
+
     public function testAddCriteriaWhere()
     {
         $qb = $this->_em->createQueryBuilder();
+        $qb->select('u')
+            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u');
+
         $criteria = new Criteria();
         $criteria->where($criteria->expr()->eq('field', 'value'));
 
         $qb->addCriteria($criteria);
 
-        $this->assertEquals('field = :field', (string) $qb->getDQLPart('where'));
+        $this->assertEquals('u.field = :field', (string) $qb->getDQLPart('where'));
         $this->assertNotNull($qb->getParameter('field'));
+    }
+
+    public function testAddMultipleSameCriteriaWhere()
+    {
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('alias1')->from('Doctrine\Tests\Models\CMS\CmsUser', 'alias1');
+
+        $criteria = new Criteria();
+        $criteria->where($criteria->expr()->andX(
+            $criteria->expr()->eq('field', 'value1'),
+            $criteria->expr()->eq('field', 'value2')
+        ));
+
+        $qb->addCriteria($criteria);
+
+        $this->assertEquals('alias1.field = :field AND alias1.field = :field_1', (string) $qb->getDQLPart('where'));
+        $this->assertNotNull($qb->getParameter('field'));
+        $this->assertNotNull($qb->getParameter('field_1'));
+    }
+
+    /**
+     * @group DDC-2844
+     */
+    public function testAddCriteriaWhereWithMultipleParametersWithSameField()
+    {
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('alias1')->from('Doctrine\Tests\Models\CMS\CmsUser', 'alias1');
+
+        $criteria = new Criteria();
+        $criteria->where($criteria->expr()->eq('field', 'value1'));
+        $criteria->andWhere($criteria->expr()->gt('field', 'value2'));
+
+        $qb->addCriteria($criteria);
+
+        $this->assertEquals('alias1.field = :field AND alias1.field > :field_1', (string) $qb->getDQLPart('where'));
+        $this->assertSame('value1', $qb->getParameter('field')->getValue());
+        $this->assertSame('value2', $qb->getParameter('field_1')->getValue());
+    }
+
+    /**
+     * @group DDC-2844
+     */
+    public function testAddCriteriaWhereWithMultipleParametersWithDifferentFields()
+    {
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('alias1')->from('Doctrine\Tests\Models\CMS\CmsUser', 'alias1');
+
+        $criteria = new Criteria();
+        $criteria->where($criteria->expr()->eq('field1', 'value1'));
+        $criteria->andWhere($criteria->expr()->gt('field2', 'value2'));
+
+        $qb->addCriteria($criteria);
+
+        $this->assertEquals('alias1.field1 = :field1 AND alias1.field2 > :field2', (string) $qb->getDQLPart('where'));
+        $this->assertSame('value1', $qb->getParameter('field1')->getValue());
+        $this->assertSame('value2', $qb->getParameter('field2')->getValue());
+    }
+
+    /**
+     * @group DDC-2844
+     */
+    public function testAddCriteriaWhereWithMultipleParametersWithSubpathsAndDifferentProperties()
+    {
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('alias1')->from('Doctrine\Tests\Models\CMS\CmsUser', 'alias1');
+
+        $criteria = new Criteria();
+        $criteria->where($criteria->expr()->eq('field1', 'value1'));
+        $criteria->andWhere($criteria->expr()->gt('field2', 'value2'));
+
+        $qb->addCriteria($criteria);
+
+        $this->assertEquals('alias1.field1 = :field1 AND alias1.field2 > :field2', (string) $qb->getDQLPart('where'));
+        $this->assertSame('value1', $qb->getParameter('field1')->getValue());
+        $this->assertSame('value2', $qb->getParameter('field2')->getValue());
+    }
+
+    /**
+     * @group DDC-2844
+     */
+    public function testAddCriteriaWhereWithMultipleParametersWithSubpathsAndSameProperty()
+    {
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('alias1')->from('Doctrine\Tests\Models\CMS\CmsUser', 'alias1');
+
+        $criteria = new Criteria();
+        $criteria->where($criteria->expr()->eq('field1', 'value1'));
+        $criteria->andWhere($criteria->expr()->gt('field1', 'value2'));
+
+        $qb->addCriteria($criteria);
+
+        $this->assertEquals('alias1.field1 = :field1 AND alias1.field1 > :field1_1', (string) $qb->getDQLPart('where'));
+        $this->assertSame('value1', $qb->getParameter('field1')->getValue());
+        $this->assertSame('value2', $qb->getParameter('field1_1')->getValue());
     }
 
     public function testAddCriteriaOrder()
     {
         $qb = $this->_em->createQueryBuilder();
+        $qb->select('u')
+            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u');
+
         $criteria = new Criteria();
         $criteria->orderBy(array('field' => Criteria::DESC));
 
         $qb->addCriteria($criteria);
 
         $this->assertCount(1, $orderBy = $qb->getDQLPart('orderBy'));
-        $this->assertEquals('field DESC', (string) $orderBy[0]);
+        $this->assertEquals('u.field DESC', (string) $orderBy[0]);
     }
 
     public function testAddCriteriaLimit()
     {
         $qb = $this->_em->createQueryBuilder();
+        $qb->select('u')
+            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u');
+
         $criteria = new Criteria();
         $criteria->setFirstResult(2);
         $criteria->setMaxResults(10);
@@ -415,7 +542,11 @@ class QueryBuilderTest extends \Doctrine\Tests\OrmTestCase
     public function testAddCriteriaUndefinedLimit()
     {
         $qb = $this->_em->createQueryBuilder();
-        $qb->setFirstResult(2)->setMaxResults(10);
+        $qb->select('u')
+            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u')
+            ->setFirstResult(2)
+            ->setMaxResults(10);
+
         $criteria = new Criteria();
 
         $qb->addCriteria($criteria);

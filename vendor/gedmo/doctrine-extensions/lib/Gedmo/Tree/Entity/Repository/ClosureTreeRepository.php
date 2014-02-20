@@ -16,9 +16,6 @@ use Doctrine\ORM\Proxy\Proxy;
  *
  * @author Gustavo Adrian <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.Tree.Entity.Repository
- * @subpackage ClosureRepository
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class ClosureTreeRepository extends AbstractTreeRepository
@@ -211,7 +208,8 @@ class ClosureTreeRepository extends AbstractTreeRepository
      *
      * @todo may be improved, to issue single query on reparenting
      * @param object $node
-     * @throws RuntimeException - if something fails in transaction
+     * @throws \Gedmo\Exception\InvalidArgumentException
+     * @throws \Gedmo\Exception\RuntimeException - if something fails in transaction
      * @return void
      */
     public function removeFromTree($node)

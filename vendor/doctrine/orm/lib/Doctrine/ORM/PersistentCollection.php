@@ -118,7 +118,7 @@ final class PersistentCollection implements Collection, Selectable
      *
      * @param EntityManager $em    The EntityManager the collection will be associated with.
      * @param ClassMetadata $class The class descriptor of the entity type of this collection.
-     * @param array         $coll  The collection elements.
+     * @param Collection    $coll  The collection elements.
      */
     public function __construct(EntityManager $em, $class, $coll)
     {
@@ -471,6 +471,13 @@ final class PersistentCollection implements Collection, Selectable
      */
     public function containsKey($key)
     {
+
+        if (! $this->initialized && $this->association['fetch'] === Mapping\ClassMetadataInfo::FETCH_EXTRA_LAZY
+            && isset($this->association['indexBy'])) {
+            $persister = $this->em->getUnitOfWork()->getCollectionPersister($this->association);
+
+            return $this->coll->containsKey($key) || $persister->containsKey($this, $key);
+        }
         $this->initialize();
 
         return $this->coll->containsKey($key);
@@ -517,6 +524,18 @@ final class PersistentCollection implements Collection, Selectable
      */
     public function get($key)
     {
+        if ( ! $this->initialized
+            && $this->association['type'] === Mapping\ClassMetadataInfo::ONE_TO_MANY
+            && $this->association['fetch'] === Mapping\ClassMetadataInfo::FETCH_EXTRA_LAZY
+            && isset($this->association['indexBy'])
+        ) {
+            if (!$this->typeClass->isIdentifierComposite && $this->typeClass->isIdentifier($this->association['indexBy'])) {
+                return $this->em->find($this->typeClass->name, $key);
+            }
+
+            return $this->em->getUnitOfWork()->getCollectionPersister($this->association)->get($this, $key);
+        }
+
         $this->initialize();
 
         return $this->coll->get($key);
@@ -587,9 +606,7 @@ final class PersistentCollection implements Collection, Selectable
      */
     public function isEmpty()
     {
-        $this->initialize();
-
-        return $this->coll->isEmpty();
+        return $this->coll->isEmpty() && $this->count() === 0;
     }
 
     /**
@@ -745,6 +762,8 @@ final class PersistentCollection implements Collection, Selectable
      */
     public function key()
     {
+        $this->initialize();
+
         return $this->coll->key();
     }
 
@@ -753,6 +772,8 @@ final class PersistentCollection implements Collection, Selectable
      */
     public function current()
     {
+        $this->initialize();
+
         return $this->coll->current();
     }
 
@@ -761,6 +782,8 @@ final class PersistentCollection implements Collection, Selectable
      */
     public function next()
     {
+        $this->initialize();
+
         return $this->coll->next();
     }
 
@@ -838,26 +861,20 @@ final class PersistentCollection implements Collection, Selectable
      */
     public function matching(Criteria $criteria)
     {
+        if ($this->isDirty) {
+            $this->initialize();
+        }
+
         if ($this->initialized) {
             return $this->coll->matching($criteria);
         }
 
         if ($this->association['type'] !== ClassMetadata::ONE_TO_MANY) {
-            throw new \RuntimeException("Matching Criteria on PersistentCollection only works on OneToMany assocations at the moment.");
+            throw new \RuntimeException("Matching Criteria on PersistentCollection only works on OneToMany associations at the moment.");
         }
 
-        // If there are NEW objects we have to check if any of them matches the criteria
-        $newObjects = array();
-
-        if ($this->isDirty) {
-            $newObjects = $this->coll->matching($criteria)->toArray();
-        }
-
-        $targetClass = $this->em->getClassMetadata(get_class($this->owner));
-
-        $id              = $targetClass->getSingleIdReflectionProperty()->getValue($this->owner);
         $builder         = Criteria::expr();
-        $ownerExpression = $builder->eq($this->backRefFieldName, $id);
+        $ownerExpression = $builder->eq($this->backRefFieldName, $this->owner);
         $expression      = $criteria->getWhereExpression();
         $expression      = $expression ? $builder->andX($expression, $ownerExpression) : $ownerExpression;
 
@@ -865,6 +882,6 @@ final class PersistentCollection implements Collection, Selectable
 
         $persister = $this->em->getUnitOfWork()->getEntityPersister($this->association['targetEntity']);
 
-        return new ArrayCollection(array_merge($persister->loadCriteria($criteria), $newObjects));
+        return new ArrayCollection($persister->loadCriteria($criteria));
     }
 }

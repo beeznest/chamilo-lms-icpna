@@ -123,7 +123,7 @@ if ($user_data !== false) {
  * Initialize the form.
  */
 $form = new FormValidator('profile', 'post', api_get_self()."?".str_replace('&fe=1', '', $_SERVER['QUERY_STRING']), null, array('style' => 'width: 70%; float: '.($text_dir == 'rtl' ? 'right;' : 'left;')));
-$form->addElement('text', 'extra_DNI',  'DNI o CE',  array('size' => 40, 'disabled' => 'disabled'));
+$form->addElement('text', 'extra_DNI',  'Usuario (DNI o CE)',  array('size' => 40, 'disabled' => 'disabled'));
 $form->addElement('text', 'firstname', 'Nombre', array('size' => 40));
 $form->addElement('text', 'lastname',  'Apellido Paterno',  array('size' => 40));
 $form->addElement('text', 'extra_middlename',  'Apellido Materno',  array('size' => 40));

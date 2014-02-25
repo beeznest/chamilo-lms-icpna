@@ -67,7 +67,7 @@ $social_right_content .= '<h3>'.get_lang('Profile').'</h3>';
 $list = array(
     array(
         'title' => 'Usuario (DNI o CE)',
-        'content' => $user_info['extra']['DNI']
+        'content' => (!empty($user_info['extra']['DNI'])) ? $user_info['extra']['DNI'] : $user_info['username'] ,
     ),
     array(
         'title' => 'Nombre',

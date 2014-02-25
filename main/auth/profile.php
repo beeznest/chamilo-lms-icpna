@@ -220,10 +220,10 @@ if (is_profile_editable() && api_get_setting('profile', 'picture') == 'true') {
 }
 
 //	LANGUAGE
-$form->addElement('select_language', 'language', get_lang('Language'));
+/*$form->addElement('select_language', 'language', get_lang('Language'));
 if (api_get_setting('profile', 'language') !== 'true') {
 	$form->freeze('language');
-}
+}*/
 
 //THEME
 if (is_profile_editable() && api_get_setting('user_selected_theme') == 'true') {

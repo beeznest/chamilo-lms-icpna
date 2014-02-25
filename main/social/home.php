@@ -92,12 +92,12 @@ $list = array(
 );
 // information current user
 $social_right_content .= '<div>'.Display::description($list).'</div>';
-$social_right_content .= '
+/*$social_right_content .= '
     <div class="form-actions">
     <a class="btn" href="'.api_get_path(WEB_PATH).'main/auth/profile.php">
         '.get_lang('EditProfile').'
     </a>
-    </div></div>';
+    </div></div>';*/
 
     if (api_get_setting('allow_skills_tool') == 'true') {
         $social_right_content .= '<div class="well_border">';

@@ -166,10 +166,10 @@ $form->addRule('username', get_lang('UserTaken'), 'username_available', $user_da
 
 //	OFFICIAL CODE
 if (CONFVAL_ASK_FOR_OFFICIAL_CODE) {
-	$form->addElement('text', 'official_code', get_lang('OfficialCode'), array('size' => 40));
+	/*$form->addElement('text', 'official_code', get_lang('OfficialCode'), array('size' => 40));
 	if (api_get_setting('profile', 'officialcode') !== 'true') {
 		$form->freeze('official_code');
-	}
+	}*/
 	$form->applyFilter('official_code', 'stripslashes');
 	$form->applyFilter('official_code', 'trim');
 	if (api_get_setting('registration', 'officialcode') == 'true' && api_get_setting('profile', 'officialcode') == 'true') {
@@ -197,10 +197,10 @@ if (is_profile_editable() && api_get_setting('openid_authentication') == 'true')
 }
 
 //	PHONE
-$form->addElement('text', 'phone', get_lang('phone'), array('size' => 20));
+/*$form->addElement('text', 'phone', get_lang('phone'), array('size' => 20));
 if (api_get_setting('profile', 'phone') !== 'true') {
 	$form->freeze('phone');
-}
+}*/
 $form->applyFilter('phone', 'stripslashes');
 $form->applyFilter('phone', 'trim');
 /*if (api_get_setting('registration', 'phone') == 'true') {

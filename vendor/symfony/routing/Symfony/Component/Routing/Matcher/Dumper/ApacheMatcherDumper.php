@@ -16,6 +16,10 @@ use Symfony\Component\Routing\Route;
 /**
  * Dumps a set of Apache mod_rewrite rules.
  *
+ * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+ *             The performance gains are minimal and it's very hard to replicate
+ *             the behavior of PHP implementation.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Kris Wallsmith <kris@symfony.com>
  */
@@ -46,30 +50,33 @@ class ApacheMatcherDumper extends MatcherDumper
 
         $rules = array("# skip \"real\" requests\nRewriteCond %{REQUEST_FILENAME} -f\nRewriteRule .* - [QSA,L]");
         $methodVars = array();
-        $hostnameRegexUnique = 0;
-        $prevHostnameRegex = '';
+        $hostRegexUnique = 0;
+        $prevHostRegex = '';
 
         foreach ($this->getRoutes()->all() as $name => $route) {
+            if ($route->getCondition()) {
+                throw new \LogicException(sprintf('Unable to dump the routes for Apache as route "%s" has a condition.', $name));
+            }
 
             $compiledRoute = $route->compile();
-            $hostnameRegex = $compiledRoute->getHostnameRegex();
+            $hostRegex = $compiledRoute->getHostRegex();
 
-            if (null !== $hostnameRegex && $prevHostnameRegex !== $hostnameRegex) {
-                $prevHostnameRegex = $hostnameRegex;
-                $hostnameRegexUnique++;
+            if (null !== $hostRegex && $prevHostRegex !== $hostRegex) {
+                $prevHostRegex = $hostRegex;
+                $hostRegexUnique++;
 
                 $rule = array();
 
-                $regex = $this->regexToApacheRegex($hostnameRegex);
+                $regex = $this->regexToApacheRegex($hostRegex);
                 $regex = self::escape($regex, ' ', '\\');
 
                 $rule[] = sprintf('RewriteCond %%{HTTP:Host} %s', $regex);
 
                 $variables = array();
-                $variables[] = sprintf('E=__ROUTING_hostname_%s:1', $hostnameRegexUnique);
+                $variables[] = sprintf('E=__ROUTING_host_%s:1', $hostRegexUnique);
 
-                foreach ($compiledRoute->getHostnameVariables() as $i => $variable) {
-                    $variables[] = sprintf('E=__ROUTING_hostname_%s_%s:%%%d', $hostnameRegexUnique, $variable, $i+1);
+                foreach ($compiledRoute->getHostVariables() as $i => $variable) {
+                    $variables[] = sprintf('E=__ROUTING_host_%s_%s:%%%d', $hostRegexUnique, $variable, $i+1);
                 }
 
                 $variables = implode(',', $variables);
@@ -79,7 +86,7 @@ class ApacheMatcherDumper extends MatcherDumper
                 $rules[] = implode("\n", $rule);
             }
 
-            $rules[] = $this->dumpRoute($name, $route, $options, $hostnameRegexUnique);
+            $rules[] = $this->dumpRoute($name, $route, $options, $hostRegexUnique);
 
             if ($req = $route->getRequirement('_method')) {
                 $methods = explode('|', strtoupper($req));
@@ -109,11 +116,11 @@ class ApacheMatcherDumper extends MatcherDumper
      * @param  string $name Route name
      * @param  Route  $route The route
      * @param  array  $options Options
-     * @param  bool   $hostnameRegexUnique Unique identifier for the hostname regex
+     * @param  bool   $hostRegexUnique Unique identifier for the host regex
      *
      * @return string The compiled route
      */
-    private function dumpRoute($name, $route, array $options, $hostnameRegexUnique)
+    private function dumpRoute($name, $route, array $options, $hostRegexUnique)
     {
         $compiledRoute = $route->compile();
 
@@ -126,13 +133,13 @@ class ApacheMatcherDumper extends MatcherDumper
         $hasTrailingSlash = (!$methods || in_array('HEAD', $methods)) && '/$' === substr($regex, -2) && '^/$' !== $regex;
 
         $variables = array('E=_ROUTING_route:'.$name);
-        foreach ($compiledRoute->getHostnameVariables() as $variable) {
-            $variables[] = sprintf('E=_ROUTING_param_%s:%%{ENV:__ROUTING_hostname_%s_%s}', $variable, $hostnameRegexUnique, $variable);
+        foreach ($compiledRoute->getHostVariables() as $variable) {
+            $variables[] = sprintf('E=_ROUTING_param_%s:%%{ENV:__ROUTING_host_%s_%s}', $variable, $hostRegexUnique, $variable);
         }
         foreach ($compiledRoute->getPathVariables() as $i => $variable) {
             $variables[] = 'E=_ROUTING_param_'.$variable.':%'.($i + 1);
         }
-        foreach ($route->getDefaults() as $key => $value) {
+        foreach ($this->normalizeValues($route->getDefaults()) as $key => $value) {
             $variables[] = 'E=_ROUTING_default_'.$key.':'.strtr($value, array(
                 ':'  => '\\:',
                 '='  => '\\=',
@@ -151,8 +158,8 @@ class ApacheMatcherDumper extends MatcherDumper
                 $allow[] = 'E=_ROUTING_allow_'.$method.':1';
             }
 
-            if ($hostnameRegex = $compiledRoute->getHostnameRegex()) {
-                $rule[] = sprintf("RewriteCond %%{ENV:__ROUTING_hostname_%s} =1", $hostnameRegexUnique);
+            if ($compiledRoute->getHostRegex()) {
+                $rule[] = sprintf("RewriteCond %%{ENV:__ROUTING_host_%s} =1", $hostRegexUnique);
             }
 
             $rule[] = "RewriteCond %{REQUEST_URI} $regex";
@@ -162,9 +169,8 @@ class ApacheMatcherDumper extends MatcherDumper
 
         // redirect with trailing slash appended
         if ($hasTrailingSlash) {
-
-            if ($hostnameRegex = $compiledRoute->getHostnameRegex()) {
-                $rule[] = sprintf("RewriteCond %%{ENV:__ROUTING_hostname_%s} =1", $hostnameRegexUnique);
+            if ($compiledRoute->getHostRegex()) {
+                $rule[] = sprintf("RewriteCond %%{ENV:__ROUTING_host_%s} =1", $hostRegexUnique);
             }
 
             $rule[] = 'RewriteCond %{REQUEST_URI} '.substr($regex, 0, -2).'$';
@@ -173,8 +179,8 @@ class ApacheMatcherDumper extends MatcherDumper
 
         // the main rule
 
-        if ($hostnameRegex = $compiledRoute->getHostnameRegex()) {
-            $rule[] = sprintf("RewriteCond %%{ENV:__ROUTING_hostname_%s} =1", $hostnameRegexUnique);
+        if ($compiledRoute->getHostRegex()) {
+            $rule[] = sprintf("RewriteCond %%{ENV:__ROUTING_host_%s} =1", $hostRegexUnique);
         }
 
         $rule[] = "RewriteCond %{REQUEST_URI} $regex";
@@ -248,5 +254,28 @@ class ApacheMatcherDumper extends MatcherDumper
         }
 
         return $output;
+    }
+
+    /**
+     * Normalizes an array of values.
+     *
+     * @param array $values
+     *
+     * @return string[]
+     */
+    private function normalizeValues(array $values)
+    {
+        $normalizedValues = array();
+        foreach ($values as $key => $value) {
+            if (is_array($value)) {
+                foreach ($value as $index => $bit) {
+                    $normalizedValues[sprintf('%s[%s]', $key, $index)] = $bit;
+                }
+            } else {
+                $normalizedValues[$key] = (string) $value;
+            }
+        }
+
+        return $normalizedValues;
     }
 }

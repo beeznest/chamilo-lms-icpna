@@ -19,16 +19,14 @@
 
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
-use Symfony\Component\Console\Command\Command,
-    Symfony\Component\Console\Input\InputInterface,
-    Symfony\Component\Console\Output\OutputInterface,
-    Symfony\Component\Console\Input\InputOption,
-    Doctrine\DBAL\Migrations\Migration,
-    Doctrine\DBAL\Migrations\MigrationException,
-    Doctrine\DBAL\Migrations\OutputWriter,
-    Doctrine\DBAL\Migrations\Configuration\Configuration,
-    Doctrine\DBAL\Migrations\Configuration\YamlConfiguration,
-    Doctrine\DBAL\Migrations\Configuration\XmlConfiguration;
+use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\Configuration\YamlConfiguration;
+use Doctrine\DBAL\Migrations\Configuration\XmlConfiguration;
+use Doctrine\DBAL\Migrations\OutputWriter;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * CLI Command for adding and deleting migration versions from the version table.
@@ -80,8 +78,8 @@ abstract class AbstractCommand extends Command
                 return $output->writeln($message);
             });
 
-            if ($this->getApplication()->getHelperSet()->has('db')) {
-                $conn = $this->getHelper('db')->getConnection();
+            if ($this->getApplication()->getHelperSet()->has('connection')) {
+                $conn = $this->getHelper('connection')->getConnection();
             } elseif ($input->getOption('db-configuration')) {
                 if ( ! file_exists($input->getOption('db-configuration'))) {
                     throw new \InvalidArgumentException("The specified connection file is not a valid file.");

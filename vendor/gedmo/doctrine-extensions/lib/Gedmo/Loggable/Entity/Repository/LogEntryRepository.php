@@ -11,9 +11,6 @@ use Gedmo\Loggable\LoggableListener;
  * to interact with log entries.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo\Loggable\Entity\Repository
- * @subpackage LogEntryRepository
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class LogEntryRepository extends EntityRepository
@@ -56,7 +53,7 @@ class LogEntryRepository extends EntityRepository
 
         $objectId = $wrapped->getIdentifier();
         $q = $this->_em->createQuery($dql);
-        $q->setParameters(compact('objectId', 'objectClass', 'order'));
+        $q->setParameters(compact('objectId', 'objectClass'));
         return $q;
     }
 

@@ -8,9 +8,13 @@ use Doctrine\Tests\Models\DDC117\DDC117Reference;
 use Doctrine\Tests\Models\DDC117\DDC117Translation;
 use Doctrine\Tests\Models\DDC117\DDC117ApproveChanges;
 use Doctrine\Tests\Models\DDC117\DDC117Editor;
+use Doctrine\Tests\Models\DDC117\DDC117Link;
 
 require_once __DIR__ . '/../../../TestInit.php';
 
+/**
+ * @group DDC-117
+ */
 class DDC117Test extends \Doctrine\Tests\OrmFunctionalTestCase
 {
     private $article1;
@@ -30,6 +34,9 @@ class DDC117Test extends \Doctrine\Tests\OrmFunctionalTestCase
         $this->_em->persist($this->article2);
         $this->_em->flush();
 
+        $link = new DDC117Link($this->article1, $this->article2, "Link-Description");
+        $this->_em->persist($link);
+        
         $this->reference = new DDC117Reference($this->article1, $this->article2, "Test-Description");
         $this->_em->persist($this->reference);
 
@@ -85,7 +92,7 @@ class DDC117Test extends \Doctrine\Tests\OrmFunctionalTestCase
     /**
      * @group DDC-117
      */
-    public function testUpdateAssocationEntity()
+    public function testUpdateAssociationEntity()
     {
         $idCriteria = array('source' => $this->article1->id(), 'target' => $this->article2->id());
 
@@ -134,6 +141,7 @@ class DDC117Test extends \Doctrine\Tests\OrmFunctionalTestCase
 
     /**
      * @group DDC-117
+     * @group non-cacheable
      */
     public function testDqlRemoveCompositeElement()
     {
@@ -211,7 +219,7 @@ class DDC117Test extends \Doctrine\Tests\OrmFunctionalTestCase
 
         $exceptionThrown = false;
         try {
-            // exception depending on the underyling Database Driver
+            // exception depending on the underlying Database Driver
             $this->_em->flush();
         } catch(\Exception $e) {
             $exceptionThrown = true;
@@ -460,5 +468,38 @@ class DDC117Test extends \Doctrine\Tests\OrmFunctionalTestCase
         $data = $this->_em->createQuery($dql)->getArrayResult();
 
         $this->assertEquals($before + 3, count($data));
+    }
+
+    /**
+     * @group DDC-2246
+     */
+    public function testGetEntityState()
+    {
+        if ($this->isSecondLevelCacheEnabled) {
+            $this->markTestIncomplete('Second level cache - not supported yet');
+        }
+
+        $this->article1 = $this->_em->find("Doctrine\Tests\Models\DDC117\DDC117Article", $this->article1->id());
+        $this->article2 = $this->_em->find("Doctrine\Tests\Models\DDC117\DDC117Article", $this->article2->id());
+
+        $this->reference = new DDC117Reference($this->article2, $this->article1, "Test-Description");
+
+        $this->assertEquals(\Doctrine\ORM\UnitOfWork::STATE_NEW, $this->_em->getUnitOfWork()->getEntityState($this->reference));
+
+        $idCriteria = array('source' => $this->article1->id(), 'target' => $this->article2->id());
+        $reference = $this->_em->find("Doctrine\Tests\Models\DDC117\DDC117Reference", $idCriteria);
+
+        $this->assertEquals(\Doctrine\ORM\UnitOfWork::STATE_MANAGED, $this->_em->getUnitOfWork()->getEntityState($reference));
+    }
+    /**
+     * @group DDC-117
+     */
+    public function testIndexByOnCompositeKeyField()
+    {   
+        $article = $this->_em->find("Doctrine\Tests\Models\DDC117\DDC117Article", $this->article1->id());
+
+        $this->assertInstanceOf('Doctrine\Tests\Models\DDC117\DDC117Article', $article);
+        $this->assertEquals(1, count($article->getLinks()));
+        $this->assertTrue($article->getLinks()->offsetExists($this->article2->id()));
     }
 }

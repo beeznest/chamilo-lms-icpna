@@ -11,15 +11,12 @@
 
 namespace Pagerfanta\View;
 
-use Pagerfanta\PagerfantaInterface;
 use Pagerfanta\Exception\InvalidArgumentException;
 
 /**
  * ViewFactory.
  *
  * @author Pablo Díez <pablodip@gmail.com>
- *
- * @api
  */
 class ViewFactory implements ViewFactoryInterface
 {
@@ -27,8 +24,6 @@ class ViewFactory implements ViewFactoryInterface
 
     /**
      * Constructor.
-     *
-     * @api
      */
     public function __construct()
     {

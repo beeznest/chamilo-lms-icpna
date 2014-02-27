@@ -9,15 +9,12 @@ use Gedmo\Mapping\Driver\Xml as BaseXml,
 /**
  * This is a xml mapping driver for Tree
  * behavioral extension. Used for extraction of extended
- * metadata from xml specificaly for Tree
+ * metadata from xml specifically for Tree
  * extension.
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @author Miha Vrhovnik <miha.vrhovnik@gmail.com>
- * @package Gedmo.Tree.Mapping.Driver
- * @subpackage Xml
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class Xml extends BaseXml
@@ -107,8 +104,35 @@ class Xml extends BaseXml
                         throw new InvalidMappingException("Tree Path field - [{$field}] Separator {$separator} is invalid. It must be only one character long.");
                     }
 
+                    $appendId = $this->_getAttribute($mapping->{'tree-path'}, 'append_id');
+
+                    if (!$appendId) {
+                        $appendId = true;
+                    } else {
+                        $appendId = strtolower($appendId) == 'false' ? false : true;
+                    }
+
+                    $startsWithSeparator = $this->_getAttribute($mapping->{'tree-path'}, 'starts_with_separator');
+
+                    if (!$startsWithSeparator) {
+                        $startsWithSeparator = false;
+                    } else {
+                        $startsWithSeparator = strtolower($startsWithSeparator) == 'false' ? false : true;
+                    }
+
+                    $endsWithSeparator = $this->_getAttribute($mapping->{'tree-path'}, 'ends_with_separator');
+
+                    if (!$endsWithSeparator) {
+                        $endsWithSeparator = true;
+                    } else {
+                        $endsWithSeparator = strtolower($endsWithSeparator) == 'false' ? false : true;
+                    }
+
                     $config['path'] = $field;
                     $config['path_separator'] = $separator;
+                    $config['path_append_id'] = $appendId;
+                    $config['path_starts_with_separator'] = $startsWithSeparator;
+                    $config['path_ends_with_separator'] = $endsWithSeparator;
                 } elseif (isset($mapping->{'tree-path-source'})) {
                     if (!$validator->isValidFieldForPathSource($meta, $field)) {
                         throw new InvalidMappingException("Tree PathSource field - [{$field}] type is not valid. It can be any of the integer variants, double, float or string in class - {$meta->name}");
@@ -127,19 +151,21 @@ class Xml extends BaseXml
             throw new InvalidMappingException("You need to map a date field as the tree lock time field to activate locking support.");
         }
 
-        if ($xmlDoctrine->getName() == 'entity') {        
+        if ($xmlDoctrine->getName() == 'entity' || $xmlDoctrine->getName() == 'mapped-superclass') {        
             if (isset($xmlDoctrine->{'many-to-one'})) {
                 foreach ($xmlDoctrine->{'many-to-one'} as $manyToOneMapping)  {
                     /**
                      * @var \SimpleXMLElement $manyToOneMapping
                      */
                     $manyToOneMappingDoctrine = $manyToOneMapping;
-                    $manyToOneMapping = $manyToOneMapping->children(self::GEDMO_NAMESPACE_URI);;
+                    $manyToOneMapping = $manyToOneMapping->children(self::GEDMO_NAMESPACE_URI);
                     if (isset($manyToOneMapping->{'tree-parent'})) {
                         $field = $this->_getAttribute($manyToOneMappingDoctrine, 'field');
-                        if ($meta->associationMappings[$field]['targetEntity'] != $meta->name) {
+                        $targetEntity = $meta->associationMappings[$field]['targetEntity'];
+                        $reflectionClass = new \ReflectionClass($targetEntity);
+                        if ($targetEntity != $meta->name && !$reflectionClass->isSubclassOf($meta->name)) {
                             throw new InvalidMappingException("Unable to find ancestor/parent child relation through ancestor field - [{$field}] in class - {$meta->name}");
-                        }
+                        }			
                         $config['parent'] = $field;
                     }
                 }
@@ -151,7 +177,7 @@ class Xml extends BaseXml
                      * @var \SimpleXMLElement $referenceOneMapping
                      */
                     $referenceOneMappingDoctrine = $referenceOneMapping;
-                    $referenceOneMapping = $referenceOneMapping->children(self::GEDMO_NAMESPACE_URI);;                    
+                    $referenceOneMapping = $referenceOneMapping->children(self::GEDMO_NAMESPACE_URI);
                     if (isset($referenceOneMapping->{'tree-parent'})) {
                         $field = $this->_getAttribute($referenceOneMappingDoctrine, 'field');                        
                         if ($this->_getAttribute($referenceOneMappingDoctrine, 'target-document') != $meta->name) {

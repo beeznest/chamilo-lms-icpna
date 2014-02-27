@@ -5,6 +5,7 @@ namespace Doctrine\Tests\ORM\Functional\Ticket;
 /**
  * @group DDC-1595
  * @group DDC-1596
+ * @group non-cacheable
  */
 class DDC1595Test extends \Doctrine\Tests\OrmFunctionalTestCase
 {
@@ -35,7 +36,7 @@ class DDC1595Test extends \Doctrine\Tests\OrmFunctionalTestCase
         $entity1  = $repository->find($e1->id);
 
         // DDC-1596
-        $this->assertEquals(
+        $this->assertSQLEquals(
             "SELECT t0.id AS id1, t0.type FROM base t0 WHERE t0.id = ? AND t0.type IN ('Entity1')",
             $sqlLogger->queries[count($sqlLogger->queries)]['sql']
         );
@@ -52,8 +53,8 @@ class DDC1595Test extends \Doctrine\Tests\OrmFunctionalTestCase
         $entity1  = $repository->find($e1->id);
         $entities = $entity1->getEntities()->count();
 
-        $this->assertEquals(
-            "SELECT COUNT(*) FROM entity1_entity2 t WHERE parent = ?",
+        $this->assertSQLEquals(
+            "SELECT COUNT(*) FROM entity1_entity2 t WHERE t.parent = ?",
             $sqlLogger->queries[count($sqlLogger->queries)]['sql']
         );
     }

@@ -1,5 +1,5 @@
-How to convert errors to exceptions
-===================================
+Converting Errors to Exceptions
+===============================
 
 Silex will catch exceptions that are thrown from within a request/response
 cycle. It will however *not* catch PHP errors and notices. You can catch them
@@ -16,21 +16,32 @@ user to register them.
 Registering the ErrorHandler
 ----------------------------
 
-Fortunately, Silex ships with an ``ErrorHandler`` (it's part of the
-``HttpKernel`` package) that solves this issue. It converts all errors to
-exceptions, and exceptions can be caught by Silex.
+Fortunately, the ``Symfony/Debug`` package has an ``ErrorHandler`` class that
+solves this issue. It converts all errors to exceptions, and exceptions can be
+caught by Silex.
 
 You register it by calling the static ``register`` method::
 
-    use Symfony\Component\HttpKernel\Debug\ErrorHandler;
+    use Symfony\Component\Debug\ErrorHandler;
 
     ErrorHandler::register();
 
 It is recommended that you do this in your front controller, i.e.
 ``web/index.php``.
 
-.. note::
+Handling fatal errors
+---------------------
 
-    The ``ErrorHandler`` has nothing to do with the ``ExceptionHandler``. The
-    ``ExceptionHandler`` is responsible for displaying caught exceptions
-    nicely.
+To handle fatal errors, you can additionally register a global
+``ExceptionHandler``::
+
+    use Symfony\Component\Debug\ExceptionHandler;
+
+    ExceptionHandler::register();
+
+In production you may want to disable the debug output by passing ``false`` as
+the ``$debug`` argument::
+
+    use Symfony\Component\Debug\ExceptionHandler;
+
+    ExceptionHandler::register(false);

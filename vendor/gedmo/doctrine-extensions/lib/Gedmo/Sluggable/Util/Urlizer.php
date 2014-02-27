@@ -13,10 +13,7 @@ namespace Gedmo\Sluggable\Util;
  * Uses 3rd party libraries and functions:
  *         http://sourceforge.net/projects/phputf8
  *
- * @package     Gedmo.Sluggable.Util
- * @subpackage  Urlizer
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link        www.doctrine-project.org
  * @since       1.0
  * @version     $Revision: 3189 $
  * @author      Konsta Vesterinen <kvesteri@cc.hut.fi>
@@ -203,9 +200,9 @@ class Urlizer
     * requiring up to the same amount again as the input string
     *
     * @see http://search.cpan.org/~sburke/Text-Unidecode-0.04/lib/Text/Unidecode.pm
-    * @param string UTF-8 string to convert
+    * @param string $str UTF-8 string to convert
     * @author <hsivonen@iki.fi>
-    * @param string (default = ?) Character use if character unknown
+    * @param string $unknown (default = ?) Character use if character unknown
     * @return string US-ASCII string
     */
     public static function utf8ToAscii($str, $unknown = '?')
@@ -276,7 +273,7 @@ class Urlizer
         if (preg_match('/[\x80-\xff]/', $text) && self::validUtf8($text)) {
             $text = self::utf8ToAscii($text);
         }
-        return  self::postProcessText($text, $separator);;
+        return  self::postProcessText($text, $separator);
     }
 
     /**
@@ -412,7 +409,7 @@ class Urlizer
         $text = preg_replace('/\W/', ' ', $text);
 
         // More stripping. Replace spaces with dashes
-        $text = strtolower(preg_replace('/[^A-Z^a-z^0-9^\/]+/', $separator,
+        $text = strtolower(preg_replace('/[^A-Za-z0-9\/]+/', $separator,
                            preg_replace('/([a-z\d])([A-Z])/', '\1_\2',
                            preg_replace('/([A-Z]+)([A-Z][a-z])/', '\1_\2',
                            preg_replace('/::/', '/', $text)))));

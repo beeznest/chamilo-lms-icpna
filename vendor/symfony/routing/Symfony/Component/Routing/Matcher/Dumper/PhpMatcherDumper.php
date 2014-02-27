@@ -13,6 +13,7 @@ namespace Symfony\Component\Routing\Matcher\Dumper;
 
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 /**
  * PhpMatcherDumper creates a PHP class able to match URLs for a given set of routes.
@@ -23,6 +24,8 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class PhpMatcherDumper extends MatcherDumper
 {
+    private $expressionLanguage;
+
     /**
      * Dumps a set of routes to a PHP class.
      *
@@ -91,6 +94,8 @@ EOF;
     {
         \$allow = array();
         \$pathinfo = rawurldecode(\$pathinfo);
+        \$context = \$this->context;
+        \$request = \$this->request;
 
 $code
 
@@ -109,19 +114,19 @@ EOF;
      */
     private function compileRoutes(RouteCollection $routes, $supportsRedirections)
     {
-        $fetchedHostname = false;
+        $fetchedHost = false;
 
-        $groups = $this->groupRoutesByHostnameRegex($routes);
+        $groups = $this->groupRoutesByHostRegex($routes);
         $code = '';
 
         foreach ($groups as $collection) {
-            if (null !== $regex = $collection->getAttribute('hostname_regex')) {
-                if (!$fetchedHostname) {
-                    $code .= "        \$hostname = \$this->context->getHost();\n\n";
-                    $fetchedHostname = true;
+            if (null !== $regex = $collection->getAttribute('host_regex')) {
+                if (!$fetchedHost) {
+                    $code .= "        \$host = \$this->context->getHost();\n\n";
+                    $fetchedHost = true;
                 }
 
-                $code .= sprintf("        if (preg_match(%s, \$hostname, \$hostnameMatches)) {\n", var_export($regex, true));
+                $code .= sprintf("        if (preg_match(%s, \$host, \$hostMatches)) {\n", var_export($regex, true));
             }
 
             $tree = $this->buildPrefixTree($collection);
@@ -198,7 +203,7 @@ EOF;
         $conditions = array();
         $hasTrailingSlash = false;
         $matches = false;
-        $hostnameMatches = false;
+        $hostMatches = false;
         $methods = array();
 
         if ($req = $route->getRequirement('_method')) {
@@ -233,8 +238,12 @@ EOF;
             $matches = true;
         }
 
-        if ($compiledRoute->getHostnameVariables()) {
-            $hostnameMatches = true;
+        if ($compiledRoute->getHostVariables()) {
+            $hostMatches = true;
+        }
+
+        if ($route->getCondition()) {
+            $conditions[] = $this->getExpressionLanguage()->compile($route->getCondition(), array('context', 'request'));
         }
 
         $conditions = implode(' && ', $conditions);
@@ -245,9 +254,8 @@ EOF;
 
 EOF;
 
+        $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);
         if ($methods) {
-            $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);
-
             if (1 === count($methods)) {
                 $code .= <<<EOF
             if (\$this->context->getMethod() != '$methods[0]') {
@@ -280,14 +288,15 @@ EOF;
 EOF;
         }
 
-        if ($scheme = $route->getRequirement('_scheme')) {
+        if ($schemes = $route->getSchemes()) {
             if (!$supportsRedirections) {
-                throw new \LogicException('The "_scheme" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
+                throw new \LogicException('The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
             }
-
+            $schemes = str_replace("\n", '', var_export(array_flip($schemes), true));
             $code .= <<<EOF
-            if (\$this->context->getScheme() !== '$scheme') {
-                return \$this->redirect(\$pathinfo, '$name', '$scheme');
+            \$requiredSchemes = $schemes;
+            if (!isset(\$requiredSchemes[\$this->context->getScheme()])) {
+                return \$this->redirect(\$pathinfo, '$name', key(\$requiredSchemes));
             }
 
 
@@ -295,18 +304,21 @@ EOF;
         }
 
         // optimize parameters array
-        if ($matches || $hostnameMatches) {
+        if ($matches || $hostMatches) {
             $vars = array();
-            if ($hostnameMatches) {
-                $vars[] = '$hostnameMatches';
+            if ($hostMatches) {
+                $vars[] = '$hostMatches';
             }
             if ($matches) {
                 $vars[] = '$matches';
             }
             $vars[] = "array('_route' => '$name')";
 
-            $code .= sprintf("            return \$this->mergeDefaults(array_replace(%s), %s);\n"
-                , implode(', ', $vars), str_replace("\n", '', var_export($route->getDefaults(), true)));
+            $code .= sprintf(
+                "            return \$this->mergeDefaults(array_replace(%s), %s);\n",
+                implode(', ', $vars),
+                str_replace("\n", '', var_export($route->getDefaults(), true))
+            );
 
         } elseif ($route->getDefaults()) {
             $code .= sprintf("            return %s;\n", str_replace("\n", '', var_export(array_replace($route->getDefaults(), array('_route' => $name)), true)));
@@ -323,27 +335,27 @@ EOF;
     }
 
     /**
-     * Groups consecutive routes having the same hostname regex.
+     * Groups consecutive routes having the same host regex.
      *
-     * The result is a collection of collections of routes having the same hostname regex.
+     * The result is a collection of collections of routes having the same host regex.
      *
      * @param RouteCollection $routes A flat RouteCollection
      *
-     * @return DumperCollection A collection with routes grouped by hostname regex in sub-collections
+     * @return DumperCollection A collection with routes grouped by host regex in sub-collections
      */
-    private function groupRoutesByHostnameRegex(RouteCollection $routes)
+    private function groupRoutesByHostRegex(RouteCollection $routes)
     {
         $groups = new DumperCollection();
 
         $currentGroup = new DumperCollection();
-        $currentGroup->setAttribute('hostname_regex', null);
+        $currentGroup->setAttribute('host_regex', null);
         $groups->add($currentGroup);
 
         foreach ($routes as $name => $route) {
-            $hostnameRegex = $route->compile()->getHostnameRegex();
-            if ($currentGroup->getAttribute('hostname_regex') !== $hostnameRegex) {
+            $hostRegex = $route->compile()->getHostRegex();
+            if ($currentGroup->getAttribute('host_regex') !== $hostRegex) {
                 $currentGroup = new DumperCollection();
-                $currentGroup->setAttribute('hostname_regex', $hostnameRegex);
+                $currentGroup->setAttribute('host_regex', $hostRegex);
                 $groups->add($currentGroup);
             }
             $currentGroup->add(new DumperRoute($name, $route));
@@ -374,5 +386,17 @@ EOF;
         $tree->mergeSlashNodes();
 
         return $tree;
+    }
+
+    private function getExpressionLanguage()
+    {
+        if (null === $this->expressionLanguage) {
+            if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
+                throw new \RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
+            }
+            $this->expressionLanguage = new ExpressionLanguage();
+        }
+
+        return $this->expressionLanguage;
     }
 }

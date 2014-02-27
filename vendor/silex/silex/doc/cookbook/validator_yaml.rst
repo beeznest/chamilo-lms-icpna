@@ -1,5 +1,5 @@
-How to use YAML to configure validation
-=======================================
+Using YAML to configure Validation
+==================================
 
 Simplicity is at the heart of Silex so there is no out of the box solution to
 use YAML files for validation. But this doesn't mean that this is not
@@ -11,7 +11,7 @@ your ``composer.json`` file:
 .. code-block:: json
 
     "require": {
-        "symfony/yaml": "2.1.*"
+        "symfony/yaml": "~2.3"
     }
 
 Next, you need to tell the Validation Service that you are not using

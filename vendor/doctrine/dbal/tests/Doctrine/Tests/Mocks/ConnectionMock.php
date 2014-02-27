@@ -46,7 +46,7 @@ class ConnectionMock extends \Doctrine\DBAL\Connection
     /**
      * @override
      */
-    public function fetchColumn($statement, array $params = array(), $colnum = 0)
+    public function fetchColumn($statement, array $params = array(), $colnum = 0, array $types = array())
     {
         return $this->_fetchOneResult;
     }
@@ -67,11 +67,6 @@ class ConnectionMock extends \Doctrine\DBAL\Connection
     public function setFetchOneResult($fetchOneResult)
     {
         $this->_fetchOneResult = $fetchOneResult;
-    }
-
-    public function setDatabasePlatform($platform)
-    {
-        $this->_platformMock = $platform;
     }
 
     public function setLastInsertId($id)

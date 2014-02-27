@@ -63,6 +63,98 @@ class SqlitePlatformTest extends AbstractPlatformTestCase
         $this->assertTrue($this->_platform->prefersIdentityColumns());
     }
 
+    public function testIgnoresUnsignedIntegerDeclarationForAutoIncrementalIntegers()
+    {
+        $this->assertSame(
+            'INTEGER',
+            $this->_platform->getIntegerTypeDeclarationSQL(array('autoincrement' => true, 'unsigned' => true))
+        );
+    }
+
+    /**
+     * @group DBAL-752
+     */
+    public function testGeneratesTypeDeclarationForTinyIntegers()
+    {
+        $this->assertEquals(
+            'TINYINT',
+            $this->_platform->getTinyIntTypeDeclarationSQL(array())
+        );
+        $this->assertEquals(
+            'TINYINT',
+            $this->_platform->getTinyIntTypeDeclarationSQL(array('autoincrement' => true))
+        );
+        $this->assertEquals(
+            'TINYINT',
+            $this->_platform->getTinyIntTypeDeclarationSQL(
+                array('autoincrement' => true, 'primary' => true))
+        );
+        $this->assertEquals(
+            'TINYINT',
+            $this->_platform->getTinyIntTypeDeclarationSQL(array('unsigned' => false))
+        );
+        $this->assertEquals(
+            'TINYINT UNSIGNED',
+            $this->_platform->getTinyIntTypeDeclarationSQL(array('unsigned' => true))
+        );
+    }
+
+    /**
+     * @group DBAL-752
+     */
+    public function testGeneratesTypeDeclarationForSmallIntegers()
+    {
+        $this->assertEquals(
+            'SMALLINT',
+            $this->_platform->getSmallIntTypeDeclarationSQL(array())
+        );
+        $this->assertEquals(
+            'SMALLINT',
+            $this->_platform->getSmallIntTypeDeclarationSQL(array('autoincrement' => true))
+        );
+        $this->assertEquals(
+            'SMALLINT',
+            $this->_platform->getSmallIntTypeDeclarationSQL(
+                array('autoincrement' => true, 'primary' => true))
+        );
+        $this->assertEquals(
+            'SMALLINT',
+            $this->_platform->getSmallIntTypeDeclarationSQL(array('unsigned' => false))
+        );
+        $this->assertEquals(
+            'SMALLINT UNSIGNED',
+            $this->_platform->getSmallIntTypeDeclarationSQL(array('unsigned' => true))
+        );
+    }
+
+    /**
+     * @group DBAL-752
+     */
+    public function testGeneratesTypeDeclarationForMediumIntegers()
+    {
+        $this->assertEquals(
+            'MEDIUMINT',
+            $this->_platform->getMediumIntTypeDeclarationSQL(array())
+        );
+        $this->assertEquals(
+            'MEDIUMINT',
+            $this->_platform->getMediumIntTypeDeclarationSQL(array('autoincrement' => true))
+        );
+        $this->assertEquals(
+            'MEDIUMINT',
+            $this->_platform->getMediumIntTypeDeclarationSQL(
+                array('autoincrement' => true, 'primary' => true))
+        );
+        $this->assertEquals(
+            'MEDIUMINT',
+            $this->_platform->getMediumIntTypeDeclarationSQL(array('unsigned' => false))
+        );
+        $this->assertEquals(
+            'MEDIUMINT UNSIGNED',
+            $this->_platform->getMediumIntTypeDeclarationSQL(array('unsigned' => true))
+        );
+    }
+
     public function testGeneratesTypeDeclarationForIntegers()
     {
         $this->assertEquals(
@@ -77,6 +169,42 @@ class SqlitePlatformTest extends AbstractPlatformTestCase
             'INTEGER',
             $this->_platform->getIntegerTypeDeclarationSQL(
                 array('autoincrement' => true, 'primary' => true))
+        );
+        $this->assertEquals(
+            'INTEGER',
+            $this->_platform->getIntegerTypeDeclarationSQL(array('unsigned' => false))
+        );
+        $this->assertEquals(
+            'INTEGER UNSIGNED',
+            $this->_platform->getIntegerTypeDeclarationSQL(array('unsigned' => true))
+        );
+    }
+
+    /**
+     * @group DBAL-752
+     */
+    public function testGeneratesTypeDeclarationForBigIntegers()
+    {
+        $this->assertEquals(
+            'BIGINT',
+            $this->_platform->getBigIntTypeDeclarationSQL(array())
+        );
+        $this->assertEquals(
+            'BIGINT',
+            $this->_platform->getBigIntTypeDeclarationSQL(array('autoincrement' => true))
+        );
+        $this->assertEquals(
+            'BIGINT',
+            $this->_platform->getBigIntTypeDeclarationSQL(
+                array('autoincrement' => true, 'primary' => true))
+        );
+        $this->assertEquals(
+            'BIGINT',
+            $this->_platform->getBigIntTypeDeclarationSQL(array('unsigned' => false))
+        );
+        $this->assertEquals(
+            'BIGINT UNSIGNED',
+            $this->_platform->getBigIntTypeDeclarationSQL(array('unsigned' => true))
         );
     }
 
@@ -280,15 +408,78 @@ class SqlitePlatformTest extends AbstractPlatformTestCase
     protected function getQuotedColumnInPrimaryKeySQL()
     {
         return array(
-            'CREATE TABLE "quoted" ("key" VARCHAR(255) NOT NULL, PRIMARY KEY("key"))',
+            'CREATE TABLE "quoted" ("create" VARCHAR(255) NOT NULL, PRIMARY KEY("create"))',
         );
     }
 
     protected function getQuotedColumnInIndexSQL()
     {
         return array(
-            'CREATE TABLE "quoted" ("key" VARCHAR(255) NOT NULL)',
-            'CREATE INDEX IDX_22660D028A90ABA9 ON "quoted" ("key")',
+            'CREATE TABLE "quoted" ("create" VARCHAR(255) NOT NULL)',
+            'CREATE INDEX IDX_22660D028FD6E0FB ON "quoted" ("create")',
+        );
+    }
+
+    protected function getQuotedColumnInForeignKeySQL()
+    {
+        return array(
+            'CREATE TABLE "quoted" (' .
+            '"create" VARCHAR(255) NOT NULL, foo VARCHAR(255) NOT NULL, "bar" VARCHAR(255) NOT NULL, ' .
+            'CONSTRAINT FK_WITH_RESERVED_KEYWORD FOREIGN KEY ("create", foo, "bar") REFERENCES "foreign" ("create", bar, "foo-bar") NOT DEFERRABLE INITIALLY IMMEDIATE, ' .
+            'CONSTRAINT FK_WITH_NON_RESERVED_KEYWORD FOREIGN KEY ("create", foo, "bar") REFERENCES foo ("create", bar, "foo-bar") NOT DEFERRABLE INITIALLY IMMEDIATE, ' .
+            'CONSTRAINT FK_WITH_INTENDED_QUOTATION FOREIGN KEY ("create", foo, "bar") REFERENCES "foo-bar" ("create", bar, "foo-bar") NOT DEFERRABLE INITIALLY IMMEDIATE)',
+        );
+    }
+
+    protected function getBinaryDefaultLength()
+    {
+        return 0;
+    }
+
+    protected function getBinaryMaxLength()
+    {
+        return 0;
+    }
+
+    public function testReturnsBinaryTypeDeclarationSQL()
+    {
+        $this->assertSame('BLOB', $this->_platform->getBinaryTypeDeclarationSQL(array()));
+        $this->assertSame('BLOB', $this->_platform->getBinaryTypeDeclarationSQL(array('length' => 0)));
+        $this->assertSame('BLOB', $this->_platform->getBinaryTypeDeclarationSQL(array('length' => 9999999)));
+
+        $this->assertSame('BLOB', $this->_platform->getBinaryTypeDeclarationSQL(array('fixed' => true)));
+        $this->assertSame('BLOB', $this->_platform->getBinaryTypeDeclarationSQL(array('fixed' => true, 'length' => 0)));
+        $this->assertSame('BLOB', $this->_platform->getBinaryTypeDeclarationSQL(array('fixed' => true, 'length' => 9999999)));
+    }
+
+    /**
+     * @group DBAL-234
+     */
+    protected function getAlterTableRenameIndexSQL()
+    {
+        return array(
+            'CREATE TEMPORARY TABLE __temp__mytable AS SELECT id FROM mytable',
+            'DROP TABLE mytable',
+            'CREATE TABLE mytable (id INTEGER NOT NULL, PRIMARY KEY(id))',
+            'INSERT INTO mytable (id) SELECT id FROM __temp__mytable',
+            'DROP TABLE __temp__mytable',
+            'CREATE INDEX idx_bar ON mytable (id)',
+        );
+    }
+
+    /**
+     * @group DBAL-234
+     */
+    protected function getQuotedAlterTableRenameIndexSQL()
+    {
+        return array(
+            'CREATE TEMPORARY TABLE __temp__table AS SELECT id FROM "table"',
+            'DROP TABLE "table"',
+            'CREATE TABLE "table" (id INTEGER NOT NULL, PRIMARY KEY(id))',
+            'INSERT INTO "table" (id) SELECT id FROM __temp__table',
+            'DROP TABLE __temp__table',
+            'CREATE INDEX "select" ON table (id)',
+            'CREATE INDEX "bar" ON table (id)',
         );
     }
 }

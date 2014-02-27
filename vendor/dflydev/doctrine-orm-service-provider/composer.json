@@ -2,6 +2,7 @@
     "name": "dflydev/doctrine-orm-service-provider",
     "description": "Doctrine ORM Service Provider",
     "keywords": ["pimple", "cilex", "silex", "doctrine", "orm"],
+    "homepage": "http://dflydev.com/projects/doctrine-orm-service-provider/",
     "license": "MIT",
     "authors": [
         {
@@ -22,7 +23,8 @@
     },
     "require-dev": {
         "cilex/cilex": "1.*@dev",
-        "silex/silex": "1.*@dev"
+        "silex/silex": "1.*@dev",
+        "cilex/console-service-provider": "@dev"
     },
     "suggest": {
         "dflydev/psr0-resource-locator-service-provider": "1.0.*@dev"

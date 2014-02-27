@@ -3,6 +3,7 @@
 namespace Gedmo\Mapping\Driver;
 
 use Gedmo\Mapping\Driver,
+    Gedmo\Exception\InvalidMappingException,
     SimpleXMLElement;
 
 
@@ -14,9 +15,6 @@ use Gedmo\Mapping\Driver,
  *
  * @author Miha Vrhovnik <miha.vrhovnik@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.Common.Mapping
- * @subpackage FileDriver
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 abstract class Xml extends File
@@ -55,7 +53,14 @@ abstract class Xml extends File
      */
     protected function _getBooleanAttribute(SimpleXmlElement $node, $attributeName)
     {
-        return 'true' === strtolower($this->_getAttribute($node, $attributeName));
+        $rawValue = strtolower($this->_getAttribute($node, $attributeName));
+        if ($rawValue === '1' || $rawValue === 'true') {
+            return true;
+        }
+        if ($rawValue === '0' || $rawValue === 'false') {
+            return false;
+        }
+        throw new InvalidMappingException(sprintf("Attribute %s must have a valid boolean value, '%s' found", $attributeName, $this->_getAttribute($node, $attributeName)));
     }
 
     /**

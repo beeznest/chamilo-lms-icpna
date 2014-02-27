@@ -14,14 +14,11 @@ use Gedmo\Blameable\Mapping\Event\BlameableAdapter;
  * dates on creation and update.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.Blameable
- * @subpackage BlameableListener
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class BlameableListener extends TimestampableListener
 {
-    private $user;
+    protected $user;
 
     /**
      * Get the user value to set on a blameable field
@@ -45,7 +42,7 @@ class BlameableListener extends TimestampableListener
             if (method_exists($this->user, 'getUsername')) {
                 return (string)$this->user->getUsername();
             }
-            if (method_exists($this->user, '__toString()')) {
+            if (method_exists($this->user, '__toString')) {
                 return $this->user->__toString();
             }
             throw new InvalidArgumentException("Field expects string, user must be a string, or object should have method getUsername or __toString");
@@ -57,7 +54,7 @@ class BlameableListener extends TimestampableListener
     /**
      * Set a user value to return
      *
-     * @return mixed
+     * @param mixed $user
      */
     public function setUserValue($user)
     {
@@ -85,6 +82,7 @@ class BlameableListener extends TimestampableListener
         $property = $meta->getReflectionProperty($field);
         $oldValue = $property->getValue($object);
         $newValue = $this->getUserValue($meta, $field);
+
         $property->setValue($object, $newValue);
         if ($object instanceof NotifyPropertyChanged) {
             $uow = $ea->getObjectManager()->getUnitOfWork();

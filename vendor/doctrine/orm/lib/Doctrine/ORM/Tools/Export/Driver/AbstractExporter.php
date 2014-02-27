@@ -134,7 +134,7 @@ abstract class AbstractExporter
         }
 
         foreach ($this->_metadata as $metadata) {
-            //In case output is returned, write it to a file, skip otherwise
+            // In case output is returned, write it to a file, skip otherwise
             if($output = $this->exportClassMetadata($metadata)){
                 $path = $this->_generateOutputPath($metadata);
                 $dir = dirname($path);
@@ -238,6 +238,12 @@ abstract class AbstractExporter
 
             case ClassMetadataInfo::GENERATOR_TYPE_IDENTITY:
                 return 'IDENTITY';
+
+            case ClassMetadataInfo::GENERATOR_TYPE_UUID:
+                return 'UUID';
+
+            case ClassMetadataInfo::GENERATOR_TYPE_CUSTOM:
+                return 'CUSTOM';
         }
     }
 }

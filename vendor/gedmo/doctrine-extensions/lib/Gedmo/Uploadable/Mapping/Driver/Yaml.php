@@ -10,14 +10,11 @@ use Gedmo\Mapping\Driver\File,
 /**
  * This is a yaml mapping driver for Uploadable
  * behavioral extension. Used for extraction of extended
- * metadata from yaml specificaly for Uploadable
+ * metadata from yaml specifically for Uploadable
  * extension.
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.Uploadable.Mapping.Driver
- * @subpackage Yaml
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class Yaml extends File implements Driver
@@ -50,6 +47,7 @@ class Yaml extends File implements Driver
                 $config['pathMethod'] = isset($uploadable['pathMethod']) ? $uploadable['pathMethod'] : '';
                 $config['callback'] = isset($uploadable['callback']) ? $uploadable['callback'] : '';
                 $config['fileMimeTypeField'] = false;
+                $config['fileNameField'] = false;
                 $config['filePathField'] = false;
                 $config['fileSizeField'] = false;
                 $config['filenameGenerator'] = isset($uploadable['filenameGenerator']) ?
@@ -67,11 +65,13 @@ class Yaml extends File implements Driver
 
                 if (isset($mapping['fields'])) {
                     foreach ($mapping['fields'] as $field => $info) {
-                        if (isset($info['gedmo'])) {
+                        if (isset($info['gedmo']) && array_key_exists(0, $info['gedmo'])) {
                             if ($info['gedmo'][0] === 'uploadableFileMimeType') {
                                 $config['fileMimeTypeField'] = $field;
                             } else if ($info['gedmo'][0] === 'uploadableFileSize') {
                                 $config['fileSizeField'] = $field;
+                            } else if ($info['gedmo'][0] === 'uploadableFileName') {
+                                $config['fileNameField'] = $field;
                             } else if ($info['gedmo'][0] === 'uploadableFilePath') {
                                 $config['filePathField'] = $field;
                             }

@@ -12,7 +12,6 @@ use Translatable\Fixture\Issue75\File;
  * These are tests for translatable behavior
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.Translatable
  * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
@@ -83,7 +82,7 @@ class Issue75Test extends BaseTestCaseORM
         $image2 = $this->em->find(self::IMAGE, $image2->getId());
         $article->setTitle('en updated');
         /**
-         * here you duplicate the objects in collection, it allready
+         * here you duplicate the objects in collection, it already
          * contains them. Read more about doctrine collections
          */
         $article->setImages(array($image1, $image2));

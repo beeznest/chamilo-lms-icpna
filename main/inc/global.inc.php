@@ -145,11 +145,11 @@ $app->register(new Silex\Provider\TranslationServiceProvider(),array(
 $app->register(new Silex\Provider\FormServiceProvider());
 
 //Monolog
-$app->register(new Silex\Provider\MonologServiceProvider(), array(
+/*$app->register(new Silex\Provider\MonologServiceProvider(), array(
     'monolog.logfile' => api_get_path(SYS_ARCHIVE_PATH).'chamilo_development.log',
     'monolog.name'    => 'chamilo',
 ));
-
+*/
 /*
 //Monolog examples
 $app['monolog']->addDebug('Testing the Monolog logging.');
@@ -318,17 +318,17 @@ $app->after(function() {
 
 $app->finish(function() use ($app) {
     //@todo will be removed before a stable release
-    $mtime = microtime();
-    $mtime = explode(" ",$mtime);
-    $mtime = $mtime[1] + $mtime[0];
+        /*$mtime = microtime();
+        $mtime = explode(" ",$mtime);
+        $mtime = $mtime[1] + $mtime[0];
 
-    $message = "Page loaded in:".($mtime-START);
-    $app['monolog']->addInfo($message);
-    $message = "memory_get_usage: ".format_file_size(memory_get_usage(true));
-    $app['monolog']->addInfo($message);
-    $message = "memory_get_peak_usage: ".format_file_size(memory_get_peak_usage(true));
-    $app['monolog']->addInfo($message);
-});
+        $message = "Page loaded in:".($mtime-START);
+        $app['monolog']->addInfo($message);
+        $message = "memory_get_usage: ".format_file_size(memory_get_usage(true));
+        $app['monolog']->addInfo($message);
+        $message = "memory_get_peak_usage: ".format_file_size(memory_get_peak_usage(true));
+        $app['monolog']->addInfo($message);*/
+    });
 
 $app['template.show_header']        = true;
 $app['template.show_footer']        = true;
@@ -366,11 +366,11 @@ if (!($conn_return = @Database::connect(
         'password'      => $_configuration['db_password'],
         'persistent'    => $_configuration['db_persistent_connection'] // When $_configuration['db_persistent_connection'] is set, it is expected to be a boolean type.
     )))) {
-    $app->abort(500, "Database is unavailable"); //error 3
+    $app->abort(500, "La base de datos se encuentra bajo alta carga en este momento. Por favor, recargue este sitio dentro de un momento"); //error 3
 }
 
 if (!$_configuration['db_host']) {
-    $app->abort(500, "Database is unavailable"); //error 3
+    $app->abort(500, "La base de datos se encuentra bajo alta carga en este momento. Por favor, recargue este sitio dentro de un momento"); //error 3
 }
 
 
@@ -396,7 +396,7 @@ if (!empty($_configuration['multiple_access_urls'])) {
 Database::query("set session sql_mode='';");
 
 if (!Database::select_db($_configuration['main_database'], $database_connection)) {
-    $app->abort(500, "Database is unavailable"); //error 3
+    $app->abort(500, "La base de datos se encuentra bajo alta carga en este momento. Por favor, recargue este sitio dentro de un momento"); //error 3
 }
 
 /*   Initialization of the default encodings */

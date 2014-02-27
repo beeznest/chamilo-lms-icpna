@@ -20,9 +20,6 @@ use Gedmo\Mapping\Event\AdapterInterface;
  *
  * @author Gustavo Adrian <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.Tree.Strategy.ORM
- * @subpackage Closure
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class Closure implements Strategy
@@ -152,7 +149,7 @@ class Closure implements Strategy
                 $this->getJoinColumnFieldName($em->getClassMetadata($config['closure'])->getAssociationMapping('descendant'))
             )
         );
-        // this one may not be very usefull
+        // this one may not be very useful
         $indexName = substr(strtoupper("IDX_" . md5($meta->name . 'depth')), 0, 20);
         $closureMetadata->table['indexes'][$indexName] = array(
             'columns' => array('depth')

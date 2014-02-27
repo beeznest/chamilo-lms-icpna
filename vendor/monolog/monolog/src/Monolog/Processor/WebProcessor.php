@@ -46,20 +46,20 @@ class WebProcessor
             return $record;
         }
 
-        if (!isset($this->serverData['HTTP_REFERER'])) {
-            $this->serverData['HTTP_REFERER'] = null;
-        }
-
         $record['extra'] = array_merge(
             $record['extra'],
             array(
                 'url'         => $this->serverData['REQUEST_URI'],
-                'ip'          => $this->serverData['REMOTE_ADDR'],
-                'http_method' => $this->serverData['REQUEST_METHOD'],
-                'server'      => $this->serverData['SERVER_NAME'],
-                'referrer'    => $this->serverData['HTTP_REFERER'],
+                'ip'          => isset($this->serverData['REMOTE_ADDR']) ? $this->serverData['REMOTE_ADDR'] : null,
+                'http_method' => isset($this->serverData['REQUEST_METHOD']) ? $this->serverData['REQUEST_METHOD'] : null,
+                'server'      => isset($this->serverData['SERVER_NAME']) ? $this->serverData['SERVER_NAME'] : null,
+                'referrer'    => isset($this->serverData['HTTP_REFERER']) ? $this->serverData['HTTP_REFERER'] : null,
             )
         );
+
+        if (isset($this->serverData['UNIQUE_ID'])) {
+            $record['extra']['unique_id'] = $this->serverData['UNIQUE_ID'];
+        }
 
         return $record;
     }

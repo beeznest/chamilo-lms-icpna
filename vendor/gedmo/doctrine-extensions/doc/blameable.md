@@ -2,7 +2,7 @@
 
 **Blameable** behavior will automate the update of username or user reference fields
 on your Entities or Documents. It works through annotations and can update
-fields on creation, update or even on specific property value change.
+fields on creation, update, property subset update, or even on specific property value change.
 
 This is very similar to Timestampable but sets a string or user object for a user association.
 
@@ -17,7 +17,7 @@ user).
 
 Features:
 
-- Automatic predifined user field update on creation, update and even on record property changes
+- Automatic predefined user field update on creation, update, property subset update, and even on record property changes
 - ORM and ODM support using same listener
 - Specific annotations for properties, and no interface required
 - Can react to specific property or relation changes to specific value
@@ -63,13 +63,15 @@ Available configuration options:
 
 - **on** - is main option and can be **create, update, change** this tells when it
 should be updated
-- **field** - only valid if **on="change"** is specified, tracks property for changes
-- **value** - only valid if **on="change"** is specified, if tracked field has this **value**
+- **field** - only valid if **on="change"** is specified, tracks property or a list of properties for changes
+- **value** - only valid if **on="change"** is specified and the tracked field is a single field (not an array), if the tracked field has this **value**
 then it updates the blame
 
 **Note:** that Blameable interface is not necessary, except in cases there
 you need to identify entity as being Blameable. The metadata is loaded only once then
 cache is activated
+
+Column is a string field:
 
 ``` php
 <?php
@@ -92,6 +94,11 @@ class Article
     private $title;
 
     /**
+     * @ORM\Column(name="body", type="string")
+     */
+    private $body;
+
+    /**
      * @var string $createdBy
      *
      * @Gedmo\Blameable(on="create")
@@ -106,6 +113,14 @@ class Article
      * @ORM\Column(type="string")
      */
     private $updatedBy;
+
+    /**
+     * @var datetime $contentChangedBy
+     *
+     * @ORM\Column(name="content_changed_by", type="string", nullable=true)
+     * @Gedmo\Timestampable(on="change", field={"title", "body"})
+     */
+    private $contentChangedBy;
 
     public function getId()
     {
@@ -122,14 +137,125 @@ class Article
         return $this->title;
     }
 
-    public function getCreated()
+    public function setBody($body)
     {
-        return $this->created;
+        $this->body = $body;
     }
 
-    public function getUpdated()
+    public function getBody()
     {
-        return $this->updated;
+        return $this->body;
+    }
+
+    public function getCreatedBy()
+    {
+        return $this->createdBy;
+    }
+
+    public function getUpdatedBy()
+    {
+        return $this->updatedBy;
+    }
+
+    public function getContentChangedBy()
+    {
+        return $this->contentChangedBy;
+    }
+}
+```
+
+Column is an association:
+
+``` php
+<?php
+namespace Entity;
+
+use Gedmo\Mapping\Annotation as Gedmo;
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Entity
+ */
+class Article
+{
+    /** @ORM\Id @ORM\GeneratedValue @ORM\Column(type="integer") */
+    private $id;
+
+    /**
+     * @ORM\Column(type="string", length=128)
+     */
+    private $title;
+
+    /**
+     * @ODM\String
+     */
+    private $body;
+
+    /**
+     * @var User $createdBy
+     *
+     * @Gedmo\Blameable(on="create")
+     * @ORM\ManyToOne(targetEntity="Path\To\Entity\User")
+     * @ORM\JoinColumn(name="created_by", referencedColumnName="id")
+     */
+    private $createdBy;
+
+    /**
+     * @var User $updatedBy
+     *
+     * @Gedmo\Blameable(on="update")
+     * @ORM\ManyToOne(targetEntity="Path\To\Entity\User")
+     * @ORM\JoinColumn(name="updated_by", referencedColumnName="id")
+     */
+    private $updatedBy;
+
+    /**
+     * @var User $contentChangedBy
+     *
+     * @Gedmo\Timestampable(on="change", fields={"title", "body"})
+     * @ORM\ManyToOne(targetEntity="Path\To\Entity\User")
+     * @ORM\JoinColumn(name="content_changed_by", referencedColumnName="id")
+     */
+    private $contentChangedBy;
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    public function setBody($body)
+    {
+        $this->body = $body;
+    }
+
+    public function getBody()
+    {
+        return $this->body;
+    }
+
+    public function getCreatedBy()
+    {
+        return $this->createdBy;
+    }
+
+    public function getUpdatedBy()
+    {
+        return $this->updatedBy;
+    }
+
+    public function getContentChangedBy()
+    {
+        return $this->contentChangedBy;
     }
 }
 ```
@@ -518,6 +644,6 @@ class UsingTrait
 annotations. If you use mongodb ODM import **Doctrine\ODM\MongoDB\Mapping\Annotations as ODM** and
 **BlameableDocument** instead.
 
-Traits are very simple and if you use different field names I recomment to simply create your
-own ones based per project. These ones are standing as an example.
+The Traits are very simplistic - if you use different field names it is recommended to simply create your
+own Traits specific to your project. The ones provided by this bundle can be used as example.
 

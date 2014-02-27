@@ -2,6 +2,10 @@
 
 namespace Doctrine\Tests;
 
+use Doctrine\Tests\EventListener\CacheMetadataListener;
+use Doctrine\ORM\Cache\Logging\StatisticsCacheLogger;
+use Doctrine\ORM\Cache\DefaultCacheFactory;
+
 /**
  * Base testcase class for all functional ORM testcases.
  *
@@ -150,6 +154,35 @@ abstract class OrmFunctionalTestCase extends OrmTestCase
             'Doctrine\Tests\Models\CustomType\CustomTypeParent',
             'Doctrine\Tests\Models\CustomType\CustomTypeUpperCase',
         ),
+        'compositekeyinheritance' => array(
+            'Doctrine\Tests\Models\CompositeKeyInheritance\JoinedRootClass',
+            'Doctrine\Tests\Models\CompositeKeyInheritance\JoinedChildClass',
+            'Doctrine\Tests\Models\CompositeKeyInheritance\SingleRootClass',
+            'Doctrine\Tests\Models\CompositeKeyInheritance\SingleChildClass',
+        ),
+        'taxi' => array(
+            'Doctrine\Tests\Models\Taxi\PaidRide',
+            'Doctrine\Tests\Models\Taxi\Ride',
+            'Doctrine\Tests\Models\Taxi\Car',
+            'Doctrine\Tests\Models\Taxi\Driver',
+        ),
+        'cache' => array(
+            'Doctrine\Tests\Models\Cache\Country',
+            'Doctrine\Tests\Models\Cache\State',
+            'Doctrine\Tests\Models\Cache\City',
+            'Doctrine\Tests\Models\Cache\Traveler',
+            'Doctrine\Tests\Models\Cache\TravelerProfileInfo',
+            'Doctrine\Tests\Models\Cache\TravelerProfile',
+            'Doctrine\Tests\Models\Cache\Travel',
+            'Doctrine\Tests\Models\Cache\Attraction',
+            'Doctrine\Tests\Models\Cache\Restaurant',
+            'Doctrine\Tests\Models\Cache\Beach',
+            'Doctrine\Tests\Models\Cache\Bar',
+            'Doctrine\Tests\Models\Cache\Flight',
+            'Doctrine\Tests\Models\Cache\AttractionInfo',
+            'Doctrine\Tests\Models\Cache\AttractionContactInfo',
+            'Doctrine\Tests\Models\Cache\AttractionLocationInfo'
+        ),
     );
 
     /**
@@ -237,7 +270,7 @@ abstract class OrmFunctionalTestCase extends OrmTestCase
         }
         if (isset($this->_usedModelSets['directorytree'])) {
             $conn->executeUpdate('DELETE FROM ' . $this->_em->getConnection()->getDatabasePlatform()->quoteIdentifier("file"));
-            // MySQL doesnt know deferred deletions therefore only executing the second query gives errors.
+            // MySQL doesn't know deferred deletions therefore only executing the second query gives errors.
             $conn->executeUpdate('DELETE FROM Directory WHERE parentDirectory_id IS NOT NULL');
             $conn->executeUpdate('DELETE FROM Directory');
         }
@@ -270,6 +303,35 @@ abstract class OrmFunctionalTestCase extends OrmTestCase
             $conn->executeUpdate('DELETE FROM customtype_parents');
             $conn->executeUpdate('DELETE FROM customtype_children');
             $conn->executeUpdate('DELETE FROM customtype_uppercases');
+        }
+
+        if (isset($this->_usedModelSets['compositekeyinheritance'])) {
+            $conn->executeUpdate('DELETE FROM JoinedChildClass');
+            $conn->executeUpdate('DELETE FROM JoinedRootClass');
+            $conn->executeUpdate('DELETE FROM SingleRootClass');
+        }
+
+        if (isset($this->_usedModelSets['taxi'])) {
+            $conn->executeUpdate('DELETE FROM taxi_paid_ride');
+            $conn->executeUpdate('DELETE FROM taxi_ride');
+            $conn->executeUpdate('DELETE FROM taxi_car');
+            $conn->executeUpdate('DELETE FROM taxi_driver');
+        }
+
+        if (isset($this->_usedModelSets['cache'])) {
+            $conn->executeUpdate('DELETE FROM cache_attraction_location_info');
+            $conn->executeUpdate('DELETE FROM cache_attraction_contact_info');
+            $conn->executeUpdate('DELETE FROM cache_attraction_info');
+            $conn->executeUpdate('DELETE FROM cache_visited_cities');
+            $conn->executeUpdate('DELETE FROM cache_flight');
+            $conn->executeUpdate('DELETE FROM cache_attraction');
+            $conn->executeUpdate('DELETE FROM cache_travel');
+            $conn->executeUpdate('DELETE FROM cache_traveler');
+            $conn->executeUpdate('DELETE FROM cache_traveler_profile_info');
+            $conn->executeUpdate('DELETE FROM cache_traveler_profile');
+            $conn->executeUpdate('DELETE FROM cache_city');
+            $conn->executeUpdate('DELETE FROM cache_state');
+            $conn->executeUpdate('DELETE FROM cache_country');
         }
 
         $this->_em->clear();
@@ -386,7 +448,31 @@ abstract class OrmFunctionalTestCase extends OrmTestCase
         $config->setProxyDir(__DIR__ . '/Proxies');
         $config->setProxyNamespace('Doctrine\Tests\Proxies');
 
-        $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver(array(), true));
+        $enableSecondLevelCache = getenv('ENABLE_SECOND_LEVEL_CACHE');
+
+        if ($this->isSecondLevelCacheEnabled || $enableSecondLevelCache) {
+
+            $cacheConfig    = new \Doctrine\ORM\Cache\CacheConfiguration();
+            $cache          = $this->getSharedSecondLevelCacheDriverImpl();
+            $factory        = new DefaultCacheFactory($cacheConfig->getRegionsConfiguration(), $cache);
+
+            $this->secondLevelCacheFactory = $factory;
+
+            if ($this->isSecondLevelCacheLogEnabled) {
+                $this->secondLevelCacheLogger = new StatisticsCacheLogger();
+                $cacheConfig->setCacheLogger($this->secondLevelCacheLogger);
+            }
+
+            $cacheConfig->setCacheFactory($factory);
+            $config->setSecondLevelCacheEnabled(true);
+            $config->setSecondLevelCacheConfiguration($cacheConfig);
+
+            $this->isSecondLevelCacheEnabled = true;
+        }
+
+        $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver(array(
+            realpath(__DIR__ . '/Models/Cache')
+        ), true));
 
         $conn = static::$_sharedConn;
         $conn->getConfiguration()->setSQLLogger($this->_sqlLoggerStack);
@@ -397,6 +483,10 @@ abstract class OrmFunctionalTestCase extends OrmTestCase
             foreach ($listeners AS $listener) {
                 $evm->removeEventListener(array($event), $listener);
             }
+        }
+
+        if ($enableSecondLevelCache) {
+            $evm->addEventListener('loadClassMetadata', new CacheMetadataListener());
         }
 
         if (isset($GLOBALS['db_event_subscribers'])) {
@@ -452,6 +542,11 @@ abstract class OrmFunctionalTestCase extends OrmTestCase
             throw new \Exception($message, (int)$e->getCode(), $e);
         }
         throw $e;
+    }
+
+    public function assertSQLEquals($expectedSql, $actualSql)
+    {
+        return $this->assertEquals(strtolower($expectedSql), strtolower($actualSql), "Lowercase comparison of SQL statements failed.");
     }
 
     /**

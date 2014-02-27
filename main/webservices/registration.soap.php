@@ -5467,8 +5467,9 @@ function WSExpireSessions($params) {
         }
         $date_end = api_get_utc_datetime();
         $sql = "UPDATE $tbl_session SET " .
-            " date_end='".$date_end."' " .
+            " access_end_date='".$date_end."' " .
             " WHERE id='".$id."'";
+        Database::query($sql);
         $id_session = Database::insert_id();
         $results[] = $id_session;
     } // end main foreach

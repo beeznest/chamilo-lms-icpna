@@ -37,16 +37,20 @@ with providers. Just keep to these rules:
 * Overriding existing services must occur **after** the provider is
   registered.
 
-  *Reason: If the services already exist, the provider will overwrite it.*
+  *Reason: If the service already exists, the provider will overwrite it.*
 
-* You can set parameters any time before the service is accessed.
+* You can set parameters any time **after** the provider is registered, but
+  **before** the service is accessed.
+
+  *Reason: Providers can set default values for parameters. Just like with
+  services, the provider will overwrite existing values.*
 
 Make sure to stick to this behavior when creating your own providers.
 
 Included providers
 ~~~~~~~~~~~~~~~~~~
 
-There are a few provider that you get out of the box. All of these are within
+There are a few providers that you get out of the box. All of these are within
 the ``Silex\Provider`` namespace:
 
 * :doc:`DoctrineServiceProvider <providers/doctrine>`
@@ -61,6 +65,7 @@ the ``Silex\Provider`` namespace:
 * :doc:`HttpCacheServiceProvider <providers/http_cache>`
 * :doc:`FormServiceProvider <providers/form>`
 * :doc:`SecurityServiceProvider <providers/security>`
+* :doc:`RememberMeServiceProvider <providers/remember_me>`
 * :doc:`ServiceControllerServiceProvider <providers/service_controller>`
 
 Third party providers
@@ -68,7 +73,7 @@ Third party providers
 
 Some service providers are developed by the community. Those third-party
 providers are listed on `Silex' repository wiki
-<https://github.com/fabpot/Silex/wiki/Third-Party-ServiceProviders>`_.
+<https://github.com/silexphp/Silex/wiki/Third-Party-ServiceProviders>`_.
 
 You are encouraged to share yours.
 
@@ -135,8 +140,10 @@ You can now use this provider as follows::
 In this example we are getting the ``name`` parameter from the query string,
 so the request path would have to be ``/hello?name=Fabien``.
 
-Controllers providers
----------------------
+.. _controller-providers:
+
+Controller Providers
+--------------------
 
 Loading providers
 ~~~~~~~~~~~~~~~~~

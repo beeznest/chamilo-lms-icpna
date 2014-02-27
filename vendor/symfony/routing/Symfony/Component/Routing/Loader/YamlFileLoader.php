@@ -14,7 +14,7 @@ namespace Symfony\Component\Routing\Loader;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Yaml\Parser as YamlParser;
 use Symfony\Component\Config\Loader\FileLoader;
 
 /**
@@ -28,8 +28,9 @@ use Symfony\Component\Config\Loader\FileLoader;
 class YamlFileLoader extends FileLoader
 {
     private static $availableKeys = array(
-        'resource', 'type', 'prefix', 'pattern', 'path', 'hostname', 'schemes', 'methods', 'defaults', 'requirements', 'options',
+        'resource', 'type', 'prefix', 'pattern', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition'
     );
+    private $yamlParser;
 
     /**
      * Loads a Yaml file.
@@ -47,7 +48,19 @@ class YamlFileLoader extends FileLoader
     {
         $path = $this->locator->locate($file);
 
-        $config = Yaml::parse($path);
+        if (!stream_is_local($path)) {
+            throw new \InvalidArgumentException(sprintf('This is not a local file "%s".', $path));
+        }
+
+        if (!file_exists($path)) {
+            throw new \InvalidArgumentException(sprintf('File "%s" not found.', $path));
+        }
+
+        if (null === $this->yamlParser) {
+            $this->yamlParser = new YamlParser();
+        }
+
+        $config = $this->yamlParser->parse(file_get_contents($path));
 
         $collection = new RouteCollection();
         $collection->addResource(new FileResource($path));
@@ -107,11 +120,12 @@ class YamlFileLoader extends FileLoader
         $defaults = isset($config['defaults']) ? $config['defaults'] : array();
         $requirements = isset($config['requirements']) ? $config['requirements'] : array();
         $options = isset($config['options']) ? $config['options'] : array();
-        $hostname = isset($config['hostname']) ? $config['hostname'] : '';
+        $host = isset($config['host']) ? $config['host'] : '';
         $schemes = isset($config['schemes']) ? $config['schemes'] : array();
         $methods = isset($config['methods']) ? $config['methods'] : array();
+        $condition = isset($config['condition']) ? $config['condition'] : null;
 
-        $route = new Route($config['path'], $defaults, $requirements, $options, $hostname, $schemes, $methods);
+        $route = new Route($config['path'], $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
 
         $collection->add($name, $route);
     }
@@ -131,7 +145,8 @@ class YamlFileLoader extends FileLoader
         $defaults = isset($config['defaults']) ? $config['defaults'] : array();
         $requirements = isset($config['requirements']) ? $config['requirements'] : array();
         $options = isset($config['options']) ? $config['options'] : array();
-        $hostname = isset($config['hostname']) ? $config['hostname'] : null;
+        $host = isset($config['host']) ? $config['host'] : null;
+        $condition = isset($config['condition']) ? $config['condition'] : null;
         $schemes = isset($config['schemes']) ? $config['schemes'] : null;
         $methods = isset($config['methods']) ? $config['methods'] : null;
 
@@ -140,8 +155,11 @@ class YamlFileLoader extends FileLoader
         $subCollection = $this->import($config['resource'], $type, false, $file);
         /* @var $subCollection RouteCollection */
         $subCollection->addPrefix($prefix);
-        if (null !== $hostname) {
-            $subCollection->setHostname($hostname);
+        if (null !== $host) {
+            $subCollection->setHost($host);
+        }
+        if (null !== $condition) {
+            $subCollection->setCondition($condition);
         }
         if (null !== $schemes) {
             $subCollection->setSchemes($schemes);

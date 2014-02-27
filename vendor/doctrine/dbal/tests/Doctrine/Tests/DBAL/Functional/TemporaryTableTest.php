@@ -22,7 +22,7 @@ class TemporaryTableTest extends \Doctrine\Tests\DbalFunctionalTestCase
     {
         if ($this->_conn) {
             try {
-                $tempTable = $this->_conn->getDatabasePlatform()->getTemporaryTableName("temporary");
+                $tempTable = $this->_conn->getDatabasePlatform()->getTemporaryTableName("my_temporary");
                 $this->_conn->exec($this->_conn->getDatabasePlatform()->getDropTemporaryTableSQL($tempTable));
             } catch(\Exception $e) { }
         }
@@ -34,9 +34,14 @@ class TemporaryTableTest extends \Doctrine\Tests\DbalFunctionalTestCase
      */
     public function testDropTemporaryTableNotAutoCommitTransaction()
     {
+        if ($this->_conn->getDatabasePlatform()->getName() == 'sqlanywhere' ||
+            $this->_conn->getDatabasePlatform()->getName() == 'oracle') {
+            $this->markTestSkipped("Test does not work on Oracle and SQL Anywhere.");
+        }
+
         $platform = $this->_conn->getDatabasePlatform();
         $columnDefinitions = array("id" => array("type" => Type::getType("integer"), "notnull" => true));
-        $tempTable = $platform->getTemporaryTableName("temporary");
+        $tempTable = $platform->getTemporaryTableName("my_temporary");
 
         $createTempTableSQL = $platform->getCreateTemporaryTableSnippetSQL() . ' ' . $tempTable . ' ('
                 . $platform->getColumnDeclarationListSQL($columnDefinitions) . ')';
@@ -67,9 +72,14 @@ class TemporaryTableTest extends \Doctrine\Tests\DbalFunctionalTestCase
      */
     public function testCreateTemporaryTableNotAutoCommitTransaction()
     {
+        if ($this->_conn->getDatabasePlatform()->getName() == 'sqlanywhere' ||
+            $this->_conn->getDatabasePlatform()->getName() == 'oracle') {
+            $this->markTestSkipped("Test does not work on Oracle and SQL Anywhere.");
+        }
+
         $platform = $this->_conn->getDatabasePlatform();
         $columnDefinitions = array("id" => array("type" => Type::getType("integer"), "notnull" => true));
-        $tempTable = $platform->getTemporaryTableName("temporary");
+        $tempTable = $platform->getTemporaryTableName("my_temporary");
 
         $createTempTableSQL = $platform->getCreateTemporaryTableSnippetSQL() . ' ' . $tempTable . ' ('
                 . $platform->getColumnDeclarationListSQL($columnDefinitions) . ')';

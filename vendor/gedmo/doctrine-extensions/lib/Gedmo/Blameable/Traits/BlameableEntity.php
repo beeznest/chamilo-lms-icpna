@@ -6,22 +6,19 @@ namespace Gedmo\Blameable\Traits;
  * Blameable Trait, usable with PHP >= 5.4
  *
  * @author David Buchmann <mail@davidbu.ch>
- * @package Gedmo.Blameable.Traits
- * @subpackage BlameableEntity
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 trait BlameableEntity
 {
     /**
      * @Gedmo\Blameable(on="create")
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      */
     private $createdBy;
 
     /**
      * @Gedmo\Blameable(on="update")
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      */
     private $updatedBy;
 

@@ -6,22 +6,18 @@ use Doctrine\Common\Persistence\ObjectManager,
     Doctrine\Common\Persistence\Mapping\ClassMetadata,
     Gedmo\Mapping\MappedEventSubscriber,
     Gedmo\Loggable\Mapping\Event\LoggableAdapter,
-    Doctrine\Common\EventArgs,
-    Doctrine\ORM\Event\LifecycleEventArgs;
+    Doctrine\Common\EventArgs
+;
 
 /**
  * SoftDeleteable listener
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.SoftDeleteable
- * @subpackage SoftDeleteableListener
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class SoftDeleteableListener extends MappedEventSubscriber
 {
-
     /**
      * Pre soft-delete event
      *
@@ -60,38 +56,44 @@ class SoftDeleteableListener extends MappedEventSubscriber
         $om = $ea->getObjectManager();
         $uow = $om->getUnitOfWork();
         $evm = $om->getEventManager();
-        
-        foreach ($uow->getScheduledEntityDeletions() as $entity) {
-            $meta = $om->getClassMetadata(get_class($entity));
+
+        //getScheduledDocumentDeletions
+        foreach ($ea->getScheduledObjectDeletions($uow) as $object) {
+            $meta = $om->getClassMetadata(get_class($object));
             $config = $this->getConfiguration($om, $meta->name);
 
             if (isset($config['softDeleteable']) && $config['softDeleteable']) {
-                $evm->dispatchEvent(self::PRE_SOFT_DELETE, new LifecycleEventArgs(
-                    $entity,
-                    $om
-                ));
 
                 $reflProp = $meta->getReflectionProperty($config['fieldName']);
-                $date = new \DateTime();
-                $oldValue = $reflProp->getValue($entity);
-                $reflProp->setValue($entity, $date);
+                $oldValue = $reflProp->getValue($object);
+                if ($oldValue instanceof \Datetime) {
+                    continue; // want to hard delete
+                }
 
-                $om->persist($entity);
-                $uow->propertyChanged($entity, $config['fieldName'], $oldValue, $date);
-                $uow->scheduleExtraUpdate($entity, array(
+                $evm->dispatchEvent(
+                    self::PRE_SOFT_DELETE,
+                    $ea->createLifecycleEventArgsInstance($object, $om)
+                 );
+
+                $date = new \DateTime();
+                $reflProp->setValue($object, $date);
+
+                $om->persist($object);
+                $uow->propertyChanged($object, $config['fieldName'], $oldValue, $date);
+                $uow->scheduleExtraUpdate($object, array(
                     $config['fieldName'] => array($oldValue, $date)
                 ));
 
-                $evm->dispatchEvent(self::POST_SOFT_DELETE, new LifecycleEventArgs(
-                    $entity,
-                    $om
-                ));
+                $evm->dispatchEvent(
+                    self::POST_SOFT_DELETE,
+                    $ea->createLifecycleEventArgsInstance($object, $om)
+                );
             }
         }
     }
 
     /**
-     * Mapps additional metadata
+     * Maps additional metadata
      *
      * @param EventArgs $eventArgs
      * @return void

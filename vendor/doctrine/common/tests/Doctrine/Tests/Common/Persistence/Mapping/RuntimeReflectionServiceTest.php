@@ -13,7 +13,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
  */
 
@@ -52,6 +52,12 @@ class RuntimeReflectionServiceTest extends \PHPUnit_Framework_TestCase
     {
         $classes = $this->reflectionService->getParentClasses(__CLASS__);
         $this->assertTrue(count($classes) >= 1, "The test class ".__CLASS__." should have at least one parent.");
+    }
+
+    public function testGetParentClassesForAbsentClass()
+    {
+        $this->setExpectedException('Doctrine\Common\Persistence\Mapping\MappingException');
+        $this->reflectionService->getParentClasses(__NAMESPACE__ . '\AbsentClass');
     }
 
     public function testGetReflectionClass()

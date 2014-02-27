@@ -57,7 +57,7 @@ use Psr\Log\LoggerInterface;
  */
 class {$options['class']} extends {$options['base_class']}
 {
-    static private \$declaredRoutes = {$this->generateDeclaredRoutes()};
+    private static \$declaredRoutes = {$this->generateDeclaredRoutes()};
 
     /**
      * Constructor.
@@ -91,7 +91,8 @@ EOF;
             $properties[] = $route->getDefaults();
             $properties[] = $route->getRequirements();
             $properties[] = $compiledRoute->getTokens();
-            $properties[] = $compiledRoute->getHostnameTokens();
+            $properties[] = $compiledRoute->getHostTokens();
+            $properties[] = $route->getSchemes();
 
             $routes .= sprintf("        '%s' => %s,\n", $name, str_replace("\n", '', var_export($properties, true)));
         }
@@ -111,12 +112,12 @@ EOF;
     public function generate(\$name, \$parameters = array(), \$referenceType = self::ABSOLUTE_PATH)
     {
         if (!isset(self::\$declaredRoutes[\$name])) {
-            throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', \$name));
+            throw new RouteNotFoundException(sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', \$name));
         }
 
-        list(\$variables, \$defaults, \$requirements, \$tokens, \$hostnameTokens) = self::\$declaredRoutes[\$name];
+        list(\$variables, \$defaults, \$requirements, \$tokens, \$hostTokens, \$requiredSchemes) = self::\$declaredRoutes[\$name];
 
-        return \$this->doGenerate(\$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$referenceType, \$hostnameTokens);
+        return \$this->doGenerate(\$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$referenceType, \$hostTokens, \$requiredSchemes);
     }
 EOF;
     }

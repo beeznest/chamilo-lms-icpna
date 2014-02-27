@@ -22,12 +22,13 @@ class Route
 {
     private $path;
     private $name;
-    private $requirements;
-    private $options;
-    private $defaults;
-    private $hostname;
-    private $methods;
-    private $schemes;
+    private $requirements = array();
+    private $options = array();
+    private $defaults = array();
+    private $host;
+    private $methods = array();
+    private $schemes = array();
+    private $condition;
 
     /**
      * Constructor.
@@ -38,12 +39,6 @@ class Route
      */
     public function __construct(array $data)
     {
-        $this->requirements = array();
-        $this->options = array();
-        $this->defaults = array();
-        $this->methods = array();
-        $this->schemes = array();
-
         if (isset($data['value'])) {
             $data['path'] = $data['value'];
             unset($data['value']);
@@ -84,14 +79,14 @@ class Route
         return $this->path;
     }
 
-    public function setHostname($pattern)
+    public function setHost($pattern)
     {
-        $this->hostname = $pattern;
+        $this->host = $pattern;
     }
 
-    public function getHostname()
+    public function getHost()
     {
-        return $this->hostname;
+        return $this->host;
     }
 
     public function setName($name)
@@ -152,5 +147,15 @@ class Route
     public function getMethods()
     {
         return $this->methods;
+    }
+
+    public function setCondition($condition)
+    {
+        $this->condition = $condition;
+    }
+
+    public function getCondition()
+    {
+        return $this->condition;
     }
 }

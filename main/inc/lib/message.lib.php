@@ -153,7 +153,6 @@ class MessageManager
 	 * @return bool
 	 */
 	public static function send_message($receiver_user_id, $subject, $content, $file_attachments = array(), $file_comments = array(), $group_id = 0, $parent_id = 0, $edit_message_id = 0, $topic_id = 0, $sender_id = null) {
-/*
 		$table_message      = Database::get_main_table(TABLE_MESSAGE);
         $group_id           = intval($group_id);
         $receiver_user_id   = intval($receiver_user_id);
@@ -245,7 +244,7 @@ class MessageManager
                 if (!empty($user_sender_id)) {
                     $sender_info = api_get_user_info($user_sender_id);
                 }
-                $notification->save_notification(NOTIFICATION_TYPE_MESSAGE, array($receiver_user_id), $subject, $content, $sender_info);
+                //$notification->save_notification(NOTIFICATION_TYPE_MESSAGE, array($receiver_user_id), $subject, $content, $sender_info);
 		    } else {
 		        $group_info = GroupPortalManager::get_group_data($group_id);
 		        $group_info['topic_id'] = $topic_id;
@@ -267,7 +266,7 @@ class MessageManager
 			return $inbox_last_id;
         }
         return false;
-*/
+
 	}
 
     /**

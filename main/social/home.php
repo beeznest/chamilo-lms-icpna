@@ -66,6 +66,10 @@ $social_right_content .= '<h3>'.get_lang('Profile').'</h3>';
 
 $list = array(
     array(
+        'title' => 'Usuario (DNI o CE)',
+        'content' => (!empty($user_info['extra']['DNI'])) ? $user_info['extra']['DNI'] : $user_info['username'] ,
+    ),
+    array(
         'title' => 'Nombre',
         'content' => $user_info['firstname']
     ),
@@ -78,10 +82,6 @@ $list = array(
         'content' => $user_info['extra']['middlename']
     ),
     array(
-        'title' => 'DNI',
-        'content' => $user_info['extra']['DNI']
-    ),
-    array(
         'title' => 'Correo electrónico',
         'content' => $user_info['email']
     ),
@@ -92,12 +92,12 @@ $list = array(
 );
 // information current user
 $social_right_content .= '<div>'.Display::description($list).'</div>';
-$social_right_content .= '
+/*$social_right_content .= '
     <div class="form-actions">
     <a class="btn" href="'.api_get_path(WEB_PATH).'main/auth/profile.php">
         '.get_lang('EditProfile').'
     </a>
-    </div></div>';
+    </div></div>';*/
 
     if (api_get_setting('allow_skills_tool') == 'true') {
         $social_right_content .= '<div class="well_border">';

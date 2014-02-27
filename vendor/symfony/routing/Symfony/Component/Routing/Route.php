@@ -29,7 +29,7 @@ class Route implements \Serializable
     /**
      * @var string
      */
-    private $hostname = '';
+    private $host = '';
 
     /**
      * @var array
@@ -57,9 +57,11 @@ class Route implements \Serializable
     private $options = array();
 
     /**
-     * @var null|RouteCompiler
+     * @var null|CompiledRoute
      */
     private $compiled;
+
+    private $condition;
 
     /**
      * Constructor.
@@ -72,19 +74,20 @@ class Route implements \Serializable
      * @param array        $defaults     An array of default parameter values
      * @param array        $requirements An array of requirements for parameters (regexes)
      * @param array        $options      An array of options
-     * @param string       $hostname     The hostname pattern to match
+     * @param string       $host         The host pattern to match
      * @param string|array $schemes      A required URI scheme or an array of restricted schemes
      * @param string|array $methods      A required HTTP method or an array of restricted methods
+     * @param string       $condition    A condition that should evaluate to true for the route to match
      *
      * @api
      */
-    public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $hostname = '', $schemes = array(), $methods = array())
+    public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array(), $condition = null)
     {
         $this->setPath($path);
         $this->setDefaults($defaults);
         $this->setRequirements($requirements);
         $this->setOptions($options);
-        $this->setHostname($hostname);
+        $this->setHost($host);
         // The conditions make sure that an initial empty $schemes/$methods does not override the corresponding requirement.
         // They can be removed when the BC layer is removed.
         if ($schemes) {
@@ -93,18 +96,20 @@ class Route implements \Serializable
         if ($methods) {
             $this->setMethods($methods);
         }
+        $this->setCondition($condition);
     }
 
     public function serialize()
     {
         return serialize(array(
             'path'         => $this->path,
-            'hostname'     => $this->hostname,
+            'host'         => $this->host,
             'defaults'     => $this->defaults,
             'requirements' => $this->requirements,
             'options'      => $this->options,
             'schemes'      => $this->schemes,
             'methods'      => $this->methods,
+            'condition'    => $this->condition,
         ));
     }
 
@@ -112,12 +117,13 @@ class Route implements \Serializable
     {
         $data = unserialize($data);
         $this->path = $data['path'];
-        $this->hostname = $data['hostname'];
+        $this->host = $data['host'];
         $this->defaults = $data['defaults'];
         $this->requirements = $data['requirements'];
         $this->options = $data['options'];
         $this->schemes = $data['schemes'];
         $this->methods = $data['methods'];
+        $this->condition = $data['condition'];
     }
 
     /**
@@ -171,34 +177,34 @@ class Route implements \Serializable
     {
         // A pattern must start with a slash and must not have multiple slashes at the beginning because the
         // generated path for this route would be confused with a network path, e.g. '//domain.com/path'.
-        $this->path = '/' . ltrim(trim($pattern), '/');
+        $this->path = '/'.ltrim(trim($pattern), '/');
         $this->compiled = null;
 
         return $this;
     }
 
     /**
-     * Returns the pattern for the hostname.
+     * Returns the pattern for the host.
      *
-     * @return string The hostname pattern
+     * @return string The host pattern
      */
-    public function getHostname()
+    public function getHost()
     {
-        return $this->hostname;
+        return $this->host;
     }
 
     /**
-     * Sets the pattern for the hostname.
+     * Sets the pattern for the host.
      *
      * This method implements a fluent interface.
      *
-     * @param string $pattern The hostname pattern
+     * @param string $pattern The host pattern
      *
      * @return Route The current Route instance
      */
-    public function setHostname($pattern)
+    public function setHost($pattern)
     {
-        $this->hostname = (string) $pattern;
+        $this->host = (string) $pattern;
         $this->compiled = null;
 
         return $this;
@@ -239,6 +245,25 @@ class Route implements \Serializable
         $this->compiled = null;
 
         return $this;
+    }
+
+    /**
+     * Checks if a scheme requirement has been set.
+     *
+     * @param string $scheme
+     *
+     * @return Boolean true if the scheme requirement exists, otherwise false
+     */
+    public function hasScheme($scheme)
+    {
+        $scheme = strtolower($scheme);
+        foreach ($this->schemes as $requiredScheme) {
+            if ($scheme === $requiredScheme) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -358,7 +383,7 @@ class Route implements \Serializable
     }
 
     /**
-     * Checks if a an option has been set
+     * Checks if an option has been set
      *
      * @param string $name An option name
      *
@@ -544,12 +569,39 @@ class Route implements \Serializable
     }
 
     /**
+     * Returns the condition.
+     *
+     * @return string The condition
+     */
+    public function getCondition()
+    {
+        return $this->condition;
+    }
+
+    /**
+     * Sets the condition.
+     *
+     * This method implements a fluent interface.
+     *
+     * @param string $condition The condition
+     *
+     * @return Route The current Route instance
+     */
+    public function setCondition($condition)
+    {
+        $this->condition = (string) $condition;
+        $this->compiled = null;
+
+        return $this;
+    }
+
+    /**
      * Compiles the route.
      *
      * @return CompiledRoute A CompiledRoute instance
      *
      * @throws \LogicException If the Route cannot be compiled because the
-     *                         path or hostname pattern is invalid
+     *                         path or host pattern is invalid
      *
      * @see RouteCompiler which is responsible for the compilation process
      */

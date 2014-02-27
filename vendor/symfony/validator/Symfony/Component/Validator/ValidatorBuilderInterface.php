@@ -11,8 +11,9 @@
 
 namespace Symfony\Component\Validator;
 
-use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use Doctrine\Common\Annotations\Reader;
 
 /**
@@ -113,11 +114,11 @@ interface ValidatorBuilderInterface
     /**
      * Sets the class metadata factory used by the validator.
      *
-     * @param ClassMetadataFactoryInterface $metadataFactory The metadata factory.
+     * @param MetadataFactoryInterface $metadataFactory The metadata factory.
      *
      * @return ValidatorBuilderInterface The builder object.
      */
-    public function setMetadataFactory(ClassMetadataFactoryInterface $metadataFactory);
+    public function setMetadataFactory(MetadataFactoryInterface $metadataFactory);
 
     /**
      * Sets the cache for caching class metadata.
@@ -136,6 +137,37 @@ interface ValidatorBuilderInterface
      * @return ValidatorBuilderInterface The builder object.
      */
     public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $validatorFactory);
+
+    /**
+     * Sets the translator used for translating violation messages.
+     *
+     * @param TranslatorInterface $translator The translator instance.
+     *
+     * @return ValidatorBuilderInterface The builder object.
+     */
+    public function setTranslator(TranslatorInterface $translator);
+
+    /**
+     * Sets the default translation domain of violation messages.
+     *
+     * The same message can have different translations in different domains.
+     * Pass the domain that is used for violation messages by default to this
+     * method.
+     *
+     * @param string $translationDomain The translation domain of the violation messages.
+     *
+     * @return ValidatorBuilderInterface The builder object.
+     */
+    public function setTranslationDomain($translationDomain);
+
+    /**
+     * Sets the property accessor for resolving property paths.
+     *
+     * @param PropertyAccessorInterface $propertyAccessor The property accessor.
+     *
+     * @return ValidatorBuilderInterface The builder object.
+     */
+    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor);
 
     /**
      * Builds and returns a new validator object.

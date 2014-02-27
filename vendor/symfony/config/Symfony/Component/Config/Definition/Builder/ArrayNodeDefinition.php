@@ -22,18 +22,18 @@ use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
  */
 class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinitionInterface
 {
-    protected $performDeepMerging;
-    protected $ignoreExtraKeys;
-    protected $children;
+    protected $performDeepMerging = true;
+    protected $ignoreExtraKeys = false;
+    protected $children = array();
     protected $prototype;
-    protected $atLeastOne;
-    protected $allowNewKeys;
+    protected $atLeastOne = false;
+    protected $allowNewKeys = true;
     protected $key;
     protected $removeKeyItem;
-    protected $addDefaults;
-    protected $addDefaultChildren;
+    protected $addDefaults = false;
+    protected $addDefaultChildren = false;
     protected $nodeBuilder;
-    protected $normalizeKeys;
+    protected $normalizeKeys = true;
 
     /**
      * {@inheritDoc}
@@ -42,16 +42,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     {
         parent::__construct($name, $parent);
 
-        $this->children = array();
-        $this->addDefaults = false;
-        $this->addDefaultChildren = false;
-        $this->allowNewKeys = true;
-        $this->atLeastOne = false;
-        $this->allowEmptyValue = true;
-        $this->performDeepMerging = true;
         $this->nullEquivalent = array();
         $this->trueEquivalent = array();
-        $this->normalizeKeys = true;
     }
 
     /**
@@ -214,16 +206,33 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Adds an "enabled" boolean to enable the current section.
      *
-     * By default, the section is disabled.
+     * By default, the section is disabled. If any configuration is specified then
+     * the node will be automatically enabled:
+     *
+     * enableableArrayNode: {enabled: true, ...}   # The config is enabled & default values get overridden
+     * enableableArrayNode: ~                      # The config is enabled & use the default values
+     * enableableArrayNode: true                   # The config is enabled & use the default values
+     * enableableArrayNode: {other: value, ...}    # The config is enabled & default values get overridden
+     * enableableArrayNode: {enabled: false, ...}  # The config is disabled
+     * enableableArrayNode: false                  # The config is disabled
      *
      * @return ArrayNodeDefinition
      */
     public function canBeEnabled()
     {
         $this
+            ->addDefaultsIfNotSet()
             ->treatFalseLike(array('enabled' => false))
             ->treatTrueLike(array('enabled' => true))
             ->treatNullLike(array('enabled' => true))
+            ->beforeNormalization()
+                ->ifArray()
+                ->then(function ($v) {
+                    $v['enabled'] = isset($v['enabled']) ? $v['enabled'] : true;
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->booleanNode('enabled')
                     ->defaultFalse()
@@ -242,6 +251,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     public function canBeDisabled()
     {
         $this
+            ->addDefaultsIfNotSet()
             ->treatFalseLike(array('enabled' => false))
             ->treatTrueLike(array('enabled' => true))
             ->treatNullLike(array('enabled' => true))

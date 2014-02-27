@@ -12,11 +12,9 @@
 namespace Silex\Tests;
 
 use Silex\Application;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Router test cases.
@@ -97,7 +95,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-    * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+    * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
     */
     public function testMissingRoute()
     {
@@ -179,6 +177,14 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/foo/', $response->getTargetUrl());
     }
 
+    public function testHostSpecification()
+    {
+        $route = new \Silex\Route();
+
+        $this->assertSame($route, $route->host('{locale}.example.com'));
+        $this->assertEquals('{locale}.example.com', $route->getHost());
+    }
+
     public function testRequireHttpRedirect()
     {
         $app = new Application();
@@ -207,6 +213,20 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($response->isRedirect('https://example.com/secured'));
     }
 
+    public function testRequireHttpsRedirectIncludesQueryString()
+    {
+        $app = new Application();
+
+        $app->match('/secured', function () {
+            return 'secured content';
+        })
+        ->requireHttps();
+
+        $request = Request::create('http://example.com/secured?query=string');
+        $response = $app->handle($request);
+        $this->assertTrue($response->isRedirect('https://example.com/secured?query=string'));
+    }
+
     public function testClassNameControllerSyntax()
     {
         $app = new Application();
@@ -225,7 +245,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->checkRouteResponse($app, '/bar', 'bar');
     }
 
-    protected function checkRouteResponse($app, $path, $expectedContent, $method = 'get', $message = null)
+    protected function checkRouteResponse(Application $app, $path, $expectedContent, $method = 'get', $message = null)
     {
         $request = Request::create($path, $method);
         $response = $app->handle($request);

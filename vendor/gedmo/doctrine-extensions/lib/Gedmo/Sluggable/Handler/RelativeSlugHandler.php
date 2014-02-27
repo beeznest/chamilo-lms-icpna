@@ -16,9 +16,6 @@ use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 * where path separator separates the relative slug
 *
 * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
-* @package Gedmo.Sluggable.Handler
-* @subpackage RelativeSlugHandler
-* @link http://www.gediminasm.org
 * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
 */
 class RelativeSlugHandler implements SlugHandlerInterface
@@ -66,7 +63,7 @@ class RelativeSlugHandler implements SlugHandlerInterface
     /**
      * {@inheritDoc}
      */
-    public function onChangeDecision(SluggableAdapter $ea, $config, $object, &$slug, &$needToChangeSlug)
+    public function onChangeDecision(SluggableAdapter $ea, array &$config, $object, &$slug, &$needToChangeSlug)
     {
         $this->om = $ea->getObjectManager();
         $isInsert = $this->om->getUnitOfWork()->isScheduledForInsert($object);
@@ -127,6 +124,14 @@ class RelativeSlugHandler implements SlugHandlerInterface
         if ($relation) {
             $wrappedRelation = AbstractWrapper::wrap($relation, $this->om);
             $slug = $wrappedRelation->getPropertyValue($this->usedOptions['relationSlugField']);
+
+            if (isset($this->usedOptions['urilize']) && $this->usedOptions['urilize']) {
+                $slug = call_user_func_array(
+                    $this->originalTransliterator,
+                    array($slug, $separator, $object)
+                );
+            }
+
             $result = $slug . $this->usedOptions['separator'] . $result;
         }
         $this->sluggable->setTransliterator($this->originalTransliterator);

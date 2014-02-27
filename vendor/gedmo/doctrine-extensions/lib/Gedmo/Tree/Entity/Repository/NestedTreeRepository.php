@@ -16,9 +16,6 @@ use Doctrine\ORM\Query,
  * the strategy used by listener
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.Tree.Entity.Repository
- * @subpackage NestedTreeRepository
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class NestedTreeRepository extends AbstractTreeRepository
@@ -100,7 +97,7 @@ class NestedTreeRepository extends AbstractTreeRepository
                 if (strstr($method,'Sibling')) {
                     $wrappedParentOrSibling = new EntityWrapper($parentOrSibling, $this->_em);
                     $newParent = $wrappedParentOrSibling->getPropertyValue($config['parent']);
-                    if (is_null($newParent)) {
+                    if (null === $newParent && isset($config['root'])) {
                         throw new UnexpectedValueException("Cannot persist sibling for a root node, tree operation is not possible");
                     }
                     $node->sibling = $parentOrSibling;
@@ -584,7 +581,7 @@ class NestedTreeRepository extends AbstractTreeRepository
     }
 
     /**
-     * UNSAFE: be sure to backup before runing this method when necessary
+     * UNSAFE: be sure to backup before running this method when necessary
      *
      * Removes given $node from the tree and reparents its descendants
      *
@@ -615,14 +612,14 @@ class NestedTreeRepository extends AbstractTreeRepository
                 $parent = $wrapped->getPropertyValue($config['parent']);
                 $parentId = null;
                 if ($parent) {
-                    $wrappedParrent = new EntityWrapper($parent, $this->_em);
-                    $parentId = $wrappedParrent->getIdentifier();
+                    $wrappedParent = new EntityWrapper($parent, $this->_em);
+                    $parentId = $wrappedParent->getIdentifier();
                 }
                 $pk = $meta->getSingleIdentifierFieldName();
                 $nodeId = $wrapped->getIdentifier();
                 $shift = -1;
 
-                // in case if root node is removed, childs become roots
+                // in case if root node is removed, children become roots
                 if (isset($config['root']) && !$parent) {
                     $qb = $this->_em->createQueryBuilder();
                     $qb->select('node.'.$pk, 'node.'.$config['left'], 'node.'.$config['right'])
@@ -794,10 +791,10 @@ class NestedTreeRepository extends AbstractTreeRepository
     }
 
     /**
+     * NOTE: flush your entity manager after
+     *
      * Tries to recover the tree
      *
-     * @todo implement
-     * @throws RuntimeException - if something fails in transaction
      * @return void
      */
     public function recover()
@@ -805,7 +802,33 @@ class NestedTreeRepository extends AbstractTreeRepository
         if ($this->verify() === true) {
             return;
         }
-        // not yet implemented
+        $meta = $this->getClassMetadata();
+        $config = $this->listener->getConfiguration($this->_em, $meta->name);
+        $self = $this;
+        $em = $this->_em;
+
+        $doRecover = function($root, &$count) use($meta, $config, $self, $em, &$doRecover) {
+            $lft = $count++;
+            foreach ($self->getChildren($root, true) as $child) {
+                $doRecover($child, $count);
+            }
+            $rgt = $count++;
+            $meta->getReflectionProperty($config['left'])->setValue($root, $lft);
+            $meta->getReflectionProperty($config['right'])->setValue($root, $rgt);
+            $em->persist($root);
+        };
+
+        if (isset($config['root'])) {
+            foreach ($this->getRootNodes() as $root) {
+                $count = 1; // reset on every root node
+                $doRecover($root, $count);
+            }
+        } else {
+            $count = 1;
+            foreach($this->getChildren(null, true) as $root) {
+                $doRecover($root, $count);
+            }
+        }
     }
 
     /**

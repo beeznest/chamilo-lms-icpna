@@ -10,7 +10,6 @@ use Sluggable\Fixture\Article;
  * These are tests for sluggable behavior
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.Sluggable
  * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
@@ -164,7 +163,7 @@ class SluggableTest extends BaseTestCaseORM
     function shouldBeAbleToForceTheSlug()
     {
         $article = $this->em->find(self::ARTICLE, $this->articleId);
-        $article->setSlug('my forced slug');
+        $article->setSlug('my-forced-slug');
         $this->em->persist($article);
 
         $new = new Article;
@@ -217,6 +216,35 @@ class SluggableTest extends BaseTestCaseORM
 
         $this->em->flush();
         $this->assertEquals('my-s', $article2->getSlug());
+    }
+
+    /**
+     * @test
+     */
+    function shouldAllowForcingEmptySlugAndRegenerateIfNullIssue807()
+    {
+        $article = $this->em->find(self::ARTICLE, $this->articleId);
+        $article->setSlug('');
+
+        $this->em->persist($article);
+        $this->em->flush();
+
+        $this->assertSame('', $article->getSlug());
+        $article->setSlug(null);
+
+        $this->em->persist($article);
+        $this->em->flush();
+
+        $this->assertSame('the-title-my-code', $article->getSlug());
+
+        $same = new Article;
+        $same->setTitle('any');
+        $same->setCode('any');
+        $same->setSlug('the-title-my-code');
+        $this->em->persist($same);
+        $this->em->flush();
+
+        $this->assertSame('the-title-my-code-1', $same->getSlug());
     }
 
     protected function getUsedEntityFixtures()

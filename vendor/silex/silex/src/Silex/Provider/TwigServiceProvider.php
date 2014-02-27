@@ -13,11 +13,11 @@ namespace Silex\Provider;
 
 use Silex\Application;
 use Silex\ServiceProviderInterface;
-
 use Symfony\Bridge\Twig\Extension\RoutingExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\SecurityExtension;
+use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Form\TwigRenderer;
 
@@ -46,7 +46,6 @@ class TwigServiceProvider implements ServiceProviderInterface
 
             $twig = new \Twig_Environment($app['twig.loader'], $app['twig.options']);
             $twig->addGlobal('app', $app);
-            $twig->addExtension(new TwigCoreExtension());
 
             if ($app['debug']) {
                 $twig->addExtension(new \Twig_Extension_Debug());
@@ -63,6 +62,15 @@ class TwigServiceProvider implements ServiceProviderInterface
 
                 if (isset($app['security'])) {
                     $twig->addExtension(new SecurityExtension($app['security']));
+                }
+
+                if (isset($app['fragment.handler'])) {
+                    $app['fragment.renderer.hinclude']->setTemplating($twig);
+
+                    $twig->addExtension(new HttpKernelExtension($app['fragment.handler']));
+                } else {
+                    // fallback for BC, to be removed in 1.3
+                    $twig->addExtension(new TwigCoreExtension());
                 }
 
                 if (isset($app['form.factory'])) {
@@ -83,11 +91,6 @@ class TwigServiceProvider implements ServiceProviderInterface
                 }
             }
 
-            // BC: to be removed before 1.0
-            if (isset($app['twig.configure'])) {
-                throw new \RuntimeException('The twig.configure service has been removed. Read the changelog to learn how you can upgrade your code.');
-            }
-
             return $twig;
         });
 
@@ -101,17 +104,13 @@ class TwigServiceProvider implements ServiceProviderInterface
 
         $app['twig.loader'] = $app->share(function ($app) {
             return new \Twig_Loader_Chain(array(
-                $app['twig.loader.filesystem'],
                 $app['twig.loader.array'],
+                $app['twig.loader.filesystem'],
             ));
         });
     }
 
     public function boot(Application $app)
     {
-        // BC: to be removed before 1.0
-        if (isset($app['twig.class_path'])) {
-            throw new \RuntimeException('You have provided the twig.class_path parameter. The autoloader has been removed from Silex. It is recommended that you use Composer to manage your dependencies and handle your autoloading. If you are already using Composer, you can remove the parameter. See http://getcomposer.org for more information.');
-        }
     }
 }

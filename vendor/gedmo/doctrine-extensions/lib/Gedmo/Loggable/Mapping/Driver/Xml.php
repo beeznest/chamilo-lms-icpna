@@ -8,15 +8,12 @@ use Gedmo\Mapping\Driver\Xml as BaseXml,
 /**
  * This is a xml mapping driver for Loggable
  * behavioral extension. Used for extraction of extended
- * metadata from xml specificaly for Loggable
+ * metadata from xml specifically for Loggable
  * extension.
  *
  * @author Boussekeyt Jules <jules.boussekeyt@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @author Miha Vrhovnik <miha.vrhovnik@gmail.com>
- * @package Gedmo.Loggable.Mapping.Driver
- * @subpackage Xml
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class Xml extends BaseXml
@@ -34,7 +31,7 @@ class Xml extends BaseXml
 
         $xml = $xml->children(self::GEDMO_NAMESPACE_URI);
 
-        if ($xmlDoctrine->getName() == 'entity' || $xmlDoctrine->getName() == 'mapped-superclass') {
+        if ($xmlDoctrine->getName() == 'entity' || $xmlDoctrine->getName() == 'document' || $xmlDoctrine->getName() == 'mapped-superclass') {
             if (isset($xml->loggable)) {
                 /**
                  * @var SimpleXMLElement $data;
@@ -60,13 +57,16 @@ class Xml extends BaseXml
         if (isset($xmlDoctrine->{'one-to-one'})) {
             $this->inspectElementForVersioned($xmlDoctrine->{'one-to-one'}, $config, $meta);
         }
+        if (isset($xmlDoctrine->{'reference-one'})) {
+            $this->inspectElementForVersioned($xmlDoctrine->{'reference-one'}, $config, $meta);
+        }
 
         if (!$meta->isMappedSuperclass && $config) {
             if (is_array($meta->identifier) && count($meta->identifier) > 1) {
                 throw new InvalidMappingException("Loggable does not support composite identifiers in class - {$meta->name}");
             }
             if (isset($config['versioned']) && !isset($config['loggable'])) {
-                throw new InvalidMappingException("Class must be annoted with Loggable annotation in order to track versioned fields in class - {$meta->name}");
+                throw new InvalidMappingException("Class must be annotated with Loggable annotation in order to track versioned fields in class - {$meta->name}");
             }
         }
     }

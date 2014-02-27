@@ -19,15 +19,16 @@
 
 namespace Doctrine\ORM\Mapping\Driver;
 
-use SimpleXMLElement,
-    Doctrine\Common\Persistence\Mapping\Driver\FileDriver,
-    Doctrine\Common\Persistence\Mapping\ClassMetadata,
-    Doctrine\ORM\Mapping\MappingException;
+use SimpleXMLElement;
+use Doctrine\Common\Persistence\Mapping\Driver\FileDriver;
+use Doctrine\ORM\Mapping\Builder\EntityListenerBuilder;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\MappingException;
 
 /**
  * XmlDriver is a metadata driver that enables mapping through XML files.
  *
- * @license 	http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @license 	http://www.opensource.org/licenses/mit-license.php MIT
  * @link    	www.doctrine-project.org
  * @since   	2.0
  * @author		Benjamin Eberlei <kontakt@beberlei.de>
@@ -68,6 +69,8 @@ class XmlDriver extends FileDriver
                 isset($xmlRoot['repository-class']) ? (string)$xmlRoot['repository-class'] : null
             );
             $metadata->isMappedSuperclass = true;
+        } else if ($xmlRoot->getName() == 'embeddable') {
+            $metadata->isEmbeddedClass = true;
         } else {
             throw MappingException::classIsNotAValidEntityOrMappedSuperClass($className);
         }
@@ -79,6 +82,11 @@ class XmlDriver extends FileDriver
         }
 
         $metadata->setPrimaryTable($table);
+
+        // Evaluate second level cache
+        if (isset($xmlRoot->cache)) {
+            $metadata->enableCache($this->cacheToArray($xmlRoot->cache));
+        }
 
         // Evaluate named queries
         if (isset($xmlRoot->{'named-queries'})) {
@@ -223,7 +231,7 @@ class XmlDriver extends FileDriver
             $metadata->table['options'] = $this->_parseOptions($xmlRoot->options->children());
         }
 
-        // The mapping assignement is done in 2 times as a bug might occurs on some php/xml lib versions
+        // The mapping assignment is done in 2 times as a bug might occurs on some php/xml lib versions
         // The internal SimpleXmlIterator get resetted, to this generate a duplicate field exception
         $mappings = array();
         // Evaluate <field ...> mappings
@@ -233,9 +241,21 @@ class XmlDriver extends FileDriver
 
                 if (isset($mapping['version'])) {
                     $metadata->setVersionMapping($mapping);
+                    unset($mapping['version']);
                 }
 
                 $metadata->mapField($mapping);
+            }
+        }
+
+        if (isset($xmlRoot->embedded)) {
+            foreach ($xmlRoot->embedded as $embeddedMapping) {
+                $mapping = array(
+                    'fieldName' => (string) $embeddedMapping['name'],
+                    'class' => (string) $embeddedMapping['class'],
+                    'columnPrefix' => isset($embeddedMapping['column-prefix']) ? (string) $embeddedMapping['column-prefix'] : null,
+                );
+                $metadata->mapEmbedded($mapping);
             }
         }
 
@@ -274,6 +294,10 @@ class XmlDriver extends FileDriver
 
             if (isset($idElement['column-definition'])) {
                 $mapping['columnDefinition'] = (string)$idElement['column-definition'];
+            }
+
+            if (isset($idElement->options)) {
+                $mapping['options'] = $this->_parseOptions($idElement->options->children());
             }
 
             $metadata->mapField($mapping);
@@ -347,6 +371,11 @@ class XmlDriver extends FileDriver
                 }
 
                 $metadata->mapOneToOne($mapping);
+
+                // Evaluate second level cache
+                if (isset($oneToOneElement->cache)) {
+                    $metadata->enableAssociationCache($mapping['fieldName'], $this->cacheToArray($oneToOneElement->cache));
+                }
             }
         }
 
@@ -386,6 +415,11 @@ class XmlDriver extends FileDriver
                 }
 
                 $metadata->mapOneToMany($mapping);
+
+                // Evaluate second level cache
+                if (isset($oneToManyElement->cache)) {
+                    $metadata->enableAssociationCache($mapping['fieldName'], $this->cacheToArray($oneToManyElement->cache));
+                }
             }
         }
 
@@ -426,6 +460,11 @@ class XmlDriver extends FileDriver
                 }
 
                 $metadata->mapManyToOne($mapping);
+
+                // Evaluate second level cache
+                if (isset($manyToOneElement->cache)) {
+                    $metadata->enableAssociationCache($mapping['fieldName'], $this->cacheToArray($manyToOneElement->cache));
+                }
             }
         }
 
@@ -491,6 +530,11 @@ class XmlDriver extends FileDriver
                 }
 
                 $metadata->mapManyToMany($mapping);
+
+                // Evaluate second level cache
+                if (isset($manyToManyElement->cache)) {
+                    $metadata->enableAssociationCache($mapping['fieldName'], $this->cacheToArray($manyToManyElement->cache));
+                }
             }
         }
 
@@ -554,6 +598,26 @@ class XmlDriver extends FileDriver
         if (isset($xmlRoot->{'lifecycle-callbacks'})) {
             foreach ($xmlRoot->{'lifecycle-callbacks'}->{'lifecycle-callback'} as $lifecycleCallback) {
                 $metadata->addLifecycleCallback((string)$lifecycleCallback['method'], constant('Doctrine\ORM\Events::' . (string)$lifecycleCallback['type']));
+            }
+        }
+
+        // Evaluate entity listener
+        if (isset($xmlRoot->{'entity-listeners'})) {
+            foreach ($xmlRoot->{'entity-listeners'}->{'entity-listener'} as $listenerElement) {
+                $className = (string) $listenerElement['class'];
+                // Evaluate the listener using naming convention.
+                if($listenerElement->count() === 0) {
+                    EntityListenerBuilder::bindEntityListener($metadata, $className);
+
+                    continue;
+                }
+
+                foreach ($listenerElement as $callbackElement) {
+                    $eventName   = (string) $callbackElement['type'];
+                    $methodName  = (string) $callbackElement['method'];
+
+                    $metadata->addEntityListener($eventName, $className, $methodName);
+                }
             }
         }
     }
@@ -665,7 +729,7 @@ class XmlDriver extends FileDriver
         }
 
         if (isset($fieldMapping['version']) && $fieldMapping['version']) {
-            $mapping['version'] = $fieldMapping['version'];
+            $mapping['version'] = $this->evaluateBoolean($fieldMapping['version']);
         }
 
         if (isset($fieldMapping['column-definition'])) {
@@ -677,6 +741,32 @@ class XmlDriver extends FileDriver
         }
 
         return $mapping;
+    }
+
+    /**
+     * Parse / Normalize the cache configuration
+     *
+     * @param SimpleXMLElement $cacheMapping
+     *
+     * @return array
+     */
+    private function cacheToArray(SimpleXMLElement $cacheMapping)
+    {
+        $region = isset($cacheMapping['region']) ? (string) $cacheMapping['region'] : null;
+        $usage  = isset($cacheMapping['usage']) ? strtoupper($cacheMapping['usage']) : null;
+
+        if ($usage && ! defined('Doctrine\ORM\Mapping\ClassMetadata::CACHE_USAGE_' . $usage)) {
+            throw new \InvalidArgumentException(sprintf('Invalid cache usage "%s"', $usage));
+        }
+
+        if ($usage) {
+            $usage = constant('Doctrine\ORM\Mapping\ClassMetadata::CACHE_USAGE_' . $usage);
+        }
+
+        return array(
+            'usage'  => $usage,
+            'region' => $region,
+        );
     }
 
     /**
@@ -718,6 +808,11 @@ class XmlDriver extends FileDriver
             foreach ($xmlElement->{'mapped-superclass'} as $mappedSuperClass) {
                 $className = (string)$mappedSuperClass['name'];
                 $result[$className] = $mappedSuperClass;
+            }
+        } else if (isset($xmlElement->embeddable)) {
+            foreach ($xmlElement->embeddable as $embeddableElement) {
+                $embeddableName = (string) $embeddableElement['name'];
+                $result[$embeddableName] = $embeddableElement;
             }
         }
 

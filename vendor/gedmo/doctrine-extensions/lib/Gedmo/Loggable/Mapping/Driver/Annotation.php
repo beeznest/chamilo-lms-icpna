@@ -2,21 +2,18 @@
 
 namespace Gedmo\Loggable\Mapping\Driver;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Gedmo\Mapping\Driver\AbstractAnnotationDriver,
+use Doctrine\Common\Persistence\Mapping\ClassMetadata,
+    Gedmo\Mapping\Driver\AbstractAnnotationDriver,
     Gedmo\Exception\InvalidMappingException;
 
 /**
  * This is an annotation mapping driver for Loggable
  * behavioral extension. Used for extraction of extended
- * metadata from Annotations specificaly for Loggable
+ * metadata from Annotations specifically for Loggable
  * extension.
  *
  * @author Boussekeyt Jules <jules.boussekeyt@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.Loggable.Mapping.Driver
- * @subpackage Annotation
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class Annotation extends AbstractAnnotationDriver
@@ -40,7 +37,7 @@ class Annotation extends AbstractAnnotationDriver
             throw new InvalidMappingException("Loggable does not support composite identifiers in class - {$meta->name}");
         }
         if (isset($config['versioned']) && !isset($config['loggable'])) {
-            throw new InvalidMappingException("Class must be annoted with Loggable annotation in order to track versioned fields in class - {$meta->name}");
+            throw new InvalidMappingException("Class must be annotated with Loggable annotation in order to track versioned fields in class - {$meta->name}");
         }
     }
 
@@ -84,7 +81,7 @@ class Annotation extends AbstractAnnotationDriver
                 throw new InvalidMappingException("Loggable does not support composite identifiers in class - {$meta->name}");
             }
             if (isset($config['versioned']) && !isset($config['loggable'])) {
-                throw new InvalidMappingException("Class must be annoted with Loggable annotation in order to track versioned fields in class - {$meta->name}");
+                throw new InvalidMappingException("Class must be annotated with Loggable annotation in order to track versioned fields in class - {$meta->name}");
             }
         }
     }

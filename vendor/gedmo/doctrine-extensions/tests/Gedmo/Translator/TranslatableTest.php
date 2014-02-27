@@ -12,7 +12,6 @@ use Doctrine\ORM\Proxy\Proxy;
  * These are tests for translatable behavior
  *
  * @author Konstantin Kudryashov <ever.zet@gmail.com>
- * @package Gedmo.Translatable
  * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
@@ -148,12 +147,12 @@ class TranslatableTest extends BaseTestCaseORM
         $person->setLastName('Abramowicz');
         $person->translate('ru_RU')->setLastName('Абрамович');
         $person->setDescription('description');
-        $person->translate('ru_RU')->setDescription('multilingual description');        
-        
+        $person->translate('ru_RU')->setDescription('multilingual description');
+
         $this->em->persist($person);
         $this->em->flush();
         $this->em->clear();
-        
+
         $personProxy = $this->em->getReference(self::PERSON, array('id' => 1));
         $this->assertTrue($personProxy instanceof Proxy);
         $name = $personProxy->translate('ru_RU')->getName();

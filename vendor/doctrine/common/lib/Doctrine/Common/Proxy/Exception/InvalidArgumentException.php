@@ -19,14 +19,15 @@
 
 namespace Doctrine\Common\Proxy\Exception;
 
+use Doctrine\Common\Persistence\Proxy;
 use InvalidArgumentException as BaseInvalidArgumentException;
 
 /**
- * Proxy Invalid Argument Exception
+ * Proxy Invalid Argument Exception.
  *
- * @link        www.doctrine-project.com
- * @since       2.4
- * @author      Marco Pivetta <ocramius@gmail.com>
+ * @link   www.doctrine-project.org
+ * @since  2.4
+ * @author Marco Pivetta <ocramius@gmail.com>
  */
 class InvalidArgumentException extends BaseInvalidArgumentException implements ProxyException
 {
@@ -39,8 +40,8 @@ class InvalidArgumentException extends BaseInvalidArgumentException implements P
     }
 
     /**
-     * @param  string $className
-     * @param  string $proxyNamespace
+     * @param string $className
+     * @param string $proxyNamespace
      *
      * @return self
      */
@@ -50,7 +51,7 @@ class InvalidArgumentException extends BaseInvalidArgumentException implements P
     }
 
     /**
-     * @param  string $name
+     * @param string $name
      *
      * @return self
      */
@@ -68,7 +69,15 @@ class InvalidArgumentException extends BaseInvalidArgumentException implements P
     }
 
     /**
-     * @param  mixed $callback
+     * @return self
+     */
+    public static function unitializedProxyExpected(Proxy $proxy)
+    {
+        return new self(sprintf('Provided proxy of type "%s" must not be initialized.', get_class($proxy)));
+    }
+
+    /**
+     * @param mixed $callback
      *
      * @return self
      */

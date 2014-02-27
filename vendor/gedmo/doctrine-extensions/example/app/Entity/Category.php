@@ -34,7 +34,7 @@ class Category
 
     /**
      * @Gedmo\Translatable
-     * @Gedmo\Slug(fields={"title"})
+     * @Gedmo\Slug(fields={"created", "title"})
      * @ORM\Column(length=64, unique=true)
      */
     private $slug;
@@ -54,7 +54,7 @@ class Category
     /**
      * @Gedmo\TreeParent
      * @ORM\ManyToOne(targetEntity="Category", inversedBy="children")
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $parent;
 

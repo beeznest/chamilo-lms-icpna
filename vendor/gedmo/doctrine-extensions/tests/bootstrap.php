@@ -12,7 +12,6 @@ use Composer\Autoload\ClassLoader;
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @author Christoph Krämer <cevou@gmx.de>
- * @package Gedmo.Tests
  * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
@@ -41,6 +40,7 @@ $loader->add('Translator\\Fixture', __DIR__ . '/Gedmo');
 $loader->add('Translatable\\Fixture', __DIR__ . '/Gedmo');
 $loader->add('Timestampable\\Fixture', __DIR__ . '/Gedmo');
 $loader->add('Blameable\\Fixture', __DIR__.'/Gedmo');
+$loader->add('IpTraceable\\Fixture', __DIR__.'/Gedmo');
 $loader->add('Tree\\Fixture', __DIR__ . '/Gedmo');
 $loader->add('Sluggable\\Fixture', __DIR__ . '/Gedmo');
 $loader->add('Sortable\\Fixture', __DIR__ . '/Gedmo');
@@ -49,6 +49,8 @@ $loader->add('Loggable\\Fixture', __DIR__ . '/Gedmo');
 $loader->add('SoftDeleteable\\Fixture', __DIR__ . '/Gedmo');
 $loader->add('Uploadable\\Fixture', __DIR__ . '/Gedmo');
 $loader->add('Wrapper\\Fixture', __DIR__ . '/Gedmo');
+$loader->add('ReferenceIntegrity\\Fixture', __DIR__ . '/Gedmo');
+$loader->add('References\\Fixture', __DIR__ . '/Gedmo');
 // stubs
 $loader->add('Gedmo\\Uploadable\\Stub', __DIR__);
 

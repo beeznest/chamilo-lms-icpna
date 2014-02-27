@@ -20,9 +20,6 @@ use Gedmo\Mapping\Event\AdapterInterface;
  * since nested set trees are slow on inserts and updates.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.Tree.Strategy.ORM
- * @subpackage Nested
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class Nested implements Strategy
@@ -143,7 +140,7 @@ class Nested implements Strategy
 
         $changeSet = $uow->getEntityChangeSet($node);
         if (isset($config['root']) && isset($changeSet[$config['root']])) {
-            throw new \Gedmo\Exception\UnexpectedValueException("Root cannot be changed manualy, change parent instead");
+            throw new \Gedmo\Exception\UnexpectedValueException("Root cannot be changed manually, change parent instead");
         }
 
         $oid = spl_object_hash($node);
@@ -157,8 +154,16 @@ class Nested implements Strategy
             // set back all other changes
             foreach ($changeSet as $field => $set) {
                 if ($field !== $config['left']) {
-                    $uow->setOriginalEntityProperty($oid, $field, $set[0]);
-                    $wrapped->setPropertyValue($field, $set[1]);
+                    if (is_array($set) && array_key_exists(0, $set) && array_key_exists(1, $set))
+                    {
+                        $uow->setOriginalEntityProperty($oid, $field, $set[0]);
+                        $wrapped->setPropertyValue($field, $set[1]);
+                    }
+                    else
+                    {
+                        $uow->setOriginalEntityProperty($oid, $field, $set);
+                        $wrapped->setPropertyValue($field, $set);
+                    }
                 }
             }
             $uow->recomputeSingleEntityChangeSet($meta, $node);
@@ -546,7 +551,7 @@ class Nested implements Strategy
 
     /**
      * Shift range of right and left values on tree
-     * depending on tree level diference also
+     * depending on tree level difference also
      *
      * @param EntityManager $em
      * @param string $class

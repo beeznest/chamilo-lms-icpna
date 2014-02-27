@@ -1,7 +1,8 @@
 HttpCacheServiceProvider
 ========================
 
-The *HttpCacheProvider* provides support for the Symfony2 Reverse Proxy.
+The *HttpCacheServiceProvider* provides support for the Symfony2 Reverse
+Proxy.
 
 Parameters
 ----------
@@ -17,6 +18,15 @@ Services
 
 * **http_cache**: An instance of `HttpCache
   <http://api.symfony.com/master/Symfony/Component/HttpKernel/HttpCache/HttpCache.html>`_.
+
+* **http_cache.esi**: An instance of `Esi
+  <http://api.symfony.com/master/Symfony/Component/HttpKernel/HttpCache/Esi.html>`_,
+  that implements the ESI capabilities to Request and Response instances.
+
+* **http_cache.store**: An instance of `Store
+  <http://api.symfony.com/master/Symfony/Component/HttpKernel/HttpCache/Store.html>`_,
+  that implements all the logic for storing cache metadata (Request and Response
+  headers).
 
 Registering
 -----------
@@ -44,16 +54,28 @@ setting Response HTTP cache headers::
 .. tip::
 
     If you want Silex to trust the ``X-Forwarded-For*`` headers from your
-    reverse proxy, you will need to run your application like this::
+    reverse proxy at address $ip, you will need to whitelist it as documented
+    in `Trusting Proxies
+    <http://symfony.com/doc/current/components/http_foundation/trusting_proxies.html>`_.
+
+    If you would be running Varnish in front of your application on the same machine:
+    
+    .. code-block:: php
 
         use Symfony\Component\HttpFoundation\Request;
-
-        Request::trustProxyData();
+        
+        Request::setTrustedProxies(array('127.0.0.1', '::1'));
         $app->run();
 
 This provider allows you to use the Symfony2 reverse proxy natively with
-Silex applications by using the ``http_cache`` service::
+Silex applications by using the ``http_cache`` service. The Symfony2 reverse proxy
+acts much like any other proxy would, so you will want to whitelist it:
 
+.. code-block:: php
+
+    use Symfony\Component\HttpFoundation\Request;
+        
+    Request::setTrustedProxies(array('127.0.0.1'));
     $app['http_cache']->run();
 
 The provider also provides ESI support::
@@ -85,6 +107,14 @@ The provider also provides ESI support::
     });
 
     $app['http_cache']->run();
+
+If your application doesn't use ESI, you can disable it to slightly improve the
+overall performance::
+
+    $app->register(new Silex\Provider\HttpCacheServiceProvider(), array(
+       'http_cache.cache_dir' => __DIR__.'/cache/',
+       'http_cache.esi'       => null,
+    ));
 
 .. tip::
 

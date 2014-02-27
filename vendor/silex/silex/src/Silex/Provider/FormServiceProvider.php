@@ -19,6 +19,7 @@ use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension as FormValidatorExtension;
 use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\ResolvedFormTypeFactory;
 
 /**
  * Symfony Form component Provider.
@@ -46,9 +47,25 @@ class FormServiceProvider implements ServiceProviderInterface
 
         $app['form.secret'] = md5(__DIR__);
 
+        $app['form.type.extensions'] = $app->share(function ($app) {
+            return array();
+        });
+
+        $app['form.type.guessers'] = $app->share(function ($app) {
+            return array();
+        });
+
+        $app['form.extension.csrf'] = $app->share(function ($app) {
+            if (isset($app['translator'])) {
+                return new CsrfExtension($app['form.csrf_provider'], $app['translator']);
+            }
+
+            return new CsrfExtension($app['form.csrf_provider']);
+        });
+
         $app['form.extensions'] = $app->share(function ($app) {
             $extensions = array(
-                new CsrfExtension($app['form.csrf_provider']),
+                $app['form.extension.csrf'],
                 new HttpFoundationExtension(),
             );
 
@@ -67,8 +84,15 @@ class FormServiceProvider implements ServiceProviderInterface
         $app['form.factory'] = $app->share(function ($app) {
             return Forms::createFormFactoryBuilder()
                 ->addExtensions($app['form.extensions'])
+                ->addTypeExtensions($app['form.type.extensions'])
+                ->addTypeGuessers($app['form.type.guessers'])
+                ->setResolvedTypeFactory($app['form.resolved_type_factory'])
                 ->getFormFactory()
             ;
+        });
+        
+        $app['form.resolved_type_factory'] = $app->share(function ($app) {
+            return new ResolvedFormTypeFactory();
         });
 
         $app['form.csrf_provider'] = $app->share(function ($app) {
@@ -82,9 +106,5 @@ class FormServiceProvider implements ServiceProviderInterface
 
     public function boot(Application $app)
     {
-        // BC: to be removed before 1.0
-        if (isset($app['form.class_path'])) {
-            throw new \RuntimeException('You have provided the form.class_path parameter. The autoloader has been removed from Silex. It is recommended that you use Composer to manage your dependencies and handle your autoloading. If you are already using Composer, you can remove the parameter. See http://getcomposer.org for more information.');
-        }
     }
 }

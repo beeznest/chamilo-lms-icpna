@@ -10,14 +10,11 @@ use Gedmo\Mapping\Driver\AbstractAnnotationDriver,
 /**
  * This is an annotation mapping driver for SoftDeleteable
  * behavioral extension. Used for extraction of extended
- * metadata from Annotations specificaly for SoftDeleteable
+ * metadata from Annotations specifically for SoftDeleteable
  * extension.
  *
  * @author Gustavo Falco <comfortablynumb84@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.SoftDeleteable.Mapping.Driver
- * @subpackage Annotation
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class Annotation extends AbstractAnnotationDriver
@@ -40,6 +37,14 @@ class Annotation extends AbstractAnnotationDriver
             Validator::validateField($meta, $annot->fieldName);
 
             $config['fieldName'] = $annot->fieldName;
+
+            $config['timeAware'] = false;
+            if(isset($annot->timeAware)){
+                if (!is_bool($annot->timeAware)) {
+                    throw new InvalidMappingException("timeAware must be boolean. ".gettype($annot->timeAware)." provided.");
+                }
+                $config['timeAware'] = $annot->timeAware;
+            }
         }
 
         $this->validateFullMetadata($meta, $config);

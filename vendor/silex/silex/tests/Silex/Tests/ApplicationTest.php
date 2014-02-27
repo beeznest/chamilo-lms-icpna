@@ -12,11 +12,13 @@
 namespace Silex\Tests;
 
 use Silex\Application;
-
+use Silex\ControllerCollection;
+use Silex\Route;
+use Silex\Provider\MonologServiceProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\EventDispatcher\Event;
@@ -90,7 +92,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             return 'foo';
         });
 
-        $app->get('/bar', function () {
+        $app->get('/bar')->run(function () {
             return 'bar';
         });
 
@@ -118,6 +120,25 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $response = $app->handle(Request::create('/foo/foo/bar'));
         $this->assertEquals('foobar', $response->getContent());
+    }
+
+    public function testConvertedAttributeIsAvailableInBeforeFilter()
+    {
+        $app = new Application();
+
+        $beforeValue = null;
+        $app
+            ->get('/foo/{foo}', function ($foo) {
+                return $foo;
+            })
+            ->convert('foo', function ($foo) { return $foo.'converted'; })
+            ->before(function (Request $request) use (&$beforeValue) {
+                $beforeValue = $request->attributes->get('foo');
+            });
+
+        $response = $app->handle(Request::create('/foo/bar'));
+        $this->assertEquals('barconverted', $beforeValue);
+        $this->assertEquals('barconverted', $response->getContent());
     }
 
     public function testOn()
@@ -374,7 +395,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testNonResponseAndNonNullReturnFromRouteBeforeMiddlewareShouldThrowRuntimeException()
     {
@@ -393,7 +414,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testNonResponseAndNonNullReturnFromRouteAfterMiddlewareShouldThrowRuntimeException()
     {
@@ -412,7 +433,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testAccessingRequestOutsideOfScopeShouldThrowRuntimeException()
     {
@@ -422,7 +443,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testAccessingRequestOutsideOfScopeShouldThrowRuntimeExceptionAfterHandling()
     {
@@ -467,6 +488,75 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         });
 
         $this->assertEquals('foo /', $app->handle($mainRequest)->getContent());
+    }
+
+    public function testRegisterShouldReturnSelf()
+    {
+        $app = new Application();
+        $provider = $this->getMock('Silex\ServiceProviderInterface');
+
+        $this->assertSame($app, $app->register($provider));
+    }
+
+    public function testMountShouldReturnSelf()
+    {
+        $app = new Application();
+        $mounted = new ControllerCollection(new Route());
+        $mounted->get('/{name}', function ($name) { return new Response($name); });
+
+        $this->assertSame($app, $app->mount('/hello', $mounted));
+    }
+
+    public function testMountPreservesOrder()
+    {
+        $app = new Application();
+        $mounted = new ControllerCollection(new Route());
+        $mounted->get('/mounted')->bind('second');
+
+        $app->get('/before')->bind('first');
+        $app->mount('/', $mounted);
+        $app->get('/after')->bind('third');
+        $app->flush();
+
+        $this->assertEquals(array('first', 'second', 'third'), array_keys(iterator_to_array($app['routes'])));
+    }
+
+    public function testSendFile()
+    {
+        $app = new Application();
+
+        try {
+            $response = $app->sendFile(__FILE__, 200, array('Content-Type: application/php'));
+            $this->assertInstanceOf('Symfony\Component\HttpFoundation\BinaryFileResponse', $response);
+            $this->assertEquals(__FILE__, (string) $response->getFile());
+        } catch (\RuntimeException $e) {
+            $this->assertFalse(class_exists('Symfony\Component\HttpFoundation\BinaryFileResponse'));
+        }
+    }
+
+    /**
+     * @expectedException        \LogicException
+     * @expectedExceptionMessage The "homepage" route must have code to run when it matches.
+     */
+    public function testGetRouteCollectionWithRouteWithoutController()
+    {
+        $app = new Application();
+        $app['exception_handler']->disable();
+        $app->match('/')->bind('homepage');
+        $app->handle(Request::create('/'));
+    }
+
+    public function testRedirectDoesNotRaisePHPNoticesWhenMonologIsRegistered()
+    {
+        $app = new Application();
+
+        ErrorHandler::register();
+        $app['monolog.logfile'] = 'php://memory';
+        $app->register(new MonologServiceProvider());
+        $app->get('/foo/', function() { return 'ok'; });
+
+        $response = $app->handle(Request::create('/foo'));
+        $this->assertEquals(301, $response->getStatusCode());
     }
 }
 

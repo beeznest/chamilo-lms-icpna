@@ -275,7 +275,7 @@
                 <p AliGN=JUSTIFY STYLE="margin-left: 1.27cm; margin-bottom: 0cm; line-height: 100%; page-break-before: always">
                     <br>
                 </p>
-                <ol START=20>
+                <ol START=21>
                     <li><p AliGN=JUSTIFY STYLE="margin-bottom: 0cm; line-height: 100%"><b>¿Desde qué dispositivos se recomienda llevar el programa?</b></p>
                         <ol TYPE=a>
                             <li><p AliGN=JUSTIFY STYLE="margin-bottom: 0cm; line-height: 100%">La Lección A debe trabajarse en la PC o Laptop. Para
@@ -285,7 +285,7 @@
                 <p AliGN=JUSTIFY STYLE="margin-left: 1.27cm; margin-bottom: 0cm; line-height: 100%; page-break-before: always">
                     <br>
                 </p>
-                <ol START=20>
+                <ol START=22>
                     <li><p AliGN=JUSTIFY STYLE="margin-bottom: 0cm; line-height: 100%"><b>¿Existe equivalencia entre el certificado del programa
                                 V-Learning y el certificado del programa presencial ICPNA?</b></p>
                         <ol TYPE=a>

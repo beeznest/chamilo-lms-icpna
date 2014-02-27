@@ -16,6 +16,7 @@ use Silex\ServiceProviderInterface;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Configuration;
 use Doctrine\Common\EventManager;
+use Symfony\Bridge\Doctrine\Logger\DbalLogger;
 
 /**
  * Doctrine DBAL Provider.
@@ -32,6 +33,7 @@ class DoctrineServiceProvider implements ServiceProviderInterface
             'host'     => 'localhost',
             'user'     => 'root',
             'password' => null,
+            'port'     => null,
         );
 
         $app['dbs.options.initializer'] = $app->protect(function () use ($app) {
@@ -72,7 +74,9 @@ class DoctrineServiceProvider implements ServiceProviderInterface
                     $manager = $app['dbs.event_manager'][$name];
                 }
 
-                $dbs[$name] = DriverManager::getConnection($options, $config, $manager);
+                $dbs[$name] = $dbs->share(function ($dbs) use ($options, $config, $manager) {
+                    return DriverManager::getConnection($options, $config, $manager);
+                });
             }
 
             return $dbs;
@@ -84,6 +88,10 @@ class DoctrineServiceProvider implements ServiceProviderInterface
             $configs = new \Pimple();
             foreach ($app['dbs.options'] as $name => $options) {
                 $configs[$name] = new Configuration();
+
+                if (isset($app['logger']) && class_exists('Symfony\Bridge\Doctrine\Logger\DbalLogger')) {
+                    $configs[$name]->setSQLLogger(new DbalLogger($app['logger'], isset($app['stopwatch']) ? $app['stopwatch'] : null));
+                }
             }
 
             return $configs;
@@ -122,14 +130,5 @@ class DoctrineServiceProvider implements ServiceProviderInterface
 
     public function boot(Application $app)
     {
-        // BC: to be removed before 1.0
-        if (isset($app['db.dbal.class_path'])) {
-            throw new \RuntimeException('You have provided the db.dbal.class_path parameter. The autoloader has been removed from Silex. It is recommended that you use Composer to manage your dependencies and handle your autoloading. If you are already using Composer, you can remove the parameter. See http://getcomposer.org for more information.');
-        }
-
-        // BC: to be removed before 1.0
-        if (isset($app['db.common.class_path'])) {
-            throw new \RuntimeException('You have provided the db.common.class_path parameter. The autoloader has been removed from Silex. It is recommended that you use Composer to manage your dependencies and handle your autoloading. If you are already using Composer, you can remove the parameter. See http://getcomposer.org for more information.');
-        }
     }
 }

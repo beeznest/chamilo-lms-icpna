@@ -46,14 +46,14 @@ class CodeExtension extends \Twig_Extension
     public function getFilters()
     {
         return array(
-            'abbr_class'            => new \Twig_Filter_Method($this, 'abbrClass', array('is_safe' => array('html'))),
-            'abbr_method'           => new \Twig_Filter_Method($this, 'abbrMethod', array('is_safe' => array('html'))),
-            'format_args'           => new \Twig_Filter_Method($this, 'formatArgs', array('is_safe' => array('html'))),
-            'format_args_as_text'   => new \Twig_Filter_Method($this, 'formatArgsAsText'),
-            'file_excerpt'          => new \Twig_Filter_Method($this, 'fileExcerpt', array('is_safe' => array('html'))),
-            'format_file'           => new \Twig_Filter_Method($this, 'formatFile', array('is_safe' => array('html'))),
-            'format_file_from_text' => new \Twig_Filter_Method($this, 'formatFileFromText', array('is_safe' => array('html'))),
-            'file_link'             => new \Twig_Filter_Method($this, 'getFileLink', array('is_safe' => array('html'))),
+            new \Twig_SimpleFilter('abbr_class', array($this, 'abbrClass'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFilter('abbr_method', array($this, 'abbrMethod'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFilter('format_args', array($this, 'formatArgs'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFilter('format_args_as_text', array($this, 'formatArgsAsText')),
+            new \Twig_SimpleFilter('file_excerpt', array($this, 'fileExcerpt'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFilter('format_file', array($this, 'formatFile'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFilter('format_file_from_text', array($this, 'formatFileFromText'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFilter('file_link', array($this, 'getFileLink'), array('is_safe' => array('html'))),
         );
     }
 
@@ -137,7 +137,9 @@ class CodeExtension extends \Twig_Extension
     public function fileExcerpt($file, $line)
     {
         if (is_readable($file)) {
-            $code = highlight_file($file, true);
+            // highlight_file could throw warnings
+            // see https://bugs.php.net/bug.php?id=25725
+            $code = @highlight_file($file, true);
             // remove main code/span tags
             $code = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);
             $content = preg_split('#<br />#', $code);
@@ -164,14 +166,14 @@ class CodeExtension extends \Twig_Extension
     {
         if (null === $text) {
             $file = trim($file);
-            $fileStr = $file;
-            if (0 === strpos($fileStr, $this->rootDir)) {
-                $fileStr = str_replace($this->rootDir, '', str_replace('\\', '/', $fileStr));
-                $fileStr = sprintf('<abbr title="%s">kernel.root_dir</abbr>/%s', $this->rootDir, $fileStr);
+            $text = $file;
+            if (0 === strpos($text, $this->rootDir)) {
+                $text = str_replace($this->rootDir, '', str_replace('\\', '/', $text));
+                $text = sprintf('<abbr title="%s">kernel.root_dir</abbr>/%s', $this->rootDir, $text);
             }
-
-            $text = "$fileStr at line $line";
         }
+
+        $text = "$text at line $line";
 
         if (false !== $link = $this->getFileLink($file, $line)) {
             return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, ENT_QUOTES | ENT_SUBSTITUTE, $this->charset), $text);

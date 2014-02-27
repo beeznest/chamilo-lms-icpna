@@ -142,8 +142,8 @@ class ResultSetMappingBuilder extends ResultSetMapping
         $classMetadata = $this->em->getClassMetadata($class);
         $platform      = $this->em->getConnection()->getDatabasePlatform();
 
-        if ($classMetadata->isInheritanceTypeSingleTable() || $classMetadata->isInheritanceTypeJoined()) {
-            throw new \InvalidArgumentException('ResultSetMapping builder does not currently support inheritance.');
+        if ( ! $this->isInheritanceSupported($classMetadata)) {
+            throw new \InvalidArgumentException('ResultSetMapping builder does not currently support your inheritance scheme.');
         }
 
 
@@ -168,10 +168,25 @@ class ResultSetMappingBuilder extends ResultSetMapping
                         throw new \InvalidArgumentException("The column '$columnAlias' conflicts with another column in the mapper.");
                     }
 
-                    $this->addMetaResult($alias, $columnAlias, $columnName);
+                    $this->addMetaResult(
+                        $alias,
+                        $columnAlias,
+                        $columnName,
+                        (isset($associationMapping['id']) && $associationMapping['id'] === true)
+                    );
                 }
             }
         }
+    }
+
+    private function isInheritanceSupported(ClassMetadataInfo $classMetadata)
+    {
+        if ($classMetadata->isInheritanceTypeSingleTable()
+            && in_array($classMetadata->name, $classMetadata->discriminatorMap, true)) {
+            return true;
+        }
+
+        return ! ($classMetadata->isInheritanceTypeSingleTable() || $classMetadata->isInheritanceTypeJoined());
     }
 
     /**

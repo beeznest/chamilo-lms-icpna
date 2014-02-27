@@ -244,6 +244,63 @@ class PostgreSqlSchemaManagerTest extends SchemaManagerFunctionalTestCase
             }
         }
     }
+
+    /**
+     * @group DBAL-511
+     */
+    public function testDefaultValueCharacterVarying()
+    {
+        $testTable = new \Doctrine\DBAL\Schema\Table('dbal511_default');
+        $testTable->addColumn('id', 'integer');
+        $testTable->addColumn('def', 'string', array('default' => 'foo'));
+        $testTable->setPrimaryKey(array('id'));
+
+        $this->_sm->createTable($testTable);
+
+        $databaseTable = $this->_sm->listTableDetails($testTable->getName());
+
+        $this->assertEquals('foo', $databaseTable->getColumn('def')->getDefault());
+    }
+
+    /**
+     * @group DDC-2843
+     */
+    public function testBooleanDefault()
+    {
+        $table = new \Doctrine\DBAL\Schema\Table('ddc2843_bools');
+        $table->addColumn('id', 'integer');
+        $table->addColumn('checked', 'boolean', array('default' => false));
+
+        $this->_sm->createTable($table);
+
+        $databaseTable = $this->_sm->listTableDetails($table->getName());
+
+        $c = new \Doctrine\DBAL\Schema\Comparator();
+        $diff = $c->diffTable($table, $databaseTable);
+
+        $this->assertFalse($diff);
+    }
+
+    public function testListTableWithBinary()
+    {
+        $tableName = 'test_binary_table';
+
+        $table = new \Doctrine\DBAL\Schema\Table($tableName);
+        $table->addColumn('id', 'integer');
+        $table->addColumn('column_varbinary', 'binary', array());
+        $table->addColumn('column_binary', 'binary', array('fixed' => true));
+        $table->setPrimaryKey(array('id'));
+
+        $this->_sm->createTable($table);
+
+        $table = $this->_sm->listTableDetails($tableName);
+
+        $this->assertInstanceOf('Doctrine\DBAL\Types\BlobType', $table->getColumn('column_varbinary')->getType());
+        $this->assertFalse($table->getColumn('column_varbinary')->getFixed());
+
+        $this->assertInstanceOf('Doctrine\DBAL\Types\BlobType', $table->getColumn('column_binary')->getType());
+        $this->assertFalse($table->getColumn('column_binary')->getFixed());
+    }
 }
 
 class MoneyType extends Type
@@ -254,7 +311,7 @@ class MoneyType extends Type
         return "MyMoney";
     }
 
-    public function getSqlDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
+    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
     {
         return 'MyMoney';
     }

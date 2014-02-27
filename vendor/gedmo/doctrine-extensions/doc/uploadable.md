@@ -1,6 +1,6 @@
 # Uploadable behavior extension for Doctrine 2
 
-**Uploadable** behavior provides the tools to manage the persistance of files with
+**Uploadable** behavior provides the tools to manage the persistence of files with
 Doctrine 2, including automatic handling of moving, renaming and removal of files and other features.
 
 Features:
@@ -50,7 +50,8 @@ on how to setup and use the extensions in most optimized way.
     * **pathMethod** - Similar to option "path", but this time it represents the name of a method on the entity that
     will return the path to which the files represented by this entity will be moved. This is useful in several cases.
     For example, you can set specific paths for specific entities, or you can get the path from other sources (like a
-    framework configuration) instead of hardcoding it in the entity. Default: ""
+    framework configuration) instead of hardcoding it in the entity. Default: "". As first argument this method takes
+    default path, so you can return path relative to default.
     * **callback** - This option allows you to set a method name. If this option is set, the method will be called after
     the file is moved. Default value: "". As first argument, this method can receive an array with information about the uploaded file, which
     includes the following keys:
@@ -63,7 +64,7 @@ on how to setup and use the extensions in most optimized way.
     * **filenameGenerator**: This option allows you to set a filename generator for the file. There are two already included
     by the extension: **SHA1**, which generates a sha1 filename for the file, and **ALPHANUMERIC**, which "normalizes"
     the filename, leaving only alphanumeric characters in the filename, and replacing anything else with a "-". You can
-    even create your own FileGenerator class (implementing the FileGeneratorInterface) and set this option with the
+    even create your own FilenameGenerator class (implementing the Gedmo\Uploadable\FilenameGenerator\FilenameGeneratorInterface) and set this option with the
     fully qualified class name. The other option available is "NONE" which, as you may guess, means no generation for the
     filename will occur. Default: "NONE".
     * **maxSize**: This option allows you to set a maximum size for the file in bytes. If file size exceeds the value
@@ -79,10 +80,12 @@ on how to setup and use the extensions in most optimized way.
     set this option, you can't set the **allowedTypes** option described next. By default, no validation of mime type
     occurs. If you want to use a custom mime type guesser, see [this](#custom-mime-type-guessers).
 2. **@Gedmo\Mapping\Annotation\UploadableFilePath**: This annotation is used to set which field will receive the path
- to the file. The field MUST be of type "string" and this annotation is REQUIRED.
-3. **@Gedmo\Mapping\Annotation\UploadableFileMimeType**: This is an optional annotation used to set which field will
+ to the file. The field MUST be of type "string". Either this one or UploadableFileName annotation is REQUIRED to be set.
+3. **@Gedmo\Mapping\Annotation\UploadableFileName**: This annotation is used to set which field will receive the name
+ of the file. The field MUST be of type "string". Either this one or UploadableFilePath annotation is REQUIRED to be set.
+4. **@Gedmo\Mapping\Annotation\UploadableFileMimeType**: This is an optional annotation used to set which field will
  receive the mime type of the file as its value. This field MUST be of type "string".
-4. **@Gedmo\Mapping\Annotation\UploadableFileSize**: This is an optional annotation used to set which field will
+5. **@Gedmo\Mapping\Annotation\UploadableFileSize**: This is an optional annotation used to set which field will
  receive the size in bytes of the file as its value. This field MUST be of type "decimal".
 
 ### Notes about setting the path where the files will be moved:
@@ -187,6 +190,12 @@ class File
     private $path;
 
     /**
+     * @ORM\Column(name="name", type="string")
+     * @Gedmo\UploadableFileName
+     */
+    private $name;
+
+    /**
      * @ORM\Column(name="mime_type", type="string")
      * @Gedmo\UploadableFileMimeType
      */
@@ -238,6 +247,10 @@ Entity\File:
       type: string
       gedmo:
         - uploadableFilePath
+    path:
+      type: string
+      gedmo:
+        - uploadableFileName
     mimeType:
       type: string
       gedmo:
@@ -272,6 +285,10 @@ Entity\File:
             <gedmo:uploadable-file-size />
         </field>
 
+        <field name="name" column="name" type="string">
+            <gedmo:uploadable-file-name />
+        </field>
+
         <field name="path" column="path" type="string">
             <gedmo:uploadable-file-path />
         </field>
@@ -299,7 +316,7 @@ Entity\File:
 
 $listener->setDefaultPath('/my/app/web/upload');
 
-if (isset($_FILES['images']) && is_array($_FILES['images']) {
+if (isset($_FILES['images']) && is_array($_FILES['images'])) {
     foreach ($_FILES['images'] as $fileInfo) {
         $file = new File();
 

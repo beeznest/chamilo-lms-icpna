@@ -314,6 +314,25 @@ class NativeQueryTest extends \Doctrine\Tests\OrmFunctionalTestCase
     }
 
     /**
+     * @group rsm-sti
+     */
+    public function testConcreteClassInSingleTableInheritanceSchemaWithRSMBuilderIsFine()
+    {
+        $rsm = new ResultSetMappingBuilder($this->_em);
+        $rsm->addRootEntityFromClassMetadata('Doctrine\Tests\Models\Company\CompanyFixContract', 'c');
+    }
+
+    /**
+     * @group rsm-sti
+     */
+    public function testAbstractClassInSingleTableInheritanceSchemaWithRSMBuilderThrowsException()
+    {
+        $this->setExpectedException('\InvalidArgumentException', 'ResultSetMapping builder does not currently support your inheritance scheme.');
+        $rsm = new ResultSetMappingBuilder($this->_em);
+        $rsm->addRootEntityFromClassMetadata('Doctrine\Tests\Models\Company\CompanyContract', 'c');
+    }
+
+    /**
      * @expectedException \InvalidArgumentException
      */
     public function testRSMBuilderThrowsExceptionOnColumnConflict()
@@ -719,7 +738,7 @@ class NativeQueryTest extends \Doctrine\Tests\OrmFunctionalTestCase
 
         $selectClause = $rsm->generateSelectClause();
 
-        $this->assertEquals('u.id AS id, u.status AS status, u.username AS username, u.name AS name, u.email_id AS email_id', $selectClause);
+        $this->assertSQLEquals('u.id AS id, u.status AS status, u.username AS username, u.name AS name, u.email_id AS email_id', $selectClause);
     }
 
     /**
@@ -735,7 +754,7 @@ class NativeQueryTest extends \Doctrine\Tests\OrmFunctionalTestCase
 
         $selectClause = $rsm->generateSelectClause();
 
-        $this->assertEquals('u.id AS id1, u.status AS status, u.username AS username2, u.name AS name, u.email_id AS email_id', $selectClause);
+        $this->assertSQLEquals('u.id AS id1, u.status AS status, u.username AS username2, u.name AS name, u.email_id AS email_id', $selectClause);
     }
 
     /**
@@ -748,7 +767,7 @@ class NativeQueryTest extends \Doctrine\Tests\OrmFunctionalTestCase
 
         $selectClause = $rsm->generateSelectClause(array('u' => 'u1'));
 
-        $this->assertEquals('u1.id AS id, u1.status AS status, u1.username AS username, u1.name AS name, u1.email_id AS email_id', $selectClause);
+        $this->assertSQLEquals('u1.id AS id, u1.status AS status, u1.username AS username, u1.name AS name, u1.email_id AS email_id', $selectClause);
     }
 
     /**
@@ -761,7 +780,7 @@ class NativeQueryTest extends \Doctrine\Tests\OrmFunctionalTestCase
 
         $selectClause = $rsm->generateSelectClause();
 
-        $this->assertEquals('u.id AS id0, u.status AS status1, u.username AS username2, u.name AS name3, u.email_id AS email_id4', $selectClause);
+        $this->assertSQLEquals('u.id AS id0, u.status AS status1, u.username AS username2, u.name AS name3, u.email_id AS email_id4', $selectClause);
     }
 
     /**
@@ -772,6 +791,6 @@ class NativeQueryTest extends \Doctrine\Tests\OrmFunctionalTestCase
         $rsm = new ResultSetMappingBuilder($this->_em, ResultSetMappingBuilder::COLUMN_RENAMING_INCREMENT);
         $rsm->addRootEntityFromClassMetadata('Doctrine\Tests\Models\CMS\CmsUser', 'u');
 
-        $this->assertEquals('u.id AS id0, u.status AS status1, u.username AS username2, u.name AS name3, u.email_id AS email_id4', (string)$rsm);
+        $this->assertSQLEquals('u.id AS id0, u.status AS status1, u.username AS username2, u.name AS name3, u.email_id AS email_id4', (string)$rsm);
     }
 }

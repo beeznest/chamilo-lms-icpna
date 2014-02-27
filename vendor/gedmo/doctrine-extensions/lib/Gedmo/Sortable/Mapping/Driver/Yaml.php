@@ -9,13 +9,10 @@ use Gedmo\Mapping\Driver\File,
 /**
  * This is a yaml mapping driver for Sortable
  * behavioral extension. Used for extraction of extended
- * metadata from yaml specificaly for Sortable
+ * metadata from yaml specifically for Sortable
  * extension.
  *
  * @author Lukas Botsch <lukas.botsch@gmail.com>
- * @package Gedmo.Sortable.Mapping.Driver
- * @subpackage Yaml
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class Yaml extends File implements Driver

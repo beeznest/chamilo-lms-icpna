@@ -123,7 +123,7 @@ if ($user_data !== false) {
  * Initialize the form.
  */
 $form = new FormValidator('profile', 'post', api_get_self()."?".str_replace('&fe=1', '', $_SERVER['QUERY_STRING']), null, array('style' => 'width: 70%; float: '.($text_dir == 'rtl' ? 'right;' : 'left;')));
-$form->addElement('text', 'extra_DNI',  'DNI o CE',  array('size' => 40, 'disabled' => 'disabled'));
+$form->addElement('text', 'username',  'Usuario (DNI o CE)',  array('size' => 40, 'disabled' => 'disabled'));
 $form->addElement('text', 'firstname', 'Nombre', array('size' => 40));
 $form->addElement('text', 'lastname',  'Apellido Paterno',  array('size' => 40));
 $form->addElement('text', 'extra_middlename',  'Apellido Materno',  array('size' => 40));
@@ -166,10 +166,10 @@ $form->addRule('username', get_lang('UserTaken'), 'username_available', $user_da
 
 //	OFFICIAL CODE
 if (CONFVAL_ASK_FOR_OFFICIAL_CODE) {
-	$form->addElement('text', 'official_code', get_lang('OfficialCode'), array('size' => 40));
+	/*$form->addElement('text', 'official_code', get_lang('OfficialCode'), array('size' => 40));
 	if (api_get_setting('profile', 'officialcode') !== 'true') {
 		$form->freeze('official_code');
-	}
+	}*/
 	$form->applyFilter('official_code', 'stripslashes');
 	$form->applyFilter('official_code', 'trim');
 	if (api_get_setting('registration', 'officialcode') == 'true' && api_get_setting('profile', 'officialcode') == 'true') {
@@ -197,10 +197,10 @@ if (is_profile_editable() && api_get_setting('openid_authentication') == 'true')
 }
 
 //	PHONE
-$form->addElement('text', 'phone', get_lang('phone'), array('size' => 20));
+/*$form->addElement('text', 'phone', get_lang('phone'), array('size' => 20));
 if (api_get_setting('profile', 'phone') !== 'true') {
 	$form->freeze('phone');
-}
+}*/
 $form->applyFilter('phone', 'stripslashes');
 $form->applyFilter('phone', 'trim');
 /*if (api_get_setting('registration', 'phone') == 'true') {
@@ -220,10 +220,10 @@ if (is_profile_editable() && api_get_setting('profile', 'picture') == 'true') {
 }
 
 //	LANGUAGE
-$form->addElement('select_language', 'language', get_lang('Language'));
+/*$form->addElement('select_language', 'language', get_lang('Language'));
 if (api_get_setting('profile', 'language') !== 'true') {
 	$form->freeze('language');
-}
+}*/
 
 //THEME
 if (is_profile_editable() && api_get_setting('user_selected_theme') == 'true') {

@@ -10,9 +10,7 @@ Features:
 - For now, it works only with the ORM
 - Can be nested with other behaviors
 - Annotation, Yaml and Xml mapping support for extensions
-
-[blog_reference]: http://gediminasm.org/article/tree-nestedset-behavior-extension-for-doctrine-2 "Softdeleteable - does not explicitly remove record entries from the database, instead it marks those as deleted and skips in selection queries"
-[blog_test]: http://gediminasm.org/test "Test extensions on this blog"
+- Support for 'timeAware' option: When creating an entity set a date of deletion in the future and never worry about cleaning up at expiration time.
 
 Content:
 
@@ -46,11 +44,15 @@ And then you can access the filter from your EntityManager to enable or disable 
 ``` php
 // This will enable the SoftDeleteable filter, so entities which were "soft-deleted" will not appear
 // in results
+// You should adapt the filter name to your configuration (ex: softdeleteable)
 $em->getFilters()->enable('soft-deleteable');
 
 // This will disable the SoftDeleteable filter, so entities which were "soft-deleted" will appear in results
 $em->getFilters()->disable('soft-deleteable');
 ```
+
+**NOTE:** by default all filters are disabled, so you must explicitly enable **soft-deleteable** filter in your setup
+or whenever you need it.
 
 <a name="entity-mapping"></a>
 
@@ -65,9 +67,9 @@ Available configuration options:
 - **fieldName** - The name of the field that will be used to determine if the object is removed or not (NULL means
 it's not removed. A date value means it was removed). NOTE: The field MUST be nullable.
 
-**Note:** that SoftDeleteable interface is not necessary, except in cases there
+**Note:** that SoftDeleteable interface is not necessary, except in cases where
 you need to identify entity as being SoftDeleteable. The metadata is loaded only once then
-cache is activated
+cache is activated.
 
 ``` php
 <?php
@@ -78,7 +80,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @Gedmo\SoftDeleteable(fieldName="deletedAt")
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
  */
 class Article
 {
@@ -140,6 +142,7 @@ Entity\Article:
   gedmo:
     soft_deleteable:
       field_name: deletedAt
+      time_aware: false
   id:
     id:
       type: integer
@@ -171,7 +174,7 @@ Entity\Article:
 
         <field name="deletedAt" type="datetime" nullable="true" />
 
-        <gedmo:soft-deleteable field-name="deletedAt" />
+        <gedmo:soft-deleteable field-name="deletedAt" time-aware="false" />
     </entity>
 
 </doctrine-mapping>

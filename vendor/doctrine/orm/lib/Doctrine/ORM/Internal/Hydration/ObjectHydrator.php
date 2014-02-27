@@ -19,6 +19,7 @@
 
 namespace Doctrine\ORM\Internal\Hydration;
 
+use Doctrine\ORM\UnitOfWork;
 use PDO;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
@@ -83,7 +84,7 @@ class ObjectHydrator extends AbstractHydrator
      */
     private $existingCollections = array();
 
-     /**
+    /**
      * {@inheritdoc}
      */
     protected function prepare()
@@ -94,8 +95,8 @@ class ObjectHydrator extends AbstractHydrator
 
         $this->resultCounter = 0;
 
-        if ( ! isset($this->_hints['deferEagerLoad'])) {
-            $this->_hints['deferEagerLoad'] = true;
+        if ( ! isset($this->_hints[UnitOfWork::HINT_DEFEREAGERLOAD])) {
+            $this->_hints[UnitOfWork::HINT_DEFEREAGERLOAD] = true;
         }
 
         foreach ($this->_rsm->aliasMap as $dqlAlias => $className) {
@@ -152,7 +153,7 @@ class ObjectHydrator extends AbstractHydrator
      */
     protected function cleanup()
     {
-        $eagerLoad = (isset($this->_hints['deferEagerLoad'])) && $this->_hints['deferEagerLoad'] == true;
+        $eagerLoad = (isset($this->_hints[UnitOfWork::HINT_DEFEREAGERLOAD])) && $this->_hints[UnitOfWork::HINT_DEFEREAGERLOAD] == true;
 
         parent::cleanup();
 
@@ -476,7 +477,7 @@ class ObjectHydrator extends AbstractHydrator
                             $targetClass = $this->ce[$relation['targetEntity']];
 
                             if ($relation['isOwningSide']) {
-                                //TODO: Just check hints['fetched'] here?
+                                // TODO: Just check hints['fetched'] here?
                                 // If there is an inverse mapping on the target class its bidirectional
                                 if ($relation['inversedBy']) {
                                     $inverseAssoc = $targetClass->associationMappings[$relation['inversedBy']];
@@ -525,7 +526,7 @@ class ObjectHydrator extends AbstractHydrator
                 // check for existing result from the iterations before
                 if ( ! isset($this->identifierMap[$dqlAlias][$id[$dqlAlias]])) {
                     $element = $this->getEntity($rowData[$dqlAlias], $dqlAlias);
-   
+
                     if ($this->_rsm->isMixed) {
                         $element = array($entityKey => $element);
                     }
@@ -597,7 +598,7 @@ class ObjectHydrator extends AbstractHydrator
 
                 if ($count === 1) {
                     $result[$resultKey] = $obj;
-                    
+
                     continue;
                 }
 

@@ -1,4 +1,5 @@
 <?php
+$language_file = array('registration', 'messages', 'userInfo');
 require_once '../inc/global.inc.php';
 $user_id = api_get_user_id();
 $social_left_content = $social_left_content = SocialManager::show_social_menu('whereiam');
@@ -180,6 +181,9 @@ if (!empty($user_id)) {
               padding-bottom: 10px;
               margin-bottom: 15px;
               background-color: #d7dde3;
+            }
+            .row h3{
+              margin-left: 60px;
             }
             /*+++++++++++++++++++++++++++++++++++++++
             FIN CSS DONDE ESTOY

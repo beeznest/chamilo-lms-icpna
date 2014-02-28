@@ -2782,7 +2782,7 @@ class SessionManager {
     }
 
     /**
-     * This function return the complete list of course session
+     * This function return the complete list of course session user
      * @param $user_id
      * @return array
      */

@@ -22,7 +22,7 @@ require_once api_get_path(LIBRARY_PATH).'message.lib.php';
 
 /**
  *
-*    @package chamilo.social
+ *    @package chamilo.social
  */
 class SocialManager extends UserManager {
 

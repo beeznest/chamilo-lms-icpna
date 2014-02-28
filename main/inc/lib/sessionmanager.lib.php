@@ -2780,4 +2780,23 @@ class SessionManager {
         );
         return $return_array;
     }
+
+    /**
+     * This function return the complete list of course session user
+     * @param $user_id
+     * @return array
+     */
+    static function get_course_session_list_by_user($user_id) {
+        $user_id = intval($user_id);
+        $tbl_rel_course_rel_user = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
+        $course_session_list = [];
+        $sql = "SELECT rcu.* FROM $tbl_rel_course_rel_user rcu WHERE rcu.id_user = $user_id";
+        $res = Database::query($sql);
+        if (Database::num_rows($res) > 0) {
+            while ($row = Database::fetch_array($res,'ASSOC')) {
+                $course_session_list[] = $row;
+            }
+        }
+        return $course_session_list;
+    }
 }

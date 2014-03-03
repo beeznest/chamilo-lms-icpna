@@ -1519,7 +1519,7 @@ class UserManager {
                 case ExtraField::FIELD_TYPE_SELECT_MULTIPLE:
                     $sqluo = "SELECT * FROM $t_ufo WHERE field_id = ".$rowuf['id'];
                     $resuo = Database::query($sqluo);
-                    $values = split(';',$fvalues);
+                    $values = explode(';', $fvalues);
                     if (Database::num_rows($resuo) > 0) {
                         $check = false;
                         while ($rowuo = Database::fetch_array($resuo)) {

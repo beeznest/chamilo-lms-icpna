@@ -216,7 +216,7 @@ if (is_profile_editable() && api_get_setting('profile', 'picture') == 'true') {
 		$form->addElement('checkbox', 'remove_picture', null, get_lang('DelImage'));
 	}
 	$allowed_picture_types = array ('jpg', 'jpeg', 'png', 'gif');
-	$form->addRule('picture', get_lang('OnlyImagesAllowed').' ('.implode(',', $allowed_picture_types).')', 'filetype', $allowed_picture_types);
+	$form->addRule('picture', '', 'filetype', $allowed_picture_types);
 }
 
 //	LANGUAGE
@@ -275,6 +275,15 @@ $(document).ready(function(){
             get_lang('Enter2passToChange') . ' </b></div>" + 
             $(\'[name="password0"]\').parent().parent().html());
         }
+
+        if ($(\'[name="picture"]\').parent().parent()) {
+            $(\'[name="picture"]\').parent()
+            .parent().html("<div class=\'alert alert-warning alert-dismissable\'> " +
+            "<button type=\'button\' class=\'close\' data-dismiss=\'alert\' aria-hidden=\'true\'>&times;</button><b>' .  
+            get_lang('OnlyImagesAllowed').' ('.implode(',', $allowed_picture_types).')' . ' </b></div>" + 
+            $(\'[name="picture"]\').parent().parent().html());
+        }
+
 
 	'.$jquery_ready_content.'
             
@@ -506,8 +515,11 @@ if ($form->validate()) {
 
 	//Checking the user language
 	$languages = api_get_languages();
-    if (!in_array($user_data['language'], $languages['folder'])) {
-        $user_data['language'] = api_get_setting('platformLanguage');
+        
+    if (!empty($user_data['language'])) {    
+        if (!in_array($user_data['language'], $languages['folder'])) {
+            $user_data['language'] = api_get_setting('platformLanguage');
+        }
     }
 
 	//Only update values that are request by the "profile" setting
@@ -636,15 +648,24 @@ if ($form->validate()) {
     $client = new $app['guzzle']['client'];
     $extra_data = UserManager::get_extra_user_data(api_get_user_id(), true);
     $externalUserId = $extra_data['extra_cs_user_id'];
-
+    
     $body = array(
         'id' => $externalUserId,
         'firstname' => $user_data['firstname'],
-        'lastname' => $user_data['lastname'],
-        'middlename' => $extra_data['extra_middlename'],
-        'email' => $changeemail,
-        'password' => $password
+        'lastname' => $user_data['lastname']
     );
+    
+    if (!empty($extra_data['extra_middlename'])) {
+        $body['middelname'] = $extra_data['extra_middlename'];
+    }
+    
+    if (!empty($changeemail)) {
+        $body['email'] = $changeemail;
+    }
+    
+    if (!empty($password)) {
+        $body['password'] = $password;
+    }
 
     global $_configuration;
     if (isset($_configuration['course_subscriber_url'])) {

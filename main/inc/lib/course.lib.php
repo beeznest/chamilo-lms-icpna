@@ -617,6 +617,25 @@ class CourseManager {
     }
 
     /**
+     * Gets the course id from the course code. Returns null if course id was not found
+     *
+     * @param string Course code
+     * @return int Course id
+     */
+    public static function get_course_id_from_course_code($code) {
+        $table = Database::get_main_table(TABLE_MAIN_COURSE);
+        $code = Database::escape_string($code);
+        $sql = "SELECT id FROM $table WHERE code = '$code' ";
+        $res = Database::query($sql);
+        $row = Database::fetch_object($res);
+        if ($row) {
+            return $row->id;
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Subscribe a user $user_id to a course $course_code.
      * @author Hugues Peeters
      * @author Roan Embrechts

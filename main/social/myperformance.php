@@ -12,58 +12,59 @@ if ($isAdult) {
     define('NUM_PHASES', 4);
     define('TOTAL_COURSES', NUM_COURSES * NUM_PHASES);
 }
-function createDivTable($course_id) {
-    $text = '';
-    global $isAdult;
-    $index = $course_id % NUM_COURSES;
-    if ($index == 1 && $course_id <= TOTAL_COURSES) {
-        $phase_title = array(
-            1 => 'Elementary',
-            2 => 'High - Elementary',
-            3 => 'Basic',
-            4 => 'High - Basic',
-            5 => 'Advanced',
-        );
-        if ($isAdult) {
-            define('NUM_PHASES', 5);
-            $phase = array(
-                1 => array(1,2,3,4,5),
-                2 => array(6,7,8,9,10),
-                3 => array(11,12,13,14,15),
-                4 => array(16,17,18,19,20),
-                5 => array(21,22,23,24,25),
-            );
-        } else {
+$phase_title = array(
+    1 => 'Elementary',
+    2 => 'High - Elementary',
+    3 => 'Basic',
+    4 => 'High - Basic',
+    5 => 'Advanced',
+);
+if ($isAdult) {
+    define('NUM_PHASES', 5);
+    $phase = array(
+        1 => array(1,2,3,4,5),
+        2 => array(6,7,8,9,10),
+        3 => array(11,12,13,14,15),
+        4 => array(16,17,18,19,20),
+        5 => array(21,22,23,24,25),
+    );
+} else {
+    $phase = array(
+        1 => array(1,2,3,4,5,6),
+        2 => array(7,8,9,10,11,12),
+        3 => array(13,14,15,16,17,18),
+        4 => array(19,20,21,22,23,24),
+    );
+}
 
-            $phase = array(
-                1 => array(1,2,3,4,5,6),
-                2 => array(7,8,9,10,11,12),
-                3 => array(13,14,15,16,17,18),
-                4 => array(19,20,21,22,23,24),
-            );
-        }
-        $phase_id = ceil($course_id / NUM_COURSES);
-        if ($phase_id % 2 == 1) {
-            if ($phase_id != 1) {
+$course_array = getAllCourses();
+function createDivTable($course_id, $sid) {
+    $text = '';
+    global $phase, $phase_title, $course_array;
+    $index = $course_id % NUM_COURSES;
+    $phase_id = ceil($course_id / NUM_COURSES);
+    if ($course_id <= TOTAL_COURSES) {
+        if ($index == 1) {
+            $text .= '<div class="row nivel">
+                                <div class="span9">
+                                   <h3 class="icon-nivel">' . $phase_title[$phase_id] . '</h3>
+                                </div>';
+        } else {
+            $score = getCourseScore($course_array[$course_id][0],$course_array[$course_id][1], $sid);
+
+            $text .= '<div class="span9">
+                                    <div class="span3"><div class="icon-complet">' . $course_array[$course_id][1] . '</div></div>
+                                    <div class="span3"><div class="nota-aprueba top-note">' . $score . '/100</div></div>
+                                </div>';
+            if ($index == 0) {
                 $text .= '</div>';
             }
-            $text .= '<div class="row nivel">
-                            <div class="span9">
-                               <h3 class="icon-nivel">' . $phase_title[$phase_id] . '</h3>
-                            </div>';
-        } else {
-            $text .= '</div>
-                          <div class="number-hours">N° de Horas: 125 </div>
-                      </div>';
         }
-        $text .= '';
-    } elseif ($course_id == (TOTAL_COURSES + 1)) {
+    } else {
         $text .= '</div>
-                      <div class="number-hours">N° de Horas: 125 </div>
-                  </div>
-            </div>
-        </div>
-        ';
+                    </div>
+                </div>
+        </div>';
     }
     return $text;
 }
@@ -79,12 +80,116 @@ function twoOrMoreDigitString($num) {
     }
 }
 
-function getAllCoursesScores() {
+function getAllCourses() {
     for($i = 1; $i <= TOTAL_COURSES; $i++) {
-        $textnum = twoOrMoreDigitString($i);
-        $course_code_array[] = 'COURSE'. $textnum;
+        if (CourseManager::course_code_exists('COURSE'.$i)) {
+            $course_code = 'COURSE'. $i;
+        } else {
+            $course_code = 'COURSE'. twoOrMoreDigitString($i);
+        }
+        $id = CourseManager::get_course_id_from_course_code($course_code);
+        $course_array[] = array(
+            $id,
+            $course_code
+        );
     }
-    return $course_code_array;
+    return $course_array;
+}
+
+/*
+ *
+ */
+function getCourseScore($cid, $ccode, $sid, $uid = null) {
+    $tbl_quiz = Database::get_course_table(TABLE_QUIZ_TEST);
+
+    // Limited list of terms that will be considered as exams that classify the user to move to next course
+    $exam_names = "'final exam', 'examen final', 'placement test', 'final test', 'examen de clasificación'";
+
+    $sql = "SELECT id, max_attempt FROM $tbl_quiz WHERE c_id = $cid AND LOWER(title) IN ($exam_names) ORDER BY id DESC LIMIT 1";
+    $res = Database::query($sql);
+    if (Database::num_rows($res) < 1) {
+        return '--';
+    }
+    $row = Database::fetch_row($res);
+    $qid = intval($row[0]);
+    $maxAttempt = intval($row[1]);
+
+    // From the results table, we have to check the latest attempt.
+    // There is a special case for exams where only one attempt is allowed: if
+    // the first attempt failed but was not finished, the user gets a second
+    // attempt. As such, in the case where only one attempt is allowed
+    // (c_quiz.max_attempt = 1) and we have more than one attempt, of which the
+    // first was not finished (track_e_exercices.status != ''), we have to
+    // take the results from the second attempt (but not more)
+    $tbl_res = Database::get_main_table(TABLE_STATISTIC_TRACK_E_EXERCICES);
+    $score = 0;
+    if ($maxAttempt == 1) {
+        // Adults case, only one attempt but if first unfinished, we take the
+        // second one
+        $sql = "SELECT exe_result, exe_weighting, status
+            FROM $tbl_res
+            WHERE exe_exo_id = $qid
+                AND exe_cours_id = '$ccode'
+                AND session_id = $sid
+            ORDER BY start_date ASC LIMIT 2";
+        $res = Database::query($sql);
+        if (Database::num_rows($res) < 1) {
+            return '--';
+        } elseif (Database::num_rows($res) == 1) {
+            $row = Database::fetch_row($res);
+            $tempScore = round(($row[0]/$row[1])*100,0);
+            if ($tempScore < 70 && $row[2]!= '') {
+                // return empty array so this score is not taken into account
+                return '--';
+            }
+            $score = $tempScore;
+        } else {
+            $lastScore = 0;
+            // only scan 2 rows, thanks to the LIMIT 2 above
+            while ($row = Database::fetch_row($res)) {
+                $tempScore = round(($row[0]/$row[1])*100,0);
+                if ($tempScore > $lastScore) {
+                    $lastScore = $tempScore;
+                }
+            }
+            // return the best score
+            $score = $lastScore;
+        }
+    } else {
+        // There are 3 attempts to these tests. As soon as one is > 70, send result
+        $sql = "SELECT exe_result, exe_weighting, status
+            FROM $tbl_res
+            WHERE exe_exo_id = $qid
+                AND exe_cours_id = '$ccode'
+                AND session_id = $sid
+            ORDER BY start_date ASC LIMIT 3";
+        $res = Database::query($sql);
+        if (Database::num_rows($res) < 1) {
+            return '--';
+        }
+        $lastScore = 0;
+        $count = 0;
+        // only scan max 3 rows, thanks to the LIMIT 2 above
+        while ($row = Database::fetch_row($res)) {
+            $tempScore = round(($row[0]/$row[1])*100,0);
+            if ($tempScore > $lastScore) {
+                $lastScore = $tempScore;
+            }
+            $count++;
+        }
+        if ($lastScore >= 70) {
+            // return the success score
+            $score = $lastScore;
+        } else {
+            if ($count == 3) {
+                // reached maximum attempts, return bad result
+                $score = $lastScore;
+            } else {
+                return '--';
+            }
+        }
+    }
+    return $score;
 }
 
 $user_id = api_get_user_id();
@@ -120,109 +225,73 @@ if (!empty($user_id)) {
         if ($i > TOTAL_COURSES) {
             break;
         }
-        // show list of courses
-        if ($course_sequences[$i]) {
-            // if user have completed a course or its in progress
-            if ($i == $sequence_int) {
-                $social_right_content .= '<span class="actual"><a href="#">'.$course_sequences[$i].'</a></span>';
-            } else {
-                $social_right_content .= '<span class="complet"><a href="#">'.$course_sequences[$i].'</a></span>';
-            }
-        } elseif ($i< 10) {
-            $social_right_content .= '0' . $i;
-        } else {
-            $social_right_content .= $i;
-        }
-
-        if ($i % NUM_COURSES != 0) {
-            $social_right_content .= ' - ';
-        }
     }
     $social_right_content .=
         '<style>
             /*+++++++++++++++++++++++++++++++++++++++
-            CSS DONDE ESTOY
+            MI DESEMPEÑO
             +++++++++++++++++++++++++++++++++++++++++*/
-            .title-nivel-01{
-              font-size: 20px;
-              color: #000;
-              border-top: 2px solid #deebf7;
-              padding-top: 5px;
-              padding-bottom: 5px;
-              border-bottom: 6px solid #deebf7;
-              text-align: center;
+            .contenedor-tabla{
+              display: table;
             }
-            .title-nivel-02{
-              font-size: 20px;
-              color: #000;
-              border-top: 2px solid #bdd7ee;
-              padding-top: 5px;
-              padding-bottom: 5px;
-              border-bottom: 6px solid #bdd7ee;
-              text-align: center;
+
+            .contenedor-fila{
+              display: table-row;
             }
-            .title-nivel-03{
-              font-size: 20px;
-              color: #000;
-              border-top: 2px solid #9dc3e6;
-              padding-top: 5px;
-              padding-bottom: 5px;
-              border-bottom: 6px solid #9dc3e6;
-              text-align: center;
+
+            .contenedor-columna{
+              display: table-cell;
             }
-            .title-nivel-04{
-              font-size: 20px;
-              color: #000;
-              border-top: 2px solid #2e75b6;
-              padding-top: 5px;
-              padding-bottom: 5px;
-              border-bottom: 6px solid #2e75b6;
-              text-align: center;
+            .seccion-info-notas{
+              background-color: #005C84;
             }
-            .location-course{
-              padding-bottom: 15px;
-              padding-top: 15px;
-              text-align: center;
-              font-size: 20px;
-              color: #ccc;
-            }
-            .location-course .complet a{
+            .seccion-info-notas .letra{
               color: #ffffff;
-              background-color: #0189bc;
-              padding-left: 5px;
-              padding-right: 5px;
+              padding: 10px;
+              margin:0px;
+              font-size: 18px;
+
             }
-            .location-course .complet a:hover{
-              color: #ffffff;
-              background-color: #1da40f;
-              padding-left: 5px;
-              padding-right: 5px;
+            .top-note{
+              padding-top: 35px;
             }
-            .location-course .actual a{
-              color: #ffffff;
-              background-color: #ff0000;
-              padding-left: 5px;
-              padding-right: 5px;
+            .icon-complet{
+              background: url(images/curso.png) no-repeat left center;
+              padding: 15px 10px 15px 50px;
+              font-size: 20px;
+              color: #005C84;
+              width: 50%;
             }
-            .location-course .actual a:hover{
-              color: #ffffff;
-              background-color: #1da40f;
-              padding-left: 5px;
-              padding-right: 5px;
+            .icon-incomplet{
+              background: url(images/curso-gris.png) no-repeat left center;
+              padding: 15px 10px 15px 50px;
+              font-size: 20px;
+              color: #808080;
+              width: 50%;
             }
-            .number-hours{
-              font-size: 16px;
-              text-align: center;
-              padding-top: 10px;
-              padding-bottom: 10px;
-              margin-bottom: 15px;
-              background-color: #d7dde3;
+            .nota-aprueba{
+              font-size: 20px;
+              color: #005C84;
+              padding: 15px 10px 15px 50px;
             }
-            .row h3{
-              margin-left: 60px;
+            .nota-desaprueba{
+              font-size: 20px;
+              color: #808080;
+              padding: 15px 10px 15px 50px;
+            }
+            .icon-nivel{
+              background: url(images/nivel.png) no-repeat left center;
+              padding: 15px 10px 15px 50px;
+              font-size: 20px;
+              color: #005C84;
+              width: 100%;
+            }
+            .icon-nivel h3{
+              padding-left: 35px;
+              font-weight: normal;
             }
             /*+++++++++++++++++++++++++++++++++++++++
-            FIN CSS DONDE ESTOY
+            FIN DE DESEMPEÑO
             +++++++++++++++++++++++++++++++++++++++++*/
         </style>';
 }

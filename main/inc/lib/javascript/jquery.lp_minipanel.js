@@ -41,7 +41,7 @@ function toogle_minipanel() {
 
 $(document).ready(function() {
     //Adding div to hide panel
-    $('#learning_path_right_zone').before('<div id="hide_bar" style="float: left; width: 15px; height: 100%; ">' +
+    $('#learning_path_right_zone').before('<div id="hide_bar" style="float: left; width: 15px; height: 700px; ">' +
         '<table style="border: 0 none; width: 100%; height: 100%; cursor: pointer; background-color: #EEEEEE">' +
         '<tr><td></td></tr></table></div>');
     

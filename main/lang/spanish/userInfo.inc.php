@@ -202,4 +202,6 @@ $EditMembersList = "Editar lista de miembros";
 $IAmAHRM = "Soy responsable de recursos humanos";
 $UnsubscribeFromPlatform = "Si desea darse de baja completamente en el Campus y que toda su información sea eliminada de nuestra base de datos pulse el botón inferior.";
 $UnsubscribeFromPlatformConfirm = "Sí, quiero suprimir completamente esta cuenta. Ningún dato quedará en el servidor y no podré acceder de nuevo, salvo que cree una cuenta completamente nueva.";
+$WhereIAm = "¿Dónde estoy?";
+$MyPerformance = "Mi desempeño";
 ?>

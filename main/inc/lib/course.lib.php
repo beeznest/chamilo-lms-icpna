@@ -617,6 +617,44 @@ class CourseManager {
     }
 
     /**
+     * Gets the course id from the course code. Returns null if course id was not found
+     *
+     * @param string Course code
+     * @return int Course id
+     */
+    public static function get_course_id_from_course_code($code) {
+        $table = Database::get_main_table(TABLE_MAIN_COURSE);
+        $code = Database::escape_string($code);
+        $sql = "SELECT id FROM $table WHERE code = '$code' ";
+        $res = Database::query($sql);
+        $row = Database::fetch_object($res);
+        if ($row) {
+            return $row->id;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Gets the course title from the course id. Returns null if course id was not found
+     *
+     * @param string Course code
+     * @return string Course title
+     */
+    public static function get_course_title_from_course_id($id) {
+        $table = Database::get_main_table(TABLE_MAIN_COURSE);
+        $id = Database::escape_string($id);
+        $sql = "SELECT title FROM $table WHERE id = '$id' ";
+        $res = Database::query($sql);
+        $row = Database::fetch_object($res);
+        if ($row) {
+            return $row->title;
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Subscribe a user $user_id to a course $course_code.
      * @author Hugues Peeters
      * @author Roan Embrechts

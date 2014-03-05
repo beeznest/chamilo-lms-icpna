@@ -388,7 +388,7 @@ header #logo {
     background-position: -210px 0px;
     cursor: default;
     display: block;
-    height: 95px;
+    height: 95px;-r
     width: 100px;
     /*position: absolute;*/
     margin:auto;
@@ -881,12 +881,51 @@ header .row-fluid .span9 {
   float:none;
   text-align: center;
   transform: rotate(0deg);
-}
-#cssmenu {
-  position:absolute;
-  top:0;
-  right:20px;
-}
+  }
+
+  .alto {
+    height: 9em;
+    padding-top: 0.5em;
+  }
+  #bar-animation {
+    width: 200px;
+  }
+  .row .row-fluid .span10{
+    width: 100%
+  }
+  #course_tools .span12 .span2 {
+    width: 33%;
+  }
+  #course_tools .span12 .span2 .center-items {
+  padding-bottom: 10px;
+  padding-left: 0;
+  }
+  footer .container .row {
+        padding: 0px;
+  }
+  footer .container .row .span12 {
+    padding-left: 0;
+    text-align: center;
+  }
+  footer {
+    padding-top: 2em;
+    padding-bottom: 2em;
+    height: 14em;
+  }
+  footer .topline {
+    font-size: 11px;
+    padding-bottom: 1em;
+    padding-top: 1em;
+  }
+  footer .centerline {
+    font-size: 10px;
+    padding-left: 2em;
+    padding-top: 1em;
+    text-align: center;
+  }
+  #learning_path_left_zone {
+        width: 190px;
+  }
 }
 /*+++++++++++++++++++++++++++++++++++++++
 MI DESEMPEÑO

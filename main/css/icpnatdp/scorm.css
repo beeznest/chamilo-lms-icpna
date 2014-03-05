@@ -207,3 +207,42 @@
     width: 89%;
     padding: 1px 5px 3px 8px;
 }
+#learning_path_main .Mostrar{
+        margin-left: 270px;
+        height: 100%;
+}
+#learning_path_main .Ocultar{
+        margin-left: 15px;
+        height: 100%;
+}
+
+@media (min-width: 321px) and (max-width: 480px) {
+    
+    .inner_lp_toc .scorm-level-0 a {
+        font-size: 12px;
+    }
+    .inner_lp_toc .scorm_item_2 {
+        padding: 10px 35px 10px 25px;  
+    }
+    .inner_lp_toc .scorm_item_1 {
+        padding: 10px 35px 10px 25px;
+    }
+    .inner_lp_toc .scorm_item_highlight {
+        padding: 10px 35px 10px 25px;
+    }
+    .inner_lp_toc .scorm-status-completed {
+        
+        background-image: url("images/check.png") !important;
+        background-position: 160px center !important;
+        background-repeat: no-repeat;
+    }
+    
+    #learning_path_main .Mostrar{
+        margin-left: 220px;
+        height: 100%;
+    }
+    #learning_path_main .Ocultar{
+        margin-left: 15px;
+        height: 100%;
+    }
+}

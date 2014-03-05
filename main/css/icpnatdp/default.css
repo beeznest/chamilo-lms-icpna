@@ -372,7 +372,7 @@ header #logo {
 
 .row .state-icon-process{
     background: transparent url(images/estados-iconos.png) no-repeat;
-    background-position: -105px 0px;
+    background-position: 0px -119px;
     cursor: pointer;
     display: block;
     height: 95px;
@@ -385,7 +385,7 @@ header #logo {
 
 .row .state-icon-closed{
     background: transparent url(images/estados-iconos.png) no-repeat;
-    background-position: -210px 0px;
+    background-position: 23px -228px;
     cursor: default;
     display: block;
     height: 95px;-r
@@ -838,15 +838,6 @@ color: #fff;
 header .row-fluid .span9 {
   width: auto;
 }
-#course_tools .span2.text-vertical {
-  color: #808080;
-  font-size: 1.4em;
-  /*margin-left: -180px;*/
-  padding:0.3em 0 0.8em;
-  float:none;
-  text-align: center;
-  transform: rotate(0deg);
-}
 #course_tools .row-fluid .span10 {
   width: 100%;
 }
@@ -872,17 +863,35 @@ header .row-fluid .span9 {
   display:none;
 }
 }
-@media (max-width: 480px) {
+@media (min-width: 321px) and (max-width: 480px) {
 #course_tools .span2.text-vertical {
   color: #808080;
   font-size: 1.4em;
   /*margin-left: -180px;*/
-  padding:0.3em 0 0.8em;
+  padding-left: 10px;
+  padding-top: 0px;
   float:none;
-  text-align: center;
-  transform: rotate(0deg);
+  text-align: left;
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
   }
-
+  #cssmenu {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  #cssmenu .welcome {
+    font-size: 12px;
+    line-height: 12px;
+    text-transform: capitalize;
+    font-weight: normal;
+  }
+  #cssmenu > ul ul li a {
+    font-weight: normal;
+    font-size: 12px;
+    width: 120px;
+  }
   .alto {
     height: 9em;
     padding-top: 0.5em;
@@ -894,11 +903,14 @@ header .row-fluid .span9 {
     width: 100%
   }
   #course_tools .span12 .span2 {
-    width: 33%;
+    width: 50%;
   }
   #course_tools .span12 .span2 .center-items {
   padding-bottom: 10px;
   padding-left: 0;
+  }
+  .row .state-icon-closed {
+    background: url("images/estados-iconos.png") no-repeat scroll center -228px rgba(0, 0, 0, 0);
   }
   footer .container .row {
         padding: 0px;
@@ -925,6 +937,40 @@ header .row-fluid .span9 {
   }
   #learning_path_left_zone {
         width: 190px;
+  }
+  header #logo{
+        display: block;
+        visibility: visible;
+        text-align: left;
+        padding: 0 0 0 15px;
+  }
+  .row-fluid .row-fluid .column-one{
+        display: none;
+        visibility: hidden;
+  }
+  .text-module {
+    font-size: 20px;
+    padding-left: 5px;
+    text-align: left;
+  }
+  .text-message {
+    color: #6E6E6E;
+    font-size: 12px;
+    padding-left: 5px;
+  }
+  .padding-text-module {
+    padding-bottom: 0.5em;
+    padding-top: 0.5em;
+  }
+  .ico-help {
+    padding-left: 12.5em;
+  }
+  .ico-help img{
+    max-width: none;
+  }
+  #bar-animation {
+    margin-left: 10px;
+    width: 200px;
   }
 }
 /*+++++++++++++++++++++++++++++++++++++++

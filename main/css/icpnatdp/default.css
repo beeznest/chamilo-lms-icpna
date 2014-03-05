@@ -65,12 +65,13 @@ footer {
     background-image: url(images/color.png);
     background-repeat:repeat-x;    
     color:#ffffff;
-    height: 10em;
+    height: 17em;
     margin-top: 5px;
-    padding-top: 3em;
+    padding-top: 1em;
 }
 footer .topline{
   padding-top: 1em;
+  padding-bottom: 1em;
   font-size: 13px;
 }
 footer .centerline{
@@ -80,14 +81,14 @@ footer .centerline{
   padding-left: 2em;
 }
 footer .container .row {
-  padding-top: 10px;
-  padding-left: 4em;
+ padding: 0;
+ text-align: center;
 }
 footer .container .row a{
   color: #ffffff
 }
 footer .container .row .span12{
-  padding-left: 4em;
+  padding: 0;
 }
 footer .container .row a:hover{
   text-decoration: underline;
@@ -1125,5 +1126,83 @@ FIN CSS DONDE ESTOY
 +++++++++++++++++++++++++++++++++++++++++*/
 
 
+@media (max-width: 320px) {
+
+  header #logo {
+        padding: 0 0 0 10px;
+        text-align: left;
+        display: block;
+    }
+#cssmenu {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  #cssmenu .welcome {
+    font-size: 12px;
+    line-height: 12px;
+    text-transform: capitalize;
+    font-weight: normal;
+  }
+  #cssmenu > ul ul li a {
+    font-weight: normal;
+    font-size: 12px;
+    width: 120px;
+  }
+  .ico-help {
+    padding-left: 11em;
+  }
+  .ico-help img{
+    max-width: none;
+  }
+  #bar-animation {
+    margin-left: 10px;
+    width: 180px;
+  }
+  .text-module {
+    font-size: 20px;
+    padding-left: 5px;
+    text-align: left;
+  }
+  .text-message {
+    color: #6E6E6E;
+    font-size: 12px;
+    padding-left: 5px;
+  }
+  #course_tools .span2.text-vertical {
+  color: #808080;
+  font-size: 1.4em;
+  /*margin-left: -180px;*/
+  padding-left: 10px;
+  padding-top: 0px;
+  float:none;
+  text-align: left;
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+  }
+  .alto {
+    height: auto;
+    padding-top: 1em;
+  }
+  #course_tools .span12 .span2 {
+    width: 50%;
+  }
+  .row-fluid .span10 {
+    width: 100%;
+  }
+  #course_tools .span12 .span2 .center-items {
+    padding-bottom: 15px;
+    padding-left: 0;
+  }
+  .course-tool h4 {
+    font-size: 12px;
+    font-weight: normal;
+  }
+  .course-tool {
+    height: 110px;
+    width: 47%;
+}
+}
 /*FIN DE ICPNA MODULO*/
 

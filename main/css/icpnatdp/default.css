@@ -888,5 +888,157 @@ header .row-fluid .span9 {
   right:20px;
 }
 }
+/*+++++++++++++++++++++++++++++++++++++++
+MI DESEMPEÑO
++++++++++++++++++++++++++++++++++++++++++*/
+.contenedor-tabla{
+    display: table;
+}
+
+.contenedor-fila{
+    display: table-row;
+}
+
+.contenedor-columna{
+    display: table-cell;
+}
+.seccion-info-notas{
+    background-color: #005C84;
+}
+.seccion-info-notas .letra{
+    color: #ffffff;
+    padding: 10px;
+    margin:0px;
+    font-size: 18px;
+
+}
+.top-note{
+    padding-top: 35px;
+}
+.icon-complet{
+    background: url(images/curso.png) no-repeat left center;
+    padding: 15px 10px 15px 50px;
+    font-size: 20px;
+    color: #005C84;
+    width: 50%;
+}
+.icon-incomplet{
+    background: url(images/curso-gris.png) no-repeat left center;
+    padding: 15px 10px 15px 50px;
+    font-size: 20px;
+    color: #808080;
+    width: 50%;
+}
+.nota-aprueba{
+    font-size: 20px;
+    color: #005C84;
+    padding: 15px 10px 15px 50px;
+}
+.nota-desaprueba{
+    font-size: 20px;
+    color: #808080;
+    padding: 15px 10px 15px 50px;
+}
+.icon-nivel{
+    background: url(images/nivel.png) no-repeat left center;
+    padding: 15px 10px 15px 50px;
+    font-size: 20px;
+    color: #005C84;
+    width: 100%;
+}
+.icon-nivel h3{
+    padding-left: 35px;
+    font-weight: normal;
+}
+/*+++++++++++++++++++++++++++++++++++++++
+FIN DE DESEMPEÑO
++++++++++++++++++++++++++++++++++++++++++*/
+
+/*+++++++++++++++++++++++++++++++++++++++
+CSS DONDE ESTOY
++++++++++++++++++++++++++++++++++++++++++*/
+.title-nivel-01{
+    font-size: 20px;
+    color: #000;
+    border-top: 2px solid #deebf7;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-bottom: 6px solid #deebf7;
+    text-align: center;
+}
+.title-nivel-02{
+    font-size: 20px;
+    color: #000;
+    border-top: 2px solid #bdd7ee;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-bottom: 6px solid #bdd7ee;
+    text-align: center;
+}
+.title-nivel-03{
+    font-size: 20px;
+    color: #000;
+    border-top: 2px solid #9dc3e6;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-bottom: 6px solid #9dc3e6;
+    text-align: center;
+}
+.title-nivel-04{
+    font-size: 20px;
+    color: #000;
+    border-top: 2px solid #2e75b6;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-bottom: 6px solid #2e75b6;
+    text-align: center;
+}
+.location-course{
+    padding-bottom: 15px;
+    padding-top: 15px;
+    text-align: center;
+    font-size: 20px;
+    color: #ccc;
+}
+.location-course .complet a{
+    color: #ffffff;
+    background-color: #0189bc;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.location-course .complet a:hover{
+    color: #ffffff;
+    background-color: #1da40f;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.location-course .actual a{
+    color: #ffffff;
+    background-color: #ff0000;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.location-course .actual a:hover{
+    color: #ffffff;
+    background-color: #1da40f;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.number-hours{
+    font-size: 16px;
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    background-color: #d7dde3;
+}
+.row h3{
+    margin-left: 60px;
+}
+/*+++++++++++++++++++++++++++++++++++++++
+FIN CSS DONDE ESTOY
++++++++++++++++++++++++++++++++++++++++++*/
+
+
 /*FIN DE ICPNA MODULO*/
 

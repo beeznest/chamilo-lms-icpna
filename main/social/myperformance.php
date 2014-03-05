@@ -36,29 +36,30 @@ if ($isAdult) {
         4 => array(19,20,21,22,23,24),
     );
 }
-
 $course_array = getAllCourses();
-function createDivTable($course_id, $sid) {
+function createDiv($seq, $sid) {
     $text = '';
     global $phase, $phase_title, $course_array;
-    $index = $course_id % NUM_COURSES;
-    $phase_id = ceil($course_id / NUM_COURSES);
-    if ($course_id <= TOTAL_COURSES) {
+    $index = $seq % NUM_COURSES;
+    $phase_id = ceil($seq / NUM_COURSES);
+    if ($seq <= TOTAL_COURSES) {
         if ($index == 1) {
             $text .= '<div class="row nivel">
                                 <div class="span9">
                                    <h3 class="icon-nivel">' . $phase_title[$phase_id] . '</h3>
                                 </div>';
+        }
+        if (empty($sid)) {
+            $score = '--';
         } else {
-            $score = getCourseScore($course_array[$course_id][0],$course_array[$course_id][1], $sid);
-
-            $text .= '<div class="span9">
-                                    <div class="span3"><div class="icon-complet">' . $course_array[$course_id][1] . '</div></div>
+            $score = getCourseScore($course_array[$seq][0],$course_array[$seq][1], $sid);
+        }
+        $text .= '<div class="span9">
+                                    <div class="span3"><div class="icon-complet">' . $course_array[$seq][2] . '</div></div>
                                     <div class="span3"><div class="nota-aprueba top-note">' . $score . '/100</div></div>
                                 </div>';
-            if ($index == 0) {
-                $text .= '</div>';
-            }
+        if ($index == 0) {
+            $text .= '</div>';
         }
     } else {
         $text .= '</div>
@@ -88,9 +89,11 @@ function getAllCourses() {
             $course_code = 'COURSE'. twoOrMoreDigitString($i);
         }
         $id = CourseManager::get_course_id_from_course_code($course_code);
-        $course_array[] = array(
+        $title = CourseManager::get_course_title_from_course_id($id);
+        $course_array[$i] = array(
             $id,
-            $course_code
+            $course_code,
+            $title,
         );
     }
     return $course_array;
@@ -101,7 +104,6 @@ function getAllCourses() {
  */
 function getCourseScore($cid, $ccode, $sid, $uid = null) {
     $tbl_quiz = Database::get_course_table(TABLE_QUIZ_TEST);
-
     // Limited list of terms that will be considered as exams that classify the user to move to next course
     $exam_names = "'final exam', 'examen final', 'placement test', 'final test', 'examen de clasificación'";
 
@@ -210,90 +212,16 @@ if (!empty($user_id)) {
     foreach ($session_list as $session) {
         $course_code = $session['course_code'];
         $sequence_int = intval(preg_replace('/\D/','',$course_code));
-        if ($sequence_int < 1) {
-            continue;
-        } elseif ($sequence_int < 10) {
-            $course_sequence = '0' . $sequence_int;
-        } elseif ($length > 99) {
-            $course_sequence = $sequence_int % 100;
-        }
-        $course_sequences[$sequence_int] = $course_sequence;
+        $sid = $session['id_session'];
+        $course_sequences[$sequence_int] = $sid;
     }
     sort($course_sequences = array_unique($course_sequences));
     for ($i = 1 ; $i <= (TOTAL_COURSES + 1) ; $i++) {
-        $social_right_content .= createDiv($i);
+        $social_right_content .= createDiv($i,$course_sequences[$i]);
         if ($i > TOTAL_COURSES) {
             break;
         }
     }
-    $social_right_content .=
-        '<style>
-            /*+++++++++++++++++++++++++++++++++++++++
-            MI DESEMPEÑO
-            +++++++++++++++++++++++++++++++++++++++++*/
-            .contenedor-tabla{
-              display: table;
-            }
-
-            .contenedor-fila{
-              display: table-row;
-            }
-
-            .contenedor-columna{
-              display: table-cell;
-            }
-            .seccion-info-notas{
-              background-color: #005C84;
-            }
-            .seccion-info-notas .letra{
-              color: #ffffff;
-              padding: 10px;
-              margin:0px;
-              font-size: 18px;
-
-            }
-            .top-note{
-              padding-top: 35px;
-            }
-            .icon-complet{
-              background: url(images/curso.png) no-repeat left center;
-              padding: 15px 10px 15px 50px;
-              font-size: 20px;
-              color: #005C84;
-              width: 50%;
-            }
-            .icon-incomplet{
-              background: url(images/curso-gris.png) no-repeat left center;
-              padding: 15px 10px 15px 50px;
-              font-size: 20px;
-              color: #808080;
-              width: 50%;
-            }
-            .nota-aprueba{
-              font-size: 20px;
-              color: #005C84;
-              padding: 15px 10px 15px 50px;
-            }
-            .nota-desaprueba{
-              font-size: 20px;
-              color: #808080;
-              padding: 15px 10px 15px 50px;
-            }
-            .icon-nivel{
-              background: url(images/nivel.png) no-repeat left center;
-              padding: 15px 10px 15px 50px;
-              font-size: 20px;
-              color: #005C84;
-              width: 100%;
-            }
-            .icon-nivel h3{
-              padding-left: 35px;
-              font-weight: normal;
-            }
-            /*+++++++++++++++++++++++++++++++++++++++
-            FIN DE DESEMPEÑO
-            +++++++++++++++++++++++++++++++++++++++++*/
-        </style>';
 }
 $tpl = new Template(null);
 $tpl->assign('social_left_content', $social_left_content);

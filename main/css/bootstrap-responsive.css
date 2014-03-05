@@ -461,7 +461,7 @@
   .navbar-static-top .container,
   .navbar-fixed-top .container,
   .navbar-fixed-bottom .container {
-    width: 724px;
+    width: 100%;
   }
   .span12 {
     width: 724px;

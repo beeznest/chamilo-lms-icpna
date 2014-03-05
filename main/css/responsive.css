@@ -293,6 +293,12 @@ The more frequent ones have been marked with *
 }
 
 @media (min-width: 481px) and (max-width: 800px) {
+    #cssmenu .welcome {
+        font-size: 16px;
+        line-height: 12px;
+        font-weight: normal;
+        text-transform: capitalize;
+    }
     /* No topbar */
     #topbar {
         display:none;

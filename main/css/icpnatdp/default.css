@@ -1204,5 +1204,90 @@ FIN CSS DONDE ESTOY
     width: 47%;
 }
 }
+@media (min-width: 481px) and (max-width: 800px) {
+    #course_tools .span2.text-vertical {
+    color: #808080;
+    font-size: 1.4em;
+    /*margin-left: -180px;*/
+    padding-left: 10px;
+    padding-top: 0px;
+    float:none;
+    text-align: left;
+      -webkit-transform: rotate(0deg);
+      -moz-transform: rotate(0deg);
+      -o-transform: rotate(0deg);
+    }
+
+    #cssmenu .welcome {
+        font-size: 14px;
+        line-height: 12px;
+        font-weight: normal;
+        text-transform: capitalize;
+    }
+    #cssmenu > ul ul li a {
+        font-weight: normal;
+        width: 152px;
+    }
+    #cssmenu > ul > li > a {
+        padding: 10px 50px;
+    }
+    .column-one {
+        float: left;
+        width: 50%;
+    }
+    #bar-animation {
+      width: 100%;
+    }
+    .home-ico {
+      background: url("images/home.png") no-repeat scroll 15px center / 25px 25px rgba(0, 0, 0, 0);
+      margin-left: 1em;
+      margin-top: 1.8em;
+      padding-left: 4em;
+      padding-top: 0.5em;
+    }
+    .home-ico a {
+      color: #FFFFFF;
+      font-size: 14px;
+    }
+    .span12 {
+      width: 100%;
+      margin-left: -3px;
+    }
+    .row {
+      margin-left: 5px;
+    }
+    #course_tools .span12 .span2 .center-items {
+      padding-left: 0;
+      padding-bottom: 20px;
+    }
+    .row .state-icon-closed {
+      background: url("images/estados-iconos.png") no-repeat scroll center -228px rgba(0, 0, 0, 0);
+    }
+    #course_tools .span12 .span2 {
+      width: 175px;
+  }
+  .course-tool h4 {
+      font-size: 14px;
+      font-weight: normal;
+    }
+    footer {
+    background-color: #818181;
+    background-image: url("images/color.png");
+    background-repeat: repeat-x;
+    color: #FFFFFF;
+    height: 13em;
+    margin-top: 5px;
+    padding-top: 2em;
+    }
+    footer .container .row .span12 .span2{
+      width: 160px;
+    }
+    footer .centerline {
+    font-size: 12px;
+    padding-left: 2em;
+    padding-top: 1em;
+    text-align: center;
+  }
+}
 /*FIN DE ICPNA MODULO*/
 

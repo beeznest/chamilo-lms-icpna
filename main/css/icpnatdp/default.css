@@ -65,12 +65,13 @@ footer {
     background-image: url(images/color.png);
     background-repeat:repeat-x;    
     color:#ffffff;
-    height: 10em;
+    height: 17em;
     margin-top: 5px;
-    padding-top: 3em;
+    padding-top: 1em;
 }
 footer .topline{
   padding-top: 1em;
+  padding-bottom: 1em;
   font-size: 13px;
 }
 footer .centerline{
@@ -80,14 +81,14 @@ footer .centerline{
   padding-left: 2em;
 }
 footer .container .row {
-  padding-top: 10px;
-  padding-left: 4em;
+ padding: 0;
+ text-align: center;
 }
 footer .container .row a{
   color: #ffffff
 }
 footer .container .row .span12{
-  padding-left: 4em;
+  padding: 0;
 }
 footer .container .row a:hover{
   text-decoration: underline;
@@ -372,7 +373,7 @@ header #logo {
 
 .row .state-icon-process{
     background: transparent url(images/estados-iconos.png) no-repeat;
-    background-position: -105px 0px;
+    background-position: 0px -119px;
     cursor: pointer;
     display: block;
     height: 95px;
@@ -385,10 +386,10 @@ header #logo {
 
 .row .state-icon-closed{
     background: transparent url(images/estados-iconos.png) no-repeat;
-    background-position: -210px 0px;
+    background-position: 23px -228px;
     cursor: default;
     display: block;
-    height: 95px;
+    height: 95px;-r
     width: 100px;
     /*position: absolute;*/
     margin:auto;
@@ -663,7 +664,7 @@ color: #fff;
 
 /*ESTILO PARA MODULO SCORM*/
 .redimension-scorm{
-  min-height: 800px;
+  min-height: 600px;
   width:100%;
 }
 #learning_path_left_zone {
@@ -838,15 +839,6 @@ color: #fff;
 header .row-fluid .span9 {
   width: auto;
 }
-#course_tools .span2.text-vertical {
-  color: #808080;
-  font-size: 1.4em;
-  /*margin-left: -180px;*/
-  padding:0.3em 0 0.8em;
-  float:none;
-  text-align: center;
-  transform: rotate(0deg);
-}
 #course_tools .row-fluid .span10 {
   width: 100%;
 }
@@ -872,21 +864,430 @@ header .row-fluid .span9 {
   display:none;
 }
 }
-@media (max-width: 480px) {
+@media (min-width: 321px) and (max-width: 480px) {
 #course_tools .span2.text-vertical {
   color: #808080;
   font-size: 1.4em;
   /*margin-left: -180px;*/
-  padding:0.3em 0 0.8em;
+  padding-left: 10px;
+  padding-top: 0px;
   float:none;
-  text-align: center;
-  transform: rotate(0deg);
+  text-align: left;
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+  }
+  #cssmenu {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  #cssmenu .welcome {
+    font-size: 12px;
+    line-height: 12px;
+    text-transform: capitalize;
+    font-weight: normal;
+  }
+  #cssmenu > ul ul li a {
+    font-weight: normal;
+    font-size: 12px;
+    width: 120px;
+  }
+  .alto {
+    height: 9em;
+    padding-top: 0.5em;
+  }
+  #bar-animation {
+    width: 200px;
+  }
+  .row .row-fluid .span10{
+    width: 100%
+  }
+  #course_tools .span12 .span2 {
+    width: 50%;
+  }
+  #course_tools .span12 .span2 .center-items {
+  padding-bottom: 10px;
+  padding-left: 0;
+  }
+  .row .state-icon-closed {
+    background: url("images/estados-iconos.png") no-repeat scroll center -228px rgba(0, 0, 0, 0);
+  }
+  footer .container .row {
+        padding: 0px;
+  }
+  footer .container .row .span12 {
+    padding-left: 0;
+    text-align: center;
+  }
+  footer {
+    padding-top: 2em;
+    padding-bottom: 2em;
+    height: 14em;
+  }
+  footer .topline {
+    font-size: 11px;
+    padding-bottom: 1em;
+    padding-top: 1em;
+  }
+  footer .centerline {
+    font-size: 10px;
+    padding-left: 2em;
+    padding-top: 1em;
+    text-align: center;
+  }
+  #learning_path_left_zone {
+        width: 190px;
+  }
+  header #logo{
+        display: block;
+        visibility: visible;
+        text-align: left;
+        padding: 0 0 0 15px;
+  }
+  .row-fluid .row-fluid .column-one{
+        display: none;
+        visibility: hidden;
+  }
+  .text-module {
+    font-size: 20px;
+    padding-left: 5px;
+    text-align: left;
+  }
+  .text-message {
+    color: #6E6E6E;
+    font-size: 12px;
+    padding-left: 5px;
+  }
+  .padding-text-module {
+    padding-bottom: 0.5em;
+    padding-top: 0.5em;
+  }
+  .ico-help {
+    padding-left: 12.5em;
+  }
+  .ico-help img{
+    max-width: none;
+  }
+  #bar-animation {
+    margin-left: 10px;
+    width: 200px;
+  }
 }
+/*+++++++++++++++++++++++++++++++++++++++
+MI DESEMPEÑO
++++++++++++++++++++++++++++++++++++++++++*/
+.contenedor-tabla{
+    display: table;
+}
+
+.contenedor-fila{
+    display: table-row;
+}
+
+.contenedor-columna{
+    display: table-cell;
+}
+.seccion-info-notas{
+    background-color: #005C84;
+}
+.seccion-info-notas .letra{
+    color: #ffffff;
+    padding: 10px;
+    margin:0px;
+    font-size: 18px;
+
+}
+.top-note{
+    padding-top: 35px;
+}
+.icon-complet{
+    background: url(images/curso.png) no-repeat left center;
+    padding: 15px 10px 15px 50px;
+    font-size: 20px;
+    color: #005C84;
+    width: 50%;
+}
+.icon-incomplet{
+    background: url(images/curso-gris.png) no-repeat left center;
+    padding: 15px 10px 15px 50px;
+    font-size: 20px;
+    color: #808080;
+    width: 50%;
+}
+.nota-aprueba{
+    font-size: 20px;
+    color: #005C84;
+    padding: 15px 10px 15px 50px;
+}
+.nota-desaprueba{
+    font-size: 20px;
+    color: #808080;
+    padding: 15px 10px 15px 50px;
+}
+.icon-nivel{
+    background: url(images/nivel.png) no-repeat left center;
+    padding: 15px 10px 15px 50px;
+    font-size: 20px;
+    color: #005C84;
+    width: 100%;
+}
+.icon-nivel h3{
+    padding-left: 35px;
+    font-weight: normal;
+}
+/*+++++++++++++++++++++++++++++++++++++++
+FIN DE DESEMPEÑO
++++++++++++++++++++++++++++++++++++++++++*/
+
+/*+++++++++++++++++++++++++++++++++++++++
+CSS DONDE ESTOY
++++++++++++++++++++++++++++++++++++++++++*/
+.title-nivel-01{
+    font-size: 20px;
+    color: #000;
+    border-top: 2px solid #deebf7;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-bottom: 6px solid #deebf7;
+    text-align: center;
+}
+.title-nivel-02{
+    font-size: 20px;
+    color: #000;
+    border-top: 2px solid #bdd7ee;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-bottom: 6px solid #bdd7ee;
+    text-align: center;
+}
+.title-nivel-03{
+    font-size: 20px;
+    color: #000;
+    border-top: 2px solid #9dc3e6;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-bottom: 6px solid #9dc3e6;
+    text-align: center;
+}
+.title-nivel-04{
+    font-size: 20px;
+    color: #000;
+    border-top: 2px solid #2e75b6;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-bottom: 6px solid #2e75b6;
+    text-align: center;
+}
+.location-course{
+    padding-bottom: 15px;
+    padding-top: 15px;
+    text-align: center;
+    font-size: 20px;
+    color: #ccc;
+}
+.location-course .complet a{
+    color: #ffffff;
+    background-color: #0189bc;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.location-course .complet a:hover{
+    color: #ffffff;
+    background-color: #1da40f;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.location-course .actual a{
+    color: #ffffff;
+    background-color: #ff0000;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.location-course .actual a:hover{
+    color: #ffffff;
+    background-color: #1da40f;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.number-hours{
+    font-size: 16px;
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    background-color: #d7dde3;
+}
+.row h3{
+    margin-left: 60px;
+}
+/*+++++++++++++++++++++++++++++++++++++++
+FIN CSS DONDE ESTOY
++++++++++++++++++++++++++++++++++++++++++*/
+
+
+@media (max-width: 320px) {
+
+  header #logo {
+        padding: 0 0 0 10px;
+        text-align: left;
+        display: block;
+    }
 #cssmenu {
-  position:absolute;
-  top:0;
-  right:20px;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  #cssmenu .welcome {
+    font-size: 12px;
+    line-height: 12px;
+    text-transform: capitalize;
+    font-weight: normal;
+  }
+  #cssmenu > ul ul li a {
+    font-weight: normal;
+    font-size: 12px;
+    width: 120px;
+  }
+  .ico-help {
+    padding-left: 11em;
+  }
+  .ico-help img{
+    max-width: none;
+  }
+  #bar-animation {
+    margin-left: 10px;
+    width: 180px;
+  }
+  .text-module {
+    font-size: 20px;
+    padding-left: 5px;
+    text-align: left;
+  }
+  .text-message {
+    color: #6E6E6E;
+    font-size: 12px;
+    padding-left: 5px;
+  }
+  #course_tools .span2.text-vertical {
+  color: #808080;
+  font-size: 1.4em;
+  /*margin-left: -180px;*/
+  padding-left: 10px;
+  padding-top: 0px;
+  float:none;
+  text-align: left;
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+  }
+  .alto {
+    height: auto;
+    padding-top: 1em;
+  }
+  #course_tools .span12 .span2 {
+    width: 50%;
+  }
+  .row-fluid .span10 {
+    width: 100%;
+  }
+  #course_tools .span12 .span2 .center-items {
+    padding-bottom: 15px;
+    padding-left: 0;
+  }
+  .course-tool h4 {
+    font-size: 12px;
+    font-weight: normal;
+  }
+  .course-tool {
+    height: 110px;
+    width: 47%;
 }
+}
+@media (min-width: 481px) and (max-width: 800px) {
+    #course_tools .span2.text-vertical {
+    color: #808080;
+    font-size: 1.4em;
+    /*margin-left: -180px;*/
+    padding-left: 10px;
+    padding-top: 0px;
+    float:none;
+    text-align: left;
+      -webkit-transform: rotate(0deg);
+      -moz-transform: rotate(0deg);
+      -o-transform: rotate(0deg);
+    }
+
+    #cssmenu .welcome {
+        font-size: 14px;
+        line-height: 12px;
+        font-weight: normal;
+        text-transform: capitalize;
+    }
+    #cssmenu > ul ul li a {
+        font-weight: normal;
+        width: 152px;
+    }
+    #cssmenu > ul > li > a {
+        padding: 10px 50px;
+    }
+    .column-one {
+        float: left;
+        width: 50%;
+    }
+    #bar-animation {
+      width: 100%;
+    }
+    .home-ico {
+      background: url("images/home.png") no-repeat scroll 15px center / 25px 25px rgba(0, 0, 0, 0);
+      margin-left: 1em;
+      margin-top: 1.8em;
+      padding-left: 4em;
+      padding-top: 0.5em;
+    }
+    .home-ico a {
+      color: #FFFFFF;
+      font-size: 14px;
+    }
+    .span12 {
+      width: 100%;
+      margin-left: -3px;
+    }
+    .row {
+      margin-left: 5px;
+    }
+    #course_tools .span12 .span2 .center-items {
+      padding-left: 0;
+      padding-bottom: 20px;
+    }
+    .row .state-icon-closed {
+      background: url("images/estados-iconos.png") no-repeat scroll center -228px rgba(0, 0, 0, 0);
+    }
+    #course_tools .span12 .span2 {
+      width: 175px;
+  }
+  .course-tool h4 {
+      font-size: 14px;
+      font-weight: normal;
+    }
+    footer {
+    background-color: #818181;
+    background-image: url("images/color.png");
+    background-repeat: repeat-x;
+    color: #FFFFFF;
+    height: 13em;
+    margin-top: 5px;
+    padding-top: 2em;
+    }
+    footer .container .row .span12 .span2{
+      width: 160px;
+    }
+    footer .centerline {
+    font-size: 12px;
+    padding-left: 2em;
+    padding-top: 1em;
+    text-align: center;
+  }
 }
 /*FIN DE ICPNA MODULO*/
 

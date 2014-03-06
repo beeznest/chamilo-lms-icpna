@@ -33,14 +33,15 @@ function toogle_minipanel() {
     });
     // Hiding navigation left zone
     $('#learning_path_left_zone').hide(50);                
-    $('#learning_path_right_zone').css('margin-left','10px');
+    // $('#learning_path_right_zone').css('margin-left','10px');
+    $('#learning_path_right_zone').addClass('Ocultar');
     $('#hide_bar table').css('backgroundImage','url(../img/hide2.png)').css('backgroundColor','#EEEEEE');
                 
 }
 
 $(document).ready(function() {
     //Adding div to hide panel
-    $('#learning_path_right_zone').before('<div id="hide_bar" style="float: left; width: 10px; height: 1000px;">' +
+    $('#learning_path_right_zone').before('<div id="hide_bar" style="float: left; width: 15px; height: 700px; ">' +
         '<table style="border: 0 none; width: 100%; height: 100%; cursor: pointer; background-color: #EEEEEE">' +
         '<tr><td></td></tr></table></div>');
     
@@ -53,12 +54,13 @@ $(document).ready(function() {
     // Adding funcionality
     $("#hide_bar").click(function() {
         var disp = $("#inner_lp_toc").css("display");
-        var frmWidth = $('#content_id').width();
+        // var frmWidth = $('#content_id').width();
         
         if (disp == 'block') {
             $("#inner_lp_toc").css('display', 'none');
-            $("#learning_path_right_zone").css('margin-left', '10px');
-            $("#content_id").width(frmWidth + 250);
+            // $("#learning_path_right_zone").css('margin-left', '10px');
+            $('#learning_path_right_zone').removeClass('Mostrar').addClass('Ocultar'); //Añadimos Clase Ocultar
+            // $("#content_id").width(frmWidth + 250);
             $('#hide_bar table').css({
                 backgroundImage: "url(../img/hide2.png)", 
                 backgroundRepeat: "no-repeat", 
@@ -66,9 +68,10 @@ $(document).ready(function() {
             });
         } else {
             $("#inner_lp_toc").css("display", "block");
-            $("#learning_path_right_zone").css('margin-left', marginLeftIni);
-            $('#content_id').width();
-            $("#content_id").width(frmWidth - 250);
+            // $("#learning_path_right_zone").css('margin-left', marginLeftIni);
+            $('#learning_path_right_zone').removeClass('Ocultar').addClass('Mostrar'); //Añadimos Clase Mostrar
+            // $('#content_id').width();
+            // $("#content_id").width(frmWidth - 250);
             $('#hide_bar table').css({
                 backgroundImage: "url(../img/hide0.png)", 
                 backgroundRepeat: "no-repeat", 
@@ -77,9 +80,9 @@ $(document).ready(function() {
         }
     });
     
-    $('#content_id').load(function() {
-        var cntHeight = $(this).contents().height() + 10;
-        $(this).height(cntHeight);
-        $("#hide_bar").css('height', cntHeight);
-    });
+    // $('#content_id').load(function() {
+    //     var cntHeight = $(this).contents().height() + 10;
+    //     $(this).height(cntHeight);
+    //     $("#hide_bar").css('height', cntHeight);
+    // });
 });

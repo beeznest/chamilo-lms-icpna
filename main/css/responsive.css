@@ -20,8 +20,20 @@ The more frequent ones have been marked with *
 /* Phone */
 
 @media (max-width: 320px) {
+    
+    body{
+        padding: 0;
+    }
     header #header_center, header #header_right, header #header_left {
         display:none;
+    }
+    .home-ico{
+        display: none;
+        visibility: hidden;
+    }
+    .light-blue-bar .row-fluid .column-one{
+        display: none;
+        visibility: hidden;
     }
     .navbar {
       margin-top: 0em;
@@ -60,7 +72,7 @@ The more frequent ones have been marked with *
     /* only for the course tools */
     #course_tools .row > [class*="span"], #course_tools  .row-fluid > [class*="span"] {
         float: left;
-        margin-left: 20px;
+        margin-left: 5px;
     }
     /* Course- home - Show 2 icons instead of one */
     .course-tool {
@@ -105,8 +117,8 @@ The more frequent ones have been marked with *
         margin-right: 15px;
     }
     .section-mycourses #main_content {
-        margin-right: 15px;
-        width: 260px;
+        margin-right: 5px;
+        width: 100%;
     }
     .section-mycourses .course-box .course-box-actions {
         display: none;
@@ -120,6 +132,9 @@ The more frequent ones have been marked with *
 }
 
 @media (min-width: 321px) and (max-width: 480px) {
+    body{
+        padding: 0;
+    }
     header #header_center, header #header_right, header #header_left {
         display:none;
     }
@@ -158,7 +173,11 @@ The more frequent ones have been marked with *
     .subnav .nav > li > a, .navbar .dropdown-menu a {
         color: white;
     }
-
+    
+    .home-ico {
+      display: none;
+      visibility: hidden;
+    }
     /* Footer fixes */
 
     footer {
@@ -179,6 +198,7 @@ The more frequent ones have been marked with *
     /* No resize font */
     .resize_font {
         display:none;
+
     }
 
     h3 {
@@ -197,17 +217,18 @@ The more frequent ones have been marked with *
     /* only for the course tools */
     #course_tools .row > [class*="span"], #course_tools  .row-fluid > [class*="span"] {
         float: left;
-        margin-left: 10px;
+        margin-left: 3px;
     }
     /* Course- home - Show 2 icons instead of one */
     .course-tool {
         float: left;
         height: 150px;
-        width: 160px;
+        width: 49%;
     }
 
     .course-tool h4 {
         font-size: 14px;
+        font-weight: normal;
     }
 
     .subbav .nav > li > a:hover,
@@ -257,8 +278,8 @@ The more frequent ones have been marked with *
         margin-right: 15px;
     }
     .section-mycourses #main_content {
-        margin-right: 15px;
-        width: 400px;
+        margin-right: 10px;
+        width: 100%;
     }
     .section-mycourses .course-box .course-box-actions {
         display: none;
@@ -272,6 +293,12 @@ The more frequent ones have been marked with *
 }
 
 @media (min-width: 481px) and (max-width: 800px) {
+    #cssmenu .welcome {
+        font-size: 16px;
+        line-height: 12px;
+        font-weight: normal;
+        text-transform: capitalize;
+    }
     /* No topbar */
     #topbar {
         display:none;

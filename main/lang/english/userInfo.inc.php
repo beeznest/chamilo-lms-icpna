@@ -202,4 +202,6 @@ $EditMembersList = "Edit members list";
 $IAmAHRM = "I am a human resources manager";
 $UnsubscribeFromPlatform = "If you want to unsubscribe completely from this campus and have all your information removed from our database, please click the button below and confirm.";
 $UnsubscribeFromPlatformConfirm = "Yes, I want to remove this account completely. No data will remain on the server and I will be unable to login again, unless I create a completely new account.";
+$WhereIAm = "Where I am?";
+$MyPerformance = "My performance";
 ?>

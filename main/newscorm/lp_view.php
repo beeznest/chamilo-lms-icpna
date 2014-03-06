@@ -313,12 +313,12 @@ if (isset($_SESSION['status']) && $_SESSION['status'][$course_code] == 5) {
 // Set flag to ensure lp_header.php is loaded by this script (flag is unset in lp_header.php).
 $_SESSION['loaded_lp_view'] = true;
 
-$display_none = '';
-$margin_left = '270px';
-echo "
-    <script>
-    var marginLeftIni = '$margin_left'
-</script>";
+// $display_none = '';
+// $margin_left = '270px';
+// echo "
+//     <script>
+//     var marginLeftIni = '$margin_left'
+// </script>";
 
 //Media player code
 
@@ -443,14 +443,15 @@ echo '<div id="learning_path_main" style="width:100%;height:100%;">';
     <!-- end left zone -->
 
     <!-- right zone -->
-    <div id="learning_path_right_zone" style="margin-left:<?php echo $margin_left;?>;height:100%">
+    <!-- <div id="learning_path_right_zone"  style="margin-left:<?php echo $margin_left;?>;height:100%" >  Antiguo -->
+    <div id="learning_path_right_zone" class="Mostrar">
     <?php
         // hub 26-05-2010 Fullscreen or not fullscreen
         $height = '100%';
         if ($_SESSION['oLP']->mode == 'fullscreen') {
             echo '<iframe id="content_id_blank" name="content_name_blank" src="blank.php" border="0" frameborder="0" style="width:100%;height:'.$height.'" ></iframe>';
         } else {
-            echo '<iframe id="content_id" name="content_name" src="'.$src.'" border="0" frameborder="0" class="redimension-scorm"></iframe>';
+            echo '<iframe id="content_id" name="content_name" src="'.$src.'" border="0" frameborder="0"  class="redimension-scorm"></iframe>';
         }
     ?>
     </div>

@@ -22,7 +22,7 @@ require_once api_get_path(LIBRARY_PATH).'message.lib.php';
 
 /**
  *
-*    @package chamilo.social
+ *    @package chamilo.social
  */
 class SocialManager extends UserManager {
 
@@ -503,6 +503,11 @@ class SocialManager extends UserManager {
             $html .= '<li class="'.$active.'"><a href="'.api_get_path(WEB_PATH).'main/auth/profile.php">'.Display::return_icon('profile.png',get_lang('Home'),array()). get_lang('Profile') .'</a></li>';
             $active = $show=='messages' ? 'active' : null;
             $html .= '<li class="'.$active.'"><a href="'.api_get_path(WEB_PATH).'main/messages/inbox.php?f=social">'.Display::return_icon('instant_message-new.png',get_lang('Messages'),array()).get_lang('Messages').$count_unread_message.'</a></li>';
+            $active = $show=='whereiam' ? 'active' : null;
+            $html .= '<li class="'.$active.'"><a href="'.api_get_path(WEB_PATH).'main/social/whereiam.php">'.Display::return_icon('instant_message-new.png',get_lang('Messages'),array()).get_lang('WhereIAm').$count_unread_message.'</a></li>';$active = $show=='whereiam' ? 'active' : null;
+            $active = $show=='myperformance' ? 'active' : null;
+            $html .= '<li class="'.$active.'"><a href="'.api_get_path(WEB_PATH).'main/social/myperformance.php">'.Display::return_icon('instant_message-new.png',get_lang('Messages'),array()).get_lang('MyPerformance').$count_unread_message.'</a></li>';
+
 /*
             //Invitations
             $active = $show=='invitations' ? 'active' : null;

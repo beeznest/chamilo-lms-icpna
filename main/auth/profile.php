@@ -132,6 +132,7 @@ $form->applyFilter(array('lastname', 'firstname'), 'trim');
 
 $form->addRule('lastname' , get_lang('ThisFieldIsRequired'), 'required');
 $form->addRule('firstname', get_lang('ThisFieldIsRequired'), 'required');
+$form->addRule('extra_middlename', get_lang('ThisFieldIsRequired'), 'required');
 
 //	EMAIL
 $form->addElement('email', 'email', get_lang('Email'), array('size' => 40));

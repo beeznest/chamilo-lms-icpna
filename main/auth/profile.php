@@ -132,6 +132,7 @@ $form->applyFilter(array('lastname', 'firstname'), 'trim');
 
 $form->addRule('lastname' , get_lang('ThisFieldIsRequired'), 'required');
 $form->addRule('firstname', get_lang('ThisFieldIsRequired'), 'required');
+$form->addRule('extra_middlename', get_lang('ThisFieldIsRequired'), 'required');
 
 //	EMAIL
 $form->addElement('email', 'email', get_lang('Email'), array('size' => 40));
@@ -656,7 +657,7 @@ if ($form->validate()) {
     );
     
     if (!empty($extra_data['extra_middlename'])) {
-        $body['middelname'] = $extra_data['extra_middlename'];
+        $body['middlename'] = $extra_data['extra_middlename'];
     }
     
     if (!empty($changeemail)) {

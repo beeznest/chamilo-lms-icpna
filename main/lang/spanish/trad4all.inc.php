@@ -1417,4 +1417,4 @@ $LegalAgreementAccepted = "Condiciones legales aceptadas";
 $Welcome = "Bienvenido";
 $MyAccount = "Mi cuenta";
 $DeleteInbox = "Borrar";
-?>
+$MyAccount = "Mi cuenta";

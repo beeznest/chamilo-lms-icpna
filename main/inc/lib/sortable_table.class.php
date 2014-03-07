@@ -282,22 +282,25 @@ class SortableTable extends HTML_Table {
 			$html .= '<td>';
             
 			if (count($this->form_actions) > 0) {
-                
 				$html .= '<div class="btn-toolbar">';         
                     $html .= '<div class="btn-group">';
                     $html .= '<a class="btn" href="?'.$params.'&amp;'.$this->param_prefix.'selectall=1" onclick="javascript: setCheckbox(true, \''.$table_id.'\'); return false;">'.get_lang('SelectAll').'</a>';
                     $html .= '<a class="btn" href="?'.$params.'" onclick="javascript: setCheckbox(false, \''.$table_id.'\'); return false;">'.get_lang('UnSelectAll').'</a> ';
-                    $html .= '</div>';                
-                    $html .= '<div class="btn-group">
-                                <button class="btn" onclick="javascript:return false;">'.get_lang('Actions').'</button>                    
+                    $html .= '</div>';
+                    $html .= '<div class="btn-group">';
+                if (count($this->form_actions) > 1) {
+                    $html .= '<button class="btn" onclick="javascript:return false;">'.get_lang('Actions').'</button>
                                 <button class="btn dropdown-toggle" data-toggle="dropdown">
-                                    <span class="caret"></span>
+                                <span class="caret"></span>
                                 </button>';
                     $html .= '<ul class="dropdown-menu">';				
-                    foreach ($this->form_actions as $action => & $label) {					
+                    foreach ($this->form_actions as $action => & $label) {
                         $html .= '<li><a data-action ="'.$action.'" href="#" onclick="javascript:action_click(this, \''.$table_id.'\');">'.$label.'</a></li>';
                     }
-                    $html .= '</ul>';				
+                    $html .= '</ul>';
+                } else {
+                    $html .= '<button data-action ="'.key($this->form_actions).'"class="btn" onclick="javascript:action_click(this, \''.$table_id.'\');">'.current($this->form_actions).'</button>';
+                }
                     $html .= '</div>';//btn-group                
                 $html .= '</div>'; //toolbar
 			} else {

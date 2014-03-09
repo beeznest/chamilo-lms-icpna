@@ -656,7 +656,7 @@ if ($form->validate()) {
     );
     
     if (!empty($extra_data['extra_middlename'])) {
-        $body['middelname'] = $extra_data['extra_middlename'];
+        $body['middlename'] = $extra_data['extra_middlename'];
     }
     
     if (!empty($changeemail)) {

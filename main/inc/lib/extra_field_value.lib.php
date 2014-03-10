@@ -238,7 +238,7 @@ class ExtraFieldValue extends Model {
      * @assert (-1,'') === false
      */
     public function get_values_by_handler_and_field_variable($item_id, $field_variable, $transform = false) {
-        $field_id = intval($field_id);
+        //$field_id = intval($field_id);
         $item_id = Database::escape_string($item_id);
         $field_variable = Database::escape_string($field_variable);
 
@@ -270,6 +270,7 @@ class ExtraFieldValue extends Model {
             return false;
         }
     }
+
     /**
      * Gets the ID from the item (course, session, etc) for which
      * the given field is defined with the given value
@@ -300,6 +301,36 @@ class ExtraFieldValue extends Model {
             return false;
         }
     }
+
+    /**
+     * Gets the ID from the item (course, session, etc) for which
+     * the given field is defined with the given value
+     * @param string Field (type of data) we want to check
+     * @param string Data we are looking for in the given field
+     * @return mixed Give the ID if found, or false on failure or not found
+     * @assert (-1,-1) === false
+     */
+    public function get_all_item_id_from_field_variable_and_field_value(
+        $field_variable,
+        $field_value
+    ) {
+        $field_value = Database::escape_string($field_value);
+        $field_variable = Database::escape_string($field_variable);
+
+        $sql = "SELECT {$this->handler_id} FROM {$this->table} s
+                INNER JOIN {$this->table_handler_field} sf ON (s.field_id = sf.id)
+                WHERE  field_value  = '$field_value'  AND
+                       field_variable = '" . $field_variable . "'
+                ";
+        $result = Database::query($sql);
+        if ($result !== false && Database::num_rows($result)) {
+            $result = Database::store_result($result, 'ASSOC');
+            return $result;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Get all values for a specific field id
      * @param int Field ID

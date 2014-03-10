@@ -5681,6 +5681,73 @@ function WSGetCourseFinalScore($params) {
     return $output;
 }
 
+
+/* Register WSGetExerciseExtraFieldOutCome function */
+// Register the data structures used by the service
+$server->wsdl->addComplexType(
+    'getExerciseExtraFieldOutCome',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'secret_key' => array('name' => 'secret_key', 'type' => 'xsd:string')
+    )
+);
+
+// Prepare output params, in this case will return an array
+$server->wsdl->addComplexType(
+    'result_exerciseOutcomes',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'exercise_id' => array('name' => 'exercise_id', 'type' => 'xsd:string'),
+        'outcome' => array('name' => 'outcome', 'type' => 'xsd:string')
+    )
+);
+
+$server->wsdl->addComplexType(
+    'results_exerciseOutcomes',
+    'complexType',
+    'array',
+    '',
+    'SOAP-ENC:Array',
+    array(),
+    array(
+        array(
+            'ref' => 'SOAP-ENC:arrayType',
+            'wsdl:arrayType' => 'tns:result_exerciseOutcomes[]'
+        )
+    ),
+    'tns:result_exerciseOutcomes'
+);
+
+
+// Register the method to expose
+$server->register(
+    'WSGetExerciseExtraFieldOutCome', // method name
+    array('getExerciseExtraFieldOutCome' => 'tns:getExerciseExtraFieldOutCome'),
+    // input parameters
+    array('return' => 'tns:results_exerciseOutcomes'), // output parameters
+    'urn:WSRegistration', // namespace
+    'urn:WSRegistration#WSGetExerciseExtraFieldOutCome', // soapaction
+    'rpc', // style
+    'encoded', // use
+    'This service returns the results of the final exam for the given student, course and session' // documentation
+);
+
+function WSGetExerciseExtraFieldOutCome($params)
+{
+    if (!WSHelperVerifyKey($params)) {
+        return return_error(WS_ERROR_SECRET_KEY);
+    }
+    require_once api_get_path(SYS_CODE_PATH) . 'exercice/exercise.lib.php';
+    $result = getAllExerciseWithExtraFieldPlex();
+    return $result;
+}
+
 // Use the request to (try to) invoke the service
 $HTTP_RAW_POST_DATA = isset($HTTP_RAW_POST_DATA) ? $HTTP_RAW_POST_DATA : '';
 $server->service($HTTP_RAW_POST_DATA);

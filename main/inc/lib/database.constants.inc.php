@@ -112,6 +112,10 @@ define('TABLE_MAIN_SESSION_FIELD',          'session_field');
 define('TABLE_MAIN_SESSION_FIELD_OPTIONS',  'session_field_options');
 define('TABLE_MAIN_SESSION_FIELD_VALUES',   'session_field_values');
 
+define('TABLE_MAIN_EXERCISE_FIELD', 'exercise_field');
+define('TABLE_MAIN_EXERCISE_FIELD_OPTIONS', 'exercise_field_options');
+define('TABLE_MAIN_EXERCISE_FIELD_VALUES', 'exercise_field_values');
+
 // Message
 define('TABLE_MAIN_MESSAGE', 'message');
 

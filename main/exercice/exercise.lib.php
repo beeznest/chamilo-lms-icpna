@@ -2540,7 +2540,7 @@ function get_question_ribbon($objExercise, $score, $weight, $check_pass_percenta
     /*
     $tmpEventMessage = strip_tags($eventMessage);
     $tmpEventMessage = trim(str_replace("&nbsp;", "", $tmpEventMessage));
-   
+
     if ($check_pass_percentage && !empty($tmpEventMessage)) {
         $ribbon .= show_success_message($score, $weight, $objExercise->selectPassPercentage(), $tmpEventMessage);
         $eventMessage = "";
@@ -2555,3 +2555,33 @@ function get_question_ribbon($objExercise, $score, $weight, $check_pass_percenta
     $ribbon .= $eventMessage;
     return $ribbon;
 }
+
+/**
+ * @return array
+ */
+function getAllExerciseWithExtraFieldPlex()
+{
+    $extraFieldValue = new ExtraFieldValue('exercise');
+    $exercises = $extraFieldValue->get_all_item_id_from_field_variable_and_field_value(
+        'plex',
+        1
+    );
+
+    $result = array();
+    if (!empty($exercises)) {
+        foreach ($exercises as $data) {
+            $exerciseId = $data['exercise_id'];
+            $outcome = $extraFieldValue->get_values_by_handler_and_field_variable(
+                $exerciseId,
+                'outcome'
+            );
+            $result[] = array(
+                'exercise_id' => $exerciseId,
+                'outcome' => $outcome['field_value'],
+            );
+        }
+    }
+    return $result;
+}
+
+//var_dump(getAllExerciseWithExtraFieldPlex());

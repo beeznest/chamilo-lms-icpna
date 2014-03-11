@@ -92,12 +92,14 @@ if (!empty($user_id)) {
             continue;
         } elseif ($sequence_int < 10) {
             $course_sequence = '0' . $sequence_int;
-        } elseif ($length > 99) {
+        } elseif ($sequence_int > 99) {
             $course_sequence = $sequence_int % 100;
         }
         $course_sequences[$sequence_int] = $course_sequence;
     }
-    sort($course_sequences = array_unique($course_sequences));
+    if (!empty($course_sequence)) {
+        sort($course_sequences = array_unique($course_sequences));
+    }
     for ($i = 1 ; $i <= (TOTAL_COURSES + 1) ; $i++) {
         $social_right_content .= createDiv($i);
         if ($i > TOTAL_COURSES) {

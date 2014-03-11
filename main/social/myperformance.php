@@ -215,7 +215,9 @@ if (!empty($user_id)) {
         $sid = $session['id_session'];
         $course_sequences[$sequence_int] = $sid;
     }
-    sort($course_sequences = array_unique($course_sequences));
+    if (!empty($course_sequences)) {
+        sort($course_sequences = array_unique($course_sequences));
+    }
     for ($i = 1 ; $i <= (TOTAL_COURSES + 1) ; $i++) {
         $social_right_content .= createDiv($i,$course_sequences[$i]);
         if ($i > TOTAL_COURSES) {

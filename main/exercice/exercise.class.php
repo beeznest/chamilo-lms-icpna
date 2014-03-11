@@ -69,6 +69,7 @@ class Exercise
     public $emailNotificationTemplateToUser = null;
     public $notifyUserByEmail = 0;
     public $emailAlert;
+    public $session_id;
 
     /**
      * Constructor of the class
@@ -158,6 +159,7 @@ class Exercise
             $this->emailNotificationTemplate = $object->email_notification_template;
             $this->emailNotificationTemplateToUser = $object->email_notification_template_to_user;
             $this->notifyUserByEmail = $object->notify_user_by_email;
+            $this->session_id = $object->session_id;
 
             $this->review_answers = (isset($object->review_answers) && $object->review_answers == 1) ? true : false;
             $sql = "SELECT max_score FROM $table_lp_item
@@ -1878,7 +1880,6 @@ class Exercise
         $field_value = new ExtraFieldValue('exercise');
         $params = $form->getSubmitValues();
         $params['exercise_id'] = $this->id;
-
         $field_value->save_field_values($params);
     }
 

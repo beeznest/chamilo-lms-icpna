@@ -1677,6 +1677,16 @@ class Exercise
 
             $form->addElement('html', '</div>');
 
+
+            // Advanced exercise settings.
+
+            // Extra fields. (Injecting question extra fields!)
+            if (!empty($this->id)) {
+                $extraFields = new ExtraField('exercise');
+                $extraFields->add_elements($form, $this->id);
+            }
+
+
             $form->addElement('html', '</div>'); //End advanced setting
             $form->addElement('html', '</div>');
         }
@@ -1864,6 +1874,12 @@ class Exercise
             $this->random_answers = 0;
         }
         $this->save($type);
+
+        $field_value = new ExtraFieldValue('exercise');
+        $params = $form->getSubmitValues();
+        $params['exercise_id'] = $this->id;
+
+        $field_value->save_field_values($params);
     }
 
     function search_engine_save()

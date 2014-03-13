@@ -127,6 +127,7 @@ $form->addElement('text', 'username',  'Usuario (DNI o CE)',  array('size' => 40
 $form->addElement('text', 'firstname', 'Nombre', array('size' => 40));
 $form->addElement('text', 'lastname',  'Apellido Paterno',  array('size' => 40));
 $form->addElement('text', 'extra_middlename',  'Apellido Materno',  array('size' => 40));
+$form->addElement('select', 'extra_gender',  'Sexo',  array('m'=>'Masculino', 'f'=>Femenino));
 $form->applyFilter(array('lastname', 'firstname'), 'stripslashes');
 $form->applyFilter(array('lastname', 'firstname'), 'trim');
 
@@ -667,6 +668,8 @@ if ($form->validate()) {
     if (!empty($password)) {
         $body['password'] = $password;
     }
+
+    $body['gender'] = strtolower(substr($extra_data['extra_gender'],0,1));
 
     global $_configuration;
     if (isset($_configuration['course_subscriber_url'])) {

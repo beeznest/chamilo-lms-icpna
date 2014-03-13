@@ -13,10 +13,10 @@ if ($isAdult) {
     define('TOTAL_COURSES', NUM_COURSES * NUM_PHASES);
 }
 $phase_title = array(
-    1 => 'Elementary',
-    2 => 'High - Elementary',
-    3 => 'Basic',
-    4 => 'High - Basic',
+    1 => 'Basic',
+    2 => 'High - Basic',
+    3 => 'Intermediate',
+    4 => 'High - Intermediate',
     5 => 'Advanced',
 );
 if ($isAdult) {

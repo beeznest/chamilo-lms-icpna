@@ -1418,3 +1418,4 @@ $Welcome = "Bienvenido";
 $MyAccount = "Mi cuenta";
 $DeleteInbox = "Borrar";
 $MyAccount = "Mi cuenta";
+$langSelectAtLeastOne = "Seleccione al menos uno";

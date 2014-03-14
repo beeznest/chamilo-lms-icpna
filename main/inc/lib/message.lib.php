@@ -403,8 +403,9 @@ class MessageManager
 				@mkdir($path_message_attach, api_get_permissions_for_new_directories(), true);
 			}
 			$new_path=$path_message_attach.$new_file_name;
-			if (is_uploaded_file($file_attach['tmp_name'])) {
-				$result= @copy($file_attach['tmp_name'], $new_path);
+                        $result = false;
+			if (@copy($file_attach['tmp_name'], $new_path)) {
+				$result = true;
 			}
 			$safe_file_comment= Database::escape_string($file_comment);
 			$safe_file_name = Database::escape_string($file_name);

@@ -3923,7 +3923,9 @@ $server->wsdl->addComplexType(
         'original_user_id_name'       => array('name' => 'original_user_id_name',  'type' => 'xsd:string'),
         'secret_key'                  => array('name' => 'secret_key',             'type' => 'xsd:string'),
         'subject'                     => array('name' => 'subject',                'type' => 'xsd:string'),
-        'message'                     => array('name' => 'message',                'type' => 'xsd:string')
+        'message'                     => array('name' => 'message',                'type' => 'xsd:string'),
+        'hasAttachment'               => array('name' => 'hasAttachment',          'type' => 'xsd:boolean'),
+        'attachments'                 => array('name' => 'attachments',            'type' => 'xsd:array')
     )
 );
 
@@ -3965,7 +3967,26 @@ function WSSendEmailByOriginalUserId($params) {
             $admin = current($admins);
             $senderId = $admin['user_id'];
         }
-        MessageManager::send_message_simple($userId, urldecode($params['subject']), urldecode($params['message']), $senderId);
+        
+       if (!empty($params['hasAttachment']) && $params['hasAttachment']) {
+            $attachments = array();
+            //When send an attachment it must be send using base64_encode($file)
+            $i = 0;
+            foreach ($params['attachments'] as $attachment) {
+                $attachments[$i]['name'] = $attachment['name'];
+                $attachments[$i]['size'] = $attachment['size'];
+                $attachments[$i]['type'] = $attachment['type'];
+                $attachments[$i]['file'] = base64_decode($attachment['tmp_file']);
+                $tmp_path = tempnam(realpath("tmp"), $attachment['name'] . $i);
+                file_put_contents($tmp_path, $attachments[$i]['file']); //Save the file in a tmp
+                $attachments[$i]['tmp_name'] = $tmp_path;
+                $attachments[$i]['error'] = 0;
+                $i++;
+            }    
+            MessageManager::send_message($userId, urldecode($params['subject']), urldecode($params['message']), $attachments, null, null, null, null, null, $senderId);
+        } else {
+            MessageManager::send_message_simple($userId, urldecode($params['subject']), urldecode($params['message']), $senderId);
+        }
         $result = 1;
     }
     return $result;

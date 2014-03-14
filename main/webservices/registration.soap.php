@@ -3946,7 +3946,7 @@ $server->register('WSSendEmailByOriginalUserId',                   // method nam
  * @return int 1 if message was sent 0 if not
  */
 function WSSendEmailByOriginalUserId($params) {
-    global $debug;
+    global $_configuration, $debug;
     $debug = true;
 
     if ($debug) error_log('WSSendEmailByOriginalUserId');
@@ -3961,13 +3961,18 @@ function WSSendEmailByOriginalUserId($params) {
 
     $result = 0;
     if (!empty($userId)) {
-        $admins = UserManager::get_all_administrators();
-        $senderId = null;
-        if (!empty($admins)) {
-            $admin = current($admins);
-            $senderId = $admin['user_id'];
+        $informes_username = $_configuration['informes_username'];
+        //@TODO Create a user firstaname: 'Informes', lastname: 'Vlearning' and save username in $_configuration['informes_username'] in main/inc/conf/configuration.php
+        $user_informes = UserManager::get_user_info_simple($informes_username);
+        $senderId = (!empty($user_informes))? $user_informes['user_id'] : null;
+        if (empty($senderId)) {
+            $admins = UserManager::get_all_administrators();
+            if (!empty($admins)) {
+                $admin = current($admins);
+                $senderId = $admin['user_id'];
+            }
         }
-        
+
        if (!empty($params['hasAttachment']) && $params['hasAttachment']) {
             $attachments = array();
             //When send an attachment it must be send using base64_encode($file)
@@ -3982,11 +3987,14 @@ function WSSendEmailByOriginalUserId($params) {
                 $attachments[$i]['tmp_name'] = $tmp_path;
                 $attachments[$i]['error'] = 0;
                 $i++;
-            }    
+            }
+            if ($debug) error_log('$senderId: '.print_r($senderId, 1));
             MessageManager::send_message($userId, urldecode($params['subject']), urldecode($params['message']), $attachments, null, null, null, null, null, $senderId);
         } else {
+            if ($debug) error_log('$senderId: '.print_r($senderId, 1));
             MessageManager::send_message_simple($userId, urldecode($params['subject']), urldecode($params['message']), $senderId);
         }
+        
         $result = 1;
     }
     return $result;

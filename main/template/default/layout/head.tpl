@@ -51,12 +51,22 @@ function setCheckbox(value, table_id) {
 
 function action_click(element, table_id) {
     d = $("#"+table_id);
-    if (!confirm('{{ "ConfirmYourChoice"|get_lang }}')) {
-        return false;
+    checkboxes = $('#'+table_id+' input:checkbox');
+    var value = false;
+    $.each(checkboxes, function(index, checkbox) {
+        value = checkbox.checked || value;
+    });
+    if (value) {
+        if (!confirm('{{ "ConfirmYourChoice"|get_lang }}')) {
+            return false;
+        } else {
+            var action =$(element).attr("data-action");
+            $('#'+table_id+' input[name="action"] ').attr("value", action);
+            d.submit();
+            return false;
+        }
     } else {
-        var action =$(element).attr("data-action");
-        $('#'+table_id+' input[name="action"] ').attr("value", action);
-        d.submit();
+        alert('{{ "SelectAtLeastOne"|get_lang }}');
         return false;
     }
 }

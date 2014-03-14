@@ -1412,3 +1412,4 @@ $LegalAgreementAccepted = "Legal agreement accepted";
 $UniqueAnswerImage = "Unique answer image";
 $MediaQuestion = "Media question";
 $MyAccount = "My account";
+$langSelectAtLeastOne = "You must select at least one";

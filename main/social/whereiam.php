@@ -7,14 +7,27 @@ if ($isAdult) {
     define('NUM_COURSES', 5);
     define('NUM_PHASES', 5);
     define('TOTAL_COURSES', NUM_COURSES * NUM_PHASES);
+    $phase_title = array(
+        1 => 'Basic',
+        2 => 'High - Basic',
+        3 => 'Intermediate',
+        4 => 'High - Intermediate',
+        5 => 'Advanced',
+    );
 } else {
     define('NUM_COURSES', 6);
     define('NUM_PHASES', 4);
     define('TOTAL_COURSES', NUM_COURSES * NUM_PHASES);
+    $phase_title = array(
+        1 => 'Elementary',
+        2 => 'High - Elementary',
+        3 => 'Basic',
+        4 => 'High - Basic',
+    );
 }
 function createDiv($course_id) {
     $text = '';
-    global $isAdult;
+    global $isAdult, $phase_title;
     $index = $course_id % NUM_COURSES;
     if ($index == 1 && $course_id <= TOTAL_COURSES) {
         $phase_class = array(
@@ -24,13 +37,7 @@ function createDiv($course_id) {
             4 => 'title-nivel-04',
             5 => 'title-nivel-04',
         );
-        $phase_title = array(
-            1 => 'Elementary',
-            2 => 'High - Elementary',
-            3 => 'Basic',
-            4 => 'High - Basic',
-            5 => 'Advanced',
-        );
+
         if ($isAdult) {
             define('NUM_PHASES', 5);
             $phase = array(

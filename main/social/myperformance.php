@@ -7,18 +7,25 @@ if ($isAdult) {
     define('NUM_COURSES', 5);
     define('NUM_PHASES', 5);
     define('TOTAL_COURSES', NUM_COURSES * NUM_PHASES);
+    $phase_title = array(
+        1 => 'Basic',
+        2 => 'High - Basic',
+        3 => 'Intermediate',
+        4 => 'High - Intermediate',
+        5 => 'Advanced',
+    );
 } else {
     define('NUM_COURSES', 6);
     define('NUM_PHASES', 4);
     define('TOTAL_COURSES', NUM_COURSES * NUM_PHASES);
+    $phase_title = array(
+        1 => 'Elementary',
+        2 => 'High - Elementary',
+        3 => 'Basic',
+        4 => 'High - Basic',
+    );
 }
-$phase_title = array(
-    1 => 'Elementary',
-    2 => 'High - Elementary',
-    3 => 'Basic',
-    4 => 'High - Basic',
-    5 => 'Advanced',
-);
+
 if ($isAdult) {
     define('NUM_PHASES', 5);
     $phase = array(

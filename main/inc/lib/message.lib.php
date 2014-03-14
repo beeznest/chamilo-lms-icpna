@@ -1204,19 +1204,21 @@ class MessageManager
         $success = get_lang('SelectedMessagesDeleted');
         $html = '';
 
-        if (isset($_REQUEST['action'])) {
-            switch ($_REQUEST['action']) {
-                case 'delete' :
-                    $number_of_selected_messages = count($_POST['id']);
-                    foreach ($_POST['id'] as $index => $message_id) {
-                        MessageManager::delete_message_by_user_receiver(api_get_user_id(), $message_id);
-                    }
-                    $html .= Display::return_message(api_xml_http_response_encode($success), 'normal', false);
-                    break;
-                case 'deleteone' :
-                    MessageManager::delete_message_by_user_receiver(api_get_user_id(), $_GET['id']);
-                    $html .= Display::return_message(api_xml_http_response_encode($success),'confirmation', false);
-                    break;
+        if (isset($_REQUEST['id'])) {
+            if (isset($_REQUEST['action'])) {
+                switch ($_REQUEST['action']) {
+                    case 'delete' :
+                        $number_of_selected_messages = count($_POST['id']);
+                        foreach ($_POST['id'] as $index => $message_id) {
+                            MessageManager::delete_message_by_user_receiver(api_get_user_id(), $message_id);
+                        }
+                        $html .= Display::return_message(api_xml_http_response_encode($success), 'normal', false);
+                        break;
+                    case 'deleteone' :
+                        MessageManager::delete_message_by_user_receiver(api_get_user_id(), $_GET['id']);
+                        $html .= Display::return_message(api_xml_http_response_encode($success),'confirmation', false);
+                        break;
+                }
             }
         }
 

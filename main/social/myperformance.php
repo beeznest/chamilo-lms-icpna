@@ -7,18 +7,25 @@ if ($isAdult) {
     define('NUM_COURSES', 5);
     define('NUM_PHASES', 5);
     define('TOTAL_COURSES', NUM_COURSES * NUM_PHASES);
+    $phase_title = array(
+        1 => 'Basic',
+        2 => 'High - Basic',
+        3 => 'Intermediate',
+        4 => 'High - Intermediate',
+        5 => 'Advanced',
+    );
 } else {
     define('NUM_COURSES', 6);
     define('NUM_PHASES', 4);
     define('TOTAL_COURSES', NUM_COURSES * NUM_PHASES);
+    $phase_title = array(
+        1 => 'Elementary',
+        2 => 'High - Elementary',
+        3 => 'Basic',
+        4 => 'High - Basic',
+    );
 }
-$phase_title = array(
-    1 => 'Elementary',
-    2 => 'High - Elementary',
-    3 => 'Basic',
-    4 => 'High - Basic',
-    5 => 'Advanced',
-);
+
 if ($isAdult) {
     define('NUM_PHASES', 5);
     $phase = array(
@@ -215,7 +222,9 @@ if (!empty($user_id)) {
         $sid = $session['id_session'];
         $course_sequences[$sequence_int] = $sid;
     }
-    sort($course_sequences = array_unique($course_sequences));
+    if (!empty($course_sequences)) {
+        sort($course_sequences = array_unique($course_sequences));
+    }
     for ($i = 1 ; $i <= (TOTAL_COURSES + 1) ; $i++) {
         $social_right_content .= createDiv($i,$course_sequences[$i]);
         if ($i > TOTAL_COURSES) {

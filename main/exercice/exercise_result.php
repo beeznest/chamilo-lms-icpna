@@ -245,7 +245,6 @@ if ($origin != 'learnpath') {
         if ($resultPercentage >= $objExercise->pass_percentage) {
             $status = 'completed';
         }
-        var_dump($status);
     }
 
     if (api_is_allowed_to_session_edit()) {

@@ -253,13 +253,13 @@ if ($origin != 'learnpath') {
     }
 
     echo "<script>window.parent.API.void_save_asset('$total_score', '$total_weight', 0, '" . $status . "'); </script>";
-    echo "
+    /*echo "
     <span id='result' style='display:none'></span>
     <script>
         $(function() {
 
         });
-    </script>";
-    //echo '<script type="text/javascript">'.$href.'</script>';
+    </script>";*/
+    echo '<script type="text/javascript">' . $href . '</script>';
     echo '</body></html>';
 }

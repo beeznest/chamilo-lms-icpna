@@ -78,6 +78,10 @@ class ExtraFieldValue extends Model {
             return false;
         }
 
+        if ($this->type == 'exercise') {
+            $params['c_id'] = api_get_course_int_id();
+        }
+
         //Parse params
         foreach ($params as $key => $value) {
             if (substr($key, 0, 6) == 'extra_') { //an extra field
@@ -91,6 +95,10 @@ class ExtraFieldValue extends Model {
                         'field_id'          => $extra_field_info['id'],
                         'field_value'       => $value
                     );
+
+                    if ($this->type == 'exercise' && isset($params['c_id'])) {
+                        $new_params['c_id'] = $params['c_id'];
+                    }
                     self::save($new_params);
                 }
             }
@@ -107,9 +115,8 @@ class ExtraFieldValue extends Model {
     {
         $extra_field = new ExtraField($this->type);
 
-        //Setting value to insert
+        // Setting value to insert
         $value = $params['field_value'];
-
         $value_to_insert = null;
 
         if (is_array($value)) {
@@ -122,6 +129,7 @@ class ExtraFieldValue extends Model {
         //If field id exists
         $extra_field_info = $extra_field->get($params['field_id']);
 
+
         if ($extra_field_info) {
             switch ($extra_field_info['field_type']) {
                 case ExtraField::FIELD_TYPE_TAG :
@@ -129,23 +137,6 @@ class ExtraFieldValue extends Model {
                 case ExtraField::FIELD_TYPE_RADIO:
                 case ExtraField::FIELD_TYPE_SELECT:
                 case ExtraField::FIELD_TYPE_SELECT_MULTIPLE:
-                //$field_options = $session_field_option->get_field_options_by_field($params['field_id']);
-                //$params['field_value'] = split(';', $value_to_insert);
-                /*
-                    if ($field_options) {
-                        $check = false;
-                        foreach ($field_options as $option) {
-                            if (in_array($option['option_value'], $values)) {
-                                $check = true;
-                                break;
-                            }
-                       }
-                       if (!$check) {
-                           return false; //option value not found
-                       }
-                   } else {
-                       return false; //enumerated type but no option found
-                   }*/
                     break;
                 case ExtraField::FIELD_TYPE_TEXT:
                 case ExtraField::FIELD_TYPE_TEXTAREA:
@@ -163,14 +154,29 @@ class ExtraFieldValue extends Model {
                 default:
                     break;
             }
-            $field_values = self::get_values_by_handler_and_field_id(
-                $params[$this->handler_id],
-                $params['field_id']
-            );
+
+            $courseId = isset($params['c_id']) ? $params['c_id'] : null;
+
+            if ($this->type == 'exercise') {
+                $this->is_course_model = true;
+                $field_values = self::get_values_by_handler_and_field_id_and_course_id(
+                    $params[$this->handler_id],
+                    $params['field_id'],
+                    false,
+                    $courseId
+                );
+            } else {
+                $field_values = self::get_values_by_handler_and_field_id(
+                    $params[$this->handler_id],
+                    $params['field_id']
+                );
+            }
+
             if ($field_values) {
                 self::delete_values_by_handler_and_field_id(
                     $params[$this->handler_id],
-                    $params['field_id']
+                    $params['field_id'],
+                    $courseId
                 );
             }
             $params['field_value'] = $value_to_insert;
@@ -229,6 +235,68 @@ class ExtraFieldValue extends Model {
             return false;
         }
     }
+
+    /**
+     * Returns the value of the given extra field on the given resource
+     * @param int Item ID (It could be a session_id, course_id or user_id)
+     * @param int Field ID (the ID from the *_field table)
+     * @param bool Whether to transform the result to a human readable strings
+     * @return mixed A structured array with the field_id and field_value, or fals on error
+     * @assert (-1,-1) === false
+     */
+    public function get_values_by_handler_and_field_id_and_course_id(
+        $item_id,
+        $field_id,
+        $transform = false,
+        $courseId = null
+    ) {
+        $field_id = intval($field_id);
+        $courseId = intval($courseId);
+        $item_id = Database::escape_string($item_id);
+
+        $sql = "SELECT s.*, field_type FROM {$this->table} s
+                INNER JOIN {$this->table_handler_field} sf ON (s.field_id = sf.id)
+                WHERE {$this->handler_id} = '$item_id' AND
+                      s.c_id = $courseId AND
+                      field_id = '" . $field_id . "'
+                ORDER BY id";
+        $result = Database::query($sql);
+        if (Database::num_rows($result)) {
+            $result = Database::fetch_array($result, 'ASSOC');
+            if ($transform) {
+                if (!empty($result['field_value'])) {
+                    switch ($result['field_type']) {
+                        case ExtraField::FIELD_TYPE_DOUBLE_SELECT:
+
+                            $field_option = new ExtraFieldOption($this->type);
+                            $options = explode('::', $result['field_value']);
+                            // only available for PHP 5.4  :( $result['field_value'] = $field_option->get($options[0])['id'].' -> ';
+                            $result = $field_option->get($options[0]);
+                            $result_second = $field_option->get($options[1]);
+                            if (!empty($result)) {
+                                $result['field_value'] = $result['option_display_text'] . ' -> ';
+                                $result['field_value'] .= $result_second['option_display_text'];
+                            }
+                            break;
+                        case ExtraField::FIELD_TYPE_SELECT:
+                            $field_option = new ExtraFieldOption($this->type);
+                            $extra_field_option_result = $field_option->get_field_option_by_field_and_option(
+                                $result['field_id'],
+                                $result['field_value']
+                            );
+                            if (isset($extra_field_option_result[0])) {
+                                $result['field_value'] = $extra_field_option_result[0]['option_display_text'];
+                            }
+                            break;
+                    }
+                }
+            }
+            return $result;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Gets a structured array of the original item and its extra values, using
      * a specific original item and a field name (like "branch", or "birthdate")
@@ -260,6 +328,54 @@ class ExtraFieldValue extends Model {
                         $result_second = $field_option->get($options[1]);
                         if (!empty($result)) {
                             $result['field_value'] = $result['option_display_text'].' -> ';
+                            $result['field_value'] .= $result_second['option_display_text'];
+                        }
+                    }
+                }
+            }
+            return $result;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Gets a structured array of the original item and its extra values, using
+     * a specific original item and a field name (like "branch", or "birthdate")
+     * @param int Item ID from the original table
+     * @param string The name of the field we are looking for
+     * @return mixed Array of results, or false on error or not found
+     * @assert (-1,'') === false
+     */
+    public function get_values_by_handler_and_field_variable_and_course_id(
+        $item_id,
+        $field_variable,
+        $transform = false,
+        $courseId = null
+    ) {
+        $courseId = intval($courseId);
+        $item_id = Database::escape_string($item_id);
+        $field_variable = Database::escape_string($field_variable);
+
+        $sql = "SELECT s.*, field_type FROM {$this->table} s
+                INNER JOIN {$this->table_handler_field} sf ON (s.field_id = sf.id)
+                WHERE   {$this->handler_id} = '$item_id'  AND
+                        s.c_id = $courseId AND
+                        field_variable = '" . $field_variable . "'
+                ORDER BY id";
+        $result = Database::query($sql);
+        if (Database::num_rows($result)) {
+            $result = Database::fetch_array($result, 'ASSOC');
+            if ($transform) {
+                if ($result['field_type'] == ExtraField::FIELD_TYPE_DOUBLE_SELECT) {
+                    if (!empty($result['field_value'])) {
+                        $field_option = new ExtraFieldOption($this->type);
+                        $options = explode('::', $result['field_value']);
+                        // only available for PHP 5.4  :( $result['field_value'] = $field_option->get($options[0])['id'].' -> ';
+                        $result = $field_option->get($options[0]);
+                        $result_second = $field_option->get($options[1]);
+                        if (!empty($result)) {
+                            $result['field_value'] = $result['option_display_text'] . ' -> ';
                             $result['field_value'] .= $result_second['option_display_text'];
                         }
                     }
@@ -365,10 +481,18 @@ class ExtraFieldValue extends Model {
      * @return void
      * @assert (-1,-1) == null
      */
-    public function delete_values_by_handler_and_field_id($item_id, $field_id) {
+    public function delete_values_by_handler_and_field_id(
+        $item_id,
+        $field_id,
+        $courseId = null
+    ) {
         $field_id = intval($field_id);
         $item_id = Database::escape_string($item_id);
         $sql = "DELETE FROM {$this->table} WHERE {$this->handler_id} = '$item_id' AND field_id = '".$field_id."' ";
+        if (!empty($courseId)) {
+            $courseId = intval($courseId);
+            $sql .= " AND c_id = $courseId";
+        }
         Database::query($sql);
     }
     /**

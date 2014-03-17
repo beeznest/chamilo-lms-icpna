@@ -613,6 +613,7 @@ DROP TABLE IF EXISTS exercise_field_values;
 CREATE TABLE IF NOT EXISTS exercise_field_values (
   id          int      NOT NULL auto_increment,
   exercise_id int      NOT NULL,
+  c_id INT NOT NULL,
   field_id    int      NOT NULL,
   field_value text,
   tms         DATETIME NOT NULL default '0000-00-00 00:00:00',

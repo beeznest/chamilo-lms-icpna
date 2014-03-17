@@ -1291,3 +1291,33 @@ FIN CSS DONDE ESTOY
 }
 /*FIN DE ICPNA MODULO*/
 
+/*BENEFICIOS MODAL*/
+.beneficios-article{
+    padding: 2em;
+    font-size: 15px;
+    color: #666;
+    font-style: italic;
+}
+.beneficios-article ol li{
+    text-align: justify;
+    margin-bottom: 1em;
+}
+.beneficios-footer{
+    border-bottom: 10px solid #134C95;
+    padding-bottom: 10px;
+}
+.beneficios-footer .row .span4 {
+    display: inline-block;
+    float: left;
+    width: 42%;
+}
+.icpna{
+    text-align: left;
+}
+.movistar{
+    text-align: right;
+}
+.cont-padding{
+    padding: 2em;
+}
+/*FIN DE BENEFICIOS MODAL*/

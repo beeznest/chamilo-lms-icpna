@@ -513,3 +513,59 @@
         </div>
     </div>
 </div>
+<!--Modal Beneficios-->
+<div class="modal fade large" style="display: none;" id="beneficios" tabindex="-1" role="dialog" aria-labelledby="beneficioslabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="FAQlabel">Beneficios de V-learning</h4>
+            </div>
+            <div class="modal-body">
+                <div class="beneficios-header">
+                    <img src="/main/css/icpnatdp/images/headerbeneficio.jpg">
+                </div>
+                <div class="beneficios-article">
+                    <ol>
+                        <li>
+                            Los programas de estudio en linea ofrecen una mayor cantidad de horas de enseñanza y aprendizajes que cualquier otra plataforma similar en el mercado (ej. V-Learning = 750 horas; V-Learning Kids = 360 horas), lo cual permite un solido desarrollo del idioma inglés en diversas competencias y destrezas.
+                        </li>
+
+                        <li>Los alumnos podrán contar con tutoriales y guías que los orienten sobre el uso y funcionalidad de la   plataforma que están usando. Además, las instrucciones están redactadas en inglés y español hasta que se familiaricen con el idioma.</li>
+
+                        <li>Las destrezas y competencias desarrolladas incluyen la compresión auditiva y lectora, el habla, la escritura, vocabulario, gramática, y pronunciación, entre otros aspectos.</li>
+
+                        <li>Los ejercicios cuentan con retroalimentación de tipo metalingüístico, lo cual explica por qué una respuesta fue correcta o incorrecta.</li>
+
+                        <li>Las plataformas cuentan con contenidos “extra” para prácticas adicionales cuando se hayan terminado las lecciones A y B, como “Trace Effects, un mundo virtual 3D que le permite al alumno usar el inglés de manera interactiva y divertida con diversos personajes o Winnie's World, que representa un “mundo” imaginario para niños.</li>
+
+                        <li>Los cursos cuenta con exámenes de practica para que los alumnos puedan afianzar sus aprendizaje y sentir mayor confianza antes de rendir la evaluación final.</li>
+
+                        <li>Los self-assessments o auto-evaluaciones, permite a los alumnos ver un resumen de lo que han aprendido y comparar sus destreza oral con modelos tanto de inglés americano como de inglés internacional.</li>
+
+                        <li>Los alumnos podrán ver las metas y objetivos del curso, así como confirmar sus logros de aprendizaje.</li>
+
+                        <li>Los contenidos son accesibles mediante una PC (Lecciones A & B) o dispositivo móvil (Lección B).</li>
+
+                        <li>Los contenidos están alineados con exámenes y estándares internacionales, lo cual le permitirá a alumno tener mayores posibilidades de éxito cuanto tome un examen con el TOEIC, TOEFL u otros.	</li>
+                    </ol>
+                </div>
+                <div class="beneficios-footer">
+                    <div class="cont-padding">
+                        <div class="row">
+                            <div class="span4 icpna">
+                                <img src="/main/css/icpnatdp/images/logoicpna.png">
+                            </div>
+                            <div class="span4 movistar">
+                                <img src="/main/css/icpnatdp/images/logomovistar.png">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

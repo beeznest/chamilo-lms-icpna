@@ -2,13 +2,16 @@
     <div class="container">
             <div class="row">
                 <div class="span12">
-                    <div class="span3">
+                    <div class="span2">
                         <img src="/main/css/icpnatdp/images/header-logo.png">
                     </div>
                     <div class="span2 topline"><a href="#" data-toggle="modal" data-target="#FAQ">Preguntas frecuentes</a></div>
                     <!-- <div class="span2 topline"><a href="#">Política de privacidad</a></div> -->
                     <div class="span2 topline"><a href="#" data-toggle="modal" data-target="#terminos">Términos del servicio</a></div>
-                    <div class="span3">
+                    <div class="span2 topline">
+                        <a href="#" data-toggle="modal" data-target="#beneficios">Beneficios</a>
+                    </div>
+                    <div class="span2">
                        
                         <center><img src="/main/css/icpnatdp/images/logo-icpna.png"></center>
                        

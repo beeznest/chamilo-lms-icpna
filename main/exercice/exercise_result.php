@@ -252,7 +252,7 @@ if ($origin != 'learnpath') {
         Session::erase('exe_id');
     }
 
-    echo "<script>console.log('chamilo_void_save_asset1');  window.parent.API.void_save_asset('$total_score', '$total_weight', 0, '" . $status . "'); </script>";
+    echo "<script>window.parent.API.void_save_asset('$total_score', '$total_weight', 0, '" . $status . "'); </script>";
     echo "
     <span id='result' style='display:none'></span>
     <script>

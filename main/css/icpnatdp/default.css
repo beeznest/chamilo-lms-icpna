@@ -864,7 +864,105 @@ header .row-fluid .span9 {
   display:none;
 }
 }
-@media (min-width: 321px) and (max-width: 480px) {
+@media (min-width: 320px) and (max-width: 360px) {
+.well_border {
+   -webkit-border-radius: none;
+  -moz-border-radius: none;
+  border-radius: none;
+  box-shadow: none;
+  margin-bottom: 20px;
+  min-height: 20px;
+  padding: 0;
+  border: none;
+}
+.seccion-info-notas .span4,.seccion-info-notas .span3{
+  width: 50%;
+  float: left;
+}
+.section-social .span9 {
+  width: 455px;
+  margin-left: 5px;
+}
+.section-social .span9 table{
+  font-size: 12px;
+  font-weight: normal;
+}
+.btn-group > .btn, .btn-group > .dropdown-menu {
+  font-size: 12px;
+}
+.btn-toolbar {
+  font-size: 0;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  width: 300px;
+}
+.form-horizontal {
+  padding-left: 1em;
+  padding-top: 2em;
+}
+.nivel .span9 .span3 {
+  float: left;
+  width: 40%;
+}
+.well_border .row h3{
+  margin-left: 0;
+}
+footer {
+    padding-top: 2em;
+    padding-bottom: 2em;
+    height: 18em;
+  }
+}
+@media (min-width: 361px) and (max-width: 480px) {
+.social-menu {
+  height: auto;
+  width: 100%;
+  padding-left: 1em;
+}
+.siderbar-social {
+  background-color: #EFEFEF;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  padding-bottom: 1em;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-top: 1em;
+  width: 426px;
+}
+.seccion-info-notas .span4,.seccion-info-notas .span3{
+  width: 50%;
+  float: left;
+}
+.section-social .span9 {
+  width: 455px;
+  margin-left: 5px;
+}
+.section-social .span9 table{
+  font-size: 12px;
+  font-weight: normal;
+}
+.btn-group > .btn, .btn-group > .dropdown-menu {
+  font-size: 12px;
+}
+.btn-toolbar {
+  font-size: 0;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  width: 300px;
+}
+.form-horizontal {
+  padding-left: 3em;
+  padding-top: 2em;
+}
+.nivel .span9 .span3 {
+  float: left;
+  width: 40%;
+}
+.well_border .row h3{
+  margin-left: 0;
+}
 #course_tools .span2.text-vertical {
   color: #808080;
   font-size: 1.4em;
@@ -900,6 +998,9 @@ header .row-fluid .span9 {
   #bar-animation {
     width: 200px;
   }
+  .well_border .row .span8{
+    width: 440px;
+  }
   .row .row-fluid .span10{
     width: 100%
   }
@@ -923,7 +1024,7 @@ header .row-fluid .span9 {
   footer {
     padding-top: 2em;
     padding-bottom: 2em;
-    height: 14em;
+    height: 16em;
   }
   footer .topline {
     font-size: 11px;
@@ -1004,7 +1105,7 @@ MI DESEMPEÑO
 .icon-complet{
     background: url(images/curso.png) no-repeat left center;
     padding: 15px 10px 15px 50px;
-    font-size: 20px;
+    font-size: 18px;
     color: #005C84;
     width: 50%;
 }
@@ -1027,7 +1128,7 @@ MI DESEMPEÑO
 }
 .icon-nivel{
     background: url(images/nivel.png) no-repeat left center;
-    padding: 15px 10px 15px 50px;
+    padding: 15px 10px 15px 30px;
     font-size: 20px;
     color: #005C84;
     width: 100%;
@@ -1119,7 +1220,7 @@ CSS DONDE ESTOY
     background-color: #d7dde3;
 }
 .row h3{
-    margin-left: 60px;
+    margin-left: 10px;
 }
 /*+++++++++++++++++++++++++++++++++++++++
 FIN CSS DONDE ESTOY
@@ -1288,6 +1389,23 @@ FIN CSS DONDE ESTOY
     padding-top: 1em;
     text-align: center;
   }
+  #top_main_content .span12 .row .span3{
+    width: 220px;
+    margin-left: 0;
+  }
+  .section-social .span9 {
+  width: 500px;
+  margin-left: 0;
+  }
+#top_main_content .well_border{
+    padding-left: 0;
+    padding-right: 0;
+  }
+footer .container .row .span12 .span2 {
+    margin-left: 10px;
+    text-align: center;
+    width: 138px;
+}
 }
 /*FIN DE ICPNA MODULO*/
 

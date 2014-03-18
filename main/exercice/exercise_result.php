@@ -253,13 +253,16 @@ if ($origin != 'learnpath') {
     }
 
     echo "<script>window.parent.API.void_save_asset('$total_score', '$total_weight', 0, '" . $status . "'); </script>";
-    /*echo "
+    // Redirect via ajax - works in ICPNA
+    echo "
     <span id='result' style='display:none'></span>
     <script>
         $(function() {
-
+             $( '#result' ).load('$url', function() {
+             });
         });
-    </script>";*/
-    echo '<script type="text/javascript">' . $href . '</script>';
+    </script>";
+    // This redirects the page but does not work.
+    //echo '<script type="text/javascript">' . $href . '</script>';
     echo '</body></html>';
 }

@@ -2451,6 +2451,10 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
             $objExercise->send_notification_for_oral_questions($question_list_answers, $origin, $exe_id);
         //}
     }
+    return array(
+        'total_score' => $total_score,
+        'total_weight' => $total_weight,
+    );
 }
 
 /**

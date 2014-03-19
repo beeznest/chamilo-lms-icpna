@@ -2479,7 +2479,6 @@ function isNextPlexAvailable($courseCode, $lpId, $userId, $nextItem)
 
 function displayPlexQuestion()
 {
-    global $_configuration;
     return '<div class="modal fade large" style="display: none;" id="plex" 
             tabindex="-1" role="dialog" aria-labelledby="plexlabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -2493,7 +2492,7 @@ function displayPlexQuestion()
                     </div>
                     <div class="modal-footer">
                         <button type="button" onclick="nextPlex();" class="btn btn-primary" data-dismiss="modal">Tomar el siguiente Examen</button>
-                        <button type="button" onclick="parent.location.href=\'' . $_configuration['course_subscriber'] . '/modules\'" class="btn" data-dismiss="modal">Tomar mi Leccion</button>
+                        <button type="button" onclick="returnModules();" class="btn" data-dismiss="modal">Tomar mi Leccion</button>
                     </div>
                 </div>
             </div>

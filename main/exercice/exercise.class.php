@@ -5237,4 +5237,38 @@ class Exercise
             }
         }
     }
+    
+    /**
+     * @param int $lpId
+     * @param int $lpItemId
+     * @param int $lpItemViewId
+     * @param int $courseId
+     * @return array
+     */
+    public function getExerciseFromLP($lpId, $lpItemId, $lpItemViewId, $courseId)
+    {
+        $table_track_e_exer = Database :: get_statistic_table(TABLE_STATISTIC_TRACK_E_EXERCICES);
+        $table_c_quiz = Database::get_course_table(TABLE_QUIZ_TEST);
+        
+        $sql = "SELECT * FROM $table_c_quiz cq "
+             . "INNER JOIN $table_track_e_exer tee ON cq.id = tee.exe_exo_id "
+             . "WHERE "
+             . "tee.orig_lp_id = %s AND "
+             . "tee.orig_lp_item_id = %s AND "
+             . "tee.orig_lp_item_view_id = '%s' AND "
+             . "cq.c_id = %s";
+        
+         $sql = sprintf($sql, $lpId, $lpItemId, $lpItemViewId, $courseId);
+         
+         Database::query($sql);
+         $result = Database::query($sql);
+         $list = array();
+         if (Database::num_rows($result)) {
+             while ($row = Database::fetch_array($result, 'ASSOC')) {
+                 $list = $row;
+             }
+         }
+
+        return $list;
+    }
 }

@@ -2427,10 +2427,13 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
     $isSuccess = is_success_exercise_result($total_score, $total_weight, $objExercise->selectPassPercentage());
     
     if ($isAdultPlex && $isSuccess) {
-        ;
-        //$this->isNextPlexAvailable($exe_id);
-//        var_dump($objExercise);
-//        exit;
+        isNextPlexAvailable
+        ( 
+                $objExercise->course['code'], 
+                $exercise_stat_info['orig_lp_id'],
+                $exercise_stat_info['exe_user_id'],
+                $exercise_stat_info['orig_lp_item_id']
+        );
     }
 
     if ($save_user_result) {
@@ -2455,6 +2458,45 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
         'total_score' => $total_score,
         'total_weight' => $total_weight,
     );
+}
+
+function isNextPlexAvailable($courseCode, $lpId, $userId, $nextItem)
+{
+    $objLearnPath = new learnpath($courseCode, $lpId, $userId);
+    $tocs = $objLearnPath->get_all_toc();
+   
+    if (!empty($tocs[$nextItem])) {
+        echo displayPlexQuestion();
+        echo "<script> $('#plex').modal('show'); "
+            . "function nextPlex(){ "
+            . "window.top.location.reload(); "
+            . "parent.switch_item($nextItem, " . ($nextItem + 1) . "); "
+            . "window.top.location.reload(); "
+            . "}"
+            . "</script>";
+    }
+}
+
+function displayPlexQuestion()
+{
+    return '<div class="modal fade large" style="display: none;" id="plex" 
+            tabindex="-1" role="dialog" aria-labelledby="plexlabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="plexlabel">Examen de Clasificación</h4>
+                    </div>
+                    <div class="modal-body">
+                        Su examen de clasificación ha sido completado correctamente.</br>
+                        ¿Que desea hacer?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" onclick="nextPlex();" class="btn btn-primary" data-dismiss="modal">Tomar el siguiente Examen</button>
+                        <button type="button" onclick="returnModules();" class="btn" data-dismiss="modal">Tomar mi Leccion</button>
+                    </div>
+                </div>
+            </div>
+        </div>';
 }
 
 /**

@@ -15,7 +15,7 @@
  */
 // Loading the global initialization file.
 require_once '../../../../../../inc/global.inc.php';
-
+api_block_anonymous_users();
 // Loading document repositories settings.
 
 require_once api_get_path(LIBRARY_PATH).'fckeditor/repository.php';

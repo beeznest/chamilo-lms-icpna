@@ -2648,10 +2648,10 @@ class CourseManager {
      * @param string Course code
      * @return string Value
      */
-    public static function get_course_extra_field_value($field_name, $code) {
+    public static function get_course_extra_field_value($field_name, $code, $likeVisible = 1) {
         $tbl_course_field = Database::get_main_table(TABLE_MAIN_COURSE_FIELD);
         $tbl_course_field_value    = Database::get_main_table(TABLE_MAIN_COURSE_FIELD_VALUES);
-        $sql = "SELECT id FROM $tbl_course_field WHERE field_visible = '1' AND field_variable = '$field_name';";
+        $sql = "SELECT id FROM $tbl_course_field WHERE field_visible like '$likeVisible' AND field_variable = '$field_name';";
         $res = Database::query($sql);
         $row = Database::fetch_object($res);
         if(!$row) {
@@ -2663,6 +2663,7 @@ class CourseManager {
             if(!$row_field_value) {
                 return null;
             } else {
+                $row_field_value = (array)$row_field_value; //Parse to array because it is an stdClass
                 return $row_field_value['field_value'];
             }
         }
@@ -5083,5 +5084,13 @@ class CourseManager {
         $course_properties = parse_ini_file($path_to_archive_ini);
         rmdir($tmp_dir_name);
         return $course_properties;
+    }
+    
+    static function isAdultPlexExam($courseCode)
+    {
+        // Verify if it is a PLEX for adults!
+        $oriCoursCode = CourseManager::get_course_extra_field_value('cs_course_id', $courseCode, '%');
+        $isAdultPlex = $oriCoursCode == '50' ? true : false;
+        return $isAdultPlex;
     }
 } //end class CourseManager

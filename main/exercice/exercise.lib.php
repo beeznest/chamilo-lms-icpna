@@ -2421,6 +2421,17 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
     if (!$show_only_score) {
         echo $total_score_text;
     }
+    
+    // Verify if it is a PLEX for adults!
+    $isAdultPlex = CourseManager::isAdultPlexExam($objExercise->course['code']);
+    $isSuccess = is_success_exercise_result($total_score, $total_weight, $objExercise->selectPassPercentage());
+    
+    if ($isAdultPlex && $isSuccess) {
+        ;
+        //$this->isNextPlexAvailable($exe_id);
+//        var_dump($objExercise);
+//        exit;
+    }
 
     if ($save_user_result) {
 
@@ -2435,7 +2446,6 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
 
         // Send notification ..
         //if (!api_is_allowed_to_edit(null, true)) {
-            $isSuccess = is_success_exercise_result($total_score, $total_weight, $objExercise->selectPassPercentage());
             $objExercise->sendCustomNotification($exe_id, $exerciseResultInfo, $isSuccess);
             $objExercise->send_notification_for_open_questions($question_list_answers, $origin, $exe_id);
             $objExercise->send_notification_for_oral_questions($question_list_answers, $origin, $exe_id);

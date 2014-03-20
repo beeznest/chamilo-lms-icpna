@@ -5580,7 +5580,7 @@ function WSGetCourseFinalScore($params) {
     $sid = intval($row[0]);
 
     if (empty($uid) or empty($cid)) {
-        return array();
+        return false;
     }
 
     require_once api_get_path(SYS_CODE_PATH) . 'exercice/exercise.lib.php';
@@ -5764,6 +5764,110 @@ function WSGetExerciseExtraFieldOutCome($params)
     require_once api_get_path(SYS_CODE_PATH) . 'exercice/exercise.lib.php';
     $result = getAllExerciseWithExtraFieldPlex();
     return $result;
+}
+
+/* Register WSGetNextCourseAfterPlex function */
+// Register the data structures used by the service
+$server->wsdl->addComplexType(
+    'getNextCourseAfterPlex',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'secret_key' => array('name' => 'secret_key', 'type' => 'xsd:string'),
+        'original_user_id_name' => array('name' => 'original_user_id_name', 'type' => 'xsd:string'),
+        'original_user_id_value' => array('name' => 'original_user_id_value', 'type' => 'xsd:string'),
+        'original_course_id_name' => array('name' => 'original_course_id_name', 'type' => 'xsd:string'),
+        'original_course_id_value' => array('name' => 'original_course_id_value', 'type' => 'xsd:string'),
+        'original_session_id_name' => array('name' => 'original_session_id_name', 'type' => 'xsd:string'),
+        'original_session_id_value' => array('name' => 'original_session_id_value', 'type' => 'xsd:string'),
+    )
+);
+
+// Prepare output params, in this case will return an array
+$server->wsdl->addComplexType(
+    'result_getNextCourseAfterPlex',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'score' => array('name' => 'score'),
+        'course' => array('name' => 'course'),
+    )
+);
+
+// Register the method to expose
+$server->register('WSGetNextCourseAfterPlex', // method name
+    array('getCourseProgress' => 'tns:getNextCourseAfterPlex'), // input parameters
+    array('return' => 'tns:result_getNextCourseAfterPlex'), // output parameters
+    'urn:WSRegistration', // namespace
+    'urn:WSRegistration#WSGetNextCourseAfterPlex',   // soapaction
+    'rpc', // style
+    'encoded', // use
+    'This service returns the progress of the student course, course and session' // documentation
+);
+
+// define the method WSGetCourseProgress
+/**
+ * returns the course progress, course and session
+ * @param $params
+ * @return array|null|soap_fault Returns result as a pure integer percentage
+ */
+function WSGetNextCourseAfterPlex($params) {
+
+    global $debug;
+
+    if(!WSHelperVerifyKey($params)) {
+        return return_error(WS_ERROR_SECRET_KEY);
+    }
+    
+    if ($debug) { error_log(__FUNCTION__.', params: '.print_r($params,1)); }
+    $t_uf = Database::get_main_table(TABLE_MAIN_USER_FIELD);
+    $t_ufv = Database::get_main_table(TABLE_MAIN_USER_FIELD_VALUES);
+    $tbl_course    = Database::get_main_table(TABLE_MAIN_COURSE);
+    $t_cf = Database::get_main_table(TABLE_MAIN_COURSE_FIELD);
+    $t_cfv = Database::get_main_table(TABLE_MAIN_COURSE_FIELD_VALUES);
+    $t_sf = Database::get_main_table(TABLE_MAIN_SESSION_FIELD);
+    $t_sfv = Database::get_main_table(TABLE_MAIN_SESSION_FIELD_VALUES);
+   
+    $original_user_id_value = $params['original_user_id_value'];
+    $original_user_id_name = $params['original_user_id_name'];
+    $original_course_id_value = $params['original_course_id_value'];
+    $original_course_id_name = $params['original_course_id_name'];
+    $original_session_id_value = $params['original_session_id_value'];
+    $original_session_id_name = $params['original_session_id_name'];
+    
+    // Get user id from original user id
+    $sql = "SELECT user_id FROM $t_uf uf,$t_ufv ufv WHERE ufv.field_id=uf.id AND field_variable='$original_user_id_name' AND field_value='$original_user_id_value' LIMIT 1";
+    $res = Database::query($sql);
+    $row = Database::fetch_row($res);
+    $uid = intval($row[0]);
+    // Get course id from original session id
+    $sql = "SELECT course_code FROM $t_cf cf,$t_cfv cfv WHERE cfv.field_id=cf.id AND field_variable='$original_course_id_name' AND field_value='$original_course_id_value' LIMIT 1";
+    $res = Database::query($sql);
+    $row = Database::fetch_row($res);
+    $ccode = $row[0];
+    $sql = "SELECT id FROM $tbl_course WHERE code = '$ccode'";
+    $res = Database::query($sql);
+    $row = Database::fetch_row($res);
+    $cid = $row[0];
+    // Get session id from original session id
+    $sql = "SELECT session_id FROM $t_sf sf,$t_sfv sfv WHERE sfv.field_id=sf.id AND field_variable='$original_session_id_name' AND field_value='$original_session_id_value' LIMIT 1";
+    $res = Database::query($sql);
+    $row = Database::fetch_row($res);
+    $sid = intval($row[0]);
+    
+    if (empty($uid) || empty($cid)) {
+        return array();
+    }
+    
+    require_once api_get_path(SYS_CODE_PATH) . 'exercice/exercise.lib.php';
+    $result = getAllExerciseWithExtraFieldPlexPerStudent($uid, $cid);
+    
+    return $result;
+
 }
 
 // Use the request to (try to) invoke the service

@@ -2479,6 +2479,7 @@ function isNextPlexAvailable($courseCode, $lpId, $userId, $nextItem)
 
 function displayPlexQuestion()
 {
+    global $_configuration;
     return '<div class="modal fade large" style="display: none;" id="plex" 
             tabindex="-1" role="dialog" aria-labelledby="plexlabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -2492,7 +2493,7 @@ function displayPlexQuestion()
                     </div>
                     <div class="modal-footer">
                         <button type="button" onclick="nextPlex();" class="btn btn-primary" data-dismiss="modal">Tomar el siguiente Examen</button>
-                        <button type="button" onclick="returnModules();" class="btn" data-dismiss="modal">Tomar mi Leccion</button>
+                        <button type="button" onclick="parent.location.href=\'' . $_configuration['course_subscriber'] . '/modules\'" class="btn" data-dismiss="modal">Tomar mi Leccion</button>
                     </div>
                 </div>
             </div>
@@ -2515,7 +2516,22 @@ function is_success_exercise_result($score, $weight, $pass_percentage)
     }
     return false;
 }
-
+/**
+ * @param float $score
+ * @param float $weight
+ * @param bool $pass_percentage
+ * @return bool
+ */
+function getSuccessExerciseResultPercentage($score, $weight, $pass_percentage)
+{
+    $percentage = float_format(($score / ($weight != 0 ? $weight : 1)) * 100, 1);
+    if (isset($pass_percentage) && !empty($pass_percentage)) {
+        if ($percentage >= $pass_percentage) {
+            return $percentage;
+        }
+    }
+    return 0;
+}
 function get_total_attempts_by_user($user_id, $exercise_id, $course_code, $session_id = 0)
 {
 
@@ -2646,7 +2662,53 @@ function getAllExerciseWithExtraFieldPlex()
 
     return $result;
 }
-
+/**
+ * @param studentId
+ * @param exe_cours_id
+ * @return array
+ */
+function getAllExerciseWithExtraFieldPlexPerStudent($studentId, $courseId)
+{
+    $sql = "SELECT te.*, s.field_value, cq.pass_percentage FROM exercise_field_values s
+            INNER JOIN exercise_field sf ON (s.field_id = sf.id)
+            INNER JOIN c_quiz cq ON cq.c_id = s.c_id and s.exercise_id = cq.id            
+            INNER JOIN course c ON c.id = cq.c_id
+            INNER JOIN track_e_exercices te ON te.exe_exo_id = cq.id and te.exe_cours_id = c.code
+            WHERE
+            field_variable = 'plex' and 
+            exe_user_id = %s and
+            c.id = %s";
+    $sql = sprintf($sql, $studentId, $courseId);
+    
+    $result = Database::query($sql);
+    
+    if ($result !== false && Database::num_rows($result)) {
+        $list = Database::store_result($result, 'ASSOC');
+        $result = array();
+        foreach($list as $exe) {
+            $percentage = getSuccessExerciseResultPercentage
+                                (
+                                    $exe['exe_result'], 
+                                    $exe['exe_weighting'], 
+                                    $exe['pass_percentage']
+                                );
+            if(is_success_exercise_result($exe['exe_result'], $exe['exe_weighting'], $exe['pass_percentage'])) {   
+                $successRs = array('score' => $percentage, 'course' => $exe['field_value']);
+            } else {
+                $failedRs = array('score' => $percentage, 'course' => 1);
+            }
+        }
+        
+        if (!empty($successRs)) {
+            return $successRs;
+        } else {
+            return $failedRs;
+        }
+    } else {
+        return array('score' => false, 'course' => 1);
+    }
+    
+}
 /**
  * @param int $cid course id
  * @param int $sid session id
@@ -2665,9 +2727,10 @@ function getFinalScore($cid, $sid)
     $ccode = $courseInfo['code'];
 
     $sql = "SELECT id, max_attempt FROM $tbl_quiz WHERE c_id = $cid AND LOWER(title) IN ($exam_names) ORDER BY id DESC LIMIT 1";
+
     $res = Database::query($sql);
     if (Database::num_rows($res) < 1) {
-        return array();
+        return false;
     }
     $row = Database::fetch_row($res);
     $qid = intval($row[0]);
@@ -2682,6 +2745,7 @@ function getFinalScore($cid, $sid)
     // take the results from the second attempt (but not more)
 
     $score = 0;
+    
     if ($maxAttempt == 1) {
         // Adults case, only one attempt but if first unfinished, we take the
         // second one
@@ -2694,13 +2758,13 @@ function getFinalScore($cid, $sid)
             ORDER BY start_date ASC LIMIT 2";
         $res = Database::query($sql);
         if (Database::num_rows($res) < 1) {
-            return array();
+            return false;
         } elseif (Database::num_rows($res) == 1) {
             $row = Database::fetch_row($res);
             $tempScore = round(($row[0] / $row[1]) * 100, 0);
             if ($tempScore < 70 && $row[2] != '') {
                 // return empty array so this score is not taken into account
-                return array();
+                return false;
             }
             $score = $tempScore;
         } else {
@@ -2725,7 +2789,7 @@ function getFinalScore($cid, $sid)
             ORDER BY start_date ASC LIMIT 3";
         $res = Database::query($sql);
         if (Database::num_rows($res) < 1) {
-            return array();
+            return false;
         }
         $lastScore = 0;
         $count = 0;
@@ -2745,7 +2809,7 @@ function getFinalScore($cid, $sid)
                 // reached maximum attempts, return bad result
                 $score = $lastScore;
             } else {
-                return array();
+                return false;
             }
         }
     }

@@ -2718,22 +2718,123 @@ class learnpath
             error_log('learnpath::get_toc()', 0);
         }
         $toc = array();
-        //echo "<pre>".print_r($this->items,true)."</pre>";
+        
+        // Verify if it is a PLEX for adults!
+        $isAdultPlex = CourseManager::isAdultPlexExam($this->getCourseCode());
+        if ($isAdultPlex && api_is_student()) {
+            $objExercise = new Exercise();
+            foreach ($this->ordered_items as $item_id) {
+                //If it is no the first item and
+                //The status of the last exam is passed
+                //then Show the next exam
+                    
+                $lastExam = !empty($this->items[$item_id-1]) ? $this->items[$item_id-1] : 0;
+                //Validate if it doesnt have last exam or if the last exam is completed
+                if (empty($lastExam) || (!empty($lastExam) && $lastExam->status == $lastExam->possible_status[2])) {
+                    //It is not the first Exam
+                    if (!empty($lastExam)) {
+                        $itemViewRow = $this->getItemViewInfo
+                                    (
+                                        $lastExam->db_item_view_id, 
+                                        $this->get_course_int_id(),
+                                        $lastExam->view_id,
+                                        $item_id-1
+                                    );
+                        
+                        $exerciseData = $objExercise->getExerciseFromLP
+                                    (
+                                        $this->lp_id, 
+                                        $item_id-1, 
+                                        $lastExam->db_item_view_id, 
+                                        $this->get_course_int_id()
+                                    );
+                        
+                        
+                        $resultPercentage = 0;
+                        $total_score = (!empty($itemViewRow['score'])) ? $itemViewRow['score'] : 0;
+                        $total_weight = (!empty($itemViewRow['max_score'])) ? $itemViewRow['max_score'] : 0;
+                        $pass_percentage = (!empty($exerciseData['pass_percentage'])) ? $exerciseData['pass_percentage'] : 0;
+                        if (!empty($total_weight)) {
+                            $resultPercentage = $total_score / $total_weight * 100;
+                        }
+                        
+                        if ($resultPercentage >= $pass_percentage) {
+                            //validate if the exam is passed
+                            $toc[] = array (
+                                'id'            => $item_id,
+                                'title'         => $this->items[$item_id]->get_title(),
+                                'status'        => $this->items[$item_id]->get_status(),
+                                'level'         => $this->items[$item_id]->get_level(),
+                                'type'          => $this->items[$item_id]->get_type(),
+                                'description'   => $this->items[$item_id]->get_description(),
+                                'path'          => $this->items[$item_id]->get_path(),
+                            );
+                        }
+                    } else {
+                        //Show the first exam
+                        $toc[] = array (
+                            'id'            => $item_id,
+                            'title'         => $this->items[$item_id]->get_title(),
+                            'status'        => $this->items[$item_id]->get_status(),
+                            'level'         => $this->items[$item_id]->get_level(),
+                            'type'          => $this->items[$item_id]->get_type(),
+                            'description'   => $this->items[$item_id]->get_description(),
+                            'path'          => $this->items[$item_id]->get_path(),
+                        );
+                    }
+                }
+            }
+        } else {
+            foreach ($this->ordered_items as $item_id) {
+                if ($this->debug > 2) {
+                    error_log('learnpath::get_toc(): getting info for item ' . $item_id, 0);
+                }
+                // TODO: Change this link generation and use new function instead.
+                $toc[] = array (
+                    'id'            => $item_id,
+                    'title'         => $this->items[$item_id]->get_title(),
+                    'status'        => $this->items[$item_id]->get_status(),
+                    'level'         => $this->items[$item_id]->get_level(),
+                    'type'          => $this->items[$item_id]->get_type(),
+                    'description'   => $this->items[$item_id]->get_description(),
+                    'path'          => $this->items[$item_id]->get_path(),
+                );
+            }
+        }
+        
+        if ($this->debug > 2) {
+            error_log('New LP - In learnpath::get_toc() - TOC array: ' . print_r($toc, true), 0);
+        }
+        return $toc;
+    }
+    
+      /**
+     * Generate and return the table of contents for this learnpath. The (flat) table returned can be
+     * used by get_html_toc() to be ready to display
+     * @return	array	TOC as a table with 4 elements per row: title, link, status and level
+     */
+    public function get_all_toc()
+    {
+        if ($this->debug > 0) {
+            error_log('learnpath::get_toc()', 0);
+        }
+        $toc = array();
         foreach ($this->ordered_items as $item_id) {
             if ($this->debug > 2) {
                 error_log('learnpath::get_toc(): getting info for item ' . $item_id, 0);
             }
             // TODO: Change this link generation and use new function instead.
-            $toc[] = array (
-                'id'            => $item_id,
-                'title'         => $this->items[$item_id]->get_title(),
-                'status'        => $this->items[$item_id]->get_status(),
-                'level'         => $this->items[$item_id]->get_level(),
-                'type'          => $this->items[$item_id]->get_type(),
-                'description'   => $this->items[$item_id]->get_description(),
-                'path'          => $this->items[$item_id]->get_path(),
+            $toc[] = array(
+                'id' => $item_id,
+                'title' => $this->items[$item_id]->get_title(),
+                'status' => $this->items[$item_id]->get_status(),
+                'level' => $this->items[$item_id]->get_level(),
+                'type' => $this->items[$item_id]->get_type(),
+                'description' => $this->items[$item_id]->get_description(),
+                'path' => $this->items[$item_id]->get_path(),
             );
         }
+
         if ($this->debug > 2) {
             error_log('New LP - In learnpath::get_toc() - TOC array: ' . print_r($toc, true), 0);
         }
@@ -9507,6 +9608,20 @@ EOD;
         $sql = "UPDATE $lp_table SET seriousgame_mode = $value WHERE c_id = ".$course_id." AND id = " . $this->get_id();
         Database::query($sql);
         $this->seriousgame_mode = $value;
+    }
+    
+    public function getItemViewInfo($itemViewId , $courseId, $viewId, $itemId)
+    {
+        $table_lp_item_view = Database::get_course_table(TABLE_LP_ITEM_VIEW);
+        $sql = "SELECT * FROM $table_lp_item_view  "
+               . "WHERE id = '$itemViewId' AND "
+               . "c_id = $courseId AND "
+               . "lp_item_id = $itemId AND "
+               . "lp_view_id = $viewId";
+        
+    	$rsItmView = Database::query($sql);
+    	$rowItmView = Database::fetch_array($rsItmView);
+        return $rowItmView;
     }
 }
 

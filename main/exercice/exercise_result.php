@@ -245,7 +245,6 @@ if ($origin != 'learnpath') {
         if ($resultPercentage >= $objExercise->pass_percentage) {
             $status = 'completed';
         }
-        var_dump($status);
     }
 
     if (api_is_allowed_to_session_edit()) {
@@ -253,14 +252,17 @@ if ($origin != 'learnpath') {
         Session::erase('exe_id');
     }
 
-    echo "<script>console.log('chamilo_void_save_asset1');  window.parent.API.void_save_asset('$total_score', '$total_weight', 0, '" . $status . "'); </script>";
+    echo "<script>window.parent.API.void_save_asset('$total_score', '$total_weight', 0, '" . $status . "'); </script>";
+    // Redirect via ajax - works in ICPNA
     echo "
     <span id='result' style='display:none'></span>
     <script>
         $(function() {
-
+             $( '#result' ).load('$url', function() {
+             });
         });
     </script>";
-    //echo '<script type="text/javascript">'.$href.'</script>';
+    // This redirects the page but does not work.
+    //echo '<script type="text/javascript">' . $href . '</script>';
     echo '</body></html>';
 }

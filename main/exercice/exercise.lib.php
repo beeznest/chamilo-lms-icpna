@@ -2421,6 +2421,20 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
     if (!$show_only_score) {
         echo $total_score_text;
     }
+    
+    // Verify if it is a PLEX for adults!
+    $isAdultPlex = CourseManager::isAdultPlexExam($objExercise->course['code']);
+    $isSuccess = is_success_exercise_result($total_score, $total_weight, $objExercise->selectPassPercentage());
+    
+    if ($isAdultPlex && $isSuccess) {
+        isNextPlexAvailable
+        ( 
+                $objExercise->course['code'], 
+                $exercise_stat_info['orig_lp_id'],
+                $exercise_stat_info['exe_user_id'],
+                $exercise_stat_info['orig_lp_item_id']
+        );
+    }
 
     if ($save_user_result) {
 
@@ -2435,7 +2449,6 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
 
         // Send notification ..
         //if (!api_is_allowed_to_edit(null, true)) {
-            $isSuccess = is_success_exercise_result($total_score, $total_weight, $objExercise->selectPassPercentage());
             $objExercise->sendCustomNotification($exe_id, $exerciseResultInfo, $isSuccess);
             $objExercise->send_notification_for_open_questions($question_list_answers, $origin, $exe_id);
             $objExercise->send_notification_for_oral_questions($question_list_answers, $origin, $exe_id);
@@ -2445,6 +2458,46 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
         'total_score' => $total_score,
         'total_weight' => $total_weight,
     );
+}
+
+function isNextPlexAvailable($courseCode, $lpId, $userId, $nextItem)
+{
+    $objLearnPath = new learnpath($courseCode, $lpId, $userId);
+    $tocs = $objLearnPath->get_all_toc();
+   
+    if (!empty($tocs[$nextItem])) {
+        echo displayPlexQuestion();
+        echo "<script> $('#plex').modal('show'); "
+            . "function nextPlex(){ "
+            . "window.top.location.reload(); "
+            . "parent.switch_item($nextItem, " . ($nextItem + 1) . "); "
+            . "window.top.location.reload(); "
+            . "}"
+            . "</script>";
+    }
+}
+
+function displayPlexQuestion()
+{
+    global $_configuration;
+    return '<div class="modal fade large" style="display: none;" id="plex" 
+            tabindex="-1" role="dialog" aria-labelledby="plexlabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="plexlabel">Examen de Clasificación</h4>
+                    </div>
+                    <div class="modal-body">
+                        Su examen de clasificación ha sido completado correctamente.</br>
+                        ¿Que desea hacer?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" onclick="nextPlex();" class="btn btn-primary" data-dismiss="modal">Tomar el siguiente Examen</button>
+                        <button type="button" onclick="parent.location.href=\'' . $_configuration['course_subscriber'] . '/modules\'" class="btn" data-dismiss="modal">Tomar mi Leccion</button>
+                    </div>
+                </div>
+            </div>
+        </div>';
 }
 
 /**
@@ -2463,7 +2516,22 @@ function is_success_exercise_result($score, $weight, $pass_percentage)
     }
     return false;
 }
-
+/**
+ * @param float $score
+ * @param float $weight
+ * @param bool $pass_percentage
+ * @return bool
+ */
+function getSuccessExerciseResultPercentage($score, $weight, $pass_percentage)
+{
+    $percentage = float_format(($score / ($weight != 0 ? $weight : 1)) * 100, 1);
+    if (isset($pass_percentage) && !empty($pass_percentage)) {
+        if ($percentage >= $pass_percentage) {
+            return $percentage;
+        }
+    }
+    return 0;
+}
 function get_total_attempts_by_user($user_id, $exercise_id, $course_code, $session_id = 0)
 {
 
@@ -2579,13 +2647,174 @@ function getAllExerciseWithExtraFieldPlex()
                 $exerciseId,
                 'outcome'
             );
+            $exercise = new Exercise($outcome['c_id']);
+            $exercise->read($exerciseId);
+            $score = getFinalScore($exercise->course_id, $exercise->session_id);
+
             $result[] = array(
                 'exercise_id' => $exerciseId,
                 'outcome' => $outcome['field_value'],
+                'c_id' => $outcome['c_id'],
+                'score' => $score
             );
         }
     }
+
     return $result;
+}
+/**
+ * @param studentId
+ * @param exe_cours_id
+ * @return array
+ */
+function getAllExerciseWithExtraFieldPlexPerStudent($studentId, $courseId)
+{
+    $sql = "SELECT te.*, s.field_value, cq.pass_percentage FROM exercise_field_values s
+            INNER JOIN exercise_field sf ON (s.field_id = sf.id)
+            INNER JOIN c_quiz cq ON cq.c_id = s.c_id and s.exercise_id = cq.id            
+            INNER JOIN course c ON c.id = cq.c_id
+            INNER JOIN track_e_exercices te ON te.exe_exo_id = cq.id and te.exe_cours_id = c.code
+            WHERE
+            field_variable = 'plex' and 
+            exe_user_id = %s and
+            c.id = %s";
+    $sql = sprintf($sql, $studentId, $courseId);
+    
+    $result = Database::query($sql);
+    
+    if ($result !== false && Database::num_rows($result)) {
+        $list = Database::store_result($result, 'ASSOC');
+        $result = array();
+        foreach($list as $exe) {
+            $percentage = getSuccessExerciseResultPercentage
+                                (
+                                    $exe['exe_result'], 
+                                    $exe['exe_weighting'], 
+                                    $exe['pass_percentage']
+                                );
+            if(is_success_exercise_result($exe['exe_result'], $exe['exe_weighting'], $exe['pass_percentage'])) {   
+                $successRs = array('score' => $percentage, 'course' => $exe['field_value']);
+            } else {
+                $failedRs = array('score' => $percentage, 'course' => 1);
+            }
+        }
+        
+        if (!empty($successRs)) {
+            return $successRs;
+        } else {
+            return $failedRs;
+        }
+    } else {
+        return array('score' => false, 'course' => 1);
+    }
+    
+}
+/**
+ * @param int $cid course id
+ * @param int $sid session id
+ * @return array|float|int
+ */
+function getFinalScore($cid, $sid)
+{
+    $tbl_quiz = Database::get_course_table(TABLE_QUIZ_TEST);
+    $tbl_res = Database::get_main_table(TABLE_STATISTIC_TRACK_E_EXERCICES);
+
+    // Limited list of terms that will be considered as exams that classify the user to move to next course
+    // @todo add a checkbox for this and a database field (c_quiz.classification_exam)
+    $exam_names = "'final exam', 'examen final', 'placement test', 'final test', 'examen de clasificación'";
+
+    $courseInfo = api_get_course_info_by_id($cid);
+    $ccode = $courseInfo['code'];
+
+    $sql = "SELECT id, max_attempt FROM $tbl_quiz WHERE c_id = $cid AND LOWER(title) IN ($exam_names) ORDER BY id DESC LIMIT 1";
+
+    $res = Database::query($sql);
+    if (Database::num_rows($res) < 1) {
+        return false;
+    }
+    $row = Database::fetch_row($res);
+    $qid = intval($row[0]);
+    $maxAttempt = intval($row[1]);
+
+    // From the results table, we have to check the latest attempt.
+    // There is a special case for exams where only one attempt is allowed: if
+    // the first attempt failed but was not finished, the user gets a second
+    // attempt. As such, in the case where only one attempt is allowed
+    // (c_quiz.max_attempt = 1) and we have more than one attempt, of which the
+    // first was not finished (track_e_exercices.status != ''), we have to
+    // take the results from the second attempt (but not more)
+
+    $score = 0;
+    
+    if ($maxAttempt == 1) {
+        // Adults case, only one attempt but if first unfinished, we take the
+        // second one
+        $sql = "SELECT exe_result, exe_weighting, status
+            FROM $tbl_res
+            WHERE
+                exe_exo_id = $qid AND
+                exe_cours_id = '$ccode' AND
+                session_id = $sid
+            ORDER BY start_date ASC LIMIT 2";
+        $res = Database::query($sql);
+        if (Database::num_rows($res) < 1) {
+            return false;
+        } elseif (Database::num_rows($res) == 1) {
+            $row = Database::fetch_row($res);
+            $tempScore = round(($row[0] / $row[1]) * 100, 0);
+            if ($tempScore < 70 && $row[2] != '') {
+                // return empty array so this score is not taken into account
+                return false;
+            }
+            $score = $tempScore;
+        } else {
+            $lastScore = 0;
+            // only scan 2 rows, thanks to the LIMIT 2 above
+            while ($row = Database::fetch_row($res)) {
+                $tempScore = round(($row[0] / $row[1]) * 100, 0);
+                if ($tempScore > $lastScore) {
+                    $lastScore = $tempScore;
+                }
+            }
+            // return the best score
+            $score = $lastScore;
+        }
+    } else {
+        // There are 3 attempts to these tests. As soon as one is > 70, send result
+        $sql = "SELECT exe_result, exe_weighting, status
+            FROM $tbl_res
+            WHERE exe_exo_id = $qid
+                AND exe_cours_id = '$ccode'
+                AND session_id = $sid
+            ORDER BY start_date ASC LIMIT 3";
+        $res = Database::query($sql);
+        if (Database::num_rows($res) < 1) {
+            return false;
+        }
+        $lastScore = 0;
+        $count = 0;
+        // only scan max 3 rows, thanks to the LIMIT 2 above
+        while ($row = Database::fetch_row($res)) {
+            $tempScore = round(($row[0] / $row[1]) * 100, 0);
+            if ($tempScore > $lastScore) {
+                $lastScore = $tempScore;
+            }
+            $count++;
+        }
+        if ($lastScore >= 70) {
+            // return the success score
+            $score = $lastScore;
+        } else {
+            if ($count == 3) {
+                // reached maximum attempts, return bad result
+                $score = $lastScore;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    return $score;
 }
 
 //var_dump(getAllExerciseWithExtraFieldPlex());

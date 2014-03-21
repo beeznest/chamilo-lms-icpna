@@ -22,14 +22,14 @@
  * Configuration file for the File Manager Connector for PHP.
  */
 
-// Modifications by Ivan Tcholakov, JUN-2009. 
+// Modifications by Ivan Tcholakov, JUN-2009.
 
 // Some language variables are needed.
 $language_file = array('create_course');
 
 // Loading the global initialization file, Chamilo LMS.
 require_once '../../../../../../global.inc.php';
-
+api_block_anonymous_users();
 // Initialization of the repositories.
 require_once api_get_path(LIBRARY_PATH).'fckeditor/repository.php' ;
 
@@ -49,16 +49,20 @@ if (api_is_in_course()) {
 		if (api_is_allowed_to_edit()) {
 			$Config['UserFilesPath'] = api_get_path(REL_COURSE_PATH).api_get_course_path().'/document/';
 		} else {
-			// 1.2. Student	
-			$current_session_id = api_get_session_id();
+            // 1.2. Student
+            $current_session_id = api_get_session_id();
 			if($current_session_id==0)
 			{
 				$Config['UserFilesPath'] = api_get_path(REL_COURSE_PATH).api_get_course_path().'/document/shared_folder/sf_user_'.api_get_user_id().'/';
 			}
 			else
 			{
-				$Config['UserFilesPath'] = api_get_path(REL_COURSE_PATH).api_get_course_path().'/document/shared_folder_session_'.$current_session_id.'/sf_user_'.api_get_user_id().'/';		
-			}
+                $Config['UserFilesPath'] = api_get_path(
+                        REL_COURSE_PATH
+                    ) . api_get_course_path(
+                    ) . '/document/shared_folder_session_' . $current_session_id . '/sf_user_' . api_get_user_id(
+                    ) . '/';
+            }
 		}
 	} else {
 		// 2. Inside a course and inside a group.

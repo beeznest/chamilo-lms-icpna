@@ -2815,5 +2815,3 @@ function getFinalScore($cid, $sid)
 
     return $score;
 }
-
-//var_dump(getAllExerciseWithExtraFieldPlex());

@@ -2815,4 +2815,3 @@ function getFinalScore($cid, $sid)
 
     return $score;
 }
-

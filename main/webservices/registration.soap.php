@@ -5689,7 +5689,7 @@ function WSGetCourseProgress($params) {
         return array();
     }
     
-    $progress = tracking::get_avg_student_progress($uid, $ccode, null, $sid, false, true);
+    $progress = Tracking::get_avg_student_progress($uid, $ccode, null, $sid, false, true);
     
     $output = array(
         'original_session_id_value' => $params['original_session_id_value'],

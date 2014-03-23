@@ -2720,8 +2720,9 @@ class learnpath
         $toc = array();
         
         // Verify if it is a PLEX for adults!
-        $isAdultPlex = CourseManager::isAdultPlexExam($this->getCourseCode());
-        if ($isAdultPlex && api_is_student()) {
+        //$isAdultPlex = CourseManager::isAdultPlexExam($this->getCourseCode());
+        //if ($isAdultPlex && api_is_student())
+        if (false) { // this code was wrong. Skipping for now
             $objExercise = new Exercise();
             foreach ($this->ordered_items as $item_id) {
                 //If it is no the first item and

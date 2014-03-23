@@ -2402,9 +2402,12 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
     }
 
     $total_score_text = null;
+    // Verify if it is a PLEX for adults!
+    $isAdultPlex = CourseManager::isAdultPlexExam($objExercise->course['code']);
+    $isSuccess = is_success_exercise_result($total_score, $total_weight, $objExercise->selectPassPercentage());
 
 //    if ($origin != 'learnpath') {
-        if ($show_results || $show_only_score) {
+        if ($show_results || $show_only_score || $isAdultPlex) {
             $total_score_text .= get_question_ribbon($objExercise, $total_score, $total_weight, true);
         }
 //    }
@@ -2422,10 +2425,7 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
         echo $total_score_text;
     }
     
-    // Verify if it is a PLEX for adults!
-    $isAdultPlex = CourseManager::isAdultPlexExam($objExercise->course['code']);
-    $isSuccess = is_success_exercise_result($total_score, $total_weight, $objExercise->selectPassPercentage());
-    
+    /*
     if ($isAdultPlex && $isSuccess) {
         isNextPlexAvailable
         ( 
@@ -2435,6 +2435,7 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
                 $exercise_stat_info['orig_lp_item_id']
         );
     }
+    */
 
     if ($save_user_result) {
 

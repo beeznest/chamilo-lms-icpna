@@ -88,12 +88,12 @@ class learnpathItem {
                 $course_id = intval($course_id);
             }
             $sql = "SELECT * FROM $items_table WHERE c_id = $course_id AND id = $id";
-            //error_log('New LP - Creating item object from DB: '.$sql, 0);
             $res = Database::query($sql);
             if (Database::num_rows($res) < 1) {
                 $this->error = 'Could not find given learnpath item in learnpath_item table';
                 return false;
             }
+
             $row = Database::fetch_array($res);
         } else {
             $row = $item_content;
@@ -1048,7 +1048,8 @@ class learnpathItem {
 	public function get_scorm_time($origin = 'php', $given_time = null, $query_db = false) {
 		$h = get_lang('h');
         $course_id = api_get_course_int_id();
-		if (!isset($given_time)) {
+        $time = $given_time;
+        if (!isset($given_time)) {
 			if (self::debug > 2) { error_log('learnpathItem::get_scorm_time(): given time empty, current_start_time = '.$this->current_start_time, 0); }
 			if (is_object($this)) {
 				if ($query_db === true) {
@@ -2279,7 +2280,24 @@ class learnpathItem {
 	 	}
 	}
 
-	/**
+    /**
+     * Updates only the status of an item.
+     */
+    function saveStatus()
+    {
+        $item_view_table = Database::get_course_table(TABLE_LP_ITEM_VIEW);
+        $courseId = api_get_course_int_id();
+        $sql = "UPDATE $item_view_table
+            SET status = '" . $this->get_status(false) . "'
+            WHERE
+                c_id = $courseId AND
+                lp_item_id = " . $this->db_id . " AND
+                lp_view_id = " . $this->view_id . " AND
+                view_count = " . $this->get_attempt_id();
+        Database::query($sql);
+    }
+
+    /**
 	 * Writes the current data to the database
 	 * @return	boolean	Query result
 	 */
@@ -2297,8 +2315,12 @@ class learnpathItem {
 
    		$item_view_table = Database::get_course_table(TABLE_LP_ITEM_VIEW);
 		$sql_verified = 'SELECT status FROM '.$item_view_table.'
-		                 WHERE c_id = '.$course_id.' AND lp_item_id="'.$this->db_id.'" AND lp_view_id="'.$this->view_id.'" AND view_count="'.$this->get_attempt_id().'" ;';
-		$rs_verified = Database::query($sql_verified);
+		                 WHERE
+		                    c_id = ' . $course_id . ' AND
+		                    lp_item_id="' . $this->db_id . '" AND
+		                    lp_view_id="' . $this->view_id . '" AND
+		                    view_count="' . $this->get_attempt_id() . '" ;';
+         $rs_verified = Database::query($sql_verified);
 		$row_verified = Database::fetch_array($rs_verified);
 
    		$my_case_completed = array('completed', 'passed', 'browsed', 'failed'); // Added by Isaac Flores.
@@ -2311,7 +2333,14 @@ class learnpathItem {
             }
         }
 
-   		if ((($save === false && $this->type == 'sco') ||
+         if ($this->type == 'quiz') {
+             $save = true;
+             if (in_array($this->get_status(false), $my_case_completed)) {
+                 $save = false;
+             }
+         }
+
+         if ((($save === false && $this->type == 'sco') ||
                 ($this->type == 'sco' && ($credit == 'no-credit' OR $mode == 'review' OR $mode == 'browse'))
             ) && ($this->seriousgame_mode != 1 && $this->type == 'sco')
            ){
@@ -2324,8 +2353,11 @@ class learnpathItem {
 	  		$inserted = false;
 
 	  		// This a special case for multiple attempts and Chamilo exercises.
-	  		if ($this->type == 'quiz' && $this->get_prevent_reinit() == 0 && $this->get_status() == 'completed') {
-	  			// We force the item to be restarted.
+
+             if ($this->type == 'quiz' && $this->get_prevent_reinit(
+                 ) == 0 && $this->get_status(false) == 'completed'
+             ) {
+                 // We force the item to be restarted.
 	  			$this->restart();
 
 	  			$sql = "INSERT INTO $item_view_table " .

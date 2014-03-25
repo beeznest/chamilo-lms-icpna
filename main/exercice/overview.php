@@ -175,6 +175,8 @@ if ($current_browser == 'Internet Explorer') {
     $btn_class = '';
 }
 
+$userPassedExerciseAtLeastOnce = false;
+
 if (!empty($attempts)) {
     $i = $counter;
 	foreach ($attempts as $attempt_result) {
@@ -201,7 +203,19 @@ if (!empty($attempts)) {
 		if (in_array($objExercise->results_disabled, array(RESULT_DISABLE_SHOW_SCORE_AND_EXPECTED_ANSWERS, RESULT_DISABLE_SHOW_FINAL_SCORE_ONLY_WITH_CATEGORIES))) {
 			$row['attempt_link'] = $attempt_link;
 		}
-		$my_attempt_array[] = $row;
+
+        if (!empty($objExercise->pass_percentage)) {
+            $score = 0;
+            if (!empty($attempt_result['exe_weighting'])) {
+                $score = (float)($attempt_result['exe_result'] / $attempt_result['exe_weighting'] * 100);
+            }
+
+            if ((float)$score >= $objExercise->pass_percentage && $userPassedExerciseAtLeastOnce == false) {
+                $userPassedExerciseAtLeastOnce = true;
+            }
+        }
+
+        $my_attempt_array[] = $row;
         $i--;
 	}
 
@@ -241,6 +255,25 @@ if (!empty($attempts)) {
 	}
 	$table_content = $table->toHtml();
 }
+
+// Change status
+if (!empty($learnpath_id) && $userPassedExerciseAtLeastOnce) {
+    if (isset($_SESSION['oLP'])) {
+        /** @var learnpath $learnpath */
+        $learnpath = $_SESSION['oLP'];
+        $lpItemId = $learnpath->get_current_item_id();
+        $viewId = $learnpath->get_view_id();
+        $learnpathItem = new learnpathItem($lpItemId, api_get_user_id(
+        ), api_get_course_int_id());
+        $status = $learnpathItem->get_status();
+        if ($status != 'completed' && $status != 'passed') {
+            $learnpathItem->set_lp_view($viewId);
+            $learnpathItem->set_status('completed');
+            $learnpathItem->saveStatus();
+        }
+    }
+}
+
 $attempt_message = '';
 if ($objExercise->selectAttempts()) {
 	if ($is_allowed_to_edit) {

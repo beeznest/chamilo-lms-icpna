@@ -2677,6 +2677,7 @@ function getAllExerciseWithExtraFieldPlexPerStudent($studentId, $courseId)
             WHERE
             field_variable = 'plex' and 
             exe_user_id = %s and
+            te. status <> 'incomplete' and
             c.id = %s";
     $sql = sprintf($sql, $studentId, $courseId);
     

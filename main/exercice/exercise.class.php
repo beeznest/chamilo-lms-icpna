@@ -4588,9 +4588,11 @@ class Exercise
                 return array('value' => true, 'message' => '');
             }
         }
+        
+        $courseInfo = api_get_course_info();
 
         //Checking visibility in the item_property table
-        $visibility = api_get_item_visibility(api_get_course_info(), TOOL_QUIZ, $this->id, api_get_session_id());
+        $visibility = api_get_item_visibility($courseInfo, TOOL_QUIZ, $this->id, api_get_session_id());
 
         if ($visibility == 0) {
             $this->active = 0;
@@ -4668,9 +4670,18 @@ class Exercise
         }
         if (!empty($message)) {
             global $extAuthSource;
+            // Verify if it is a PLEX for adults!
+            $isAdultPlex = CourseManager::isAdultPlexExam($courseInfo['code']);
             $path = isset($extAuthSource['modules_path']) ? $extAuthSource['modules_path'] : null;
             $link = '<a href="' . $path . '">Regresa a la lista de módulos</a>';
-            $message = Display :: return_message('Lo sentimos, no has alcanzado el puntaje mínimo para aprobar el módulo. ' . $link, 'warning', false);
+            
+            if (!empty($isAdultPlex) && $isAdultPlex) {
+                $mesText = 'Para seguir, pueden usar el menu de la izquierda.';
+            } else {
+                $mesText = 'Lo sentimos, no has alcanzado el puntaje mínimo para aprobar el módulo. ' . $link;
+            }
+            
+            $message = Display :: return_message($mesText, 'warning', false);
         }
 
         return array('value' => $is_visible, 'message' => $message);

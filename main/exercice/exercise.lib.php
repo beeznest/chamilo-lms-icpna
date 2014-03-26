@@ -2669,6 +2669,23 @@ function getAllExerciseWithExtraFieldPlex()
  */
 function getAllExerciseWithExtraFieldPlexPerStudent($studentId, $courseId)
 {
+    
+    //If there is an exam incomplete let the user to continue taking the PLEX in Modules
+    $sql = "SELECT te.*, s.field_value, cq.pass_percentage FROM exercise_field_values s
+            INNER JOIN exercise_field sf ON (s.field_id = sf.id)
+            INNER JOIN c_quiz cq ON cq.c_id = s.c_id and s.exercise_id = cq.id            
+            INNER JOIN course c ON c.id = cq.c_id
+            INNER JOIN track_e_exercices te ON te.exe_exo_id = cq.id and te.exe_cours_id = c.code
+            WHERE
+            field_variable = 'plex' and 
+            exe_user_id = %s and
+            te. status = 'incomplete' and
+            c.id = %s";
+    $sql = sprintf($sql, $studentId, $courseId);
+    $incompResult = Database::query($sql);
+    if ($incompResult !== false && Database::num_rows($incompResult)) {
+        return array('score' => false, 'course' => 1);
+    }
     $sql = "SELECT te.*, s.field_value, cq.pass_percentage FROM exercise_field_values s
             INNER JOIN exercise_field sf ON (s.field_id = sf.id)
             INNER JOIN c_quiz cq ON cq.c_id = s.c_id and s.exercise_id = cq.id            

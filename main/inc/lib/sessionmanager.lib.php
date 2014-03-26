@@ -1892,6 +1892,25 @@ class SessionManager {
     }
 
     /**
+     * Get the original session id based on the session id. Returns 0 if original session id was not found
+     *
+     * @param string session id
+     * @return int Session id
+     */
+    public static function get_original_id_from_session_id($session_id) {
+        $t_sfv = Database::get_main_table(TABLE_MAIN_SESSION_FIELD_VALUES);
+        $table_field = Database::get_main_table(TABLE_MAIN_SESSION_FIELD);
+        $sql_session = "SELECT sfv.field_value FROM $table_field sf INNER JOIN $t_sfv sfv ON sfv.field_id=sf.id WHERE field_variable='cs_session_id' AND session_id=$session_id";
+        $res_session = Database::query($sql_session);
+        $row = Database::fetch_object($res_session);
+        if ($row) {
+            return $row->field_value;
+        } else {
+            return 0;
+        }
+    }
+
+    /**
      * Get users by session
      * @param  int session id
      * @param    int    filter by status

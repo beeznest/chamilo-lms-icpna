@@ -2695,7 +2695,8 @@ function getAllExerciseWithExtraFieldPlexPerStudent($studentId, $courseId)
             field_variable = 'plex' and 
             exe_user_id = %s and
             te. status <> 'incomplete' and
-            c.id = %s";
+            c.id = %s
+            ORDER BY te.start_date";
     $sql = sprintf($sql, $studentId, $courseId);
     
     $result = Database::query($sql);

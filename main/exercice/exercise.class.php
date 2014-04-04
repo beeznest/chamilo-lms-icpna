@@ -2463,6 +2463,12 @@ class Exercise
             }
 
             function open_clock_warning() {
+               $('<input>').attr({
+                    type: 'hidden',
+                    value: 'exp',
+                    id: 'expiredTime',
+                    name: 'expiredTime'
+                }).appendTo('#exercise_form');
                 $('#clock_warning').dialog({
                     modal:true,
                     height:250,

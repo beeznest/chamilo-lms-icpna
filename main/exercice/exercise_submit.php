@@ -392,6 +392,7 @@ $origin 				= isset($_REQUEST['origin']) ? Security::remove_XSS($_REQUEST['origi
 $reminder 				= isset($_REQUEST['reminder']) ? intval($_REQUEST['reminder']) : 0;
 $remind_question_id 	= isset($_REQUEST['remind_question_id']) ? intval($_REQUEST['remind_question_id']) : 0;
 $exerciseId				= isset($_REQUEST['exerciseId']) ? intval($_REQUEST['exerciseId']) : 0;
+$expiredTime = !empty($_REQUEST['expiredTime']) ? true : false; 
 
 $formSent = isset($_REQUEST['formSent']) ? $_REQUEST['formSent'] : null;
 $exerciseResult = isset($_REQUEST['exerciseResult']) ? $_REQUEST['exerciseResult'] : null;
@@ -459,7 +460,7 @@ if ($objExercise->review_answers) {
 
 //----
 $exercise_stat_info = $objExercise->get_stat_track_exercise_info($learnpath_id, $learnpath_item_id, 0);
-if ($exercise_stat_info['exe_cours_id'] == 'PLACEMENTTEST' && $objExercise->attempts == 1) {
+if ($exercise_stat_info['exe_cours_id'] == 'PLACEMENTTEST' && $objExercise->attempts == 1 && !$expiredTime) {
 
     //var_dump($exercise_stat_info);
     $attempt_list = null;

@@ -2418,6 +2418,9 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
         echo Testcategory::get_stats_table_by_attempt($objExercise->id, $category_list);
     }
 
+    // Remove autoplay from questions for result
+    $exercise_content = preg_replace('/autoplay[\=\".+\"]+/','',$exercise_content);
+
     echo $total_score_text;
     echo $exercise_content;
 

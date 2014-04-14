@@ -461,8 +461,9 @@ if ($objExercise->review_answers) {
 
 $user_id = api_get_user_id();
 $lastAttemptId = 'lastAttempt' . $exerciseId . $user_id;
+$exams = array('final exam', 'examen final');
 //See BT#5414
-if ($objExercise->name == 'Final Exam' && 
+if (in_array($this->name, $exams) &&
     $objExercise->attempts == 1 && $expiredTime && 
     $lastAttempt && empty($_COOKIE[$lastAttemptId])) {
     $exe_id = isset($_REQUEST['exe_id']) ? intval($_REQUEST['exe_id']) : 0;

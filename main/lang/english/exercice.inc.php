@@ -526,3 +526,4 @@ $EmailNotificationTemplateToTeacherDescription = "Define here the template for t
 $NotifyUserByEmail = "Send e-mail to learner";
 $EmailNotificationTemplateToUser = "Learner e-mail template";
 $EmailNotificationTemplateToUserDescription = "Define here the template for the e-mail that will be sent to the learner when (s)he finishes the test";
+$LastAttempt = "Last Attempt";

@@ -385,14 +385,15 @@ $(function(){
 
 // General parameters passed via POST/GET
 
-$learnpath_id 			= isset($_REQUEST['learnpath_id']) ? intval($_REQUEST['learnpath_id']) : 0;
-$learnpath_item_id 		= isset($_REQUEST['learnpath_item_id']) ? intval($_REQUEST['learnpath_item_id']) : 0;
-$learnpath_item_view_id	= isset($_REQUEST['learnpath_item_view_id']) ? intval($_REQUEST['learnpath_item_view_id']) : 0;
-$origin 				= isset($_REQUEST['origin']) ? Security::remove_XSS($_REQUEST['origin']) : '';
-$reminder 				= isset($_REQUEST['reminder']) ? intval($_REQUEST['reminder']) : 0;
-$remind_question_id 	= isset($_REQUEST['remind_question_id']) ? intval($_REQUEST['remind_question_id']) : 0;
-$exerciseId				= isset($_REQUEST['exerciseId']) ? intval($_REQUEST['exerciseId']) : 0;
-$expiredTime = !empty($_REQUEST['expiredTime']) ? true : false; 
+$learnpath_id = isset($_REQUEST['learnpath_id']) ? intval($_REQUEST['learnpath_id']) : 0;
+$learnpath_item_id = isset($_REQUEST['learnpath_item_id']) ? intval($_REQUEST['learnpath_item_id']) : 0;
+$learnpath_item_view_id = isset($_REQUEST['learnpath_item_view_id']) ? intval($_REQUEST['learnpath_item_view_id']) : 0;
+$origin = isset($_REQUEST['origin']) ? Security::remove_XSS($_REQUEST['origin']) : '';
+$reminder = isset($_REQUEST['reminder']) ? intval($_REQUEST['reminder']) : 0;
+$remind_question_id = isset($_REQUEST['remind_question_id']) ? intval($_REQUEST['remind_question_id']) : 0;
+$exerciseId = isset($_REQUEST['exerciseId']) ? intval($_REQUEST['exerciseId']) : 0;
+$expiredTime = !empty($_REQUEST['expiredTime']) ? true : false;
+$lastAttempt = !empty($_REQUEST['lastAttempt']) ? true : false;
 
 $formSent = isset($_REQUEST['formSent']) ? $_REQUEST['formSent'] : null;
 $exerciseResult = isset($_REQUEST['exerciseResult']) ? $_REQUEST['exerciseResult'] : null;
@@ -458,63 +459,27 @@ if ($objExercise->review_answers) {
 	}
 }
 
-//----
-$exercise_stat_info = $objExercise->get_stat_track_exercise_info($learnpath_id, $learnpath_item_id, 0);
-if ($exercise_stat_info['exe_cours_id'] == 'PLACEMENTTEST' && $objExercise->attempts == 1 && !$expiredTime) {
-
-    //var_dump($exercise_stat_info);
-    $attempt_list = null;
-    if (isset($exercise_stat_info['exe_id'])) {
-        $attempt_list = get_all_exercise_event_by_exe_id($exercise_stat_info['exe_id']);
-        //var_dump($attempt_list);
-
-        if (!empty($attempt_list) && $objExercise->attempts > 0) {
-            $message = Display::return_message(get_lang('YouTriedToResolveThisExerciseEarlier'));
-
-            if (!empty($exercise_stat_info['start_date']) && $exercise_stat_info['status'] == 'incomplete') {
-                $attempts = getAllExerciseAttemptResultByUserNoStatusFilter(
-                    $objExercise->id,
-                    api_get_user_id(),
-                    api_get_course_id(),
-                    api_get_session_id(),
-                    $learnpath_id,
-                    $learnpath_item_id
-                );
-
-                //var_dump($attempts);
-
-                //if ($objExercise->selectAttempts() == 30) {
-                $startedDate = api_strtotime($exercise_stat_info['start_date']);
-                $current_timestamp = api_strtotime(api_get_utc_datetime());
-
-                $expected_time = $startedDate + $objExercise->expired_time * 60;
-                $diff = $current_timestamp - $expected_time;
-                $countNotFinished = get_attempt_count_not_finished(api_get_user_id(), $objExercise->id, $learnpath_id, $learnpath_item_id);
-                $attempts = is_array($attempts) ? count($attempts) : 0;
-                //exit;
-                //var_dump($objExercise->attempts, $attempts);
-
-                if ($diff > 0 && $objExercise->attempts == $attempts) {
-                    $objExercise->attempts = $objExercise->attempts + 1;
-                    $learnpath_item_view_id = isset($learnpath_item_view_id) ? $learnpath_item_view_id : 0;
-
-                    completeExerciseAttempt($exercise_stat_info['exe_id']);
-                    //$_SESSION['try_once'] = true;
-                    $redirectTo = 'Location: '.api_get_self().'?'.api_get_cidreq().$params;
-                    header($redirectTo);
-                    exit;
-                }
-                //}
-            }
-        }
-    }
+$user_id = api_get_user_id();
+$lastAttemptId = 'lastAttempt' . $exerciseId;
+//See BT#5414
+if ($objExercise->name == 'Final Exam' && 
+    $objExercise->attempts == 1 && $expiredTime && 
+    $lastAttempt && empty($_SESSION[$lastAttemptId])) {
+    $exe_id = isset($_REQUEST['exe_id']) ? intval($_REQUEST['exe_id']) : 0;
+    //Delete the attempt
+    $sql = "DELETE FROM track_e_exercices
+            WHERE exe_id = %s AND
+            exe_user_id = %s AND
+            exe_cours_id = '%s' AND
+            exe_exo_id = %s";
+    $sqlParam = sprintf($sql, $exe_id, $user_id, $objExercise->course['code'], $exerciseId);
+    Database::query($sqlParam);
+    $_SESSION[$lastAttemptId] = true;
+    header("Location: " . api_get_path(WEB_CODE_PATH) . "exercice/overview.php?lp_init=1&origin={$origin}&learnpath_id={$learnpath_id}&learnpath_item_id={$learnpath_item_id}&exerciseId={$exerciseId}&" . api_get_cidreq());
+    exit;
 }
-
-
-
-
-$current_timestamp 	= time();
-$my_remind_list 	= array();
+$current_timestamp = time();
+$my_remind_list = array();
 
 $time_control = false;
 if ($objExercise->expired_time != 0) {
@@ -532,7 +497,6 @@ if ($time_control) {
 }
 
 $show_clock = true;
-$user_id = api_get_user_id();
 
 if ($objExercise->selectAttempts() > 0) {
 	$attempt_html = '';

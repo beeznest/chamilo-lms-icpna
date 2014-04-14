@@ -2463,7 +2463,7 @@ class Exercise
             } ";
         //Validate just for Final Exam
         //not to redirect when the time is finished
-        $lastAttemptId = 'lastAttempt' . $this->id;
+        $lastAttemptId = 'lastAttempt' . $this->id . api_get_user_id();
         if ($this->name == 'Final Exam' && empty($_COOKIE[$lastAttemptId])) {
             $script .= "  
                 function open_clock_warning() {
@@ -5032,7 +5032,7 @@ class Exercise
     function return_time_left_div()
     {
         $timeFinishMssg = 'YouWillBeRedirectedInXSeconds';
-        $lastAttemptId = 'lastAttempt' . $this->id;
+        $lastAttemptId = 'lastAttempt' . $this->id . api_get_user_id();
         if ($this->name == 'Final Exam' && empty($_COOKIE[$lastAttemptId])) {
             $timeFinishMssg = 'WeHaveDetectedExamNotFinish';
         }

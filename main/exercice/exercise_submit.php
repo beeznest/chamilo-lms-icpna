@@ -460,7 +460,7 @@ if ($objExercise->review_answers) {
 }
 
 $user_id = api_get_user_id();
-$lastAttemptId = 'lastAttempt' . $exerciseId;
+$lastAttemptId = 'lastAttempt' . $exerciseId . $user_id;
 //See BT#5414
 if ($objExercise->name == 'Final Exam' && 
     $objExercise->attempts == 1 && $expiredTime && 

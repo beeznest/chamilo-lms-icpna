@@ -464,7 +464,7 @@ $lastAttemptId = 'lastAttempt' . $exerciseId;
 //See BT#5414
 if ($objExercise->name == 'Final Exam' && 
     $objExercise->attempts == 1 && $expiredTime && 
-    $lastAttempt && empty($_SESSION[$lastAttemptId])) {
+    $lastAttempt && empty($_COOKIE[$lastAttemptId])) {
     $exe_id = isset($_REQUEST['exe_id']) ? intval($_REQUEST['exe_id']) : 0;
     //Delete the attempt
     $sql = "DELETE FROM track_e_exercices
@@ -474,7 +474,9 @@ if ($objExercise->name == 'Final Exam' &&
             exe_exo_id = %s";
     $sqlParam = sprintf($sql, $exe_id, $user_id, $objExercise->course['code'], $exerciseId);
     Database::query($sqlParam);
-    $_SESSION[$lastAttemptId] = true;
+    //(60 sec * 60 min * 24 hours * 30 days)
+    $expire = time() + 60 * 60 * 24 * 30;
+    setcookie($lastAttemptId, true, $expire);
     header("Location: " . api_get_path(WEB_CODE_PATH) . "exercice/overview.php?lp_init=1&origin={$origin}&learnpath_id={$learnpath_id}&learnpath_item_id={$learnpath_item_id}&exerciseId={$exerciseId}&" . api_get_cidreq());
     exit;
 }

@@ -464,7 +464,7 @@ $lastAttemptId = 'lastAttempt' . $exerciseId . $user_id;
 
 $exams = array('final exam', 'examen final', 'final test');
 //See BT#5414
-if (in_array($this->name, $exams) &&
+if (in_array($objExercise->name, $exams) &&
     $objExercise->attempts == 1 && $expiredTime && 
     $lastAttempt && empty($_COOKIE[$lastAttemptId])) {
     $exe_id = isset($_REQUEST['exe_id']) ? intval($_REQUEST['exe_id']) : 0;

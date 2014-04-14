@@ -2442,7 +2442,7 @@ class Exercise
     {
         $time_left = intval($time_left);
 
-        return "<script>
+        $script = "<script>
 
             function get_expired_date_string(expired_time) {
                 var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -2460,41 +2460,80 @@ class Exercise
                 if (seconds < 10) seconds = '0' + seconds;
                 date_string = months[month] +' ' + day + ', ' + year + ' ' + hours + ':' + minutes + ':' + seconds;
                 return date_string;
-            }
-
-            function open_clock_warning() {
-               $('<input>').attr({
-                    type: 'hidden',
-                    value: 'exp',
-                    id: 'expiredTime',
-                    name: 'expiredTime'
-                }).appendTo('#exercise_form');
-                $('#clock_warning').dialog({
-                    modal:true,
-                    height:250,
-                    closeOnEscape: false,
-                    resizable: false,
-                    buttons: {
-                        '".addslashes(get_lang("EndTest"))."': function() {
-                            $('#clock_warning').dialog('close');
+            } ";
+        //Validate just for Final Exam
+        //not to redirect when the time is finished
+        $lastAttemptId = 'lastAttempt' . $this->id;
+        if ($this->name == 'Final Exam' && empty($_SESSION[$lastAttemptId])) {
+            $script .= "  
+                function open_clock_warning() {
+                   $('<input>').attr({
+                        type: 'hidden',
+                        value: 'exp',
+                        id: 'expiredTime',
+                        name: 'expiredTime'
+                    }).appendTo('#exercise_form');
+                    $('#clock_warning').dialog({
+                        modal:true,
+                        height:250,
+                        closeOnEscape: false,
+                        resizable: false,
+                        buttons: {
+                            '".addslashes(get_lang("LastAttempt"))."': function() {
+                                $('<input>').attr({
+                                    type: 'hidden',
+                                    value: 'exp',
+                                    id: 'lastAttempt',
+                                    name: 'lastAttempt'
+                                }).appendTo('#exercise_form');
+                                $('#clock_warning').dialog('close');
+                            },
+                            '".addslashes(get_lang("EndTest"))."': function() {
+                                $('#clock_warning').dialog('close');
+                            },
                         },
-                    },
-                    close: function() {
-                        send_form();
-                    }
-                });
-                $('#clock_warning').dialog('open');
+                        close: function() {
+                            send_form();
+                        }
+                    });
+                    $('#clock_warning').dialog('open');
+                } ";
+          } else {
+                $script .= "  
+                    function open_clock_warning() {
+                       $('<input>').attr({
+                            type: 'hidden',
+                            value: 'exp',
+                            id: 'expiredTime',
+                            name: 'expiredTime'
+                        }).appendTo('#exercise_form');
+                        $('#clock_warning').dialog({
+                            modal:true,
+                            height:250,
+                            closeOnEscape: false,
+                            resizable: false,
+                            buttons: {
+                                '".addslashes(get_lang("EndTest"))."': function() {
+                                    $('#clock_warning').dialog('close');
+                                },
+                            },
+                            close: function() {
+                                send_form();
+                            }
+                        });
+                        $('#clock_warning').dialog('open');
 
-                $('#counter_to_redirect').epiclock({
-                    mode: $.epiclock.modes.countdown,
-                    offset: {seconds: 5},
-                    format: 's'
-                }).bind('timer', function () {
-                    send_form();
-                });
+                        $('#counter_to_redirect').epiclock({
+                            mode: $.epiclock.modes.countdown,
+                            offset: {seconds: 5},
+                            format: 's'
+                        }).bind('timer', function () {
+                            send_form();
+                        });
 
-            }
-
+                    } ";
+        }
+        $script .= "
             function send_form() {
                 if ($('#exercise_form').length) {
                     $('#exercise_form').submit();
@@ -2513,13 +2552,11 @@ class Exercise
                 $('#num_current_id').attr('value', '".$this->selectNbrQuestions()."');
                 open_clock_warning();
             }
-
-			$(document).ready(function() {
-
-				var current_time = new Date().getTime();
-                var time_left    = parseInt(".$time_left."); // time in seconds when using minutes there are some seconds lost
-				var expired_time = current_time + (time_left*1000);
-				var expired_date = get_expired_date_string(expired_time);
+		$(document).ready(function() {
+                    var current_time = new Date().getTime();
+                    var time_left = parseInt(".$time_left."); // time in seconds when using minutes there are some seconds lost
+                    var expired_time = current_time + (time_left*1000);
+                    var expired_date = get_expired_date_string(expired_time);
 
                 $('#exercise_clock_warning').epiclock({
                     mode: $.epiclock.modes.countdown,
@@ -2532,6 +2569,7 @@ class Exercise
 	       		$('#submit_save').click(function () {});
 	    });
 	    </script>";
+        return $script;
     }
 
     /**
@@ -4993,11 +5031,17 @@ class Exercise
 
     function return_time_left_div()
     {
+        $timeFinishMssg = 'YouWillBeRedirectedInXSeconds';
+        $lastAttemptId = 'lastAttempt' . $this->id;
+        if ($this->name == 'Final Exam' && empty($_SESSION[$lastAttemptId])) {
+            $timeFinishMssg = 'WeHaveDetectedExamNotFinish';
+        }
+        
         $html = '<div id="clock_warning" style="display:none">'.Display::return_message(
             get_lang('ReachedTimeLimit'),
             'warning'
         ).' '.sprintf(
-            get_lang('YouWillBeRedirectedInXSeconds'),
+            get_lang($timeFinishMssg),
             '<span id="counter_to_redirect" class="red_alert"></span>'
         ).'</div>';
         $html .= '<div id="exercise_clock_warning" class="well count_down"></div>';

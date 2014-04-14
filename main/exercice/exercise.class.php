@@ -2466,7 +2466,7 @@ class Exercise
         $lastAttemptId = 'lastAttempt' . $this->id . api_get_user_id();
 
         $exams = array('final exam', 'examen final', 'final test');
-        if (in_array($this->name, $exams) && empty($_COOKIE[$lastAttemptId])) {
+        if (in_array(strtolower($this->name), $exams) && empty($_COOKIE[$lastAttemptId])) {
             $script .= "  
                 function open_clock_warning() {
                    $('<input>').attr({
@@ -5037,7 +5037,7 @@ class Exercise
         $lastAttemptId = 'lastAttempt' . $this->id . api_get_user_id();
 
         $exams = array('final exam', 'examen final', 'final test');
-        if (in_array($this->name, $exams) && empty($_COOKIE[$lastAttemptId])) {
+        if (in_array(strtolower($this->name), $exams) && empty($_COOKIE[$lastAttemptId])) {
             $timeFinishMssg = 'WeHaveDetectedExamNotFinish';
         }
         

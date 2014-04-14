@@ -2463,8 +2463,10 @@ class Exercise
             } ";
         //Validate just for Final Exam
         //not to redirect when the time is finished
-        $lastAttemptId = 'lastAttempt' . $this->id;
-        if ($this->name == 'Final Exam' && empty($_SESSION[$lastAttemptId])) {
+        $lastAttemptId = 'lastAttempt' . $this->id . api_get_user_id();
+        $exams = array('final exam', 'examen final', 
+                       'final test', 'examen de clasificación');
+        if (in_array($this->name, $exams) && empty($_COOKIE[$lastAttemptId])) {
             $script .= "  
                 function open_clock_warning() {
                    $('<input>').attr({
@@ -5032,8 +5034,10 @@ class Exercise
     function return_time_left_div()
     {
         $timeFinishMssg = 'YouWillBeRedirectedInXSeconds';
-        $lastAttemptId = 'lastAttempt' . $this->id;
-        if ($this->name == 'Final Exam' && empty($_SESSION[$lastAttemptId])) {
+        $lastAttemptId = 'lastAttempt' . $this->id . api_get_user_id();
+        $exams = array('final exam', 'examen final', 
+                       'final test', 'examen de clasificación');
+        if (in_array($this->name, $exams) && empty($_COOKIE[$lastAttemptId])) {
             $timeFinishMssg = 'WeHaveDetectedExamNotFinish';
         }
         

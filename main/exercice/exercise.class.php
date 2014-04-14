@@ -2464,6 +2464,7 @@ class Exercise
         //Validate just for Final Exam
         //not to redirect when the time is finished
         $lastAttemptId = 'lastAttempt' . $this->id . api_get_user_id();
+
         $exams = array('final exam', 'examen final');
         if (in_array($this->name, $exams) && empty($_COOKIE[$lastAttemptId])) {
             $script .= "  
@@ -5034,6 +5035,7 @@ class Exercise
     {
         $timeFinishMssg = 'YouWillBeRedirectedInXSeconds';
         $lastAttemptId = 'lastAttempt' . $this->id . api_get_user_id();
+
         $exams = array('final exam', 'examen final');
         if (in_array($this->name, $exams) && empty($_COOKIE[$lastAttemptId])) {
             $timeFinishMssg = 'WeHaveDetectedExamNotFinish';

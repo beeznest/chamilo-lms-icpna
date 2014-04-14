@@ -5031,11 +5031,17 @@ class Exercise
 
     function return_time_left_div()
     {
+        $timeFinishMssg = 'YouWillBeRedirectedInXSeconds';
+        $lastAttemptId = 'lastAttempt' . $this->id;
+        if ($this->name == 'Final Exam' && empty($_SESSION[$lastAttemptId])) {
+            $timeFinishMssg = 'WeHaveDetectedExamNotFinish';
+        }
+        
         $html = '<div id="clock_warning" style="display:none">'.Display::return_message(
             get_lang('ReachedTimeLimit'),
             'warning'
         ).' '.sprintf(
-            get_lang('YouWillBeRedirectedInXSeconds'),
+            get_lang($timeFinishMssg),
             '<span id="counter_to_redirect" class="red_alert"></span>'
         ).'</div>';
         $html .= '<div id="exercise_clock_warning" class="well count_down"></div>';

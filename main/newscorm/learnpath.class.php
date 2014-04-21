@@ -1661,6 +1661,8 @@ class learnpath
         if ($this->debug > 2) {
             error_log('New LP - In learnpath::first() - First item is ' . $this->get_current_item_id());
         }
+
+        $this->update_license_activated_at();
     }
 
     /**
@@ -4104,8 +4106,8 @@ class learnpath
 
         // Save progress.
         list($progress, $text) = $this->get_progress_bar_text('%');
+        $progress = (int) $progress;
         if ($progress >= 0 && $progress <= 100) {
-            $progress = (int) $progress;
             $sql = "UPDATE $table SET progress = $progress
                     WHERE   c_id = ".$course_id." AND
                             lp_id = " . $this->get_id() . " AND
@@ -9623,6 +9625,48 @@ EOD;
     	$rsItmView = Database::query($sql);
     	$rowItmView = Database::fetch_array($rsItmView);
         return $rowItmView;
+    }
+
+    public function update_license_activated_at()
+    {
+        if ($this->debug > 1) { error_log('New LP - In learnpath::update_license_activated_at()'); }
+        if ($this->get_complete_items_count() < 1 && strpos($this->get_name(), 'Unit 1') !== false && strpos($this->get_name(), 'Lesson A') !== false) {
+            if ($this->debug > 1) { error_log('SENDING REQUEST TO COURSE SUBSCRIBER'); }
+            global $_configuration;
+            if (isset($_configuration['course_subscriber_url'])) {
+                $apiKeyId = UserManager::get_api_key_id(api_get_user_id(), 'subs');
+                if (!empty($apiKeyId)) {
+                    $apiKeys = UserManager::get_api_keys(api_get_user_id(), 'subs');
+                    $apiKey = $apiKeys[$apiKeyId];
+                }
+                if (!empty($apiKey)) {
+                    $externalSessionId = SessionManager::get_original_id_from_session_id(api_get_session_id());
+                    if (!empty($externalSessionId)) {
+                        $body = array(
+                            'license_activated_at' => 1,
+                        );
+                        /** @var Guzzle\Service\Client $client */
+                        global $app;
+                        $client = new $app['guzzle']['client'];
+                        $url = $_configuration['course_subscriber_url'] . 'sessions/' . $externalSessionId . '.json?apikey=' . $apiKey;
+                        try {
+                            $response = $client->put(
+                                $url,
+                                array(),
+                                json_encode($body)
+                            )->send();
+                            if ($this->debug > 1) { error_log('Response from REST Session: ' . $response); }
+                        } catch (Exception $e) {
+                            if ($this->debug > 1) { error_log('Fail to PUT to REST Session, Exception: ' . $e->getMessage()); }
+                        }
+                    } else {
+                        if ($this->debug > 1) { error_log('Couldn\'t find Course Subscriber Session id '); }
+                    }
+                } else {
+                    if ($this->debug > 1) { error_log('missing api_key user_id: ' . api_get_user_id()); }
+                }
+            }
+        }
     }
 }
 

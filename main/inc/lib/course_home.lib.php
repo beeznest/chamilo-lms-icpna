@@ -478,7 +478,6 @@ class CourseHome {
         $course_link_table 			= Database::get_course_table(TABLE_LINK);
         $course_item_property_table = Database::get_course_table(TABLE_ITEM_PROPERTY);
 
-
         switch ($course_tool_category) {
             case TOOL_AUTHORING:
                 $sql_links = "SELECT tl.*, tip.visibility
@@ -571,7 +570,8 @@ class CourseHome {
      * @param bool rows
      * @return string
      */
-    public static function show_tools_category($toolList, $rows = false) {
+    public static function show_tools_category($toolList, $rows = false)
+    {
         global $_user;
         $theme = api_get_setting('homepage_view');
         if ($theme == 'vertical_activity') {
@@ -684,6 +684,7 @@ class CourseHome {
                     $tool['link'] = $tool['link'].$qm_or_amp;
                 } else {
                     $tool['link'] = $tool['link'].$qm_or_amp.api_get_cidreq();
+
                 }
 
                 $tool_link_params = array();
@@ -691,17 +692,21 @@ class CourseHome {
                 //$tool['link'] = htmlspecialchars($tool['link']) ;
                 //@todo this visio stuff should be removed
                 if (strpos($tool['name'],'visio_') !== false) {
-                    $tool_link_params = array('id'      => 'tooldesc_'.$tool["id"],
-                                              'href'    => '"javascript: void(0);"',
-                                              'class'   => $class,
-                                              'onclick' => 'javascript: window.open(\'' . $tool['link'] . '\',\'window_visio'.$_SESSION['_cid'].'\',config=\'height=\'+730+\', width=\'+1020+\', left=2, top=2, toolbar=no, menubar=no, scrollbars=yes, resizable=yes, location=no, directories=no, status=no\')',
-                                              'target'  =>  $tool['target']);
+                    $tool_link_params = array(
+                        'id' => 'tooldesc_' . $tool["id"],
+                        'href' => '"javascript: void(0);"',
+                        'class' => $class,
+                        'onclick' => 'javascript: window.open(\'' . $tool['link'] . '\',\'window_visio' . $_SESSION['_cid'] . '\',config=\'height=\'+730+\', width=\'+1020+\', left=2, top=2, toolbar=no, menubar=no, scrollbars=yes, resizable=yes, location=no, directories=no, status=no\')',
+                        'target' => $tool['target']
+                    );
                 } elseif (strpos($tool['name'], 'chat') !== false && api_get_course_setting('allow_open_chat_window')) {
-                    $tool_link_params = array('id'      => 'tooldesc_'.$tool["id"],
-                                              'class'   => $class,
-                                              'href'    => 'javascript: void(0);',
-                                              'onclick' => 'javascript: window.open(\'' . $tool['link'] . '\',\'window_chat'.$_SESSION['_cid'].'\',config=\'height=\'+380+\', width=\'+625+\', left=2, top=2, toolbar=no, menubar=no, scrollbars=yes, resizable=yes, location=no, directories=no, status=no\')',
-                                              'target'  =>  $tool['target']);
+                    $tool_link_params = array(
+                        'id' => 'tooldesc_' . $tool["id"],
+                        'class' => $class,
+                        'href' => 'javascript: void(0);',
+                        'onclick' => 'javascript: window.open(\'' . $tool['link'] . '\',\'window_chat' . $_SESSION['_cid'] . '\',config=\'height=\'+380+\', width=\'+625+\', left=2, top=2, toolbar=no, menubar=no, scrollbars=yes, resizable=yes, location=no, directories=no, status=no\')',
+                        'target' => $tool['target']
+                    );
                 } else {
                     if (count(explode('type=classroom',$tool['link'])) == 2 || count(explode('type=conference', $tool['link'])) == 2) {
                         $tool_link_params = array('id'      => 'tooldesc_'.$tool["id"],
@@ -711,10 +716,12 @@ class CourseHome {
 
 
                     } else {
-                        $tool_link_params = array('id'      => 'tooldesc_'.$tool["id"],
-                                                  'href'    => $tool['link'],
-                                                  'class'   => $class,
-                                                  'target'  => $tool['target']);
+                        $tool_link_params = array(
+                            'id' => 'tooldesc_' . $tool["id"],
+                            'href' => $tool['link'],
+                            'class' => $class,
+                            'target' => $tool['target']
+                        );
                     }
                 }
 

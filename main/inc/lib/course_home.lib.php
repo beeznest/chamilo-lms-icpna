@@ -464,6 +464,13 @@ class CourseHome {
         }
 
         while ($temp_row = Database::fetch_assoc($result)) {
+            if (!empty($session_id)) {
+                $temp_row['link'] = str_replace(
+                    '&id_session=0',
+                    '',
+                    $temp_row['link']
+                );
+            }
             if ($check) {
                 if (!in_array($temp_row['name'], $hide_list)) {
                     $all_tools_list[] = $temp_row;
@@ -538,13 +545,6 @@ class CourseHome {
 
         if (isset($tmp_all_tools_list)) {
             foreach ($tmp_all_tools_list as $tool) {
-                if (!empty($session_id)) {
-                    $tool['link'] = str_replace(
-                        'id_session=0',
-                        '',
-                        $tool['link']
-                    );
-                }
                 if ($tool['image'] == 'blog.gif') {
                     // Init
                     $tbl_blogs_rel_user = Database::get_course_table(TABLE_BLOGS_REL_USER);

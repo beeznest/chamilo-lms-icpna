@@ -1156,6 +1156,8 @@ class CourseHome {
             return $text;
         }
 
+        $courseInfo = api_get_course_info();
+
         foreach ($toolList as $tool) {
             if (!isset($tool['icon'])) {
                 continue;
@@ -1187,8 +1189,9 @@ class CourseHome {
                 require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
                 $row_entity_id = Sequence::get_row_entity_id_by_row_id($type_entity_id, $id, api_get_course_int_id(), $toolName);
                 $stateTemp = Sequence::get_state_lp_by_row_entity_id($row_entity_id, api_get_user_id(), api_get_session_id());
-                if (!empty($stateTemp)) { $state = $stateTemp; }
-                $courseInfo = api_get_course_info();
+                if (!empty($stateTemp)) {
+                    $state = $stateTemp;
+                }
                 $regex ='/src=\"\S*\.(gif|png|jpg)/';
                 $dir_icons = 'icons/64/';
                 $ext_png = 'png';
@@ -1196,15 +1199,19 @@ class CourseHome {
                 if (!empty($tool['tool']['custom_icon'])) {
                     $custom_icon = $tool['tool']['custom_icon'];
                 } else {
-                    $custom_icon = preg_replace('/(.)+alt=\"/','',$tool['pure_icon']);
-                    $custom_icon = preg_replace('/\"(.)+/','',$custom_icon);
+                    $custom_icon = preg_replace(
+                        '/(.)+alt=\"/',
+                        '',
+                        $tool['pure_icon']
+                    );
+                    $custom_icon = preg_replace('/\"(.)+/', '', $custom_icon);
                     if ($custom_icon !== $tool['tool']['image']) {
                         $is_lp_icon = true;
                     }
                 }
-                $basedir = ($is_lp_icon)? '/upload/learning_path/images/':'/upload/course_home_icons/';
+                $basedir = $is_lp_icon ? '/upload/learning_path/images/' : '/upload/course_home_icons/';
+
                 if ($state === 'process' || $state === 'completed') {
-                    
                     $iconPathTemp = api_get_path(WEB_COURSE_PATH).$courseInfo['directory'].$basedir.$custom_icon;
                     if (is_file(api_get_path(SYS_COURSE_PATH).$courseInfo['directory'].$basedir.$custom_icon)) {
                         $icon_path = 'src="'.$iconPathTemp;
@@ -1246,7 +1253,7 @@ class CourseHome {
                     }
                 }
             }
-            
+
             $show = '<div class="span2 center">'
 
               . ($tool['visibility']==1 ? ' <a href="'.$tool['tool']['link'].'" class="state-icon-link">' : '')

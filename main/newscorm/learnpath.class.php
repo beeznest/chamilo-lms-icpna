@@ -183,6 +183,7 @@ class learnpath
 
         // Selecting by view_count descending allows to get the highest view_count first.
         $sql = "SELECT * FROM $lp_table WHERE c_id = $course_id AND lp_id = '$lp_id' AND user_id = '$user_id' $session ORDER BY view_count DESC";
+
         $res = Database::query($sql);
         if ($this->debug > 2) { error_log('New LP - learnpath::__construct() ' . __LINE__ . ' - querying lp_view: ' . $sql, 0); }
 
@@ -2720,7 +2721,7 @@ class learnpath
             error_log('learnpath::get_toc()', 0);
         }
         $toc = array();
-        
+
         // Verify if it is a PLEX for adults!
         //$isAdultPlex = CourseManager::isAdultPlexExam($this->getCourseCode());
         //if ($isAdultPlex && api_is_student())
@@ -2730,7 +2731,7 @@ class learnpath
                 //If it is no the first item and
                 //The status of the last exam is passed
                 //then Show the next exam
-                    
+
                 $lastExam = !empty($this->items[$item_id-1]) ? $this->items[$item_id-1] : 0;
                 //Validate if it doesnt have last exam or if the last exam is completed
                 if (empty($lastExam) || (!empty($lastExam) && $lastExam->status == $lastExam->possible_status[2])) {
@@ -2738,21 +2739,21 @@ class learnpath
                     if (!empty($lastExam)) {
                         $itemViewRow = $this->getItemViewInfo
                                     (
-                                        $lastExam->db_item_view_id, 
-                                        $this->get_course_int_id(),
+                                $lastExam->db_item_view_id,
+                                $this->get_course_int_id(),
                                         $lastExam->view_id,
                                         $item_id-1
                                     );
-                        
+
                         $exerciseData = $objExercise->getExerciseFromLP
                                     (
-                                        $this->lp_id, 
-                                        $item_id-1, 
-                                        $lastExam->db_item_view_id, 
-                                        $this->get_course_int_id()
+                                $this->lp_id,
+                                $item_id - 1,
+                                $lastExam->db_item_view_id,
+                                $this->get_course_int_id()
                                     );
-                        
-                        
+
+
                         $resultPercentage = 0;
                         $total_score = (!empty($itemViewRow['score'])) ? $itemViewRow['score'] : 0;
                         $total_weight = (!empty($itemViewRow['max_score'])) ? $itemViewRow['max_score'] : 0;
@@ -2760,7 +2761,7 @@ class learnpath
                         if (!empty($total_weight)) {
                             $resultPercentage = $total_score / $total_weight * 100;
                         }
-                        
+
                         if ($resultPercentage >= $pass_percentage) {
                             //validate if the exam is passed
                             $toc[] = array (
@@ -2804,14 +2805,14 @@ class learnpath
                 );
             }
         }
-        
+
         if ($this->debug > 2) {
             error_log('New LP - In learnpath::get_toc() - TOC array: ' . print_r($toc, true), 0);
         }
         return $toc;
     }
-    
-      /**
+
+    /**
      * Generate and return the table of contents for this learnpath. The (flat) table returned can be
      * used by get_html_toc() to be ready to display
      * @return	array	TOC as a table with 4 elements per row: title, link, status and level
@@ -3451,25 +3452,32 @@ class learnpath
         $search = '';
         // Use $attempt_num to enable multi-views management (disabled so far).
         if ($attempt_num != 0 AND intval(strval($attempt_num)) == $attempt_num) {
-            $search = 'AND view_count = ' . $attempt_num;
+            $search = ' AND view_count = ' . $attempt_num;
         }
         // When missing $attempt_num, search for a unique lp_view record for this lp and user.
         $lp_view_table = Database :: get_course_table(TABLE_LP_VIEW);
 
         $course_id = api_get_course_int_id();
+        $sessionId = api_get_session_id();
 
         $sql = "SELECT id, view_count FROM $lp_view_table
-        		WHERE c_id = ".$course_id." AND lp_id = " . $this->get_id() ." AND user_id = " . $this->get_user_id() . " " .$search .
-        		" ORDER BY view_count DESC";
+        		WHERE
+        		    c_id = " . $course_id . " AND
+        		    lp_id = " . $this->get_id() . " AND
+        		    user_id = " . $this->get_user_id() . " AND
+        		    session_id = $sessionId
+        		    $search
+                ORDER BY view_count DESC";
         $res = Database::query($sql);
         if (Database :: num_rows($res) > 0) {
             $row = Database :: fetch_array($res);
             $this->lp_view_id = $row['id'];
         } else {
             // There is no database record, create one.
-            $sql = "INSERT INTO $lp_view_table (c_id, lp_id,user_id,view_count) VALUES
-            		($course_id, " . $this->get_id() . "," . $this->get_user_id() . ",1)";
-            $res = Database::query($sql);
+            $sql = "INSERT INTO $lp_view_table (c_id, lp_id, user_id, view_count, session_id) VALUES
+            		($course_id, " . $this->get_id() . "," . $this->get_user_id(
+                ) . ", 1, $sessionId)";
+            Database::query($sql);
             $id = Database :: insert_id();
             $this->lp_view_id = $id;
 
@@ -3479,6 +3487,7 @@ class learnpath
             /*Sequence::temp_hack_4_insert($this->get_total_items_count(), $row_entity_id, $this->get_user_id(), 0);
             */
         }
+
         return $this->lp_view_id;
     }
 
@@ -9612,7 +9621,7 @@ EOD;
         Database::query($sql);
         $this->seriousgame_mode = $value;
     }
-    
+
     public function getItemViewInfo($itemViewId , $courseId, $viewId, $itemId)
     {
         $table_lp_item_view = Database::get_course_table(TABLE_LP_ITEM_VIEW);
@@ -9621,8 +9630,8 @@ EOD;
                . "c_id = $courseId AND "
                . "lp_item_id = $itemId AND "
                . "lp_view_id = $viewId";
-        
-    	$rsItmView = Database::query($sql);
+
+        $rsItmView = Database::query($sql);
     	$rowItmView = Database::fetch_array($rsItmView);
         return $rowItmView;
     }

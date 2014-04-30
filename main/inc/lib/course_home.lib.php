@@ -464,6 +464,13 @@ class CourseHome {
         }
 
         while ($temp_row = Database::fetch_assoc($result)) {
+            if (!empty($session_id)) {
+                $temp_row['link'] = str_replace(
+                    '&id_session=0',
+                    '',
+                    $temp_row['link']
+                );
+            }
             if ($check) {
                 if (!in_array($temp_row['name'], $hide_list)) {
                     $all_tools_list[] = $temp_row;
@@ -477,7 +484,6 @@ class CourseHome {
         // Grabbing all the links that have the property on_homepage set to 1
         $course_link_table 			= Database::get_course_table(TABLE_LINK);
         $course_item_property_table = Database::get_course_table(TABLE_ITEM_PROPERTY);
-
 
         switch ($course_tool_category) {
             case TOOL_AUTHORING:
@@ -571,7 +577,8 @@ class CourseHome {
      * @param bool rows
      * @return string
      */
-    public static function show_tools_category($toolList, $rows = false) {
+    public static function show_tools_category($toolList, $rows = false)
+    {
         global $_user;
         $theme = api_get_setting('homepage_view');
         if ($theme == 'vertical_activity') {
@@ -684,6 +691,7 @@ class CourseHome {
                     $tool['link'] = $tool['link'].$qm_or_amp;
                 } else {
                     $tool['link'] = $tool['link'].$qm_or_amp.api_get_cidreq();
+
                 }
 
                 $tool_link_params = array();
@@ -691,17 +699,21 @@ class CourseHome {
                 //$tool['link'] = htmlspecialchars($tool['link']) ;
                 //@todo this visio stuff should be removed
                 if (strpos($tool['name'],'visio_') !== false) {
-                    $tool_link_params = array('id'      => 'tooldesc_'.$tool["id"],
-                                              'href'    => '"javascript: void(0);"',
-                                              'class'   => $class,
-                                              'onclick' => 'javascript: window.open(\'' . $tool['link'] . '\',\'window_visio'.$_SESSION['_cid'].'\',config=\'height=\'+730+\', width=\'+1020+\', left=2, top=2, toolbar=no, menubar=no, scrollbars=yes, resizable=yes, location=no, directories=no, status=no\')',
-                                              'target'  =>  $tool['target']);
+                    $tool_link_params = array(
+                        'id' => 'tooldesc_' . $tool["id"],
+                        'href' => '"javascript: void(0);"',
+                        'class' => $class,
+                        'onclick' => 'javascript: window.open(\'' . $tool['link'] . '\',\'window_visio' . $_SESSION['_cid'] . '\',config=\'height=\'+730+\', width=\'+1020+\', left=2, top=2, toolbar=no, menubar=no, scrollbars=yes, resizable=yes, location=no, directories=no, status=no\')',
+                        'target' => $tool['target']
+                    );
                 } elseif (strpos($tool['name'], 'chat') !== false && api_get_course_setting('allow_open_chat_window')) {
-                    $tool_link_params = array('id'      => 'tooldesc_'.$tool["id"],
-                                              'class'   => $class,
-                                              'href'    => 'javascript: void(0);',
-                                              'onclick' => 'javascript: window.open(\'' . $tool['link'] . '\',\'window_chat'.$_SESSION['_cid'].'\',config=\'height=\'+380+\', width=\'+625+\', left=2, top=2, toolbar=no, menubar=no, scrollbars=yes, resizable=yes, location=no, directories=no, status=no\')',
-                                              'target'  =>  $tool['target']);
+                    $tool_link_params = array(
+                        'id' => 'tooldesc_' . $tool["id"],
+                        'class' => $class,
+                        'href' => 'javascript: void(0);',
+                        'onclick' => 'javascript: window.open(\'' . $tool['link'] . '\',\'window_chat' . $_SESSION['_cid'] . '\',config=\'height=\'+380+\', width=\'+625+\', left=2, top=2, toolbar=no, menubar=no, scrollbars=yes, resizable=yes, location=no, directories=no, status=no\')',
+                        'target' => $tool['target']
+                    );
                 } else {
                     if (count(explode('type=classroom',$tool['link'])) == 2 || count(explode('type=conference', $tool['link'])) == 2) {
                         $tool_link_params = array('id'      => 'tooldesc_'.$tool["id"],
@@ -711,10 +723,12 @@ class CourseHome {
 
 
                     } else {
-                        $tool_link_params = array('id'      => 'tooldesc_'.$tool["id"],
-                                                  'href'    => $tool['link'],
-                                                  'class'   => $class,
-                                                  'target'  => $tool['target']);
+                        $tool_link_params = array(
+                            'id' => 'tooldesc_' . $tool["id"],
+                            'href' => $tool['link'],
+                            'class' => $class,
+                            'target' => $tool['target']
+                        );
                     }
                 }
 
@@ -1156,6 +1170,8 @@ class CourseHome {
             return $text;
         }
 
+        $courseInfo = api_get_course_info();
+
         foreach ($toolList as $tool) {
             if (!isset($tool['icon'])) {
                 continue;
@@ -1187,8 +1203,9 @@ class CourseHome {
                 require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
                 $row_entity_id = Sequence::get_row_entity_id_by_row_id($type_entity_id, $id, api_get_course_int_id(), $toolName);
                 $stateTemp = Sequence::get_state_lp_by_row_entity_id($row_entity_id, api_get_user_id(), api_get_session_id());
-                if (!empty($stateTemp)) { $state = $stateTemp; }
-                $courseInfo = api_get_course_info();
+                if (!empty($stateTemp)) {
+                    $state = $stateTemp;
+                }
                 $regex ='/src=\"\S*\.(gif|png|jpg)/';
                 $dir_icons = 'icons/64/';
                 $ext_png = 'png';
@@ -1196,15 +1213,19 @@ class CourseHome {
                 if (!empty($tool['tool']['custom_icon'])) {
                     $custom_icon = $tool['tool']['custom_icon'];
                 } else {
-                    $custom_icon = preg_replace('/(.)+alt=\"/','',$tool['pure_icon']);
-                    $custom_icon = preg_replace('/\"(.)+/','',$custom_icon);
+                    $custom_icon = preg_replace(
+                        '/(.)+alt=\"/',
+                        '',
+                        $tool['pure_icon']
+                    );
+                    $custom_icon = preg_replace('/\"(.)+/', '', $custom_icon);
                     if ($custom_icon !== $tool['tool']['image']) {
                         $is_lp_icon = true;
                     }
                 }
-                $basedir = ($is_lp_icon)? '/upload/learning_path/images/':'/upload/course_home_icons/';
+                $basedir = $is_lp_icon ? '/upload/learning_path/images/' : '/upload/course_home_icons/';
+
                 if ($state === 'process' || $state === 'completed') {
-                    
                     $iconPathTemp = api_get_path(WEB_COURSE_PATH).$courseInfo['directory'].$basedir.$custom_icon;
                     if (is_file(api_get_path(SYS_COURSE_PATH).$courseInfo['directory'].$basedir.$custom_icon)) {
                         $icon_path = 'src="'.$iconPathTemp;
@@ -1246,7 +1267,7 @@ class CourseHome {
                     }
                 }
             }
-            
+
             $show = '<div class="span2 center">'
 
               . ($tool['visibility']==1 ? ' <a href="'.$tool['tool']['link'].'" class="state-icon-link">' : '')

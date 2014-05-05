@@ -2421,13 +2421,13 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
     // Remove autoplay from questions for result
     $exercise_content = preg_replace('/autoplay[\=\".+\"]+/','',$exercise_content);
 
-    echo $total_score_text;
+    echo $total_score_text; 
     echo $exercise_content;
-
+ 
     if (!$show_only_score) {
         echo $total_score_text;
     }
-    
+  
     /*
     if ($isAdultPlex && $isSuccess) {
         isNextPlexAvailable
@@ -2559,7 +2559,7 @@ function get_total_attempts_by_user($user_id, $exercise_id, $course_code, $sessi
             WHERE   status = ''  AND
                     exe_cours_id = '$course_code' AND
                     exe_exo_id = '$exercise_id' AND
-                    session_id = $session_id  AND
+                    (session_id = 0 OR session_id = $session_id) AND
                     orig_lp_id = $learnpath_id AND
                     orig_lp_item_id = $learnpath_item_id
                     $user_condition
@@ -2572,6 +2572,7 @@ function get_total_attempts_by_user($user_id, $exercise_id, $course_code, $sessi
 function get_question_ribbon($objExercise, $score, $weight, $check_pass_percentage = false)
 {
     $user = api_get_user_info();
+    $sessionId = api_get_session_id();
     $eventMessage = null;
     $ribbon = '<div class="question_row">';
     $ribbon .= '<div class="ribbon">';
@@ -2584,7 +2585,7 @@ function get_question_ribbon($objExercise, $score, $weight, $check_pass_percenta
                 $eventMessage = $objExercise->getOnSuccessMessage();
                 $ribbon_total_success_or_error = ' ribbon-total-success';
             } else {
-                $attempts = get_total_attempts_by_user($user['user_id'], $objExercise->id, $objExercise->course['id'], 0);
+                $attempts = get_total_attempts_by_user($user['user_id'], $objExercise->id, $objExercise->course['id'], $sessionId);
                 //If we have attempts left tell the user so
                 if ($objExercise->attempts == ($attempts + 1)) {
                     $eventMessage = $objExercise->getOnFailedMessage();

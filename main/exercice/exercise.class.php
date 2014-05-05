@@ -4679,7 +4679,7 @@ class Exercise
             // Verify if it is a PLEX for adults!
             $isAdultPlex = CourseManager::isAdultPlexExam($courseInfo['code']);
             $path = isset($extAuthSource['modules_path']) ? $extAuthSource['modules_path'] : null;
-            $link = '<a href="' . $path . '">Regresa a la lista de módulos</a>';
+            $link = '<a target="_top" href="' . $path . '">Regresa a la lista de módulos</a>';
             
             if (!empty($isAdultPlex) && $isAdultPlex) {
                 $mesText = 'Para seguir, pueden usar el menu de la izquierda.';

@@ -2421,13 +2421,13 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
     // Remove autoplay from questions for result
     $exercise_content = preg_replace('/autoplay[\=\".+\"]+/','',$exercise_content);
 
-    echo $total_score_text;
+    echo $total_score_text; 
     echo $exercise_content;
-
+ 
     if (!$show_only_score) {
         echo $total_score_text;
     }
-    
+  
     /*
     if ($isAdultPlex && $isSuccess) {
         isNextPlexAvailable
@@ -2559,7 +2559,7 @@ function get_total_attempts_by_user($user_id, $exercise_id, $course_code, $sessi
             WHERE   status = ''  AND
                     exe_cours_id = '$course_code' AND
                     exe_exo_id = '$exercise_id' AND
-                    session_id = $session_id  AND
+                    (session_id = 0 OR session_id = $session_id) AND
                     orig_lp_id = $learnpath_id AND
                     orig_lp_item_id = $learnpath_item_id
                     $user_condition
@@ -2572,6 +2572,7 @@ function get_total_attempts_by_user($user_id, $exercise_id, $course_code, $sessi
 function get_question_ribbon($objExercise, $score, $weight, $check_pass_percentage = false)
 {
     $user = api_get_user_info();
+    $sessionId = api_get_session_id();
     $eventMessage = null;
     $ribbon = '<div class="question_row">';
     $ribbon .= '<div class="ribbon">';
@@ -2584,7 +2585,7 @@ function get_question_ribbon($objExercise, $score, $weight, $check_pass_percenta
                 $eventMessage = $objExercise->getOnSuccessMessage();
                 $ribbon_total_success_or_error = ' ribbon-total-success';
             } else {
-                $attempts = get_total_attempts_by_user($user['user_id'], $objExercise->id, $objExercise->course['id'], 0);
+                $attempts = get_total_attempts_by_user($user['user_id'], $objExercise->id, $objExercise->course['id'], $sessionId);
                 //If we have attempts left tell the user so
                 if ($objExercise->attempts == ($attempts + 1)) {
                     $eventMessage = $objExercise->getOnFailedMessage();
@@ -2766,75 +2767,35 @@ function getFinalScore($cid, $sid)
     // first was not finished (track_e_exercices.status != ''), we have to
     // take the results from the second attempt (but not more)
 
-    $score = 0;
-    
-    if ($maxAttempt == 1) {
-        // Adults case, only one attempt but if first unfinished, we take the
-        // second one
-        $sql = "SELECT exe_result, exe_weighting, status
+    $sql = "SELECT exe_result, exe_weighting, status
             FROM $tbl_res
             WHERE
                 exe_exo_id = $qid AND
                 exe_cours_id = '$ccode' AND
-                session_id = $sid
+                session_id = $sid AND
+                status = ''
             ORDER BY start_date ASC LIMIT 2";
-        $res = Database::query($sql);
-        if (Database::num_rows($res) < 1) {
-            return false;
-        } elseif (Database::num_rows($res) == 1) {
-            $row = Database::fetch_row($res);
-            $tempScore = round(($row[0] / $row[1]) * 100, 0);
-            if ($tempScore < 70 && $row[2] != '') {
-                // return empty array so this score is not taken into account
-                return false;
-            }
-            $score = $tempScore;
-        } else {
-            $lastScore = 0;
-            // only scan 2 rows, thanks to the LIMIT 2 above
-            while ($row = Database::fetch_row($res)) {
-                $tempScore = round(($row[0] / $row[1]) * 100, 0);
-                if ($tempScore > $lastScore) {
-                    $lastScore = $tempScore;
-                }
-            }
-            // return the best score
-            $score = $lastScore;
-        }
+    
+    $res = Database::query($sql);
+    $numRows = Database::num_rows($res);
+    
+    if ($numRows < 1) {
+        return false;
     } else {
-        // There are 3 attempts to these tests. As soon as one is > 70, send result
-        $sql = "SELECT exe_result, exe_weighting, status
-            FROM $tbl_res
-            WHERE exe_exo_id = $qid
-                AND exe_cours_id = '$ccode'
-                AND session_id = $sid
-            ORDER BY start_date ASC LIMIT 3";
-        $res = Database::query($sql);
-        if (Database::num_rows($res) < 1) {
-            return false;
-        }
         $lastScore = 0;
-        $count = 0;
-        // only scan max 3 rows, thanks to the LIMIT 2 above
+        $minPercentage = ($maxAttempt === 3) ? 80 : 70; //PLEX for kids
         while ($row = Database::fetch_row($res)) {
             $tempScore = round(($row[0] / $row[1]) * 100, 0);
             if ($tempScore > $lastScore) {
                 $lastScore = $tempScore;
             }
-            $count++;
         }
-        if ($lastScore >= 70) {
-            // return the success score
-            $score = $lastScore;
+        if ($numRows === $maxAttempt) {
+            return $lastScore;
+        } elseif($lastScore >= $minPercentage) {
+            return $lastScore;
         } else {
-            if ($count == 3) {
-                // reached maximum attempts, return bad result
-                $score = $lastScore;
-            } else {
-                return false;
-            }
+            return false;
         }
     }
-
-    return $score;
 }

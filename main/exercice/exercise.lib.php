@@ -2732,6 +2732,7 @@ function getAllExerciseWithExtraFieldPlexPerStudent($studentId, $courseId)
     }
     
 }
+
 /**
  * @param int $cid course id
  * @param int $sid session id
@@ -2744,7 +2745,7 @@ function getFinalScore($cid, $sid)
 
     // Limited list of terms that will be considered as exams that classify the user to move to next course
     // @todo add a checkbox for this and a database field (c_quiz.classification_exam)
-    $exam_names = "'final exam', 'examen final', 'placement test', 'final test', 'examen de clasificación'";
+    $exam_names = "'final exam', 'examen final', 'final test'";
 
     $courseInfo = api_get_course_info_by_id($cid);
     $ccode = $courseInfo['code'];
@@ -2774,7 +2775,7 @@ function getFinalScore($cid, $sid)
                 exe_cours_id = '$ccode' AND
                 session_id = $sid AND
                 status = ''
-            ORDER BY start_date ASC LIMIT 2";
+            ORDER BY start_date ASC";
     
     $res = Database::query($sql);
     $numRows = Database::num_rows($res);
@@ -2783,7 +2784,75 @@ function getFinalScore($cid, $sid)
         return false;
     } else {
         $lastScore = 0;
-        $minPercentage = ($maxAttempt === 3) ? 80 : 70; //PLEX for kids
+        $minPercentage = 70; //Courses
+        while ($row = Database::fetch_row($res)) {
+            $tempScore = round(($row[0] / $row[1]) * 100, 0);
+            if ($tempScore > $lastScore) {
+                $lastScore = $tempScore;
+            }
+        }
+        if ($numRows === $maxAttempt) {
+            return $lastScore;
+        } elseif($lastScore >= $minPercentage) {
+            return $lastScore;
+        } else {
+            return false;
+        }
+    }
+}
+
+/**
+ * @param int $cid course id
+ * @param int $sid session id
+ * @return array|float|int
+ */
+function getKidPlexFinalScore($cid, $sid)
+{
+    $tbl_quiz = Database::get_course_table(TABLE_QUIZ_TEST);
+    $tbl_res = Database::get_main_table(TABLE_STATISTIC_TRACK_E_EXERCICES);
+
+    // Limited list of terms that will be considered as exams that classify the user to move to next course
+    // @todo add a checkbox for this and a database field (c_quiz.classification_exam)
+    $exam_names = "'placement test', 'examen de clasificación'";
+
+    $courseInfo = api_get_course_info_by_id($cid);
+    $ccode = $courseInfo['code'];
+
+    $sql = "SELECT id, max_attempt FROM $tbl_quiz WHERE c_id = $cid AND LOWER(title) IN ($exam_names) ORDER BY id DESC LIMIT 1";
+
+    $res = Database::query($sql);
+    if (Database::num_rows($res) < 1) {
+        return false;
+    }
+    $row = Database::fetch_row($res);
+    $qid = intval($row[0]);
+    $maxAttempt = intval($row[1]);
+
+    // From the results table, we have to check the latest attempt.
+    // There is a special case for exams where only one attempt is allowed: if
+    // the first attempt failed but was not finished, the user gets a second
+    // attempt. As such, in the case where only one attempt is allowed
+    // (c_quiz.max_attempt = 1) and we have more than one attempt, of which the
+    // first was not finished (track_e_exercices.status != ''), we have to
+    // take the results from the second attempt (but not more)
+
+    $sql = "SELECT exe_result, exe_weighting, status
+            FROM $tbl_res
+            WHERE
+                exe_exo_id = $qid AND
+                exe_cours_id = '$ccode' AND
+                session_id = $sid AND
+                status = ''
+            ORDER BY start_date ASC";
+    
+    $res = Database::query($sql);
+    $numRows = Database::num_rows($res);
+    
+    if ($numRows < 1) {
+        return false;
+    } else {
+        $lastScore = 0;
+        $minPercentage = 80; //PLEX for kids
         while ($row = Database::fetch_row($res)) {
             $tempScore = round(($row[0] / $row[1]) * 100, 0);
             if ($tempScore > $lastScore) {

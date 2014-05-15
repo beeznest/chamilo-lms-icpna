@@ -323,11 +323,11 @@ class Nanogong {
 					var java_enabled = navigator.javaEnabled();
 
 					if (java_enabled) {
-						$("#nanogong_warning").hide();
-						$("#nanogong_player_id").show();
+						$(".nanogong_warning").hide();
+						$(".nanogong_player_container").show();
 					} else {
-						$("#nanogong_warning").show();
-						$("#nanogong_player_id").hide();
+						$(".nanogong_warning").show();
+						$(".nanogong_player_container").hide();
 					}
 				});
 				</script>';
@@ -356,7 +356,7 @@ class Nanogong {
 					$html .= '</div>';
 				$html .= '</div>';
 
-				$html .= '<div id="nanogong_warning">'.Display::return_message(get_lang('BrowserDoesNotSupportNanogongPlayer'),'warning').$download_button.'</div>';
+				$html .= '<div class="nanogong_warning">'.Display::return_message(get_lang('BrowserDoesNotSupportNanogongPlayer'),'warning').$download_button.'</div>';
 
 			} elseif(in_array($path_info['extension'],array('mp3', 'ogg','wav'))) {
 				$js_path 		= api_get_path(WEB_LIBRARY_PATH).'javascript/';

@@ -5086,11 +5086,29 @@ class CourseManager {
         return $course_properties;
     }
     
-    static function isAdultPlexExam($courseCode)
+    /**
+     * This function let you know if the course is the adult plex exam
+     * @params $courseCode 
+     * @return boolean
+     */
+    public static function isAdultPlexExam($courseCode)
     {
         // Verify if it is a PLEX for adults!
-        $oriCoursCode = CourseManager::get_course_extra_field_value('cs_course_id', $courseCode, '%');
-        $isAdultPlex = $oriCoursCode == '50' ? true : false;
+        $oriCourseCode = CourseManager::get_course_extra_field_value('cs_course_id', $courseCode, '%');
+        $isAdultPlex = $oriCourseCode == '50' ? true : false;
         return $isAdultPlex;
+    }
+    
+    /**
+     * This function let you know if the course is the kid plex exam
+     * @params $courseCode 
+     * @return boolean
+     */
+    public static function isKidPlexExam($courseCode)
+    {
+        // Verify if it is a PLEX for kids!
+        $oriCourseCode = CourseManager::get_course_extra_field_value('cs_course_id', $courseCode, '%');
+        $isKidPlex = $oriCourseCode == '51' ? true : false;
+        return $isKidPlex; 
     }
 } //end class CourseManager

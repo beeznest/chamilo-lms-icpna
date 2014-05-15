@@ -283,10 +283,33 @@ if ($objExercise->selectAttempts()) {
         $attempt_message = 'No has alcanzado el puntaje mínimo para aprobar el módulo. Intentos restantes: ' . ($objExercise->selectAttempts() - $counter);
         //$attempt_message = get_lang('Attempts').' '.$counter.' / '.$objExercise->selectAttempts();
 
-        if ($counter == $objExercise->selectAttempts()) {
-            $attempt_message = Display::return_message($attempt_message, 'error');
+        global $extAuthSource;
+        // Verify if it is a PLEX for adults!
+        $isAdultPlex = CourseManager::isAdultPlexExam($objExercise->course['code']);
+        $isKidPlex = CourseManager::isKidPlexExam($objExercise->course['code']);
+        $path = isset($extAuthSource['modules_path']) ? $extAuthSource['modules_path'] : null;
+        
+        $link = '<a target="_top" href="' . $path . '">Regresa a la lista de módulos</a>';
+        $showMessage = true;
+        $sessionId = api_get_session_id();
+        if (!empty($isAdultPlex) && $isAdultPlex) {
+            $mesText = 'Para seguir, pueden usar el menu de la izquierda.';
+        } elseif($isKidPlex) {
+            $kidPlexScore = getKidPlexFinalScore($objExercise->course['real_id'], $sessionId);
+            if($kidPlexScore >= $objExercise->pass_percentage) {
+                $attempt_message = 'Has terminado satisfactoriamente el módulo hacer click para continuar ' . $link;
+            }
         } else {
-            $attempt_message = Display::return_message($attempt_message, 'info');
+            $score = getFinalScore($objExercise->course['real_id'], $sessionId);
+            if($score >= $objExercise->pass_percentage) {
+                $attempt_message = 'Has terminado satisfactoriamente el módulo hacer click para continuar ' . $link;
+            }
+        }
+      
+        if ($counter == $objExercise->selectAttempts()) {
+            $attempt_message = Display::return_message($attempt_message, 'error', false);
+        } else {
+            $attempt_message = Display::return_message($attempt_message, 'info', false);
         }
         if ($visible_return['value'] == true) {
             $message .=   $attempt_message;

@@ -4718,16 +4718,31 @@ class Exercise
             global $extAuthSource;
             // Verify if it is a PLEX for adults!
             $isAdultPlex = CourseManager::isAdultPlexExam($courseInfo['code']);
+            $isKidPlex = CourseManager::isKidPlexExam($courseInfo['code']);
             $path = isset($extAuthSource['modules_path']) ? $extAuthSource['modules_path'] : null;
             $link = '<a target="_top" href="' . $path . '">Regresa a la lista de módulos</a>';
-            
+            $showMessage = true;
+            $sessionId = api_get_session_id();
+            $mesText = 'Lo sentimos, no has alcanzado el puntaje mínimo para aprobar el módulo. ' . $link;
             if (!empty($isAdultPlex) && $isAdultPlex) {
-                $mesText = 'Para seguir, pueden usar el menu de la izquierda.';
+            } elseif($isKidPlex) {
+                $kidPlexScore = getKidPlexFinalScore($courseInfo['real_id'], $sessionId);
+                if (empty($kidPlexScore)) {
+                    $showMessage = false;
+                } elseif($kidPlexScore >= $this->pass_percentage) {
+                    $mesText = 'Has terminado satisfactoriamente el módulo hacer click para continuar ' . $link;
+                }
             } else {
-                $mesText = 'Lo sentimos, no has alcanzado el puntaje mínimo para aprobar el módulo. ' . $link;
+                $score = getFinalScore($courseInfo['real_id'], $sessionId);
+                if (empty($score)) {
+                    $showMessage = false;
+                } elseif($score >= $this->pass_percentage) {
+                    $mesText = 'Has terminado satisfactoriamente el módulo hacer click para continuar ' . $link;
+                }
             }
-            
-            $message = Display :: return_message($mesText, 'warning', false);
+            if ($showMessage) {
+                $message = Display :: return_message($mesText, 'warning', false);
+            }
         }
 
         return array('value' => $is_visible, 'message' => $message);

@@ -122,18 +122,84 @@ $test_mode = api_get_setting('server_type');
 $lp_showed = false;
 
 foreach ($categories as $item) {
-    $list = new LearnpathList(api_get_user_id(), null, null, null, false, $item->getId());
+    $categoryId = $item->getId();
+    $list = new LearnpathList(
+        api_get_user_id(),
+        null,
+        null,
+        null,
+        false,
+        $categoryId
+    );
     $flat_list = $list->get_flat_list();
 
+    if (empty($flat_list) && $categoryId == 0) {
+        continue;
+    }
     $edit_link = null;
     $delete_link = null;
-    if ($item->getId() > 0) {
-        $url = 'lp_controller.php?'.api_get_cidreq().'&action=add_lp_category&id='.$item->getId();
-        $edit_link = Display::url(Display::return_icon('edit.png', get_lang('Edit')), $url);
-        $delete_url = 'lp_controller.php?'.api_get_cidreq().'&action=delete_lp_category&id='.$item->getId();
-        $delete_link = Display::url(Display::return_icon('delete.png', get_lang('Delete')), $delete_url);
+    /*    if ($item->getId() > 0) {
+        if (api_is_course_admin()) {
+            $url = 'lp_controller.php?'.api_get_cidreq().'&action=add_lp_category&id='.$item->getId();
+            $edit_link = Display::url(Display::return_icon('edit.png', get_lang('Edit')), $url);
+            $delete_url = 'lp_controller.php?'.api_get_cidreq().'&action=delete_lp_category&id='.$item->getId();
+            $delete_link = Display::url(Display::return_icon('delete.png', get_lang('Delete')), $delete_url);
+        }
+        echo Display::page_subheader2($item->getName().$edit_link.$delete_link);
+        } else if (api_is_course_admin()) {
+        echo Display::page_subheader2($item->getName().$edit_link.$delete_link);
+        }
+    */
+
+    if ($item->getId() > 0 && api_is_allowed_to_edit()) {
+        $url = 'lp_controller.php?' . api_get_cidreq(
+            ) . '&action=add_lp_category&id=' . $item->getId();
+
+        $edit_link = Display::url(
+            Display::return_icon('edit.png', get_lang('Edit')),
+            $url
+        );
+        $delete_url = 'lp_controller.php?' . api_get_cidreq(
+            ) . '&action=delete_lp_category&id=' . $item->getId();
+        $moveUpUrl = 'lp_controller.php?' . api_get_cidreq(
+            ) . '&action=move_up_category&id=' . $item->getId();
+        $moveDownUrl = 'lp_controller.php?' . api_get_cidreq(
+            ) . '&action=move_down_category&id=' . $item->getId();
+
+        if ($counterCategories == 1) {
+            $moveUpLink = Display::url(
+                Display::return_icon('up_na.png', get_lang('Move')),
+                '#'
+            );
+        } else {
+            $moveUpLink = Display::url(
+                Display::return_icon('up.png', get_lang('Move')),
+                $moveUpUrl
+            );
+        }
+
+        if (($total - 1) == $counterCategories) {
+            $moveDownLink = Display::url(
+                Display::return_icon('down_na.png', get_lang('Move')),
+                '#'
+            );
+        } else {
+            $moveDownLink = Display::url(
+                Display::return_icon('down.png', get_lang('Move')),
+                $moveDownUrl
+            );
+        }
+        $delete_link = Display::url(
+            Display::return_icon('delete.png', get_lang('Delete')),
+            $delete_url
+        );
+        $counterCategories++;
     }
-    echo Display::page_subheader2($item->getName().$edit_link.$delete_link);
+
+    echo Display::page_subheader2(
+        $item->getName(
+        ) . $edit_link . $moveUpLink . $moveDownLink . $delete_link
+    );
 
     if (!empty($flat_list)) {
         echo '<table class="data_table">';

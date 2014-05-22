@@ -69,7 +69,10 @@ $form->addRule('lp_name', get_lang('ThisFieldIsRequired'), 'required');
 
 $form->addElement('hidden', 'lp_encoding');
 
-$items = learnpath::get_category_from_course_into_select(api_get_course_int_id());
+$items = learnpath::get_category_from_course_into_select(
+    api_get_course_int_id(),
+    true
+);
 $form->addElement('select', 'category_id', get_lang('Category'), $items);
 
 

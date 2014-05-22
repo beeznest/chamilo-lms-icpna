@@ -9423,9 +9423,15 @@ EOD;
         }
     }
 
-    static function get_category_from_course_into_select($course_id) {
+    static function get_category_from_course_into_select(
+        $course_id,
+        $addSelectOption = false
+    ) {
         $items = self::get_category_by_course($course_id);
         $cats = array();
+        if ($addSelectOption) {
+            $cats = array(get_lang('SelectACategory'));
+        }
         if (!empty($items)) {
             foreach($items as $cat) {
                 $cats[$cat->getId()] = $cat->getName();

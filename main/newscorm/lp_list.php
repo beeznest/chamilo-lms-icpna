@@ -89,7 +89,17 @@ if ($is_allowed_to_edit) {
     }
 
     echo '<div class="actions">';
-    echo Display::url(Display::return_icon('new_folder.png', get_lang('AddCategory'), array(), ICON_SIZE_MEDIUM), api_get_self().'?'.api_get_cidreq().'&action=add_lp_category');
+    if (api_is_allowed_to_edit() && !api_is_coach()) {
+        echo Display::url(
+            Display::return_icon(
+                'new_folder.png',
+                get_lang('AddCategory'),
+                array(),
+                ICON_SIZE_MEDIUM
+            ),
+            api_get_self() . '?' . api_get_cidreq() . '&action=add_lp_category'
+        );
+    }
     echo '<a href="'.api_get_self().'?'.api_get_cidreq().'&action=add_lp">'.Display::return_icon('new_learnpath.png', get_lang('LearnpathAddLearnpath'), '', ICON_SIZE_MEDIUM).'</a>'.
     str_repeat('&nbsp;', 3).
     '<a href="../upload/index.php?'.api_get_cidreq().'&curdirpath=/&tool='.TOOL_LEARNPATH.'">'.Display::return_icon('import_scorm.png', get_lang('UploadScorm'), '', ICON_SIZE_MEDIUM).'</a>';
@@ -151,7 +161,7 @@ foreach ($categories as $item) {
         }
     */
 
-    if ($item->getId() > 0 && api_is_allowed_to_edit()) {
+    if ($item->getId() > 0 && api_is_allowed_to_edit() && !api_is_coach()) {
         $url = 'lp_controller.php?' . api_get_cidreq(
             ) . '&action=add_lp_category&id=' . $item->getId();
 

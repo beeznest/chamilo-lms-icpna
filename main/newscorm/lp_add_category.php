@@ -100,8 +100,6 @@ if (!empty($gradebook) && $gradebook=='view') {
 
 $interbreadcrumb[] = array('url' => 'lp_controller.php?action=list', 'name' => get_lang('LearningPaths'));
 
-
-
 $form = new FormValidator('lp_add_category', 'post', 'lp_controller.php');
 
 // Form title

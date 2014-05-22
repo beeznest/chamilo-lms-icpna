@@ -316,10 +316,16 @@ switch ($action) {
         if (!$is_allowed_to_edit) {
             api_not_allowed(true);
         }
+        if (api_is_coach()) {
+            api_not_allowed(true);
+        }
         require 'lp_add_category.php';
         break;
     case 'delete_lp_category':
         if (!$is_allowed_to_edit) {
+            api_not_allowed(true);
+        }
+        if (api_is_coach()) {
             api_not_allowed(true);
         }
         if (isset($_REQUEST['id'])) {

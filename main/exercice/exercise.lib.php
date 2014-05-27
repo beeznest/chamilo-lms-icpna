@@ -2750,7 +2750,7 @@ function getFinalScore($cid, $sid)
     $courseInfo = api_get_course_info_by_id($cid);
     $ccode = $courseInfo['code'];
 
-    $sql = "SELECT id, max_attempt FROM $tbl_quiz WHERE c_id = $cid AND LOWER(title) IN ($exam_names) ORDER BY id DESC LIMIT 1";
+    $sql = "SELECT id, max_attempt FROM $tbl_quiz WHERE active <> -1 AND c_id = $cid AND LOWER(title) IN ($exam_names) ORDER BY id DESC LIMIT 1";
 
     $res = Database::query($sql);
     if (Database::num_rows($res) < 1) {
@@ -2818,7 +2818,7 @@ function getKidPlexFinalScore($cid, $sid)
     $courseInfo = api_get_course_info_by_id($cid);
     $ccode = $courseInfo['code'];
 
-    $sql = "SELECT id, max_attempt FROM $tbl_quiz WHERE c_id = $cid AND LOWER(title) IN ($exam_names) ORDER BY id DESC LIMIT 1";
+    $sql = "SELECT id, max_attempt FROM $tbl_quiz WHERE active <> -1 AND c_id = $cid AND LOWER(title) IN ($exam_names) ORDER BY id DESC LIMIT 1";
 
     $res = Database::query($sql);
     if (Database::num_rows($res) < 1) {

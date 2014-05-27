@@ -826,36 +826,35 @@ abstract class Question
 								test_question.exercice_id	= '".Database::escape_string($exerciseId)."' AND
 								question.c_id 				= $c_id AND
 								test_question.c_id 			= $c_id ";
-            $result = Database::query($sql);
-            $current_position = Database::result($result, 0, 0);
-            $this->updatePosition($current_position + 1);
-            $position = $this->position;
-            $sql = "INSERT INTO $TBL_QUESTIONS (c_id, question, description, ponderation, position, type, picture, extra, level, parent_id) VALUES ( ".
-                " $c_id, ".
-                " '".Database::escape_string($question)."', ".
-                " '".Database::escape_string($description)."', ".
-                " '".Database::escape_string($weighting)."', ".
-                " '".Database::escape_string($position)."', ".
-                " '".Database::escape_string($type)."', ".
-                " '".Database::escape_string($picture)."', ".
-                " '".Database::escape_string($extra)."', ".
-                " '".Database::escape_string($level)."', ".
-                " '".$this->parent_id."' ".
-                " )";
-            Database::query($sql);
+			$result	= Database::query($sql);
+			$current_position = Database::result($result,0,0);
+			$this->updatePosition($current_position+1);
+			$position = $this->position;
+            $id = $this->getMaxIdByCourse($c_id);
+            $this->id = $id;
 
-            $this->id = Database::insert_id();
+            $sql = "INSERT INTO $TBL_QUESTIONS (id, c_id, question, description, ponderation, position, type, picture, extra, level) VALUES (
+			        $id,
+					$c_id,
+					'".Database::escape_string($question)."',
+					'".Database::escape_string($description)."',
+					'".Database::escape_string($weighting)."',
+					'".Database::escape_string($position)."',
+					'".Database::escape_string($type)."',
+					'".Database::escape_string($picture)."',
+					'".Database::escape_string($extra)."',
+                    '".Database::escape_string($level)."'
+					)";
+			Database::query($sql);
 
-            api_item_property_update($this->course, TOOL_QUIZ, $this->id, 'QuizQuestionAdded', api_get_user_id());
+			api_item_property_update($this->course, TOOL_QUIZ, $this->id,'QuizQuestionAdded',api_get_user_id());
 
-            // If hotspot, create first answer
-            if ($type == HOT_SPOT || $type == HOT_SPOT_ORDER) {
-                $TBL_ANSWERS = Database::get_course_table(TABLE_QUIZ_ANSWER);
-                $sql = "INSERT INTO $TBL_ANSWERS (c_id, id, question_id , answer , correct , comment , ponderation , position , hotspot_coordinates , hotspot_type )
-					    VALUES (".$c_id.", '1', '".Database::escape_string(
-                    $this->id
-                )."', '', NULL , '', '10' , '1', '0;0|0|0', 'square')";
-                Database::query($sql);
+			// If hotspot, create first answer
+			if ($type == HOT_SPOT || $type == HOT_SPOT_ORDER) {
+				$TBL_ANSWERS = Database::get_course_table(TABLE_QUIZ_ANSWER);
+				$sql = "INSERT INTO $TBL_ANSWERS (c_id, id, question_id , answer , correct , comment , ponderation , position , hotspot_coordinates , hotspot_type )
+					    VALUES (".$c_id.", '1', '".Database::escape_string($this->id)."', '', NULL , '', '10' , '1', '0;0|0|0', 'square')";
+				Database::query($sql);
             }
 
             if ($type == HOT_SPOT_DELINEATION) {
@@ -893,8 +892,26 @@ abstract class Question
         }
     }
 
-    function search_engine_edit($exerciseId, $addQs = false, $rmQs = false)
-    {
+    /**
+     * Returns the max question id by course
+     * @param string $courseId
+     * @return int $newId
+     */
+    function getMaxIdByCourse($courseId) {
+        $tblQuestion = Database::get_course_table(TABLE_QUIZ_QUESTION);
+        $maxRow = Database::select('MAX(id) as maxId', $tblQuestion, array('where' => array('c_id = ?' => $courseId)));
+
+        if (empty($maxRow)) {
+            $newId = 1;
+        } else {
+            $row = current($maxRow);
+            $newId = $row['maxId'] + 1;
+        }
+
+        return $newId;
+    }
+
+    function search_engine_edit($exerciseId, $addQs=FALSE, $rmQs=FALSE) {
         // update search engine and its values table if enabled
         if (api_get_setting('search_enabled') == 'true' && extension_loaded('xapian')) {
             $course_id = api_get_course_id();

@@ -826,10 +826,29 @@ class Exercise
             }
         } else {
             // creates a new exercise
-            $sql = "INSERT INTO $TBL_EXERCICES (c_id, start_time, end_time, title, description, sound, type, random, random_answers, active,
+
+            // In this case of new exercise, we don't do the api_get_utc_datetime() for date because, bellow, we call function api_set_default_visibility()
+            // In this function, api_set_default_visibility, the Quiz is saved too, with an $id and api_get_utc_datetime() is done.
+            // If we do it now, it will be done twice (cf. https://support.chamilo.org/issues/6586)
+            if (!empty($this->start_time) && $this->start_time != '0000-00-00 00:00:00') {
+                $start_time = Database::escape_string($this->start_time);
+            } else {
+                $start_time = '0000-00-00 00:00:00';
+            }
+
+            if (!empty($this->end_time) && $this->end_time != '0000-00-00 00:00:00') {
+                $end_time 	= Database::escape_string(($this->end_time));
+            } else {
+                $end_time = '0000-00-00 00:00:00';
+            }
+
+            $id = $this->getMaxIdByCourse($this->course_id);
+            $this->id = $id;
+            $sql = "INSERT INTO $TBL_EXERCICES (id, c_id, start_time, end_time, title, description, sound, type, random, random_answers, active,
                                                 results_disabled, max_attempt, feedback_type, expired_time, session_id, review_answers, random_by_category,
                                                 text_when_finished, display_category_name, pass_percentage)
 					VALUES(
+					    $id,
 						".$this->course_id.",
 						'$start_time','$end_time',
 						'".Database::escape_string($exercise)."',
@@ -851,7 +870,7 @@ class Exercise
                         '".Database::escape_string($pass_percentage)."'
 						)";
             Database::query($sql);
-            $this->id = Database::insert_id();
+            //$this->id = Database::insert_id();
 
             $this->add_exercise_to_order_table();
 
@@ -868,10 +887,29 @@ class Exercise
         $this->update_question_positions();
     }
 
-    /* Updates question position */
+    /**
+     * Returns the max quiz id of a course
+     * @param string $courseId
+     * @return int $newId
+     */
+    function getMaxIdByCourse($courseId) {
+        $tblExercise = Database::get_course_table(TABLE_QUIZ_TEST);
+        $maxRow = Database::select('MAX(id) as maxId', $tblExercise, array('where' => array('c_id = ?' => $courseId)));
 
-    function update_question_positions()
-    {
+        if (empty($maxRow)) {
+            $newId = 1;
+        } else {
+            $row = current($maxRow);
+            $newId = $row['maxId'] + 1;
+        }
+
+        return $newId;
+    }
+
+    /**
+     * Updates question position
+     */
+    function update_question_positions() {
         $quiz_question_table = Database::get_course_table(TABLE_QUIZ_TEST_QUESTION);
         //Fixes #3483 when updating order
         $question_list = $this->selectQuestionList(true);

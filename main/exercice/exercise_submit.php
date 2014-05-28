@@ -1012,7 +1012,7 @@ if (!empty($objExercise->description)) {
                 changestart: function(event, ui) {
                     //var clicked = $(this).find('.ui-state-active').attr('id');
                     //$('#'+clicked).load('/widgets/'+clicked);
-                    $('#collapse1').html('".str_replace("'", '"', preg_replace("/\r?\n/", "\\n", addslashes($objExercise->description)))."');
+                    $('#collapse1').html('".preg_replace("/\r?\n/", "\\n", addslashes($objExercise->description))."');
                 }
             });
          });

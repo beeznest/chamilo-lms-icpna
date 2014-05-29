@@ -92,6 +92,8 @@ if (!empty($user_id)) {
                     <h3>¿Dónde Estoy?</h3>';
     $session_list = SessionManager::get_course_session_list_by_user($user_id);
     $sequence_int = 0;
+    $max_int = 0;
+
     foreach ($session_list as $session) {
         $course_code = $session['course_code'];
         $sequence_int = intval(preg_replace('/\D/','',$course_code));
@@ -101,11 +103,18 @@ if (!empty($user_id)) {
             $course_sequence = '0' . $sequence_int;
         } elseif ($sequence_int > 99) {
             $course_sequence = $sequence_int % 100;
+        } else {
+            $course_sequence = $sequence_int;
         }
         $course_sequences[$sequence_int] = $course_sequence;
+        if ($max_int < $sequence_int) {
+            $max_int = $sequence_int;
+        }
     }
-    if (!empty($course_sequence)) {
-        sort($course_sequences = array_unique($course_sequences));
+
+    if (!empty($course_sequences)) {
+        $course_sequences = array_unique($course_sequences);
+        ksort($course_sequences);
     }
     for ($i = 1 ; $i <= (TOTAL_COURSES + 1) ; $i++) {
         $social_right_content .= createDiv($i);
@@ -113,9 +122,9 @@ if (!empty($user_id)) {
             break;
         }
         // show list of courses
-        if ($course_sequences[$i]) {
+        if (!empty($course_sequences[$i])) {
             // if user have completed a course or its in progress
-            if ($i == $sequence_int) {
+            if ($i == $max_int) {
                 $social_right_content .= '<span class="actual"><a href="#">'.$course_sequences[$i].'</a></span>';
             } else {
                 $social_right_content .= '<span class="complet"><a href="#">'.$course_sequences[$i].'</a></span>';

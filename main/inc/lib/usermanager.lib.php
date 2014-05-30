@@ -2226,13 +2226,14 @@ class UserManager {
     /**
      * Gives a list of [session_category][session_id] for the current user.
      * @param integer $user_id
-     * @param boolean optional true if we want to see expired sessions, false otherwise
-     * @param boolean Whether to return only a count (true) or the full result (false)
-     * @param boolean Whether to order by alphabetical order (false) or reverse-alphabetical (used in history to show latest sessions on top)
-     * @return array  list of statuses [session_category][session_id]
+     * @param boolean $is_time_over
+     * @param boolean $get_count
+     * @param boolean $reverse_order
+     * @param array $option
+     * @return array $categories list of statuses [session_category][session_id]
      * @todo ensure multiple access urls are managed correctly
      */
-    public static function get_sessions_by_category($user_id, $is_time_over = false, $get_count = false, $reverse_order = false, $start = 0 , $limit = null) {
+    public static function get_sessions_by_category($user_id, $is_time_over = false, $get_count = false, $reverse_order = false, $option = array()) {
         // Database Table Definitions
         $tbl_session                = Database :: get_main_table(TABLE_MAIN_SESSION);
         $tbl_session_course_user    = Database :: get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
@@ -2274,6 +2275,14 @@ class UserManager {
                 //$condition_date_start2 = " AND (session.access_start_date <= '$now' OR session.access_start_date = '0000-00-00 00:00:00') ";
                 $condition_date_end1 = " AND (session.access_end_date >= '$now' OR session.access_end_date = '0000-00-00 00:00:00') ";
                 $condition_date_end2 = " AND (session.access_end_date >= '$now' OR session.access_end_date = '0000-00-00 00:00:00') ";
+            }
+        }
+
+        if (!empty($option['moved_to']) || $option['moved_to'] === false) {
+            if ($option['moved_to'] == true) {
+                $condition_date_end1 .= " AND su.moved_status > 0";
+            } else {
+                $condition_date_end1 .= " AND su.moved_status = 0";
             }
         }
 

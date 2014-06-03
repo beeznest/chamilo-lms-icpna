@@ -70,6 +70,8 @@
                             <div id="in-out-buttons" class="text-center pagination-centered pull-right">
                                 <button class="btn  btn-large btn-success {% if _p.count_active_in > 0 %} hide-important {% endif %}" type="button" id="btn_in_session" name="btn_in_session">IN</button>
                                 <button class="btn btn-large btn-danger {% if _p.count_active_in == 0 %} hide-important {% endif %}" type="button" id="btn_out_session" name="btn_out_session">OUT</button>
+                                <input type="hidden" name="in_course_id" id="in_course_id" value="{{ _u.coach_course_id }}" />
+                                <input type="hidden" name="in_session_id" id="in_session_id" value="{{ _u.coach_session_id }}" />
                             </div>
                         {% endif %}
                         {# END IN/OUT #}

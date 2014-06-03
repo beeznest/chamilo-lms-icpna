@@ -100,8 +100,8 @@ $(document).ready( function() {
         placement : 'right'
     }
     $('.boot-tooltip').tooltip(tip_options);
-
 });
 </script>
 {% endraw %}
+{% include "default/layout/in_out_js.tpl" %}
 {{ execution_stats }}

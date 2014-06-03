@@ -470,8 +470,8 @@ switch ($action) {
          */
         require_once '../global.inc.php';
         $userId = api_get_user_id();
-        $courseId = api_get_course_int_id();
-        $sessionId = api_get_session_id();
+        $courseId = intval($_GET['course_id']);
+        $sessionId = intval($_GET['session_id']);
         $trackTeacherInOut = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
 
         $whereCondition = array(
@@ -509,8 +509,8 @@ switch ($action) {
          */
         require_once '../global.inc.php';
         $userId = api_get_user_id();
-        $courseId = api_get_course_int_id();
-        $sessionId = api_get_session_id();
+        $courseId = intval($_GET['course_id']);
+        $sessionId = intval($_GET['session_id']);
         $trackTeacherInOut = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
 
         $values = array($userId, $courseId, $sessionId);

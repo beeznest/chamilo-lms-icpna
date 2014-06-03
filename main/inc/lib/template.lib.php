@@ -281,6 +281,8 @@ class Template {
             $user_info['is_course_coach'] = 0;
             if (!empty($_SESSION['is_courseCoach'])) {
                 $user_info['is_course_coach'] = 1;
+                $user_info['coach_course_id'] = $_SESSION['_course']['real_id'];
+                $user_info['coach_session_id'] = $_SESSION['id_session'];
             }
             $new_messages = MessageManager::get_new_messages();
             $user_info['messages_count'] = $new_messages != 0 ? Display::label($new_messages, 'warning') : null;

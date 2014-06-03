@@ -5121,7 +5121,16 @@ class learnpath {
         });
         </script>';
 
-        $is_allowed_to_edit = api_is_allowed_to_edit(null,true);
+        $sessionId = $this->get_lp_session_id();
+
+        if (empty($sessionId)) {
+            $is_allowed_to_edit = api_is_allowed_to_edit(
+                    null,
+                    true
+                ) && !api_is_coach();
+        } else {
+            $is_allowed_to_edit = api_is_allowed_to_edit(null, true);
+        }
 
         $course_id = api_get_course_int_id();
         $tbl_lp_item = Database :: get_course_table(TABLE_LP_ITEM);
@@ -5841,8 +5850,8 @@ class learnpath {
      * Function that displays a list with al the resources that could be added to the learning path
      * @return string
      */
-    public function display_resources() {
-        global $_course; // TODO: Don't use globals.
+    public function display_resources()
+    {
         $course_code = api_get_course_id();
 
         //Get all the docs
@@ -5860,16 +5869,65 @@ class learnpath {
         //Get al the forums
         $forums = $this->get_forums(null, $course_code);
 
-        $headers = array(   Display::return_icon('folder_document.png', get_lang('Documents'), array(), 64),
-                            Display::return_icon('quiz.png',  get_lang('Quiz'), array(), 64),
-                            Display::return_icon('links.png', get_lang('Links'), array(), 64),
-                            Display::return_icon('works.png', get_lang('Works'), array(), 64),
-                            Display::return_icon('forum.png', get_lang('Forums'), array(), 64),
-                            Display::return_icon('add_learnpath_section.png', get_lang('NewChapter'), array(), 64)
-                        );
+        $headers = array(
+            Display::return_icon(
+                'folder_document.png',
+                get_lang('Documents'),
+                array(),
+                64
+            ),
+            Display::return_icon('quiz.png', get_lang('Quiz'), array(), 64),
+            Display::return_icon('links.png', get_lang('Links'), array(), 64),
+            Display::return_icon('works.png', get_lang('Works'), array(), 64),
+            Display::return_icon('forum.png', get_lang('Forums'), array(), 64),
+            Display::return_icon(
+                'add_learnpath_section.png',
+                get_lang('NewChapter'),
+                array(),
+                64
+            )
+        );
         echo Display::display_normal_message(get_lang('ClickOnTheLearnerViewToSeeYourLearningPath'));
-        $chapter = $_SESSION['oLP']->display_item_form('chapter', get_lang('EnterDataNewChapter'), 'add_item');
-        echo Display::tabs($headers, array($documents, $exercises, $links, $works, $forums, $chapter), 'resource_tab');
+
+        $sessionId = $_SESSION['oLP']->get_lp_session_id();
+
+        if (empty($sessionId)) {
+            $is_allowed_to_edit = api_is_allowed_to_edit(
+                    false,
+                    true,
+                    false,
+                    false
+                ) && !api_is_coach();
+        } else {
+            $is_allowed_to_edit = api_is_allowed_to_edit(
+                false,
+                true,
+                false,
+                false
+            );
+        }
+
+        if ($is_allowed_to_edit) {
+            $chapter = $_SESSION['oLP']->display_item_form(
+                'chapter',
+                get_lang('EnterDataNewChapter'),
+                'add_item'
+            );
+
+            echo Display::tabs(
+                $headers,
+                array(
+                    $documents,
+                    $exercises,
+                    $links,
+                    $works,
+                    $forums,
+                    $chapter
+                ),
+                'resource_tab'
+            );
+        }
+
         return true;
     }
 

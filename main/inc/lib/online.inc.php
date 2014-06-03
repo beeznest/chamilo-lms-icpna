@@ -102,7 +102,7 @@ function online_logout($user_id = null, $logout_redirect = false) {
 
     require_once api_get_path(SYS_PATH) . 'main/chat/chat_functions.lib.php';
     exit_of_chat($user_id);
-
+    OutActiveTeacher($user_id);
     Session::destroy();
     if ($logout_redirect) {
         header("Location: index.php");
@@ -110,6 +110,30 @@ function online_logout($user_id = null, $logout_redirect = false) {
     }
 }
 
+function OutActiveTeacher($userId) {
+    $trackTeacherInOut = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
+    $values = array($userId);
+    $whereCondition = array(
+        'where' => array(
+            'user_id = ?
+            AND log_out_course_date IS NULL
+            ORDER BY id DESC' => $values
+        )
+    );
+
+    $dataTable = Database::select('*', $trackTeacherInOut, $whereCondition);
+
+    if (!empty($dataTable)) {
+        $rowInfo = current($dataTable);
+        $setAttribute = array(
+            'log_out_course_date' => api_get_datetime()
+        );
+        $whereCondition = array(
+            'id = ?' => $rowInfo['id']
+        );
+        Database::update($trackTeacherInOut, $setAttribute, $whereCondition);
+    }
+}
 /**
  * Remove all login records from the track_e_online stats table, for the given user ID.
  * @param int User ID

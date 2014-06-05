@@ -349,3 +349,9 @@ define('TABLE_BRANCH_SYNC_LOG',              'branch_sync_log');
 define('TABLE_BRANCH_TRANSACTION',           'branch_transaction');
 define('TABLE_BRANCH_TRANSACTION_STATUS',    'branch_transaction_status');
 
+//Branch IPs
+define('TABLE_BRANCH', 'branch');
+define('TABLE_BRANCH_IP', 'branch_ip');
+define('TABLE_BRANCH_ROOM', 'branch_room');
+define('TABLE_ROOM', 'room');
+define('TABLE_BRANCH_IP_REL_ROOM', 'branch_ip_rel_room');

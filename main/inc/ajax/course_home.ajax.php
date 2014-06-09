@@ -452,7 +452,7 @@ switch ($action) {
         if($count > 0 && $limit > 0) { 
             $total_pages = ceil($count/$limit); 
         } else { 
-            $total_pages = 0; 
+            $total_pages = 0;
         }         
         $response->total    = $total_pages;         
         if ($page > $total_pages) { 
@@ -464,7 +464,7 @@ switch ($action) {
         
         echo json_encode($response); 
         break;
-    case 'save_in':
+    case 'save_teacher_track_in':
         /**
          * ($columns, $table_name, $conditions = array(), $type_result = 'all', $option = 'ASSOC')
          */
@@ -484,11 +484,13 @@ switch ($action) {
         $dataTable = Database::select('*', $trackTeacherInOut, $whereCondition);
 
         if (empty($dataTable)) {
+            $roomId = !empty($_COOKIE['room_id']) ? $_COOKIE['room_id']: 0;
             $attributes = array(
                 'course_id' => $courseId,
                 'user_id' => $userId,
                 'log_in_course_date' => api_get_datetime(),
                 'session_id' => $sessionId,
+                'room_id' => $roomId
             );
 
             $insertResponse = Database::insert($trackTeacherInOut, $attributes);
@@ -503,7 +505,7 @@ switch ($action) {
         }
         echo json_encode($arrayResp);
         break;
-    case 'save_out':
+    case 'save_teacher_track_out':
         /**
          * ($columns, $table_name, $conditions = array(), $type_result = 'all', $option = 'ASSOC')
          */

@@ -748,8 +748,9 @@ class PageController
             //Load sessions in category in *history*
             $session_categories = UserManager::get_sessions_by_category($user_id, true, false, true);
         } else {
+            $option = array('moved_to' => false);
             //Load sessions in category
-            $session_categories = UserManager::get_sessions_by_category($user_id, false);
+            $session_categories = UserManager::get_sessions_by_category($user_id, false, false, false, $option);
         }
 
         $html = '';

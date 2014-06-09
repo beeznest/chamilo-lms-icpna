@@ -7,7 +7,7 @@
                 type: "GET",
                 dataType: "json",
                 url: "{{ _p.web_ajax }}course_home.ajax.php",
-                data: "a=save_in&course_id=" + $("#in_course_id").val() + "&session_id=" + $("#in_session_id").val(),
+                data: "a=save_teacher_track_in&course_id=" + $("#in_course_id").val() + "&session_id=" + $("#in_session_id").val(),
                 success: function (jsonData) {
                     if (jsonData.id == 1) {
                         $("#in-out-modal-label").css("color", "blue");
@@ -47,7 +47,7 @@
                 type: "GET",
                 dataType: "json",
                 url: "{{ _p.web_ajax }}course_home.ajax.php",
-                data: "a=save_out&course_id=" + $("#in_course_id").val() + "&session_id=" + $("#in_session_id").val(),
+                data: "a=save_teacher_track_out&course_id=" + $("#in_course_id").val() + "&session_id=" + $("#in_session_id").val(),
                 success: function (jsonData) {
                     if (jsonData.id == 1) {
                         $("#in-out-modal-label").css("color", "blue");

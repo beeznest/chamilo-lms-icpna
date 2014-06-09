@@ -3255,6 +3255,51 @@ class Tracking
         return $html;
     }
 
+    /**
+     * Returns if the PC is in a local network
+     *
+     * @return boolean $isLocalIP
+     */
+    public function isLocalIP()
+    {
+        $ipAddress = $_SERVER['REMOTE_ADDR'];
+        $isLocalIP = false;
+        if (!filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE)) {
+            $isLocalIP = true;
+        }
+
+        return $isLocalIP;
+    }
+
+    /**
+     * Returns the number of actives IN
+     *
+     * @return int
+     */
+    public function countActiveTeacherIn(){
+        if (!empty($_SESSION['is_courseCoach'])) {
+            $userId = api_get_user_id();
+            $courseId = api_get_course_int_id();
+            $sessionId = api_get_session_id();
+            $trackTeacherInOut = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
+
+            $values = array($userId, $courseId, $sessionId);
+            $whereCondition = array(
+                'where' => array(
+                    'user_id = ?
+                    AND course_id = ?
+                    AND session_id = ?
+                    AND log_out_course_date IS NULL' => $values
+                )
+            );
+
+            $count = Database::select('count(*) as count', $trackTeacherInOut, $whereCondition);
+
+            return (int)$count[0]['count'];
+        } else {
+            return 0;
+        }
+    }
 }
 
 /**
@@ -4539,5 +4584,4 @@ class TrackingUserLogCSV
         }
         return array($title_line, $line);
     }
-
 }

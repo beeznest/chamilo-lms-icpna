@@ -278,6 +278,12 @@ class Template {
             if (api_is_platform_admin()) {
                 $user_info['is_admin'] = 1;
             }
+            $user_info['is_course_coach'] = 0;
+            if (!empty($_SESSION['is_courseCoach'])) {
+                $user_info['is_course_coach'] = 1;
+                $user_info['coach_course_id'] = $_SESSION['_course']['real_id'];
+                $user_info['coach_session_id'] = $_SESSION['id_session'];
+            }
             $new_messages = MessageManager::get_new_messages();
             $user_info['messages_count'] = $new_messages != 0 ? Display::label($new_messages, 'warning') : null;
             $messages_invitations_count = GroupPortalManager::get_groups_by_user_count($user_info['user_id'], GROUP_USER_PERMISSION_PENDING_INVITATION, false);
@@ -291,7 +297,7 @@ class Template {
     /** Set system parameters */
     private function set_system_parameters() {
         global $_configuration;
-
+        $objTracking = new Tracking();
         //Setting app paths/URLs
         $_p = array(
             'web' => api_get_path(WEB_PATH),
@@ -302,6 +308,8 @@ class Template {
             'web_img' => api_get_path(WEB_IMG_PATH),
             'web_plugin' => api_get_path(WEB_PLUGIN_PATH),
             'web_lib' => api_get_path(WEB_LIBRARY_PATH),
+            'is_local_ip' => $objTracking->isLocalIP(),
+            'count_active_in' => $objTracking->countActiveTeacherIn(),
         );
         $this->assign('_p', $_p);
 

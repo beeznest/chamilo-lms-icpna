@@ -6,7 +6,6 @@
 */
 $action = $_GET['a'];
 $now    = time();
-
 switch ($action) {
 	case 'set_visibility':
 		require_once '../global.inc.php';
@@ -464,6 +463,95 @@ switch ($action) {
         $response->records = $count; 
         
         echo json_encode($response); 
+        break;
+    case 'save_in':
+        /**
+         * ($columns, $table_name, $conditions = array(), $type_result = 'all', $option = 'ASSOC')
+         */
+        require_once '../global.inc.php';
+        $userId = api_get_user_id();
+        $courseId = intval($_GET['course_id']);
+        $sessionId = intval($_GET['session_id']);
+        $trackTeacherInOut = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
+
+        $whereCondition = array(
+            'where' => array(
+                'user_id = ?
+                AND log_out_course_date IS NULL' => $userId
+            )
+        );
+
+        $dataTable = Database::select('*', $trackTeacherInOut, $whereCondition);
+
+        if (empty($dataTable)) {
+            $attributes = array(
+                'course_id' => $courseId,
+                'user_id' => $userId,
+                'log_in_course_date' => api_get_datetime(),
+                'session_id' => $sessionId,
+            );
+
+            $insertResponse = Database::insert($trackTeacherInOut, $attributes);
+            $arrayResp = array('id' => 1, 'data' => 'SUCCESS');
+        } else {
+            foreach ($dataTable as $key => $inOutRow) {
+                $session = api_get_session_info($inOutRow['session_id']);
+                $course = api_get_course_info_by_id($inOutRow['course_id']);
+                $dataTable[$key]['session_name'] = $session['name'];
+            }
+            $arrayResp = array('id' => 2, 'data' => $dataTable);
+        }
+        echo json_encode($arrayResp);
+        break;
+    case 'save_out':
+        /**
+         * ($columns, $table_name, $conditions = array(), $type_result = 'all', $option = 'ASSOC')
+         */
+        require_once '../global.inc.php';
+        $userId = api_get_user_id();
+        $courseId = intval($_GET['course_id']);
+        $sessionId = intval($_GET['session_id']);
+        $trackTeacherInOut = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
+
+        $values = array($userId, $courseId, $sessionId);
+        $whereCondition = array(
+            'where' => array(
+                'user_id = ?
+                AND course_id = ?
+                AND session_id = ?
+                AND log_out_course_date IS NULL
+                ORDER BY id DESC
+                LIMIT 1' => $values
+            )
+        );
+
+        $dataTable = Database::select('id', $trackTeacherInOut, $whereCondition);
+
+        if (!empty($dataTable)) {
+            $rowInfo = current($dataTable);
+            $attributes = array(
+                'course_id' => $courseId,
+                'user_id' => $userId,
+
+                'session_id' => $sessionId,
+            );
+            $setAttribute = array(
+                'log_out_course_date' => api_get_datetime()
+            );
+            $whereCondition = array(
+                'id = ?' => $rowInfo['id']
+            );
+            $insertResponse = Database::update($trackTeacherInOut, $setAttribute, $whereCondition);
+            $arrayResp = array('id' => 1, 'data' => 'SUCCESS');
+        } else {
+            foreach ($dataTable as $key => $inOutRow) {
+                $session = api_get_session_info($inOutRow['session_id']);
+                $course = api_get_course_info_by_id($inOutRow['course_id']);
+                $dataTable[$key]['session_name'] = $session['name'];
+            }
+            $arrayResp = array('id' => 2, 'data' => $dataTable);
+        }
+        echo json_encode($arrayResp);
         break;
 	default:
 		echo '';

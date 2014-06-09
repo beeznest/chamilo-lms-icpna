@@ -349,3 +349,5 @@ define('TABLE_BRANCH_SYNC_LOG',              'branch_sync_log');
 define('TABLE_BRANCH_TRANSACTION',           'branch_transaction');
 define('TABLE_BRANCH_TRANSACTION_STATUS',    'branch_transaction_status');
 
+// IN / OUT
+define('TABLE_TRACK_E_TEACHER_IN_OUT', 'track_e_teacher_in_out');

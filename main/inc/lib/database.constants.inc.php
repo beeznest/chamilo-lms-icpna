@@ -355,5 +355,6 @@ define('TABLE_BRANCH_IP', 'branch_ip');
 define('TABLE_BRANCH_ROOM', 'branch_room');
 define('TABLE_ROOM', 'room');
 define('TABLE_BRANCH_IP_REL_ROOM', 'branch_ip_rel_room');
-// IN / OUT
+
+// TRACK TEACHER ATTENDANCE IN / OUT
 define('TABLE_TRACK_E_TEACHER_IN_OUT', 'track_e_teacher_in_out');

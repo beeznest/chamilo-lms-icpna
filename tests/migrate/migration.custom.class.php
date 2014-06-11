@@ -61,6 +61,9 @@ class MigrationCustom {
     const TRANSACTION_TYPE_DEL_ASSIST  = 35;
     const TRANSACTION_TYPE_EDIT_ASSIST = 36;
 
+    //Teacher
+    const TRANSACTION_TYPE_SEND_TEACHER_ATTENDANCE = 534;
+
     public static $attend_status = array(
         'DEF' => 4,
         'AUS' => 0,
@@ -1351,6 +1354,115 @@ class MigrationCustom {
                    'status_id' => self::TRANSACTION_STATUS_FAILED
             );
         }
+    }
+
+    /**
+     * This transaction is used to send teachers
+     * attendance information
+     * @param $data
+     * @param $webServiceDetails
+     * @return array
+     */
+    static function transaction_534($data, $webServiceDetails) {
+        $trackAttendanceId = $data['item_id'];
+        $tableTrackTeachers = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
+        $tableTrackTeacherAttendance = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
+        $tableUser = Database::get_main_table(TABLE_MAIN_USER);
+        $tableBranchRoom = Database::get_main_table(TABLE_BRANCH_ROOM);
+        $tableRoom = Database::get_main_table(TABLE_ROOM);
+        $tableBranch = Database::get_main_table(TABLE_BRANCH);
+
+        $whereCondition = array(
+            'where' => array(
+                'id = ?' => array(
+                    $data['item_id']
+                )
+            )
+        );
+        $dataTrackTeachers = Database::select('*', $tableTrackTeachers, $whereCondition);
+        if (!empty($dataTrackTeachers)) {
+            $dataTrackTeachers = current($dataTrackTeachers);
+            $sql = "SELECT
+            u.username,
+            r.title as room,
+            tck.log_in_course_date,
+            tck.log_out_course_date,
+            b.id as branch_id,
+            tck.id as track_id
+            FROM
+            $tableTrackTeacherAttendance tck
+            INNER JOIN $tableUser u ON u.user_id = tck.user_id
+            INNER JOIN $tableBranchRoom br ON br.room_id = tck.room_id
+            INNER JOIN $tableRoom r ON r.id = tck.room_id
+            INNER JOIN $tableBranch b ON b.id = br.branch_id
+            WHERE tck.id = {$data['item_id']}
+            ";
+
+            $result = Database::query($sql);
+            while ($row = Database::fetch_array($result)) {
+                $dataTrackInOut = $row;
+            }
+
+            if ($data['dest_id'] == 'IN') {
+                $dataTrackInOut['log_in_course_date'] = api_get_local_time($dataTrackInOut['log_in_course_date']);
+                $dateTime = self::explodeDateTime($dataTrackInOut['log_in_course_date']);
+            } else {
+                $dataTrackInOut['log_out_course_date'] = api_get_local_time($dataTrackInOut['log_out_course_date']);
+                $dateTime = self::explodeDateTime($dataTrackInOut['log_out_course_date']);
+            }
+
+            $wsParams = array(
+                'chraula' => $dataTrackInOut['room'],
+                'vchcodigorrhh' => $dataTrackInOut['username'],
+                'chrtipomarcacion' => $data['dest_id'],
+                'chrfechamarcacion' => $dateTime['date'],
+                'chrhoramarcacion' => $dateTime['time'],
+                'intidsede' => $dataTrackInOut['branch_id']
+            );
+            $serviceResponse = Migration::soap_call(
+                $webServiceDetails,
+                'insAsistenciaDocente',
+                $wsParams
+            );
+
+            if ($serviceResponse['error'] == false) {
+                return array(
+                    'entity' => 'track_e_teacher_in_out',
+                    'before' => '',
+                    'after'  => '',
+                    'message' => "{$data['dest_id']} sent to ICPNAs WS",
+                    'status_id' => self::TRANSACTION_STATUS_SUCCESSFUL
+                );
+            } else {
+                return $wsParams;
+            }
+        }
+    }
+
+    /**
+     * @param $data
+     * @param $param
+     * @return array
+     */
+    static function insAsistenciaDocente($data, $param) {
+        if ($data->insAsistenciaDocenteResult) {
+            return array('error' => false);
+        } else {
+            return array('error' => true);
+        }
+    }
+    /**
+     * This is to split the date and time
+     * @param $dateTimeParam
+     * @return array
+     */
+    public static function explodeDateTime($dateTimeParam) {
+        $dateTime = explode(' ', $dateTimeParam);
+
+        return array(
+            'date' => $dateTime[0],
+            'time' => $dateTime[1]
+        );
     }
 
     static function transaction_cambiar_generic($extra_field_variable, $data) {

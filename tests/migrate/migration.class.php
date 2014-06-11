@@ -686,7 +686,7 @@ error_log($sql);
 
         //$extra_conditions = " AND branch_id = $branch_id ";
         // Temporary patch to avoid attendances and gradebook transactions
-        $extra_conditions = " AND branch_id = $branch_id and action < 31 ";
+        $extra_conditions = " AND branch_id = $branch_id AND (action < 31 OR action > 500)";
         if ($check_attend) {
             $extra_conditions = " AND branch_id = $branch_id ";
         }

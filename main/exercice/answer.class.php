@@ -266,7 +266,7 @@ class Answer
         $TBL_ANSWER = Database::get_course_table(TABLE_QUIZ_ANSWER);
 
         $auto_id = intval($auto_id);
-        $sql     = "SELECT id, answer FROM $TBL_ANSWER WHERE c_id = {$this->course_id} AND id_auto='$auto_id'";
+        $sql     = "SELECT id, answer, position FROM $TBL_ANSWER WHERE c_id = {$this->course_id} AND id_auto='$auto_id'";
         $rs      = Database::query($sql);
 
         if (Database::num_rows($rs) > 0) {

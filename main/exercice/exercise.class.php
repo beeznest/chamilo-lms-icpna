@@ -3260,7 +3260,7 @@ class Exercise
                         while ($real_answer = Database::fetch_array($res_answer)) {
                             $real_list[$real_answer['id']] = $real_answer['answer'];
                         }
-                        $sql_select_answer = 'SELECT id, answer, correct, id_auto FROM '.$table_ans.'
+                        $sql_select_answer = 'SELECT id, answer, correct, id_auto, position FROM '.$table_ans.'
                                               WHERE c_id = '.$course_id.' AND question_id="'.$questionId.'" AND correct <> 0 ORDER BY id_auto';
                         $res_answers = Database::query($sql_select_answer);
 
@@ -3282,7 +3282,7 @@ class Exercise
                             } else {
                                 $s_user_answer = 0;
                             }
-                            $i_answerWeighting = $objAnswerTmp->selectWeighting($i_answer_id);
+                            $i_answerWeighting = $objAnswerTmp->selectWeighting($a_answers['position']);
 
                             $user_answer = '';
                             if (!empty($s_user_answer)) {

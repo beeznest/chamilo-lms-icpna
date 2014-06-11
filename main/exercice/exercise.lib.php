@@ -107,7 +107,8 @@ function showQuestion($questionId, $only_questions = false, $origin = false, $cu
             $letter = 'A'; //mark letters for each answer
             $answer_matching = $cpt1 = array();
 
-            for ($answerId = 1; $answerId <= $nbrAnswers; $answerId++) {
+            for ($pos = 1; $pos <= $nbrAnswers; $pos++) {
+                $answerId = $objAnswerTmp->selectAnswerIdByPosition($pos);
                 $answerCorrect = $objAnswerTmp->isCorrect($answerId);
                 $numAnswer = $objAnswerTmp->selectAutoId($answerId);
                 $answer = $objAnswerTmp->selectAnswer($answerId);
@@ -130,6 +131,7 @@ function showQuestion($questionId, $only_questions = false, $origin = false, $cu
                 $select_items[$i]['id'] = $value['id'];
                 $select_items[$i]['letter'] = $cpt1[$id];
                 $select_items[$i]['answer'] = $value['answer'];
+                $select_items[$i]['position'] = $value['position'];
                 $i++;
             }
             $num_suggestions = ($nbrAnswers - $x) + 1;
@@ -206,6 +208,24 @@ function showQuestion($questionId, $only_questions = false, $origin = false, $cu
             }
         }
 
+        $choice_keys = array();
+        $j = 0;
+        if (!empty($user_choice)) {
+            for ($pos = 1; $pos <= $nbrAnswers; $pos++) {
+                foreach ($user_choice as $item) {
+                    $isCorrect = $objAnswerTmp->isCorrect($pos);
+                    if ($isCorrect) {
+                        if ($isCorrect == $item['answer']) {
+                            $choice_keys[$item['answer']-1] = $j;
+                            break;
+                        }
+                        $j++;
+                    }
+                }
+                $j = 0;
+            }
+        }
+
         $matching_correct_answer = 0;
         $user_choice_array = array();
         if (!empty($user_choice)) {
@@ -214,7 +234,8 @@ function showQuestion($questionId, $only_questions = false, $origin = false, $cu
             }
         }
 
-        for ($answerId = 1; $answerId <= $nbrAnswers; $answerId++) {
+        for ($pos = 1; $pos <= $nbrAnswers; $pos++) {
+            $answerId = $pos;
             $answer = $objAnswerTmp->selectAnswer($answerId);
             $answerCorrect = $objAnswerTmp->isCorrect($answerId);
             $numAnswer = $objAnswerTmp->selectAutoId($answerId);
@@ -576,16 +597,21 @@ function showQuestion($questionId, $only_questions = false, $origin = false, $cu
                         // show the correct answer with a suffix '-x'
                         $selected = '';
                         if ($debug_mark_answer) {
-                            if ($val['id'] == $answerCorrect) {
+                            if ($val['answer'] == $answerCorrect) {
                                 $selected = 'selected="selected"';
-                                $selectedValue = $val['id'];
+                                $selectedValue = $val['position'];
                             }
                         }
-                        if (isset($user_choice[$matching_correct_answer]) && $val['id'] == $user_choice[$matching_correct_answer]['answer']) {
+
+                        if (isset($user_choice[$choice_keys[$matching_correct_answer]]) && $val['position'] == $user_choice[$choice_keys[$matching_correct_answer]]['answer']) {
                             $selected = 'selected="selected"';
-                            $selectedValue = $val['id'];
+                            if (!empty($val['position'])) {
+                                $selectedValue = $choice_keys[$matching_correct_answer]+1;
+                            } else {
+                                $selectedValue = 0;
+                            }
                         }
-                        $s .= '<option value="'.$val['id'].'" '.$selected.'>'.$val['letter'].'</option>';
+                        $s .= '<option value="'.$val['position'].'" '.$selected.'>'.$val['letter'].'</option>';
                     }
 
                     if (!empty($answerCorrect) && !empty($selectedValue)) {
@@ -640,7 +666,8 @@ function showQuestion($questionId, $only_questions = false, $origin = false, $cu
             $s .= '</ul><div class="clear"></div>';
 
             $counterAnswer = 1;
-            for ($answerId = 1; $answerId <= $nbrAnswers; $answerId++) {
+            for ($pos = 1; $pos <= $nbrAnswers; $pos++) {
+                $answerId = $objAnswerTmp->selectAnswerIdByPosition($pos);
                 $answerCorrect = $objAnswerTmp->isCorrect($answerId);
                 $windowId = $questionId.'_'.$counterAnswer;
                 if ($answerCorrect) {

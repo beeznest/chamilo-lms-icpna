@@ -143,11 +143,26 @@ $action = isset($_GET['action']) ? $_GET['action'] : null;
 if ($action == 'add' && $type == 'learnpathitem') {
      $htmlHeadXtra[] = "<script language='JavaScript' type='text/javascript'> window.location=\"../resourcelinker/resourcelinker.php?source_id=5&action=$action&learnpath_id=$learnpath_id&chapter_id=$chapter_id&originalresource=no\"; </script>";
 }
-if ((!$is_allowed_to_edit) || ($isStudentView)) {
-    error_log('New LP - User not authorized in lp_add_item.php');
-    header('location:lp_controller.php?action=view&lp_id='.$learnpath_id);
-    exit;
+
+$sessionId = $_SESSION['oLP']->get_lp_session_id();
+
+if (empty($sessionId)) {
+    $is_allowed_to_edit = api_is_allowed_to_edit(
+            false,
+            true,
+            false,
+            false
+        ) && !api_is_coach();
+} else {
+    $is_allowed_to_edit = api_is_allowed_to_edit(false, true, false, false);
 }
+
+if ($type != 'step') {
+    if ((!$is_allowed_to_edit) || ($isStudentView)) {
+        api_not_allowed(true);
+    }
+}
+
 /* SHOWING THE ADMIN TOOLS */
 
 if (isset($_SESSION['gradebook'])) {

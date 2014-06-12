@@ -4819,7 +4819,7 @@ i.size-32.icon-new-work{
 .item_added {
     float:left;
 }
-
-
-
-
+/* Force bootstrap hide */
+.hide-important {
+    display: none !important;
+}

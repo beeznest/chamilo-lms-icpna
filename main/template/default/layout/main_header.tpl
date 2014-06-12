@@ -50,17 +50,31 @@
                         &nbsp;
                     </div>
                     <div id="header_right" class="span5">
-                        <ul id="notifications" class="nav nav-pills pull-right">
-                            {{ notification_menu }}
-                        </ul>
+                        {# NOTIFICATIONS #}
+                        <div id="notifications-container">
+                            <ul id="notifications" class="nav nav-pills pull-right">
+                                {{ notification_menu }}
+                            </ul>
 
-                        {# plugin_header right #}
-                        {% if plugin_header_right is not null %}
-                            <div id="plugin_header_right">
-                                {{ plugin_header_right }}
+                            {# plugin_header right #}
+                            {% if plugin_header_right is not null %}
+                                <div id="plugin_header_right">
+                                    {{ plugin_header_right }}
+                                </div>
+                            {% endif %}
+                            &nbsp;
+                        </div>
+                        {# END NOTIFICATIONS #}
+                        {# IN/OUT #}
+                        {% if _u.is_course_coach == 1 and _p.is_local_ip %}
+                            <div id="in-out-buttons" class="text-center pagination-centered pull-right">
+                                <button class="btn  btn-large btn-success {% if _p.count_active_in > 0 %} hide-important {% endif %}" type="button" id="btn_in_session" name="btn_in_session">IN</button>
+                                <button class="btn btn-large btn-danger {% if _p.count_active_in == 0 %} hide-important {% endif %}" type="button" id="btn_out_session" name="btn_out_session">OUT</button>
+                                <input type="hidden" name="in_course_id" id="in_course_id" value="{{ _u.coach_course_id }}" />
+                                <input type="hidden" name="in_session_id" id="in_session_id" value="{{ _u.coach_session_id }}" />
                             </div>
                         {% endif %}
-                        &nbsp;
+                        {# END IN/OUT #}
                     </div>
                 </div>
 

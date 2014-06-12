@@ -6225,7 +6225,7 @@ function api_get_real_ip(){
     global $debug;
     $ip = trim($_SERVER['REMOTE_ADDR']);
     if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        list($ip1,$ip2) = split(',',$_SERVER['HTTP_X_FORWARDED_FOR']);
+        list($ip1, $ip2) = explode(',',$_SERVER['HTTP_X_FORWARDED_FOR']);
         $ip = trim($ip1);
     }
     if (!empty($debug)) error_log('Real IP: '.$ip);

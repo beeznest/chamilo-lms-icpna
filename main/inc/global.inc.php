@@ -42,6 +42,9 @@ $main_configuration_file_path = $includePath.'/conf/configuration.php';
 
 if (!empty($_GET['r'])) {
     setcookie('room_id', $_GET['r'],  time()+3600*24*365*10, '/'); //Ten Years
+    $uri = preg_replace('/r='.$_GET['r'].'/','',$_SERVER['REQUEST_URI']);
+    header('location: '.$uri);
+    exit();
 }
 
 $already_installed = false;

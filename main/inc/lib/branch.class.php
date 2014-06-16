@@ -6,7 +6,7 @@
  * Time: 12:59 PM
  */
 
-class branch
+class Branch
 {
 
     /**
@@ -14,7 +14,8 @@ class branch
      * @param string $ip
      * @return int $id
      */
-    public function getIpMatch($ip) {
+    public function getIpMatch($ip)
+    {
         $tableBranchIp = Database::get_main_table(TABLE_BRANCH_IP);
         $branchIps = Database::select('*', $tableBranchIp);
         $id = false;
@@ -35,7 +36,8 @@ class branch
      * @param $ipId
      * @return int $roomId
      */
-    public function findRoom($ipId) {
+    public function findRoom($ipId)
+    {
         $tableBranchIpRoom = Database::get_main_table(TABLE_BRANCH_IP_REL_ROOM);
         $whereCondition = array(
             'where' => array(
@@ -54,23 +56,28 @@ class branch
 
         return $roomId;
     }
+
     /**
-     * Set the room globally in a cookie
-     * @param $ip
-     * @return bool
+     * Returns the branch id by session
+     * @param $sessionId
+     * @return integer / bool
      */
-    public function setRoomGlobally($ip) {
-        $ipId = $this->getIpMatch($ip); // Find the ip ID in the branch_ips table from the IP of the user
-        if ($ipId === false) { // We can't find a matching IP or range
-            return false;
-        }
-        $roomId = $this->findRoom($ipId);
+    public function getBranchId($sessionId)
+    {
+        $objExtraFieldValue = new ExtraFieldValue('session');
+        $objExtraFieldOption = new ExtraFieldOption('session');
+        $data = $objExtraFieldValue->get_values_by_handler_and_field_variable($sessionId, 'sede', true);
 
-        if ($roomId === false) { // We can't find a matching room
-            return false;
-        }
-        setcookie('room_id', $roomId,  time()+3600*24*365*10, '/'); //Ten Years
+        if (!empty($data)) {
+            $optionTmp = $objExtraFieldOption->get_field_option_by_field_and_option($data['field_id'], $data['field_value']);
+            if (!empty($optionTmp)) {
+                $option = current($optionTmp);
+                $branchId = $option['id'];
 
-        return true;
+                return $branchId;
+            }
+        }
+
+        return false;
     }
 } 

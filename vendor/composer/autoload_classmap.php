@@ -999,4 +999,5 @@ return array(
     'xajaxResponse' => $baseDir . '/main/inc/lib/xajax/xajaxResponse.inc.php',
     'xhtdoc' => $baseDir . '/main/inc/lib/xht.lib.php',
     'xmddoc' => $baseDir . '/main/inc/lib/xmd.lib.php',
+    'Branch' => $baseDir . '/main/inc/lib/branch.class.php',
 );

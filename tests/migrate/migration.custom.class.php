@@ -1364,7 +1364,6 @@ class MigrationCustom {
      * @return array
      */
     static function transaction_534($data, $webServiceDetails) {
-        $trackAttendanceId = $data['item_id'];
         $tableTrackTeachers = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
         $tableTrackTeacherAttendance = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
         $tableUser = Database::get_main_table(TABLE_MAIN_USER);
@@ -1381,20 +1380,16 @@ class MigrationCustom {
         );
         $dataTrackTeachers = Database::select('*', $tableTrackTeachers, $whereCondition);
         if (!empty($dataTrackTeachers)) {
-            $dataTrackTeachers = current($dataTrackTeachers);
             $sql = "SELECT
             u.username,
             r.title as room,
             tck.log_in_course_date,
             tck.log_out_course_date,
-            b.id as branch_id,
             tck.id as track_id
             FROM
             $tableTrackTeacherAttendance tck
             INNER JOIN $tableUser u ON u.user_id = tck.user_id
-            INNER JOIN $tableBranchRoom br ON br.room_id = tck.room_id
             INNER JOIN $tableRoom r ON r.id = tck.room_id
-            INNER JOIN $tableBranch b ON b.id = br.branch_id
             WHERE tck.id = {$data['item_id']}
             ";
 
@@ -1417,7 +1412,7 @@ class MigrationCustom {
                 'chrtipomarcacion' => $data['dest_id'],
                 'chrfechamarcacion' => $dateTime['date'],
                 'chrhoramarcacion' => $dateTime['time'],
-                'intidsede' => $dataTrackInOut['branch_id']
+                'intidsede' => $data['branch_id']
             );
             $serviceResponse = Migration::soap_call(
                 $webServiceDetails,

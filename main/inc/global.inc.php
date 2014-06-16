@@ -41,7 +41,7 @@ $includePath = dirname(__FILE__);
 $main_configuration_file_path = $includePath.'/conf/configuration.php';
 
 if (!empty($_GET['r'])) {
-    setcookie('room_id', $_GET['r'],  time()+3600*24*365*10, '/'); //Ten Years
+    setcookie('room', $_GET['r'], time()+3600*24*365*10, '/'); //Ten Years
     $uri = preg_replace('/r='.$_GET['r'].'/','',$_SERVER['REQUEST_URI']);
     header('location: '.$uri);
     exit();
@@ -769,12 +769,6 @@ if (!isset($_SESSION['login_as']) && isset($_user)) {
 
         $s_sql_update_logout_date = "UPDATE $tbl_track_login SET logout_date=NOW() WHERE login_id='$i_id_last_connection'";
         Database::query($s_sql_update_logout_date);
-    }
-    if (empty($_COOKIE['room_id'])) {
-        require_once api_get_path(LIBRARY_PATH).'branch.class.php';
-        $objBranch = new branch();
-        $ip = api_get_real_ip();
-        $objBranch->setRoomGlobally($ip);
     }
 }
 

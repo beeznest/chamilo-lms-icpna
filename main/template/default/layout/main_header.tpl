@@ -66,7 +66,7 @@
                         </div>
                         {# END NOTIFICATIONS #}
                         {# IN/OUT #}
-                        {% if _u.is_course_coach == 1 and _p.is_local_ip %}
+                        {% if _u.is_course_coach == 1 and _p.is_in_branch %}
                             <div id="in-out-buttons" class="text-center pagination-centered pull-right">
                                 <button class="btn  btn-large btn-success {% if _p.count_active_in > 0 %} hide-important {% endif %}" type="button" id="btn_in_session" name="btn_in_session">IN</button>
                                 <button class="btn btn-large btn-danger {% if _p.count_active_in == 0 %} hide-important {% endif %}" type="button" id="btn_out_session" name="btn_out_session">OUT</button>

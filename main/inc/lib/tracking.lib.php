@@ -3272,6 +3272,30 @@ class Tracking
     }
 
     /**
+     * This function let you know if
+     * the user is connected from a Branch
+     * @param $sessionId
+     *
+     * @return bool
+     */
+    public function isInBranch($sessionId)
+    {
+        $userIp = api_get_real_ip();
+        $objBranch = new Branch();
+
+        $branchId = $objBranch->getBranchId($sessionId);
+        if (!empty($branchId)) {
+            $branchIpTmp = $objBranch->getIpMatch($userIp);
+            if (!empty($branchId) && !empty($branchIpTmp) && $branchId == $branchIpTmp) {
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Returns the number of actives IN
      *
      * @return int

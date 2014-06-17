@@ -71,13 +71,14 @@ class Certificate extends Model {
     /**
      * Checks if the certificate user path directory is created
      */
-    public function check_certificate_path() {
+    public function check_certificate_path()
+    {
         $this->certification_user_path = null;
         
         //Setting certification path
-        $path_info = UserManager::get_user_picture_path_by_id($this->user_id, 'system', true);
+        $path_info = UserManager::get_user_picture_path_by_id($this->user_id, 'system');
         
-        $web_path_info = UserManager::get_user_picture_path_by_id($this->user_id, 'web', true);
+        $web_path_info = UserManager::get_user_picture_path_by_id($this->user_id, 'web');
         
         if (!empty($path_info) && isset($path_info['dir'])) {
             

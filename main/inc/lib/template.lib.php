@@ -308,7 +308,7 @@ class Template {
             'web_img' => api_get_path(WEB_IMG_PATH),
             'web_plugin' => api_get_path(WEB_PLUGIN_PATH),
             'web_lib' => api_get_path(WEB_LIBRARY_PATH),
-            'is_local_ip' => $objTracking->isLocalIP(),
+            'is_in_branch' => $objTracking->isInBranch($_SESSION['id_session']),
             'count_active_in' => $objTracking->countActiveTeacherIn(),
         );
         $this->assign('_p', $_p);

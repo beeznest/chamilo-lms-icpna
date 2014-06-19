@@ -26,6 +26,7 @@ class AddExternalPagesPlugin extends Plugin
             'button_name' => 'text',
             'web_path' => 'text',
             'image_path' =>'text',
+            'sso_enable' => 'boolean',
         );
 
         parent::__construct('1.0', 'Francis Gonzales', $parameters);
@@ -65,7 +66,7 @@ class AddExternalPagesPlugin extends Plugin
                         'name' => $tool['name'],
                         'link' => $tool['link'],
                         'image' => $tool['image'],
-                        'visibility' => 1,
+                        'visibility' => 2,
                         'admin' => 1,
                         'address' => '',
                         'added_tool' => 0,

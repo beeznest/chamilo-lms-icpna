@@ -59,6 +59,7 @@ if (isset($form)) {
 
         }
         $message = Display::return_message(get_lang('Updated'), 'success');
+        eval("{$plugin_info['plugin_class']}::create()->saveAdditionalConfiguration(\$values);");
     }
 }
 $tpl = new Template($tool_name);

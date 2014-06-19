@@ -394,4 +394,17 @@ class Plugin {
      */
     public function course_settings_updated($values = array()) {
     }
+
+    /**
+     * Save additional configuration when the
+     * form of main configuration is send
+     * override this if you have an special
+     * configuration in your plugin
+     * @param $configurationParams
+     * @return mixed
+     */
+    public function saveAdditionalConfiguration($configurationParams)
+    {
+        return $configurationParams;
+    }
 }

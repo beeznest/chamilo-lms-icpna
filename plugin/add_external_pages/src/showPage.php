@@ -23,7 +23,14 @@ if (!empty($_GET['id']) || $_GET['id'] === '0') {
     $getNewPath = $paths[$id];
     if ($isSsoEnable === 'true') {
         $objSsoServer = new ssoServer();
-        $getNewPath = $objSsoServer->getUrl($paths[$id]);
+        $objBranch = new Branch();
+        $sessionId = api_get_session_id();
+        $branchUid = $objBranch->getUidSede($sessionId);
+        $programUid = $objBranch->getUidProgram($sessionId);
+        $additionalParams['uididsede'] = $branchUid;
+        $additionalParams['uididprograma'] = $programUid;
+
+        $getNewPath = $objSsoServer->getUrl($paths[$id], $additionalParams);
     }
 
     $toolName = $objAddExternalPage->get_lang('external_page');

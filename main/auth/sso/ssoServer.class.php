@@ -14,9 +14,10 @@ class ssoServer
     /**
      * This is used to get the url with the SSO params
      * @param $refererSso
+     * @param $additionalParams
      * @return bool|string
      */
-    public function getUrl($refererSso)
+    public function getUrl($refererSso, $additionalParams = array())
     {
         if (!empty($refererSso)) {
             $getParams = parse_url($refererSso, PHP_URL_QUERY);
@@ -31,6 +32,17 @@ class ssoServer
                 'lifetime' => time() + 3600,
                 'target' => $refererSso,
             );
+
+            if (!empty($additionalParams)) {
+                foreach ($additionalParams as $key => $value) {
+                    if (!empty($key)) {
+                        $sso[$key] = $value;
+                    } else {
+                        $sso[] = $value;
+                    }
+                }
+            }
+
             $cookie = base64_encode(serialize($sso));
             if ($getParams) {
                 $params .= '&loginFailed=0&sso_referer=' . $refererSso . '&sso_cookie=' . urlencode($cookie);

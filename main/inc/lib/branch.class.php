@@ -80,4 +80,41 @@ class Branch
 
         return false;
     }
+
+    /**
+     * Returns the branch uid by session
+     * @param $sessionId
+     * @return integer / bool
+     */
+    public function getUidSede($sessionId)
+    {
+        $objExtraFieldValue = new ExtraFieldValue('session');
+        $data = $objExtraFieldValue->get_values_by_handler_and_field_variable($sessionId, 'sede', true);
+
+        if (!empty($data['field_value'])) {
+            $uidIdSede = $data['field_value'];
+
+            return $uidIdSede;
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns the program uid by session
+     * @param $sessionId
+     * @return integer / bool
+     */
+    public function getUidProgram($sessionId)
+    {
+        $objExtraFieldValue = new ExtraFieldValue('session');
+        $data = $objExtraFieldValue->get_values_by_handler_and_field_variable($sessionId, 'uidIdPrograma', true);
+        if (!empty($data['field_value'])) {
+            $uidIdProgram = $data['field_value'];
+
+            return $uidIdProgram;
+        }
+
+        return false;
+    }
 } 

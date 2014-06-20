@@ -3031,18 +3031,26 @@ class Exercise
                 // for hotspot with no order
                 case HOT_SPOT :
                     if ($from_database) {
-                        if ($show_result) {
-                            $TBL_TRACK_HOTSPOT = Database::get_statistic_table(TABLE_STATISTIC_TRACK_E_HOTSPOT);
-                            $query = "SELECT hotspot_correct FROM ".$TBL_TRACK_HOTSPOT." WHERE hotspot_exe_id = '".$exeId."' and hotspot_question_id= '".$questionId."' AND hotspot_answer_id='".Database::escape_string(
+                        $TBL_TRACK_HOTSPOT = Database::get_statistic_table(
+                            TABLE_STATISTIC_TRACK_E_HOTSPOT
+                        );
+                        $query = "SELECT hotspot_correct FROM " . $TBL_TRACK_HOTSPOT . "
+                                  WHERE
+                                        hotspot_exe_id = '" . $exeId . "' and
+                                        hotspot_question_id= '" . $questionId . "' AND
+                                        hotspot_answer_id='" . Database::escape_string(
                                 $answerId
-                            )."'";
-                            $resq = Database::query($query);
-                            $studentChoice = Database::result($resq, 0, "hotspot_correct");
+                            ) . "'";
+                        $resq = Database::query($query);
+                        $studentChoice = Database::result(
+                            $resq,
+                            0,
+                            "hotspot_correct"
+                        );
 
-                            if ($studentChoice) {
-                                $questionScore += $answerWeighting;
-                                $totalScore += $answerWeighting;
-                            }
+                        if ($studentChoice) {
+                            $questionScore += $answerWeighting;
+                            $totalScore += $answerWeighting;
                         }
                     } else {
                         $studentChoice = $choice[$answerId];

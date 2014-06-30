@@ -6,8 +6,8 @@
 */
 
 if ((!isset($_GET['admin789']) or empty($_GET['admin789'])) && empty($_REQUEST['login']) && empty($_REQUEST['logout'])) {
-    header('location: http://vlearning.icpna.edu.pe/in/web');
-    exit;
+    //header('location: http://vlearning.icpna.edu.pe/in/web');
+    //exit;
 }
 define('CHAMILO_HOMEPAGE', true);
 
@@ -24,6 +24,13 @@ require_once 'main/chat/chat_functions.lib.php';
 $this_section = SECTION_CAMPUS;
 
 $htmlHeadXtra[] = api_get_jquery_libraries_js(array('bxslider'));
+$htmlHeadXtra[] = api_get_js('functions/functions.js'); // check enabled Cookie of (javascript) (anb)
+
+$msg = Display::return_message(get_lang('NoCookies').'<br />', 'error', false);
+$msg = Display::div($msg, array('align' => 'center','id' => 'cookieEnabled'));
+$tpl = new Template();
+$tpl->assign('content', $msg);
+
 $htmlHeadXtra[] ='
 <script>
 	$(document).ready(function(){
@@ -34,7 +41,16 @@ $htmlHeadXtra[] ='
 			autoHover		: true,
 		pause			: 10000
 		});
+
+        // check  coockie with js
+        if (!checkCookie()) {
+            $("#cookieEnabled").show();
+        } else {            
+            $("#cookieEnabled").hide();
+        }
 	});
+
+
 </script>';
 
 //set cookie for check if client browser are cookies enabled

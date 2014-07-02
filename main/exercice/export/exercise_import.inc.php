@@ -45,7 +45,7 @@ function get_and_unzip_uploaded_exercise($baseWorkDir, $uploadPath)
         // upload failed
         return false;
     }
-    if (preg_match('/.zip$/i', $_FILES['userFile']['name']) && FileManager::handle_uploaded_document(
+    if (preg_match('/.zip$/i', $_FILES['userFile']['name']) && handle_uploaded_document(
         $_course,
         $_FILES['userFile'],
         $baseWorkDir,

@@ -646,7 +646,7 @@ foreach ($categories as $item) {
         // TODO: Erint some user-friendly message if counter is still = 0 to tell nothing can be display yet.
         echo "</table>";
     } else {
-        echo get_lang('NoData');
+        echo get_lang('NoDataAvailable');
     }
     echo '</div>';
 }

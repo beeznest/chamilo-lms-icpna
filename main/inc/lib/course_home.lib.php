@@ -1197,7 +1197,7 @@ class CourseHome {
             $tool['tool']['image'] = preg_replace('/_na/','',$tool['tool']['image']);
             $tool['tool']['custom_icon'] = preg_replace('/_na/','',$tool['tool']['custom_icon']);
             $tool['visibility'] = 1;
-            $state = 'process';
+            $state = 'process'; // variable high hierarchy for this process
             $toolName = $tool['tool']['name'];
             if ($type_entity_id > 0 && $id > 0) {
                 require_once api_get_path(LIBRARY_PATH).'sequence.lib.php';
@@ -1237,17 +1237,19 @@ class CourseHome {
                         $tool['pure_icon'] = preg_replace($regex, $icon_path, $tool['pure_icon']);
                         $tool['icon'] = preg_replace($regex, $icon_path, $tool['icon']);
                     }
-                } else {
+                } else if ($state == 'closed' ) { // status icono dependiente (no exite imagen png)
 					$tool['visibility'] = 0;
                     $iconPathNATemp = api_get_path(WEB_COURSE_PATH).$courseInfo['directory'].$basedir.$custom_icon;
                     $iconPathNATempSys = api_get_path(SYS_COURSE_PATH).$courseInfo['directory'].$basedir.$custom_icon;
                     $ext = pathinfo($iconPathNATempSys, PATHINFO_EXTENSION);
+
                     if (strpos($iconPathNATempSys,'_na') === false) {
-                        $iconPathNATempSys = substr($iconPathNATempSys,0,-(strlen($ext)+1)) . '_na.' . $ext_png;
+                        $iconPathNATempSys = substr($iconPathNATempSys,0,-(strlen($ext)+1)) . '_na.' . $ext;
                     }
+
                     if (is_file($iconPathNATempSys)) {
                         if (strpos($iconPathNATemp,'_na') === false) {
-                            $iconPathNATemp = substr($iconPathNATemp,0,-(strlen($ext)+1)) . '_na.' . $ext_png;
+                            $iconPathNATemp = substr($iconPathNATemp,0,-(strlen($ext)+1)) . '_na.' . $ext;
                         }
                         $icon_path = $iconPathNATemp;
                         $icon_path = 'src="' . $icon_path;
@@ -1257,9 +1259,9 @@ class CourseHome {
                         $ext = pathinfo(api_get_path(WEB_IMG_PATH). $dir_icons . $tool['tool']['image'], PATHINFO_EXTENSION);
                         $default_icon = api_get_path(WEB_IMG_PATH). $dir_icons . substr($tool['tool']['image'],0,-(strlen($ext)+1));
                         if (strpos($default_icon,'_na') === false) {
-                            $icon_path = $default_icon .'_na.'. $ext_png;
+                            $icon_path = $default_icon .'_na.'. $ext;
                         } else {
-                            $icon_path = $default_icon .'.'. $ext_png;
+                            $icon_path = $default_icon .'.'. $ext;
                         }
                         $icon_path = 'src="'. $icon_path;
                         $tool['pure_icon'] = preg_replace($regex, $icon_path,$tool['pure_icon']);

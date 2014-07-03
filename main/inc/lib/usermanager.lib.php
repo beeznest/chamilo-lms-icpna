@@ -184,7 +184,7 @@ class UserManager {
         if (empty($params['user_id'])) {
             return false;
         }
-        
+
         if (isset($params['password'])) {
             if (empty($params['encrypt_method'])) {
                 $params['password'] = api_get_encrypted_password($params['password']);
@@ -1233,11 +1233,16 @@ class UserManager {
         $picture_filename = trim($user['picture_uri']);
 
         if (api_get_setting('split_users_upload_directory') === 'true') {
-            if (!empty($picture_filename) or $preview) {
+            /*if (!empty($picture_filename) or $preview) {
                 $dir = $base.'upload/users/'.substr((string)$user_id, 0, 1).'/'.$user_id.'/';
             } else {
                 $dir = $base.'upload/users/'.$user_id.'/';
-            }
+            }*/
+            $dir = $base . 'upload/users/' . substr(
+                    (string)$user_id,
+                    0,
+                    1
+                ) . '/' . $user_id . '/';
         } else {
             $dir = $base.'upload/users/'.$user_id.'/';
         }
@@ -1383,8 +1388,8 @@ class UserManager {
             return false;
         }
 
-        $production_path = self::get_user_picture_path_by_id($user_id, 'web', true);
-        $production_dir = $production_path['dir'].$user_id.'/';
+        $production_path = self::get_user_picture_path_by_id($user_id, 'web');
+        $production_dir = $production_path['dir'];
         $del_image = api_get_path(WEB_CODE_PATH).'img/delete.gif';
         $del_text = get_lang('Delete');
         $production_list = '';
@@ -1438,8 +1443,11 @@ class UserManager {
      * @param    $production    The production to remove
      */
     public static function remove_user_production($user_id, $production) {
-        $production_path = self::get_user_picture_path_by_id($user_id, 'system', true);
-        $production_file = $production_path['dir'].$user_id.'/'.$production;
+        $production_path = self::get_user_picture_path_by_id(
+            $user_id,
+            'system'
+        );
+        $production_file = $production_path['dir'] . $production;
         if (is_file($production_file)) {
             unlink($production_file);
             return true;
@@ -2346,7 +2354,7 @@ class UserManager {
             }
         }
         if (Database::num_rows($result1) > 0) {
-            // Now add the diff with $row1, ordering elements as planned by 
+            // Now add the diff with $row1, ordering elements as planned by
             //   query
             $i = 0;
             while ($row1 = Database::fetch_array($result1)) {
@@ -2390,7 +2398,7 @@ class UserManager {
 
                 $session_id = $row['id'];
                 //$session_info = api_get_session_info($session_id);
-                // The only usage of $session_info is to call 
+                // The only usage of $session_info is to call
                 // api_get_session_date_valudation, which only needs id and
                 // dates from the session itself, so really no need to query
                 // the session table again

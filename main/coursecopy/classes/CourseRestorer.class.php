@@ -72,7 +72,8 @@ class CourseRestorer
         //'scorm_documents', ??
         'tool_intro',
         'thematic',
-        'wiki'
+        'wiki',
+        'sequence'
     );
 
     /** Setting per tool */
@@ -1950,24 +1951,21 @@ class CourseRestorer
                     "modified_on        = '".self::DBUTF8escapestring($lp->modified_on)."', ".
                     "publicated_on      = '".self::DBUTF8escapestring($lp->publicated_on)."', ".
                     "expired_on         = '".self::DBUTF8escapestring($lp->expired_on)."', ".
-                    "debug              = '".self::DBUTF8escapestring($lp->debug)."' $condition_session ";
+                    "debug              = '".self::DBUTF8escapestring($lp->debug)."', ".
+                    "seriousgame_mode   = '".self::DBUTF8escapestring($lp->seriousgame_mode)."' $condition_session";
 
                 Database::query($sql);
                 $new_lp_id = Database::insert_id();
-
-                if ($lp->visibility) {
+                if (intval($lp->visibility) >= 0) {
                     $sql = "INSERT INTO $table_tool SET
-					            c_id = " . $this->destination_course_id . ",
-					            name = '" . self::DBUTF8escapestring(
-                            $lp->name
-                        ) . "',
-					            link = 'newscorm/lp_controller.php?action=view&lp_id=$new_lp_id&id_session=$session_id',
-					            image = 'scormbuilder.gif',
-					            visibility = '0',
-					            admin = '0',
-					            address = 'squaregrey.gif',
-					            session_id = $session_id
-                            ";
+                        c_id = " . $this->destination_course_id . " ,
+                        name = '" . self::DBUTF8escapestring($lp->name) . "',
+                        link = 'newscorm/lp_controller.php?action=view&lp_id=$new_lp_id&id_session=$session_id',
+                        image = 'scormbuilder.gif',
+                        visibility = {$lp->visibility},
+                        admin = '0',
+                        address = 'pastillegris.gif',
+                        session_id = $session_id";
                     Database::query($sql);
                 }
 
@@ -2379,6 +2377,53 @@ class CourseRestorer
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * @param int $session_id
+     */
+    function restore_sequence($session_id = 0)
+    {
+        if ($this->course->has_resources(RESOURCE_SEQUENCE)) {
+            $table_sequence = Database::get_main_table(TABLE_MAIN_SEQUENCE);
+            $table_sequence_row_entity = Database::get_main_table(TABLE_SEQUENCE_ROW_ENTITY);
+            $resources = $this->course->resources;
+
+            // First, insert all new sequence_row_entity
+            foreach ($resources[RESOURCE_SEQUENCE] as $id => $obj) {
+                if (intval($obj->sequence_type_entity_id) !== 1) {
+                    continue;
+                }
+                $new_row_id = $this->get_new_id(RESOURCE_LEARNPATH, $obj->row_id);
+                $sql = "INSERT INTO ".$table_sequence_row_entity." SET
+							c_id = ".$this->destination_course_id." ,
+							row_id = ".self::DBUTF8escapestring($new_row_id).", ".
+                    "sequence_type_entity_id=".self::DBUTF8escapestring($obj->sequence_type_entity_id).", ".
+                    "name = '".self::DBUTF8escapestring($obj->name)."'";
+                $result = Database::query($sql);
+                $new_sequence_row_entity_id = Database::insert_id($result);
+                $this->course->resources[RESOURCE_SEQUENCE][$id]->destination_id = $new_sequence_row_entity_id;
+            }
+
+            // Second, update sequence arrays and insert them in sequence
+            foreach ($resources[RESOURCE_SEQUENCE] as $id => $obj) {
+                $previous_sequence = $obj->previous_sequence;
+                if (!is_array($previous_sequence)) {
+                    continue;
+                }
+                foreach ($previous_sequence as $key => $value) {
+                    $value = ($value == 0)? 0 : $this->get_new_id(RESOURCE_SEQUENCE, $value);
+                    $new_sequence_row_entity_id= $this->get_new_id(RESOURCE_SEQUENCE, $id);
+                    $sql = "INSERT INTO ".$table_sequence." SET
+                    sequence_row_entity_id = ".$value." ,
+                    sequence_row_entity_id_next = ".$new_sequence_row_entity_id;
+                    Database::query($sql);
+                }
+            }
+
+        } else {
+            // nothing to do
         }
     }
 

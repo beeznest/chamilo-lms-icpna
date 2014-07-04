@@ -23,6 +23,7 @@ require_once 'CourseSession.class.php';
 require_once 'wiki.class.php';
 require_once 'Thematic.class.php';
 require_once 'Attendance.class.php';
+require_once 'Sequence.class.php';
 
 /**
  * Class which can build a course-object from a Chamilo-course.
@@ -50,9 +51,10 @@ class CourseBuilder {
         'surveys',
         'tool_intro',
         'thematic',
-        'wiki'
+        'wiki',
+        'sequence' //To build sequence and sequence_row_entity
     );
-    
+
     /* With this array you can filter wich elements of the tools are going to be added in the course obj (only works with LPs) */
     public $specific_id_list = array();
     
@@ -755,20 +757,21 @@ class CourseBuilder {
 				$item['prerequisite']	   = $obj_item->prerequisite;
 				$item['parameters'] 	   = $obj_item->parameters;
 				$item['launch_data'] 	   = $obj_item->launch_data;
-				$item['audio'] 			   = $obj_item->audio;				
+				$item['audio'] 			   = $obj_item->audio;
 				$items[] = $item;
 			}
 
-            $sql_tool = "SELECT id FROM $table_tool
+            $sql_tool = "SELECT visibility FROM $table_tool
                          WHERE  c_id = $course_id AND
-                                (link LIKE '%lp_controller.php%lp_id=".$obj->id."%' AND image='scormbuilder.gif') AND
-                                visibility = '1' ";
+                                (link LIKE '%lp_controller.php%lp_id=".$obj->id."%' AND image='scormbuilder.gif')
+                                LIMIT 1";
 			$db_tool = Database::query($sql_tool);
 
-			if(Database::num_rows($db_tool)) {
-				$visibility='1';
+			if (Database::num_rows($db_tool)) {
+                $row = Database::fetch_row($db_tool);
+                $visibility = intval($row[0]);
 			} else {
-				$visibility='0';
+				$visibility = -1;
 			}
 
             $lp = new CourseCopyLearnpath(
@@ -798,7 +801,9 @@ class CourseBuilder {
 								$obj->publicated_on,
 								$obj->expired_on,														
 								$obj->session_id,
-								$items);
+								$items,
+                                $obj->seriousgame_mode
+            );
 			$this->course->add_resource($lp);
 		}
 
@@ -984,5 +989,65 @@ class CourseBuilder {
 			}
 			$this->course->add_resource($obj);
 		}
-	}	
+	}
+
+    /**
+     * Build Sequence
+     * @param int $session_id
+     * @param string $course_code
+     * @param bool $with_base_content
+     * @param array $id_list
+     * @param int $sequence_type_entity_id
+     * @param array $row_id_list
+     */
+    function build_sequence($session_id = 0, $course_code = '', $with_base_content = false, $id_list = array(), $sequence_type_entity_id = 1, $row_id_list = array())
+    {
+        $table_sequence = Database::get_main_table(TABLE_MAIN_SEQUENCE);
+        $table_sequence_row_entity = Database::get_main_table(TABLE_SEQUENCE_ROW_ENTITY);
+        $course_info 	= api_get_course_info($course_code);
+        $c_id 		= $course_info['real_id'];
+
+        $sql = "SELECT id, row_id, name
+            FROM $table_sequence_row_entity
+            WHERE sequence_type_entity_id = $sequence_type_entity_id
+            AND c_id = $c_id
+            ";
+
+        if (!empty($id_list)) {
+            $id_list = array_map('intval', $id_list);
+            $sql .=" AND id IN (".implode(', ', $id_list).") ";
+        }
+
+        if (!empty($row_id_list)) {
+            $row_id_list = array_map('intval', $row_id_list);
+            $sql .=" AND row_id IN (".implode(', ', $row_id_list).") ";
+        }
+
+        $result = Database::query($sql);
+        if (Database::num_rows($result)) {
+            while ($row = Database::fetch_row($result)) {
+                $previous_sequence = array();
+                $next_sequence = array();
+                $id = $row[0];
+                $row_id = $row[1];
+                $name = $row[2];
+                $sql_previous = "SELECT sequence_row_entity_id
+                    FROM $table_sequence
+                    WHERE sequence_row_entity_id_next = $id";
+                $res_previous = Database::query($sql_previous);
+                while ($row_previous = Database::fetch_row($res_previous)) {
+                    $previous_sequence[] = $row_previous[0];
+                }
+                $sql_next = "SELECT sequence_row_entity_id_next
+                    FROM $table_sequence
+                    WHERE sequence_row_entity_id = $id";
+                $res_next = Database::query($sql_next);
+                while ($row_next = Database::fetch_row($res_next)) {
+                    $next_sequence[] = $row_next[0];
+                }
+                $obj = new CourseCopySequence($id, $sequence_type_entity_id, $c_id, $row_id, $name, $previous_sequence, $next_sequence);
+                $this->course->add_resource($obj);
+            }
+        }
+    }
 }

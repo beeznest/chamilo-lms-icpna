@@ -55,14 +55,18 @@ echo Display::page_header($nameTools);
 
 if ((isset($_POST['action']) && $_POST['action'] == 'course_select_form') || (isset($_POST['backup_option']) && $_POST['backup_option'] == 'full_backup')) {
 	if (isset ($_POST['action']) && $_POST['action'] == 'course_select_form') {
-		$course = CourseSelectForm::get_posted_course();        
+		$course = CourseSelectForm::get_posted_course();
 	} else {
 		$cb = new CourseBuilder();
 		$course = $cb->build();
 	}
-	$zip_file = CourseArchiver::write_course($course); 
+	$zip_file = CourseArchiver::write_course($course);
 	Display::display_confirmation_message(get_lang('BackupCreated'));
-	echo '<br /><a class="btn btn-primary btn-large" href="../course_info/download.php?archive='.$zip_file.'">'.get_lang('Download').'</a>';
+    echo '<br /><a class="btn btn-primary btn-large" href="' . api_get_path(
+            WEB_CODE_PATH
+        ) . 'course_info/download.php?archive=' . $zip_file . '&' . api_get_cidreq(
+        ) . '">
+	' . get_lang('Download') . '</a>';
 
 } elseif (isset($_POST['backup_option']) && $_POST['backup_option'] == 'select_items') {
 	$cb = new CourseBuilder('partial');
@@ -73,14 +77,17 @@ if ((isset($_POST['action']) && $_POST['action'] == 'course_select_form') || (is
 	$course = $cb->build();
 	if (!$course->has_resources()) {
 		echo get_lang('NoResourcesToBackup');
-	} else {		
-		
-		$form = new FormValidator('create_backup_form', 'post');
+    } else {
+        $form = new FormValidator(
+            'create_backup_form',
+            'post',
+            api_get_self() . '?' . api_get_cidreq()
+        );
 		$form->addElement('header',get_lang('SelectOptionForBackup'));
-		
+
 		$form->addElement('radio', 'backup_option', '', get_lang('CreateFullBackup'), 'full_backup');
 		$form->addElement('radio', 'backup_option', '',  get_lang('LetMeSelectItems'), 'select_items');
-		
+
 		$form->addElement('style_submit_button', null, get_lang('CreateBackup'), 'class="save"');
 
 		$form->add_progress_bar();

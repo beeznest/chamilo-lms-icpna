@@ -1605,7 +1605,12 @@ class CourseRestorer
                     $new_filename = uniqid('').$new_filename.substr($lp->preview_image, strlen($lp->preview_image) - 7, strlen($lp->preview_image));
                     if (file_exists($origin_path.$lp->preview_image) && !is_dir($origin_path.$lp->preview_image)) {
                         $copy_result = copy($origin_path.$lp->preview_image, $destination_path.$new_filename);
-                        //$copy_result = true;
+                        // create image white and black
+                        $temp = new Image($origin_path.$lp->preview_image);
+                        $r = $temp->convert2bw();
+                        $ext = pathinfo($new_filename, PATHINFO_EXTENSION);
+                        $file = substr($new_filename, 0,(strlen($new_filename))-4);
+                        $temp->send_image($destination_path . $file.'.64_na.' . $ext);
                         if ($copy_result) {
                             $lp->preview_image = $new_filename;
                         } else {

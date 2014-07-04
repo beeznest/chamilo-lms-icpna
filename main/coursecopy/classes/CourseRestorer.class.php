@@ -1605,12 +1605,9 @@ class CourseRestorer
                     $new_filename = uniqid('').$new_filename.substr($lp->preview_image, strlen($lp->preview_image) - 7, strlen($lp->preview_image));
                     if (file_exists($origin_path.$lp->preview_image) && !is_dir($origin_path.$lp->preview_image)) {
                         $copy_result = copy($origin_path.$lp->preview_image, $destination_path.$new_filename);
-                        // create image white and black
-                        $temp = new Image($origin_path.$lp->preview_image);
-                        $r = $temp->convert2bw();
-                        $ext = pathinfo($new_filename, PATHINFO_EXTENSION);
-                        $file = substr($new_filename, 0,(strlen($new_filename))-4);
-                        $temp->send_image($destination_path . $file.'.64_na.' . $ext);
+
+                        $this->_createImagenWebLearningPath($origin_path.$lp->preview_image, $destination_path ,$new_filename);
+
                         if ($copy_result) {
                             $lp->preview_image = $new_filename;
                         } else {
@@ -1797,6 +1794,39 @@ class CourseRestorer
                 $this->course->resources[RESOURCE_LEARNPATH][$id]->destination_id = $new_lp_id;
             }
         }
+    }
+
+    /**
+     * function private
+     * add Imagen web of (64px x xxpx)
+     */
+    private function _createImagenWebLearningPath($origin_path_preview_image, $destination_path ,$new_filename)
+    {
+        // 01 - image of 64 : Resize image if it is larger than 64px
+        $temp = new Image($origin_path_preview_image);
+        $picture_infos = $temp->get_image_info();
+        if ($picture_infos['width'] > 64) {
+            $thumbwidth = 64;
+        } else {
+            $thumbwidth = $picture_infos['width'];
+        }
+
+        if ($picture_infos['height'] > 64) {
+            $new_height = 64;
+        } else {
+            $new_height = $picture_infos['height'];
+        }
+
+        $temp->resize($thumbwidth, $new_height, 0);
+        $ext = pathinfo($new_filename, PATHINFO_EXTENSION);
+        $file = substr($new_filename, 0,(strlen($new_filename))-4);
+        $path = $destination_path . $file.'.64.' . $ext; // 53b5a5722da4b.64.jpg
+        $temp->send_image($path);
+
+        // 02 - image : in white and black
+        $temp = new Image($path);
+        $r = $temp->convert2bw();
+        $temp->send_image($destination_path . $file.'.64_na.' . $ext); // 53b5a5722da4b.64_na.jpg
     }
 
     /**

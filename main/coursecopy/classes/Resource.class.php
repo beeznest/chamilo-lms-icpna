@@ -30,6 +30,7 @@ define('RESOURCE_SURVEYINVITATION', 'survey_invitation');
 define('RESOURCE_WIKI', 'wiki');
 define('RESOURCE_THEMATIC', 'thematic');
 define('RESOURCE_ATTENDANCE', 'attendance');
+define('RESOURCE_SEQUENCE', 'sequence');
 
 /**
  * Representation of a resource in a Chamilo-course.

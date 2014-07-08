@@ -8214,13 +8214,13 @@ class learnpath
         $tbl_lp = Database :: get_course_table(TABLE_LP_MAIN);
 
         // get current prerequisite
-        $sql = "SELECT * FROM $tbl_lp WHERE c_id = $course_id AND id = $lp_id ";
+        $sql = "SELECT prerequisite FROM $tbl_lp WHERE c_id = $course_id AND id = $lp_id ";
         $result = Database::query($sql);
         $row = Database :: fetch_array($result);
         $preq_id = $row['prerequisite'];
         $session_id = api_get_session_id();
         $session_condition = api_get_session_condition($session_id);
-        $sql 	= "SELECT * FROM $tbl_lp
+        $sql 	= "SELECT id, name FROM $tbl_lp
                    WHERE c_id = $course_id $session_condition ORDER BY display_order ";
         $rs = Database::query($sql);
         $return = '';

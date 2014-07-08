@@ -1,6 +1,7 @@
 # ide
+.idea/*
 .ide/*
-
+nbproject/*
 
 # files
 main/inc/conf/auth.conf.php
@@ -11,6 +12,5 @@ main/inc/conf/mail.conf.php
 main/inc/conf/portfolio.conf.php
 main/inc/conf/profile.conf.php
 courses/*
+data/*
 
-
-/nbproject/private/

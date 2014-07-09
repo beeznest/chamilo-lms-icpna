@@ -69,7 +69,7 @@ class CourseRestorer
         'links',
         'learnpaths',
         'surveys',
-        //'scorm_documents', ??
+        'scorm_documents', // copy files scorm
         'tool_intro',
         'thematic',
         'wiki',

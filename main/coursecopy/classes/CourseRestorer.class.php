@@ -1890,19 +1890,22 @@ class CourseRestorer
                 //Adding the author's image
                 if (!empty($lp->preview_image)) {
 
-                    if ($this->file_option  == FILE_RENAME){
+                    if($this->file_option == FILE_OVERWRITE) {
+                        $copy_result = copy($origin_path.$lp->preview_image, $destination_path.$lp->preview_image);
+                        $this->_createImagenWebLearningPath($origin_path.$lp->preview_image, $destination_path ,$lp->preview_image);
+                        //$lp->preview_image = ($copy_result) ? $lp->preview_image : '';
+
+                    } else if ($this->file_option  == FILE_RENAME) {
                         $nb = ''; // add numerical suffix to directory if another one of the same number already exists
                         while (file_exists($origin_path.$lp->preview_image.$nb)) {
                             $nb += 1;
                         }
-                        $lp->preview_image = $lp->preview_image.$nb;
+                        $copy_result = copy($origin_path.$lp->preview_image, $destination_path.$lp->preview_image.$nb);
+                        $this->_createImagenWebLearningPath($origin_path.$lp->preview_image, $destination_path ,$lp->preview_image.$nb);
+
                     } else if ($this->file_option  == FILE_SKIP) {
 
                     }
-
-                    $copy_result = copy($origin_path.$lp->preview_image, $lp->preview_image);
-                    $this->_createImagenWebLearningPath($origin_path.$lp->preview_image, $destination_path ,$lp->preview_image);
-                    $lp->preview_image = ($copy_result) ? $lp->preview_image : '';
                 }
 
                 if ($this->add_text_in_items) {

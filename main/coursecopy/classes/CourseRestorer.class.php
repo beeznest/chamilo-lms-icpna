@@ -2425,14 +2425,18 @@ class CourseRestorer
                     "sequence_type_entity_id=".self::DBUTF8escapestring($obj->sequence_type_entity_id).", ".
                     "name = '".self::DBUTF8escapestring($obj->name)."'";
                 $result = Database::query($sql);
-                $new_sequence_row_entity_id = Database::insert_id($result);
-                $this->course->resources[RESOURCE_SEQUENCE][$id]->destination_id = $new_sequence_row_entity_id;
+                if (!$result) {
+                    $this->course->resources[RESOURCE_SEQUENCE][$id]->destination_id = 0;
+                } else {
+                    $new_sequence_row_entity_id = Database::insert_id($result);
+                    $this->course->resources[RESOURCE_SEQUENCE][$id]->destination_id = $new_sequence_row_entity_id;
+                }
             }
 
             // Second, update sequence arrays and insert them in sequence
             foreach ($resources[RESOURCE_SEQUENCE] as $id => $obj) {
                 $previous_sequence = $obj->previous_sequence;
-                if (!is_array($previous_sequence)) {
+                if (!is_array($previous_sequence) || $obj->destination_id == 0) {
                     continue;
                 }
                 foreach ($previous_sequence as $key => $value) {

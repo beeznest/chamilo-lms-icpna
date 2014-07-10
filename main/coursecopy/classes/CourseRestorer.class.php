@@ -1893,7 +1893,6 @@ class CourseRestorer
                     if($this->file_option == FILE_OVERWRITE) {
                         $copy_result = copy($origin_path.$lp->preview_image, $destination_path.$lp->preview_image);
                         $this->_createImagenWebLearningPath($origin_path.$lp->preview_image, $destination_path ,$lp->preview_image);
-                        //$lp->preview_image = ($copy_result) ? $lp->preview_image : '';
 
                     } else if ($this->file_option  == FILE_RENAME) {
                         $nb = ''; // add numerical suffix to directory if another one of the same number already exists

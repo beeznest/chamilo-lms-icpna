@@ -188,7 +188,7 @@ function import_exercise($file)
             $answer->save();
         }
         // delete the temp dir where the exercise was unzipped
-        FileManager::my_delete($baseWorkDir.$uploadPath);
+        my_delete($baseWorkDir.$uploadPath);
         $operation = true;
     }
 
@@ -385,6 +385,10 @@ function startElement($parser, $name, $attributes)
             if ("single" == $attributes['CARDINALITY']) {
                 $exercise_info['question'][$current_question_ident]['type'] = 'MCUA';
                 $cardinality = 'single';
+            }
+            if ("ordered" == $attributes['CARDINALITY']) {
+                $exercise_info['question'][$current_question_ident]['type'] = 'HOT_SPOT';
+                $cardinality = 'ordered';
             }
 
             //needed for FIB

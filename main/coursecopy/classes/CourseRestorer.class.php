@@ -69,7 +69,7 @@ class CourseRestorer
         'links',
         'learnpaths',
         'surveys',
-        //'scorm_documents', ??
+        'scorm_documents', // copy files scorm
         'tool_intro',
         'thematic',
         'wiki',
@@ -966,27 +966,11 @@ class CourseRestorer
                         case FILE_SKIP :
                             break;
                         case FILE_RENAME :
-                            $i = 1;
-
-                            $ext = explode('.', basename($document->path));
-
-                            if (count($ext) > 1) {
-                                $ext = array_pop($ext);
-                                $file_name_no_ext = substr($document->path, 0, - (strlen($ext) + 1));
-                                $ext = '.'.$ext;
-                            } else {
-                                $ext = '';
-                                $file_name_no_ext = $document->path;
+                            $nb = ''; // add numerical suffix to directory if another one of the same number already exists
+                            while (file_exists($path . $document->path . $nb)) {
+                                $nb += 1;
                             }
-
-                            $new_file_name = $file_name_no_ext.'_'.$i.$ext;
-                            $file_exists = file_exists($path.$new_file_name);
-
-                            while ($file_exists) {
-                                $i++;
-                                $new_file_name = $file_name_no_ext.'_'.$i.$ext;
-                                $file_exists = file_exists($path.$new_file_name);
-                            }
+                            $new_file_name = $document->path . $nb;
 
                             rename($this->course->backup_path.'/'.$document->path, $this->course->backup_path.'/'.$new_file_name);
                             copyDirTo($this->course->backup_path.'/'.$new_file_name, $path.dirname($new_file_name), false);
@@ -1866,6 +1850,8 @@ class CourseRestorer
         return $new_id;
     }
 
+
+
     /**
      * Restore learnpaths
      */
@@ -1903,18 +1889,20 @@ class CourseRestorer
 
                 //Adding the author's image
                 if (!empty($lp->preview_image)) {
-                    $new_filename = uniqid('').$new_filename.substr($lp->preview_image, strlen($lp->preview_image) - 7, strlen($lp->preview_image));
-                    if (file_exists($origin_path.$lp->preview_image) && !is_dir($origin_path.$lp->preview_image)) {
-                        $copy_result = copy($origin_path.$lp->preview_image, $destination_path.$new_filename);
 
-                        $this->_createImagenWebLearningPath($origin_path.$lp->preview_image, $destination_path ,$new_filename);
-
-                        if ($copy_result) {
-                            $lp->preview_image = $new_filename;
-                        } else {
-                            $lp->preview_image = '';
+                    if ($this->file_option  == FILE_RENAME){
+                        $nb = ''; // add numerical suffix to directory if another one of the same number already exists
+                        while (file_exists($origin_path.$lp->preview_image.$nb)) {
+                            $nb += 1;
                         }
+                        $lp->preview_image = $lp->preview_image.$nb;
+                    } else if ($this->file_option  == FILE_SKIP) {
+
                     }
+
+                    $copy_result = copy($origin_path.$lp->preview_image, $lp->preview_image);
+                    $this->_createImagenWebLearningPath($origin_path.$lp->preview_image, $destination_path ,$lp->preview_image);
+                    $lp->preview_image = ($copy_result) ? $lp->preview_image : '';
                 }
 
                 if ($this->add_text_in_items) {

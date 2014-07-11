@@ -1895,12 +1895,9 @@ class CourseRestorer
                         $this->_createImagenWebLearningPath($origin_path.$lp->preview_image, $destination_path ,$lp->preview_image);
 
                     } else if ($this->file_option  == FILE_RENAME) {
-                        $nb = ''; // add numerical suffix to directory if another one of the same number already exists
-                        while (file_exists($origin_path.$lp->preview_image.$nb)) {
-                            $nb += 1;
-                        }
-                        $copy_result = copy($origin_path.$lp->preview_image, $destination_path.$lp->preview_image.$nb);
-                        $this->_createImagenWebLearningPath($origin_path.$lp->preview_image, $destination_path ,$lp->preview_image.$nb);
+                        $fileRename = $this->_uniqueFileDir($destination_path, $lp->preview_image);
+                        $copy_result = copy($origin_path.$lp->preview_image, $destination_path.$fileRename);
+                        $this->_createImagenWebLearningPath($origin_path.$lp->preview_image, $destination_path ,$fileRename);
 
                     } else if ($this->file_option  == FILE_SKIP) {
 
@@ -2100,6 +2097,12 @@ class CourseRestorer
      * function private
      * add Imagen web of (64px x xxpx)
      */
+    /**
+     * @param class Image $origin_path_preview_image
+     * @param string s$destination_path
+     * @param string $new_filename
+     * @return void
+     */
     private function _createImagenWebLearningPath($origin_path_preview_image, $destination_path ,$new_filename)
     {
         // 01 - image of 64 : Resize image if it is larger than 64px
@@ -2127,6 +2130,29 @@ class CourseRestorer
         $temp = new Image($path);
         $r = $temp->convert2bw();
         $temp->send_image($destination_path . $file.'.64_na.' . $ext); // 53b5a5722da4b.64_na.jpg
+    }
+
+    /**
+     * @param string $path of directory in location images
+     * @param string $file name include extension
+     * @return string with name unique to exist for this directory
+     * example: apple.jpg or apple_1.jpg or apple_2.jpg
+     */
+    private function _uniqueFileDir($path = '', $file = '')
+    {
+        $path = empty($path) ? __DIR__.'/images/' : $path;
+        $file = empty($file) ? 'example.jpg' : $file;
+
+        $ext = pathinfo($file, PATHINFO_EXTENSION);
+        $fileLessExt = str_replace(".$ext", '', $file);
+
+        $nb = '';
+        $nbCount = 0;
+        while (file_exists($path.$fileLessExt.$nb.".$ext")) {
+            $nbCount += 1;
+            $nb = "_$nbCount";
+        }
+        return $fileLessExt.$nb.".$ext";
     }
 
     /**

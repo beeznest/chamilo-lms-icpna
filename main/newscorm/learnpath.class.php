@@ -2993,12 +2993,13 @@ class learnpath
             // Returns the type of classes by state Lesson
             $class_name = array (
                 'not attempted' => 'scorm-status-not-attempted',
-                'incomplete'    => 'scorm-status-not-attempted',
-                'failed'        => 'scorm-status-failed',
-                'completed'     => 'scorm-status-completed',
-                'passed'        => 'scorm-status-completed',
-                'succeeded'     => 'scorm-status-completed',
-                'browsed'       => 'scorm-status-completed',
+                'incomplete' => 'scorm-status-not-attempted',
+                'failed' => 'scorm-status-failed',
+                'completed' => 'scorm-status-completed',
+                'passed' => 'scorm-status-completed',
+                'succeeded' => 'scorm-status-completed',
+                'browsed' => 'scorm-status-completed',
+                'failed' => 'scorm-status-not-attempted'
             );
 
             $add_class = 'scorm-status-not-attempted';

@@ -60,6 +60,7 @@ if (CONFIG_SYS_VIEW_ONLY || !CONFIG_OPTIONS_DELETE) {
             } else {
                 $file->delete(addTrailingSlash(backslashToSlash($_GET['delete']))); //deleted by ajaxfilemanager
                 event_system(LOG_USER_PERSONAL_DOC_DELETED, 'document_path', addTrailingSlash(backslashToSlash($_GET['delete'])));
+                event_system(LOG_MY_FOLDER_DELETE, LOG_MY_FOLDER_PATH, $_GET['delete']);
             }
             //////end bridge to Chamilo
             $file->delete(addTrailingSlash(backslashToSlash($_GET['delete'])));
@@ -98,6 +99,7 @@ if (CONFIG_SYS_VIEW_ONLY || !CONFIG_OPTIONS_DELETE) {
             } else {
                 $file->delete($_GET['delete']); //deleted by ajaxfilemanager
                 event_system(LOG_USER_PERSONAL_DOC_DELETED, 'document_path', $_GET['delete']);
+                event_system(LOG_MY_FOLDER_DELETE, LOG_MY_FOLDER_PATH, $_GET['delete']);
             }
             //////end bridge to Chamilo
         }
@@ -151,6 +153,7 @@ if (CONFIG_SYS_VIEW_ONLY || !CONFIG_OPTIONS_DELETE) {
                     } else {
                         $file->delete(addTrailingSlash(backslashToSlash($doc))); //deleted by ajaxfilemanager
                         event_system(LOG_USER_PERSONAL_DOC_DELETED, 'document_path', addTrailingSlash(backslashToSlash($doc)));
+                        event_system(LOG_MY_FOLDER_DELETE, LOG_MY_FOLDER_PATH, $doc);
                     }
                     //////end bridge to Chamilo
                 } elseif (is_file($doc)
@@ -189,6 +192,7 @@ if (CONFIG_SYS_VIEW_ONLY || !CONFIG_OPTIONS_DELETE) {
                     } else {
                         $file->delete($doc); //deleted by ajaxfilemanager
                         event_system(LOG_USER_PERSONAL_DOC_DELETED, 'document_path', $doc);
+                        event_system(LOG_MY_FOLDER_DELETE, LOG_MY_FOLDER_PATH, $doc);
                     }
                     //////end bridge to Chamilo
                 }

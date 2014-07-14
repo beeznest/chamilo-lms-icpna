@@ -37,6 +37,7 @@ if (CONFIG_SYS_VIEW_ONLY || !CONFIG_OPTIONS_NEWFOLDER) {
     include_once CLASS_FILE;
     $file = new file();
     if ($file->mkdir(addTrailingSlash($_POST['currentFolderPath']) . $_POST['new_folder'], 0775)) {
+        event_system(LOG_MY_FOLDER_CREATE, LOG_MY_FOLDER_PATH, $_POST['currentFolderPath'] . $_POST['new_folder']);
         include_once CLASS_MANAGER;
         $manager = new manager(addTrailingSlash($_POST['currentFolderPath']) . $_POST['new_folder'], false);
         $pathInfo = $manager->getFolderInfo(addTrailingSlash($_POST['currentFolderPath']) . $_POST['new_folder']);

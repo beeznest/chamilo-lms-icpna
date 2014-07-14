@@ -11,6 +11,7 @@ require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "inc" . DIRECTORY_SEPARAT
 echo "{";
 $error = "";
 $info = "";
+$fullPath = '';
 
 include_once CLASS_UPLOAD ;
 $upload = new Upload();
@@ -91,7 +92,10 @@ if(CONFIG_SYS_VIEW_ONLY || !CONFIG_OPTIONS_UPLOAD) {
 		}
 		$info .= sprintf(", url:'%s'",  getFileUrl($path));
 		$info .= sprintf(", tipedit:'%s'",  TIP_DOC_RENAME);
-	} else {
+        // Log to TRACK_E_DEFAULT
+        event_system(LOG_MY_FOLDER_UPLOAD, LOG_MY_FOLDER_PATH, $fullPath);
+
+    } else {
 		$error = ERR_FILE_NOT_AVAILABLE;
 	}
 }

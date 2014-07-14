@@ -173,6 +173,14 @@ define('LOG_CAREER_DELETE',                     'career_deleted');
 
 define('LOG_USER_PERSONAL_DOC_DELETED',         'user_doc_deleted');
 
+define('LOG_MY_FOLDER_CREATE',                  'my_folder_created');
+define('LOG_MY_FOLDER_CHANGE',                  'my_folder_changed');
+define('LOG_MY_FOLDER_DELETE',                  'my_folder_deleted');
+define('LOG_MY_FOLDER_COPY',                    'my_folder_copied');
+define('LOG_MY_FOLDER_CUT',                     'my_folder_cut');
+define('LOG_MY_FOLDER_PASTE',                   'my_folder_pasted');
+define('LOG_MY_FOLDER_UPLOAD',                  'my_folder_uploaded');
+
 // Event logs data types
 define('LOG_COURSE_CODE',                       'course_code');
 define('LOG_USER_ID',                           'user_id');
@@ -188,6 +196,9 @@ define('LOG_PROMOTION_ID',                      'promotion_id');
 define('LOG_GRADEBOOK_LOCKED',                   'gradebook_locked');
 define('LOG_GRADEBOOK_UNLOCKED',                 'gradebook_unlocked');
 define('LOG_GRADEBOOK_ID',                       'gradebook_id');
+
+define('LOG_MY_FOLDER_PATH',                    'path');
+define('LOG_MY_FOLDER_NEW_PATH',                'new_path');
 
 define('USERNAME_PURIFIER', '/[^0-9A-Za-z_\.]/');
 

@@ -22,13 +22,19 @@
 	{
 		$error = ERR_FOLDER_PATH_NOT_ALLOWED;
 	}else 
-	{		
+	{
+        $_POST['action_value'] = Security::remove_XSS($_POST['action_value']);
+        $_POST['currentFolderPath'] = Security::remove_XSS($_POST['currentFolderPath']);
+        $_POST['selectedDoc'] = Security::remove_XSS($_POST['selectedDoc']);
 		require_once(CLASS_SESSION_ACTION);
 		$sessionAction = new SessionAction();
 		$sessionAction->setAction($_POST['action_value']);
 		$sessionAction->setFolder($_POST['currentFolderPath']);
 		$sessionAction->set($_POST['selectedDoc']);
 		$info = ',num:' . sizeof($_POST['selectedDoc']);
-	}
+        foreach ($_POST['selectedDoc'] as $doc) {
+            event_system(LOG_MY_FOLDER_COPY, LOG_MY_FOLDER_PATH, $doc);
+        }
+    }
 	echo "{error:'" . $error .  "'\n" . $info . "}";
 ?>

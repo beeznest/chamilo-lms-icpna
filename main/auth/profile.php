@@ -326,7 +326,6 @@ function is_profile_editable() {
  */
 function upload_user_production($user_id) {
 	$image_path = UserManager::get_user_picture_path_by_id($user_id, 'system');
-
 	$production_repository = $image_path['dir'];
 
 	if (!file_exists($production_repository)) {

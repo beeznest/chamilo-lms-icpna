@@ -298,6 +298,7 @@ class Template {
     private function set_system_parameters() {
         global $_configuration;
         $objTracking = new Tracking();
+        $sessionId = api_get_session_id();
         //Setting app paths/URLs
         $_p = array(
             'web' => api_get_path(WEB_PATH),
@@ -308,7 +309,7 @@ class Template {
             'web_img' => api_get_path(WEB_IMG_PATH),
             'web_plugin' => api_get_path(WEB_PLUGIN_PATH),
             'web_lib' => api_get_path(WEB_LIBRARY_PATH),
-            'is_in_branch' => $objTracking->isInBranch($_SESSION['id_session']),
+            'is_in_branch' => $objTracking->isInBranch($sessionId),
             'count_active_in' => $objTracking->countActiveTeacherIn(),
         );
         $this->assign('_p', $_p);

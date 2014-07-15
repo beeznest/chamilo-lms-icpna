@@ -29,15 +29,46 @@ require_once 'learnpathItem.class.php';
  * Display initialisation and security checks
  */
 // Extra javascript functions for in html head:
-$htmlHeadXtra[] =
-    "<script>
+$htmlHeadXtra[] = "<script>
 function confirmation(name) {
-    if (confirm(\" ".trim(get_lang('AreYouSureToDelete'))." \"+name+\"?\"))
-        {return true;}
-    else
-        {return false;}
+    if (confirm(\" " . trim(get_lang('AreYouSureToDelete')) . " \"+name+\"?\")) {
+        return true;
+    } else {
+        return false;
+    }
 }
-</script>";
+
+var icons = {
+    header: 'ui-icon-circle-arrow-e',
+    headerSelected: 'ui-icon-circle-arrow-s'
+};
+
+
+
+$(function() {
+    $('#category_accordion').accordion({
+		icons: icons,
+        autoHeight: false,
+        active: false, // all items closed by default
+        collapsible: true,
+		header: '.page-header'
+	});
+});
+
+</script>
+<style>
+#category_accordion .page-header {
+    height: 40px;
+    margin-bottom: 5px;
+}
+.ui-state-highlight { height: 30px; line-height: 1.2em; }
+/*Fixes edition buttons*/
+.ui-accordion-icons .ui-accordion-header .edition a {
+    padding-left:4px;
+}
+</style>
+
+";
 $nameTools = get_lang('LearningPaths');
 event_access_tool(TOOL_LEARNPATH);
 
@@ -113,7 +144,6 @@ if ($is_allowed_to_edit) {
 
 /* DISPLAY SCORM LIST */
 
-
 $categories_temp = learnpath::get_categories(api_get_course_int_id());
 
 $category_test = new Entity\EntityCLpCategory;
@@ -130,8 +160,18 @@ if (!empty($categories_temp)) {
 $test_mode = api_get_setting('server_type');
 
 $lp_showed = false;
+$counterCategories = 1;
+$total = count($categories);
+$isCoach = api_is_coach();
+if (api_is_course_admin()) {
+    $isCoach = false;
+}
 
+echo '<div id="category_accordion">';
 foreach ($categories as $item) {
+    $moveUpLink = null;
+    $moveDownLink = null;
+
     $categoryId = $item->getId();
     $list = new LearnpathList(
         api_get_user_id(),
@@ -146,6 +186,7 @@ foreach ($categories as $item) {
     if (empty($flat_list) && $categoryId == 0) {
         continue;
     }
+
     $edit_link = null;
     $delete_link = null;
     /*    if ($item->getId() > 0) {
@@ -161,10 +202,9 @@ foreach ($categories as $item) {
         }
     */
 
-    if ($item->getId() > 0 && api_is_allowed_to_edit() && !api_is_coach()) {
+    if ($item->getId() > 0 && api_is_course_admin()) {
         $url = 'lp_controller.php?' . api_get_cidreq(
             ) . '&action=add_lp_category&id=' . $item->getId();
-
         $edit_link = Display::url(
             Display::return_icon('edit.png', get_lang('Edit')),
             $url
@@ -206,10 +246,46 @@ foreach ($categories as $item) {
         $counterCategories++;
     }
 
-    echo Display::page_subheader2(
-        $item->getName(
-        ) . $edit_link . $moveUpLink . $moveDownLink . $delete_link
+    //echo '<div class="group-category">';
+    $title = Display::div(
+        Display::div(
+            $item->getName(),
+            array('class' => 'float:right')
+        ),
+        array('style' => 'width:50%; float:left; padding-top:9px;padding-left:28px')
     );
+
+    $actions = Display::div(
+        Display::div(
+            $edit_link,
+            array('style' => 'float:left; padding:0px; margin:0px')
+        ) .
+        Display::div(
+            $moveUpLink,
+            array('style' => 'float:left; padding:0px; margin:0px')
+        ) .
+        Display::div(
+            $moveDownLink,
+            array('style' => 'float:left; padding:0px; margin:0px')
+        ) .
+        Display::div(
+            $delete_link,
+            array('style' => 'float:left; padding:0px; margin:0px')
+        ),
+        //. . .,
+        array(
+            'class' => 'edition',
+            'style' => 'width:150px; right:10px; margin-top: 0px; position: absolute; top: 10%;'
+        )
+    );
+
+    echo '<div class="page-header" >' .
+        $title .
+        $actions;
+    echo '</div>';
+
+
+    echo '<div>';
 
     if (!empty($flat_list)) {
         echo '<table class="data_table">';
@@ -442,6 +518,9 @@ foreach ($categories as $item) {
                 }
 
 
+                //Copy
+
+
                 /* Export */
 
                 if ($details['lp_type'] == 1) {
@@ -452,8 +531,16 @@ foreach ($categories as $item) {
                     $dsp_disk = Display::return_icon('cd_gray.gif', get_lang('Export'), array(), ICON_SIZE_SMALL);
                 }
 
-                //Copy
-                $copy = Display::url(Display::return_icon('cd_copy.png', get_lang('Copy'), array(), ICON_SIZE_SMALL), api_get_self()."?".api_get_cidreq()."&action=copy&lp_id=$id");
+
+                $copy = Display::url(
+                    Display::return_icon(
+                        'cd_copy.png',
+                        get_lang('Copy'),
+                        array(),
+                        ICON_SIZE_SMALL
+                    ),
+                    api_get_self() . "?" . api_get_cidreq() . "&action=copy&lp_id=$id"
+                );
 
                 /* Auto Lunch LP code */
                 $lp_auto_lunch_icon = '';
@@ -469,16 +556,31 @@ foreach ($categories as $item) {
                 }
 
                 //if (api_get_setting('pdf_export_watermark_enable') == 'true') {
-                $export_icon = ' <a href="'.api_get_self().'?'.api_get_cidreq().'&action=export_to_pdf&lp_id='.$id.'">
-				  '.Display::return_icon('pdf.png', get_lang('ExportToPDFOnlyHTMLAndImages'), '', ICON_SIZE_SMALL).'</a>';
+
+                $export_icon = ' <a href="' . api_get_self(
+                    ) . '?' . api_get_cidreq(
+                    ) . '&action=export_to_pdf&lp_id=' . $id . '">
+                  ' . Display::return_icon(
+                        'pdf.png',
+                        get_lang('ExportToPDFOnlyHTMLAndImages'),
+                        '',
+                        ICON_SIZE_SMALL
+                    ) . '</a>';
                 //}
 
                 /* DELETE COMMAND */
 
                 if ($current_session == $details['lp_session']) {
-                    $dsp_delete = "<a href=\"lp_controller.php?".api_get_cidreq()."&action=delete&lp_id=$id\" ".
-                        "onclick=\"javascript: return confirmation('".addslashes($name)."');\">".
-                        Display::return_icon('delete.png', get_lang('LearnpathDeleteLearnpath'), '', ICON_SIZE_SMALL).'</a>';
+                    $dsp_delete = "<a href=\"lp_controller.php?" . api_get_cidreq(
+                        ) . "&action=delete&lp_id=$id\" " . "onclick=\"javascript: return confirmation('" . addslashes(
+                            $name
+                        ) . "');\">" .
+                        Display::return_icon(
+                            'delete.png',
+                            get_lang('LearnpathDeleteLearnpath'),
+                            '',
+                            ICON_SIZE_SMALL
+                        ) . '</a>';
                 } else {
                     $dsp_delete = Display::return_icon('delete_na.png', get_lang('LearnpathDeleteLearnpath'), '', ICON_SIZE_SMALL);
                 }
@@ -516,6 +618,24 @@ foreach ($categories as $item) {
                 $export_icon = ' <a href="'.api_get_self().'?'.api_get_cidreq().'&action=export_to_pdf&lp_id='.$id.'">'.Display::return_icon('pdf.png', get_lang('ExportToPDF'), '', ICON_SIZE_SMALL).'</a>';
             }
 
+            if ($isCoach) {
+                $dsp_edit_lp = null;
+                $dsp_export = null;
+                //$dsp_edit = null;
+                $dsp_build = null;
+
+                //$dsp_visible.
+                $dsp_publish = null;
+                $dsp_reinit = null;
+                $dsp_default_view = null;
+                $dsp_debug = null;
+                $dsp_disk = null;
+                $copy = null;
+                $lp_auto_lunch_icon = null;
+                $export_icon = null;
+                $dsp_delete = null;
+            }
+
             echo $dsp_line.$start_time.$end_time.$dsp_progress.$dsp_desc.$dsp_export.$dsp_edit.$dsp_build.$dsp_edit_lp.$dsp_visible.$dsp_publish.$dsp_reinit.
             $dsp_default_view.$dsp_debug.$dsp_disk.$copy.$lp_auto_lunch_icon.$export_icon.$dsp_delete.$dsp_order.$dsp_edit_close;
             $lp_showed = true;
@@ -525,7 +645,10 @@ foreach ($categories as $item) {
         } // end foreach ($flat_list)
         // TODO: Erint some user-friendly message if counter is still = 0 to tell nothing can be display yet.
         echo "</table>";
+    } else {
+        echo get_lang('NoDataAvailable');
     }
+    echo '</div>';
 }
 
 if ($is_allowed_to_edit && $lp_showed == false) {
@@ -537,10 +660,12 @@ if ($is_allowed_to_edit && $lp_showed == false) {
     echo '</div>';
     echo '</div>';
 }
+echo '</div>';
+
 $course_info = api_get_course_info();
 learnpath::generate_learning_path_folder($course_info);
 
 //Deleting the objects
-    Session::erase('oLP');
-    Session::erase('lpobject');
-    Display::display_footer();
+Session::erase('oLP');
+Session::erase('lpobject');
+Display::display_footer();

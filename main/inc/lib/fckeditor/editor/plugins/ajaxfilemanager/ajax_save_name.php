@@ -36,6 +36,9 @@
 		$error = ERR_RENAME_FAILED;
 	}else 
 	{
+        $_POST['original_path'] = isset($_POST['original_path'])?
+            Security::remove_XSS($_POST['original_path']) :
+            '';
 		//update record of session if image exists in session for cut or copy
 		include_once(CLASS_SESSION_ACTION);
 		$sessionAction = new SessionAction();		
@@ -62,14 +65,16 @@
 			$fileInfo['mtime'] = date(DATE_TIME_FORMAT,$fileInfo['mtime']);
 		}else
 		{
-			include_once(CLASS_MANAGER);
-			$manager = new manager($path, false);
-			$fileInfo = $manager->getFolderInfo();
-			$fileInfo['mtime'] = date(DATE_TIME_FORMAT,$fileInfo['mtime']);
-		}
-	}
-	
-	echo "{";
+            include_once(CLASS_MANAGER);
+            $manager = new manager($path, false);
+            $fileInfo = $manager->getFolderInfo();
+            $fileInfo['mtime'] = date(DATE_TIME_FORMAT,$fileInfo['mtime']);
+        }
+        event_system(LOG_MY_FOLDER_CHANGE, LOG_MY_FOLDER_PATH, $_POST['original_path']);
+        event_system(LOG_MY_FOLDER_CHANGE, LOG_MY_FOLDER_NEW_PATH, $path);
+    }
+
+echo "{";
 	echo "error:'" . $error . "' ";
 	foreach ($fileInfo as $k=>$v)
 	{

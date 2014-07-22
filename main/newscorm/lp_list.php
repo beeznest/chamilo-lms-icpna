@@ -95,6 +95,7 @@ Display::display_introduction_section(TOOL_LEARNPATH, array(
 );
 
 $is_allowed_to_edit = api_is_allowed_to_edit(null, true);
+$is_platform_admin = api_is_platform_admin();
 
 if ($is_allowed_to_edit) {
     /* DIALOG BOX SECTION */
@@ -202,7 +203,7 @@ foreach ($categories as $item) {
         }
     */
 
-    if ($item->getId() > 0 && api_is_course_admin()) {
+    if ($item->getId() > 0 && $is_platform_admin && api_get_session_id() == 0) {
         $url = 'lp_controller.php?' . api_get_cidreq(
             ) . '&action=add_lp_category&id=' . $item->getId();
         $edit_link = Display::url(
@@ -507,7 +508,7 @@ foreach ($categories as $item) {
 
                 /*  DEBUG  */
 
-                if ($test_mode == 'test' or api_is_platform_admin()) {
+                if ($test_mode == 'test' or $is_platform_admin) {
                     if ($details['lp_scorm_debug'] == 1) {
                         $dsp_debug = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_scorm_debug&lp_id='.$id.'">'.
                             Display::return_icon('bug.png', get_lang('HideDebug'), '', ICON_SIZE_SMALL).'</a>';
@@ -523,24 +524,34 @@ foreach ($categories as $item) {
 
                 /* Export */
 
-                if ($details['lp_type'] == 1) {
+                if ($is_platform_admin && $details['lp_type'] == 1) {
                     $dsp_disk = Display::url(Display::return_icon('cd.gif', get_lang('Export'), array(), ICON_SIZE_SMALL), api_get_self()."?".api_get_cidreq()."&action=export&lp_id=$id");
-                } elseif ($details['lp_type'] == 2) {
+                } elseif ($is_platform_admin && $details['lp_type'] == 2) {
                     $dsp_disk = Display::url(Display::return_icon('cd.gif', get_lang('Export'), array(), ICON_SIZE_SMALL), api_get_self()."?".api_get_cidreq()."&action=export&lp_id=$id&export_name=".replace_dangerous_char($name, 'strict').".zip");
                 } else {
                     $dsp_disk = Display::return_icon('cd_gray.gif', get_lang('Export'), array(), ICON_SIZE_SMALL);
                 }
 
 
-                $copy = Display::url(
-                    Display::return_icon(
-                        'cd_copy.png',
+
+                if ($is_platform_admin) {
+                    $copy = Display::url(
+                        Display::return_icon(
+                            'cd_copy.png',
+                            get_lang('Copy'),
+                            array(),
+                            ICON_SIZE_SMALL
+                        ),
+                        api_get_self() . "?" . api_get_cidreq() . "&action=copy&lp_id=$id"
+                    );
+                } else {
+                    $copy = Display::return_icon(
+                        'cd_copy_na.png',
                         get_lang('Copy'),
                         array(),
                         ICON_SIZE_SMALL
-                    ),
-                    api_get_self() . "?" . api_get_cidreq() . "&action=copy&lp_id=$id"
-                );
+                    );
+                }
 
                 /* Auto Lunch LP code */
                 $lp_auto_lunch_icon = '';
@@ -557,20 +568,30 @@ foreach ($categories as $item) {
 
                 //if (api_get_setting('pdf_export_watermark_enable') == 'true') {
 
-                $export_icon = ' <a href="' . api_get_self(
-                    ) . '?' . api_get_cidreq(
-                    ) . '&action=export_to_pdf&lp_id=' . $id . '">
+                if ($is_platform_admin) {
+                    $export_icon = ' <a href="' . api_get_self(
+                        ) . '?' . api_get_cidreq(
+                        ) . '&action=export_to_pdf&lp_id=' . $id . '">
                   ' . Display::return_icon(
-                        'pdf.png',
-                        get_lang('ExportToPDFOnlyHTMLAndImages'),
-                        '',
-                        ICON_SIZE_SMALL
-                    ) . '</a>';
+                            'pdf.png',
+                            get_lang('ExportToPDFOnlyHTMLAndImages'),
+                            '',
+                            ICON_SIZE_SMALL
+                        ) . '</a>';
+
+                } else {
+                    $export_icon = Display::return_icon(
+                            'pdf_na.png',
+                            get_lang('ExportToPDFOnlyHTMLAndImages'),
+                            '',
+                            ICON_SIZE_SMALL
+                        );
+                }
                 //}
 
                 /* DELETE COMMAND */
 
-                if ($current_session == $details['lp_session']) {
+                if ($current_session == $details['lp_session'] && $is_platform_admin) {
                     $dsp_delete = "<a href=\"lp_controller.php?" . api_get_cidreq(
                         ) . "&action=delete&lp_id=$id\" " . "onclick=\"javascript: return confirmation('" . addslashes(
                             $name
@@ -582,9 +603,12 @@ foreach ($categories as $item) {
                             ICON_SIZE_SMALL
                         ) . '</a>';
                 } else {
-                    $dsp_delete = Display::return_icon('delete_na.png', get_lang('LearnpathDeleteLearnpath'), '', ICON_SIZE_SMALL);
+                    $dsp_delete = Display::return_icon('delete_na.png',
+                        get_lang('LearnpathDeleteLearnpath'),
+                        '',
+                        ICON_SIZE_SMALL
+                    );
                 }
-
 
                 /* COLUMN ORDER	 */
 

@@ -665,7 +665,7 @@ color: #fff;
 /*ESTILO PARA MODULO SCORM*/
 .redimension-scorm{
   min-height: 600px;
-  width:100%;
+  width: 900px;
 }
 #learning_path_left_zone {
     float: left;

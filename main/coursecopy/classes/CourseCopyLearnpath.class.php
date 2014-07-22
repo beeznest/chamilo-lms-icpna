@@ -9,86 +9,86 @@ class CourseCopyLearnpath extends Resource {
 	/**
 	 * Type of learnpath (can be dokeos (1), scorm (2), aicc (3))
 	 */
-	var $lp_type;
+	public $lp_type;
 	/**
 	 * The name
 	 */
-	var $name;
+	public $name;
 	/**
 	 * The reference
 	 */
-	var $ref;
+	public $ref;
 	/**
 	 * The description
 	 */
-	var $description;
+	public $description;
 	/**
 	 * Path to the learning path files
 	 */
-	var $path;
+	public $path;
 	/**
 	 * Whether additional commits should be forced or not
 	 */
-	var $force_commit;
+	public $force_commit;
 	/**
 	 * View mode by default ('embedded' or 'fullscreen')
 	 */
-	var $default_view_mod;
+	public $default_view_mod;
 	/**
 	 * Default character encoding
 	 */
-	var $default_encoding;
+	public $default_encoding;
 	/**
 	 * Display order
 	 */
-	var $display_order;
+	public $display_order;
 	/**
 	 * Content editor/publisher
 	 */
-	var $content_maker;
+	public $content_maker;
 	/**
 	 * Location of the content (local or remote)
 	 */
-	var $content_local;
+	public $content_local;
 	/**
 	 * License of the content
 	 */
-	var $content_license;
+	public $content_license;
 	/**
 	 * Whether to prevent reinitialisation or not
 	 */
-	var $prevent_reinit;
+	public $prevent_reinit;
 	/**
 	 * JavaScript library used
 	 */
-	var $js_lib;
+	public $js_lib;
 	/**
 	 * Debug level for this lp
 	 */
-	var $debug;
+	public $debug;
 	/**
 	 * The items
 	 */
-	var $items;
+	public $items;
 	/**
 	 * The learnpath visibility on the homepage
 	 */
-	var $visibility;
+	public $visibility;
 	
 	/**
 	 * Author info
 	 */
-	var $author;
+	public $author;
 	
 	/**
 	 * Author's image
 	 */
-	var $preview_image;
+	public $preview_image;
 
     /**
      * @var Serious Game Mode to use sequence rules
      */
-    var $seriousgame_mode;
+    public $seriousgame_mode;
 
 	/**
 	 * Create a new learnpath

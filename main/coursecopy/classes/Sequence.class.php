@@ -10,17 +10,17 @@ class CourseCopySequence extends Resource {
 		
 	var $prerequisites = array();
 
-    var $sequence_type_entity_id;
+    public $sequence_type_entity_id;
 
-    var $c_id;
+    public $c_id;
 
-    var $row_id;
+    public $row_id;
 
-    var $name;
+    public $name;
 
-    var $previous;
+    public $previous;
 
-    var $next;
+    public $next;
 
 	/**
 	 * Create a new Thematic

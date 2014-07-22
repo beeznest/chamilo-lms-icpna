@@ -6,7 +6,9 @@
 
 require_once '../global.inc.php';
 
-api_protect_admin_script();
+if (!api_is_session_admin()) {
+    api_protect_admin_script();
+}
 
 $action = isset($_REQUEST['a']) ? $_REQUEST['a'] : null;
 

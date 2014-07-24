@@ -711,7 +711,7 @@ class CourseHome {
                         'id' => 'tooldesc_' . $tool["id"],
                         'class' => $class,
                         'href' => 'javascript: void(0);',
-                        'onclick' => 'javascript: window.open(\'' . $tool['link'] . '\',\'window_chat' . $_SESSION['_cid'] . '\',config=\'height=\'+380+\', width=\'+625+\', left=2, top=2, toolbar=no, menubar=no, scrollbars=yes, resizable=yes, location=no, directories=no, status=no\')',
+                        'onclick' => 'javascript: window.open(\'' . $tool['link'] . '\',\'window_chat' . $_SESSION['_cid'] . '\',config=\'height=\'+700+\', width=\'+625+\', left=2, top=2, toolbar=no, menubar=no, scrollbars=yes, resizable=yes, location=no, directories=no, status=no\')',
                         'target' => $tool['target']
                     );
                 } else {

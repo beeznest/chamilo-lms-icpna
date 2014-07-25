@@ -120,8 +120,7 @@ class learnpathItem {
 		}
 		$this->save_on_close = true;
 		$this->db_id = $id;
-        //$this->seriousgame_mode = $this->get_seriousgame_mode();
-        $this->seriousgame_mode = 0;
+        $this->seriousgame_mode = $this->get_seriousgame_mode();
 
 		// Get search_did.
 		if (api_get_setting('search_enabled') == 'true') {
@@ -2340,6 +2339,7 @@ class learnpathItem {
              }
          }
 
+         // @TODO Check why use seriousgame_mode condition?
          if ((($save === false && $this->type == 'sco') ||
                 ($this->type == 'sco' && ($credit == 'no-credit' OR $mode == 'review' OR $mode == 'browse'))
             ) && ($this->seriousgame_mode != 1 && $this->type == 'sco')

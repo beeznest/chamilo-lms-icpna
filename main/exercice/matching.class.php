@@ -1,5 +1,6 @@
 <?php
 /* For licensing terms, see /license.txt */
+
 /**
  * CLASS Matching
  *
@@ -9,14 +10,6 @@
  * @author Eric Marguin
  * @package chamilo.exercise
  **/
-/**
- * Code
- */
-
-/**
- * Matching questions type class
- * @package chamilo.exercise
- */
 class Matching extends Question
 {
     static $typePicture = 'matching.gif';
@@ -25,7 +18,7 @@ class Matching extends Question
     /**
      * Constructor
      */
-    function Matching()
+    public function Matching()
     {
         parent::question();
         $this->type      = MATCHING;
@@ -33,10 +26,10 @@ class Matching extends Question
     }
 
     /**
-     * function which redifines Question::createAnswersForm
-     * @param the formvalidator instance
+     * function which redefines Question::createAnswersForm
+     * @param the FormValidator instance
      */
-    function createAnswersForm($form)
+    public function createAnswersForm($form)
     {
         $defaults       = array();
         $navigator_info = api_get_navigator();
@@ -125,7 +118,18 @@ class Matching extends Question
             $puce->freeze();
             $group[] = $puce;
 
-            $group[] = $form->createElement('text', 'answer['.$i.']', null, 'size="60" style="margin-left: 0em;"');
+            //$group[] = $form->createElement('text', 'answer['.$i.']', null, 'size="60" style="margin-left: 0em;"');
+            $group[] = $form->createElement(
+                'html_editor',
+                'answer[' . $i . ']',
+                null,
+                'style="vertical-align:middle"',
+                array(
+                    'ToolbarSet' => 'TestProposedAnswer',
+                    'Width' => '100%',
+                    'Height' => '100'
+                )
+            );
             $group[] = $form->createElement('select', 'matches['.$i.']', null, $a_matches);
             $group[] = $form->createElement(
                 'text',
@@ -184,7 +188,19 @@ class Matching extends Question
             $puce  = $form->createElement('text', null, null, 'value="'.chr(64 + $i).'"');
             $puce->freeze();
             $group[] = $puce;
-            $group[] = $form->createElement('text', 'option['.$i.']', null, array('class' => 'span6'));
+            //$group[] = $form->createElement('text', 'option['.$i.']', null, array('class' => 'span6'));
+            $group[] = $form->createElement(
+                'html_editor',
+                'option[' . $i . ']',
+                null,
+                'style="vertical-align:middle"',
+                array(
+                    'ToolbarSet' => 'TestProposedAnswer',
+                    'Width' => '100%',
+                    'Height' => '100'
+                )
+            );
+
             $form->addGroup($group, null, null, '</td><td>');
             $form->addElement('html', '</td></tr>');
         }

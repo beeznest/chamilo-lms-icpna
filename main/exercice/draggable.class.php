@@ -1,5 +1,6 @@
 <?php
 /* For licensing terms, see /license.txt */
+
 /**
  * CLASS Draggable
  *
@@ -9,14 +10,6 @@
  * @author Julio Montoya
  * @package chamilo.exercise
  **/
-/**
- * Code
- */
-
-/**
- * Matching questions type class
- * @package chamilo.exercise
- */
 class Draggable extends Matching
 {
     static $typePicture = 'matching.gif';
@@ -25,7 +18,7 @@ class Draggable extends Matching
     /**
      * Constructor
      */
-    function Draggable()
+    public function Draggable()
     {
         parent::question();
         $this->type      = DRAGGABLE;
@@ -33,8 +26,8 @@ class Draggable extends Matching
     }
 
     /**
-     * function which redifines Question::createAnswersForm
-     * @param the formvalidator instance
+     * function which redefines Question::createAnswersForm
+     * @param the FormValidator instance
      */
     public function createAnswersForm($form)
     {
@@ -100,11 +93,10 @@ class Draggable extends Matching
         // DISPLAY MATCHES
         $html = '<table class="data_table">
 					<tr>
-
-						<th width="40%">
+						<th width="60%">
 							'.get_lang('Answer').'
 						</th>
-						<th width="40%">
+						<th width="20%">
 							'.get_lang('MatchesTo').'
 						</th>
 						<th width="50px">
@@ -122,11 +114,18 @@ class Draggable extends Matching
         for ($i = 1; $i <= $nb_matches; ++$i) {
             $form->addElement('html', '<tr><td>');
             $group = array();
-            /*$puce  = $form->createElement('text', null, null, 'value="'.$i.'"');
-            $puce->freeze();
-            $group[] = $puce;*/
 
-            $group[] = $form->createElement('text', 'answer['.$i.']', null, ' size="60" style="margin-left: 0em;"');
+            $group[] = $form->createElement(
+                'html_editor',
+                'answer[' . $i . ']',
+                null,
+                'style="vertical-align:middle"',
+                array(
+                    'ToolbarSet' => 'TestProposedAnswer',
+                    'Width' => '100%',
+                    'Height' => '100'
+                )
+            );
             $group[] = $form->createElement('select', 'matches['.$i.']', null, $a_matches);
             $group[] = $form->createElement(
                 'text',

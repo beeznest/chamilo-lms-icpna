@@ -2330,8 +2330,12 @@ class learnpathItem {
          $rs_verified = Database::query($sql_verified);
 		$row_verified = Database::fetch_array($rs_verified);
 
-   		$my_case_completed = array('completed', 'passed', 'browsed'); // Added by Isaac Flores. // Remove 'failed' - see BT#8443
-
+         if (!empty($_configuration['kids'])) {
+             // Remove 'failed' from status completed array - see BT#8443
+             $my_case_completed = array('completed', 'passed', 'browsed');
+         } else {
+             $my_case_completed = array('completed', 'passed', 'browsed', 'failed'); // Added by Isaac Flores.
+         }
         $save = true;
 
         if (isset($row_verified) && isset($row_verified['status'])) {

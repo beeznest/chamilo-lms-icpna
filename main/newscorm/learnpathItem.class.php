@@ -120,7 +120,8 @@ class learnpathItem {
 		}
 		$this->save_on_close = true;
 		$this->db_id = $id;
-        $this->seriousgame_mode = $this->get_seriousgame_mode();
+        //$this->seriousgame_mode = $this->get_seriousgame_mode();
+        $this->seriousgame_mode = 0;
 
 		// Get search_did.
 		if (api_get_setting('search_enabled') == 'true') {
@@ -310,18 +311,23 @@ class learnpathItem {
 	public function get_credit() {
 		if (self::debug > 1) {error_log('learnpathItem::get_credit()', 0); }
 		$credit = 'credit';
-		// Now check the value of prevent_reinit (if it's 0, return credit as the default was).
-		if ($this->get_prevent_reinit() != 0) { // If prevent_reinit == 1 (or more).
-			// If status is not attempted or incomplete, credit anyway. Otherwise:
-			// Check the status in the database rather than in the object, as checking in the object
-			// would always return "no-credit" when we want to set it to completed.
-			$status = $this->get_status(true);
-			if (self::debug > 2) { error_log('learnpathItem::get_credit() - get_prevent_reinit!=0 and status is '.$status, 0); }
+        $status = $this->get_status(true);
+        // Now check the value of prevent_reinit (if it's 0, return credit as the default was).
+        if ($this->get_prevent_reinit() != 0) { // If prevent_reinit == 1 (or more).
+            // If status is not attempted or incomplete, credit anyway. Otherwise:
+            // Check the status in the database rather than in the object, as checking in the object
+            // would always return "no-credit" when we want to set it to completed.
+            if (self::debug > 2) { error_log('learnpathItem::get_credit() - get_prevent_reinit!=0 and status is '.$status, 0); }
             //0=not attempted - 1 = incomplete
-			if ($status != $this->possible_status[0] && $status != $this->possible_status[1]) {
-				$credit = 'no-credit';
-			}
-		}
+            if ($status != $this->possible_status[0] && $status != $this->possible_status[1]) {
+                $credit = 'no-credit';
+            }
+        } else {
+            //0=not attempted, 1 = incomplete, 4 = failed
+            if ($status != $this->possible_status[4] && $status != $this->possible_status[0] && $status != $this->possible_status[1]) {
+                $credit = 'no-credit';
+            }
+        }
         if (self::debug > 1) {error_log("learnpathItem::get_credit() returns: $credit"); }
 		return $credit;
 	}
@@ -638,9 +644,10 @@ class learnpathItem {
 	 * @return	int	1 or 0 (defaults to 1)
 	 */
 	public function get_prevent_reinit() {
-	    $course_id = api_get_course_int_id();
+	    global $_configuration;
+        $course_id = api_get_course_int_id();
 		if (self::debug > 2) { error_log('learnpathItem::get_prevent_reinit()', 0); }
-		if (!isset($this->prevent_reinit)) {
+		if (!empty($_configuration['kids']) || !isset($this->prevent_reinit)) { //Disabled to ensure the value is coming from DB - see BT#8443
 			if (!empty($this->lp_id)) {
 				$table = Database::get_course_table(TABLE_LP_MAIN);
 			   	$sql = "SELECT prevent_reinit FROM $table WHERE c_id = $course_id AND id = ".$this->lp_id;
@@ -1199,9 +1206,10 @@ class learnpathItem {
 				$restart = 0;
 			}
 		} else {
-			if ($mystatus == $this->possible_status[0] || $mystatus == $this->possible_status[1]) {
-				$restart = -1;
-			}
+            // If is not failed, do not authorize restart - see BT#8443
+			if ($mystatus != $this->possible_status[4]) {
+                $restart = -1;
+            }
 		}
 		if (self::debug > 2) { error_log('New LP - End of learnpathItem::is_restart_allowed() - Returning '.$restart, 0); }
 		return $restart;
@@ -2322,7 +2330,7 @@ class learnpathItem {
          $rs_verified = Database::query($sql_verified);
 		$row_verified = Database::fetch_array($rs_verified);
 
-   		$my_case_completed = array('completed', 'passed', 'browsed', 'failed'); // Added by Isaac Flores.
+   		$my_case_completed = array('completed', 'passed', 'browsed'); // Added by Isaac Flores. // Remove 'failed' - see BT#8443
 
         $save = true;
 
@@ -2463,7 +2471,7 @@ class learnpathItem {
 		 			} else {
 		 				$my_type_lp = learnpath::get_type_static($this->lp_id);
 		 				// This is a array containing values finished
-		 				$case_completed = array('completed', 'passed', 'browsed', 'failed');
+		 				$case_completed = $my_case_completed;
 
 	     				//is not multiple attempts
                         if ($this->seriousgame_mode==1 && $this->type=='sco') {

@@ -966,11 +966,7 @@ class CourseRestorer
                         case FILE_SKIP :
                             break;
                         case FILE_RENAME :
-                            $nb = ''; // add numerical suffix to directory if another one of the same number already exists
-                            while (file_exists($path . $document->path . $nb)) {
-                                $nb += 1;
-                            }
-                            $new_file_name = $document->path . $nb;
+                            $new_file_name = $this->_uniqueFileInDirectory($path . $document->path);
 
                             rename($this->course->backup_path.'/'.$document->path, $this->course->backup_path.'/'.$new_file_name);
                             copyDirTo($this->course->backup_path.'/'.$new_file_name, $path.dirname($new_file_name), false);
@@ -1895,7 +1891,7 @@ class CourseRestorer
                         $this->_createImagenWebLearningPath($origin_path.$lp->preview_image, $destination_path ,$lp->preview_image);
 
                     } else if ($this->file_option  == FILE_RENAME) {
-                        $fileRename = $this->_uniqueFileDir($destination_path, $lp->preview_image);
+                        $fileRename = $this->_uniqueFileInDirectory($destination_path . $lp->preview_image);
                         $copy_result = copy($origin_path.$lp->preview_image, $destination_path.$fileRename);
                         $this->_createImagenWebLearningPath($origin_path.$lp->preview_image, $destination_path ,$fileRename);
 
@@ -2133,18 +2129,19 @@ class CourseRestorer
     }
 
     /**
-     * @param string $path of directory in location images
-     * @param string $file name include extension
-     * @return string with name unique to exist for this directory
-     * example: apple.jpg or apple_1.jpg or apple_2.jpg
+     * Create unique file , search in path (directory) and valid if
+     * other files with iqual name not exist else return string renamed file name.
+     * @param string $pathFile  path absolut of file
+     * @return string with file name unique
      */
-    private function _uniqueFileDir($path = '', $file = '')
+    function _uniqueFileInDirectory($pathFile)
     {
-        $path = empty($path) ? __DIR__.'/images/' : $path;
-        $file = empty($file) ? 'example.jpg' : $file;
-
-        $ext = pathinfo($file, PATHINFO_EXTENSION);
+        $rs = FALSE;
+        $pathFile = str_replace('\\', '/', $pathFile); // valid path if is format windows
+        $ext = pathinfo($pathFile, PATHINFO_EXTENSION);
+        $file = substr(strrchr($pathFile, "/"), 1);
         $fileLessExt = str_replace(".$ext", '', $file);
+        $path = str_replace($file, '', $pathFile);
 
         $nb = '';
         $nbCount = 0;
@@ -2152,7 +2149,9 @@ class CourseRestorer
             $nbCount += 1;
             $nb = "_$nbCount";
         }
-        return $fileLessExt.$nb.".$ext";
+        $rs = $fileLessExt.$nb.".$ext";
+
+        return $rs;
     }
 
     /**

@@ -3169,9 +3169,14 @@ class DocumentManager {
         return true;
     }
 
-    public static function get_web_odf_extension_list(){
-        return array('ods', 'odt');
+    /**
+     * @return array
+     */
+    public static function get_web_odf_extension_list()
+    {
+        return array('ods', 'odt', 'odp');
     }
+
     public static function is_folder_to_avoid($path, $is_certificate_mode = false) {
         $folders_to_avoid = array(
             '/HotPotatoes_files',

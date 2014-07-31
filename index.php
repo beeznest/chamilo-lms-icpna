@@ -24,6 +24,7 @@ require_once 'main/chat/chat_functions.lib.php';
 $this_section = SECTION_CAMPUS;
 
 $htmlHeadXtra[] = api_get_jquery_libraries_js(array('bxslider'));
+
 $htmlHeadXtra[] ='
 <script>
 	$(document).ready(function(){

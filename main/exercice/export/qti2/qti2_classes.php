@@ -395,8 +395,9 @@ class ImsAnswerHotspot extends Answer
     {
         global $charset;
 		$this->answerList = $this->getAnswersList(true);
+        $questionMediaSys = api_get_path(SYS_COURSE_PATH).api_get_course_path().'/document/images/'.$questionMedia;
 		$questionMedia = api_get_path(WEB_COURSE_PATH).api_get_course_path().'/document/images/'.$questionMedia;
-		$mimetype = mime_content_type($questionMedia);
+		$mimetype = mime_content_type($questionMediaSys);
 		if(empty($mimetype)){
 			$mimetype = 'image/jpeg';
 		}

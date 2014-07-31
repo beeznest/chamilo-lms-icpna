@@ -2033,7 +2033,8 @@ class DocumentManager {
                             if (strpos($content_html,$real_orig_url) !== false) {
                                 //$origin_course_code
                                 $url_course_path = str_replace($orig_course_info_path.'/'.$document_file, '', $real_orig_path);
-                                $destination_url = $url_course_path.$destination_course_directory.'/'.$document_file.$dest_url_query;
+                                //$destination_url = $url_course_path . $destination_course_directory . '/' . $document_file . $dest_url_query;
+                                $destination_url = $dest_course_path_rel . $document_file . $dest_url_query;
 
                                 //If the course code doesn't exist in the path? what we do? Nothing! see BT#1985
                                 if (strpos($real_orig_path, $origin_course_code) === false) {

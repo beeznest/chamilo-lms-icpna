@@ -34,6 +34,8 @@ require_once 'learnpath.class.php';
 require_once 'learnpathItem.class.php';
 require_once 'scorm.class.php';
 
+global $_configuration;
+
 $file   = (empty($_SESSION['file'])?'':$_SESSION['file']);
 $oLP    = unserialize($_SESSION['lpobject']);
 $oItem 	= $oLP->items[$oLP->current];
@@ -1371,7 +1373,13 @@ function switch_item(current_item, next_item){
             xajax_switch_item_details(olms.lms_lp_id,olms.lms_user_id,olms.lms_view_id,olms.lms_item_id,next_item);
         }
     } else {
+        <?php
+            if (empty($_configuration['kids'])) {
+        ?>
         orig_lesson_status  = olms.lesson_status = 'completed';
+        <?php
+            }
+        ?>
         if (next_item_type != 'sco') {
             logit_lms('Case 3');
             //case 3

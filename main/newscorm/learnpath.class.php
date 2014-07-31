@@ -2993,12 +2993,13 @@ class learnpath
             // Returns the type of classes by state Lesson
             $class_name = array (
                 'not attempted' => 'scorm-status-not-attempted',
-                'incomplete'    => 'scorm-status-not-attempted',
-                'failed'        => 'scorm-status-failed',
-                'completed'     => 'scorm-status-completed',
-                'passed'        => 'scorm-status-completed',
-                'succeeded'     => 'scorm-status-completed',
-                'browsed'       => 'scorm-status-completed',
+                'incomplete' => 'scorm-status-not-attempted',
+                'failed' => 'scorm-status-failed',
+                'completed' => 'scorm-status-completed',
+                'passed' => 'scorm-status-completed',
+                'succeeded' => 'scorm-status-completed',
+                'browsed' => 'scorm-status-completed',
+                'failed' => 'scorm-status-not-attempted'
             );
 
             $add_class = 'scorm-status-not-attempted';
@@ -4912,6 +4913,7 @@ class learnpath
      * @author ndiechburg <noel@cblue.be>
      **/
     public function get_attempt_mode() {
+        global $_configuration;
         if (!isset($this->seriousgame_mode)) { //Set default value for seriousgame_mode
             $this->seriousgame_mode=0;
         }
@@ -4921,8 +4923,17 @@ class learnpath
         if ($this->seriousgame_mode == 1 && $this->prevent_reinit == 1) {
             return 'seriousgame';
         }
+        if (!empty($_configuration['kids']) && $this->seriousgame_mode == 1 && $this->prevent_reinit == 0) {
+            return 'seriousgame';
+        }
         if ($this->seriousgame_mode == 0 && $this->prevent_reinit == 1) {
-            return 'single';
+            if (!empty($_configuration['kids'])) {
+
+                return 'multiple';
+            } else {
+
+                return 'single';
+            }
         }
         if ($this->seriousgame_mode == 0 && $this->prevent_reinit == 0) {
             return 'multiple';
@@ -4938,11 +4949,16 @@ class learnpath
      * @author ndiechburg <noel@cblue.be>
      **/
     public function set_attempt_mode($mode) {
+        global $_configuration;
         $course_id = api_get_course_int_id();
         switch ($mode) {
             case 'seriousgame' :
               $sg_mode = 1;
-              $prevent_reinit = 1;
+              if (!empty($_configuration['kids'])) {
+                  $prevent_reinit = 0; //Set 0 - see BT#8463
+              } else {
+                  $prevent_reinit = 1;
+              }
               break;
             case 'single' :
               $sg_mode = 0;
@@ -8214,13 +8230,13 @@ class learnpath
         $tbl_lp = Database :: get_course_table(TABLE_LP_MAIN);
 
         // get current prerequisite
-        $sql = "SELECT * FROM $tbl_lp WHERE c_id = $course_id AND id = $lp_id ";
+        $sql = "SELECT prerequisite FROM $tbl_lp WHERE c_id = $course_id AND id = $lp_id ";
         $result = Database::query($sql);
         $row = Database :: fetch_array($result);
         $preq_id = $row['prerequisite'];
         $session_id = api_get_session_id();
         $session_condition = api_get_session_condition($session_id);
-        $sql 	= "SELECT * FROM $tbl_lp
+        $sql 	= "SELECT id, name FROM $tbl_lp
                    WHERE c_id = $course_id $session_condition ORDER BY display_order ";
         $rs = Database::query($sql);
         $return = '';

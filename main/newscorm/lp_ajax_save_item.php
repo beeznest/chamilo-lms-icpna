@@ -47,6 +47,7 @@ require_once 'aiccItem.class.php';
 function save_item($lp_id, $user_id, $view_id, $item_id, $score = -1, $max = -1, $min = -1, $status = '', $time = 0, $suspend = '', $location = '', $interactions = array(), $core_exit = 'none') {
     $return = null;
     global $debug;
+    global $_configuration;
     if ($debug > 0) {
         error_log('lp_ajax_save_item.php : save_item() params: ');
         error_log("item_id: $item_id");
@@ -145,7 +146,7 @@ function save_item($lp_id, $user_id, $view_id, $item_id, $score = -1, $max = -1,
                 $mylpi->set_status($mystatus);
                 if ($debug > 1) { error_log('Done calling set_status for hotpotatoes - now '.$mylpi->get_status(false), 0); }
             }
-        } elseif ($my_type == 'sco') {
+        } elseif ($my_type == 'sco' && empty($_configuration['kids'])) {
             error_log('Setting status to completed');
             $mylpi->set_status('completed');
         }
@@ -202,12 +203,7 @@ function save_item($lp_id, $user_id, $view_id, $item_id, $score = -1, $max = -1,
     if ($debug) error_log("Status in DB: $mystatus_in_db");
 
     if ($mystatus_in_db != 'completed' && $mystatus_in_db != 'passed' && $mystatus_in_db != 'browsed' && $mystatus_in_db != 'failed') {
-         $mystatus_in_memory = $mylpi->get_status(false);
-         if ($mystatus_in_memory != $mystatus_in_db) {
-             $mystatus = $mystatus_in_memory;
-         } else {
-             $mystatus = $mystatus_in_db;
-         }
+         $mystatus = $mylpi->get_status(false);
     } else {
         $mystatus = $mystatus_in_db;
     }
@@ -227,7 +223,9 @@ function save_item($lp_id, $user_id, $view_id, $item_id, $score = -1, $max = -1,
         // If this object's JS status has not been updated by the SCORM API, update now.
         $return .= "olms.lesson_status='".$mystatus."';";
     } else {
-        $return .= "olms.lesson_status='completed'";
+        if (empty($_configuration['kids'])) {
+            $return .= "olms.lesson_status='completed'";
+        }
     }
     $return .= "update_toc('".$mystatus."','".$item_id."');";
     $update_list = $mylp->get_update_queue();

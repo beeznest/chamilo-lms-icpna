@@ -295,7 +295,12 @@ if (!empty($flat_list)) {
                         Display::return_icon('reload_na.png', get_lang('AllowMultipleAttempts'), '', ICON_SIZE_SMALL).
                         '</a>';
                 } elseif ($details['seriousgame_mode'] == 0 && $details['lp_prevent_reinit'] == 0) { //multiple mode | next = seriousgame
-                    $dsp_reinit = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_attempt_mode&lp_id='.$id.'">'.Display::return_icon('reload.png', get_lang('AllowMultipleAttempts'), '', ICON_SIZE_SMALL).
+                    $dsp_reinit = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_attempt_mode&lp_id='.$id.'">'.
+                        Display::return_icon('reload.png', get_lang('AllowMultipleAttempts'), '', ICON_SIZE_SMALL).
+                        '</a>';
+                } else {
+                    $dsp_reinit = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_attempt_mode&lp_id='.$id.'">'.
+                        Display::return_icon('reload_na.png', get_lang('AllowMultipleAttempts'), '', ICON_SIZE_SMALL).
                         '</a>';
                 }
             } else {

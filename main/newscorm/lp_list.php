@@ -281,27 +281,26 @@ if (!empty($flat_list)) {
              * It is thus a mix betwenn multiple attempt and mono attempt
              */
             if ($current_session == $details['lp_session']) {
-                if (!empty($_configuration['kids'])) {
-                    if ($details['seriousgame_mode'] == 1 && $details['lp_prevent_reinit'] == 0) {
-                        //seriousgame mode | next = single. Edited - see BT#8463
-                        $dsp_reinit = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_attempt_mode&lp_id='.$id.'">'.
-                            Display::return_icon('reload.png', get_lang('PreventMultipleAttempts'), '', ICON_SIZE_SMALL).
-                            '</a>';
-                    }
-                } else {
-                    if ($details['seriousgame_mode'] == 1 && $details['lp_prevent_reinit'] == 1) { //seriousgame mode | next = single
-                        $dsp_reinit = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_attempt_mode&lp_id='.$id.'">'.
-                            Display::return_icon('reload.png', get_lang('PreventMultipleAttempts'), '', ICON_SIZE_SMALL).
-                            '</a>';
-                    }
-                }
-                if ($details['seriousgame_mode'] == 0 && $details['lp_prevent_reinit'] == 1) { //single mode | next = multiple
+                if (!empty($_configuration['kids']) && $details['seriousgame_mode'] == 1 && $details['lp_prevent_reinit'] == 0) {
+                    //seriousgame mode | next = single. Edited - see BT#8463
+                    $dsp_reinit = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_attempt_mode&lp_id='.$id.'">'.
+                        Display::return_icon('reload.png', get_lang('PreventMultipleAttempts'), '', ICON_SIZE_SMALL).
+                        '</a>';
+                } elseif (empty($_configuration['kids']) && $details['seriousgame_mode'] == 1 && $details['lp_prevent_reinit'] == 1) { //seriousgame mode | next = single
+                    $dsp_reinit = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_attempt_mode&lp_id='.$id.'">'.
+                        Display::return_icon('reload.png', get_lang('PreventMultipleAttempts'), '', ICON_SIZE_SMALL).
+                        '</a>';
+                } elseif ($details['seriousgame_mode'] == 0 && $details['lp_prevent_reinit'] == 1) { //single mode | next = multiple
                     $dsp_reinit = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_attempt_mode&lp_id='.$id.'">'.
                         Display::return_icon('reload_na.png', get_lang('AllowMultipleAttempts'), '', ICON_SIZE_SMALL).
                         '</a>';
-                }
-                if ($details['seriousgame_mode'] == 0 && $details['lp_prevent_reinit'] == 0) { //multiple mode | next = seriousgame
-                    $dsp_reinit = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_attempt_mode&lp_id='.$id.'">'.Display::return_icon('reload.png', get_lang('AllowMultipleAttempts'), '', ICON_SIZE_SMALL).
+                } elseif ($details['seriousgame_mode'] == 0 && $details['lp_prevent_reinit'] == 0) { //multiple mode | next = seriousgame
+                    $dsp_reinit = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_attempt_mode&lp_id='.$id.'">'.
+                        Display::return_icon('reload.png', get_lang('AllowMultipleAttempts'), '', ICON_SIZE_SMALL).
+                        '</a>';
+                } else {
+                    $dsp_reinit = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_attempt_mode&lp_id='.$id.'">'.
+                        Display::return_icon('reload_na.png', get_lang('AllowMultipleAttempts'), '', ICON_SIZE_SMALL).
                         '</a>';
                 }
             } else {

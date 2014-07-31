@@ -4921,12 +4921,12 @@ class learnpath
             $this->prevent_reinit =1;
         }
         if ($this->seriousgame_mode == 1 && $this->prevent_reinit == 1) {
+
             return 'seriousgame';
-        }
-        if (!empty($_configuration['kids']) && $this->seriousgame_mode == 1 && $this->prevent_reinit == 0) {
+        } elseif (!empty($_configuration['kids']) && $this->seriousgame_mode == 1 && $this->prevent_reinit == 0) {
+
             return 'seriousgame';
-        }
-        if ($this->seriousgame_mode == 0 && $this->prevent_reinit == 1) {
+        } elseif ($this->seriousgame_mode == 0 && $this->prevent_reinit == 1) {
             if (!empty($_configuration['kids'])) {
 
                 return 'multiple';
@@ -4934,10 +4934,11 @@ class learnpath
 
                 return 'single';
             }
-        }
-        if ($this->seriousgame_mode == 0 && $this->prevent_reinit == 0) {
+        } elseif ($this->seriousgame_mode == 0 && $this->prevent_reinit == 0) {
+
             return 'multiple';
         }
+
         return 'single';
     }
 

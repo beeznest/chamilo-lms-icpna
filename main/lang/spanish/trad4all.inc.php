@@ -1419,3 +1419,6 @@ $MyAccount = "Mi cuenta";
 $DeleteInbox = "Borrar";
 $MyAccount = "Mi cuenta";
 $langSelectAtLeastOne = "Seleccione al menos uno";
+$XEnabled = "%s habilitado";
+$XDisabled = "%s deshabilitado";
+$SeriousGameMode = "Modo juego serio";

@@ -4875,26 +4875,43 @@ class learnpath
     }
 
     /**
-     * Updates the "prevent_reinit" value that enables control on reinitialising items on second view
+     * Updates (Switches) the "prevent_reinit" value that enables control on reinitialising items on second view
      * @return	boolean	True if prevent_reinit has been set to 'on', false otherwise (or 1 or 0 in this case)
      */
     public function update_reinit() {
         $course_id = api_get_course_int_id();
+        $session_id = api_get_session_id();
+        $lp_table = Database :: get_course_table(TABLE_LP_MAIN);
         if ($this->debug > 0) {
             error_log('New LP - In learnpath::update_reinit()', 0);
         }
-        $lp_table = Database :: get_course_table(TABLE_LP_MAIN);
-        $sql = "SELECT * FROM $lp_table WHERE c_id = ".$course_id." AND id = " . $this->get_id();
-        $res = Database::query($sql);
-        if (Database :: num_rows($res) > 0) {
-            $row = Database :: fetch_array($res);
-            $force = $row['prevent_reinit'];
+        if (!isset($this->prevent_reinit)) {
+            $sql = 'SELECT prevent_reinit FROM ' . $lp_table.
+                ' WHERE c_id = ' . $course_id.
+                ' AND session_id = ' . $session_id.
+                ' AND id = ' . $this->get_id().
+                ' LIMIT 1';
+            $res = Database::query($sql);
+            if (Database :: num_rows($res) > 0) {
+                $row = Database :: fetch_array($res);
+                $force = $row['prevent_reinit'];
+            } else {
+                $force = null;
+            }
+        } else {
+            $force = $this->prevent_reinit;
+        }
+
+        if (isset($force)) {
             if ($force == 1) {
                 $force = 0;
             } elseif ($force == 0) {
                 $force = 1;
             }
-            $sql = "UPDATE $lp_table SET prevent_reinit = $force WHERE c_id = ".$course_id." AND id = " . $this->get_id();
+            $sql = 'UPDATE ' . $lp_table . ' SET prevent_reinit = ' . $force.
+                ' WHERE c_id = ' . $course_id.
+                ' AND session_id = ' . $session_id.
+                ' AND id = ' . $this->get_id();
             $res = Database::query($sql);
             $this->prevent_reinit = $force;
             return $force;
@@ -5022,24 +5039,41 @@ class learnpath
    **/
     public function set_seriousgame_mode() {
         $course_id = api_get_course_int_id();
-		if ($this->debug > 0) {
-			error_log('New LP - In learnpath::set_seriousgame_mode()', 0);
-		}
-		$lp_table = Database :: get_course_table(TABLE_LP_MAIN);
-		$sql = "SELECT * FROM $lp_table WHERE c_id = ".$course_id." AND id = " . $this->get_id();
-		$res = Database::query($sql);
-		if (Database :: num_rows($res) > 0) {
-			$row = Database :: fetch_array($res);
-			$force = $row['seriousgame_mode'];
+        $session_id = api_get_session_id();
+        $lp_table = Database :: get_course_table(TABLE_LP_MAIN);
+        if ($this->debug > 0) {
+            error_log('New LP - In learnpath::set_seriousgame_mode()', 0);
+        }
+        if (!isset($this->seriousgame_mode)) {
+            $sql = 'SELECT seriousgame_mode FROM ' . $lp_table.
+                ' WHERE c_id = ' . $course_id.
+                ' AND session_id = ' . $session_id.
+                ' AND id = ' . $this->get_id().
+                ' LIMIT 1';
+            $res = Database::query($sql);
+            if (Database :: num_rows($res) > 0) {
+                $row = Database :: fetch_array($res);
+                $force = $row['seriousgame_mode'];
+            } else {
+                $force = null;
+            }
+        } else {
+            $force = $this->seriousgame_mode;
+        }
+
+        if (isset($force)) {
 			if ($force == 1) {
 				$force = 0;
 			} elseif ($force == 0) {
 				$force = 1;
 			}
-			$sql = "UPDATE $lp_table SET seriousgame_mode = $force WHERE c_id = ".$course_id." AND id = " . $this->get_id();
+            $sql = 'UPDATE ' . $lp_table . ' SET seriousgame_mode = ' . $force.
+                ' WHERE c_id = ' . $course_id.
+                ' AND session_id = ' . $session_id.
+                ' AND id = ' . $this->get_id();
 			$res = Database::query($sql);
 			$this->seriousgame_mode = $force;
-			return $force;
+            return $force;
 		} else {
 			if ($this->debug > 2) {
 				error_log('New LP - Problem in set_seriousgame_mode() - could not find LP ' . $this->get_id() . ' in DB', 0);

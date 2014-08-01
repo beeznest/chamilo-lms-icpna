@@ -280,31 +280,37 @@ if (!empty($flat_list)) {
              * When lp status is completed, user can still modify the attempt (adds/time change score, and browse it)
              * It is thus a mix betwenn multiple attempt and mono attempt
              */
+            // Do NOT use attempts mode (single, multiple, seriousgame) - see BT#8463
             if ($current_session == $details['lp_session']) {
-                if (!empty($_configuration['kids']) && $details['seriousgame_mode'] == 1 && $details['lp_prevent_reinit'] == 0) {
+                if ($details['lp_prevent_reinit'] == 0) {
                     //seriousgame mode | next = single. Edited - see BT#8463
-                    $dsp_reinit = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_attempt_mode&lp_id='.$id.'">'.
+                    $dsp_reinit = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_reinit&lp_id='.$id.'">'.
                         Display::return_icon('reload.png', get_lang('PreventMultipleAttempts'), '', ICON_SIZE_SMALL).
-                        '</a>';
-                } elseif (empty($_configuration['kids']) && $details['seriousgame_mode'] == 1 && $details['lp_prevent_reinit'] == 1) { //seriousgame mode | next = single
-                    $dsp_reinit = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_attempt_mode&lp_id='.$id.'">'.
-                        Display::return_icon('reload.png', get_lang('PreventMultipleAttempts'), '', ICON_SIZE_SMALL).
-                        '</a>';
-                } elseif ($details['seriousgame_mode'] == 0 && $details['lp_prevent_reinit'] == 1) { //single mode | next = multiple
-                    $dsp_reinit = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_attempt_mode&lp_id='.$id.'">'.
-                        Display::return_icon('reload_na.png', get_lang('AllowMultipleAttempts'), '', ICON_SIZE_SMALL).
-                        '</a>';
-                } elseif ($details['seriousgame_mode'] == 0 && $details['lp_prevent_reinit'] == 0) { //multiple mode | next = seriousgame
-                    $dsp_reinit = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_attempt_mode&lp_id='.$id.'">'.
-                        Display::return_icon('reload.png', get_lang('AllowMultipleAttempts'), '', ICON_SIZE_SMALL).
                         '</a>';
                 } else {
-                    $dsp_reinit = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_attempt_mode&lp_id='.$id.'">'.
+                    $dsp_reinit = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_reinit&lp_id='.$id.'">'.
                         Display::return_icon('reload_na.png', get_lang('AllowMultipleAttempts'), '', ICON_SIZE_SMALL).
                         '</a>';
                 }
             } else {
                 $dsp_reinit = Display::return_icon('reload_na.png', get_lang('AllowMultipleAttempts'), '', ICON_SIZE_SMALL);
+            }
+
+            // Do NOT use attempts mode (single, multiple, seriousgame) - see BT#8463
+            // Use this icon to show seriousgame mode status
+            if ($current_session == $details['lp_session']) {
+                if ($details['seriousgame_mode'] == 1) {
+                    //seriousgame mode | next = single. Edited - see BT#8463
+                    $dsp_seriousgame = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_seriousgame_mode&lp_id='.$id.'">'.
+                        Display::return_icon('reload.png', sprintf(get_lang('XEnabled'), get_lang('SeriousGameMode')), '', ICON_SIZE_SMALL).
+                        '</a>';
+                } else {
+                    $dsp_seriousgame = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_seriousgame_mode&lp_id='.$id.'">'.
+                        Display::return_icon('reload_na.png', sprintf(get_lang('XDisabled'), get_lang('SeriousGameMode')), '', ICON_SIZE_SMALL).
+                        '</a>';
+                }
+            } else {
+                $dsp_seriousgame = Display::return_icon('reload_na.png', get_lang('AllowMultipleAttempts'), '', ICON_SIZE_SMALL);
             }
 
             /* SCREEN LP VIEW */
@@ -425,7 +431,7 @@ if (!empty($flat_list)) {
         }
 
         echo $dsp_line.$start_time.$end_time.$dsp_progress.$dsp_desc.$dsp_export.$dsp_edit.$dsp_build.$dsp_edit_lp.$dsp_visible.$dsp_publish.$dsp_reinit.
-        $dsp_default_view.$dsp_debug.$dsp_disk.$copy.$lp_auto_lunch_icon.$export_icon.$dsp_delete.$dsp_order.$dsp_edit_close;
+            $dsp_seriousgame.$dsp_default_view.$dsp_debug.$dsp_disk.$copy.$lp_auto_lunch_icon.$export_icon.$dsp_delete.$dsp_order.$dsp_edit_close;
 
         echo "</tr>";
         $current++; //counter for number of elements treated

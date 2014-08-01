@@ -1414,3 +1414,6 @@ $MediaQuestion = "Media question";
 $MyAccount = "My account";
 $langSelectAtLeastOne = "You must select at least one";
 $WeHaveDetectedExamNotFinish = "We have detected you could NOT complete the exam. You may need a second (and last) attempt if so then press the 'Last Attempt' button.";
+$XEnabled = "%s enabled";
+$XDisabled = "%s disabled";
+$SeriousGameMode = "Serious game mode";

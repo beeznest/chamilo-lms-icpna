@@ -4930,7 +4930,6 @@ class learnpath
      * @author ndiechburg <noel@cblue.be>
      **/
     public function get_attempt_mode() {
-        global $_configuration;
         if (!isset($this->seriousgame_mode)) { //Set default value for seriousgame_mode
             $this->seriousgame_mode=0;
         }
@@ -4940,17 +4939,9 @@ class learnpath
         if ($this->seriousgame_mode == 1 && $this->prevent_reinit == 1) {
 
             return 'seriousgame';
-        } elseif (!empty($_configuration['kids']) && $this->seriousgame_mode == 1 && $this->prevent_reinit == 0) {
-
-            return 'seriousgame';
         } elseif ($this->seriousgame_mode == 0 && $this->prevent_reinit == 1) {
-            if (!empty($_configuration['kids'])) {
 
-                return 'multiple';
-            } else {
-
-                return 'single';
-            }
+            return 'single';
         } elseif ($this->seriousgame_mode == 0 && $this->prevent_reinit == 0) {
 
             return 'multiple';
@@ -4967,16 +4958,11 @@ class learnpath
      * @author ndiechburg <noel@cblue.be>
      **/
     public function set_attempt_mode($mode) {
-        global $_configuration;
         $course_id = api_get_course_int_id();
         switch ($mode) {
             case 'seriousgame' :
               $sg_mode = 1;
-              if (!empty($_configuration['kids'])) {
-                  $prevent_reinit = 0; //Set 0 - see BT#8463
-              } else {
-                  $prevent_reinit = 1;
-              }
+              $prevent_reinit = 1;
               break;
             case 'single' :
               $sg_mode = 0;

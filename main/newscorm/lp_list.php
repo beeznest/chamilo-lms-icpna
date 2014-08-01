@@ -302,12 +302,12 @@ if (!empty($flat_list)) {
                 if ($details['seriousgame_mode'] == 1) {
                     //seriousgame mode | next = single. Edited - see BT#8463
                     $dsp_seriousgame = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_seriousgame_mode&lp_id='.$id.'">'.
-                        Display::return_icon('reload.png', sprintf(get_lang('XEnabled'), get_lang('SeriousGameMode')), '', ICON_SIZE_SMALL).
-                        '</a>';
+                        Display::return_icon('dice.png', sprintf(get_lang('XEnabled'), get_lang('SeriousGameMode')), '', ICON_SIZE_SMALL).
+                        '</a>&nbsp;';
                 } else {
                     $dsp_seriousgame = '<a href="lp_controller.php?'.api_get_cidreq().'&action=switch_seriousgame_mode&lp_id='.$id.'">'.
-                        Display::return_icon('reload_na.png', sprintf(get_lang('XDisabled'), get_lang('SeriousGameMode')), '', ICON_SIZE_SMALL).
-                        '</a>';
+                        Display::return_icon('dice_na.png', sprintf(get_lang('XDisabled'), get_lang('SeriousGameMode')), '', ICON_SIZE_SMALL).
+                        '</a>&nbsp;';
                 }
             } else {
                 $dsp_seriousgame = Display::return_icon('reload_na.png', get_lang('AllowMultipleAttempts'), '', ICON_SIZE_SMALL);

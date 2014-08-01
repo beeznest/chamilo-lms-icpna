@@ -1259,7 +1259,7 @@ class CourseHome {
                         $ext = pathinfo(api_get_path(WEB_IMG_PATH). $dir_icons . $tool['tool']['image'], PATHINFO_EXTENSION);
                         $default_icon = api_get_path(WEB_IMG_PATH). $dir_icons . substr($tool['tool']['image'],0,-(strlen($ext)+1));
                         if (strpos($default_icon,'_na') === false) {
-                            $icon_path = $default_icon .'_na.'. $ext;
+                            $icon_path = (strpos($default_icon, 'scormbuilder')) ? $default_icon .'_na.png' : $default_icon .'_na.'. $ext;
                         } else {
                             $icon_path = $default_icon .'.'. $ext;
                         }

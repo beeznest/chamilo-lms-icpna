@@ -1,0 +1,7 @@
+# Chamilo
+main/inc/conf/configuration.php
+courses/*
+archive/*
+main/upload/users/*
+tests/migrate/php_errors.log
+tests/migrate/ws.conf.php

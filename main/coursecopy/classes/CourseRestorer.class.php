@@ -69,7 +69,7 @@ class CourseRestorer
         'links',
         'learnpaths',
         'surveys',
-        //'scorm_documents', ??
+        'scorm_documents', // copy files scorm
         'tool_intro',
         'thematic',
         'wiki',
@@ -966,27 +966,7 @@ class CourseRestorer
                         case FILE_SKIP :
                             break;
                         case FILE_RENAME :
-                            $i = 1;
-
-                            $ext = explode('.', basename($document->path));
-
-                            if (count($ext) > 1) {
-                                $ext = array_pop($ext);
-                                $file_name_no_ext = substr($document->path, 0, - (strlen($ext) + 1));
-                                $ext = '.'.$ext;
-                            } else {
-                                $ext = '';
-                                $file_name_no_ext = $document->path;
-                            }
-
-                            $new_file_name = $file_name_no_ext.'_'.$i.$ext;
-                            $file_exists = file_exists($path.$new_file_name);
-
-                            while ($file_exists) {
-                                $i++;
-                                $new_file_name = $file_name_no_ext.'_'.$i.$ext;
-                                $file_exists = file_exists($path.$new_file_name);
-                            }
+                            $new_file_name = $this->_uniqueFileInDirectory($path . $document->path);
 
                             rename($this->course->backup_path.'/'.$document->path, $this->course->backup_path.'/'.$new_file_name);
                             copyDirTo($this->course->backup_path.'/'.$new_file_name, $path.dirname($new_file_name), false);
@@ -1866,6 +1846,8 @@ class CourseRestorer
         return $new_id;
     }
 
+
+
     /**
      * Restore learnpaths
      */
@@ -1903,17 +1885,18 @@ class CourseRestorer
 
                 //Adding the author's image
                 if (!empty($lp->preview_image)) {
-                    $new_filename = uniqid('').$new_filename.substr($lp->preview_image, strlen($lp->preview_image) - 7, strlen($lp->preview_image));
-                    if (file_exists($origin_path.$lp->preview_image) && !is_dir($origin_path.$lp->preview_image)) {
-                        $copy_result = copy($origin_path.$lp->preview_image, $destination_path.$new_filename);
 
-                        $this->_createImagenWebLearningPath($origin_path.$lp->preview_image, $destination_path ,$new_filename);
+                    if($this->file_option == FILE_OVERWRITE) {
+                        $copy_result = copy($origin_path.$lp->preview_image, $destination_path.$lp->preview_image);
+                        $this->_createImagenWebLearningPath($origin_path.$lp->preview_image, $destination_path ,$lp->preview_image);
 
-                        if ($copy_result) {
-                            $lp->preview_image = $new_filename;
-                        } else {
-                            $lp->preview_image = '';
-                        }
+                    } else if ($this->file_option  == FILE_RENAME) {
+                        $fileRename = $this->_uniqueFileInDirectory($destination_path . $lp->preview_image);
+                        $copy_result = copy($origin_path.$lp->preview_image, $destination_path.$fileRename);
+                        $this->_createImagenWebLearningPath($origin_path.$lp->preview_image, $destination_path ,$fileRename);
+
+                    } else if ($this->file_option  == FILE_SKIP) {
+
                     }
                 }
 
@@ -2110,6 +2093,12 @@ class CourseRestorer
      * function private
      * add Imagen web of (64px x xxpx)
      */
+    /**
+     * @param class Image $origin_path_preview_image
+     * @param string s$destination_path
+     * @param string $new_filename
+     * @return void
+     */
     private function _createImagenWebLearningPath($origin_path_preview_image, $destination_path ,$new_filename)
     {
         // 01 - image of 64 : Resize image if it is larger than 64px
@@ -2137,6 +2126,32 @@ class CourseRestorer
         $temp = new Image($path);
         $r = $temp->convert2bw();
         $temp->send_image($destination_path . $file.'.64_na.' . $ext); // 53b5a5722da4b.64_na.jpg
+    }
+
+    /**
+     * Create unique file , search in path (directory) and valid if
+     * other files with iqual name not exist else return string renamed file name.
+     * @param string $pathFile  path absolut of file
+     * @return string with file name unique
+     */
+    function _uniqueFileInDirectory($pathFile)
+    {
+        $rs = FALSE;
+        $pathFile = str_replace('\\', '/', $pathFile); // valid path if is format windows
+        $ext = pathinfo($pathFile, PATHINFO_EXTENSION);
+        $file = substr(strrchr($pathFile, "/"), 1);
+        $fileLessExt = str_replace(".$ext", '', $file);
+        $path = str_replace($file, '', $pathFile);
+
+        $nb = '';
+        $nbCount = 0;
+        while (file_exists($path.$fileLessExt.$nb.".$ext")) {
+            $nbCount += 1;
+            $nb = "_$nbCount";
+        }
+        $rs = $fileLessExt.$nb.".$ext";
+
+        return $rs;
     }
 
     /**
@@ -2437,14 +2452,18 @@ class CourseRestorer
                     "sequence_type_entity_id=".self::DBUTF8escapestring($obj->sequence_type_entity_id).", ".
                     "name = '".self::DBUTF8escapestring($obj->name)."'";
                 $result = Database::query($sql);
-                $new_sequence_row_entity_id = Database::insert_id($result);
-                $this->course->resources[RESOURCE_SEQUENCE][$id]->destination_id = $new_sequence_row_entity_id;
+                if (!$result) {
+                    $this->course->resources[RESOURCE_SEQUENCE][$id]->destination_id = 0;
+                } else {
+                    $new_sequence_row_entity_id = Database::insert_id($result);
+                    $this->course->resources[RESOURCE_SEQUENCE][$id]->destination_id = $new_sequence_row_entity_id;
+                }
             }
 
             // Second, update sequence arrays and insert them in sequence
             foreach ($resources[RESOURCE_SEQUENCE] as $id => $obj) {
                 $previous_sequence = $obj->previous_sequence;
-                if (!is_array($previous_sequence)) {
+                if (!is_array($previous_sequence) || $obj->destination_id == 0) {
                     continue;
                 }
                 foreach ($previous_sequence as $key => $value) {

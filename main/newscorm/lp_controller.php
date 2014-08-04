@@ -902,7 +902,8 @@ switch ($action) {
         $_SESSION['oLP']->update_default_scorm_commit();
         require 'lp_list.php';
         break;
-    /* Those 2 switches have been replaced by switc_attempt_mode switch
+    // Those 2 switches have been replaced by switc_attempt_mode switch
+    // But now are used instead of switch_attempt_mode
     case 'switch_reinit':
         if ($debug > 0) error_log('New LP - switch_reinit action triggered', 0);
         if (!$lp_found) { error_log('New LP - No learnpath given for switch', 0); require 'lp_list.php'; }
@@ -910,6 +911,7 @@ switch ($action) {
         $_SESSION['oLP']->update_reinit();
 		require 'lp_list.php';
 		break;
+
 	case 'switch_seriousgame_mode':
 		if($debug>0) error_log('New LP - switch_seriousgame_mode action triggered',0);
 		if(!$lp_found){ error_log('New LP - No learnpath given for switch',0); require 'lp_list.php'; }
@@ -917,7 +919,8 @@ switch ($action) {
 		$_SESSION['oLP']->set_seriousgame_mode();
 		require 'lp_list.php';
 		break;
-     */
+
+    /*
 	case 'switch_attempt_mode':
 		if($debug>0) error_log('New LP - switch_reinit action triggered',0);
 		if(!$lp_found){ error_log('New LP - No learnpath given for switch',0); require 'lp_list.php'; }
@@ -925,6 +928,7 @@ switch ($action) {
 		$_SESSION['oLP']->switch_attempt_mode();
         require 'lp_list.php';
         break;
+    */
 
     case 'switch_scorm_debug':
         if ($debug > 0) error_log('New LP - switch_scorm_debug action triggered', 0);

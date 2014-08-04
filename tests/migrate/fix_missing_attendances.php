@@ -8,7 +8,7 @@ require '../../main/inc/global.inc.php';
 require '../../main/inc/lib/attendance.lib.php';
 require 'config.php';
 require 'db_matches.php';
-// redefine web servces config
+// redefine web services config
 require_once 'ws.conf.php';
 require 'migration.class.php';
 require 'migration.mssql.class.php';

@@ -56,7 +56,10 @@ $branch_id = 0;
 // We need $branch_id defined before calling db_matches.php
 // The only thing we need from db_matches is the definition of the web service
 require_once 'db_matches.php';
-// redefine web servces config
+// redefine web services config
+if (!is_file(__DIR__.'/ws.conf.php')) {
+    die ('Please define a ws.conf.php file (copy ws.conf.dist.php) before you run the transactions');
+}
 require_once 'ws.conf.php';
     
 $migration = new Migration();    

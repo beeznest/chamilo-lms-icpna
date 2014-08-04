@@ -631,7 +631,11 @@ class CourseHome {
                     }
                 }
 
-                if ($session_id != 0 && in_array($tool['name'], array('course_maintenance', 'course_setting'))) {
+                if ($session_id != 0 && in_array(
+                        $tool['name'],
+                        array('course_setting')
+                    )
+                ) {
                     continue;
                 }
 

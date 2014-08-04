@@ -132,9 +132,14 @@ class CourseSelectForm
 
 		//get destination course title
 		if (!empty($hidden_fields['destination_course'])) {
+            $sessionTitle = !empty($hidden_fields['destination_session']) ? ' (' . api_get_session_name(
+                    $hidden_fields['destination_session']
+                ) . ')' : null;
 			$course_infos = CourseManager::get_course_information($hidden_fields['destination_course']);
 			echo '<h3>';
-			echo get_lang('DestinationCourse').' : '.$course_infos['title'];
+            echo get_lang(
+                    'DestinationCourse'
+                ) . ' : ' . $course_infos['title'] . $sessionTitle;
 			echo '</h3>';
 		}
         echo '<script src="'.api_get_path(WEB_CODE_PATH).'inc/lib/javascript/upload.js" type="text/javascript"></script>';
@@ -560,9 +565,14 @@ class CourseSelectForm
 		//get destination course title
 		if(!empty($hidden_fields['destination_course'])) {
 			require_once(api_get_path(LIBRARY_PATH).'course.lib.php');
+            $sessionTitle = !empty($hidden_fields['destination_session']) ? ' (' . api_get_session_name(
+                    $hidden_fields['destination_session']
+                ) . ')' : null;
 			$course_infos = CourseManager::get_course_information($hidden_fields['destination_course']);
 			echo '<h3>';
-				echo get_lang('DestinationCourse').' : '.$course_infos['title'];
+            echo get_lang(
+                    'DestinationCourse'
+                ) . ' : ' . $course_infos['title'] . $sessionTitle;
 			echo '</h3>';
 		}
 

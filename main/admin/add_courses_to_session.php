@@ -112,8 +112,7 @@ if (isset($_POST['formSent']) && $_POST['formSent']) {
 	$result     = Database::query($sql);
 	$UserList   = Database::store_result($result);
 
-
-	foreach($CourseList as $enreg_course) {
+    foreach ($CourseList as $enreg_course) {
 		$enreg_course = Database::escape_string($enreg_course);
 		$exists = false;
 		foreach($existingCourses as $existingCourse) {
@@ -121,8 +120,11 @@ if (isset($_POST['formSent']) && $_POST['formSent']) {
 				$exists=true;
 			}
 		}
-		if(!$exists) {
-			$sql_insert_rel_course= "INSERT INTO $tbl_session_rel_course(id_session,course_code) VALUES('$id_session','$enreg_course')";
+        $courseInfo = api_get_course_info($enreg_course);
+        $courseId = $courseInfo['real_id'];
+
+        if (!$exists) {
+            $sql_insert_rel_course = "INSERT INTO $tbl_session_rel_course(id_session, course_id, course_code) VALUES('$id_session', '$courseId','$enreg_course')";
 			Database::query($sql_insert_rel_course);
 
             $course_info = api_get_course_info($enreg_course);
@@ -141,7 +143,6 @@ if (isset($_POST['formSent']) && $_POST['formSent']) {
 			}
 			Database::query("UPDATE $tbl_session_rel_course SET nbr_users=$nbr_users WHERE id_session='$id_session' AND course_code='$enreg_course'");
 		}
-
 	}
 
 	foreach($existingCourses as $existingCourse) {

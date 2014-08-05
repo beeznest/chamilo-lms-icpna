@@ -2467,7 +2467,7 @@ class Exercise
 
         $exams = array('final exam', 'examen final', 'final test');
         if (in_array(strtolower($this->name), $exams) && empty($_COOKIE[$lastAttemptId])) {
-            $script .= "  
+            $script .= "
                 function open_clock_warning() {
                    $('<input>').attr({
                         type: 'hidden',
@@ -2501,7 +2501,7 @@ class Exercise
                     $('#clock_warning').dialog('open');
                 } ";
           } else {
-                $script .= "  
+            $script .= "
                     function open_clock_warning() {
                        $('<input>').attr({
                             type: 'hidden',
@@ -3433,7 +3433,11 @@ class Exercise
                     }
 
                     //display answers (if not matching type, or if the answer is correct)
-                    if (!in_array($answerType, array(DRAGGABLE, MATCHING, MATCHING_DRAG))|| $answerCorrect) {
+                    if (!in_array(
+                            $answerType,
+                            array(DRAGGABLE, MATCHING, MATCHING_DRAG)
+                        ) || $answerCorrect
+                    ) {
                         if (in_array(
                             $answerType,
                             array(
@@ -3459,29 +3463,26 @@ class Exercise
 
                         } elseif ($answerType == MULTIPLE_ANSWER_TRUE_FALSE) {
                             $htmlContent .= ExerciseShowFunctions::display_multiple_answer_true_false(
-                                    $answerType,
-                                    $studentChoice,
-                                    $answer,
-                                    $answerComment,
-                                    $answerCorrect,
-                                    0,
-                                    $questionId,
-                                    0
-                                );
-
+                                $answerType,
+                                $studentChoice,
+                                $answer,
+                                $answerComment,
+                                $answerCorrect,
+                                0,
+                                $questionId,
+                                0
+                            );
                         } elseif ($answerType == MULTIPLE_ANSWER_COMBINATION_TRUE_FALSE) {
-
-                                $htmlContent .= ExerciseShowFunctions::display_multiple_answer_combination_true_false(
-                                    $answerType,
-                                    $studentChoice,
-                                    $answer,
-                                    $answerComment,
-                                    $answerCorrect,
-                                    0,
-                                    0,
-                                    0
-                                );
-
+                            $htmlContent .= ExerciseShowFunctions::display_multiple_answer_combination_true_false(
+                                $answerType,
+                                $studentChoice,
+                                $answer,
+                                $answerComment,
+                                $answerCorrect,
+                                0,
+                                0,
+                                0
+                            );
                         } elseif ($answerType == FILL_IN_BLANKS) {
                             $htmlContent .= ExerciseShowFunctions::display_fill_in_blanks_answer($answer, 0, 0);
                         } elseif ($answerType == FREE_ANSWER) {
@@ -3670,6 +3671,7 @@ class Exercise
                         } elseif ($answerType == MATCHING || $answerType == MATCHING_DRAG) {
                             //if ($origin != 'learnpath') {
                             $htmlContent .= '<tr>';
+
                             $htmlContent .= '<td>'.$answer_matching[$answerId].'</td><td>'.$user_answer.' / <b><span style="color: #008000;">'.text_filter(
                                     $answer_matching[$answerCorrect]
                                 ).'</span></b></td>';
@@ -4644,7 +4646,7 @@ class Exercise
                 return array('value' => true, 'message' => '');
             }
         }
-        
+
         $courseInfo = api_get_course_info();
 
         //Checking visibility in the item_property table
@@ -5065,7 +5067,7 @@ class Exercise
         if (in_array(strtolower($this->name), $exams) && empty($_COOKIE[$lastAttemptId])) {
             $timeFinishMssg = 'WeHaveDetectedExamNotFinish';
         }
-        
+
         $html = '<div id="clock_warning" style="display:none">'.Display::return_message(
             get_lang('ReachedTimeLimit'),
             'warning'
@@ -5327,7 +5329,7 @@ class Exercise
             }
         }
     }
-    
+
     /**
      * @param int $lpId
      * @param int $lpItemId
@@ -5339,7 +5341,7 @@ class Exercise
     {
         $table_track_e_exer = Database :: get_statistic_table(TABLE_STATISTIC_TRACK_E_EXERCICES);
         $table_c_quiz = Database::get_course_table(TABLE_QUIZ_TEST);
-        
+
         $sql = "SELECT * FROM $table_c_quiz cq "
              . "INNER JOIN $table_track_e_exer tee ON cq.id = tee.exe_exo_id "
              . "WHERE "
@@ -5347,10 +5349,10 @@ class Exercise
              . "tee.orig_lp_item_id = %s AND "
              . "tee.orig_lp_item_view_id = '%s' AND "
              . "cq.c_id = %s";
-        
-         $sql = sprintf($sql, $lpId, $lpItemId, $lpItemViewId, $courseId);
-         
-         Database::query($sql);
+
+        $sql = sprintf($sql, $lpId, $lpItemId, $lpItemViewId, $courseId);
+
+        Database::query($sql);
          $result = Database::query($sql);
          $list = array();
          if (Database::num_rows($result)) {

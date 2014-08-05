@@ -3251,7 +3251,8 @@ class Exercise
                     break;
                 // for matching
                 case DRAGGABLE:
-                case MATCHING :
+                case MATCHING_DRAG:
+                case MATCHING:
                     if ($from_database) {
                         $sql_answer = 'SELECT id, answer FROM '.$table_ans.' WHERE c_id = '.$course_id.' AND question_id="'.$questionId.'" AND correct=0';
                         $res_answer = Database::query($sql_answer);
@@ -3311,7 +3312,7 @@ class Exercise
                                 $htmlContent .= '<tr>';
                                 $htmlContent .= '<td>'.$s_answer_label.'</td>';
                                 $htmlContent .= '<td>'.$user_answer.'';
-                                if ($answerType == MATCHING) {
+                                if ($answerType == MATCHING || $answerType == MATCHING_DRAG) {
                                     $htmlContent .= '<b><span style="color: #008000;">'.$real_list[$i_answer_correct_answer].'</span></b>';
                                 }
                                 $htmlContent .= '</td>';
@@ -3432,7 +3433,7 @@ class Exercise
                     }
 
                     //display answers (if not matching type, or if the answer is correct)
-                    if (!in_array($answerType, array(DRAGGABLE, MATCHING))|| $answerCorrect) {
+                    if (!in_array($answerType, array(DRAGGABLE, MATCHING, MATCHING_DRAG))|| $answerCorrect) {
                         if (in_array(
                             $answerType,
                             array(
@@ -3666,7 +3667,7 @@ class Exercise
                                     error_log(__LINE__.' first', 0);
                                 }
                             }
-                        } elseif ($answerType == MATCHING) {
+                        } elseif ($answerType == MATCHING || $answerType == MATCHING_DRAG) {
                             //if ($origin != 'learnpath') {
                             $htmlContent .= '<tr>';
                             $htmlContent .= '<td>'.$answer_matching[$answerId].'</td><td>'.$user_answer.' / <b><span style="color: #008000;">'.text_filter(
@@ -3951,6 +3952,7 @@ class Exercise
                             );
                             break;
                         case DRAGGABLE:
+                        case MATCHING_DRAG:
                         case MATCHING:
                             //if ($origin != 'learnpath') {
                         $htmlContent .= '<tr>';
@@ -4265,7 +4267,7 @@ class Exercise
                 } else {
                     exercise_attempt($questionScore, 0, $quesId, $exeId, 0, $this->id);
                 }
-            } elseif ($answerType == MATCHING || $answerType == DRAGGABLE) {
+            } elseif ($answerType == MATCHING || $answerType == MATCHING_DRAG || $answerType == DRAGGABLE) {
                 if (isset($matching)) {
                     foreach ($matching as $j => $val) {
                         exercise_attempt($questionScore, $val, $quesId, $exeId, $j, $this->id);

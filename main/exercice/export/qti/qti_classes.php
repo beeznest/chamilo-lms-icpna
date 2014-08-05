@@ -51,7 +51,8 @@ class ImsQuestion extends Question
 			case FIB :
 				$this->answer = new ImsAnswerFillInBlanks($this->id);
 				break;
-			case MATCHING :
+            case MATCHING:
+            case MATCHING_DRAG:
 				$this->answer = new ImsAnswerMatching($this->id);
 				break;
 			default :

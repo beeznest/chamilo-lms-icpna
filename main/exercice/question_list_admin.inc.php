@@ -165,9 +165,9 @@ if (!$inATest) {
         $styleCat = "width:22%; float:left; padding-top:8px; text-align:center;";
         $styleLevel = "width:6%; float:left; padding-top:8px; text-align:center;";
         $styleScore = "width:4%; float:left; padding-top:8px; text-align:center;";
-        
+
         $category_list = Testcategory::getCategoryListName();
-        
+
         if (is_array($questionList)) {
 			foreach ($questionList as $id) {
 				//To avoid warning messages
@@ -195,14 +195,14 @@ if (!$inATest) {
 
 				// Question type
 				list($typeImg, $typeExpl) = $objQuestionTmp->get_type_icon_html();
-                
+
                 $question_media = null;
                 if (!empty($objQuestionTmp->parent_id)) {
                     $objQuestionMedia = Question::read($objQuestionTmp->parent_id);
                     $question_media  = Display::label($objQuestionMedia->question, 'info');
                 }
-                
-				$questionType = Display::tag('div', Display::return_icon($typeImg, $typeExpl, array(), ICON_SIZE_MEDIUM).$question_media, array('style' => $styleType));
+
+                $questionType = Display::tag('div', Display::return_icon($typeImg, $typeExpl, array(), ICON_SIZE_MEDIUM).$question_media, array('style' => $styleType));
 
 				// Question category
                 $category_labels = Testcategory::return_category_labels($objQuestionTmp->category_list, $category_list);
@@ -226,8 +226,8 @@ if (!$inATest) {
                     echo '<div class="header_operations">';
                         echo $questionName;
                         echo $questionType;
-                        
-                        echo $questionCategory;
+
+                echo $questionCategory;
                         echo $questionLevel;
                         echo $questionScore;
                         echo $actions;
@@ -247,8 +247,8 @@ if (!$inATest) {
 			}
 		}
 	}
-    
-	if (!$nbrQuestions) {
+
+    if (!$nbrQuestions) {
 	  	echo Display::display_warning_message(get_lang('NoQuestion'));
 	}
 	echo '</div>'; //question list div

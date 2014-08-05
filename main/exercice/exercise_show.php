@@ -325,8 +325,18 @@ foreach ($questionList as $questionId) {
 		$question_result = $objExercise->manage_answer($id, $questionId, $choice,'exercise_show', array(), false, true, $show_results, $objExercise->selectPropagateNeg());
 		$questionScore   = $question_result['score'];
 		$totalScore     += $question_result['score'];
-	} elseif ($answerType == MATCHING || $answerType == DRAGGABLE) {
-        $question_result = $objExercise->manage_answer($id, $questionId, $choice,'exercise_show', array(), false, true, $show_results, $objExercise->selectPropagateNeg());
+    } elseif ($answerType == MATCHING || $answerType == MATCHING_DRAG || $answerType == DRAGGABLE) {
+        $question_result = $objExercise->manage_answer(
+            $id,
+            $questionId,
+            $choice,
+            'exercise_show',
+            array(),
+            false,
+            true,
+            $show_results,
+            $objExercise->selectPropagateNeg()
+        );
         $questionScore   = $question_result['score'];
         $totalScore     += $question_result['score'];
 	} elseif ($answerType == HOT_SPOT) {

@@ -30,6 +30,7 @@ define('GLOBAL_MULTIPLE_ANSWER', 14);
 define('MEDIA_QUESTION', 15);
 define('UNIQUE_ANSWER_IMAGE', 16);
 define('DRAGGABLE', 17);
+define('MATCHING_DRAG', 18);
 
 //Some alias used in the QTI exports
 define('MCUA', 1);
@@ -70,6 +71,7 @@ abstract class Question
         MULTIPLE_ANSWER => array('multiple_answer.class.php', 'MultipleAnswer'),
         FILL_IN_BLANKS => array('fill_blanks.class.php', 'FillBlanks'),
         MATCHING => array('matching.class.php', 'Matching'),
+        MATCHING_DRAG => array('matching_drag.class.php', 'MatchingDrag'),
         FREE_ANSWER => array('freeanswer.class.php', 'FreeAnswer'),
         ORAL_EXPRESSION => array('oral_expression.class.php', 'OralExpression'),
         HOT_SPOT => array('hotspot.class.php', 'HotSpot'),
@@ -150,7 +152,6 @@ abstract class Question
 
         // if the question has been found
         if ($object = Database::fetch_object($result)) {
-
             $objQuestion = Question::getInstance($object->type);
             if (!empty($objQuestion)) {
 

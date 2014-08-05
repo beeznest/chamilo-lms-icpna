@@ -139,11 +139,17 @@ class MatchingDrag extends Question
             $group[] = $puce;
 
             $group[] = $form->createElement(
-                'text',
+                'html_editor',
                 'answer[' . $i . ']',
                 null,
-                'size="60" style="margin-left: 0em;"'
+                'style="vertical-align:middle"',
+                array(
+                    'ToolbarSet' => 'TestProposedAnswer',
+                    'Width' => '100%',
+                    'Height' => '100'
+                )
             );
+
             $group[] = $form->createElement(
                 'select',
                 'matches[' . $i . ']',
@@ -225,10 +231,15 @@ class MatchingDrag extends Question
             $puce->freeze();
             $group[] = $puce;
             $group[] = $form->createElement(
-                'text',
+                'html_editor',
                 'option[' . $i . ']',
                 null,
-                array('class' => 'span6')
+                'style="vertical-align:middle"',
+                array(
+                    'ToolbarSet' => 'TestProposedAnswer',
+                    'Width' => '100%',
+                    'Height' => '100'
+                )
             );
             $form->addGroup($group, null, null, '</td><td>');
             $form->addElement('html', '</td></tr>');

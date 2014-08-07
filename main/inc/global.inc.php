@@ -446,8 +446,9 @@ Chamilo::session()->start($already_installed);
 $settings_refresh_info = api_get_settings_params_simple(array('variable = ?' => 'settings_latest_update'));
 $settings_latest_update = $settings_refresh_info ? $settings_refresh_info['selected_value'] : null;
 
-$_setting = isset($_SESSION['_setting']) ? $_SESSION['_setting'] : null;
-$_plugins = isset($_SESSION['_plugins']) ? $_SESSION['_plugins'] : null;
+// Commented because avoid refresh plugin values - refs BT#8274
+// $_setting = isset($_SESSION['_setting']) ? $_SESSION['_setting'] : null;
+// $_plugins = isset($_SESSION['_plugins']) ? $_SESSION['_plugins'] : null;
 
 if (!isset($_setting)) {
     api_set_settings_and_plugins();

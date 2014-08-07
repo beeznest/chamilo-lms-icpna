@@ -4,7 +4,7 @@ include_once '../../../main/inc/global.inc.php';
 include_once 'add_external_pages_plugin.class.php';
 include_once '../../../main/auth/sso/ssoServer.class.php';
 
-if (api_is_teacher() || api_is_course_admin() || api_is_course_admin()) {
+if (api_is_teacher() || api_is_course_admin() || api_is_course_admin() || api_is_student()) {
     ;
 } else {
     api_not_allowed(true);

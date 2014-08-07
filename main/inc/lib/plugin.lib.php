@@ -314,7 +314,7 @@ class AppPlugin {
                 if (file_exists($plugin_path)) {
                     require_once $plugin_path;
                     if (isset($plugin_info) && isset($plugin_info['plugin_class'])) {
-                        $plugin_info['plugin_class']::create()->course_install($course_id);
+                        $plugin_info['plugin_class']::create()->course_install($course_id, $plugin_info['is_course_plugin']);
                     }
                 }
             }

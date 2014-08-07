@@ -3320,7 +3320,14 @@ class DocumentManager {
         if (api_get_setting('show_chat_folder') == 'false') {
             $folders_to_avoid[] = '/chat_files';
         }
-        return in_array($path, $folders_to_avoid);
+
+        if (is_array($folders_to_avoid)) {
+
+            return in_array($path, $folders_to_avoid);
+        } else {
+
+            return false;
+        }
     }
 
     static function get_system_folders() {

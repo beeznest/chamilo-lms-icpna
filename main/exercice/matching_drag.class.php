@@ -2,28 +2,27 @@
 /* For licensing terms, see /license.txt */
 
 /**
+ * CLASS Matching
  *
- *  Class Matching
- *  Matching questions type class
+ * This class allows to instantiate an object of type MULTIPLE_ANSWER (MULTIPLE CHOICE, MULTIPLE ANSWER),
+ * extending the class question
  *
- *    This class allows to instantiate an object of type MULTIPLE_ANSWER (MULTIPLE CHOICE, MULTIPLE ANSWER),
- *    extending the class question
- *
+ * Matching questions type class
  * @author Eric Marguin
  * @package chamilo.exercise
  */
-class Matching extends Question
+class MatchingDrag extends Question
 {
-    static $typePicture = 'matching.gif';
-    static $explanationLangVar = 'Matching';
+    static $typePicture = 'matching_drag.gif';
+    static $explanationLangVar = 'MatchingDrag';
 
     /**
      * Constructor
      */
-    public function Matching()
+    public function MatchingDrag()
     {
         parent::question();
-        $this->type = MATCHING;
+        $this->type = MATCHING_DRAG;
         $this->isContent = $this->getIsContent();
     }
 
@@ -37,77 +36,82 @@ class Matching extends Question
         $navigator_info = api_get_navigator();
 
         $nb_matches = $nb_options = 2;
-        if ($form ->isSubmitted()) {
-            $nb_matches = $form ->getSubmitValue('nb_matches');
-            $nb_options = $form ->getSubmitValue('nb_options');
-            if (isset($_POST['lessMatches']))
+        if ($form->isSubmitted()) {
+            $nb_matches = $form->getSubmitValue('nb_matches');
+            $nb_options = $form->getSubmitValue('nb_options');
+            if (isset($_POST['lessMatches'])) {
                 $nb_matches--;
-            if (isset($_POST['moreMatches']))
-                $nb_matches++;
-            if (isset($_POST['lessOptions']))
-                $nb_options--;
-            if (isset($_POST['moreOptions']))
-                $nb_options++;
-
-        } else if (!empty($this ->id)) {
-            $answer = new Answer($this ->id);
-            $answer ->read();
-            if (count($answer->nbrAnswers) > 0) {
-                $a_matches = $a_options = array();
-                $nb_matches = $nb_options = 0;
-                for ($i = 1; $i <= $answer->nbrAnswers; $i++) {
-                    if ($answer ->isCorrect($i)) {
-                        $nb_matches++;
-                        $defaults['answer[' . $nb_matches . ']'] = $answer ->selectAnswer(
-                            $i
-                        );
-                        $defaults['weighting[' . $nb_matches . ']'] = float_format(
-                            $answer ->selectWeighting($i),
-                            1
-                        );
-                        $defaults['matches[' . $nb_matches . ']'] = $answer ->correct[$i];
-                    } else {
-                        $nb_options++;
-                        $defaults['option[' . $nb_options . ']'] = $answer ->selectAnswer(
-                            $i
-                        );
-                    }
-                }
-
             }
+            if (isset($_POST['moreMatches'])) {
+                $nb_matches++;
+            }
+            if (isset($_POST['lessOptions'])) {
+                $nb_options--;
+            }
+            if (isset($_POST['moreOptions'])) {
+                $nb_options++;
+            }
+
         } else {
-            $defaults['answer[1]'] = get_lang('DefaultMakeCorrespond1');
-            $defaults['answer[2]'] = get_lang('DefaultMakeCorrespond2');
-            $defaults['matches[2]'] = '2';
-            $defaults['option[1]'] = get_lang('DefaultMatchingOptA');
-            $defaults['option[2]'] = get_lang('DefaultMatchingOptB');
+            if (!empty($this->id)) {
+                $answer = new Answer($this->id);
+                $answer->read();
+                if (count($answer->nbrAnswers) > 0) {
+                    $nb_matches = $nb_options = 0;
+                    for ($i = 1; $i <= $answer->nbrAnswers; $i++) {
+                        if ($answer->isCorrect($i)) {
+                            $nb_matches++;
+                            $defaults['answer[' . $nb_matches . ']'] = $answer->selectAnswer(
+                                $i
+                            );
+                            $defaults['weighting[' . $nb_matches . ']'] = float_format(
+                                $answer->selectWeighting($i),
+                                1
+                            );
+                            $defaults['matches[' . $nb_matches . ']'] = $answer->correct[$i];
+                        } else {
+                            $nb_options++;
+                            $defaults['option[' . $nb_options . ']'] = $answer->selectAnswer(
+                                $i
+                            );
+                        }
+                    }
+
+                }
+            } else {
+                $defaults['answer[1]'] = get_lang('DefaultMakeCorrespond1');
+                $defaults['answer[2]'] = get_lang('DefaultMakeCorrespond2');
+                $defaults['matches[2]'] = '2';
+                $defaults['option[1]'] = get_lang('DefaultMatchingOptA');
+                $defaults['option[2]'] = get_lang('DefaultMatchingOptB');
+            }
         }
         $a_matches = array();
         for ($i = 1; $i <= $nb_options; ++$i) {
             $a_matches[$i] = chr(64 + $i); // fill the array with A, B, C.....
         }
 
-        $form ->addElement('hidden', 'nb_matches', $nb_matches);
-        $form ->addElement('hidden', 'nb_options', $nb_options);
+        $form->addElement('hidden', 'nb_matches', $nb_matches);
+        $form->addElement('hidden', 'nb_options', $nb_options);
 
         // DISPLAY MATCHES
         $html = '<table class="data_table">
 					<tr>
 						<th width="10px">
-							'.get_lang('Number').'
+							' . get_lang('Number') . '
 						</th>
 						<th width="40%">
-							'.get_lang('Answer').'
+							' . get_lang('Answer') . '
 						</th>
 						<th width="40%">
-							'.get_lang('MatchesTo').'
+							' . get_lang('MatchesTo') . '
 						</th>
 						<th width="50px">
-							'.get_lang('Weighting').'
+							' . get_lang('Weighting') . '
 						</th>
 					</tr>';
 
-        $form ->addElement(
+        $form->addElement(
             'label',
             get_lang(
                 'MakeCorrespond'
@@ -117,11 +121,13 @@ class Matching extends Question
 
         if ($nb_matches < 1) {
             $nb_matches = 1;
-            Display::display_normal_message(get_lang('YouHaveToCreateAtLeastOneAnswer'));
+            Display::display_normal_message(
+                get_lang('YouHaveToCreateAtLeastOneAnswer')
+            );
         }
 
         for ($i = 1; $i <= $nb_matches; ++$i) {
-            $form ->addElement('html', '<tr><td>');
+            $form->addElement('html', '<tr><td>');
             $group = array();
             $puce = $form->createElement(
                 'text',
@@ -150,11 +156,11 @@ class Matching extends Question
                 null,
                 array('class' => 'span1', 'value' => 10)
             );
-            $form ->addGroup($group, null, null, '</td><td>');
-            $form ->addElement('html', '</td></tr>');
+            $form->addGroup($group, null, null, '</td><td>');
+            $form->addElement('html', '</td></tr>');
         }
 
-        $form ->addElement('html', '</table></div></div>');
+        $form->addElement('html', '</table></div></div>');
         $group = array();
 
         if ($navigator_info['name'] == 'Internet Explorer' && $navigator_info['version'] == '6') {
@@ -185,28 +191,30 @@ class Matching extends Question
             );
         }
 
-        $form ->addGroup($group);
+        $form->addGroup($group);
 
         // DISPLAY OPTIONS
         $html = '<table class="data_table">
 					<tr style="text-align: center;">
 						<th width="10px">
-							'.get_lang('Number').'
+							' . get_lang('Number') . '
 						</th>
 						<th width="90%"
-							'.get_lang('Answer').'
+							' . get_lang('Answer') . '
 						</th>
 					</tr>';
         //$form -> addElement ('html', $html);
-        $form ->addElement('label', null, $html);
+        $form->addElement('label', null, $html);
 
         if ($nb_options < 1) {
             $nb_options = 1;
-            Display::display_normal_message(get_lang('YouHaveToCreateAtLeastOneAnswer'));
+            Display::display_normal_message(
+                get_lang('YouHaveToCreateAtLeastOneAnswer')
+            );
         }
 
         for ($i = 1; $i <= $nb_options; ++$i) {
-            $form ->addElement('html', '<tr><td>');
+            $form->addElement('html', '<tr><td>');
             $group = array();
             $puce = $form->createElement(
                 'text',
@@ -222,11 +230,11 @@ class Matching extends Question
                 null,
                 array('class' => 'span6')
             );
-            $form ->addGroup($group, null, null, '</td><td>');
-            $form ->addElement('html', '</td></tr>');
+            $form->addGroup($group, null, null, '</td><td>');
+            $form->addElement('html', '</td></tr>');
         }
 
-        $form ->addElement('html', '</table></div></div>');
+        $form->addElement('html', '</table></div></div>');
         $group = array();
         global $text, $class;
 
@@ -272,13 +280,13 @@ class Matching extends Question
             );
         }
 
-        $form ->addGroup($group);
+        $form->addGroup($group);
 
-        if (!empty($this ->id)) {
-            $form ->setDefaults($defaults);
+        if (!empty($this->id)) {
+            $form->setDefaults($defaults);
         } else {
-            if ($this ->isContent == 1) {
-                $form ->setDefaults($defaults);
+            if ($this->isContent == 1) {
+                $form->setDefaults($defaults);
             }
         }
 
@@ -294,9 +302,9 @@ class Matching extends Question
      */
     public function processAnswersCreation($form)
     {
-        $nb_matches = $form ->getSubmitValue('nb_matches');
-        $nb_options = $form ->getSubmitValue('nb_options');
-        $this ->weighting = 0;
+        $nb_matches = $form->getSubmitValue('nb_matches');
+        $nb_options = $form->getSubmitValue('nb_options');
+        $this->weighting = 0;
         $objAnswer = new Answer($this->id);
 
         $position = 0;
@@ -304,17 +312,17 @@ class Matching extends Question
         // insert the options
         for ($i = 1; $i <= $nb_options; ++$i) {
             $position++;
-            $option = $form ->getSubmitValue('option[' . $i . ']');
+            $option = $form->getSubmitValue('option[' . $i . ']');
             $objAnswer->createAnswer($option, 0, '', 0, $position);
         }
 
         // insert the answers
         for ($i = 1; $i <= $nb_matches; ++$i) {
             $position++;
-            $answer = $form ->getSubmitValue('answer[' . $i . ']');
-            $matches = $form ->getSubmitValue('matches[' . $i . ']');
-            $weighting = $form ->getSubmitValue('weighting[' . $i . ']');
-            $this ->weighting += $weighting;
+            $answer = $form->getSubmitValue('answer[' . $i . ']');
+            $matches = $form->getSubmitValue('matches[' . $i . ']');
+            $weighting = $form->getSubmitValue('weighting[' . $i . ']');
+            $this->weighting += $weighting;
             $objAnswer->createAnswer(
                 $answer,
                 $matches,
@@ -331,20 +339,28 @@ class Matching extends Question
      * @param null $feedback_type
      * @param null $counter
      * @param null $score
+     * @param bool $show_media
      * @return string
      */
     public function return_header(
         $feedback_type = null,
         $counter = null,
-        $score = null
-    )
-    {
-        $header = parent::return_header($feedback_type, $counter, $score);
-        $header .= '<table class="' . $this->question_table_class . '">';
-        $header .= '<tr>
-                <th>' . get_lang('ElementList') . '</th>
-                <th>' . get_lang('CorrespondsTo') . '</th>
-              </tr>';
+        $score = null,
+        $show_media = false
+    ) {
+        $header = parent::return_header(
+            $feedback_type,
+            $counter,
+            $score,
+            $show_media
+        );
+        if ($this->type == MATCHING_DRAG) {
+            $header .= '<table class="' . $this->question_table_class . '">';
+            $header .= '<tr>
+                    <th>' . get_lang('ElementList') . '</th>
+                    <th>' . get_lang('CorrespondsTo') . '</th>
+                  </tr>';
+        }
         return $header;
     }
 }

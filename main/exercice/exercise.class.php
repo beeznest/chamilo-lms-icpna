@@ -2944,7 +2944,8 @@ class Exercise
                     break;
                 // for matching
                 case DRAGGABLE:
-                case MATCHING :
+                case MATCHING_DRAG:
+                case MATCHING:
                     if ($from_database) {
                         $sql_answer = 'SELECT id, answer FROM '.$table_ans.' WHERE c_id = '.$course_id.' AND question_id="'.$questionId.'" AND correct=0';
                         $res_answer = Database::query($sql_answer);
@@ -3004,7 +3005,7 @@ class Exercise
                                 echo '<tr>';
                                 echo '<td>'.$s_answer_label.'</td>';
                                 echo '<td>'.$user_answer.'';
-                                if ($answerType == MATCHING) {
+                                if ($answerType == MATCHING || $answerType == MATCHING_DRAG) {
                                     echo '<b><span style="color: #008000;">'.$real_list[$i_answer_correct_answer].'</span></b>';
                                 }
                                 echo '</td>';
@@ -3126,7 +3127,11 @@ class Exercise
                     }
 
                     //display answers (if not matching type, or if the answer is correct)
-                    if (!in_array($answerType, array(DRAGGABLE, MATCHING))|| $answerCorrect) {
+                    if (!in_array(
+                            $answerType,
+                            array(DRAGGABLE, MATCHING, MATCHING_DRAG)
+                        ) || $answerCorrect
+                    ) {
                         if (in_array(
                             $answerType,
                             array(
@@ -3139,7 +3144,6 @@ class Exercise
                             )
                         )
                         ) {
-
                                 ExerciseShowFunctions::display_unique_or_multiple_answer(
                                     $answerType,
                                     $studentChoice,
@@ -3176,25 +3180,27 @@ class Exercise
                                     0,
                                     0
                                 );
-
                         } elseif ($answerType == FILL_IN_BLANKS) {
-
-                                ExerciseShowFunctions::display_fill_in_blanks_answer($answer, 0, 0);
-
+                            ExerciseShowFunctions::display_fill_in_blanks_answer(
+                                $answer,
+                                0,
+                                0
+                            );
                         } elseif ($answerType == FREE_ANSWER) {
-
-                                ExerciseShowFunctions::display_free_answer(
-                                    $choice,
-                                    $exeId,
-                                    $questionId,
-                                    $questionScore
-                                );
-
+                            ExerciseShowFunctions::display_free_answer(
+                                $choice,
+                                $exeId,
+                                $questionId,
+                                $questionScore
+                            );
                         } elseif ($answerType == ORAL_EXPRESSION) {
                             // to store the details of open questions in an array to be used in mail
-
-                                ExerciseShowFunctions::display_oral_expression_answer($choice, 0, 0, $nano);
-
+                            ExerciseShowFunctions::display_oral_expression_answer(
+                                $choice,
+                                0,
+                                0,
+                                $nano
+                            );
                         } elseif ($answerType == HOT_SPOT) {
 //                            if ($origin != 'learnpath') {
                                 ExerciseShowFunctions::display_hotspot_answer(
@@ -3368,7 +3374,7 @@ class Exercise
                                     error_log(__LINE__.' first', 0);
                                 }
                             }
-                        } elseif ($answerType == MATCHING) {
+                        } elseif ($answerType == MATCHING || $answerType == MATCHING_DRAG) {
                             //if ($origin != 'learnpath') {
                                 echo '<tr>';
                                 echo '<td>'.$answer_matching[$answerId].'</td><td>'.$user_answer.' / <b><span style="color: #008000;">'.text_filter(
@@ -3649,6 +3655,7 @@ class Exercise
                             );
                             break;
                         case DRAGGABLE:
+                        case MATCHING_DRAG:
                         case MATCHING:
                             //if ($origin != 'learnpath') {
                                 echo '<tr>';
@@ -3963,7 +3970,7 @@ class Exercise
                 } else {
                     exercise_attempt($questionScore, 0, $quesId, $exeId, 0, $this->id);
                 }
-            } elseif ($answerType == MATCHING || $answerType == DRAGGABLE) {
+            } elseif ($answerType == MATCHING || $answerType == MATCHING_DRAG || $answerType == DRAGGABLE) {
                 if (isset($matching)) {
                     foreach ($matching as $j => $val) {
                         exercise_attempt($questionScore, $val, $quesId, $exeId, $j, $this->id);

@@ -10,6 +10,8 @@ require_once '../../main/inc/global.inc.php';
 require_once 'config.php';
 require_once 'migration.class.php'; 
 require_once 'db_matches.php';
+// redefine web services config
+require_once 'ws.conf.php';
 $eol = "\n";
 $exec = true;
 /**

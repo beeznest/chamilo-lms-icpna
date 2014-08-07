@@ -56,6 +56,7 @@ class Ims2Question extends Question
             case FIB :
                 $answer = new ImsAnswerFillInBlanks($this->id);
             	return $answer;
+            case MATCHING_DRAG:
             case MATCHING :
                 $answer = new ImsAnswerMatching($this->id);
             	return $answer;
@@ -97,9 +98,9 @@ class ImsAnswerMultipleChoice extends Answer
         $out .= '      <prompt> ' . $questionStatment . ' </prompt>'. "\n";
 		if (is_array($this->answerList)) {
 	        foreach ($this->answerList as $current_answer) {
-	        	
-	        	
-	            $out .= '      <simpleChoice identifier="answer_' . $current_answer['id'] . '" fixed="false">' . $current_answer['answer'];
+
+
+                $out .= '      <simpleChoice identifier="answer_' . $current_answer['id'] . '" fixed="false">' . $current_answer['answer'];
 	            if (isset($current_answer['comment']) && $current_answer['comment'] != '')
 	            {
 	                $out .= '<feedbackInline identifier="answer_' . $current_answer['id'] . '">' . $current_answer['comment'] . '</feedbackInline>';
@@ -247,8 +248,8 @@ class ImsAnswerFillInBlanks extends Answer
         $out = '';
 		if (is_array($this->answerList)) {
 	        foreach ($this->answerList as $answerKey=>$answer) {
-	        	
-	        	$answerKey = $answer['id'];
+
+                $answerKey = $answer['id'];
 	        	$answer = $answer['answer'];
 	            $out .= '  <responseDeclaration identifier="fill_' . $answerKey . '" cardinality="single" baseType="identifier">' . "\n";
 	            $out .= '    <correctResponse>'. "\n";

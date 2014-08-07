@@ -14,6 +14,8 @@ require_once dirname(__FILE__).'/../../main/inc/global.inc.php';
 require_once 'config.php';
 require_once 'migration.class.php'; 
 require_once 'db_matches.php';
+// redefine web services config
+require_once 'ws.conf.php';
 foreach ($servers as $server_info) {
     if ($server_info['active'])  {
         //echo "\n---- Start loading server----- \n";

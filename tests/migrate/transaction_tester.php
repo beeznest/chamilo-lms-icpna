@@ -30,6 +30,8 @@ if ($form->validate()) {
     require_once 'migration.custom.class.php';
     //harcoded db_matches
     require_once 'db_matches.php';
+    // redefine web services config
+    require_once 'ws.conf.php';
     
     $migration = new Migration();    
     $migration->set_web_service_connection_info($matches);    

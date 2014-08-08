@@ -32,6 +32,32 @@ class AddExternalPagesPlugin extends Plugin
         parent::__construct('1.0', 'Francis Gonzales', $parameters);
     }
 
+    /**
+     * funcion poco claro cuando se usa.
+     */
+    function install() {
+/*
+        //Installing course settings
+        $setting = $this->get_info();
+        //
+        // Esta funcion no pasa por crear iconos para home principal:
+        // $isCoursePlugin = isset($setting['is_course_plugin']) ? $setting['is_course_plugin'] : '';
+        // $this->install_course_fields_in_all_courses($isCoursePlugin);
+        //
+
+        $isCoursePlugin = isset($setting['is_course_plugin']) ? $setting['is_course_plugin'] : '';
+        $this->install_course_fields_in_all_courses($isCoursePlugin);
+        $this->saveAdditionalConfiguration($setting);
+*/
+
+    }
+
+
+    /**
+     * Funcion recorre todo tool list y agrega icono.
+     * @param array $params config
+     * @return mixed|void
+     */
     public function saveAdditionalConfiguration($params)
     {
         $toolTable = Database::get_course_table(TABLE_TOOL_LIST);
@@ -51,6 +77,7 @@ class AddExternalPagesPlugin extends Plugin
                     'image' => $imagesPath[$i]
                 );
             }
+            // verifica que existan registros en esta tabla para agregar los parametros del plugin.
             $sql = "SELECT t.* FROM $toolTable t
                 INNER JOIN (
                     SELECT c_id, MAX(id) as id

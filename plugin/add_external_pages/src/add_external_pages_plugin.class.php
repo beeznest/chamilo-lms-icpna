@@ -29,29 +29,20 @@ class AddExternalPagesPlugin extends Plugin
             'sso_enable' => 'boolean',
         );
 
-        parent::__construct('1.0', 'Francis Gonzales', $parameters);
+        parent::__construct('1.0', 'Francis Gonzales, Anibal Copitan', $parameters);
     }
 
-    /**
-     * funcion poco claro cuando se usa.
-     */
     function install() {
-/*
-        //Installing course settings
         $setting = $this->get_info();
-        //
-        // Esta funcion no pasa por crear iconos para home principal:
-        // $isCoursePlugin = isset($setting['is_course_plugin']) ? $setting['is_course_plugin'] : '';
-        // $this->install_course_fields_in_all_courses($isCoursePlugin);
-        //
-
-        $isCoursePlugin = isset($setting['is_course_plugin']) ? $setting['is_course_plugin'] : '';
-        $this->install_course_fields_in_all_courses($isCoursePlugin);
         $this->saveAdditionalConfiguration($setting);
-*/
 
+        // comment this lines for create one icon in menu principal
+        //$this->install_course_fields_in_all_courses($setting['is_course_plugin']);
     }
 
+    function uninstall() {
+        $this->deleteAllData();
+    }
 
     /**
      * Funcion recorre todo tool list y agrega icono.
@@ -61,10 +52,8 @@ class AddExternalPagesPlugin extends Plugin
     public function saveAdditionalConfiguration($params)
     {
         $toolTable = Database::get_course_table(TABLE_TOOL_LIST);
-        $whereCondition = array(
-                'link like ?' => '%add_page_plugin=1%'
-        );
-        Database::delete($toolTable, $whereCondition);
+        $this->deleteAllData();
+
         if ($params['tool_enable'] == "true") {
             $imagesPath = explode(';', $params['image_path']);
             $buttons = explode(';', $params['button_name']);
@@ -105,4 +94,16 @@ class AddExternalPagesPlugin extends Plugin
             }
         }
     }
+
+    /*
+     * Delete data generador for this plugin into table c_tool
+     */
+    private function deleteAllData() {
+        $toolTable = Database::get_course_table(TABLE_TOOL_LIST);
+        $whereCondition = array(
+            'link like ?' => '%add_page_plugin=1%'
+        );
+        Database::delete($toolTable, $whereCondition);
+    }
+
 }

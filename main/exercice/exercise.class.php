@@ -2467,7 +2467,7 @@ class Exercise
 
         $exams = array('final exam', 'examen final', 'final test');
         if (in_array(strtolower($this->name), $exams) && empty($_COOKIE[$lastAttemptId])) {
-            $script .= "  
+            $script .= "
                 function open_clock_warning() {
                    $('<input>').attr({
                         type: 'hidden',
@@ -2501,7 +2501,7 @@ class Exercise
                     $('#clock_warning').dialog('open');
                 } ";
           } else {
-                $script .= "  
+            $script .= "
                     function open_clock_warning() {
                        $('<input>').attr({
                             type: 'hidden',
@@ -3251,7 +3251,8 @@ class Exercise
                     break;
                 // for matching
                 case DRAGGABLE:
-                case MATCHING :
+                case MATCHING_DRAG:
+                case MATCHING:
                     if ($from_database) {
                         $sql_answer = 'SELECT id, answer FROM '.$table_ans.' WHERE c_id = '.$course_id.' AND question_id="'.$questionId.'" AND correct=0';
                         $res_answer = Database::query($sql_answer);
@@ -3311,7 +3312,7 @@ class Exercise
                                 $htmlContent .= '<tr>';
                                 $htmlContent .= '<td>'.$s_answer_label.'</td>';
                                 $htmlContent .= '<td>'.$user_answer.'';
-                                if ($answerType == MATCHING) {
+                                if ($answerType == MATCHING || $answerType == MATCHING_DRAG) {
                                     $htmlContent .= '<b><span style="color: #008000;">'.$real_list[$i_answer_correct_answer].'</span></b>';
                                 }
                                 $htmlContent .= '</td>';
@@ -3432,7 +3433,11 @@ class Exercise
                     }
 
                     //display answers (if not matching type, or if the answer is correct)
-                    if (!in_array($answerType, array(DRAGGABLE, MATCHING))|| $answerCorrect) {
+                    if (!in_array(
+                            $answerType,
+                            array(DRAGGABLE, MATCHING, MATCHING_DRAG)
+                        ) || $answerCorrect
+                    ) {
                         if (in_array(
                             $answerType,
                             array(
@@ -3458,29 +3463,26 @@ class Exercise
 
                         } elseif ($answerType == MULTIPLE_ANSWER_TRUE_FALSE) {
                             $htmlContent .= ExerciseShowFunctions::display_multiple_answer_true_false(
-                                    $answerType,
-                                    $studentChoice,
-                                    $answer,
-                                    $answerComment,
-                                    $answerCorrect,
-                                    0,
-                                    $questionId,
-                                    0
-                                );
-
+                                $answerType,
+                                $studentChoice,
+                                $answer,
+                                $answerComment,
+                                $answerCorrect,
+                                0,
+                                $questionId,
+                                0
+                            );
                         } elseif ($answerType == MULTIPLE_ANSWER_COMBINATION_TRUE_FALSE) {
-
-                                $htmlContent .= ExerciseShowFunctions::display_multiple_answer_combination_true_false(
-                                    $answerType,
-                                    $studentChoice,
-                                    $answer,
-                                    $answerComment,
-                                    $answerCorrect,
-                                    0,
-                                    0,
-                                    0
-                                );
-
+                            $htmlContent .= ExerciseShowFunctions::display_multiple_answer_combination_true_false(
+                                $answerType,
+                                $studentChoice,
+                                $answer,
+                                $answerComment,
+                                $answerCorrect,
+                                0,
+                                0,
+                                0
+                            );
                         } elseif ($answerType == FILL_IN_BLANKS) {
                             $htmlContent .= ExerciseShowFunctions::display_fill_in_blanks_answer($answer, 0, 0);
                         } elseif ($answerType == FREE_ANSWER) {
@@ -3666,9 +3668,10 @@ class Exercise
                                     error_log(__LINE__.' first', 0);
                                 }
                             }
-                        } elseif ($answerType == MATCHING) {
+                        } elseif ($answerType == MATCHING || $answerType == MATCHING_DRAG) {
                             //if ($origin != 'learnpath') {
                             $htmlContent .= '<tr>';
+
                             $htmlContent .= '<td>'.$answer_matching[$answerId].'</td><td>'.$user_answer.' / <b><span style="color: #008000;">'.text_filter(
                                     $answer_matching[$answerCorrect]
                                 ).'</span></b></td>';
@@ -3951,6 +3954,7 @@ class Exercise
                             );
                             break;
                         case DRAGGABLE:
+                        case MATCHING_DRAG:
                         case MATCHING:
                             //if ($origin != 'learnpath') {
                         $htmlContent .= '<tr>';
@@ -4265,7 +4269,7 @@ class Exercise
                 } else {
                     exercise_attempt($questionScore, 0, $quesId, $exeId, 0, $this->id);
                 }
-            } elseif ($answerType == MATCHING || $answerType == DRAGGABLE) {
+            } elseif ($answerType == MATCHING || $answerType == MATCHING_DRAG || $answerType == DRAGGABLE) {
                 if (isset($matching)) {
                     foreach ($matching as $j => $val) {
                         exercise_attempt($questionScore, $val, $quesId, $exeId, $j, $this->id);
@@ -4642,7 +4646,7 @@ class Exercise
                 return array('value' => true, 'message' => '');
             }
         }
-        
+
         $courseInfo = api_get_course_info();
 
         //Checking visibility in the item_property table
@@ -5063,7 +5067,7 @@ class Exercise
         if (in_array(strtolower($this->name), $exams) && empty($_COOKIE[$lastAttemptId])) {
             $timeFinishMssg = 'WeHaveDetectedExamNotFinish';
         }
-        
+
         $html = '<div id="clock_warning" style="display:none">'.Display::return_message(
             get_lang('ReachedTimeLimit'),
             'warning'
@@ -5325,7 +5329,7 @@ class Exercise
             }
         }
     }
-    
+
     /**
      * @param int $lpId
      * @param int $lpItemId
@@ -5337,7 +5341,7 @@ class Exercise
     {
         $table_track_e_exer = Database :: get_statistic_table(TABLE_STATISTIC_TRACK_E_EXERCICES);
         $table_c_quiz = Database::get_course_table(TABLE_QUIZ_TEST);
-        
+
         $sql = "SELECT * FROM $table_c_quiz cq "
              . "INNER JOIN $table_track_e_exer tee ON cq.id = tee.exe_exo_id "
              . "WHERE "
@@ -5345,10 +5349,10 @@ class Exercise
              . "tee.orig_lp_item_id = %s AND "
              . "tee.orig_lp_item_view_id = '%s' AND "
              . "cq.c_id = %s";
-        
-         $sql = sprintf($sql, $lpId, $lpItemId, $lpItemViewId, $courseId);
-         
-         Database::query($sql);
+
+        $sql = sprintf($sql, $lpId, $lpItemId, $lpItemViewId, $courseId);
+
+        Database::query($sql);
          $result = Database::query($sql);
          $list = array();
          if (Database::num_rows($result)) {

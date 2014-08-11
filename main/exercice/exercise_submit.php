@@ -1447,8 +1447,7 @@ function render_question($objExercise, $questionId, $attempt_list, $remind_list,
         $remind_highlight = ' remind_highlight ';
     }
 
-    //Showing the question
-
+    // Showing the question
     $exercise_actions  = null;
 
     echo '<div id="question_div_'.$questionId.'" class="main_question '.$remind_highlight.'" >';
@@ -1461,7 +1460,7 @@ function render_question($objExercise, $questionId, $attempt_list, $remind_list,
             case ONE_PER_PAGE:
                 $exercise_actions .= $objExercise->show_button($questionId, $current_question);
                 break;
-            case ALL_ON_ONE_PAGE :
+            case ALL_ON_ONE_PAGE:
                 $button  = '<a href="javascript://" class="btn" onclick="save_now(\''.$questionId.'\'); ">'.get_lang('SaveForNow').'</a>';
                 $button .= '<span id="save_for_now_'.$questionId.'" class="exercise_save_mini_message"></span>&nbsp;';
                 $exercise_actions  .= Display::div($button, array('class'=>'exercise_save_now_button'));

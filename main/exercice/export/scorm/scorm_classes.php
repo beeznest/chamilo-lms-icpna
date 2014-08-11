@@ -59,7 +59,8 @@ class ScormQuestion extends Question
 				$this->answer = new ScormAnswerFillInBlanks($this->id);
                 $this->answer->questionJSId = $this->js_id;
 				break;
-			case MATCHING :
+            case MATCHING_DRAG:
+            case MATCHING:
 				$this->answer = new ScormAnswerMatching($this->id);
                 $this->answer->questionJSId = $this->js_id;
 				break;

@@ -1,6 +1,6 @@
 <?php
-
 /* For licensing terms, see /license.txt */
+
 /**
  *     Exercise administration
  *     This script allows to manage (create, modify) an exercise and its questions

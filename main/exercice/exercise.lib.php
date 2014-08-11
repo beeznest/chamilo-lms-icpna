@@ -94,12 +94,16 @@ function showQuestion($questionId, $only_questions = false, $origin = false, $cu
         // on the right side are called answers
         $num_suggestions = 0;
 
-        if ($answerType == MATCHING || $answerType == DRAGGABLE) {
+        if ($answerType == MATCHING || $answerType == MATCHING_DRAG || $answerType == DRAGGABLE) {
             if ($answerType == DRAGGABLE) {
                 $s .= '<div class="ui-widget ui-helper-clearfix">
                         <ul class="drag_question ui-helper-reset ui-helper-clearfix">';
             } else {
-                $s .= '<div id="drag'.$questionId.'_question" class="drag_question">';
+                if ($answerType == MATCHING_DRAG) {
+                    $s .= '<div id="drag' . $questionId . '_question" class="drag_question">';
+                } else {
+                    $s .= '<div>';
+                }
                 $s .= '<table class="data_table">';
             }
 
@@ -478,7 +482,7 @@ function showQuestion($questionId, $only_questions = false, $origin = false, $cu
                     $answer = api_preg_replace('/\[[^]]+\]/', Display::input('text', "choice[$questionId][]", '', $attributes), $answer);
                 }
                 $s .= $answer;
-            } elseif ($answerType == MATCHING) {
+            } elseif ($answerType == MATCHING_DRAG) {
                 // matching type, showing suggestions and answers
                 // TODO: replace $answerId by $numAnswer
                 if ($answerId == 1) {
@@ -565,6 +569,71 @@ function showQuestion($questionId, $only_questions = false, $origin = false, $cu
                             $lines_count++;
                         } // end while()
                     }  // end if()
+                    $matching_correct_answer++;
+                }
+            } elseif ($answerType == MATCHING) {
+                // matching type, showing suggestions and answers
+                // TODO: replace $answerId by $numAnswer
+
+                if ($answerCorrect != 0) {
+                    // only show elements to be answered (not the contents of
+                    // the select boxes, who are corrrect = 0)
+                    $s .= '<tr><td width="45%" valign="top">';
+                    $parsed_answer = $answer;
+                    //left part questions
+                    $s .= ' <span style="float:left; width:8%;"><b>' . $lines_count . '</b>.&nbsp;</span>
+    					 	<span style="float:left; width:92%;">' . $parsed_answer . '</span></td>';
+                    //middle part (matches selects)
+
+                    $s .= '<td width="10%" valign="top" align="center">&nbsp;&nbsp;
+    			            <select name="choice[' . $questionId . '][' . $numAnswer . ']">';
+
+                    // fills the list-box
+                    foreach ($select_items as $key => $val) {
+                        // set $debug_mark_answer to true at function start to
+                        // show the correct answer with a suffix '-x'
+                        $selected = '';
+                        if ($debug_mark_answer) {
+                            if ($val['id'] == $answerCorrect) {
+                                $selected = 'selected="selected"';
+                            }
+                        }
+                        //$user_choice_array_position
+                        if (isset($user_choice_array_position[$numAnswer]) && $val['id'] == $user_choice_array_position[$numAnswer]) {
+                            $selected = 'selected="selected"';
+                        }
+                        /*if (isset($user_choice_array[$matching_correct_answer]) && $val['id'] == $user_choice_array[$matching_correct_answer]['answer']) {
+                            $selected = 'selected="selected"';
+                        }*/
+                        $s .= '<option value="' . $val['id'] . '" ' . $selected . '>' . $val['letter'] . '</option>';
+
+                    } // end foreach()
+
+                    $s .= '</select></td>';
+                    $s .= '<td width="45%" valign="top" >';
+                    if (isset($select_items[$lines_count])) {
+                        $s .= '<span style="float:left; width:5%;"><b>' . $select_items[$lines_count]['letter'] . '.</b></span>' .
+                            '<span style="float:left; width:95%;">' . $select_items[$lines_count]['answer'] . '</span>';
+                    } else {
+                        $s .= '&nbsp;';
+                    }
+                    $s .= '</td>';
+                    $s .= '</tr>';
+                    $lines_count++;
+                    //if the left side of the "matching" has been completely
+                    // shown but the right side still has values to show...
+                    if (($lines_count - 1) == $num_suggestions) {
+                        // if it remains answers to shown at the right side
+                        while (isset($select_items[$lines_count])) {
+                            $s .= '<tr>
+    							  <td colspan="2"></td>
+    							  <td valign="top">';
+                            $s .= '<b>' . $select_items[$lines_count]['letter'] . '.</b> ' . $select_items[$lines_count]['answer'];
+                            $s .= "</td>
+    						</tr>";
+                            $lines_count++;
+                        } // end while()
+                    } // end if()
                     $matching_correct_answer++;
                 }
             } elseif ($answerType ==  DRAGGABLE) {
@@ -656,7 +725,9 @@ function showQuestion($questionId, $only_questions = false, $origin = false, $cu
         if ($show_comment) {
             $s .= '</table>';
         } else {
-            if (  $answerType == MATCHING || $answerType == UNIQUE_ANSWER_NO_OPTION || $answerType == MULTIPLE_ANSWER_TRUE_FALSE ||
+            if ($answerType == MATCHING ||
+                $answerType == MATCHING_DRAG ||
+                $answerType == UNIQUE_ANSWER_NO_OPTION || $answerType == MULTIPLE_ANSWER_TRUE_FALSE ||
                 $answerType == MULTIPLE_ANSWER_COMBINATION_TRUE_FALSE) {
                 $s .= '</table>';
             }
@@ -680,7 +751,7 @@ function showQuestion($questionId, $only_questions = false, $origin = false, $cu
             //$s .= '</div>';
         }
 
-        if ($answerType == MATCHING) {
+        if ($answerType == MATCHING || $answerType == MATCHING_DRAG) {
             $s .= '</div>';
         }
 
@@ -2009,6 +2080,7 @@ function get_number_students_answer_count($answer_id, $question_id, $exercise_id
             $answer_condition = "";
             $select_condition = " e.exe_id, answer ";
             break;
+        case MATCHING_DRAG:
         case MATCHING:
         default:
             $answer_condition = " answer = $answer_id AND ";
@@ -2041,6 +2113,7 @@ function get_number_students_answer_count($answer_id, $question_id, $exercise_id
                 }
                 return $good_answers;
                 break;
+            case MATCHING_DRAG:
             case MATCHING:
             default:
                 $return = Database::num_rows($result);
@@ -2448,18 +2521,18 @@ function display_question_list_by_attempt($objExercise, $exe_id, $save_user_resu
     // Remove autoplay from questions for result
     $exercise_content = preg_replace('/autoplay[\=\".+\"]+/','',$exercise_content);
 
-    echo $total_score_text; 
+    echo $total_score_text;
     echo $exercise_content;
- 
+
     if (!$show_only_score) {
         echo $total_score_text;
     }
-  
+
     /*
     if ($isAdultPlex && $isSuccess) {
         isNextPlexAvailable
-        ( 
-                $objExercise->course['code'], 
+        (
+                $objExercise->course['code'],
                 $exercise_stat_info['orig_lp_id'],
                 $exercise_stat_info['exe_user_id'],
                 $exercise_stat_info['orig_lp_item_id']
@@ -2495,7 +2568,7 @@ function isNextPlexAvailable($courseCode, $lpId, $userId, $nextItem)
 {
     $objLearnPath = new learnpath($courseCode, $lpId, $userId);
     $tocs = $objLearnPath->get_all_toc();
-   
+
     if (!empty($tocs[$nextItem])) {
         echo displayPlexQuestion();
         echo "<script> $('#plex').modal('show'); "
@@ -2510,7 +2583,7 @@ function isNextPlexAvailable($courseCode, $lpId, $userId, $nextItem)
 
 function displayPlexQuestion()
 {
-    return '<div class="modal fade large" style="display: none;" id="plex" 
+    return '<div class="modal fade large" style="display: none;" id="plex"
             tabindex="-1" role="dialog" aria-labelledby="plexlabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -2700,15 +2773,15 @@ function getAllExerciseWithExtraFieldPlex()
  */
 function getAllExerciseWithExtraFieldPlexPerStudent($studentId, $courseId)
 {
-    
+
     //If there is an exam incomplete let the user to continue taking the PLEX in Modules
     $sql = "SELECT te.*, s.field_value, cq.pass_percentage FROM exercise_field_values s
             INNER JOIN exercise_field sf ON (s.field_id = sf.id)
-            INNER JOIN c_quiz cq ON cq.c_id = s.c_id and s.exercise_id = cq.id            
+            INNER JOIN c_quiz cq ON cq.c_id = s.c_id and s.exercise_id = cq.id
             INNER JOIN course c ON c.id = cq.c_id
             INNER JOIN track_e_exercices te ON te.exe_exo_id = cq.id and te.exe_cours_id = c.code
             WHERE
-            field_variable = 'plex' and 
+            field_variable = 'plex' and
             exe_user_id = %s and
             te. status = 'incomplete' and
             c.id = %s";
@@ -2719,36 +2792,40 @@ function getAllExerciseWithExtraFieldPlexPerStudent($studentId, $courseId)
     }
     $sql = "SELECT te.*, s.field_value, cq.pass_percentage FROM exercise_field_values s
             INNER JOIN exercise_field sf ON (s.field_id = sf.id)
-            INNER JOIN c_quiz cq ON cq.c_id = s.c_id and s.exercise_id = cq.id            
+            INNER JOIN c_quiz cq ON cq.c_id = s.c_id and s.exercise_id = cq.id
             INNER JOIN course c ON c.id = cq.c_id
             INNER JOIN track_e_exercices te ON te.exe_exo_id = cq.id and te.exe_cours_id = c.code
             WHERE
-            field_variable = 'plex' and 
+            field_variable = 'plex' and
             exe_user_id = %s and
             te. status <> 'incomplete' and
             c.id = %s
             ORDER BY te.start_date";
     $sql = sprintf($sql, $studentId, $courseId);
-    
+
     $result = Database::query($sql);
-    
+
     if ($result !== false && Database::num_rows($result)) {
         $list = Database::store_result($result, 'ASSOC');
         $result = array();
         foreach($list as $exe) {
             $percentage = getSuccessExerciseResultPercentage
                                 (
-                                    $exe['exe_result'], 
-                                    $exe['exe_weighting'], 
+                $exe['exe_result'],
+                $exe['exe_weighting'],
                                     $exe['pass_percentage']
                                 );
-            if(is_success_exercise_result($exe['exe_result'], $exe['exe_weighting'], $exe['pass_percentage'])) {   
+            if (is_success_exercise_result(
+                $exe['exe_result'],
+                $exe['exe_weighting'],
+                $exe['pass_percentage']
+            )) {
                 $successRs = array('score' => $percentage, 'course' => $exe['field_value']);
             } else {
                 $failedRs = array('score' => $percentage, 'course' => 1);
             }
         }
-        
+
         if (!empty($successRs)) {
             return $successRs;
         } else {
@@ -2757,7 +2834,7 @@ function getAllExerciseWithExtraFieldPlexPerStudent($studentId, $courseId)
     } else {
         return array('score' => false, 'course' => 1);
     }
-    
+
 }
 
 /**
@@ -2803,10 +2880,10 @@ function getFinalScore($cid, $sid)
                 session_id = $sid AND
                 status = ''
             ORDER BY start_date ASC";
-    
+
     $res = Database::query($sql);
     $numRows = Database::num_rows($res);
-    
+
     if ($numRows < 1) {
         return false;
     } else {
@@ -2871,10 +2948,10 @@ function getKidPlexFinalScore($cid, $sid)
                 session_id = $sid AND
                 status = ''
             ORDER BY start_date ASC";
-    
+
     $res = Database::query($sql);
     $numRows = Database::num_rows($res);
-    
+
     if ($numRows < 1) {
         return false;
     } else {

@@ -1539,7 +1539,10 @@ class CourseRestorer
                 }
             }
 
-            if ($question->quiz_type == MATCHING) {
+            if (in_array(
+                $question->quiz_type,
+                array(MATCHING, MATCHING_DRAG)
+            )) {
                 $temp = array();
                 foreach ($question->answers as $index => $answer) {
                     $temp[$answer['position']] = $answer;

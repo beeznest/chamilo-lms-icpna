@@ -29,16 +29,31 @@ class AddExternalPagesPlugin extends Plugin
             'sso_enable' => 'boolean',
         );
 
-        parent::__construct('1.0', 'Francis Gonzales', $parameters);
+        parent::__construct('1.0', 'Francis Gonzales, Anibal Copitan', $parameters);
     }
 
+    function install() {
+        $setting = $this->get_info();
+        $this->saveAdditionalConfiguration($setting);
+
+        // comment this lines for create one icon in menu principal
+        //$this->install_course_fields_in_all_courses($setting['is_course_plugin']);
+    }
+
+    function uninstall() {
+        $this->deleteAllData();
+    }
+
+    /**
+     * Funcion recorre todo tool list y agrega icono.
+     * @param array $params config
+     * @return mixed|void
+     */
     public function saveAdditionalConfiguration($params)
     {
         $toolTable = Database::get_course_table(TABLE_TOOL_LIST);
-        $whereCondition = array(
-                'link like ?' => '%add_page_plugin=1%'
-        );
-        Database::delete($toolTable, $whereCondition);
+        $this->deleteAllData();
+
         if ($params['tool_enable'] == "true") {
             $imagesPath = explode(';', $params['image_path']);
             $buttons = explode(';', $params['button_name']);
@@ -51,6 +66,7 @@ class AddExternalPagesPlugin extends Plugin
                     'image' => $imagesPath[$i]
                 );
             }
+            // verifica que existan registros en esta tabla para agregar los parametros del plugin.
             $sql = "SELECT t.* FROM $toolTable t
                 INNER JOIN (
                     SELECT c_id, MAX(id) as id
@@ -66,8 +82,8 @@ class AddExternalPagesPlugin extends Plugin
                         'name' => $tool['name'],
                         'link' => $tool['link'],
                         'image' => $tool['image'],
-                        'visibility' => 2,
-                        'admin' => 1,
+                        'visibility' => 1,
+                        'admin' => 0,
                         'address' => '',
                         'added_tool' => 0,
                         'category' => 'interaction',
@@ -78,4 +94,16 @@ class AddExternalPagesPlugin extends Plugin
             }
         }
     }
+
+    /*
+     * Delete data generador for this plugin into table c_tool
+     */
+    private function deleteAllData() {
+        $toolTable = Database::get_course_table(TABLE_TOOL_LIST);
+        $whereCondition = array(
+            'link like ?' => '%add_page_plugin=1%'
+        );
+        Database::delete($toolTable, $whereCondition);
+    }
+
 }

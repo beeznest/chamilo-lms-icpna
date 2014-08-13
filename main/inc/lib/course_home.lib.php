@@ -572,8 +572,48 @@ class CourseHome {
                 }
             }
         }
+
+        $all_tools_list = CourseHome::filterExternalPagesPlugin($all_tools_list, $course_tool_category);
+
         return $all_tools_list;
     }
+
+    /**
+    * filter for view icons only show if patronKey is = :teacher
+    * example dataIcons[i]['name']: parameter titleIcons1:teacher || titleIcons2 || titleIcons3:teacher
+    * @param array $dataIcons array reference to icons
+    * @return array
+    */
+    private static function filterExternalPagesPlugin($dataIcons, $course_tool_category)
+    {
+        $patronKey = ':teacher';
+        if ($course_tool_category == TOOL_STUDENT_VIEW) {
+            $flagOrder = false;
+            foreach ($dataIcons as $indice => $array) {
+                if (isset($array['name'])) {
+                    $pos = strpos($array['name'], $patronKey);
+                    if ($pos !== false) {
+                        unset($dataIcons[$indice]);
+                        $flagOrder = true;
+                    }
+                }
+            }
+
+            if ($flagOrder) {
+                $dataIcons = array_values($dataIcons);
+            }
+        } else {
+            // clean patronKey of name icons
+            foreach ($dataIcons as $indice => $array) {
+                if (isset($array['name'])) {
+                    $dataIcons[$indice]['name'] = str_replace($patronKey, '', $array['name']);
+                }
+            }
+        }
+
+        return $dataIcons;
+    }
+
 
     /**
      * Displays the tools of a certain category.

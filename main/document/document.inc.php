@@ -470,6 +470,7 @@ function build_edit_icons($document_data, $id, $is_template, $is_read_only = 0, 
     } else {
         $req_gid = '';
     }
+    $web_odf_extension_list = DocumentManager::get_web_odf_extension_list();
     $document_id = $document_data['id'];
 
     $type = $document_data['filetype'];
@@ -481,6 +482,9 @@ function build_edit_icons($document_data, $id, $is_template, $is_read_only = 0, 
     $is_certificate_mode = DocumentManager::is_certificate_mode($path);
     $curdirpath = urlencode($curdirpath);
     $extension = pathinfo($path, PATHINFO_EXTENSION);
+    $usePpt2lp = api_get_setting('service_ppt2lp', 'active') == 'true';
+    $formatTypeList = DocumentManager::getFormatTypeListConvertor('from', $extension);
+    $formatType = current($formatTypeList);
 
     // Build URL-parameters for table-sorting
     $sort_params = array();
@@ -508,6 +512,8 @@ function build_edit_icons($document_data, $id, $is_template, $is_read_only = 0, 
         if (api_is_course_admin() || api_is_platform_admin()) {
             if ($extension == 'svg' && api_browser_support('svg') && api_get_setting('enabled_support_svg') == 'true') {
                 $modify_icons = '<a href="edit_draw.php?' . api_get_cidreq() . '&id=' . $document_id . $req_gid . '">' . Display::return_icon('edit.png', get_lang('Modify'), '', ICON_SIZE_SMALL) . '</a>';
+            } elseif (in_array($extension, $web_odf_extension_list)  && api_get_setting('enabled_support_odf') === true) {
+            $modify_icons = '<a href="edit_odf.php?' . api_get_cidreq() . '&id=' . $document_id . $req_gid . '">' . Display::return_icon('edit.png', get_lang('Modify'), '', ICON_SIZE_SMALL) . '</a>';
             } elseif ($extension == 'png' || $extension == 'jpg' || $extension == 'jpeg' || $extension == 'bmp' || $extension == 'gif' || $extension == 'pxd' && api_get_setting('enabled_support_pixlr') == 'true') {
                 $modify_icons = '<a href="edit_paint.php?' . api_get_cidreq() . '&id=' . $document_id . $req_gid . '">' . Display::return_icon('edit.png', get_lang('Modify'), '', ICON_SIZE_SMALL) . '</a>';
             } else {
@@ -533,8 +539,10 @@ function build_edit_icons($document_data, $id, $is_template, $is_read_only = 0, 
                 if ($document_data['session_id'] == api_get_session_id()) {
                     if ($extension == 'svg' && api_browser_support('svg') && api_get_setting('enabled_support_svg') == 'true') {
                         $modify_icons = '<a href="edit_draw.php?' . api_get_cidreq() . '&amp;id=' . $document_id . $req_gid . '">' . Display::return_icon('edit.png', get_lang('Modify'), '', ICON_SIZE_SMALL) . '</a>';
+                    } elseif (in_array($extension, $web_odf_extension_list)  && api_get_setting('enabled_support_odf') === true) {
+                        $modify_icons = '<a href="edit_odf.php?' . api_get_cidreq() . '&id=' . $document_id . $req_gid . '">' . Display::return_icon('edit.png', get_lang('Modify'), '', ICON_SIZE_SMALL) . '</a>';
                     } elseif ($extension == 'png' || $extension == 'jpg' || $extension == 'jpeg' || $extension == 'bmp' || $extension == 'gif' || $extension == 'pxd' && api_get_setting('enabled_support_pixlr') == 'true') {
-                        $modify_icons = '<a href="edit_paint.php?' . api_get_cidreq() . '&amp;id=' . $document_id . $req_gid . '">' . Display::return_icon('edit.png', get_lang('Modify'), '', ICON_SIZE_SMALL) . '</a>';
+                        $modify_icons = '<a href="edit_paint.php?' . api_get_cidreq() . '&id=' . $document_id . $req_gid . '">' . Display::return_icon('edit.png', get_lang('Modify'), '', ICON_SIZE_SMALL) . '</a>';
                     } else {
                         $modify_icons = '<a href="edit_document.php?' . api_get_cidreq() . '&amp;id=' . $document_id . $req_gid . '">' . Display::return_icon('edit.png', get_lang('Modify'), '', ICON_SIZE_SMALL) . '</a>';
                     }
@@ -544,6 +552,8 @@ function build_edit_icons($document_data, $id, $is_template, $is_read_only = 0, 
             } else {
                 if ($extension == 'svg' && api_browser_support('svg') && api_get_setting('enabled_support_svg') == 'true') {
                     $modify_icons = '<a href="edit_draw.php?' . api_get_cidreq() . '&amp;id=' . $document_id . $req_gid . '">' . Display::return_icon('edit.png', get_lang('Modify'), '', ICON_SIZE_SMALL) . '</a>';
+                } elseif (in_array($extension, $web_odf_extension_list)  && api_get_setting('enabled_support_odf') === true) {
+                    $modify_icons = '<a href="edit_odf.php?' . api_get_cidreq() . '&id=' . $document_id . $req_gid . '">' . Display::return_icon('edit.png', get_lang('Modify'), '', ICON_SIZE_SMALL) . '</a>';
                 } elseif ($extension == 'png' || $extension == 'jpg' || $extension == 'jpeg' || $extension == 'bmp' || $extension == 'gif' || $extension == 'pxd' && api_get_setting('enabled_support_pixlr') == 'true') {
                     $modify_icons = '<a href="edit_paint.php?' . api_get_cidreq() . '&amp;id=' . $document_id . $req_gid . '">' . Display::return_icon('edit.png', get_lang('Modify'), '', ICON_SIZE_SMALL) . '</a>';
                 } else {
@@ -601,6 +611,17 @@ function build_edit_icons($document_data, $id, $is_template, $is_read_only = 0, 
                         $modify_icons .= '&nbsp;<a href="' . api_get_self() . '?' . api_get_cidreq() . '&amp;curdirpath=' . $curdirpath . '&amp;delete=' . urlencode($path) . $req_gid . '&amp;' . $sort_params . '" onclick="return confirmation(\'' . basename($path) . '\');">' . Display::return_icon('delete.png', get_lang('Delete'), array(), ICON_SIZE_SMALL) . '</a>';
                     }
                 }
+            }
+        }
+
+        // Add action to covert to PDF, will create a new document whit same filename but .pdf extension
+        // @TODO: add prompt to select a format target
+        if (in_array($path, DocumentManager::get_system_folders())) {
+            // nothing to do
+        } else {
+            if ($usePpt2lp && $formatType) {
+                $modify_icons .= '&nbsp;<a class="convertAction" href="#" data-documentId = ' . $document_id . ' data-formatType = ' . $formatType . '>' .
+                    Display::return_icon('convert.png', get_lang('Convert'), array(), ICON_SIZE_SMALL) . '</a>';
             }
         }
     }

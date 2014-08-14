@@ -998,7 +998,8 @@ class Template {
         return $html;
     }
 
-    function return_notification_menu() {
+    public function return_notification_menu()
+    {
 
         $_course    = api_get_course_info();
         $course_id  = api_get_course_id();
@@ -1044,6 +1045,63 @@ class Template {
             $html .= '<span class="decrease_font" title="'.get_lang('DecreaseFontSize').'">A</span> <span class="reset_font" title="'.get_lang('ResetFontSize').'">A</span> <span class="increase_font" title="'.get_lang('IncreaseFontSize').'">A</span>';
             $html .= '</li>';
         }
+
+        $sessionId = api_get_session_id();
+        $userInfo = api_get_user_info();
+
+        if (!empty($_course) && !empty($sessionId) && !empty($userInfo)) {
+            global $_configuration;
+
+            if (isset($_configuration['ws_icpna_message_viewer_count']) && !empty($_configuration['ws_icpna_message_viewer_count'])) {
+                $wsUrl = $_configuration['ws_icpna_message_viewer_count'];
+
+                //$username = $userInfo['username'];
+
+                $objBranch = new Branch();
+                $branchId = $objBranch->getBranchId($sessionId);
+                $programUid = $objBranch->getUidProgram($sessionId);
+                // Test
+                /*$branchId = 1;
+                $programUid = '7B00C961-D8B4-49A2-911C-4B7CF0E21CCE';*/
+                ini_set("soap.wsdl_cache_enabled", "0");
+                try {
+                    $soapClient = new SoapClient(
+                        $wsUrl,
+                        array(
+                            'cache_wsdl' => WSDL_CACHE_NONE,
+                            'exceptions' => 1
+                        )
+                    );
+                    $params = array(
+                        'intidsede' => (int)$branchId,
+                        //'vcodigorrhh' => $username,
+                        'uidIdPrograma' => (string)$programUid,
+                    );
+                    $wsResponse = $soapClient->ObtenerNroMensajes($params);
+                    $countMessages = 0;
+
+                    if ($wsResponse) {
+                        $countMessages = $wsResponse->ObtenerNroMensajesResult;
+                    }
+
+                    if ($countMessages > 0) {
+                        $html .= '<li><a>' .
+                            Display::return_icon(
+                                'dropbox.gif',
+                                get_lang('Messages'),
+                                array(),
+                                ICON_SIZE_TINY
+                            ) . ' ' .
+                            $countMessages . ' </a></li>';
+                    }
+                } catch (\Exception $e) {
+                    //var_dump($e->getMessage());
+                }
+            }
+        }
+
+
+
         return $html;
     }
 

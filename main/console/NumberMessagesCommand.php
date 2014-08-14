@@ -24,6 +24,10 @@ class NumberMessagesCommand extends Command
     {
         $username = $input->getArgument('username');
         $branchId = $input->getArgument('branch_id');
+        $sessionId = $input->getArgument('session_id');
+        $objBranch = new Branch();
+        $programUid = $objBranch->getUidProgram($sessionId);
+
         /*
         $userInfo = api_get_user_info_from_username($username);
 
@@ -32,17 +36,34 @@ class NumberMessagesCommand extends Command
             return 0;
         }*/
 
-        $wsUrl = "https://www2.icpna.edu.pe/wsprueba/service.asmx?wsdl";
-        $soapClient = new SoapClient($wsUrl);
-        $params = array(
-            'branch_id' => $branchId,
-            'username' => $username
-        );
+        if (isset($_configuration['ws_icpna_message_viewer_count']) &&
+            !empty($_configuration['ws_icpna_message_viewer_count'])
+        ) {
+            ini_set("soap.wsdl_cache_enabled", "0");
+            try {
+                $wsUrl = $_configuration['ws_icpna_message_viewer_count'];
 
-        $wsResponse = $soapClient->ObtenerNroMensajes($params);
+                $soapClient = new SoapClient(
+                    $wsUrl,
+                    array('cache_wsdl' => WSDL_CACHE_NONE, 'exceptions' => 1)
+                );
+                $params = array(
+                    'intidsede' => $branchId,
+                    //'vcodigorrhh' => $username,
+                    'uidIdPrograma' => $programUid,
+                );
 
-        if ($wsResponse) {
-            var_dump($wsResponse);
+                $wsResponse = $soapClient->ObtenerNroMensajes($params);
+                $countMessages = 0;
+                if ($wsResponse) {
+                    $countMessages = $wsResponse->ObtenerNroMensajesResult;
+                }
+                var_dump($countMessages);
+
+            } catch (\Exception $e) {
+                //var_dump($e->getMessage());
+            }
         }
+
     }
 }

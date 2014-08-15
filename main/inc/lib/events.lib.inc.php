@@ -583,12 +583,11 @@ function exercise_attempt($score, $answer, $question_id, $exe_id, $position, $ex
 function exercise_attempt_hotspot($exe_id, $question_id, $answer_id, $correct, $coords, $exerciseId = 0)
 {
     require_once api_get_path(SYS_CODE_PATH).'exercice/exercise.lib.php';
-    global $safe_lp_id, $safe_lp_item_id;
+    global $learnpath_id, $learnpath_item_id;
     //Validation in case of fraud  with actived control time
-    if (!exercise_time_control_is_valid($exerciseId, $safe_lp_id, $safe_lp_item_id)) {
+    if (!exercise_time_control_is_valid($exerciseId, $learnpath_id, $learnpath_item_id)) {
         $correct = 0;
     }
-
     $tbl_track_e_hotspot = Database :: get_statistic_table(TABLE_STATISTIC_TRACK_E_HOTSPOT);
     $sql = "INSERT INTO $tbl_track_e_hotspot (hotspot_user_id, hotspot_course_code, hotspot_exe_id, hotspot_question_id, hotspot_answer_id, hotspot_correct, hotspot_coordinate)".
         " VALUES ('".api_get_user_id()."',".

@@ -11,9 +11,9 @@ require '../main/inc/global.inc.php';
 $roomField = 0;
 $branchField = 0;
 
-$sqlFieldId = "SELECT id FROM session_field";
+$sqlFieldId = "SELECT id, field_variable FROM session_field";
 $r = Database::query($sqlFieldId);
-while ($row = Database::fetch_sassoc($r)) {
+while ($row = Database::fetch_assoc($r)) {
     if ($row['field_variable'] == 'aula') {
         $roomField = $row['id'];
     }

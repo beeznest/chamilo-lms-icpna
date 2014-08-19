@@ -1,5 +1,5 @@
 {# IN/OUT FEATURE FOR TEACHERS #}
-{% if session_teachers is not null %}
+{% if _u.status == 1 %}
 <script>
     $(document).ready(function () {
         $("#btn_in_session").click(function () {

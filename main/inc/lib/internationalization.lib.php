@@ -3773,25 +3773,6 @@ function setting_gettext() {
 }
 
 /**
- * Retuns the id of a room
- * @param $room
- * @return mixed
- */
-function getRoomId($room)
-{
-    $tableRoom = Database::get_main_table(TABLE_ROOM);
-    $whereCondition = array(
-        'where' => array(
-            'title = ?' => array(
-                $room
-            )
-        )
-    );
-    $roomData = Database::select('id', $tableRoom, $whereCondition);
-    $room = current($roomData);
-    return $room['id'];
-}
-/**
  * Functions for internal use behind this API
  */
 

@@ -482,13 +482,16 @@ switch ($action) {
             )
         );
 
+        // Select all registers in the table where the "OUT" has not been
+        // saved yet
         $dataTable = Database::select('*', $trackTeacherInOut, $whereCondition);
 
+        // if there is no such register with an open "OUT", insert new line
         if (empty($dataTable)) {
             $objBranch = new Branch();
             $branchId = $objBranch->getBranchId($sessionId);
             $room = !empty($_COOKIE['room']) ? $_COOKIE['room']: 0;
-            $roomId = getRoomId($room);
+            $roomId = $objBranch->getRoomId($room, $branchId);
             $whereCondition = array(
                 'where' => array(
                     'room_id = ?' => $roomId
@@ -569,7 +572,7 @@ switch ($action) {
             $objBranch = new Branch();
             $branchId = $objBranch->getBranchId($sessionId);
             $room = !empty($_COOKIE['room']) ? $_COOKIE['room']: 0;
-            $roomId = getRoomId($room);
+            $roomId = $objBranch->getRoomId($room, $branchId);
             $whereCondition = array(
                 'where' => array(
                     'room_id = ?' => $roomId

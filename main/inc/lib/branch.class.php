@@ -1,14 +1,14 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: fgonzales
- * Date: 03/06/14
- * Time: 12:59 PM
+ * Manage branches (in case the same Chamilo portal works for several branches
+ * of the institution)
+ * @package chamilo.branch
  */
-
+/**
+ * Class Branch
+ */
 class Branch
 {
-
     /**
      * Returns the id is in the range if not returns false
      * @param string $ip
@@ -116,5 +116,31 @@ class Branch
         }
 
         return false;
+    }
+
+    /**
+     * Retuns the id of a room from its name
+     * @param string $room The name of the room
+     * @param int $branchId The ID of the branch (or 0 if no room involved)
+     * @return mixed
+     */
+    public function getRoomId($room, $branchId = 0)
+    {
+        $tableRoom = Database::get_main_table(TABLE_BRANCH_ROOM);
+        if (strlen($room) > 30) {
+            //Throw exception?
+            $room = substr(0, 30, $room);
+        }
+        $whereCondition = array(
+            'where' => array(
+                'title = ? AND branch_id = ?' => array(
+                    $room,
+                    $branchId
+                )
+            )
+        );
+        $roomData = Database::select('id', $tableRoom, $whereCondition);
+        $room = current($roomData);
+        return $room['id'];
     }
 } 

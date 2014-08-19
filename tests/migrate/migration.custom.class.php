@@ -1368,7 +1368,6 @@ class MigrationCustom {
         $tableTrackTeacherAttendance = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
         $tableUser = Database::get_main_table(TABLE_MAIN_USER);
         $tableBranchRoom = Database::get_main_table(TABLE_BRANCH_ROOM);
-        $tableRoom = Database::get_main_table(TABLE_ROOM);
         $tableBranch = Database::get_main_table(TABLE_BRANCH);
 
         $whereCondition = array(
@@ -1382,14 +1381,14 @@ class MigrationCustom {
         if (!empty($dataTrackTeachers)) {
             $sql = "SELECT
             u.username,
-            r.title as room,
+            br.title as room,
             tck.log_in_course_date,
             tck.log_out_course_date,
             tck.id as track_id
             FROM
             $tableTrackTeacherAttendance tck
             INNER JOIN $tableUser u ON u.user_id = tck.user_id
-            INNER JOIN $tableRoom r ON r.id = tck.room_id
+            INNER JOIN $tableBranchRoom br ON br.id = tck.room_id
             WHERE tck.id = {$data['item_id']}
             ";
 

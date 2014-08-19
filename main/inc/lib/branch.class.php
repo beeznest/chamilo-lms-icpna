@@ -117,4 +117,30 @@ class Branch
 
         return false;
     }
+
+    /**
+     * Retuns the id of a room from its name
+     * @param string $room The name of the room
+     * @param int $branchId The ID of the branch (or 0 if no room involved)
+     * @return mixed
+     */
+    public function getRoomId($room, $branchId = 0)
+    {
+        $tableRoom = Database::get_main_table(TABLE_BRANCH_ROOM);
+        if (strlen($room) > 30) {
+            //Throw exception?
+            $room = substr(0, 30, $room);
+        }
+        $whereCondition = array(
+            'where' => array(
+                'title = ? AND branch_id = ?' => array(
+                    $room,
+                    $branchId
+                )
+            )
+        );
+        $roomData = Database::select('id', $tableRoom, $whereCondition);
+        $room = current($roomData);
+        return $room['id'];
+    }
 } 

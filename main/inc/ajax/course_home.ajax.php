@@ -491,7 +491,7 @@ switch ($action) {
             $objBranch = new Branch();
             $branchId = $objBranch->getBranchId($sessionId);
             $room = !empty($_COOKIE['room']) ? $_COOKIE['room']: 0;
-            $roomId = getRoomId($room);
+            $roomId = $objBranch->getRoomId($room, $branchId);
             $whereCondition = array(
                 'where' => array(
                     'room_id = ?' => $roomId
@@ -572,7 +572,7 @@ switch ($action) {
             $objBranch = new Branch();
             $branchId = $objBranch->getBranchId($sessionId);
             $room = !empty($_COOKIE['room']) ? $_COOKIE['room']: 0;
-            $roomId = getRoomId($room);
+            $roomId = $objBranch->getRoomId($room, $branchId);
             $whereCondition = array(
                 'where' => array(
                     'room_id = ?' => $roomId

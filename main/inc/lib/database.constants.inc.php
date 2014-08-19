@@ -353,7 +353,6 @@ define('TABLE_BRANCH_TRANSACTION_STATUS',    'branch_transaction_status');
 define('TABLE_BRANCH', 'branch');
 define('TABLE_BRANCH_IP', 'branch_ip');
 define('TABLE_BRANCH_ROOM', 'branch_room');
-define('TABLE_ROOM', 'room');
 define('TABLE_BRANCH_IP_REL_ROOM', 'branch_ip_rel_room');
 
 // TRACK TEACHER ATTENDANCE IN / OUT

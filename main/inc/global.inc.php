@@ -40,7 +40,7 @@ $includePath = dirname(__FILE__);
 // Include the main Chamilo platform configuration file.
 $main_configuration_file_path = $includePath.'/conf/configuration.php';
 
-if (!empty($_GET['r'])) {
+if (!empty($_GET['r']) && (int)$_GET['r'] > 0) {
     setcookie('room', $_GET['r'], time()+3600*24*365*10, '/'); //Ten Years
     $uri = preg_replace('/r='.$_GET['r'].'/','',$_SERVER['REQUEST_URI']);
     header('location: '.$uri);

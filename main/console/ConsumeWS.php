@@ -143,8 +143,9 @@ class ConsumeWSCommand extends Command
      * @param $dateTimeParam
      * @return array
      */
-    public function explodeDateTime($dateTimeParam) {
-        $dateTime = explode(' ', $dateTimeParam);
+    public function explodeDateTime($dateTimeParam)
+    {
+        $dateTime = explode(' ', api_get_local_time($dateTimeParam));
 
         return array(
             'date' => $dateTime[0],

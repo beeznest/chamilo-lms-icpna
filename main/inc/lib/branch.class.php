@@ -10,11 +10,11 @@
 class Branch
 {
     /**
-     * Returns the id is in the range if not returns false
+     * Returns the id of the branch matching this IP
      * @param string $ip
      * @return int $id
      */
-    public function getIpMatch($ip)
+    public function getBranchFromIP($ip)
     {
         $tableBranchIp = Database::get_main_table(TABLE_BRANCH_IP);
         $branchIps = Database::select('*', $tableBranchIp);

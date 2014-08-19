@@ -3285,6 +3285,7 @@ class Tracking
 
         $branchId = $objBranch->getBranchId($sessionId);
         if (!empty($branchId)) {
+            // Get the matching branch from the user IP
             $branchIpTmp = $objBranch->getIpMatch($userIp);
             if (!empty($branchId) && !empty($branchIpTmp) && $branchId == $branchIpTmp) {
 

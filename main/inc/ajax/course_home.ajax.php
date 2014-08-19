@@ -482,8 +482,11 @@ switch ($action) {
             )
         );
 
+        // Select all registers in the table where the "OUT" has not been
+        // saved yet
         $dataTable = Database::select('*', $trackTeacherInOut, $whereCondition);
 
+        // if there is no such register with an open "OUT", insert new line
         if (empty($dataTable)) {
             $objBranch = new Branch();
             $branchId = $objBranch->getBranchId($sessionId);

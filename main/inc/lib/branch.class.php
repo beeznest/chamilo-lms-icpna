@@ -1,14 +1,14 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: fgonzales
- * Date: 03/06/14
- * Time: 12:59 PM
+ * Manage branches (in case the same Chamilo portal works for several branches
+ * of the institution)
+ * @package chamilo.branch
  */
-
+/**
+ * Class Branch
+ */
 class Branch
 {
-
     /**
      * Returns the id is in the range if not returns false
      * @param string $ip

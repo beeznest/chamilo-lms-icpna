@@ -303,4 +303,19 @@ $(function() {
     });*/
 });
 </script>
+<script>
+$(document).ready(function () {
+    var branchLogoutAjaxURL = '{{ _p.web_ajax }}branch_logout.ajax.php';
+
+    $('#logout_button').click(function (e) {
+        e.preventDefault();
+
+        var logoutButtonRef = this.href;
+
+        $.get(branchLogoutAjaxURL).always(function () {
+            location.href = logoutButtonRef;
+        });
+    });
+});
+</script>
 {{ header_extra_content }}

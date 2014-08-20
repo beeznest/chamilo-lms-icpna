@@ -3304,17 +3304,17 @@ class Tracking
     public function countActiveTeacherIn(){
         if (!empty($_SESSION['is_courseCoach'])) {
             $userId = api_get_user_id();
-            $courseId = api_get_course_int_id();
-            $sessionId = api_get_session_id();
+            //$courseId = api_get_course_int_id();
+            //$sessionId = api_get_session_id();
             $trackTeacherInOut = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
 
-            $values = array($userId, $courseId, $sessionId);
+            $values = array($userId);//, $courseId, $sessionId);
             $whereCondition = array(
                 'where' => array(
-                    'user_id = ?
-                    AND course_id = ?
-                    AND session_id = ?
-                    AND log_out_course_date IS NULL' => $values
+                    'user_id = ? ' .
+                    //'AND course_id = ? ' .
+                    //'AND session_id = ? ' .
+                    ' AND log_out_course_date IS NULL' => $values
                 )
             );
 

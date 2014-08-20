@@ -470,8 +470,13 @@ switch ($action) {
          */
         require_once '../global.inc.php';
         $userId = api_get_user_id();
-        $courseId = intval($_GET['course_id']);
-        $sessionId = intval($_GET['session_id']);
+        $courseId = $sessionId = 0;
+        if (!empty($_GET['course_id'])) {
+            $courseId = intval($_GET['course_id']);
+        }
+        if (!empty($_GET['session_id'])) {
+            $sessionId = intval($_GET['session_id']);
+        }
         $trackTeacherInOut = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
         $branchTransaction = Database::get_main_table(TABLE_BRANCH_TRANSACTION);
 
@@ -489,7 +494,11 @@ switch ($action) {
         // if there is no such register with an open "OUT", insert new line
         if (empty($dataTable)) {
             $objBranch = new Branch();
-            $branchId = $objBranch->getBranchId($sessionId);
+            if (!empty($sessionId)) {
+                $branchId = $objBranch->getBranchId($sessionId);
+            } else {
+                $branchId = $objBranch->getBranchFromIP(api_get_real_ip());
+            }
             $room = !empty($_COOKIE['room']) ? $_COOKIE['room']: 0;
             $roomId = $objBranch->getRoomId($room, $branchId);
             $whereCondition = array(
@@ -508,10 +517,10 @@ switch ($action) {
             //  Save in transaction table
             $lastTrackId = Database::insert_id();
             require_once api_get_path(SYS_SERVER_ROOT_PATH) . 'tests/migrate/migration.class.php';
-            $lastTransactionId = Migration::get_latest_transaction_id_by_branch($branchId);
+            $lastTransactionId = Migration::get_latest_transaction_id_by_branch(500 + $branchId);
             $transactionParams = array(
                 'transaction_id' => $lastTransactionId + 1,
-                'branch_id' => $branchId,
+                'branch_id' => 500 + $branchId,
                 'action' => 534,
                 'item_id' => $lastTrackId,
                 'orig_id' => $courseId . "-" . $userId . "-" . $sessionId . "-" . $roomId,
@@ -535,17 +544,22 @@ switch ($action) {
     case 'save_teacher_track_out':
         require_once '../global.inc.php';
         $userId = api_get_user_id();
-        $courseId = intval($_GET['course_id']);
-        $sessionId = intval($_GET['session_id']);
+        $courseId = $sessionId = 0;
+        if (!empty($_GET['course_id'])) {
+            $courseId = intval($_GET['course_id']);
+        }
+        if (!empty($_GET['session_id'])) {
+            $sessionId = intval($_GET['session_id']);
+        }
         $trackTeacherInOut = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
 
         $values = array($userId, $courseId, $sessionId);
         $whereCondition = array(
             'where' => array(
-                'user_id = ?
-                AND course_id = ?
-                AND session_id = ?
-                AND log_out_course_date IS NULL
+                'user_id = ? ' .
+                //'AND course_id = ? ' .
+                //'AND session_id = ? ' .
+                'AND log_out_course_date IS NULL
                 ORDER BY id DESC
                 LIMIT 1' => $values
             )
@@ -556,9 +570,8 @@ switch ($action) {
         if (!empty($dataTable)) {
             $rowInfo = current($dataTable);
             $attributes = array(
-                'course_id' => $courseId,
                 'user_id' => $userId,
-
+                'course_id' => $courseId,
                 'session_id' => $sessionId,
             );
             $setAttribute = array(
@@ -570,7 +583,11 @@ switch ($action) {
             $insertResponse = Database::update($trackTeacherInOut, $setAttribute, $whereCondition);
             //  Save in transaction table
             $objBranch = new Branch();
-            $branchId = $objBranch->getBranchId($sessionId);
+            if (!empty($sessionId)) {
+                $branchId = $objBranch->getBranchId($sessionId);
+            } else {
+                $branchId = $objBranch->getBranchFromIP(api_get_real_ip());
+            }
             $room = !empty($_COOKIE['room']) ? $_COOKIE['room']: 0;
             $roomId = $objBranch->getRoomId($room, $branchId);
             $whereCondition = array(
@@ -579,10 +596,11 @@ switch ($action) {
                 )
             );
             require_once api_get_path(SYS_SERVER_ROOT_PATH) . 'tests/migrate/migration.class.php';
-            $lastTransactionId = Migration::get_latest_transaction_id_by_branch($branchId);
+            $lastTransactionId = Migration::get_latest_transaction_id_by_branch(500 + $branchId);
             $transactionParams = array(
+                // we have to generate a unique transaction_id
                 'transaction_id' => $lastTransactionId + 1,
-                'branch_id' => $branchId,
+                'branch_id' => 500 + $branchId,
                 'action' => 534,
                 'item_id' => $rowInfo['id'],
                 'orig_id' => $courseId . "-" . $userId . "-" . $sessionId . "-" . $roomId,

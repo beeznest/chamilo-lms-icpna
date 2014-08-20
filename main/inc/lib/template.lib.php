@@ -299,6 +299,15 @@ class Template {
         global $_configuration;
         $objTracking = new Tracking();
         $sessionId = api_get_session_id();
+        if (!empty($sessionId)) {
+            $inBranch = $objTracking->isInBranch($sessionId);
+        } else {
+            // No session defined at this point, check by IP if part of a branch
+            $userIp = api_get_real_ip();
+            $objBranch = new Branch();
+            $inBranch = $objBranch->getBranchFromIP($userIp);
+        }
+
         //Setting app paths/URLs
         $_p = array(
             'web' => api_get_path(WEB_PATH),
@@ -309,7 +318,7 @@ class Template {
             'web_img' => api_get_path(WEB_IMG_PATH),
             'web_plugin' => api_get_path(WEB_PLUGIN_PATH),
             'web_lib' => api_get_path(WEB_LIBRARY_PATH),
-            'is_in_branch' => $objTracking->isInBranch($sessionId),
+            'is_in_branch' => $inBranch,
             'count_active_in' => $objTracking->countActiveTeacherIn(),
         );
         $this->assign('_p', $_p);

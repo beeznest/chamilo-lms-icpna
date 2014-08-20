@@ -1,1 +1,1 @@
-This plugin is used to show additional buttons in the course with external information embedded.
+This plugin is used to show a additional button in the course with NGL information embedded.

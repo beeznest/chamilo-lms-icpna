@@ -1094,7 +1094,10 @@ class Template {
                     }
 
                     if ($countMessages > 0) {
-                        $html .= '<li><a>' .
+                        // Put a link to the message viewer, if defined
+                        $html .= '<li><a ' .
+                            !empty($_configuration[''])? 'href="' . $_configuration['message_viewer_sso_url'] . '"' : ''
+                            . '>' .
                             Display::return_icon(
                                 'dropbox.gif',
                                 get_lang('Messages'),

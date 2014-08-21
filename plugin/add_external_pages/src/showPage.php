@@ -25,14 +25,16 @@ if (!empty($_GET['id']) || $_GET['id'] === '0') {
         $objSsoServer = new ssoServer();
         $objBranch = new Branch();
         $sessionId = api_get_session_id();
-        $branchUid = $objBranch->getUidSede($sessionId);
         if (empty($sessionId)) {
+            // if no session or branch context, pass 0 to login link
             $programUid = 0;
+            $branchUid = 0;
         } else {
             $programUid = $objBranch->getUidProgram($sessionId);
+            $branchUid = $objBranch->getUidSede($sessionId);
         }
-        $additionalParams['uididsede'] = $branchUid;
         $additionalParams['uididprograma'] = $programUid;
+        $additionalParams['uididsede'] = $branchUid;
 
 
         $getNewPath = $objSsoServer->getUrl($paths[$id], $additionalParams);

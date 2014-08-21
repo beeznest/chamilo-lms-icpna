@@ -18,20 +18,22 @@ if (Database::num_rows($lastCourseAccessResult) > 0) {
     $branch = new Branch();
     $branchId = $branch->getBranchId($lastSessionId);
 
-    foreach ($_configuration['branch_logout'] as $tool) {
-        if (!array_key_exists($branchId, $tool)) {
-            continue;
+    if (isset($_configuration['branch_logout']) && is_array($_configuration['branch_logout'])) {
+        foreach ($_configuration['branch_logout'] as $tool) {
+            if (!array_key_exists($branchId, $tool)) {
+                continue;
+            }
+
+            $url = $tool[$branchId];
+
+            $ch = curl_init();
+
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+            curl_exec($ch);
+
+            curl_close($ch);
         }
-
-        $url = $tool[$branchId];
-
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        curl_exec($ch);
-
-        curl_close($ch);
     }
 }

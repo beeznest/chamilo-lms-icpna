@@ -43,6 +43,11 @@ function validate_data($users) {
 				$user['error'] = get_lang('UserNameTooLong');
 				$errors[] = $user;
 			}
+            // 2.1.1
+            if (UserManager::is_username_has_dash($user['UserName'])) {
+                $user['error'] = get_lang('UserNameHasDash');
+                $errors[] = $user;
+            }
 			// 2.2. Check whether the username was used twice in import file.
 			if (isset($usernames[$user['UserName']])) {
 				$user['error'] = get_lang('UserNameUsedTwice');

@@ -26,9 +26,14 @@ if (!empty($_GET['id']) || $_GET['id'] === '0') {
         $objBranch = new Branch();
         $sessionId = api_get_session_id();
         $branchUid = $objBranch->getUidSede($sessionId);
-        $programUid = $objBranch->getUidProgram($sessionId);
+        if (empty($sessionId)) {
+            $programUid = 0;
+        } else {
+            $programUid = $objBranch->getUidProgram($sessionId);
+        }
         $additionalParams['uididsede'] = $branchUid;
         $additionalParams['uididprograma'] = $programUid;
+
 
         $getNewPath = $objSsoServer->getUrl($paths[$id], $additionalParams);
     }

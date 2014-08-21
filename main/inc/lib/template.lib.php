@@ -299,13 +299,20 @@ class Template {
         global $_configuration;
         $objTracking = new Tracking();
         $sessionId = api_get_session_id();
-        if (!empty($sessionId)) {
-            $inBranch = $objTracking->isInBranch($sessionId);
-        } else {
-            // No session defined at this point, check by IP if part of a branch
-            $userIp = api_get_real_ip();
-            $objBranch = new Branch();
-            $inBranch = $objBranch->getBranchFromIP($userIp);
+        $inBranch = false;
+        $inRoom = false;
+        if (isset($_COOKIE['room']) && !empty($_COOKIE['room'])) {
+            if (!empty($sessionId)) {
+                $inBranch = $objTracking->isInBranch($sessionId);
+            } else {
+                // No session defined at this point, check by IP if part of a branch
+                $userIp = api_get_real_ip();
+                $objBranch = new Branch();
+                $inBranch = $objBranch->getBranchFromIP($userIp);
+            }
+            //if the branch is set and the room is set, consider the user is
+            // physically in the room
+            $inRoom = $inBranch;
         }
 
         //Setting app paths/URLs
@@ -318,7 +325,7 @@ class Template {
             'web_img' => api_get_path(WEB_IMG_PATH),
             'web_plugin' => api_get_path(WEB_PLUGIN_PATH),
             'web_lib' => api_get_path(WEB_LIBRARY_PATH),
-            'is_in_branch' => $inBranch,
+            'is_in_room' => $inRoom,
             'count_active_in' => $objTracking->countActiveTeacherIn(),
         );
         $this->assign('_p', $_p);

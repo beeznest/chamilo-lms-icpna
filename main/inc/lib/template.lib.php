@@ -1058,7 +1058,7 @@ class Template {
         $sessionId = api_get_session_id();
         $userInfo = api_get_user_info();
 
-        if (!empty($_course) && !empty($sessionId) && !empty($userInfo)) {
+        if (!empty($userInfo)) {
             global $_configuration;
 
             if (isset($_configuration['ws_icpna_message_viewer_count']) && !empty($_configuration['ws_icpna_message_viewer_count'])) {
@@ -1066,9 +1066,9 @@ class Template {
 
                 //$username = $userInfo['username'];
 
-                $objBranch = new Branch();
-                $branchId = $objBranch->getBranchId($sessionId);
-                $programUid = $objBranch->getUidProgram($sessionId);
+                //$objBranch = new Branch();
+                //$branchId = $objBranch->getBranchFromIP(api_get_real_ip());
+                //$programUid = $objBranch->getUidProgram($sessionId);
                 // Test
                 /*$branchId = 1;
                 $programUid = '7B00C961-D8B4-49A2-911C-4B7CF0E21CCE';*/
@@ -1082,9 +1082,9 @@ class Template {
                         )
                     );
                     $params = array(
-                        'intidsede' => (int)$branchId,
-                        //'vcodigorrhh' => $username,
-                        'uidIdPrograma' => (string)$programUid,
+                        //'intidsede' => (int)$branchId,
+                        'vcodigorrhh' => $userInfo['username'],
+                        //'uidIdPrograma' => (string)$programUid,
                     );
                     $wsResponse = $soapClient->ObtenerNroMensajes($params);
                     $countMessages = 0;

@@ -866,7 +866,7 @@ error_log($sql);
         if (empty($branch_id)) {
             $branches = self::get_branches();
         } else {
-            $branches = array('branch_id' => $branch_id);
+            $branches = array(array('branch_id' => $branch_id));
         }
 
         if (!empty($branches)) {

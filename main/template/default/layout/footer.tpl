@@ -6,19 +6,22 @@
                     <div id="session_teachers">
                         {{ session_teachers }}
                     </div>
-                    {# MODAL IN/OUT #}
-                    <div id="in-out-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="in-out-modal-label" aria-hidden="true">
-                        <div class="modal-header">
-                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                            <h3 id="in-out-modal-label">Alert</h3>
-                        </div>
-                        <div class="modal-body">
-                        </div>
-                        <div class="modal-footer">
-                        </div>
-                    </div>
-                    {# END MODAL IN/OUT #}
                 {% endif %}
+
+                {# MODAL IN/OUT #}
+                {% if _u.status == 1 %}
+                <div id="in-out-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="in-out-modal-label" aria-hidden="true">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h3 id="in-out-modal-label">Alert</h3>
+                    </div>
+                    <div class="modal-body">
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+                {% endif %}
+                {# END MODAL IN/OUT #}
 
                 {% if teachers is not null %}
                     <div id="teachers">

@@ -471,12 +471,14 @@ switch ($action) {
         require_once '../global.inc.php';
         $userId = api_get_user_id();
         $courseId = $sessionId = 0;
+        /*
         if (!empty($_GET['course_id'])) {
             $courseId = intval($_GET['course_id']);
         }
         if (!empty($_GET['session_id'])) {
             $sessionId = intval($_GET['session_id']);
         }
+        */
         $trackTeacherInOut = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
         $branchTransaction = Database::get_main_table(TABLE_BRANCH_TRANSACTION);
 
@@ -494,8 +496,8 @@ switch ($action) {
         // if there is no such register with an open "OUT", insert new line
         if (empty($dataTable)) {
             $objBranch = new Branch();
-            if (!empty($sessionId)) {
-                $branchId = $objBranch->getBranchId($sessionId);
+            if (!empty($_GET['session_id'])) {
+                $branchId = $objBranch->getBranchId($_GET['sessionId']);
             } else {
                 $branchId = $objBranch->getBranchFromIP(api_get_real_ip());
             }
@@ -545,15 +547,17 @@ switch ($action) {
         require_once '../global.inc.php';
         $userId = api_get_user_id();
         $courseId = $sessionId = 0;
+        /*
         if (!empty($_GET['course_id'])) {
             $courseId = intval($_GET['course_id']);
         }
         if (!empty($_GET['session_id'])) {
             $sessionId = intval($_GET['session_id']);
         }
+        */
         $trackTeacherInOut = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
 
-        $values = array($userId, $courseId, $sessionId);
+        $values = array($userId);//, $courseId, $sessionId);
         $whereCondition = array(
             'where' => array(
                 'user_id = ? ' .

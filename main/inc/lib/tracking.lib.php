@@ -3302,7 +3302,8 @@ class Tracking
      * @return int
      */
     public function countActiveTeacherIn(){
-        if (!empty($_SESSION['is_courseCoach'])) {
+        //if (!empty($_SESSION['is_courseCoach'])) {
+        if (api_is_teacher()) {
             $userId = api_get_user_id();
             //$courseId = api_get_course_int_id();
             //$sessionId = api_get_session_id();

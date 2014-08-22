@@ -591,6 +591,7 @@ $SelectACoach = "Seleccionar un tutor";
 $UserNameUsedTwice = "El nombre de usuario ya está en uso";
 $UserNameNotAvailable = "Este nombre de usuario no está disponible pues ya está siendo utilizado por otro usuario";
 $UserNameTooLong = "Este nombre de usuario es demasiado largo";
+$UserNameHasDash = "Este nombre no puede contener '-'";
 $WrongStatus = "Este estado no existe";
 $ClassNameNotAvailable = "Este nombre de clase no está disponible";
 $FileImported = "Archivo importado";

@@ -631,10 +631,10 @@ if (!empty($action)) {
                 	if ($_GET['warn'] == 'session_message'){
                 		$_GET['warn'] = $_SESSION['session_message_import_users'];
                 	}
-                	$message = Display::return_message(urldecode($_GET['warn']),'warning', false);
+                	$message .= Display::return_message(urldecode($_GET['warn']),'warning', false);
                 }
                 if (!empty($_GET['message'])) {
-                    $message = Display :: return_message(stripslashes($_GET['message']), 'confirmation');
+                    $message .= Display :: return_message(stripslashes($_GET['message']), 'confirmation');
                 }
 				break;
 			case 'delete_user' :

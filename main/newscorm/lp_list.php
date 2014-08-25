@@ -167,10 +167,6 @@ $test_mode = api_get_setting('server_type');
 $lp_showed = false;
 $counterCategories = 1;
 $total = count($categories);
-$isCoach = api_is_coach();
-if (api_is_course_admin()) {
-    $isCoach = false;
-}
 
 echo '<div id="category_accordion">';
 foreach ($categories as $item) {
@@ -674,24 +670,6 @@ foreach ($categories as $item) {
             } else { // end if ($is_allowedToEdit)
                 //Student
                 $export_icon = ' <a href="'.api_get_self().'?'.api_get_cidreq().'&action=export_to_pdf&lp_id='.$id.'">'.Display::return_icon('pdf.png', get_lang('ExportToPDF'), '', ICON_SIZE_SMALL).'</a>';
-            }
-
-            if ($isCoach) {
-                $dsp_edit_lp = null;
-                $dsp_export = null;
-                //$dsp_edit = null;
-                $dsp_build = null;
-
-                //$dsp_visible.
-                $dsp_publish = null;
-                $dsp_reinit = null;
-                $dsp_default_view = null;
-                $dsp_debug = null;
-                $dsp_disk = null;
-                $copy = null;
-                $lp_auto_lunch_icon = null;
-                $export_icon = null;
-                $dsp_delete = null;
             }
 
             echo $dsp_line.$start_time.$end_time.$dsp_progress.$dsp_desc.$dsp_export.$dsp_edit.$dsp_build.$dsp_edit_lp.$dsp_visible.$dsp_publish.$dsp_reinit.

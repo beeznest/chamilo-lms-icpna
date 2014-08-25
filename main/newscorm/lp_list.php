@@ -53,6 +53,10 @@ $(function() {
         collapsible: true,
 		header: '.page-header'
 	});
+    $('#category_accordion  a').click(function(){
+        window.location = $(this).attr('href');
+        return false;
+    });
 });
 
 </script>

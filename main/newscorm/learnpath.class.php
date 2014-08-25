@@ -9425,6 +9425,8 @@ EOD;
         $item = new Entity\EntityCLpCategory();
         $item->setName($params['name']);
         $item->setCId($params['c_id']);
+        $item->setUserCreator($params['user_creator']);
+        $item->setSessionCreator($params['session_creator']);
         $em->persist($item);
         $em->flush();
     }

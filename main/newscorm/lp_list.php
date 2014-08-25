@@ -121,7 +121,7 @@ if ($is_allowed_to_edit) {
     }
 
     echo '<div class="actions">';
-    if (api_is_allowed_to_edit() && !api_is_coach()) {
+    if (api_is_allowed_to_edit() || api_is_coach()) {
         echo Display::url(
             Display::return_icon(
                 'new_folder.png',
@@ -204,47 +204,77 @@ foreach ($categories as $item) {
     */
 
     if ($item->getId() > 0 && $is_platform_admin && api_get_session_id() == 0) {
-        $url = 'lp_controller.php?' . api_get_cidreq(
-            ) . '&action=add_lp_category&id=' . $item->getId();
-        $edit_link = Display::url(
-            Display::return_icon('edit.png', get_lang('Edit')),
-            $url
-        );
-        $delete_url = 'lp_controller.php?' . api_get_cidreq(
-            ) . '&action=delete_lp_category&id=' . $item->getId();
-        $moveUpUrl = 'lp_controller.php?' . api_get_cidreq(
-            ) . '&action=move_up_category&id=' . $item->getId();
-        $moveDownUrl = 'lp_controller.php?' . api_get_cidreq(
-            ) . '&action=move_down_category&id=' . $item->getId();
-
-        if ($counterCategories == 1) {
-            $moveUpLink = Display::url(
-                Display::return_icon('up_na.png', get_lang('Move')),
-                '#'
+            $url = 'lp_controller.php?' . api_get_cidreq(
+                ) . '&action=add_lp_category&id=' . $item->getId();
+            $edit_link = Display::url(
+                Display::return_icon('edit.png', get_lang('Edit')),
+                $url
             );
-        } else {
-            $moveUpLink = Display::url(
-                Display::return_icon('up.png', get_lang('Move')),
-                $moveUpUrl
+            $delete_url = 'lp_controller.php?' . api_get_cidreq(
+                ) . '&action=delete_lp_category&id=' . $item->getId();
+            $moveUpUrl = 'lp_controller.php?' . api_get_cidreq(
+                ) . '&action=move_up_category&id=' . $item->getId();
+            $moveDownUrl = 'lp_controller.php?' . api_get_cidreq(
+                ) . '&action=move_down_category&id=' . $item->getId();
+
+            if ($counterCategories == 1) {
+                $moveUpLink = Display::url(
+                    Display::return_icon('up_na.png', get_lang('Move')),
+                    '#'
+                );
+            } else {
+                $moveUpLink = Display::url(
+                    Display::return_icon('up.png', get_lang('Move')),
+                    $moveUpUrl
+                );
+            }
+
+            if (($total - 1) == $counterCategories) {
+                $moveDownLink = Display::url(
+                    Display::return_icon('down_na.png', get_lang('Move')),
+                    '#'
+                );
+            } else {
+                $moveDownLink = Display::url(
+                    Display::return_icon('down.png', get_lang('Move')),
+                    $moveDownUrl
+                );
+            }
+            $delete_link = Display::url(
+                Display::return_icon('delete.png', get_lang('Delete')),
+                $delete_url
+            );
+            $counterCategories++;
+
+    } else {
+        // verificar si este couch creo esta categoria
+        if (api_get_user_id() == $item->getUserCreator()) {
+            $url = 'lp_controller.php?' . api_get_cidreq(
+                ) . '&action=add_lp_category&id=' . $item->getId();
+            $edit_link = Display::url(
+                Display::return_icon('edit.png', get_lang('Edit')),
+                $url
+            );
+            $delete_url = 'lp_controller.php?' . api_get_cidreq(
+                ) . '&action=delete_lp_category&id=' . $item->getId();
+            $delete_link = Display::url(
+                Display::return_icon('delete.png', get_lang('Delete')),
+                $delete_url
+            );
+        } else if (api_get_session_id() == $item->getSessionCreator() && api_get_user_id() == $item->getUserCreator()) {
+            $url = 'lp_controller.php?' . api_get_cidreq(
+                ) . '&action=add_lp_category&id=' . $item->getId();
+            $edit_link = Display::url(
+                Display::return_icon('edit.png', get_lang('Edit')),
+                $url
+            );
+            $delete_url = 'lp_controller.php?' . api_get_cidreq(
+                ) . '&action=delete_lp_category&id=' . $item->getId();
+            $delete_link = Display::url(
+                Display::return_icon('delete.png', get_lang('Delete')),
+                $delete_url
             );
         }
-
-        if (($total - 1) == $counterCategories) {
-            $moveDownLink = Display::url(
-                Display::return_icon('down_na.png', get_lang('Move')),
-                '#'
-            );
-        } else {
-            $moveDownLink = Display::url(
-                Display::return_icon('down.png', get_lang('Move')),
-                $moveDownUrl
-            );
-        }
-        $delete_link = Display::url(
-            Display::return_icon('delete.png', get_lang('Delete')),
-            $delete_url
-        );
-        $counterCategories++;
     }
 
     //echo '<div class="group-category">';

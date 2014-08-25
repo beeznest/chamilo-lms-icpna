@@ -112,6 +112,8 @@ $form->addRule('name', get_lang('ThisFieldIsRequired'), 'required');
 $form->addElement('hidden', 'action', 'add_lp_category');
 $form->addElement('hidden', 'c_id', api_get_course_int_id());
 $form->addElement('hidden', 'id', 0);
+$form->addElement('hidden', 'user_creator', api_get_user_id());
+$form->addElement('hidden', 'session_creator', api_get_session_id());
 
 $form->addElement('style_submit_button', 'Submit', get_lang('Save'),'class="save"');
 

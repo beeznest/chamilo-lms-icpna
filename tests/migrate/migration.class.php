@@ -827,6 +827,10 @@ error_log($sql);
         }
 
         error_log(count($branches)." branch(es) found");
+        if (isset($branches['branch_id'])) {
+            // the value is not where we want it
+            $branches = array(0 => $branches);
+        }
 
         if (!empty($branches)) {
             foreach ($branches as $branch) {

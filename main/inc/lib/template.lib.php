@@ -796,12 +796,7 @@ class Template {
 
         if (count($navigation) > 0 || !empty($lis)) {
             $pre_lis = '';
-            
-            $icpnaNumberMessages = UserManager::get_extra_user_data_by_field($user_info['user_id'], 'ws_icpna_number_messages');
-
             foreach ($navigation as $section => $navigation_info) {
-                $navigation_info['title'] = str_replace('{{ icpna_number_messages }}', $icpnaNumberMessages['ws_icpna_number_messages'], $navigation_info['title']);
-                
                 if (isset($GLOBALS['this_section'])) {
                     $current = $section == $GLOBALS['this_section'] ? ' id="current" class="active" ' : '';
                 } else {

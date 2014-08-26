@@ -407,4 +407,132 @@ class Plugin {
     {
         return $configurationParams;
     }
+
+   /**
+    * Add a tab to platform
+    * @param string   $tabName
+    * @param string   $url
+    *
+    * @return boolean
+    */
+    public function addTab($tabName, $url)
+    {
+        $sql = "SELECT * FROM settings_current "
+                . "WHERE variable = 'show_tabs' "
+                . "AND subkey LIKE 'custom_tab_%'";
+        $result = Database::query($sql);
+        $customTabsNum = Database::num_rows($result);
+
+        $tabNum = $customTabsNum + 1;
+
+        //Avoid Tab Name Spaces
+        $tabNameNoSpaces = preg_replace('/\s+/', '', $tabName);
+        $subkeytext = "Tabs" . $tabNameNoSpaces;
+
+        //Check if it is already added
+        $checkCondition = array(
+            'where' =>
+            array(
+                "variable = 'show_tabs' AND subkeytext = ?" => array(
+                    $subkeytext
+                )
+            )
+        );
+
+        $checkDuplicate = Database::select('*', 'settings_current', $checkCondition);
+
+        if (!empty($checkDuplicate)) {
+            return false;
+        }
+        //End Check
+
+        $subkey = 'custom_tab_' . $tabNum;
+
+        $attributes = array(
+            'variable' => 'show_tabs',
+            'subkey' => $subkey,
+            'type' => 'checkbox',
+            'category' => 'Platform',
+            'selected_value' => 'true',
+            'title' => $tabName,
+            'comment' => $url,
+            'subkeytext' => $subkeytext,
+            'access_url' => 1,
+            'access_url_changeable' => 0,
+            'access_url_locked' => 0
+        );
+        $resp = Database::insert('settings_current', $attributes);
+
+        //Save the id
+        $settings = $this->get_settings();
+
+        $setData = array(
+            'comment' => $subkey
+        );
+        $whereCondition = array(
+            'id = ?' => key($settings)
+        );
+        Database::update('settings_current', $setData, $whereCondition);
+
+        return $resp;
+    }
+
+    /**
+     * Delete a tab to chamilo's platform
+     * @param string $key
+     * @return boolean $resp Transaction response
+     */
+    public function deleteTab($key)
+    {
+        $sql = "SELECT *
+                FROM settings_current
+                WHERE variable = 'show_tabs'
+                AND subkey <> '$key'
+                AND subkey like 'custom_tab_%'
+                ";
+        $resp = $result = Database::query($sql);
+        $customTabsNum = Database::num_rows($result);
+
+        if (!empty($key)) {
+            $whereCondition = array(
+                'variable = ? AND subkey = ?' => array('show_tabs', $key)
+            );
+            $resp = Database::delete('settings_current', $whereCondition);
+
+            var_dump($resp);
+            
+            //if there is more than one tab
+            //re enumerate them
+            if (!empty($customTabsNum) && $customTabsNum > 0) {
+                $tabs = Database::store_result($result, 'ASSOC');
+                $i = 1;
+                foreach ($tabs as $row) {
+                    $attributes = array(
+                        'subkey' => 'custom_tab_' . $i
+                    );
+                    $this->updateTab($row['subkey'], $attributes);
+                    $i++;
+                }
+            }
+        }
+
+        return $resp;
+    }
+
+    /**
+     * Update the tabs attributes
+     * @param string $key
+     * @param array  $attributes
+     *
+     * @return boolean
+     */
+    public function updateTab($key, $attributes)
+    {
+        $whereCondition = array(
+            'variable = ? AND subkey = ?' => array('show_tabs', $key)
+        );
+        $resp = Database::update('settings_current', $attributes, $whereCondition);
+
+        return $resp;
+    }
 }

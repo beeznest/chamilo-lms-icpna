@@ -25,6 +25,7 @@ if (!empty($_GET['id']) || $_GET['id'] === '0') {
         $objSsoServer = new ssoServer();
         $objBranch = new Branch();
         $sessionId = api_get_session_id();
+        $user = api_get_user_info();
         if (empty($sessionId)) {
             // if no session or branch context, pass 0 to login link
             $programUid = 0;
@@ -35,6 +36,7 @@ if (!empty($_GET['id']) || $_GET['id'] === '0') {
         }
         $additionalParams['uididprograma'] = $programUid;
         $additionalParams['uididsede'] = $branchUid;
+        $additionalParams['vchcodigorrhh'] = $user['username'];
 
 
         $getNewPath = $objSsoServer->getUrl($paths[$id], $additionalParams);

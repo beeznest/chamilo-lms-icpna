@@ -102,7 +102,8 @@ function online_logout($user_id = null, $logout_redirect = false) {
 
     require_once api_get_path(SYS_PATH) . 'main/chat/chat_functions.lib.php';
     exit_of_chat($user_id);
-    OutActiveTeacher($user_id);
+    //Doing the "OUT" is
+    //OutActiveTeacher($user_id);
     Session::destroy();
     if ($logout_redirect) {
         header("Location: index.php");
@@ -126,7 +127,7 @@ function OutActiveTeacher($userId) {
     if (!empty($dataTable)) {
         $rowInfo = current($dataTable);
         $setAttribute = array(
-            'log_out_course_date' => api_get_datetime()
+            'log_out_course_date' => api_get_utc_datetime()
         );
         $whereCondition = array(
             'id = ?' => $rowInfo['id']

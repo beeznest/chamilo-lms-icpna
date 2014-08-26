@@ -1,0 +1,1 @@
+This plugin is used to show additional tabs with external information embedded for SSO and the number of messages from web service.

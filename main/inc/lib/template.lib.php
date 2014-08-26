@@ -796,7 +796,12 @@ class Template {
 
         if (count($navigation) > 0 || !empty($lis)) {
             $pre_lis = '';
+            
+            $icpnaNumberMessages = UserManager::get_extra_user_data_by_field($user_info['user_id'], 'ws_icpna_number_messages');
+
             foreach ($navigation as $section => $navigation_info) {
+                $navigation_info['title'] = str_replace('{{ icpna_number_messages }}', $icpnaNumberMessages['ws_icpna_number_messages'], $navigation_info['title']);
+                
                 if (isset($GLOBALS['this_section'])) {
                     $current = $section == $GLOBALS['this_section'] ? ' id="current" class="active" ' : '';
                 } else {
@@ -1216,14 +1221,19 @@ class Template {
             }
 
             // Custom tabs
-            for ($i=1;$i<=3;$i++)
-                if (api_get_setting('show_tabs', 'custom_tab_'.$i) == 'true') {
-                    $navigation['custom_tab_'.$i] = $possible_tabs['custom_tab_'.$i];
-                } else {
-                    if (isset($possible_tabs['custom_tab_'.$i])) {
-                        $menu_navigation['custom_tab_'.$i] = $possible_tabs['custom_tab_'.$i];
+            $customTabs = $this->getCustomTabs();
+
+            if (!empty($customTabs)) {
+                foreach ($customTabs as $tab) {
+                    if (api_get_setting($tab['variable'], $tab['subkey']) == 'true') {
+                        if (!empty($tab['comment']) && $tab['comment'] !== 'ShowTabsComment') {
+                            $navigation[$tab['subkey']]['url'] = $tab['comment'];
+                            $navigation[$tab['subkey']]['title'] = $tab['title'];
+                            $navigation[$tab['subkey']]['key'] = $tab['subkey'];
+                        }
                     }
                 }
+            }
         }
         $return = array('menu_navigation' => $menu_navigation, 'navigation' => $navigation, 'possible_tabs' => $possible_tabs);
         return $return;
@@ -1395,4 +1405,21 @@ class Template {
         }
         return $html ;
     }
+    
+    public function getCustomTabs()
+    {
+        $tableSettingsCurrent = Database::get_main_table(TABLE_MAIN_SETTINGS_CURRENT);
+
+        $sql = "SELECT * FROM $tableSettingsCurrent WHERE variable = 'show_tabs' AND subkey like 'custom_tab_%'";
+
+        $result = Database::query($sql);
+        $customTabs = array();
+
+        while ($row = Database::fetch_assoc($result)) {
+            $customTabs[] = $row;
+        }
+
+        return $customTabs;
+    }
+
 }

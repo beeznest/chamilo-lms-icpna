@@ -36,17 +36,7 @@ class IcpnaNumberMessagesPlugin extends Plugin
 
     public function uninstall()
     {
-        $settings = $this->get_settings();
-
-        $lastTabSetting = current($settings);
-
-        $lastTabSubKey = $lastTabSetting['comment'];
-
-        $lastTabNumber = str_replace('custom_tab_', '', $lastTabSubKey);
-
-        for ($i = $lastTabNumber; $i > 0; $i--) {
-            $this->deleteTab("custom_tab_$i");
-        }
+        $this->deleteAllData();
     }
 
     public function saveAdditionalConfiguration($params)
@@ -76,7 +66,17 @@ class IcpnaNumberMessagesPlugin extends Plugin
      */
     private function deleteAllData()
     {
-        
+        $settings = $this->get_settings();
+
+        $lastTabSetting = current($settings);
+
+        $lastTabSubKey = $lastTabSetting['comment'];
+
+        $lastTabNumber = str_replace('custom_tab_', '', $lastTabSubKey);
+
+        for ($i = $lastTabNumber; $i > 0; $i--) {
+            $this->deleteTab("custom_tab_$i");
+        }
     }
 
     public function refreshCount($forced = false)
@@ -116,7 +116,7 @@ class IcpnaNumberMessagesPlugin extends Plugin
                     'exceptions' => 1)
                 );
                 $params = array(
-                    'vcodigorrhh' => $username,
+                    'vchcodigorrhh' => $username,
                 );
                 $wsResponse = $soapClient->ObtenerNroMensajes($params);
 

@@ -533,7 +533,7 @@ switch ($action) {
             );
             Migration::add_transaction($transactionParams);
             // End save in transaction table
-            $arrayResp = array('id' => 1, 'data' => 'SUCCESS');
+            $arrayResp = array('id' => 1, 'data' => 'SUCCESS', 'date' => api_get_local_time($utc));
         } else {
             foreach ($dataTable as $key => $inOutRow) {
                 $session = api_get_session_info($inOutRow['session_id']);
@@ -616,7 +616,7 @@ switch ($action) {
             );
             Migration::add_transaction($transactionParams);
             // End save in transaction table
-            $arrayResp = array('id' => 1, 'data' => 'SUCCESS');
+            $arrayResp = array('id' => 1, 'data' => 'SUCCESS', 'date' => api_get_local_time($utc));
         } else {
             foreach ($dataTable as $key => $inOutRow) {
                 $session = api_get_session_info($inOutRow['session_id']);

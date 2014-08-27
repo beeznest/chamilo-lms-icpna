@@ -520,6 +520,7 @@ switch ($action) {
             $lastTrackId = Database::insert_id();
             require_once api_get_path(SYS_SERVER_ROOT_PATH) . 'tests/migrate/migration.class.php';
             $lastTransactionId = Migration::get_latest_transaction_id_by_branch(500 + $branchId);
+            $utc = api_get_utc_datetime();
             $transactionParams = array(
                 'transaction_id' => $lastTransactionId + 1,
                 'branch_id' => 500 + $branchId,
@@ -527,7 +528,7 @@ switch ($action) {
                 'item_id' => $lastTrackId,
                 'orig_id' => $courseId . "-" . $userId . "-" . $sessionId . "-" . $roomId,
                 'dest_id' => 'IN',
-                'info' => api_get_utc_datetime(),
+                'info' => $utc,
                 'status_id' => 0,
             );
             Migration::add_transaction($transactionParams);
@@ -539,7 +540,7 @@ switch ($action) {
                 $course = api_get_course_info_by_id($inOutRow['course_id']);
                 $dataTable[$key]['session_name'] = $session['name'];
             }
-            $arrayResp = array('id' => 2, 'data' => $dataTable);
+            $arrayResp = array('id' => 2, 'data' => $dataTable, 'date' => api_get_local_time($utc));
         }
         echo json_encode($arrayResp);
         break;
@@ -601,6 +602,7 @@ switch ($action) {
             );
             require_once api_get_path(SYS_SERVER_ROOT_PATH) . 'tests/migrate/migration.class.php';
             $lastTransactionId = Migration::get_latest_transaction_id_by_branch(500 + $branchId);
+            $utc = api_get_utc_datetime();
             $transactionParams = array(
                 // we have to generate a unique transaction_id
                 'transaction_id' => $lastTransactionId + 1,
@@ -609,7 +611,7 @@ switch ($action) {
                 'item_id' => $rowInfo['id'],
                 'orig_id' => $courseId . "-" . $userId . "-" . $sessionId . "-" . $roomId,
                 'dest_id' => 'OUT',
-                'info' => api_get_utc_datetime(),
+                'info' => $utc,
                 'status_id' => 0,
             );
             Migration::add_transaction($transactionParams);
@@ -621,7 +623,7 @@ switch ($action) {
                 $course = api_get_course_info_by_id($inOutRow['course_id']);
                 $dataTable[$key]['session_name'] = $session['name'];
             }
-            $arrayResp = array('id' => 2, 'data' => $dataTable);
+            $arrayResp = array('id' => 2, 'data' => $dataTable, 'date' => api_get_local_time($utc));
         }
         echo json_encode($arrayResp);
         break;

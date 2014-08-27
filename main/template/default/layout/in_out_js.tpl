@@ -11,7 +11,7 @@
                 success: function (jsonData) {
                     if (jsonData.id == 1) {
                         $("#in-out-modal-label").css("color", "blue");
-                        $("#in-out-modal .modal-body").html("<p style='color: blue'>Your IN has been saved correctly.</p>");
+                        $("#in-out-modal .modal-body").html("<p style='color: blue'>Your IN has been saved correctly (" + jsonData.date + ").</p>");
                         $("#btn_in_session").addClass('hide-important');
                         $("#btn_out_session").removeClass('hide-important');
                     } else {
@@ -51,7 +51,7 @@
                 success: function (jsonData) {
                     if (jsonData.id == 1) {
                         $("#in-out-modal-label").css("color", "blue");
-                        $("#in-out-modal .modal-body").html("<p style='color: blue'>Your OUT has been saved correctly.</p>");
+                        $("#in-out-modal .modal-body").html("<p style='color: blue'>Your OUT has been saved correctly (" + jsonData.date + ").</p>");
                         $("#btn_out_session").addClass('hide-important');
                         $("#btn_in_session").removeClass('hide-important');
                     } else {

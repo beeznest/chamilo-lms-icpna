@@ -13,7 +13,12 @@ if (!api_is_anonymous()) {
 
     $numberMessages = $icpnaNumberMessages->getNumberMessagesFromDatabase();
 
+    $settingTabName = rtrim($icpnaNumberMessages->get('tab_name'), ';');
+
+    $tabNames = split(";", $settingTabName);
+
     $_template['show_script'] = true;
     $_template['variable'] = IcpnaNumberMessagesPlugin::FIELD_VARIABLE;
+    $_template['tab_name'] = $tabNames[0];
     $_template['number_messages'] = $numberMessages;
 }

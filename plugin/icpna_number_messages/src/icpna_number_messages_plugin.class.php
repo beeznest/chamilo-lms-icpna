@@ -116,7 +116,7 @@ class IcpnaNumberMessagesPlugin extends Plugin
                     'exceptions' => 1)
                 );
                 $params = array(
-                    'vcodigorrhh' => $username,
+                    'vchcodigorrhh' => $username,
                 );
                 $wsResponse = $soapClient->ObtenerNroMensajes($params);
 

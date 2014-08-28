@@ -24,20 +24,25 @@ if (!empty($_GET['id']) || $_GET['id'] === '0') {
     $objBranch = new Branch();
 
     $sessionId = api_get_session_id();
-
-    $branchUid = $objBranch->getUidSede($sessionId);
-    $programUid = $objBranch->getUidProgram($sessionId);
+    $user = api_get_user_info();
+    if (empty($sessionId)) {
+        // if no session or branch context, pass 0 to login link
+        $programUid = 0;
+        $branchUid = 0;
+    } else {
+        $programUid = $objBranch->getUidProgram($sessionId);
+        $branchUid = $objBranch->getUidSede($sessionId);
+    }
 
     $additionalParams['uididsede'] = $branchUid;
     $additionalParams['uididprograma'] = $programUid;
+    $additionalParams['vchcodigorrhh'] = $user['username'];
 
     $getNewPath = $objSsoServer->getUrl($paths[$id], $additionalParams);
 
     $objTpl = new Template($names[$id]);
     $objTpl->assign('path', $getNewPath);
-
     $content = $objTpl->fetch('add_external_pages/views/showpage.tpl');
-
     $objTpl->assign('content', $content);
     $objTpl->display_one_col_template();
 }

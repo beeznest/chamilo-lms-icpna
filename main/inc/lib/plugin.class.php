@@ -498,8 +498,6 @@ class Plugin {
                 'variable = ? AND subkey = ?' => array('show_tabs', $key)
             );
             $resp = Database::delete('settings_current', $whereCondition);
-
-            var_dump($resp);
             
             //if there is more than one tab
             //re enumerate them

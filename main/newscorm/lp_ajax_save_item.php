@@ -276,7 +276,7 @@ $interactions = array();
 if (isset($_REQUEST['interact'])) {
     if (is_array($_REQUEST['interact'])) {
         foreach ($_REQUEST['interact'] as $idx => $interac) {
-            $interactions[$idx] = split(',', substr($interac, 1, -1));
+            $interactions[$idx] = preg_split('/,/', substr($interac, 1, -1));
             if(!isset($interactions[$idx][7])){ // Make sure there are 7 elements.
                 $interactions[$idx][7] = '';
             }

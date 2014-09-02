@@ -832,6 +832,7 @@ class Sequence
             error_log('Entering '.__FUNCTION__.' in '.__FILE__);
         }
         $row_entity_id = self::get_row_entity_id_by_row_id($entity_id, $row_id, $c_id);
+        $seq_array = array();
         if ($row_entity_id !== false) {
             $seq_table = Database::get_main_table(TABLE_MAIN_SEQUENCE);
             $sql = "SELECT * FROM $seq_table WHERE sequence_row_entity_id = $row_entity_id";

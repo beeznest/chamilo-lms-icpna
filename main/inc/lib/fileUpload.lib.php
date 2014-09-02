@@ -404,6 +404,8 @@ function dir_total_space($dir_path) {
 	$save_dir = getcwd();
 	chdir($dir_path) ;
 	$handle = opendir($dir_path);
+    $sumSize = 0;
+    $dirList = array();
 
 	while ($element = readdir($handle)) {
 		if ( $element == '.' || $element == '..') {

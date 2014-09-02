@@ -1040,10 +1040,22 @@ class learnpathItem {
 	/**
 	 * Gets the suspend data
 	 */
-	public function get_suspend_data() {
-		if (self::debug > 0) { error_log('learnpathItem::get_suspend_data()', 0); }
+    public function get_suspend_data()
+    {
+        if (self::debug > 0) {
+            error_log('learnpathItem::get_suspend_data()', 0);
+        }
+
 		// TODO: Improve cleaning of breaklines ... it works but is it really a beautiful way to do it ?
-		if (!empty($this->current_data)) { return str_replace(array("\r", "\n"), array('\r', '\n'), $this->current_data); } else { return ''; }
+        if (!empty($this->current_data)) {
+            return str_replace(
+                array("\r", "\n"),
+                array('\r', '\n'),
+                $this->current_data
+            );
+        } else {
+            return '';
+        }
 	}
 
 	/**
@@ -1462,7 +1474,7 @@ class learnpathItem {
 								// Nothing found there either. Now return the value of the corresponding resource completion status.
 								if (self::debug > 1) { error_log('New LP - Didnt find any group, returning value for '.$prereqs_string, 0); }
 
-								if (isset($items[$refs_list[$prereqs_string]])) {
+                                if (isset($refs_list[$prereqs_string]) && isset($items[$refs_list[$prereqs_string]])) {
 									if ($items[$refs_list[$prereqs_string]]->type == 'quiz') {
 
 										// 1. Checking the status in current items.

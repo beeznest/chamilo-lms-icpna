@@ -557,6 +557,7 @@ $SubscribeUsersToSession = "Subscribe users to this session";
 $UserListInPlatform = "Portal users list";
 $UserListInSession = "List of users registered in this session";
 $CourseListInPlatform = "Courses list";
+$CoachSustitute = "Coach Sustitute";
 $Host = "Host";
 $UserOnHost = "Login";
 $FtpPassword = "FTP password";

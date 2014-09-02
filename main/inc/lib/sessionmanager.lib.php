@@ -1681,6 +1681,57 @@ class SessionManager {
         }
     }
 
+
+    /**
+     * Update or Insert Coach Sustitute
+     * @param int $user_id
+     * @param int $session_id
+     * @param string $course_code
+     * @return bool
+     */
+    public static function set_coach_sustitution_to_course_session($user_id, $session_id = 0, $course_code = '') {
+
+        // Definition of variables
+        $user_id = intval($user_id);
+        $session_id = !empty($session_id) ? intval($session_id) : 0;
+
+
+        // definitios of tables
+        $tbl_session_rel_course_rel_user = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
+        $tbl_session_rel_user = Database::get_main_table(TABLE_MAIN_SESSION_USER);
+        $tbl_user    = Database::get_main_table(TABLE_MAIN_USER);
+
+        // check if user is a teacher
+        $sql= "SELECT * FROM $tbl_user WHERE status='1' AND user_id = '$user_id'";
+
+        $rs_check_user = Database::query($sql);
+
+        if (Database::num_rows($rs_check_user) > 0) {
+
+            // Assign user like a coach to course
+            // First check if the user is registered in the course
+            $sql = "SELECT id_user FROM $tbl_session_rel_course_rel_user WHERE id_session = '$session_id' AND course_code = '$course_code' AND id_user = '$user_id'";
+            $rs_check = Database::query($sql);
+
+            //Then update or insert
+            $status = COACH_SUBSTITUTION;
+            if (Database::num_rows($rs_check) > 0) {
+                $sql = "UPDATE $tbl_session_rel_course_rel_user SET status = '$status' WHERE id_session = '$session_id' AND course_code = '$course_code' AND id_user = '$user_id' ";
+                $rs_update = Database::query($sql);
+                if (Database::affected_rows() > 0) return true;
+                else return false;
+            } else {
+                $sql = " INSERT INTO $tbl_session_rel_course_rel_user(id_session, course_code, id_user, status) VALUES('$session_id', '$course_code', '$user_id', '$status')";
+                $rs_insert = Database::query($sql);
+                if (Database::affected_rows() > 0) return true;
+                else return false;
+            }
+
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Assign a coach to course in session with status = 2
      * @param int          - user id

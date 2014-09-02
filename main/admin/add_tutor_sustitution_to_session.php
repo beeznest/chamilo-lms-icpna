@@ -182,85 +182,34 @@ function remove_item(origin)
 </script>';
 
 $formSent = 0;
-$errorMsg = $firstLetterCourse=$firstLetterSession='';
-$CourseList = $SessionList=array();
-$courses = $sessions=array();
-$noPHP_SELF = true;
+$errorMsg = '';
+if (isset($_POST['formSent']) && $_POST['formSent']) {
 
-if (false/*isset($_POST['formSent']) && $_POST['formSent']*/) {
-
-    $formSent              = $_POST['formSent'];
-    $firstLetterCourse     = $_POST['firstLetterCourse'];
-    $firstLetterSession    = $_POST['firstLetterSession'];
-    $CourseList            = $_POST['SessionCoursesList']; // noUsersList
-    if (!is_array($CourseList)) {
-        $CourseList=array();
-    }
-    $nbr_courses=0;
-
-    $rs = Database::query("SELECT course_code FROM $tbl_session_rel_course WHERE id_session=$id_session");
-    $existingCourses = Database::store_result($rs);
-
-    // Updating only the RRHH users?? why?
-    //$sql="SELECT id_user FROM $tbl_session_rel_user WHERE id_session = $id_session AND relation_type=".COURSE_RELATION_TYPE_RRHH." ";
-    $sql        = "SELECT id_user FROM $tbl_session_rel_user WHERE id_session = $id_session ";
-    $result     = Database::query($sql);
-    $UserList   = Database::store_result($result);
-
-    foreach ($CourseList as $enreg_course) {
-        $enreg_course = Database::escape_string($enreg_course);
-        $exists = false;
-        foreach($existingCourses as $existingCourse) {
-            if($enreg_course == $existingCourse['course_code']) {
-                $exists=true;
-            }
-        }
-        $courseInfo = api_get_course_info($enreg_course);
-        $courseId = $courseInfo['real_id'];
-
-        if (!$exists) {
-            $sql_insert_rel_course = "INSERT INTO $tbl_session_rel_course(id_session, course_id, course_code) VALUES('$id_session', '$courseId','$enreg_course')";
-            Database::query($sql_insert_rel_course);
-
-            $course_info = api_get_course_info($enreg_course);
-            CourseManager::update_course_ranking($course_info['real_id'], $id_session);
-
-            //We add in the existing courses table the current course, to not try to add another time the current course
-            $existingCourses[]=array('course_code'=>$enreg_course);
-            $nbr_users=0;
-            foreach ($UserList as $enreg_user) {
-                $enreg_user = Database::escape_string($enreg_user['id_user']);
-                $sql_insert = "INSERT IGNORE INTO $tbl_session_rel_course_rel_user(id_session,course_code,id_user) VALUES('$id_session','$enreg_course','$enreg_user')";
-                Database::query($sql_insert);
-                if(Database::affected_rows()) {
-                    $nbr_users++;
-                }
-            }
-            Database::query("UPDATE $tbl_session_rel_course SET nbr_users=$nbr_users WHERE id_session='$id_session' AND course_code='$enreg_course'");
-        }
+    $userId  = $_POST['usersList'][0];
+    if ($userId > 0 ) {
+        $course_code = $dataHeader['course_code'];
+        SessionManager::set_coach_sustitution_to_course_session($userId, $id_session, $course_code);
+        header('Location: pagina.php?id_session='.$id_session);
     }
 
-    foreach($existingCourses as $existingCourse) {
-        if(!in_array($existingCourse['course_code'], $CourseList)) {
-            $course_info = api_get_course_info($existingCourse['course_code']);
-            CourseManager::remove_course_ranking($course_info['real_id'], $id_session);
-            Database::query("DELETE FROM $tbl_session_rel_course WHERE course_code='".$existingCourse['course_code']."' AND id_session=$id_session");
-            Database::query("DELETE FROM $tbl_session_rel_course_rel_user WHERE course_code='".$existingCourse['course_code']."' AND id_session=$id_session");
-
-        }
-    }
-    $nbr_courses=count($CourseList);
-    Database::query("UPDATE $tbl_session SET nbr_courses=$nbr_courses WHERE id='$id_session'");
-
-    if(isset($_GET['add']))
-        header('Location: add_users_to_session.php?id_session='.$id_session.'&add=true');
-    else
-        header('Location: resume_session.php?id_session='.$id_session);
 }
 
 // display the dokeos header
 Display::display_header('');
-$str = <<<EOD
+if($add_type == 'multiple') {
+    $link_add_type_unique = '<a href="'.api_get_self().'?id_session='.$id_session.'&add='.Security::remove_XSS($_GET['add']).'&add_type=unique">'.Display::return_icon('single.gif').get_lang('SessionAddTypeUnique').'</a>';
+    $link_add_type_multiple = Display::return_icon('multiple.gif').get_lang('SessionAddTypeMultiple').' ';
+} else {
+    $link_add_type_unique = Display::return_icon('single.gif').get_lang('SessionAddTypeUnique').'&nbsp;&nbsp;&nbsp;';
+    $link_add_type_multiple = '<a href="'.api_get_self().'?id_session='.$id_session.'&add='.Security::remove_XSS($_GET['add']).'&add_type=multiple">'.Display::return_icon('multiple.gif').get_lang('SessionAddTypeMultiple').'</a>';
+}
+
+// the form header
+$session_info = SessionManager::fetch($id_session);
+echo '<div class="actions">';
+echo $link_add_type_unique.$link_add_type_multiple;
+echo '</div>';
+$headerInformation = <<<EOD
 <table class="data_table">
     <tr>
         <td>Phase</td>
@@ -282,27 +231,7 @@ $str = <<<EOD
     </tr>
 </table>
 EOD;
-
-
-
-
-
-
-if($add_type == 'multiple') {
-    $link_add_type_unique = '<a href="'.api_get_self().'?id_session='.$id_session.'&add='.Security::remove_XSS($_GET['add']).'&add_type=unique">'.Display::return_icon('single.gif').get_lang('SessionAddTypeUnique').'</a>';
-    $link_add_type_multiple = Display::return_icon('multiple.gif').get_lang('SessionAddTypeMultiple').' ';
-} else {
-    $link_add_type_unique = Display::return_icon('single.gif').get_lang('SessionAddTypeUnique').'&nbsp;&nbsp;&nbsp;';
-    $link_add_type_multiple = '<a href="'.api_get_self().'?id_session='.$id_session.'&add='.Security::remove_XSS($_GET['add']).'&add_type=multiple">'.Display::return_icon('multiple.gif').get_lang('SessionAddTypeMultiple').'</a>';
-}
-
-// the form header
-$session_info = SessionManager::fetch($id_session);
-echo '<div class="actions">';
-echo $link_add_type_unique.$link_add_type_multiple;
-echo '</div>';
-
-echo $str;
+echo $headerInformation;
 
 
 $ajax_search = ($add_type == 'unique') ? true : false;

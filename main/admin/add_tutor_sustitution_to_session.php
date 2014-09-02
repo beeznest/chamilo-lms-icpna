@@ -19,11 +19,10 @@ $interbreadcrumb[] = array('url' => 'inout.php','name' => get_lang('InOut'));
 $interbreadcrumb[] = array('url' => "resume_session.php?id_session=".$id_session,"name" => get_lang('SessionOverview'));
 
 // Database Table Definitions
-$tbl_session_rel_course_rel_user	= Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
 $tbl_session						= Database::get_main_table(TABLE_MAIN_SESSION);
-$tbl_session_rel_user				= Database::get_main_table(TABLE_MAIN_SESSION_USER);
-$tbl_session_rel_course				= Database::get_main_table(TABLE_MAIN_SESSION_COURSE);
 $tbl_course							= Database::get_main_table(TABLE_MAIN_COURSE);
+$tbl_user							= Database::get_main_table(TABLE_MAIN_USER);
+//$tbl_session_rel_user				= Database::get_main_table(TABLE_MAIN_SESSION_USER);
 
 // setting the name of the tool
 $tool_name= get_lang('SubscribeCoursesToSession');
@@ -104,6 +103,8 @@ function search_users($needle, $type) {
             }
             $xajax_response -> addAssign('ajax_list_users_single','innerHTML',api_utf8_encode($return));
         } else {
+            ECHO "EXIT;"; exit;
+            /*
             global $nosessionUsersList;
             $return .= '<select id="origin_users" name="nosessionUsersList[]" multiple="multiple" size="15" style="width:360px;">';
             while ($user = Database :: fetch_array($rs)) {
@@ -111,7 +112,7 @@ function search_users($needle, $type) {
                 $return .= '<option value="'.$user['user_id'].'">'.$person_name.' ('.$user['username'].')</option>';
             }
             $return .= '</select>';
-            $xajax_response -> addAssign('ajax_list_users_multiple','innerHTML',api_utf8_encode($return));
+            $xajax_response -> addAssign('ajax_list_users_multiple','innerHTML',api_utf8_encode($return));*/
         }
     }
     return $xajax_response;
@@ -122,10 +123,10 @@ $xajax -> processRequests();
 $htmlHeadXtra[] = $xajax->getJavascript('../inc/lib/xajax/');
 $htmlHeadXtra[] = '
 <script type="text/javascript">
-function add_course_to_session (code, content) {
+function add_user_to_session (code, content) {
 
 	document.getElementById("course_to_add").value = "";
-	document.getElementById("ajax_list_courses_single").innerHTML = "";
+	document.getElementById("ajax_list_users_single").innerHTML = "";
 
 	destination = document.getElementById("destination");
 
@@ -260,69 +261,55 @@ $rs = Database::query($sql);
 $count_courses = Database::result($rs, 0, 0);*/
 
 $ajax_search = $add_type == 'unique' ? true : false;
-$nosessionCourses = $sessionCourses = array();
+$sessionCourses = array();
+
 if ($ajax_search) {
 
-    $sql="SELECT code, title, visual_code, id_session
-			FROM $tbl_course course
-			INNER JOIN $tbl_session_rel_course session_rel_course
-				ON course.code = session_rel_course.course_code
-				AND session_rel_course.id_session = ".intval($id_session)."
-			ORDER BY ".(sizeof($courses)?"(code IN(".implode(',',$courses).")) DESC,":"")." title";
+    $order_clause = api_sort_by_first_name() ? ' ORDER BY firstname, lastname, username' : ' ORDER BY lastname, firstname, username';
 
-    if (api_is_multiple_url_enabled()) {
-        $tbl_course_rel_access_url= Database::get_main_table(TABLE_MAIN_ACCESS_URL_REL_COURSE);
+    $sql = "SELECT user_id, lastname, firstname, username, id_session
+            FROM $tbl_user WHERE u.status = 1" . $order_clause;
+
+    /*if (api_is_multiple_url_enabled()) {
+        $tbl_user_rel_access_url= Database::get_main_table(TABLE_MAIN_ACCESS_URL_REL_USER);
         $access_url_id = api_get_current_access_url_id();
-        if ($access_url_id != -1){
-            $sql="SELECT code, title, visual_code, id_session
-			FROM $tbl_course course
-			INNER JOIN $tbl_session_rel_course session_rel_course
-				ON course.code = session_rel_course.course_code
-				AND session_rel_course.id_session = ".intval($id_session)."
-				INNER JOIN $tbl_course_rel_access_url url_course ON (url_course.course_code=course.code)
-				WHERE access_url_id = $access_url_id
-			ORDER BY ".(sizeof($courses)?"(code IN(".implode(',',$courses).")) DESC,":"")." title";
-
+        if ($access_url_id != -1) {
+            $sql = "SELECT u.user_id, lastname, firstname, username, id_session
+            FROM $tbl_user u
+            INNER JOIN $tbl_user_rel_access_url url_user ON (url_user.user_id=u.user_id)
+            WHERE access_url_id = $access_url_id AND
+                u.status = 1 AND " . $order_clause;
         }
-    }
+    }*/
 
     $result=Database::query($sql);
     $Courses=Database::store_result($result);
 
     foreach($Courses as $course) {
-        $sessionCourses[$course['code']] = $course ;
+        $sessionCourses[$course['user_id']] = $course ;
     }
 } else {
-    $sql="SELECT code, title, visual_code, id_session
-			FROM $tbl_course course
-			LEFT JOIN $tbl_session_rel_course session_rel_course
-				ON course.code = session_rel_course.course_code
-				AND session_rel_course.id_session = ".intval($id_session)."
-			ORDER BY ".(sizeof($courses)?"(code IN(".implode(',',$courses).")) DESC,":"")." title";
+    $order_clause = api_sort_by_first_name() ? ' ORDER BY firstname, lastname, username' : ' ORDER BY lastname, firstname, username';
 
-    if (api_is_multiple_url_enabled()) {
-        $tbl_course_rel_access_url= Database::get_main_table(TABLE_MAIN_ACCESS_URL_REL_COURSE);
+    $sql = "SELECT user_id, lastname, firstname, username, id_session
+            FROM $tbl_user WHERE u.status = 1" . $order_clause;
+
+    /*if (api_is_multiple_url_enabled()) {
+        $tbl_user_rel_access_url= Database::get_main_table(TABLE_MAIN_ACCESS_URL_REL_USER);
         $access_url_id = api_get_current_access_url_id();
-        if ($access_url_id != -1){
-            $sql="SELECT code, title, visual_code, id_session
-				FROM $tbl_course course
-				LEFT JOIN $tbl_session_rel_course session_rel_course
-					ON course.code = session_rel_course.course_code
-					AND session_rel_course.id_session = ".intval($id_session)."
-				INNER JOIN $tbl_course_rel_access_url url_course ON (url_course.course_code=course.code)
-				WHERE access_url_id = $access_url_id
-				ORDER BY ".(sizeof($courses)?"(code IN(".implode(',',$courses).")) DESC,":"")." title";
+        if ($access_url_id != -1) {
+            $sql = "SELECT u.user_id, lastname, firstname, username, id_session
+            FROM $tbl_user u
+            INNER JOIN $tbl_user_rel_access_url url_user ON (url_user.user_id=u.user_id)
+            WHERE access_url_id = $access_url_id AND
+                u.status = 1 AND " . $order_clause;
         }
-    }
+    }*/
 
-    $result=Database::query($sql);
-    $Courses=Database::store_result($result);
+    $result = Database::query($sql);
+    $Courses = Database::store_result($result);
     foreach($Courses as $course) {
-        if ($course['id_session'] == $id_session) {
-            $sessionCourses[$course['code']] = $course ;
-        } else {
-            $nosessionCourses[$course['code']] = $course ;
-        }
+        $sessionCourses[$course['user_id']] = $course ;
     }
 }
 unset($Courses);
@@ -331,12 +318,9 @@ unset($Courses);
     <legend><?php echo $tool_name.' ('.$session_info['name'].')'; ?></legend>
     <input type="hidden" name="formSent" value="1" />
 
-    <?php
-    if(!empty($errorMsg))
-    {
+    <?php if(!empty($errorMsg)) {
         Display::display_normal_message($errorMsg); //main API
-    }
-    ?>
+    } ?>
 
     <table border="0" cellpadding="5" cellspacing="0" width="100%" align="center">
         <tr>
@@ -349,7 +333,7 @@ unset($Courses);
         <?php if($add_type == 'multiple') { ?>
             <tr><td width="45%" align="center">
                     <?php echo get_lang('FirstLetterCourse'); ?> :
-                    <select name="firstLetterCourse" onchange = "xajax_search_courses(this.value,'multiple')">
+                    <select name="firstLetterCourse" onchange = "xajax_search_users(this.value,'multiple')">
                         <option value="%">--</option>
                         <?php
                         echo Display :: get_alphabet_options();
@@ -362,54 +346,33 @@ unset($Courses);
 
         <tr>
             <td width="45%" align="center">
-
-                <?php
-                if(!($add_type == 'multiple')){
-                    ?>
-                    <input type="text" id="course_to_add" onkeyup="xajax_search_courses(this.value,'single')" />
-                    <div id="ajax_list_courses_single"></div>
-                <?php
-                }
-                else
-                {
-                    ?>
+                <?php if(!($add_type == 'multiple')) { ?>
+                    <input type="text" id="course_to_add" onkeyup="xajax_search_users(this.value,'single')" />
+                    <div id="ajax_list_users_single"></div>
+                <?php } else { ?>
                     <div id="ajax_list_courses_multiple">
-                        <select id="origin" name="NoSessionCoursesList[]" multiple="multiple" size="20" style="width:360px;"> <?php
-                            foreach($nosessionCourses as $enreg)
-                            {
-                                ?>
+                        <select id="origin" name="NoSessionCoursesList[]" multiple="multiple" size="20" style="width:360px;">
+                            <?php foreach($nosessionCourses as $enreg) { ?>
                                 <option value="<?php echo $enreg['code']; ?>" <?php echo 'title="'.htmlspecialchars($enreg['title'].' ('.$enreg['visual_code'].')',ENT_QUOTES).'"'; if(in_array($enreg['code'],$CourseList)) echo 'selected="selected"'; ?>><?php echo $enreg['title'].' ('.$enreg['visual_code'].')'; ?></option>
-                            <?php
-                            }
-                            ?></select>
+                            <?php } ?>
+                        </select>
                     </div>
-                <?php
-                }
-                unset($nosessionCourses);
-                ?>
+                <?php }  unset($nosessionCourses); ?>
             </td>
             <td width="10%" valign="middle" align="center">
-                <?php
-                if ($ajax_search) {
-                    ?>
+                <?php if ($ajax_search) { ?>
                     <button class="arrowl" type="button" onclick="remove_item(document.getElementById('destination'))"></button>
-                <?php
-                } else {
-                    ?>
+                <?php } else { ?>
                     <button class="arrowr" type="button" onclick="moveItem(document.getElementById('origin'), document.getElementById('destination'))" onclick="moveItem(document.getElementById('origin'), document.getElementById('destination'))"></button>
                     <br /><br />
                     <button class="arrowl" type="button" onclick="moveItem(document.getElementById('destination'), document.getElementById('origin'))" onclick="moveItem(document.getElementById('destination'), document.getElementById('origin'))"></button>
-                <?php
-                }
-                ?>
+                <?php } ?>
                 <br /><br /><br /><br /><br /><br />
-                <?php
-                if(isset($_GET['add'])) {
+                <?php if(isset($_GET['add'])) {
                     echo '<button class="save" type="button" value="" onclick="valide()" >'.get_lang('NextStep').'</button>';
                 } else {
                     echo '<button class="save" type="button" value="" onclick="valide()" >'.get_lang('SubscribeCoursesToSession').'</button>';
-                }
-                ?>
+                } ?>
             </td>
             <td width="45%" align="center"><select id='destination' name="SessionCoursesList[]" multiple="multiple" size="20" style="width:360px;">
 

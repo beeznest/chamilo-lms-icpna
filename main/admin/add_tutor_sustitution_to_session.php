@@ -7,7 +7,7 @@ require_once '../inc/global.inc.php';
 
 
 $id_session = isset($_GET['id_session']) ? intval($_GET['id_session']) : null;
-
+$id_session = 462137;
 SessionManager::protect_session_edit($id_session);
 
 $xajax = new xajax();
@@ -29,10 +29,45 @@ $add_type = 'multiple';
 if (isset($_GET['add_type']) && $_GET['add_type']!='') {
     $add_type = Security::remove_XSS($_REQUEST['add_type']);
 }
-
 $page = isset($_GET['page']) ? Security::remove_XSS($_GET['page']) : null;
 
+$dataHeader = getDataHeader($id_session);
+/**
+ * Get data basic, for panel sustitution
+ * @param $id_session
+ * @return array
+ */
+function getDataHeader($id_session) {
+    $session_field = new SessionField();
+    $session_fields = $session_field->get_all();
+    $data = array();
+    foreach ($session_fields as $session_field) {
+        if ($session_field['field_visible'] != '1') {
+            continue;
+        }
+        $obj = new SessionFieldValue();
+        $result = $obj->get_values_by_handler_and_field_id($id_session, $session_field['id'], true);
 
+        $session_key = strtolower($session_field['field_display_text']);
+        $session_value = ($result) ? $result['field_value'] : null;
+
+        if ($session_field['id'] == 4) {
+            $data[$session_key] = $session_value;
+        } else if ($session_field['id'] == 6) {
+            $data[$session_key] = $session_value;
+        }
+    }
+
+    return $data;
+}
+
+
+/**
+ * Function is use for ajax
+ * @param $needle
+ * @param $type
+ * @return XajaxResponse
+ */
 function search_users($needle, $type) {
     global $tbl_user, $tbl_session_rel_user, $id_session;
     $xajax_response = new XajaxResponse();
@@ -67,22 +102,22 @@ function search_users($needle, $type) {
 
         if (api_is_multiple_url_enabled()) {
             $tbl_user_rel_access_url = Database::get_main_table(TABLE_MAIN_ACCESS_URL_REL_USER);
-            $access_url_id = api_get_current_access_url_id(); VAR_DUMP($access_url_id); EXIT;
-            if ($access_url_id != -1) { ECHO "DDD"; EXIT;
+            $access_url_id = api_get_current_access_url_id();
+            if ($access_url_id != -1) {
                 switch($type) {
                     case 'single':
                         $sql = 'SELECT user.user_id, username, lastname, firstname FROM '.$tbl_user.' user
                         INNER JOIN '.$tbl_user_rel_access_url.' url_user ON (url_user.user_id=user.user_id)
                         WHERE access_url_id = '.$access_url_id.'  AND (username LIKE "'.$needle.'%"
                         OR firstname LIKE "'.$needle.'%"
-                        OR lastname LIKE "'.$needle.'%") AND user.status=1 '.$order_clause.' LIMIT 11'; echo $sql; exit;
+                        OR lastname LIKE "'.$needle.'%") AND user.status=1 '.$order_clause.' LIMIT 11';
                         break;
                     case 'multiple':
                         $sql = 'SELECT user.user_id, username, lastname, firstname FROM '.$tbl_user.' user
                         INNER JOIN '.$tbl_user_rel_access_url.' url_user ON (url_user.user_id=user.user_id)
                         WHERE access_url_id = '.$access_url_id.' AND
                                 '.(api_sort_by_first_name() ? 'firstname' : 'lastname').' LIKE "'.$needle.'%" AND user.status = 1 '.$order_clause;
-                        break; echo $sql; exit;
+                        break;
                 }
             }
         }
@@ -163,10 +198,6 @@ if (false/*isset($_POST['formSent']) && $_POST['formSent']*/) {
     }
     $nbr_courses=0;
 
-    $id_coach = Database::query("SELECT id_coach FROM $tbl_session WHERE id=$id_session");
-    $id_coach = Database::fetch_array($id_coach);
-    $id_coach = $id_coach[0];
-
     $rs = Database::query("SELECT course_code FROM $tbl_session_rel_course WHERE id_session=$id_session");
     $existingCourses = Database::store_result($rs);
 
@@ -230,13 +261,12 @@ if (false/*isset($_POST['formSent']) && $_POST['formSent']*/) {
 // display the dokeos header
 Display::display_header('');
 $str = <<<EOD
-<!--<div class=" actions" style="border:1px solid red">-->
 <table class="data_table">
     <tr>
         <td>Phase</td>
         <td><strong>(001) Basic Daily</strong></td>
         <td>Room</td>
-        <td><strong>504</strong></td>
+        <td><strong>{$dataHeader['aula']}</strong></td>
     </tr>
     <tr>
         <td>Course</td>
@@ -246,9 +276,9 @@ $str = <<<EOD
     </tr>
     <tr>
         <td>Schedule</td>
-        <td><strong>16:00 - 17:30</strong></td>
+        <td><strong>{$dataHeader['horario']}</strong></td>
         <td>Teacher</td>
-        <td><strong>JOO ROSMERY TH</strong></td>
+        <td><strong>{$dataHeader['teacher']}</strong></td>
     </tr>
 </table>
 EOD;
@@ -336,7 +366,7 @@ unset($Courses);
                     <div id="ajax_list_users_single"></div>
                 <?php } else { ?>
                     <div id="ajax_list_users_multiple">
-                        <select id="origin" name="usersList[]" multiple="multiple" size="20" style="width:360px;">
+                        <select id="origin" name="noUsersList[]" multiple="multiple" size="20" style="width:360px;">
                             <?php foreach($sessionCourses as $enreg) { ?>
                                 <option value="<?php echo $enreg['user_id']; ?>"><?php echo api_get_person_name($enreg['firstname'], $enreg['lastname']).' ('.$enreg['username'].')'; ?></option>
                             <?php } ?>
@@ -358,7 +388,7 @@ unset($Courses);
 
             </td>
             <td width="45%" align="center">
-                <select id='destination' name="noUsersList[]" multiple="multiple" size="20" style="width:360px;">
+                <select id='destination' name="usersList[]" multiple="multiple" size="20" style="width:360px;">
                 </select>
             </td>
         </tr>

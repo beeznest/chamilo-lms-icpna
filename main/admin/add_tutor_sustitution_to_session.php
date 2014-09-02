@@ -25,9 +25,6 @@ $tbl_course							= Database::get_main_table(TABLE_MAIN_COURSE);
 $tbl_user							= Database::get_main_table(TABLE_MAIN_USER);
 //$tbl_session_rel_user				= Database::get_main_table(TABLE_MAIN_SESSION_USER);
 
-// setting the name of the tool
-$tool_name= get_lang('Substitute');
-
 $add_type = 'multiple';
 if (isset($_GET['add_type']) && $_GET['add_type']!='') {
     $add_type = Security::remove_XSS($_REQUEST['add_type']);
@@ -312,21 +309,12 @@ if ($ajax_search == true || $ajax_search == false) {
 unset($Courses);
 ?>
 <form name="formulaire" method="post" action="<?php echo api_get_self(); ?>?page=<?php echo $page; ?>&id_session=<?php echo $id_session; ?><?php if(!empty($_GET['add'])) echo '&add=true' ; ?>" style="margin:0px;" <?php if($ajax_search){echo ' onsubmit="valide();"';}?>>
-    <legend><?php echo $tool_name.' ('.$session_info['name'].')'; ?></legend>
     <input type="hidden" name="formSent" value="1" />
-
     <?php if(!empty($errorMsg)) {
         Display::display_normal_message($errorMsg); //main API
     } ?>
 
     <table border="0" cellpadding="5" cellspacing="0" width="100%" align="center">
-        <tr>
-            <td width="45%" align="center"><b><?php echo get_lang('CoachSustituteListInPlatform') ?> :</b></td>
-
-            <td width="10%">&nbsp;</td>
-            <td align="center" width="45%"><b><?php echo get_lang('CoachSustituteListInSession') ?> :</b></td>
-        </tr>
-
         <?php if($add_type == 'multiple') { ?>
             <tr><td width="45%" align="center">
                     <?php echo get_lang('FirstLetterCourse'); ?> :

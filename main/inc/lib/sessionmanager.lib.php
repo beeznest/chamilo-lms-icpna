@@ -1714,7 +1714,7 @@ class SessionManager {
             $rs_check = Database::query($sql);
 
             //Then update or insert
-            $status = COACH_SUBSTITUTION;
+            $status = ROLE_COACH_SUBSTITUTE;
             if (Database::num_rows($rs_check) > 0) {
                 $sql = "UPDATE $tbl_session_rel_course_rel_user SET status = '$status' WHERE id_session = '$session_id' AND course_code = '$course_code' AND id_user = '$user_id' ";
                 $rs_update = Database::query($sql);

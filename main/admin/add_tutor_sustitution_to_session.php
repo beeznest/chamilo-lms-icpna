@@ -20,10 +20,10 @@ $interbreadcrumb[] = array('url' => "#", 'name' => get_lang('CoachSustitute'));
 //$interbreadcrumb[] = array('url' => "resume_session.php?id_session=".$id_session,"name" => get_lang('CoachSustitute'));
 
 // Database Table Definitions
-$tbl_session						= Database::get_main_table(TABLE_MAIN_SESSION);
-$tbl_course							= Database::get_main_table(TABLE_MAIN_COURSE);
-$tbl_user							= Database::get_main_table(TABLE_MAIN_USER);
-//$tbl_session_rel_user				= Database::get_main_table(TABLE_MAIN_SESSION_USER);
+$tbl_session                        = Database::get_main_table(TABLE_MAIN_SESSION);
+$tbl_course                         = Database::get_main_table(TABLE_MAIN_COURSE);
+$tbl_user                           = Database::get_main_table(TABLE_MAIN_USER);
+//$tbl_session_rel_user             = Database::get_main_table(TABLE_MAIN_SESSION_USER);
 
 $add_type = 'multiple';
 if (isset($_GET['add_type']) && $_GET['add_type']!='') {
@@ -154,30 +154,32 @@ $htmlHeadXtra[] = $xajax->getJavascript('../inc/lib/xajax/');
 $htmlHeadXtra[] = '
 <script type="text/javascript">
 function add_user_to_session (code, content) {
+    document.getElementById("course_to_add").value = "";
+    document.getElementById("ajax_list_users_single").innerHTML = "";
 
-	document.getElementById("course_to_add").value = "";
-	document.getElementById("ajax_list_users_single").innerHTML = "";
-
-	destination = document.getElementById("destination");
-
-	for (i=0;i<destination.length;i++) {
-		if(destination.options[i].text == content) {
-				return false;
-		}
-	}
-
-	destination.options[destination.length] = new Option(content,code);
-	destination.selectedIndex = -1;
-	sortOptions(destination.options);
+    destination = document.getElementById("destination");
+    
+    for (i=0;i<destination.length;i++) {
+        if(destination.options[i].text == content) {
+            return false;
+        }
+    }
+    // only one couch sustitute
+    if ( destination.options.length == 0) {
+        destination.options[destination.length] = new Option(content,code);
+        destination.selectedIndex = -1;
+        sortOptions(destination.options);
+    }
 }
+
 function remove_item(origin)
 {
-	for(var i = 0 ; i<origin.options.length ; i++) {
-		if(origin.options[i].selected) {
-			origin.options[i]=null;
-			i = i-1;
-		}
-	}
+    for(var i = 0 ; i<origin.options.length ; i++) {
+        if(origin.options[i].selected) {
+            origin.options[i]=null;
+            i = i-1;
+        }
+    }
 }
 </script>';
 
@@ -327,15 +329,26 @@ unset($Courses);
 <script type="text/javascript">
     <!--
     function moveItem(origin , destination) {
-        for(var i = 0 ; i<origin.options.length ; i++) {
-            if(origin.options[i].selected) {
-                destination.options[destination.length] = new Option(origin.options[i].text,origin.options[i].value);
-                origin.options[i]=null;
-                i = i-1;
+
+        if('origin' == origin.id) {
+            if (destination.length == 0) { // only first coach.
+                _helper(origin, destination);
             }
+        } else if ('destination' == origin.id) {
+            _helper(origin, destination);
+        };
+
+        function _helper(origin, destination) {
+            for(var i = 0 ; i<origin.options.length ; i++) {
+                if(origin.options[i].selected) {
+                    destination.options[destination.length] = new Option(origin.options[i].text,origin.options[i].value);
+                    origin.options[i] = null;
+                    i = i-1;
+                }
+            }            
+            destination.selectedIndex = -1;
+            sortOptions(destination.options);            
         }
-        destination.selectedIndex = -1;
-        sortOptions(destination.options);
     }
 
     function sortOptions(options) {

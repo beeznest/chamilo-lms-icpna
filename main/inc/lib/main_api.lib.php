@@ -44,8 +44,9 @@ define('SESSION_GENERAL_COACH', 13);
 define('COURSE_STUDENT', 14);   //student subscribed in a course
 define('SESSION_STUDENT', 15);  //student subscribed in a session course
 define('COURSE_TUTOR', 16); // student is tutor of a course (NOT in session)
-define('COACH_SUBSTITUTION', 17); // substitution tutor
-define('TEACHER_ADMIN', 18); // teacher admin
+define('ROLE_COACH_SUBSTITUTE', 17); // substitution tutor
+define('ROLE_TEACHER_ADMIN', 18); // teacher admin
+
 
 // Table of status
 $_status_list[COURSEMANAGER]    = 'teacher';        // 1

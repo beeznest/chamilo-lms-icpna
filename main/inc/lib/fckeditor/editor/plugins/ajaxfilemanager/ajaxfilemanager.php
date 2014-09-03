@@ -17,6 +17,7 @@ require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "inc" . DIRECTORY_SEPARAT
 
 require_once CLASS_SESSION_ACTION;
 $sessionAction = new SessionAction();
+$configOptionsRename = CONFIG_OPTIONS_RENAME;
 
 if (CONFIG_LOAD_DOC_LATTER) {
 	$fileList = array();
@@ -27,6 +28,10 @@ if (CONFIG_LOAD_DOC_LATTER) {
 	$manager->setSessionAction($sessionAction);
 	$fileList = $manager->getFileList();
 	$folderInfo = $manager->getFolderInfo();
+}
+// Disable rename option if use file manager from My Files. This should be temporal - refs BT#8314
+if (!empty($folderInfo['path']) && is_string($folderInfo['path'])) {
+    $configOptionsRename = preg_match('|\/upload\/users\/\d\/\d+\/my_files|i',$folderInfo['path']) ? 0 : $configOptionsRename;
 }
 
 if(CONFIG_SYS_THUMBNAIL_VIEW_ENABLE) {
@@ -129,7 +134,7 @@ if(!empty($_GET['view'])) {
 					'cut':<?php echo (CONFIG_OPTIONS_CUT?'1':'0'); ?>,
 					'copy':<?php echo (CONFIG_OPTIONS_COPY?1:0); ?>,
 					'newfolder':<?php echo (CONFIG_OPTIONS_NEWFOLDER?1:0); ?>,
-					'rename':<?php echo (CONFIG_OPTIONS_RENAME?1:0); ?>,
+					'rename':<?php echo $configOptionsRename; ?>,
 					'upload':<?php echo (CONFIG_OPTIONS_UPLOAD?1:0); ?>,
 					'edit':<?php echo (CONFIG_OPTIONS_EDITABLE?1:0); ?>,
 					'view_only':<?php echo (CONFIG_SYS_VIEW_ONLY?1:0); ?>};

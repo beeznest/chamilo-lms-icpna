@@ -483,13 +483,20 @@ class learnpathItem {
 	 * @params  bool    Whether to check directly into the database (default no)
 	 * @return  string  An empty string if no interaction, a JS array definition otherwise
 	 */
-	public function get_interactions_js_array($checkdb = false) {
+    public function get_interactions_js_array($checkdb = false)
+    {
 		$return = '';
 		if ($checkdb) {
 			$this->load_interactions(true);
 		}
 		foreach ($this->interactions as $id => $in) {
-			$return .= "['$id','".$in[1]."','".$in[2]."','".$in[3]."','".$in[4]."','".$in[5]."','".$in[6]."','".$in[7]."'],";
+            $return .= "['$id','" . addslashes($in[1]) . "','" . addslashes(
+                    $in[2]
+                ) . "','" . addslashes($in[3]) . "','" . addslashes(
+                    $in[4]
+                ) . "','" . addslashes($in[5]) . "','" . addslashes(
+                    $in[6]
+                ) . "','" . addslashes($in[7]) . "'],";
 		}
 		if (!empty($return)) {
 			$return = substr($return, 0, -1);
@@ -1049,8 +1056,8 @@ class learnpathItem {
 		// TODO: Improve cleaning of breaklines ... it works but is it really a beautiful way to do it ?
         if (!empty($this->current_data)) {
             return str_replace(
-                array("\r", "\n"),
-                array('\r', '\n'),
+                array("\r", "\n", "'"),
+                array('\r', '\n', "\\'"),
                 $this->current_data
             );
         } else {

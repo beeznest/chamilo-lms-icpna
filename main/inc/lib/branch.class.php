@@ -143,4 +143,11 @@ class Branch
         $room = current($roomData);
         return $room['id'];
     }
+    
+    public static function getAll()
+    {
+        $branchTable = Database::get_statistic_table(TABLE_BRANCH);
+        
+        return Database::select('*', $branchTable);
+    }
 } 

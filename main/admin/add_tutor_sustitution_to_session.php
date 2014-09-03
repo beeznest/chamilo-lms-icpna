@@ -86,17 +86,15 @@ function search_users($needle, $type) {
         $needle = Database::escape_string($needle);
         $needle = api_convert_encoding($needle, $charset, 'utf-8');
 
-        $order_clause = api_sort_by_first_name() ? ' ORDER BY firstname, lastname, username' : ' ORDER BY lastname, firstname, username';
-
-        switch($type) {
+        switch ($type) {
             case 'single':
                 $sql = 'SELECT user.user_id, username, lastname, firstname FROM '.$tbl_user.' user
                         WHERE (username LIKE "'.$needle.'%" OR firstname LIKE "'.$needle.'%"
-                            OR lastname LIKE "'.$needle.'%") AND user.status = 1'. $order_clause.' LIMIT 11';
+                            OR lastname LIKE "'.$needle.'%") AND user.status = 1 LIMIT 11';
                 break;
             case 'multiple':
                 $sql = 'SELECT user.user_id, username, lastname, firstname FROM '.$tbl_user.' user
-                        WHERE '.(api_sort_by_first_name() ? 'firstname' : 'lastname').' LIKE "'.$needle.'%" AND user.status=1 '.$order_clause;
+                        WHERE '.(api_sort_by_first_name() ? 'firstname' : 'lastname').' LIKE "'.$needle.'%" AND user.status=1 ';
                 break;
         }
 
@@ -110,13 +108,13 @@ function search_users($needle, $type) {
                         INNER JOIN '.$tbl_user_rel_access_url.' url_user ON (url_user.user_id=user.user_id)
                         WHERE access_url_id = '.$access_url_id.'  AND (username LIKE "'.$needle.'%"
                         OR firstname LIKE "'.$needle.'%"
-                        OR lastname LIKE "'.$needle.'%") AND user.status=1 '.$order_clause.' LIMIT 11';
+                        OR lastname LIKE "'.$needle.'%") AND user.status=1 LIMIT 11';
                         break;
                     case 'multiple':
                         $sql = 'SELECT user.user_id, username, lastname, firstname FROM '.$tbl_user.' user
                         INNER JOIN '.$tbl_user_rel_access_url.' url_user ON (url_user.user_id=user.user_id)
                         WHERE access_url_id = '.$access_url_id.' AND
-                                '.(api_sort_by_first_name() ? 'firstname' : 'lastname').' LIKE "'.$needle.'%" AND user.status = 1 '.$order_clause;
+                                '.(api_sort_by_first_name() ? 'firstname' : 'lastname').' LIKE "'.$needle.'%" AND user.status = 1 ';
                         break;
                 }
             }
@@ -128,7 +126,7 @@ function search_users($needle, $type) {
             while ($user = Database :: fetch_array($rs)) {
                 $i++;
                 if ($i <= 10) {
-                    $person_name = api_get_person_name($user['firstname'], $user['lastname']);
+                    $person_name = api_get_person_name($user['firstname'], $user['lastname'], null, PERSON_NAME_EASTERN_ORDER);
                     $return .= '<a href="javascript: void(0);" onclick="javascript: add_user_to_session(\''.$user['user_id'].'\',\''.$person_name.' ('.$user['username'].')'.'\')">'.$person_name.' ('.$user['username'].')</a><br />';
                 } else {
                     $return .= '...<br />';
@@ -138,7 +136,7 @@ function search_users($needle, $type) {
         } else {
             $return .= '<select id="origin_users" name="usersList[]" multiple="multiple" size="20" style="width:360px;">';
             while ($user = Database :: fetch_array($rs)) {
-                $person_name = api_get_person_name($user['firstname'], $user['lastname']);
+                $person_name = api_get_person_name($user['firstname'], $user['lastname'], null, PERSON_NAME_EASTERN_ORDER);
                 $return .= '<option value="'.$user['user_id'].'">'.$person_name.' ('.$user['username'].')</option>';
             }
             $return .= '</select>';
@@ -241,12 +239,8 @@ $sessionCourses = array();
 
 if ($ajax_search == true || $ajax_search == false) {
 
-    $order_clause = api_sort_by_first_name() ?
-        ' ORDER BY u.firstname, u.lastname, u.username' :
-        ' ORDER BY u.lastname, u.firstname, u.username';
-
     $sql = "SELECT user_id, lastname, firstname, username
-            FROM $tbl_user AS u WHERE u.status = 1" . $order_clause;
+            FROM $tbl_user AS u WHERE u.status = 1";
 
 
     if (api_is_multiple_url_enabled()) {
@@ -256,7 +250,7 @@ if ($ajax_search == true || $ajax_search == false) {
             $sql = "SELECT u.user_id, lastname, firstname, username
             FROM $tbl_user u
             INNER JOIN $tbl_user_rel_access_url url_user ON (url_user.user_id = u.user_id)
-            WHERE access_url_id = $access_url_id AND u.status = 1 " . $order_clause;
+            WHERE access_url_id = $access_url_id AND u.status = 1 ";
         }
     }
 
@@ -299,7 +293,7 @@ unset($Courses);
                     <div id="ajax_list_users_multiple">
                         <select id="origin" name="noUsersList[]" multiple="multiple" size="20" style="width:360px;">
                             <?php foreach($sessionCourses as $enreg) { ?>
-                                <option value="<?php echo $enreg['user_id']; ?>"><?php echo api_get_person_name($enreg['firstname'], $enreg['lastname']).' ('.$enreg['username'].')'; ?></option>
+                                <option value="<?php echo $enreg['user_id']; ?>"><?php echo api_get_person_name($enreg['firstname'], $enreg['lastname'], null, PERSON_NAME_EASTERN_ORDER).' ('.$enreg['username'].')'; ?></option>
                             <?php } ?>
                         </select>
                     </div>

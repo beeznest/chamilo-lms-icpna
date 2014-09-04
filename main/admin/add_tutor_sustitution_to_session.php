@@ -1,8 +1,4 @@
 <?php
-/*echo "<pre>";
-print_r($_GET);
-echo "</pre>";
-*/
 $language_file='admin';
 // resetting the course id
 $cidReset = true;
@@ -10,7 +6,6 @@ require_once '../inc/global.inc.php';
 
 
 $id_session = isset($_GET['id_session']) ? intval($_GET['id_session']) : null;
-$id_session = 462137;
 SessionManager::protect_session_edit($id_session);
 
 $xajax = new xajax();
@@ -160,13 +155,14 @@ $formSent = 0;
 $errorMsg = '';
 if (isset($_POST['formSent']) && $_POST['formSent']) {
 
-    $userId  = $_POST['usersList'][0];
-    if ($userId > 0 ) {
-        $course_code = $dataHeader['course_code'];
-        //SessionManager::set_coach_sustitution_to_course_session($userId, $id_session, $course_code);
-        header('Location: pagina.php?id_session='.$id_session);
+    $userId  = (!empty($_POST['usersList'][0])) ? $_POST['usersList'][0] : 0;
+    if ($userId > 0 && $id_session > 0  && !empty($dataHeader['course'])) {
+        $course = $dataHeader['course'];
+        $array = preg_split('#\)#', $course);
+        $codeCourse = substr($array[0], 1, strlen($array[0]));
+        SessionManager::set_coach_sustitution_to_course_session($userId, $id_session, $codeCourse);
+        //header('Location: /main/admin/sessions_schedule.php');
     }
-
 }
 
 // display the dokeos header
@@ -228,11 +224,11 @@ if ($ajax_search == true || $ajax_search == false) {
     foreach($Courses as $course) {
         $sessionCourses[$course['user_id']] = $course ;
     }
-
 }
 unset($Courses);
+$urlConcat = $_SERVER['QUERY_STRING'];
 ?>
-<form name="formulaire" method="post" action="<?php echo api_get_self(); ?>?page=<?php echo $page; ?>&id_session=<?php echo $id_session; ?><?php if(!empty($_GET['add'])) echo '&add=true' ; ?>" style="margin:0px;" <?php if($ajax_search){echo ' onsubmit="valide();"';}?>>
+<form name="formulaire" method="post" action="<?php echo api_get_self(); ?>?<?php echo $urlConcat ?>&page=<?php echo $page; ?><?php if(!empty($_GET['add'])) echo '&add=true' ; ?>" style="margin:0px;" <?php if($ajax_search){echo ' onsubmit="valide();"';}?>>
     <input type="hidden" name="formSent" value="1" />
     <?php if(!empty($errorMsg)) {
         Display::display_normal_message($errorMsg); //main API

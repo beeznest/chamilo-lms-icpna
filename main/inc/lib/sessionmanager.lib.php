@@ -1708,6 +1708,15 @@ class SessionManager {
 
         if (Database::num_rows($rs_check_user) > 0) {
 
+            $dataSerialNow = array(
+                'admin' => api_get_user_id(),
+                'coach' => $user_id,
+                'session_id' => $session_id,
+                'course_code' => $course_code,
+                'create_at' => date('Y-m-d h:i:s')
+            );
+            event_system('session_substitute', 'MISC', serialize($dataSerialNow), null, null, null, $session_id);
+
             // Assign user like a coach to course
             // First check if the user is registered in the course
             $sql = "SELECT id_user FROM $tbl_session_rel_course_rel_user WHERE id_session = '$session_id' AND course_code = '$course_code' AND id_user = '$user_id'";
@@ -1730,6 +1739,32 @@ class SessionManager {
         } else {
             return false;
         }
+    }
+
+    private static function _getSerialDataSubstitute($data, $extraArray = null)
+    {
+        $array = array();
+        //$data = !empty($data[0]) ? $data[0] : array();
+
+        $c = 0;
+        if (is_array($data) && count($data) > 0) {
+            foreach($data as $key => $value) {
+                foreach($value as $indice => $valor) {
+                    $array[$c][$indice] = $valor;
+                }
+                $c++;
+            }
+        }
+
+        if (is_array($extraArray)) {
+            $array[$c]['admin'] = $extraArray['admin'];
+            $array[$c]['coach'] = $extraArray['teacher'];
+            $array[$c]['session_id'] = $extraArray['session_id'];
+            $array[$c]['course_code'] = $extraArray['course_code'];
+            $array[$c]['create_at'] = $extraArray['create_at'];
+        }
+
+        return serialize($array);
     }
 
     /**

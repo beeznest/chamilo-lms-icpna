@@ -64,11 +64,11 @@ function search_users($needle, $type) { //echo " $type...0"; exit;
             case 'single':
                 $sql = 'SELECT user.user_id, username, lastname, firstname FROM '.$tbl_user.' user
                         WHERE (username LIKE "'.$needle.'%" OR firstname LIKE "'.$needle.'%"
-                            OR lastname LIKE "'.$needle.'%") AND user.status = 1 LIMIT 11';
+                            OR lastname LIKE "'.$needle.'%") AND user.status = 1 order by lastname LIMIT 11';
                 break;
             case 'multiple':
                 $sql = 'SELECT user.user_id, username, lastname, firstname FROM '.$tbl_user.' user
-                        WHERE '.(api_sort_by_first_name() ? 'firstname' : 'lastname').' LIKE "'.$needle.'%" AND user.status=1 ';
+                        WHERE lastname  LIKE "'.$needle.'%" AND user.status=1  order by lastname';
                 break;
         }
 
@@ -76,7 +76,7 @@ function search_users($needle, $type) { //echo " $type...0"; exit;
             $tbl_user_rel_access_url = Database::get_main_table(TABLE_MAIN_ACCESS_URL_REL_USER);
             $access_url_id = api_get_current_access_url_id();
             if ($access_url_id != -1) {
-                $orderby = "ORDER BY lastname DESC";
+                $orderby = "ORDER BY lastname";
                 switch($type) {
                     case 'single':
                         $sql = 'SELECT user.user_id, username, lastname, firstname FROM '.$tbl_user.' user
@@ -88,8 +88,7 @@ function search_users($needle, $type) { //echo " $type...0"; exit;
                     case 'multiple':
                         $sql = 'SELECT user.user_id, username, lastname, firstname FROM '.$tbl_user.' user
                         INNER JOIN '.$tbl_user_rel_access_url.' url_user ON (url_user.user_id=user.user_id)
-                        WHERE access_url_id = '.$access_url_id.' AND
-                                '.(api_sort_by_first_name() ? 'firstname' : 'lastname').' LIKE "'.$needle.'%" AND user.status = 1 '.$orderby;
+                        WHERE access_url_id = '.$access_url_id.' AND lastname LIKE "'.$needle.'%" AND user.status = 1 '.$orderby;
                         break;
                 }
             }
@@ -112,6 +111,7 @@ function search_users($needle, $type) { //echo " $type...0"; exit;
             $return .= '<select id="origin_users" name="usersList[]" multiple="multiple" size="20" style="width:360px;">';
             while ($user = Database :: fetch_array($rs)) {
                 $person_name = api_get_person_name($user['firstname'], $user['lastname'], null, PERSON_NAME_EASTERN_ORDER);
+                //echo $person_name;
                 $return .= '<option value="'.$user['user_id'].'">'.$person_name.' ('.$user['username'].')</option>';
             }
             $return .= '</select>';
@@ -215,7 +215,7 @@ $sessionCourses = array();
 if ($ajax_search == true || $ajax_search == false) {
 
     $sql = "SELECT user_id, lastname, firstname, username
-            FROM $tbl_user AS u WHERE u.status = 1";
+            FROM $tbl_user AS u WHERE u.status = 1 order by lastname";
 
 
     if (api_is_multiple_url_enabled()) {
@@ -225,7 +225,7 @@ if ($ajax_search == true || $ajax_search == false) {
             $sql = "SELECT u.user_id, lastname, firstname, username
             FROM $tbl_user u
             INNER JOIN $tbl_user_rel_access_url url_user ON (url_user.user_id = u.user_id)
-            WHERE access_url_id = $access_url_id AND u.status = 1 ";
+            WHERE access_url_id = $access_url_id AND u.status = 1 order by u.lastname";
         }
     }
 

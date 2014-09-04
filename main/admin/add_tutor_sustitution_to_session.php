@@ -18,7 +18,7 @@ $xajax -> registerFunction ('search_users');
 
 // setting breadcrumbs
 $interbreadcrumb[] = array('url' => 'index.php', 'name' => get_lang('PlatformAdmin'));
-$interbreadcrumb[] = array('url' => 'inout.php','name' => get_lang('InOut'));
+$interbreadcrumb[] = array('url' => 'sessions_schedule.php','name' => get_lang('InOut'));
 $interbreadcrumb[] = array('url' => "#", 'name' => get_lang('CoachSustitute'));
 //$interbreadcrumb[] = array('url' => "resume_session.php?id_session=".$id_session,"name" => get_lang('CoachSustitute'));
 
@@ -108,7 +108,7 @@ function search_users($needle, $type) { //echo " $type...0"; exit;
             }
             $xajax_response -> addAssign('ajax_list_users_single','innerHTML',api_utf8_encode($return));
         } else {
-            $return .= '<select id="origin_users" name="usersList[]" multiple="multiple" size="20" style="width:360px;">';
+            $return .= '<select id="origin" name="usersList[]" multiple="multiple" size="20" style="width:360px;">';
             while ($user = Database :: fetch_array($rs)) {
                 $person_name = api_get_person_name($user['firstname'], $user['lastname'], null, PERSON_NAME_EASTERN_ORDER);
                 //echo $person_name;
@@ -187,16 +187,10 @@ echo '</div>';
 $headerInformation = <<<EOD
 <table class="data_table">
     <tr>
-        <td>Phase</td>
-        <td><strong>(001) Basic Daily</strong></td>
-        <td>Room</td>
-        <td><strong>{$dataHeader['room']}</strong></td>
-    </tr>
-    <tr>
         <td>Course</td>
         <td><strong>{$dataHeader['course']}</strong></td>
-        <td>Status</td>
-        <td><strong>Registered</strong></td>
+        <td>Room</td>
+        <td><strong>{$dataHeader['room']}</strong></td>
     </tr>
     <tr>
         <td>Schedule</td>

@@ -39,7 +39,6 @@ Display::display_header();
                 var sessionTr = '';
 
                 $(sessions).each(function(index, session) {
-
                     var substitutionURL = '<?php echo api_get_path(WEB_PATH) . 'main/admin/add_tutor_sustitution_to_session.php' ?>';
                     var params = '?id_session=' + session.id
                         +'&room='+session.room
@@ -47,14 +46,13 @@ Display::display_header();
                         +'&coach='+session.coach
                         +'&schedule='+session.schedule;
 
-
                     sessionTr += '<tr><td>' + session.schedule + '</td>' +
                             '<td>' + session.room + '</td>' +
                             '<td>' + session.course + '</td>' +
                             '<td>' + session.coach + '</td>' +
                             '<td>' + (session.in ? session.in : '') + '</td>' +
                             '<td>' + (session.out ? session.out : '') + '</td>' +
-                            '<td><a class="btn btn-info" href="' + substitutionURL + params + '"><?php echo get_lang('Substitution') ?></a></td><tr>';
+                            '<td><a class="btn btn-info" href="' + substitutionURL + params + '"><?php echo get_lang('Substitution') ?></a></td></tr>';
                 });
 
                 $('#tbl-list-sessions tbody').append(sessionTr);
@@ -81,23 +79,20 @@ Display::display_header();
     <div class="row">
         <div class="span3">
             <label for="schedule"><?php echo get_lang('Schedule') ?></label>
-            <select name="schedule" id="schedule">
-                <?php foreach ($schedules as $schedule) { ?>
-                    <?php $selected = ($scheduleIdSelected == $schedule['id']) ? 'selected' : ''; ?>
-                    <option value="<?php echo $schedule['id'] ?>" <?php echo $selected ?>><?php echo $schedule['option_display_text'] ?></option>
-                <?php } ?>
-            </select>
+            <?php echo Display::select('schedule', $schedules, null, null, false) ?>
         </div>
         <div class="span3 offset1">
-            <label><?php echo get_lang('Status') ?></label>
-            <select id="status" name="status" class="input-large">
-                <option value="all"><?php echo get_lang('All') ?></option>
-                <option value="reg"><?php echo get_lang('Registrered') ?></option>
-                <option value="noreg"><?php echo get_lang('NoRegistrered') ?></option>
-            </select>
+            <label for="status"><?php echo get_lang('Status') ?></label>
+            <?php
+            echo Display::select('status', array(
+                'all' => get_lang('All'),
+                'reg' => get_lang('Registrered'),
+                'noreg' => get_lang('NoRegistrered')), null, array(
+                'class' => 'input-large'), false)
+            ?>
         </div>
         <div class="span2 offset1">
-            <button type="submit"><?php echo get_lang('Submit') ?></button>
+            <button type="submit" class="btn btn-primary"><?php echo get_lang('Submit') ?></button>
         </div>
     </div>
     <div class="row">
@@ -127,18 +122,9 @@ Display::display_header();
                     </tr>
                 </tfoot>
                 <tbody>
-                    <?php $sessions = getSessionsList($scheduleIdSelected, $dateSelected); ?>
-                    <?php foreach ($sessions as $session) { ?>
-                        <tr>
-                            <td><?php echo $session['schedule'] ?></td>
-                            <td><?php echo $session['room'] ?></td>
-                            <td><?php echo $session['course'] ?></td>
-                            <td><?php echo $session['coach'] ?></td>
-                            <td><?php echo $session['in'] ?></td>
-                            <td><?php echo $session['out'] ?></td>
-                            <td><a class="btn btn-info" href="<?php echo api_get_path(WEB_PATH) ?>"><?php echo get_lang('Substitution') ?></a></td>
-                        </tr>
-                    <?php } ?>
+                    <tr>
+                        <td colspan="7"><?php echo get_lang('NoCoursesForThisSession') ?></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -170,5 +156,11 @@ function getSchedulesList()
 
     $scheduleExtraField = reset($scheduleExtraFields);
 
-    return $scheduleExtraField['options'];
+    $schedules = array();
+
+    foreach ($scheduleExtraField['options'] as $schedule) {
+        $schedules[$schedule['id']] = $schedule['option_display_text'];
+    }
+
+    return $schedules;
 }

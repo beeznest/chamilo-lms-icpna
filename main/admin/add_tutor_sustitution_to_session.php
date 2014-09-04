@@ -1,5 +1,8 @@
 <?php
-
+/*echo "<pre>";
+print_r($_GET);
+echo "</pre>";
+*/
 $language_file='admin';
 // resetting the course id
 $cidReset = true;
@@ -31,36 +34,7 @@ if (isset($_GET['add_type']) && $_GET['add_type']!='') {
 }
 $page = isset($_GET['page']) ? Security::remove_XSS($_GET['page']) : null;
 
-$dataHeader = getDataHeader($id_session);
-/**
- * Get data basic, for panel sustitution
- * @param $id_session
- * @return array
- */
-function getDataHeader($id_session) {
-    $session_field = new SessionField();
-    $session_fields = $session_field->get_all();
-    $data = array();
-    foreach ($session_fields as $session_field) {
-        if ($session_field['field_visible'] != '1') {
-            continue;
-        }
-        $obj = new SessionFieldValue();
-        $result = $obj->get_values_by_handler_and_field_id($id_session, $session_field['id'], true);
-
-        $session_key = strtolower($session_field['field_display_text']);
-        $session_value = ($result) ? $result['field_value'] : null;
-
-        if ($session_field['id'] == 4) {
-            $data[$session_key] = $session_value;
-        } else if ($session_field['id'] == 6) {
-            $data[$session_key] = $session_value;
-        }
-    }
-
-    return $data;
-}
-
+$dataHeader = $_REQUEST;
 
 /**
  * Function is use for ajax
@@ -68,7 +42,7 @@ function getDataHeader($id_session) {
  * @param $type
  * @return XajaxResponse
  */
-function search_users($needle, $type) {
+function search_users($needle, $type) { //echo " $type...0"; exit;
     global $tbl_user, $tbl_session_rel_user, $id_session;
     $xajax_response = new XajaxResponse();
     $return = '';
@@ -102,19 +76,20 @@ function search_users($needle, $type) {
             $tbl_user_rel_access_url = Database::get_main_table(TABLE_MAIN_ACCESS_URL_REL_USER);
             $access_url_id = api_get_current_access_url_id();
             if ($access_url_id != -1) {
+                $orderby = "ORDER BY lastname DESC";
                 switch($type) {
                     case 'single':
                         $sql = 'SELECT user.user_id, username, lastname, firstname FROM '.$tbl_user.' user
                         INNER JOIN '.$tbl_user_rel_access_url.' url_user ON (url_user.user_id=user.user_id)
                         WHERE access_url_id = '.$access_url_id.'  AND (username LIKE "'.$needle.'%"
                         OR firstname LIKE "'.$needle.'%"
-                        OR lastname LIKE "'.$needle.'%") AND user.status=1 LIMIT 11';
+                        OR lastname LIKE "'.$needle.'%") AND user.status=1 '.$orderby.' LIMIT 11 ';
                         break;
                     case 'multiple':
                         $sql = 'SELECT user.user_id, username, lastname, firstname FROM '.$tbl_user.' user
                         INNER JOIN '.$tbl_user_rel_access_url.' url_user ON (url_user.user_id=user.user_id)
                         WHERE access_url_id = '.$access_url_id.' AND
-                                '.(api_sort_by_first_name() ? 'firstname' : 'lastname').' LIKE "'.$needle.'%" AND user.status = 1 ';
+                                '.(api_sort_by_first_name() ? 'firstname' : 'lastname').' LIKE "'.$needle.'%" AND user.status = 1 '.$orderby;
                         break;
                 }
             }
@@ -188,7 +163,7 @@ if (isset($_POST['formSent']) && $_POST['formSent']) {
     $userId  = $_POST['usersList'][0];
     if ($userId > 0 ) {
         $course_code = $dataHeader['course_code'];
-        SessionManager::set_coach_sustitution_to_course_session($userId, $id_session, $course_code);
+        //SessionManager::set_coach_sustitution_to_course_session($userId, $id_session, $course_code);
         header('Location: pagina.php?id_session='.$id_session);
     }
 
@@ -215,19 +190,19 @@ $headerInformation = <<<EOD
         <td>Phase</td>
         <td><strong>(001) Basic Daily</strong></td>
         <td>Room</td>
-        <td><strong>{$dataHeader['aula']}</strong></td>
+        <td><strong>{$dataHeader['room']}</strong></td>
     </tr>
     <tr>
         <td>Course</td>
-        <td><strong>(B10) Basic Ten</strong></td>
+        <td><strong>{$dataHeader['course']}</strong></td>
         <td>Status</td>
         <td><strong>Registered</strong></td>
     </tr>
     <tr>
         <td>Schedule</td>
-        <td><strong>{$dataHeader['horario']}</strong></td>
+        <td><strong>{$dataHeader['schedule']}</strong></td>
         <td>Teacher</td>
-        <td><strong>{$dataHeader['teacher']}</strong></td>
+        <td><strong>{$dataHeader['coach']}</strong></td>
     </tr>
 </table>
 EOD;

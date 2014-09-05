@@ -43,6 +43,7 @@ Display::display_header();
                 var sessionTr = '';
 
                 $(sessions).each(function(index, session) {
+
                     var substitutionURL = '<?php echo api_get_path(WEB_PATH) . 'main/admin/add_tutor_sustitution_to_session.php' ?>';
                     var params = '?id_session=' + session.id
                             + '&room=' + session.room
@@ -50,25 +51,24 @@ Display::display_header();
                             + '&coach=' + session.coach
                             + '&schedule=' + session.schedule;
 
-                    sessionTr += '<tr>';
-
-                    sessionTr += '<td>' + session.schedule + '</td>' +
+                    sessionTr += '<tr><td>' + session.schedule + '</td>' +
                             '<td>' + session.room + '</td>' +
                             '<td>' + session.course + '</td>' +
                             '<td>' + session.coach + '</td>' +
                             '<td>' + (session.in ? session.in : '') + '</td>' +
-                            '<td>' + (session.out ? session.out : '') + '</td>';
+                            '<td>' + (session.out ? session.out : '') + '</td>' +
+                            '<td><a href="' + substitutionURL + params + '">';
 
                     if (!session.hasSubstitute) {
-                        sessionTr += '<td><a class="btn btn-info" href="' + substitutionURL + params + '"><?php echo get_lang('Substitution') ?></a></td>';
+                        sessionTr += '<?php echo Display::display_icon('students.gif', get_lang('GlobalEvent')) ?>';
                     } else {
-                        sessionTr += '<td>&nbsp;a</td>';
+                        sessionTr += '<?php echo Display::display_icon('group.gif', get_lang('GlobalEvent')) ?>';
                     }
 
-                    sessionTr += '</tr>';
+                    sessionTr += '</a></td></tr>';
                 });
 
-                $('#tbl-list-sessions tbody').append(sessionTr);
+                $('#tbl-list-sessions tbody').html(sessionTr);
             }, 'json');
         });
     });

@@ -485,7 +485,7 @@ if (file_exists($mail_conf)) {
 }
 
 $mail_settings = array();
-/*
+
 $app->register(new Silex\Provider\SwiftmailerServiceProvider(), array(
      'swiftmailer.options' =>  array(
         'host' => $platform_email['SMTP_HOST'],
@@ -501,7 +501,7 @@ $app->register(new Silex\Provider\SwiftmailerServiceProvider(), array(
 $app['mailer'] = $app->share(function ($app) {
     return new \Swift_Mailer($app['swiftmailer.transport']);
 });
-*/
+
 
 // check and modify the date of user in the track.e.online table
 if (!$x = strpos($_SERVER['PHP_SELF'], 'whoisonline.php')) {

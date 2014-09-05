@@ -1741,32 +1741,6 @@ class SessionManager {
         }
     }
 
-    private static function _getSerialDataSubstitute($data, $extraArray = null)
-    {
-        $array = array();
-        //$data = !empty($data[0]) ? $data[0] : array();
-
-        $c = 0;
-        if (is_array($data) && count($data) > 0) {
-            foreach($data as $key => $value) {
-                foreach($value as $indice => $valor) {
-                    $array[$c][$indice] = $valor;
-                }
-                $c++;
-            }
-        }
-
-        if (is_array($extraArray)) {
-            $array[$c]['admin'] = $extraArray['admin'];
-            $array[$c]['coach'] = $extraArray['teacher'];
-            $array[$c]['session_id'] = $extraArray['session_id'];
-            $array[$c]['course_code'] = $extraArray['course_code'];
-            $array[$c]['create_at'] = $extraArray['create_at'];
-        }
-
-        return serialize($array);
-    }
-
     /**
      * Assign a coach to course in session with status = 2
      * @param int          - user id

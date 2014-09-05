@@ -12,6 +12,10 @@ $scheduleIdSelected = isset($_GET['schedule']) ? $_GET['schedule'] : 0;
 $dateSelected = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
 $branchSelected = isset($_GET['branch']) ? $_GET['branch'] : 2;
 
+if (!api_is_platform_admin()) {
+    die;
+}
+
 $this_section = SECTION_PLATFORM_ADMIN;
 
 $branchs = Branch::getAll();
@@ -41,18 +45,27 @@ Display::display_header();
                 $(sessions).each(function(index, session) {
                     var substitutionURL = '<?php echo api_get_path(WEB_PATH) . 'main/admin/add_tutor_sustitution_to_session.php' ?>';
                     var params = '?id_session=' + session.id
-                        +'&room='+session.room
-                        +'&course='+session.course
-                        +'&coach='+session.coach
-                        +'&schedule='+session.schedule;
+                            + '&room=' + session.room
+                            + '&course=' + session.course
+                            + '&coach=' + session.coach
+                            + '&schedule=' + session.schedule;
 
-                    sessionTr += '<tr><td>' + session.schedule + '</td>' +
+                    sessionTr += '<tr>';
+
+                    sessionTr += '<td>' + session.schedule + '</td>' +
                             '<td>' + session.room + '</td>' +
                             '<td>' + session.course + '</td>' +
                             '<td>' + session.coach + '</td>' +
                             '<td>' + (session.in ? session.in : '') + '</td>' +
-                            '<td>' + (session.out ? session.out : '') + '</td>' +
-                            '<td><a class="btn btn-info" href="' + substitutionURL + params + '"><?php echo get_lang('Substitution') ?></a></td></tr>';
+                            '<td>' + (session.out ? session.out : '') + '</td>';
+
+                    if (!session.hasSubstitute) {
+                        sessionTr += '<td><a class="btn btn-info" href="' + substitutionURL + params + '"><?php echo get_lang('Substitution') ?></a></td>';
+                    } else {
+                        sessionTr += '<td>&nbsp;a</td>';
+                    }
+
+                    sessionTr += '</tr>';
                 });
 
                 $('#tbl-list-sessions tbody').append(sessionTr);

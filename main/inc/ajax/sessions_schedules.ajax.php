@@ -6,7 +6,7 @@
  */
 require_once '../global.inc.php';
 
-function getSessionsList($scheduleId, $date)
+function getSessionsList($scheduleId, $date, $listFilter = 'all')
 {
     $scheduleFieldOption = new ExtraFieldOption('session');
 
@@ -31,24 +31,58 @@ function getSessionsList($scheduleId, $date)
         $scheduleData = getScheduleStart($schedule['option_display_text'], 'array');
 
         while ($session = Database::fetch_assoc($listResult)) {
-            $sessionId = $session['id'];
             $room = getRoom($session['id']);
-
-            $courses = SessionManager::get_course_list_by_session_id($sessionId);
+            $courses = SessionManager::get_course_list_by_session_id($session['id']);
 
             foreach ($courses as $course) {
-                $coaches = SessionManager::get_session_course_coaches_to_string($course['code'], $sessionId);
-                $inOut = getInOut($sessionId, $course['id'], $room['id'], $date, $scheduleData);
+                $coaches = SessionManager::get_session_course_coaches_to_string($course['code'], $session['id']);
+                $inOut = getInOut($session['id'], $course['id'], $room['id'], $date, $scheduleData);
+                $hasSubstitute = hasSubstitute($session['id'], $course['code']);
 
-                $rows[] = array(
-                    'id' => $session['id'],
-                    'room' => $room['title'],
-                    'course' => $course['title'],
-                    'schedule' => $schedule['option_display_text'],
-                    'coach' => $coaches,
-                    'in' => empty($inOut) ? null : $inOut['log_in_course_date'],
-                    'out' => empty($inOut) ? null : $inOut['log_out_course_date']
-                );
+
+                switch ($listFilter) {
+                    case 'reg':
+                        if ($inOut) {
+                            $rows[] = array(
+                                'id' => $session['id'],
+                                'room' => $room['title'],
+                                'course' => $course['title'],
+                                'schedule' => $schedule['option_display_text'],
+                                'coach' => $coaches,
+                                'in' => $inOut['log_in_course_date'],
+                                'out' => $inOut['log_out_course_date'],
+                                'hasSubstitute' => $hasSubstitute
+                            );
+                        }
+                        break;
+
+                    case 'noreg':
+                        if (empty($inOut)) {
+                            $rows[] = array(
+                                'id' => $session['id'],
+                                'room' => $room['title'],
+                                'course' => $course['title'],
+                                'schedule' => $schedule['option_display_text'],
+                                'coach' => $coaches,
+                                'in' => null,
+                                'out' => null,
+                                'hasSubstitute' => $hasSubstitute
+                            );
+                        }
+                        break;
+
+                    default :
+                        $rows[] = array(
+                            'id' => $session['id'],
+                            'room' => $room['title'],
+                            'course' => $course['title'],
+                            'schedule' => $schedule['option_display_text'],
+                            'coach' => $coaches,
+                            'in' => empty($inOut) ? null : $inOut['log_in_course_date'],
+                            'out' => empty($inOut) ? null : $inOut['log_out_course_date'],
+                            'hasSubstitute' => $hasSubstitute
+                        );
+                }
             }
         }
 
@@ -164,9 +198,34 @@ function getRoom($sessionId)
     return false;
 }
 
+function hasSubstitute($sessionId, $courseCode)
+{
+    $sql = "SELECT COUNT(1) AS is_io FROM session_rel_course_rel_user "
+            . "WHERE id_session = $sessionId "
+            . "AND course_code = $courseCode"
+            . "AND status = 17";
+
+    $result = Database::query($sql);
+
+    if ($result) {
+        $count = Database::fetch_assoc($result);
+
+        if ($count['is_io'] > 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+if (!api_is_platform_admin()) {
+    die;
+}
+
 $scheduleIdSelected = isset($_POST['schedule']) ? $_POST['schedule'] : 0;
 $dateSelected = isset($_POST['date']) ? $_POST['date'] : date('Y-m-d');
+$status = isset($_POST['status']) ? $_POST['status'] : 'all';
 
-$sessions = getSessionsList($scheduleIdSelected, $dateSelected);
+$sessions = getSessionsList($scheduleIdSelected, $dateSelected, $status);
 
 echo json_encode($sessions);

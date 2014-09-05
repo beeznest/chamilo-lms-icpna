@@ -12,6 +12,10 @@ if (!api_is_platform_admin()) {
     api_not_allowed(true);
 }
 
+// setting breadcrumbs
+$interbreadcrumb[] = array('url' => 'index.php', 'name' => get_lang('PlatformAdmin'));
+$interbreadcrumb[] = array('url' => '#','name' => get_lang('InOut'));
+
 $scheduleIdSelected = isset($_GET['schedule']) ? $_GET['schedule'] : 0;
 $dateSelected = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
 $branchSelected = isset($_GET['branch']) ? $_GET['branch'] : 2;

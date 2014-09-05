@@ -4,7 +4,6 @@ $language_file='admin';
 $cidReset = true;
 require_once '../inc/global.inc.php';
 
-
 $id_session = isset($_GET['id_session']) ? intval($_GET['id_session']) : null;
 SessionManager::protect_session_edit($id_session);
 
@@ -28,8 +27,26 @@ if (isset($_GET['add_type']) && $_GET['add_type']!='') {
     $add_type = Security::remove_XSS($_REQUEST['add_type']);
 }
 $page = isset($_GET['page']) ? Security::remove_XSS($_GET['page']) : null;
-
 $dataHeader = $_REQUEST;
+$dataHeader = formatPostHeader($dataHeader);
+$urlConcat = $_SERVER['QUERY_STRING'];
+
+/**
+ * Formating data if necessary
+ * @param $dataHeader
+ * @return mixed
+ */
+function formatPostHeader($dataHeader)
+{
+    if(empty($dataHeader['course_code'])) {
+        $course = $dataHeader['course'];
+        $array = preg_split('#\)#', $course);
+        $codeCourse = substr($array[0], 1, strlen($array[0]));
+        $dataHeader['course_code'] = $codeCourse;
+    }
+
+    return $dataHeader;
+}
 
 /**
  * Function is use for ajax
@@ -37,13 +54,13 @@ $dataHeader = $_REQUEST;
  * @param $type
  * @return XajaxResponse
  */
-function search_users($needle, $type) { //echo " $type...0"; exit;
+function search_users($needle, $type) {
     global $tbl_user, $tbl_session_rel_user, $id_session;
+    $sqlNotIn = !empty($_SESSION['sqlNotIn']) ?  $_SESSION['sqlNotIn'] : '';
     $xajax_response = new XajaxResponse();
     $return = '';
 
     if (!empty($needle) && !empty($type)) {
-
         //normal behaviour
         if ($needle == 'false')  {
             $type = 'multiple';
@@ -56,14 +73,9 @@ function search_users($needle, $type) { //echo " $type...0"; exit;
         $needle = api_convert_encoding($needle, $charset, 'utf-8');
 
         switch ($type) {
-            case 'single':
-                $sql = 'SELECT user.user_id, username, lastname, firstname FROM '.$tbl_user.' user
-                        WHERE (username LIKE "'.$needle.'%" OR firstname LIKE "'.$needle.'%"
-                            OR lastname LIKE "'.$needle.'%") AND user.status = 1 order by lastname LIMIT 11';
-                break;
             case 'multiple':
-                $sql = 'SELECT user.user_id, username, lastname, firstname FROM '.$tbl_user.' user
-                        WHERE lastname  LIKE "'.$needle.'%" AND user.status=1  order by lastname';
+                $sql = 'SELECT u.user_id, u.username, u.lastname, u.firstname FROM '.$tbl_user.' u
+                        WHERE u.lastname  LIKE "'.$needle.'%" AND u.status = 1  '.$sqlNotIn.' order by u.lastname';
                 break;
         }
 
@@ -71,38 +83,20 @@ function search_users($needle, $type) { //echo " $type...0"; exit;
             $tbl_user_rel_access_url = Database::get_main_table(TABLE_MAIN_ACCESS_URL_REL_USER);
             $access_url_id = api_get_current_access_url_id();
             if ($access_url_id != -1) {
-                $orderby = "ORDER BY lastname";
+                $orderby = "ORDER BY u.lastname";
                 switch($type) {
-                    case 'single':
-                        $sql = 'SELECT user.user_id, username, lastname, firstname FROM '.$tbl_user.' user
-                        INNER JOIN '.$tbl_user_rel_access_url.' url_user ON (url_user.user_id=user.user_id)
-                        WHERE access_url_id = '.$access_url_id.'  AND (username LIKE "'.$needle.'%"
-                        OR firstname LIKE "'.$needle.'%"
-                        OR lastname LIKE "'.$needle.'%") AND user.status=1 '.$orderby.' LIMIT 11 ';
-                        break;
                     case 'multiple':
-                        $sql = 'SELECT user.user_id, username, lastname, firstname FROM '.$tbl_user.' user
-                        INNER JOIN '.$tbl_user_rel_access_url.' url_user ON (url_user.user_id=user.user_id)
-                        WHERE access_url_id = '.$access_url_id.' AND lastname LIKE "'.$needle.'%" AND user.status = 1 '.$orderby;
+                        $sql = 'SELECT u.user_id, u.username, u.lastname, u.firstname FROM '.$tbl_user.' u
+                        INNER JOIN '.$tbl_user_rel_access_url.' url_user ON (url_user.user_id = u.user_id)
+                        WHERE access_url_id = '.$access_url_id.' AND u.lastname LIKE "'.$needle.'%" AND u.status = 1 ' .
+                            $sqlNotIn . $orderby;
                         break;
                 }
             }
         }
 
         $rs = Database::query($sql);
-        $i = 0;
-        if ($type == 'single') {
-            while ($user = Database :: fetch_array($rs)) {
-                $i++;
-                if ($i <= 10) {
-                    $person_name = api_get_person_name($user['firstname'], $user['lastname'], null, PERSON_NAME_EASTERN_ORDER);
-                    $return .= '<a href="javascript: void(0);" onclick="javascript: add_user_to_session(\''.$user['user_id'].'\',\''.$person_name.' ('.$user['username'].')'.'\')">'.$person_name.' ('.$user['username'].')</a><br />';
-                } else {
-                    $return .= '...<br />';
-                }
-            }
-            $xajax_response -> addAssign('ajax_list_users_single','innerHTML',api_utf8_encode($return));
-        } else {
+        if ($type == 'multiple') {
             $return .= '<select id="origin" name="usersList[]" multiple="multiple" size="20" style="width:360px;">';
             while ($user = Database :: fetch_array($rs)) {
                 $person_name = api_get_person_name($user['firstname'], $user['lastname'], null, PERSON_NAME_EASTERN_ORDER);
@@ -113,6 +107,7 @@ function search_users($needle, $type) { //echo " $type...0"; exit;
             $xajax_response -> addAssign('ajax_list_users_multiple','innerHTML',api_utf8_encode($return));
         }
     }
+
     return $xajax_response;
 }
 
@@ -156,30 +151,18 @@ $errorMsg = '';
 if (isset($_POST['formSent']) && $_POST['formSent']) {
 
     $userId  = (!empty($_POST['usersList'][0])) ? $_POST['usersList'][0] : 0;
-    if ($userId > 0 && $id_session > 0  && !empty($dataHeader['course'])) {
-        $course = $dataHeader['course'];
-        $array = preg_split('#\)#', $course);
-        $codeCourse = substr($array[0], 1, strlen($array[0]));
-        SessionManager::set_coach_sustitution_to_course_session($userId, $id_session, $codeCourse);
-        //header('Location: /main/admin/sessions_schedule.php');
+    if ($userId > 0 && $id_session > 0  && !empty($dataHeader['course_code'])) {
+        SessionManager::set_coach_sustitution_to_course_session($userId, $id_session, $dataHeader['course_code']);
+        header('Location: /main/admin/sessions_schedule.php');
     }
 }
 
 // display the dokeos header
 Display::display_header('');
-if($add_type == 'multiple') {
-    $link_add_type_unique = '<a href="'.api_get_self().'?id_session='.$id_session.'&add='.Security::remove_XSS($_GET['add']).'&add_type=unique">'.Display::return_icon('single.gif').get_lang('SessionAddTypeUnique').'</a>';
-    $link_add_type_multiple = Display::return_icon('multiple.gif').get_lang('SessionAddTypeMultiple').' ';
-} else {
-    $link_add_type_unique = Display::return_icon('single.gif').get_lang('SessionAddTypeUnique').'&nbsp;&nbsp;&nbsp;';
-    $link_add_type_multiple = '<a href="'.api_get_self().'?id_session='.$id_session.'&add='.Security::remove_XSS($_GET['add']).'&add_type=multiple">'.Display::return_icon('multiple.gif').get_lang('SessionAddTypeMultiple').'</a>';
-}
 
 // the form header
 $session_info = SessionManager::fetch($id_session);
-echo '<div class="actions">';
-echo $link_add_type_unique.$link_add_type_multiple;
-echo '</div>';
+
 $headerInformation = <<<EOD
 <table class="data_table">
     <tr>
@@ -201,12 +184,35 @@ echo $headerInformation;
 
 $ajax_search = ($add_type == 'unique') ? true : false;
 $sessionCourses = array();
-
+$sqlNotIn = '';
 if ($ajax_search == true || $ajax_search == false) {
 
-    $sql = "SELECT user_id, lastname, firstname, username
-            FROM $tbl_user AS u WHERE u.status = 1 order by lastname";
+    // select user teacher substitute
+    $userSubstitute = array();
+    $roleSubstitute = ROLE_COACH_SUBSTITUTE;
+    $sqlSubs = "SELECT sr.id_user, u.lastname, u.firstname, u.username FROM session_rel_course_rel_user sr
+    INNER JOIN user u on sr.id_user = u.user_id
+    WHERE sr.id_session = '$id_session'
+    AND sr.course_code = '".$dataHeader['course_code']."'
+    AND sr.status = '$roleSubstitute' ";
 
+    $resultSubs = Database::query($sqlSubs);
+    if (Database::num_rows($resultSubs) > 0) {
+        $sqlNotIn = ' AND u.user_id NOT IN (';
+        $users = Database::store_result($resultSubs, 'ASSOC');
+        foreach($users as $user) {
+            $userSubstitute[$user['id_user']] = $user ;
+            $sqlNotIn .= "'" . $user['id_user']. "',";
+        }
+        $sqlNotIn = substr($sqlNotIn, 0, -1);
+        $sqlNotIn .= ") ";
+        $_SESSION['sqlNotIn'] = $sqlNotIn;
+        unset($users);
+    }
+
+
+    $sql = "SELECT u.user_id, u.lastname, u.firstname, u.username
+            FROM $tbl_user AS u WHERE u.status = 1 $sqlNotIn order by u.lastname";
 
     if (api_is_multiple_url_enabled()) {
         $tbl_user_rel_access_url= Database::get_main_table(TABLE_MAIN_ACCESS_URL_REL_USER);
@@ -215,7 +221,7 @@ if ($ajax_search == true || $ajax_search == false) {
             $sql = "SELECT u.user_id, lastname, firstname, username
             FROM $tbl_user u
             INNER JOIN $tbl_user_rel_access_url url_user ON (url_user.user_id = u.user_id)
-            WHERE access_url_id = $access_url_id AND u.status = 1 order by u.lastname";
+            WHERE access_url_id = $access_url_id AND u.status = 1 $sqlNotIn ORDER BY u.lastname";
         }
     }
 
@@ -226,7 +232,6 @@ if ($ajax_search == true || $ajax_search == false) {
     }
 }
 unset($Courses);
-$urlConcat = $_SERVER['QUERY_STRING'];
 ?>
 <form name="formulaire" method="post" action="<?php echo api_get_self(); ?>?<?php echo $urlConcat ?>&page=<?php echo $page; ?><?php if(!empty($_GET['add'])) echo '&add=true' ; ?>" style="margin:0px;" <?php if($ajax_search){echo ' onsubmit="valide();"';}?>>
     <input type="hidden" name="formSent" value="1" />
@@ -279,6 +284,9 @@ $urlConcat = $_SERVER['QUERY_STRING'];
             </td>
             <td width="45%" align="center">
                 <select id='destination' name="usersList[]" multiple="multiple" size="20" style="width:360px;">
+                    <?php foreach($userSubstitute as $enreg) : ?>
+                        <option value="<?php echo $enreg['id_user']; ?>"><?php echo api_get_person_name($enreg['firstname'], $enreg['lastname'], null, PERSON_NAME_EASTERN_ORDER).' ('.$enreg['username'].')'; ?></option>
+                    <?php endforeach; unset($userSubstitute); ?>
                 </select>
             </td>
         </tr>

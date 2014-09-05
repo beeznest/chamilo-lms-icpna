@@ -1713,7 +1713,7 @@ class SessionManager {
                 'coach' => $user_id,
                 'session_id' => $session_id,
                 'course_code' => $course_code,
-                'create_at' => date('Y-m-d h:i:s')
+                'create_at' => api_get_utc_datetime()
             );
             event_system('session_substitute', 'MISC', serialize($dataSerialNow), null, null, null, $session_id);
 

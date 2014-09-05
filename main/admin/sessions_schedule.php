@@ -8,6 +8,10 @@ $cidReset = true;
 
 require_once '../inc/global.inc.php';
 
+if (!api_is_platform_admin()) {
+    api_not_allowed(true);
+}
+
 $scheduleIdSelected = isset($_GET['schedule']) ? $_GET['schedule'] : 0;
 $dateSelected = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
 $branchSelected = isset($_GET['branch']) ? $_GET['branch'] : 2;

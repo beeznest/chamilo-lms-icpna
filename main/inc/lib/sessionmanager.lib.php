@@ -1708,6 +1708,15 @@ class SessionManager {
 
         if (Database::num_rows($rs_check_user) > 0) {
 
+            $dataSerialNow = array(
+                'admin' => api_get_user_id(),
+                'coach' => $user_id,
+                'session_id' => $session_id,
+                'course_code' => $course_code,
+                'create_at' => date('Y-m-d h:i:s')
+            );
+            event_system('session_substitute', 'MISC', serialize($dataSerialNow), null, null, null, $session_id);
+
             // Assign user like a coach to course
             // First check if the user is registered in the course
             $sql = "SELECT id_user FROM $tbl_session_rel_course_rel_user WHERE id_session = '$session_id' AND course_code = '$course_code' AND id_user = '$user_id'";

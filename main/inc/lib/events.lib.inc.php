@@ -599,7 +599,7 @@ function exercise_attempt_hotspot($exe_id, $question_id, $answer_id, $correct, $
  * @param	integer	User ID (defaults to null)
  * @param	string	Course code (defaults to null)
  */
-function event_system($event_type, $event_value_type, $event_value, $datetime = null, $user_id = null, $course_code = null)
+function event_system($event_type, $event_value_type, $event_value, $datetime = null, $user_id = null, $course_code = null, $session_id = null)
 {
     global $TABLETRACK_DEFAULT;
 
@@ -646,6 +646,10 @@ function event_system($event_type, $event_value_type, $event_value, $datetime = 
         $user_id = api_get_user_id();
     }
 
+    if (!isset($session_id)) {
+        $session_id = api_get_session_id();
+    }
+
     $user_id = intval($user_id);
 
     $sql = "INSERT INTO $TABLETRACK_DEFAULT
@@ -655,7 +659,8 @@ function event_system($event_type, $event_value_type, $event_value, $datetime = 
         		 default_date,
         		 default_event_type,
         		 default_value_type,
-        		 default_value
+        		 default_value,
+        		 session_id
         		 )
         		 VALUES('$user_id.',
         			'$course_code',
@@ -663,7 +668,8 @@ function event_system($event_type, $event_value_type, $event_value, $datetime = 
         			'$datetime',
         			'$event_type',
         			'$event_value_type',
-        			'$event_value')";
+        			'$event_value',
+        			'$session_id')";
     Database::query($sql);
     return true;
 }

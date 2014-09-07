@@ -21,8 +21,15 @@ $this_section = SECTION_PLATFORM_ADMIN;
 $branchs = Branch::getAll();
 
 $schedules = getSchedulesList();
+if ($_GET['action'] == 'show_message')
+    Display::display_header();
 
-Display::display_header();
+    $check = Security::check_token('get');
+    if ($check) {
+        Display::display_confirmation_message(Security::remove_XSS(stripslashes($_GET['message'])));
+        Security::clear_token();
+    }
+
 ?>
 <script>
     $(document).on('ready', function() {

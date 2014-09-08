@@ -1776,7 +1776,7 @@ class SessionManager {
         $sqlMaxOne = "SELECT MAX(transaction_id) transaction_id FROM branch_transaction LIMIT 1";
         $rMaxOne = Database::query($sqlMaxOne);
         if (Database::num_rows($rMaxOne) > 0) {
-            while ($row = Database::fetch_assoc($rMaxOne)) {var_dump($row);
+            while ($row = Database::fetch_assoc($rMaxOne)) {
                 $transaction_id = intval($row['transaction_id']) + 1;
             }
         } else {
@@ -1824,7 +1824,7 @@ class SessionManager {
             $last_id = Database::insert_id();
         }
 
-        return ($flag == true) ? $last_id : false;
+        return ($flag == true && ($last_id > 0)) ? true : false;
     }
 
     /**

@@ -1758,6 +1758,7 @@ class SessionManager {
         //03
         $branch = new Branch();
         $array['dest_id'] = $branch->getUidProgram($idSession);
+        $flag = empty($array['dest_id']) ? false : true;
 
         //04
         $array['action'] = 537;

@@ -15,7 +15,7 @@ function getSessionsList($scheduleId, $date, $listFilter = 'all')
     if (!empty($schedule)) {
         $rows = array();
 
-        $sql = "SELECT s.id, s.id_coach, s.nbr_courses, s.access_start_date, s.access_end_date, scu.data_serial_substitute "
+        $sql = "SELECT s.id, s.id_coach, s.nbr_courses, s.access_start_date, s.access_end_date "
                 . "FROM session as s "
                 . "INNER JOIN session_rel_course_rel_user AS scu "
                 . "ON s.id = scu.id_session "
@@ -25,6 +25,8 @@ function getSessionsList($scheduleId, $date, $listFilter = 'all')
                 . "AND val.field_id = '{$schedule['field_id']}' "
                 . "AND '$date' BETWEEN DATE(s.access_start_date) AND DATE(s.access_end_date) "
                 . "AND s.id_coach = scu.id_user";
+                
+                echo "$sql\n";
 
         $listResult = Database::query($sql);
 

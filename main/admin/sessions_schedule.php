@@ -14,7 +14,7 @@ if (!api_is_platform_admin()) {
 
 // setting breadcrumbs
 $interbreadcrumb[] = array('url' => 'index.php', 'name' => get_lang('PlatformAdmin'));
-$interbreadcrumb[] = array('url' => '#','name' => get_lang('InOut'));
+$interbreadcrumb[] = array('url' => '#', 'name' => get_lang('InOut'));
 
 $scheduleIdSelected = isset($_GET['schedule']) ? $_GET['schedule'] : 0;
 $dateSelected = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
@@ -62,7 +62,8 @@ if ($_GET['action'] == 'show_message' && true == $check) {
                             + '&room=' + session.room
                             + '&course=' + session.course
                             + '&coach=' + session.coach
-                            + '&schedule=' + session.schedule;
+                            + '&schedule=' + session.schedule
+                            + '&course_code=' + session.courseCode;
 
                     sessionTr += '<tr><td>' + session.schedule + '</td>' +
                             '<td>' + session.room + '</td>' +

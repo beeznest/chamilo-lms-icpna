@@ -485,7 +485,7 @@ if (file_exists($mail_conf)) {
 }
 
 $mail_settings = array();
-
+/*
 $app->register(new Silex\Provider\SwiftmailerServiceProvider(), array(
      'swiftmailer.options' =>  array(
         'host' => $platform_email['SMTP_HOST'],
@@ -496,7 +496,7 @@ $app->register(new Silex\Provider\SwiftmailerServiceProvider(), array(
         'auth_mode' => null
     )
 ));
-
+*/
 //if (isset($platform_email['SMTP_MAILER']) && $platform_email['SMTP_MAILER'] == 'smtp') {
 $app['mailer'] = $app->share(function ($app) {
     return new \Swift_Mailer($app['swiftmailer.transport']);

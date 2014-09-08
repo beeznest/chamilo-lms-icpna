@@ -1758,7 +1758,6 @@ class SessionManager {
         //03
         $branch = new Branch();
         $array['dest_id'] = $branch->getUidProgram($idSession);
-        $flag = empty($array['dest_id']) ? false : true;
 
         //04
         $array['action'] = 537;
@@ -1804,7 +1803,7 @@ class SessionManager {
             $fields = substr($fields, 0, -1);
             $values = substr($values, 0, -1);
 
-            $sql = "INSERT INTO branch_transaction ($fields) VALUES ($values)"; echo $sql;
+            $sql = "INSERT INTO branch_transaction ($fields) VALUES ($values)";
             $result = Database::query($sql) or die (Database::error());
             $last_id = Database::insert_id();
         }

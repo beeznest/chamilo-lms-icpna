@@ -1716,7 +1716,7 @@ class SessionManager {
                 'create_at' => api_get_utc_datetime()
             );
             event_system('session_substitute', 'MISC', serialize($dataSerialNow), null, null, null, $session_id);
-
+            self::_generateNewTransaccion($session_id, $user_id);
             // Assign user like a coach to course
             // First check if the user is registered in the course
             $sql = "SELECT id_user FROM $tbl_session_rel_course_rel_user WHERE id_session = '$session_id' AND course_code = '$course_code' AND id_user = '$user_id'";
@@ -1739,6 +1739,77 @@ class SessionManager {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Genera new record,in branch_transaction
+     */
+    private static function _generateNewTransaccion($idSession, $idCoach)
+    {
+        // 01
+        $flag = true;
+        $data1  = api_get_user_info($idCoach);
+        $flag = empty($data1['username']) ? false : true;
+        $array['item_id'] = $data1['username'];
+
+        // 02
+        $array['orig_id'] = null;
+
+        //03
+        $branch = new Branch();
+        $array['dest_id'] = $branch->getUidProgram($idSession);
+        $flag = empty($array['dest_id']) ? false : true;
+
+        //04
+        $array['action'] = 537;
+
+        //05
+        $array['branch_id'] = $branch->getBranchId($idSession);
+
+        //06
+        $array['transaction_id'] = 0;
+
+        //07
+        $array['status_id'] = 1;
+
+        //08
+        $session_field = 0;
+        $sqlFieldId = "SELECT id, field_variable FROM session_field";
+        $r = Database::query($sqlFieldId);
+        while ($row = Database::fetch_assoc($r)) {
+            if ($row['field_variable'] == 'horario') {
+                $session_field = $row['id'];
+                break;
+            }
+        }
+
+        if (!empty($session_field)) {
+            $obj = new SessionFieldValue();
+            $result = $obj->get_values_by_handler_and_field_id($idSession, $session_field, false);
+            $array['info'] = $result['field_value'];
+        } else {
+            $flag = false;
+        }
+
+        // 09
+        $array['time_insert'] = api_get_utc_datetime(); //api_get_local_time();
+        $last_id = false;
+        if ($flag && is_array($array) && count($array) > 0) {
+            $fields = '';
+            $values = '';
+            foreach ($array as $key => $value) {
+                $fields .= "$key,";
+                $values .= "'$value',";
+            }
+            $fields = substr($fields, 0, -1);
+            $values = substr($values, 0, -1);
+
+            $sql = "INSERT INTO branch_transaction ($fields) VALUES ($values)"; echo $sql;
+            $result = Database::query($sql) or die (Database::error());
+            $last_id = Database::insert_id();
+        }
+
+        return ($flag == true) ? $last_id : false;
     }
 
     /**

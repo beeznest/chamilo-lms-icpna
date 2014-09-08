@@ -27,25 +27,7 @@ if (isset($_GET['add_type']) && $_GET['add_type']!='') {
 }
 $page = isset($_GET['page']) ? Security::remove_XSS($_GET['page']) : null;
 $dataHeader = $_REQUEST;
-$dataHeader = formatPostHeader($dataHeader);
 $urlConcat = $_SERVER['QUERY_STRING'];
-
-/**
- * Formating data if necessary
- * @param $dataHeader
- * @return mixed
- */
-function formatPostHeader($dataHeader)
-{
-    if(empty($dataHeader['course_code'])) {
-        $course = $dataHeader['course'];
-        $array = preg_split('#\)#', $course);
-        $codeCourse = substr($array[0], 1, strlen($array[0]));
-        $dataHeader['course_code'] = $codeCourse;
-    }
-
-    return $dataHeader;
-}
 
 /**
  * Function is use for ajax

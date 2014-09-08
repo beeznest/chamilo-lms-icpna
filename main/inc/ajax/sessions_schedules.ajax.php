@@ -202,8 +202,8 @@ function hasSubstitute($sessionId, $courseCode)
 {
     $sql = "SELECT COUNT(1) AS is_io FROM session_rel_course_rel_user "
             . "WHERE id_session = $sessionId "
-            . "AND course_code = $courseCode"
-            . "AND status = 17";
+            . "AND course_code = '$courseCode' "
+            . "AND status = " . ROLE_COACH_SUBSTITUTE;
 
     $result = Database::query($sql);
 

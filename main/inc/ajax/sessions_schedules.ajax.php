@@ -123,7 +123,7 @@ function calculateInTime($hours, $minutes, $format = 'string')
 
     $datetime->modify('-5 minutes');
 
-    $inTime = $datetime->format('h:i');
+    $inTime = $datetime->format('h:i:s');
 
     switch ($format) {
         case 'array':
@@ -131,7 +131,8 @@ function calculateInTime($hours, $minutes, $format = 'string')
 
             return array(
                 'hours' => $inTimeParts[0],
-                'minutes' => $inTimeParts[1]
+                'minutes' => $inTimeParts[1],
+                'seconds' => $inTimeParts[2]
             );
 
         default:
@@ -148,14 +149,14 @@ function getInOut($sessionId, $courseId, $roomId, $date, $schedule)
 
     $trackResult = Database::select('*', $trackIOTable, array(
                 'where' => array(
-                    'session_id = ? AND ' => $sessionId,
-                    'course_id = ? AND ' => $courseId,
-                    'room_id = ? AND ' => $roomId,
-                    'log_in_course_date >= ?' => $inDatetime
+                    "session_id = ? AND " => $sessionId,
+                    "course_id = ? AND " => $courseId,
+                    "room_id = ? AND " => $roomId,
+                    "log_in_course_date >= '?'" => $inDatetime
                 )
     ));
 
-    return $trackResult;
+    return current($trackResult);
 }
 
 function getRoom($sessionId)

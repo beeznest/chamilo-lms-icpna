@@ -1765,9 +1765,20 @@ class SessionManager {
 
         //05
         $array['branch_id'] = $branch->getBranchId($idSession);
+        $array['branch_id'] = intval($array['branch_id']) + 500; // value 500  Note (transaction_id, branch_id) key unique
 
         //06
-        $array['transaction_id'] = 0;
+        $transaction_id = 0;
+        $sqlMaxOne = "SELECT MAX(transaction_id) transaction_id FROM branch_transaction LIMIT 1";
+        $rMaxOne = Database::query($sqlMaxOne);
+        if (Database::num_rows($rMaxOne) > 0) {
+            while ($row = Database::fetch_assoc($rMaxOne)) {var_dump($row);
+                $transaction_id = intval($row['transaction_id']) + 1;
+            }
+        } else {
+            $transaction_id = $transaction_id + 1;
+        }
+        $array['transaction_id'] = $transaction_id;
 
         //07
         $array['status_id'] = 1;

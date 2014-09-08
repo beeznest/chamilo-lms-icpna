@@ -1689,12 +1689,12 @@ class SessionManager {
      * @param string $course_code
      * @return bool
      */
-    public static function set_coach_sustitution_to_course_session($user_id, $session_id = 0, $course_code = '') {
-
+    public static function set_coach_sustitution_to_course_session($user_id, $session_id = 0, $course_code = '')
+    {
         // Definition of variables
+        $return = true;
         $user_id = intval($user_id);
         $session_id = !empty($session_id) ? intval($session_id) : 0;
-
 
         // definitios of tables
         $tbl_session_rel_course_rel_user = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
@@ -1707,7 +1707,6 @@ class SessionManager {
         $rs_check_user = Database::query($sql);
 
         if (Database::num_rows($rs_check_user) > 0) {
-
             $dataSerialNow = array(
                 'admin' => api_get_user_id(),
                 'coach' => $user_id,
@@ -1715,30 +1714,35 @@ class SessionManager {
                 'course_code' => $course_code,
                 'create_at' => api_get_utc_datetime()
             );
-            event_system('session_substitute', 'MISC', serialize($dataSerialNow), null, null, null, $session_id);
-            self::_generateNewTransaccion($session_id, $user_id);
-            // Assign user like a coach to course
-            // First check if the user is registered in the course
-            $sql = "SELECT id_user FROM $tbl_session_rel_course_rel_user WHERE id_session = '$session_id' AND course_code = '$course_code' AND id_user = '$user_id'";
-            $rs_check = Database::query($sql);
 
-            //Then update or insert
-            $status = ROLE_COACH_SUBSTITUTE;
-            if (Database::num_rows($rs_check) > 0) {
-                $sql = "UPDATE $tbl_session_rel_course_rel_user SET status = '$status' WHERE id_session = '$session_id' AND course_code = '$course_code' AND id_user = '$user_id' ";
-                $rs_update = Database::query($sql);
-                if (Database::affected_rows() > 0) return true;
-                else return false;
-            } else {
-                $sql = " INSERT INTO $tbl_session_rel_course_rel_user(id_session, course_code, id_user, status) VALUES('$session_id', '$course_code', '$user_id', '$status')";
-                $rs_insert = Database::query($sql);
-                if (Database::affected_rows() > 0) return true;
-                else return false;
+            event_system('session_substitute', 'MISC', serialize($dataSerialNow), null, null, null, $session_id);
+            $flagTransaction = self::_generateNewTransaccion($session_id, $user_id);
+            $return = $flagTransaction;
+
+            if ($flagTransaction == true) {
+                // Assign user like a coach to course
+                // First check if the user is registered in the course
+                $sql = "SELECT id_user FROM $tbl_session_rel_course_rel_user WHERE id_session = '$session_id' AND course_code = '$course_code' AND id_user = '$user_id'";
+                $rs_check = Database::query($sql);
+
+                //Then update or insert
+                $status = ROLE_COACH_SUBSTITUTE;
+                if (Database::num_rows($rs_check) > 0) {
+                    $sql = "UPDATE $tbl_session_rel_course_rel_user SET status = '$status' WHERE id_session = '$session_id' AND course_code = '$course_code' AND id_user = '$user_id' ";
+                    $rs_update = Database::query($sql);
+                    $return = (Database::affected_rows() > 0) ? true : false;
+                } else {
+                    $sql = " INSERT INTO $tbl_session_rel_course_rel_user(id_session, course_code, id_user, status) VALUES('$session_id', '$course_code', '$user_id', '$status')";
+                    $rs_insert = Database::query($sql);
+                    $return = (Database::affected_rows() > 0) ? true : false;
+                }
             }
 
         } else {
-            return false;
+            $return = false;
         }
+
+        return $return;
     }
 
     /**

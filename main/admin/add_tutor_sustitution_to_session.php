@@ -13,8 +13,7 @@ $xajax -> registerFunction ('search_users');
 // setting breadcrumbs
 $interbreadcrumb[] = array('url' => 'index.php', 'name' => get_lang('PlatformAdmin'));
 $interbreadcrumb[] = array('url' => 'sessions_schedule.php','name' => get_lang('InOut'));
-$interbreadcrumb[] = array('url' => "#", 'name' => get_lang('CoachSustitute'));
-//$interbreadcrumb[] = array('url' => "resume_session.php?id_session=".$id_session,"name" => get_lang('CoachSustitute'));
+$interbreadcrumb[] = array('url' => "#", 'name' => get_lang('CoachSubstitute'));
 
 // Database Table Definitions
 $tbl_session                        = Database::get_main_table(TABLE_MAIN_SESSION);
@@ -151,14 +150,26 @@ $errorMsg = '';
 if (isset($_POST['formSent']) && $_POST['formSent']) {
 
     $userId  = (!empty($_POST['usersList'][0])) ? $_POST['usersList'][0] : 0;
+    $errorMsg = (0 == $userId) ? get_lang('SelectedCoachSubstituteError') : '';
     if ($userId > 0 && $id_session > 0  && !empty($dataHeader['course_code'])) {
-        SessionManager::set_coach_sustitution_to_course_session($userId, $id_session, $dataHeader['course_code']);
-        header('Location: /main/admin/sessions_schedule.php');
+        $flagOperation = SessionManager::set_coach_sustitution_to_course_session($userId, $id_session, $dataHeader['course_code']);
+
+        Security::clear_token();
+        $tok = Security::get_token();
+        if (true == $flagOperation) {
+            $message = get_lang('CoachSubstituteAdded');
+            header('Location: sessions_schedule.php?action=show_message&message='.urlencode($message).'&sec_token='.$tok);
+        } else {
+            $message = get_lang('CoachSubstituteNotAdded');
+        }
     }
 }
 
 // display the dokeos header
 Display::display_header('');
+if (!empty($message)) {
+    Display::display_error_message($message);
+}
 
 // the form header
 $session_info = SessionManager::fetch($id_session);
@@ -233,10 +244,10 @@ if ($ajax_search == true || $ajax_search == false) {
 }
 unset($Courses);
 ?>
-<form name="formulaire" method="post" action="<?php echo api_get_self(); ?>?<?php echo $urlConcat ?>&page=<?php echo $page; ?><?php if(!empty($_GET['add'])) echo '&add=true' ; ?>" style="margin:0px;" <?php if($ajax_search){echo ' onsubmit="valide();"';}?>>
+<form name="formulaire" method="post" action="<?php echo api_get_self(); ?>?<?php echo $urlConcat ?><?php if(!empty($_GET['add'])) echo '&add=true' ; ?>" style="margin:0px;" <?php if($ajax_search){echo ' onsubmit="valide();"';}?>>
     <input type="hidden" name="formSent" value="1" />
     <?php if(!empty($errorMsg)) {
-        Display::display_normal_message($errorMsg); //main API
+        Display::display_warning_message($errorMsg);
     } ?>
 
     <table border="0" cellpadding="5" cellspacing="0" width="100%" align="center">
@@ -261,7 +272,7 @@ unset($Courses);
                     <div id="ajax_list_users_single"></div>
                 <?php } else { ?>
                     <div id="ajax_list_users_multiple">
-                        <select id="origin" name="noUsersList[]" multiple="multiple" size="20" style="width:360px;">
+                        <select id="origin" name="noUsersList[]" size="20" style="width:360px;">
                             <?php foreach($sessionCourses as $enreg) { ?>
                                 <option value="<?php echo $enreg['user_id']; ?>"><?php echo api_get_person_name($enreg['firstname'], $enreg['lastname'], null, PERSON_NAME_EASTERN_ORDER).' ('.$enreg['username'].')'; ?></option>
                             <?php } ?>

@@ -219,7 +219,7 @@ function hasSubstitute($sessionId, $courseCode)
 }
 
 if (!api_is_platform_admin()) {
-    die;
+    api_not_allowed(true);
 }
 
 $scheduleIdSelected = isset($_POST['schedule']) ? $_POST['schedule'] : 0;

@@ -25,8 +25,6 @@ function getSessionsList($scheduleId, $date, $listFilter = 'all')
                 . "AND val.field_id = '{$schedule['field_id']}' "
                 . "AND '$date' BETWEEN DATE(s.access_start_date) AND DATE(s.access_end_date) "
                 . "AND s.id_coach = scu.id_user";
-                
-                echo "$sql\n";
 
         $listResult = Database::query($sql);
 

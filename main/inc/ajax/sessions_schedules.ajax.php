@@ -6,23 +6,26 @@
  */
 require_once '../global.inc.php';
 
-function getSessionsList($scheduleId, $date, $listFilter = 'all')
+function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all')
 {
     $scheduleFieldOption = new ExtraFieldOption('session');
+    $branchFieldOption = new ExtraFieldOption('session');
 
     $schedule = $scheduleFieldOption->get($scheduleId);
+    $branch = $branchFieldOption->get($branchId);
 
     if (!empty($schedule)) {
         $rows = array();
 
         $sql = "SELECT s.id, s.id_coach, s.nbr_courses, s.access_start_date, s.access_end_date "
                 . "FROM session as s "
-                . "INNER JOIN session_rel_course_rel_user AS scu "
-                . "ON s.id = scu.id_session "
-                . "INNER JOIN session_field_values as val "
-                . "ON s.id = val.session_id "
-                . "AND val.field_value = '{$schedule['option_value']}' "
-                . "AND val.field_id = '{$schedule['field_id']}' "
+                . "INNER JOIN session_rel_course_rel_user AS scu ON s.id = scu.id_session "
+                . "INNER JOIN session_field_values as valSch ON s.id = valSch.session_id "
+                . "INNER JOIN session_field_values AS valBr ON s.id = valBr.session_id "
+                . "AND valSch.field_value = '{$schedule['option_value']}' "
+                . "AND valSch.field_id = '{$schedule['field_id']}' "
+                . "AND valBr.field_value = '{$branch['option_value']}' "
+                . "AND valBr.field_id = '{$branch['field_id']}' "
                 . "AND '$date' BETWEEN DATE(s.access_start_date) AND DATE(s.access_end_date) "
                 . "AND s.id_coach = scu.id_user";
 
@@ -222,10 +225,11 @@ if (!api_is_platform_admin()) {
     api_not_allowed(true);
 }
 
+$branchIdSelected = isset($_POST['branch']) ? $_POST['branch'] : 0;
 $scheduleIdSelected = isset($_POST['schedule']) ? $_POST['schedule'] : 0;
 $dateSelected = isset($_POST['date']) ? $_POST['date'] : date('Y-m-d');
 $status = isset($_POST['status']) ? $_POST['status'] : 'all';
 
-$sessions = getSessionsList($scheduleIdSelected, $dateSelected, $status);
+$sessions = getSessionsList($scheduleIdSelected, $dateSelected, $branchIdSelected, $status);
 
 echo json_encode($sessions);

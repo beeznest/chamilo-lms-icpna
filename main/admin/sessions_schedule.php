@@ -92,7 +92,7 @@ if ($_GET['action'] == 'show_message' && true == $check) {
             <label for="branch"><?php echo get_lang('Branch') ?></label>
             <select name="branch" id="branch" class="input-xlarge">
                 <?php foreach ($branchs as $branch) { ?>
-                    <option value="<?php echo date('Y-m-d') ?>"><?php echo $branch['title'] ?></option>
+                    <option value="<?php echo $branch['id'] ?>"><?php echo $branch['title'] ?></option>
                 <?php } ?>
             </select>
         </div>

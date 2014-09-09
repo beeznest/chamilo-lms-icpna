@@ -1727,14 +1727,12 @@ class SessionManager {
 
                 //Then update or insert
                 $status = ROLE_COACH_SUBSTITUTE;
-                if (Database::num_rows($rs_check) > 0) {
+                if (Database::num_rows($rs_check) > 0) { // NO PROBLEM WHEN COUCH REPEAT ONLY UPDATE
                     $sql = "UPDATE $tbl_session_rel_course_rel_user SET status = '$status' WHERE id_session = '$session_id' AND course_code = '$course_code' AND id_user = '$user_id' ";
                     $rs_update = Database::query($sql);
-                    $return = (Database::affected_rows() > 0) ? true : false;
                 } else {
                     $sql = " INSERT INTO $tbl_session_rel_course_rel_user(id_session, course_code, id_user, status) VALUES('$session_id', '$course_code', '$user_id', '$status')";
                     $rs_insert = Database::query($sql);
-                    $return = (Database::affected_rows() > 0) ? true : false;
                 }
             }
 

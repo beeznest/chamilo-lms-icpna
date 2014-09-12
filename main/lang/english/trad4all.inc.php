@@ -825,6 +825,7 @@ $ThematicAdvance = "Thematic advance";
 $EditProfile = "Edit profile";
 $TabsDashboard = "Dashboard";
 $Dashboard = "Dashboard";
+$InOutManagement = "In Out Management";
 $DashboardPlugins = "Dashboard plugins";
 $SelectBlockForDisplayingInsideBlocksDashboardView = "Select blocks to display in the dashboard blocks view";
 $ColumnPosition = "Position (column)";

@@ -10,6 +10,8 @@ if (!api_is_teacher_admin() || intval($_GET['id_session']) <= 0) {
 }
 $id_session = intval($_GET['id_session']);
 
+$this_section = IN_OUT_MANAGEMENT;
+
 $xajax = new xajax();
 $xajax -> registerFunction ('search_users');
 

@@ -225,7 +225,7 @@ function hasSubstitute($sessionId, $courseCode)
     return false;
 }
 
-if (!api_is_platform_admin()) {
+if (!api_is_teacher_admin()) {
     api_not_allowed(true);
 }
 

@@ -1452,7 +1452,7 @@ class MigrationCustom {
         $whereCondition = array(
             'where' => array(
                 'id = ?' => array(
-                    $data['item_id']
+                    $data['id']
                 )
             )
         );
@@ -1490,7 +1490,8 @@ class MigrationCustom {
                 'chrtipomarcacion' => $data['dest_id'],
                 'chrfechamarcacion' => $dateTime['date'],
                 'chrhoramarcacion' => $dateTime['time'],
-                'intidsede' => $data['branch_id']
+                'intidsede' => $data['branch_id'],
+                'uidIdPrograma' => $data['dest_id']
             );
             $serviceResponse = Migration::soap_call(
                 $webServiceDetails,

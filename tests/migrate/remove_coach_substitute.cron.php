@@ -30,18 +30,30 @@ if (is_array($sessionIds) and !empty($sessionIds)) {
                 if (is_array($branchTransactionData) and !empty($branchTransactionData)) {
                     $branchTransactionIds = array();
                     foreach ($branchTransactionData as $branchTransactionRow) {
-                        $branchTransactionIds[] = Migration::add_transaction($branchTransactionRow);
-                    }
-                    if (!empty($branchTransactionIds)) {
-                        // Remove substitute coaches from session
-                        removeSubstituteCoachFromSession($sessionId);
-
-                        // @TODO: Set params here
-                        $return537 = MigrationCustom::transaction_537(null,null);
-                        if ($return537 === 537) {
-                            // transaction_537() is not completed yet
-                            break;
+                        $migration = new Migration();
+                        $res = $migration->get_transaction_by_params($branchTransactionRow);
+                        if ($res) {
+                            $res = current($res);
+                            $branchTransactionIds[] = $res['id'];
+                        } else {
+                            $res = $branchTransactionRow;
+                            $res['id'] = Migration::add_transaction($branchTransactionRow);
                         }
+                        if ($res['id']) {
+                            removeSubstituteCoachFromSession($sessionId);
+
+                            // @TODO: Set params here
+                            $webServiceDetails = array('url' => 'url.com');
+                            $return537 = MigrationCustom::transaction_537($res,null);
+                            if ($return537 === 537) {
+                                // transaction_537() is not completed yet
+                                break;
+                            }
+                        }
+                    }
+                    if (!empty($branchTransactionIds[0])) {
+                        // Remove substitute coaches from session
+
                     }
                 }
 
@@ -63,6 +75,7 @@ function requireAction()
 {
     require_once dirname(__FILE__).'/../../main/inc/global.inc.php';
     require_once 'migration.class.php';
+    require_once 'migration.custom.class.php';
     $branch_id = 0;
     // We need $branch_id defined before calling db_matches.php
     // The only thing we need from db_matches is the definition of the web service
@@ -80,7 +93,7 @@ function requireAction()
  * @return int
  */
 function getRoleCoachSubstitute() {
-    return defined(ROLE_COACH_SUBSTITUTE)? ROLE_COACH_SUBSTITUTE : 17;
+    return defined(ROLE_COACH_SUBSTITUTE)? ROLE_COACH_SUBSTITUTE : 18;
 }
 
 /**
@@ -120,7 +133,7 @@ function getSessionData($id)
     $sessionCourseUserTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
     $sql = "SELECT DISTINCT user.username FROM $sessionCourseUserTable scu
     INNER JOIN user ON user.user_id = scu.id_user
-    WHERE status = $roleCoachSubstitute AND id_session = $id";
+    WHERE scu.status = $roleCoachSubstitute AND id_session = $id";
     $res = Database::query($sql);
 
     if (Database::num_rows($res) > 0) {
@@ -141,7 +154,6 @@ function getSessionData($id)
     } else {
         return false;
     }
-    return $sessionData;
 
     $extraData = $sessionExtraField->get_values_by_handler_and_field_variable($id, 'uidIdPrograma');
     if ($extraData) {
@@ -166,12 +178,12 @@ function getSessionData($id)
  */
 function adaptSessionData($sessionData) {
 
-    if (is_array($sessionData['coaches'])) {
+    if (is_array($sessionData['coaches']) && $sessionData['sede'] && $sessionData['uidIdPrograma'] && $sessionData['horario']) {
         $branchTransactionData = array();
         foreach ($sessionData['coaches'] as $coach) {
             $branchTransactionRow = array();
             $branchTransactionRow['id'] = null;
-            $branchTransactionRow['transacion_id'] = null;
+            $branchTransactionRow['transaction_id'] = null;
             $branchTransactionRow['branch_id'] = $sessionData['sede'];
             $branchTransactionRow['action'] = 537;
             $branchTransactionRow['item_id'] = $coach;

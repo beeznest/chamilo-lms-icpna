@@ -959,6 +959,12 @@ class Template {
             $navigation['platform_admin']['url'] = api_get_path(WEB_CODE_PATH).'admin/';
             $navigation['platform_admin']['title'] = get_lang('PlatformAdmin');
         }
+
+        if (api_is_teacher_admin()) {
+            $navigation['inOutManagement']['url'] = api_get_path(WEB_CODE_PATH).'admin/sessions_schedule.php';
+            $navigation['inOutManagement']['title'] = get_lang('InOutManagement');
+        }
+
         return $navigation;
     }
 
@@ -1209,6 +1215,11 @@ class Template {
                 } else {
                     $menu_navigation['platform_admin'] = $possible_tabs['platform_admin'];
                 }
+            }
+
+            // inOutManagement
+            if (api_is_teacher_admin()) {
+                $navigation['inOutManagement'] = $possible_tabs['inOutManagement'];
             }
 
             // Reports

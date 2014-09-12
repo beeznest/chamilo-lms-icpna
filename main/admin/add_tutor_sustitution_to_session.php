@@ -2,10 +2,13 @@
 $language_file='admin';
 // resetting the course id
 $cidReset = true;
+
 require_once '../inc/global.inc.php';
 
-$id_session = isset($_GET['id_session']) ? intval($_GET['id_session']) : null;
-SessionManager::protect_session_edit($id_session);
+if (!api_is_teacher_admin() || intval($_GET['id_session']) <= 0) {
+    api_not_allowed(true);
+}
+$id_session = intval($_GET['id_session']);
 
 $xajax = new xajax();
 $xajax -> registerFunction ('search_users');

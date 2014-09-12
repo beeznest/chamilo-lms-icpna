@@ -27,6 +27,8 @@ use \ChamiloSession as Session;
 define('STUDENT', 5);
 /** global status of a user: course manager */
 define('COURSEMANAGER', 1);
+/** global status of a user: teacher admin */
+define('TEACHERADMIN', 2);
 /** global status of a user: session admin */
 define('SESSIONADMIN', 3);
 /** global status of a user: human ressource manager */
@@ -44,12 +46,13 @@ define('SESSION_GENERAL_COACH', 13);
 define('COURSE_STUDENT', 14);   //student subscribed in a course
 define('SESSION_STUDENT', 15);  //student subscribed in a session course
 define('COURSE_TUTOR', 16); // student is tutor of a course (NOT in session)
-define('ROLE_COACH_SUBSTITUTE', 17); // substitution tutor
-define('ROLE_TEACHER_ADMIN', 18); // teacher admin
+define('ROLE_COACH_SUBSTITUTE', 18);
+define('ROLE_TEACHER_ADMIN', 19);
 
 
 // Table of status
 $_status_list[COURSEMANAGER]    = 'teacher';        // 1
+$_status_list[TEACHERADMIN]     = 'teacher_admin';  // 2
 $_status_list[SESSIONADMIN]     = 'session_admin';  // 3
 $_status_list[DRH]              = 'drh';            // 4
 $_status_list[STUDENT]          = 'user';           // 5
@@ -2548,6 +2551,7 @@ function api_is_student() {
     return isset($_user['status']) && $_user['status'] == STUDENT;
 
 }
+
 /**
  * Checks whether the current user is a teacher
  * @return boolean True if current user is a human resources manager
@@ -2555,6 +2559,15 @@ function api_is_student() {
 function api_is_teacher() {
     global $_user;
     return isset($_user['status']) && $_user['status'] == COURSEMANAGER;
+}
+
+/**
+ * Checks whether the current user is a teacher admin
+ * @return boolean True if current user is a course administrator
+ */
+function api_is_teacher_admin() {
+    global $_user;
+    return isset($_user['status']) && $_user['status'] == TEACHERADMIN;
 }
 
 /**

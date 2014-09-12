@@ -34,6 +34,13 @@ Class LoginRedirection {
                 $redirect_url = substr(api_get_path(WEB_PATH), 0, -1) . $redirect_url;
             }
         }
+        // TO BE DONE: Not sure to what $redirect_url the user should be headed
+        /*if (api_is_teacher_admin() && !api_get_setting('teacheradmin_page_after_login') == '') {
+            $redirect_url = html_entity_decode(api_get_setting('teacheradmin_page_after_login'));
+            if ($redirect_url[0] == "/") {
+                $redirect_url = substr(api_get_path(WEB_PATH), 0, -1) . $redirect_url;
+            }
+        }*/
         if (api_is_drh() && !api_get_setting('drh_page_after_login') == '') {
             $redirect_url = html_entity_decode(api_get_setting('drh_page_after_login'));
             if ($redirect_url[0] == "/") {

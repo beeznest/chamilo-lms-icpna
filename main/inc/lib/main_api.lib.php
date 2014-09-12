@@ -27,8 +27,6 @@ use \ChamiloSession as Session;
 define('STUDENT', 5);
 /** global status of a user: course manager */
 define('COURSEMANAGER', 1);
-/** global status of a user: teacher admin */
-define('TEACHERADMIN', 2);
 /** global status of a user: session admin */
 define('SESSIONADMIN', 3);
 /** global status of a user: human ressource manager */
@@ -52,12 +50,11 @@ define('ROLE_TEACHER_ADMIN', 19);
 
 // Table of status
 $_status_list[COURSEMANAGER]    = 'teacher';        // 1
-$_status_list[TEACHERADMIN]     = 'teacher_admin';  // 2
 $_status_list[SESSIONADMIN]     = 'session_admin';  // 3
 $_status_list[DRH]              = 'drh';            // 4
 $_status_list[STUDENT]          = 'user';           // 5
 $_status_list[ANONYMOUS]        = 'anonymous';      // 6
-
+$_status_list[ROLE_TEACHER_ADMIN]	= 'teacher_admin';  // 19
 
 // COURSE VISIBILITY CONSTANTS
 /** only visible for course admin */
@@ -2567,7 +2564,7 @@ function api_is_teacher() {
  */
 function api_is_teacher_admin() {
     global $_user;
-    return isset($_user['status']) && $_user['status'] == TEACHERADMIN;
+    return isset($_user['status']) && $_user['status'] == ROLE_TEACHER_ADMIN;
 }
 
 /**

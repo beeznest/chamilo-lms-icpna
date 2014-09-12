@@ -1722,14 +1722,12 @@ class SessionManager {
             if ($flagTransaction == true) {
                 // Assign user like a coach to course
                 // First check if the user is registered in the course
-                $sql = "SELECT id_user FROM $tbl_session_rel_course_rel_user WHERE id_session = '$session_id' AND course_code = '$course_code' AND id_user = '$user_id'";
+                $status = ROLE_COACH_SUBSTITUTE;
+                $sql = "SELECT id_user FROM $tbl_session_rel_course_rel_user WHERE id_session = '$session_id' AND course_code = '$course_code' AND id_user = '$user_id' AND status = '$status'";
                 $rs_check = Database::query($sql);
 
-                //Then update or insert
-                $status = ROLE_COACH_SUBSTITUTE;
-                if (Database::num_rows($rs_check) > 0) { // NO PROBLEM WHEN COUCH REPEAT ONLY UPDATE
-                    $sql = "UPDATE $tbl_session_rel_course_rel_user SET status = '$status' WHERE id_session = '$session_id' AND course_code = '$course_code' AND id_user = '$user_id' ";
-                    $rs_update = Database::query($sql);
+                if (Database::num_rows($rs_check) > 0) {
+                    // Nothing do.
                 } else {
                     $sql = " INSERT INTO $tbl_session_rel_course_rel_user(id_session, course_code, id_user, status) VALUES('$session_id', '$course_code', '$user_id', '$status')";
                     $rs_insert = Database::query($sql);

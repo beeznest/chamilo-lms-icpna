@@ -329,6 +329,7 @@ $Everyone = "Todos";
 $SelectGroupsUsers = "Seleccionar grupos/usuarios";
 $Student = "Estudiante";
 $Teacher = "Profesor";
+$RoleTeacherAdmin = "Administrador de profesores";
 $Send2All = "No seleccionó ningún usuario / grupo. Este item será visible por todos los usuarios.";
 $Wiki = "Wiki";
 $Complete = "Completado";

@@ -329,6 +329,7 @@ $Everyone = "Everyone";
 $SelectGroupsUsers = "Select groups/users";
 $Student = "Learner";
 $Teacher = "Trainer";
+$RoleTeacherAdmin = "Teacher Administrator";
 $Send2All = "You did not select a user / group. The announcement is visible for every learner";
 $Wiki = "Group wiki";
 $Complete = "Complete";

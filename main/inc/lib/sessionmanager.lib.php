@@ -1720,18 +1720,14 @@ class SessionManager {
             $return = $flagTransaction;
 
             if ($flagTransaction == true) {
-                // Assign user like a coach to course
-                // First check if the user is registered in the course
+                // Clear record of couch susbtitute for adding one.
                 $status = ROLE_COACH_SUBSTITUTE;
-                $sql = "SELECT id_user FROM $tbl_session_rel_course_rel_user WHERE id_session = '$session_id' AND course_code = '$course_code' AND id_user = '$user_id' AND status = '$status'";
-                $rs_check = Database::query($sql);
+                $sqlClear = "DELETE FROM $tbl_session_rel_course_rel_user WHERE id_session = '$session_id' ".
+                    "AND course_code = '$course_code' AND status = '$status'";
+                $rs_check = Database::query($sqlClear);
 
-                if (Database::num_rows($rs_check) > 0) {
-                    // Nothing do.
-                } else {
-                    $sql = " INSERT INTO $tbl_session_rel_course_rel_user(id_session, course_code, id_user, status) VALUES('$session_id', '$course_code', '$user_id', '$status')";
-                    $rs_insert = Database::query($sql);
-                }
+                $sql = " INSERT INTO $tbl_session_rel_course_rel_user(id_session, course_code, id_user, status) VALUES('$session_id', '$course_code', '$user_id', '$status')";
+                Database::query($sql);
             }
 
         } else {
@@ -1822,6 +1818,7 @@ class SessionManager {
 
         return ($flag == true && ($last_id > 0)) ? true : false;
     }
+
 
     /**
      * Assign a coach to course in session with status = 2

@@ -47,7 +47,7 @@ if ($_GET['action'] == 'show_message' && true == $check) {
     Security::clear_token();
 }
 ?>
-<form class="form-horizontal" name="frmlistsessions" method="post" method="<?php echo api_get_self() ?>">
+<form class="form-horizontal" name="frmlistsessions" method="get" method="<?php echo api_get_self() ?>">
     <div class="control-group">
         <label class="control-label" for="branch"><?php echo get_lang('Branch') ?></label>
         <div class="controls">

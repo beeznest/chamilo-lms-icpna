@@ -118,7 +118,25 @@ if ($_GET['action'] == 'show_message' && true == $check) {
                                 <td><?php echo $session['schedule'] ?></td>
                                 <td><?php echo $session['room'] ?></td>
                                 <td><?php echo $session['course'] ?></td>
-                                <td><?php echo $session['coach'] ?></td>
+                                <td><?php
+                                    foreach ($session['coaches'] as $coach) {
+                                        $profileURL = api_get_path(WEB_PATH) . "main/social/profile.php?u=" . $coach['user_id'];
+                                        ?>
+                                        <a href="<?php echo $profileURL ?>"><?php echo $coach['complete_name_with_username'] ?></a><br>
+                                        <?php
+                                    }
+
+                                    if ($session['hasSubstitute']) {
+                                        foreach ($session['susbtitutes'] as $coachSubstitute) {
+                                            $profileURL = api_get_path(WEB_PATH) . "main/social/profile.php?u=" . $coachSubstitute['user_id'];
+                                            ?>
+                                            <strong>
+                                                &xrarr; <a href="<?php echo $profileURL ?>"><?php echo $coachSubstitute['complete_name_with_username'] ?></a>
+                                            </strong><br>
+                                            <?php
+                                        }
+                                    }
+                                    ?></td>
                                 <td><?php echo $session['in'] ?></td>
                                 <td><?php echo $session['out'] ?></td>
                                 <td>
@@ -342,55 +360,47 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all')
             $courses = SessionManager::get_course_list_by_session_id($session['id']);
 
             foreach ($courses as $course) {
-                $coaches = SessionManager::get_session_course_coaches_to_string($course['code'], $session['id']);
+                $coachesId = SessionManager::get_session_course_coaches($course['code'], $session['id']);
+
+                $coaches = array();
+
+                foreach ($coachesId as $coachId) {
+                    $coaches[] = api_get_user_info($coachId['user_id']);
+                }
+
                 $inOut = getInOut($session['id'], $course['id'], $room['id'], $date, $scheduleData);
                 $hasSubstitute = hasSubstitute($session['id'], $course['code']);
+
+                $substitutes = SessionManager::getSessionCourseSusbtituteCoachesWithInfo($course['code'], $session['id']);
+
+                $row = array(
+                    'id' => $session['id'],
+                    'room' => $room['title'],
+                    'course' => $course['title'],
+                    'courseCode' => $course['code'],
+                    'schedule' => $schedule['option_display_text'],
+                    'coaches' => $coaches,
+                    'susbtitutes' => $substitutes,
+                    'in' => empty($inOut) ? null : $inOut['log_in_course_date'],
+                    'out' => empty($inOut) ? null : $inOut['log_out_course_date'],
+                    'hasSubstitute' => $hasSubstitute
+                );
 
                 switch ($listFilter) {
                     case 'reg':
                         if ($inOut) {
-                            $rows[] = array(
-                                'id' => $session['id'],
-                                'room' => $room['title'],
-                                'course' => $course['title'],
-                                'courseCode' => $course['code'],
-                                'schedule' => $schedule['option_display_text'],
-                                'coach' => $coaches,
-                                'in' => $inOut['log_in_course_date'],
-                                'out' => $inOut['log_out_course_date'],
-                                'hasSubstitute' => $hasSubstitute
-                            );
+                            $rows[] = $row;
                         }
                         break;
 
                     case 'noreg':
                         if (empty($inOut)) {
-                            $rows[] = array(
-                                'id' => $session['id'],
-                                'room' => $room['title'],
-                                'course' => $course['title'],
-                                'courseCode' => $course['code'],
-                                'schedule' => $schedule['option_display_text'],
-                                'coach' => $coaches,
-                                'in' => null,
-                                'out' => null,
-                                'hasSubstitute' => $hasSubstitute
-                            );
+                            $rows[] = $row;
                         }
                         break;
 
                     default :
-                        $rows[] = array(
-                            'id' => $session['id'],
-                            'room' => $room['title'],
-                            'course' => $course['title'],
-                            'courseCode' => $course['code'],
-                            'schedule' => $schedule['option_display_text'],
-                            'coach' => $coaches,
-                            'in' => empty($inOut) ? null : $inOut['log_in_course_date'],
-                            'out' => empty($inOut) ? null : $inOut['log_out_course_date'],
-                            'hasSubstitute' => $hasSubstitute
-                        );
+                        $rows[] = $row;
                 }
             }
         }

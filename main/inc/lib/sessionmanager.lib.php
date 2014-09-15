@@ -2922,4 +2922,46 @@ class SessionManager {
         );
         return $return_array;
     }
+    
+    /**
+     * Get the list of substitute coaches (only user ids)
+     * @param int $courseCode Course code
+     * @param int $sessionId Session id
+     * @return array Substitue coaches. Otherwise return false
+     */
+    static public function getSessionCourseSubstituteCoaches($courseCode, $sessionId)
+    {
+        $sessionCourseUserTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
+
+        $usersId = Database::select('id_user', $sessionCourseUserTable, array(
+                    'where' => array(
+                        'id_session = ? AND ' => intval($sessionId),
+                        'course_code = ? AND ' => Database::escape_string($courseCode),
+                        'status = ?' => ROLE_COACH_SUBSTITUTE
+                    )
+        ));
+
+        return $usersId;
+    }
+
+    /**
+     * Get the info of substitute coaches
+     * @param int $courseCode Course code
+     * @param int $sessionId Session id
+     * @return string Names
+     */
+    static public function getSessionCourseSusbtituteCoachesWithInfo($courseCode, $sessionId)
+    {
+        $coaches = array();
+        $usersId = self::getSessionCourseSubstituteCoaches($courseCode, $sessionId);
+
+        if (!empty($usersId)) {
+            foreach ($usersId as $userId) {
+                $coaches[] = api_get_user_info($userId['id_user']);
+            }
+        }
+
+        return $coaches;
+    }
+
 }

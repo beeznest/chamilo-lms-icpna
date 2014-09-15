@@ -48,7 +48,17 @@ if ($_GET['action'] == 'export') {
         Export::export_table_xls($data);
         exit;
     } elseif($_GET['type'] == 'pdf') {
-
+        $data[0] = array('#', 'Tuno', 'Tdos', 'Ttres');
+        $data[1] = array(1, 'uno', 'dos', 'tres');
+        $data[2] = array(2, 'uno', 'dos', 'tres');
+        $params = array(
+            'add_signatures' => false,
+            'filename' => get_lang('UserList'),
+            'pdf_title' => 'Title',
+            'pdf_description' => 'description pdf',
+        );
+        Export::export_table_pdf($data, $params);
+        exit;
     }
 }
 

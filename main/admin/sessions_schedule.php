@@ -59,6 +59,7 @@ if ($_GET['action'] == 'show_message' && true == $check) {
     Security::clear_token();
 }
 ?>
+
 <a href="?action=export&type=xls">exel</a>
 <a href="?action=export&type=pdf">pdf</a>
 <form class="form-horizontal" name="frmlistsessions" method="get" method="<?php echo api_get_self() ?>">

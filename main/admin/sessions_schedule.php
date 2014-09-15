@@ -7,6 +7,7 @@ $language_file = array('admin', 'registration');
 $cidReset = true;
 
 require_once '../inc/global.inc.php';
+require_once api_get_path(LIBRARY_PATH).'export.lib.inc.php';
 
 if (!api_is_teacher_admin()) {
     api_not_allowed(true);
@@ -39,15 +40,28 @@ $htmlHeadXtra[] = <<<EOD
 </script>
 EOD;
 
-Display::display_header();
+if ($_GET['action'] == 'export') {
+    if ($_GET['type'] == 'xls') {
+        $data[0] = array('id', 'nombre', 'apellido');
+        $data[1] = array('user_id' => '1', 'firstname' =>'pepe', 'lastname'=>'rios');
+        $data[2] = array('user_id' => '3', 'firstname' =>'pepe', 'lastname'=>'rios');
+        Export::export_table_xls($data);
+        exit;
+    } elseif($_GET['type'] == 'pdf') {
 
+    }
+}
+
+Display::display_header();
 $check = Security::check_token('get');
 if ($_GET['action'] == 'show_message' && true == $check) {
     Display::display_confirmation_message(Security::remove_XSS(stripslashes($_GET['message'])));
     Security::clear_token();
 }
 ?>
-<form class="form-horizontal" name="frmlistsessions" method="post" method="<?php echo api_get_self() ?>">
+<a href="?action=export&type=xls">exel</a>
+<a href="?action=export&type=pdf">pdf</a>
+<form class="form-horizontal" name="frmlistsessions" method="get" method="<?php echo api_get_self() ?>">
     <div class="control-group">
         <label class="control-label" for="branch"><?php echo get_lang('Branch') ?></label>
         <div class="controls">

@@ -145,7 +145,18 @@ if (isset($_POST['formSent']) && $_POST['formSent']) {
         $tok = Security::get_token();
         if (true == $flagOperation) {
             $message = get_lang('CoachSubstituteAdded');
-            header('Location: sessions_schedule.php?action=show_message&message='.urlencode($message).'&sec_token='.$tok);
+            
+            $redirectParams = array(
+                'action' => 'show_message',
+                'message' => $message,
+                'sec_token' => $tok,
+                'schedule' => $dataHeader['schedule'],
+                'branch' => $dataHeader['branch'],
+                'date' => $dataHeader['date'],
+                'status' => $dataHeader['status']
+            );
+            
+            header('Location: sessions_schedule.php?' . http_build_query($redirectParams));
         } else {
             $message = get_lang('CoachSubstituteNotAdded');
         }
@@ -171,7 +182,7 @@ $headerInformation = <<<EOD
     </tr>
     <tr>
         <td>Schedule</td>
-        <td><strong>{$dataHeader['schedule']}</strong></td>
+        <td><strong>{$dataHeader['schedule_display']}</strong></td>
         <td>Teacher</td>
         <td><strong>{$dataHeader['coach']}</strong></td>
     </tr>

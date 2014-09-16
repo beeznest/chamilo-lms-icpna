@@ -19,7 +19,20 @@ $interbreadcrumb[] = array('url' => '#', 'name' => get_lang('InOut'));
 
 $scheduleIdSelected = isset($_REQUEST['schedule']) ? $_REQUEST['schedule'] : 0;
 $dateSelected = isset($_REQUEST['date']) ? $_REQUEST['date'] : date('Y-m-d');
-$branchSelected = isset($_REQUEST['branch']) ? $_REQUEST['branch'] : 2;
+
+if (isset($_REQUEST['branch'])) {
+    $branchSelected = intval($_REQUEST['branch']);
+} else {
+    $objBranch = new Branch();
+    $branchId = $objBranch->getBranchFromIP(api_get_real_ip());
+
+    if ($branchId != false) {
+        $branchSelected = $branchId;
+    } else {
+        $branchSelected = 2;
+    }
+}
+
 $statusSelected = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'all';
 
 $branches = array();

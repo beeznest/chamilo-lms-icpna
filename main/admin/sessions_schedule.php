@@ -7,7 +7,7 @@ $language_file = array('admin', 'registration');
 $cidReset = true;
 
 require_once '../inc/global.inc.php';
-require_once api_get_path(LIBRARY_PATH).'export.lib.inc.php';
+require_once api_get_path(LIBRARY_PATH) . 'export.lib.inc.php';
 
 if (!api_is_teacher_admin()) {
     api_not_allowed(true);
@@ -42,23 +42,9 @@ EOD;
 
 if ($_GET['action'] == 'export') {
     if ($_GET['type'] == 'xls') {
-        $data[0] = array('id', 'nombre', 'apellido');
-        $data[1] = array('user_id' => '1', 'firstname' =>'pepe', 'lastname'=>'rios');
-        $data[2] = array('user_id' => '3', 'firstname' =>'pepe', 'lastname'=>'rios');
-        Export::export_table_xls($data);
-        exit;
-    } elseif($_GET['type'] == 'pdf') {
-        $data[0] = array('#', 'Tuno', 'Tdos', 'Ttres');
-        $data[1] = array(1, 'uno', 'dos', 'tres');
-        $data[2] = array(2, 'uno', 'dos', 'tres');
-        $params = array(
-            'add_signatures' => false,
-            'filename' => get_lang('UserList'),
-            'pdf_title' => 'Title',
-            'pdf_description' => 'description pdf',
-        );
-        Export::export_table_pdf($data, $params);
-        exit;
+        exportToXLS($scheduleIdSelected, $dateSelected, $branchSelected);
+    } elseif ($_GET['type'] == 'pdf') {
+        exportToPDF($scheduleIdSelected, $dateSelected, $branchSelected);
     }
 }
 
@@ -68,10 +54,38 @@ if ($_GET['action'] == 'show_message' && true == $check) {
     Display::display_confirmation_message(Security::remove_XSS(stripslashes($_GET['message'])));
     Security::clear_token();
 }
-?>
 
-<a href="?action=export&type=xls">exel</a>
-<a href="?action=export&type=pdf">pdf</a>
+$sessions = getSessionsList($scheduleIdSelected, $dateSelected, $branchSelected, $statusSelected);
+
+if ($sessions != false) {
+    ?>
+    <div class="actions">
+        <span style="float:right; padding-top: 0px;">
+            <?php
+            $exportXLSURL = api_get_self() . '?' . http_build_query(array(
+                        'action' => 'export',
+                        'type' => 'xls',
+                        'branch' => $branchSelected,
+                        'date' => $dateSelected,
+                        'schedule' => $scheduleIdSelected,
+                        'status' => $statusSelected,
+            ));
+            ?>
+            <?php echo Display::url(Display::return_icon('export_excel.png', get_lang('ExportAsXLS'), array(), ICON_SIZE_MEDIUM), $exportXLSURL); ?>
+            <?php
+            $exportPDFURL = api_get_self() . '?' . http_build_query(array(
+                        'action' => 'export',
+                        'type' => 'pdf',
+                        'branch' => $branchSelected,
+                        'date' => $dateSelected,
+                        'schedule' => $scheduleIdSelected,
+                        'status' => $statusSelected,
+            ));
+            ?>
+            <?php echo Display::url(Display::return_icon('pdf.png', get_lang('ExportToPDF'), array(), ICON_SIZE_MEDIUM), $exportPDFURL); ?>
+        </span>
+    </div>
+<?php } ?>
 <form class="form-horizontal" name="frmlistsessions" method="get" method="<?php echo api_get_self() ?>">
     <div class="control-group">
         <label class="control-label" for="branch"><?php echo get_lang('Branch') ?></label>
@@ -136,7 +150,6 @@ if ($_GET['action'] == 'show_message' && true == $check) {
                     </tr>
                 </tfoot>
                 <tbody>
-                    <?php $sessions = getSessionsList($scheduleIdSelected, $dateSelected, $branchSelected, $statusSelected) ?>
                     <?php if ($sessions != false) { ?>
                         <?php foreach ($sessions as $session) { ?>
                             <tr>
@@ -156,7 +169,7 @@ if ($_GET['action'] == 'show_message' && true == $check) {
                                             $profileURL = api_get_path(WEB_PATH) . "main/social/profile.php?u=" . $coachSubstitute['user_id'];
                                             ?>
                                             <strong>
-                                                &xrarr; <a href="<?php echo $profileURL ?>"><?php echo $coachSubstitute['complete_name_with_username'] ?></a>
+                                                &xrarr; <a href="<?php echo $profileURL ?>"><?php echo $coachSubstitute['complete_name_with_username']; ?></a>
                                             </strong><br>
                                             <?php
                                         }
@@ -434,4 +447,105 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all')
     }
 
     return false;
+}
+
+function convertToArray($scheduleId, $date, $branchId)
+{
+    $extraFieldOption = new ExtraFieldOption('session');
+    $schedule = $extraFieldOption->get($scheduleId);
+
+    $arrayData = array(
+        array(
+            get_lang('InOutManagement')
+        ),
+        null,
+        array(
+            get_lang('Branch'),
+            Branch::getName($branchId)
+        ),
+        array(
+            get_lang('Date'),
+            $date,
+            '',
+            get_lang('Schedule'),
+            $schedule['option_display_text']
+        ),
+        null,
+        array(
+            get_lang('Schedule'),
+            get_lang('Room'),
+            get_lang('Course'),
+            get_lang('Teacher'),
+            get_lang('Substitute'),
+            get_lang('InAt'),
+            get_lang('OutAt')
+        )
+    );
+
+    $sessionsToExport = getSessionsList($scheduleId, $date, $branchId);
+
+    foreach ($sessionsToExport as $session) {
+        $row = array(
+            'schedule' => $session['schedule'],
+            'room' => $session['room'],
+            'course' => $session['course'],
+            'coaches' => '',
+            'substitutes' => '',
+            'in' => $session['in'],
+            'out' => $session['out']
+        );
+
+        $coachNames = array();
+
+        foreach ($session['coaches'] as $coach) {
+            $coachNames[] = $coach['complete_name_with_username'];
+        }
+
+        $row['coaches'] = implode(', ', $coachNames);
+
+        if ($session['hasSubstitute']) {
+            $substituteNames = array();
+
+            foreach ($session['susbtitutes'] as $substitute) {
+                $substituteNames[] = $substitute['complete_name_with_username'];
+            }
+
+            $row['substitutes'] = implode(', ', $substituteNames);
+        }
+
+        $arrayData[] = $row;
+    }
+
+    return $arrayData;
+}
+
+function exportToXLS($scheduleId, $date, $branchId)
+{
+    $dataToConvert = convertToArray($scheduleId, $date, $branchId);
+
+    $fileName = get_lang('InOutManagement') . ' ' . api_get_local_time();
+
+    Export::export_table_xls($dataToConvert, $fileName);
+    die;
+}
+
+function exportToPDF($scheduleId, $date, $branchId)
+{
+    $dataToConvert = convertToArray($scheduleId, $date, $branchId);
+
+    $params = array(
+        'add_signatures' => false,
+        'filename' => get_lang('InOutManagement') . ' ' . api_get_local_time(),
+        'pdf_title' => get_lang('InOutManagement'),
+        'pdf_description' => get_lang('InOutManagement'),
+        'format' => 'A4-L',
+        'orientation' => 'L'
+    );
+
+    $pdfContent = Export::convert_array_to_html($dataToConvert);
+
+    print_r($pdfContent);
+
+    Export::export_html_to_pdf($pdfContent, $params);
+    exit;
 }

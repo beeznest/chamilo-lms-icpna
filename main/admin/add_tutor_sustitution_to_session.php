@@ -172,6 +172,8 @@ if (!empty($message)) {
 // the form header
 $session_info = SessionManager::fetch($id_session);
 
+$coacheNames = SessionManager::get_session_course_coaches_to_string($dataHeader['course_code'], $dataHeader['id_session']);
+
 $headerInformation = <<<EOD
 <table class="data_table">
     <tr>
@@ -184,7 +186,7 @@ $headerInformation = <<<EOD
         <td>Schedule</td>
         <td><strong>{$dataHeader['schedule_display']}</strong></td>
         <td>Teacher</td>
-        <td><strong>{$dataHeader['coach']}</strong></td>
+        <td><strong>$coacheNames</strong></td>
     </tr>
 </table>
 EOD;

@@ -1413,4 +1413,6 @@ $DisplayColumn = "Show column";
 $LegalAgreementAccepted = "Legal agreement accepted";
 $UniqueAnswerImage = "Unique answer image";
 $MediaQuestion = "Media question";
+$InAt = "In at";
+$OutAt = "Out at";
 ?>

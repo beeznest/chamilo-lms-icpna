@@ -19,7 +19,20 @@ $interbreadcrumb[] = array('url' => '#', 'name' => get_lang('InOut'));
 
 $scheduleIdSelected = isset($_REQUEST['schedule']) ? $_REQUEST['schedule'] : 0;
 $dateSelected = isset($_REQUEST['date']) ? $_REQUEST['date'] : date('Y-m-d');
-$branchSelected = isset($_REQUEST['branch']) ? $_REQUEST['branch'] : 2;
+
+if (isset($_REQUEST['branch'])) {
+    $branchSelected = intval($_REQUEST['branch']);
+} else {
+    $objBranch = new Branch();
+    $branchId = $objBranch->getBranchFromIP(api_get_real_ip());
+
+    if ($branchId != false) {
+        $branchSelected = $branchId;
+    } else {
+        $branchSelected = 2;
+    }
+}
+
 $statusSelected = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'all';
 
 $branches = array();
@@ -133,9 +146,9 @@ if ($sessions != false) {
                         <th><?php echo get_lang('Room') ?></th>
                         <th><?php echo get_lang('Course') ?></th>
                         <th><?php echo get_lang('Teacher') ?></th>
-                        <th><?php echo get_lang('In') ?></th>
-                        <th><?php echo get_lang('Out') ?></th>
-                        <th><?php echo get_lang('Actions') ?></th>
+                        <th><?php echo get_lang('InAt') ?></th>
+                        <th><?php echo get_lang('OutAt') ?></th>
+                        <th><?php echo get_lang('Substitute') ?></th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -144,9 +157,9 @@ if ($sessions != false) {
                         <th><?php echo get_lang('Room') ?></th>
                         <th><?php echo get_lang('Course') ?></th>
                         <th><?php echo get_lang('Teacher') ?></th>
-                        <th><?php echo get_lang('In') ?></th>
-                        <th><?php echo get_lang('Out') ?></th>
-                        <th><?php echo get_lang('Actions') ?></th>
+                        <th><?php echo get_lang('InAt') ?></th>
+                        <th><?php echo get_lang('OutAt') ?></th>
+                        <th><?php echo get_lang('Substitute') ?></th>
                     </tr>
                 </tfoot>
                 <tbody>
@@ -187,7 +200,6 @@ if ($sessions != false) {
                                         'id_session' => $session['id'],
                                         'room' => $session['room'],
                                         'course' => $session['course'],
-                                        'coach' => $session['coach'],
                                         'schedule_display' => $session['schedule'],
                                         'course_code' => $session['courseCode']
                                     );

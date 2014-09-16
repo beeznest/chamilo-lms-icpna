@@ -138,7 +138,7 @@ if (isset($_POST['formSent']) && $_POST['formSent']) {
 
     $userId  = (!empty($_POST['usersList'][0])) ? $_POST['usersList'][0] : 0;
     $errorMsg = (0 == $userId) ? get_lang('SelectedCoachSubstituteError') : '';
-    if ($userId > 0 && $id_session > 0  && !empty($dataHeader['course_code'])) {
+    if ($userId >= 0 && $id_session > 0  && !empty($dataHeader['course_code'])) {
         $flagOperation = SessionManager::set_coach_sustitution_to_course_session($userId, $id_session, $dataHeader['course_code']);
 
         Security::clear_token();
@@ -355,10 +355,18 @@ unset($Courses);
 
     function valide(){
         var options = document.getElementById('destination').options;
-        for (i = 0 ; i<options.length ; i++)
+        for (i = 0 ; i<options.length ; i++) {
             options[i].selected = true;
+        }
 
-        document.forms.formulaire.submit();
+        if (options.length == 0) {
+            var messageConfirm = 'You sure you want to save without a substitute coach?';
+            if (window.confirm(messageConfirm)) {
+                document.forms.formulaire.submit();
+            }
+        } else {
+            document.forms.formulaire.submit();
+        }
     }
     -->
 </script>

@@ -1684,52 +1684,51 @@ class SessionManager {
 
     /**
      * Update or Insert Coach Sustitute
-     * @param int $user_id
+     * @param int $user_id WHEN user_id = 0 Not send coach.
      * @param int $session_id
      * @param string $course_code
      * @return bool
      */
     public static function set_coach_sustitution_to_course_session($user_id, $session_id = 0, $course_code = '')
     {
-        // Definition of variables
         $return = true;
         $user_id = intval($user_id);
         $session_id = !empty($session_id) ? intval($session_id) : 0;
 
-        // definitios of tables
         $tbl_session_rel_course_rel_user = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
-        $tbl_session_rel_user = Database::get_main_table(TABLE_MAIN_SESSION_USER);
         $tbl_user    = Database::get_main_table(TABLE_MAIN_USER);
+        $status = ROLE_COACH_SUBSTITUTE;
 
-        // check if user is a teacher
-        $sql= "SELECT * FROM $tbl_user WHERE status='1' AND user_id = '$user_id'";
+        $rs_check_user = Database::query("SELECT * FROM $tbl_user WHERE status='1' AND user_id = '$user_id'");
+        $countUser = Database::num_rows($rs_check_user);
+        $dataSerialNow = array(
+            'admin' => api_get_user_id(),
+            'coach' => $user_id,
+            'session_id' => $session_id,
+            'course_code' => $course_code,
+            'create_at' => api_get_utc_datetime()
+        );
 
-        $rs_check_user = Database::query($sql);
-
-        if (Database::num_rows($rs_check_user) > 0) {
-            $dataSerialNow = array(
-                'admin' => api_get_user_id(),
-                'coach' => $user_id,
-                'session_id' => $session_id,
-                'course_code' => $course_code,
-                'create_at' => api_get_utc_datetime()
-            );
-
+        if ($countUser > 0) {
             event_system('session_substitute', 'MISC', serialize($dataSerialNow), null, null, null, $session_id);
             $flagTransaction = self::_generateNewTransaccion($session_id, $user_id);
             $return = $flagTransaction;
 
             if ($flagTransaction == true) {
                 // Clear record of couch susbtitute for adding one.
-                $status = ROLE_COACH_SUBSTITUTE;
                 $sqlClear = "DELETE FROM $tbl_session_rel_course_rel_user WHERE id_session = '$session_id' ".
                     "AND course_code = '$course_code' AND status = '$status'";
-                $rs_check = Database::query($sqlClear);
+                Database::query($sqlClear);
 
                 $sql = " INSERT INTO $tbl_session_rel_course_rel_user(id_session, course_code, id_user, status) VALUES('$session_id', '$course_code', '$user_id', '$status')";
                 Database::query($sql);
             }
+        } elseif ($countUser == 0) {
+            event_system('session_substitute', 'MISC', serialize($dataSerialNow), null, null, null, $session_id);
 
+            $sqlClear = "DELETE FROM $tbl_session_rel_course_rel_user WHERE id_session = '$session_id' ".
+                "AND course_code = '$course_code' AND status = '$status'";
+            Database::query($sqlClear);
         } else {
             $return = false;
         }

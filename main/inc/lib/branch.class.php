@@ -144,10 +144,39 @@ class Branch
         return $room['id'];
     }
     
+    /**
+     * List all branches
+     * @return array Branches list
+     */
     public static function getAll()
     {
         $branchTable = Database::get_statistic_table(TABLE_BRANCH);
-        
+
         return Database::select('*', $branchTable);
     }
+
+    /**
+     * 
+     * @param type $branchId
+     * @return type
+     */
+    public static function getName($branchId)
+    {
+        $branchTable = Database::get_statistic_table(TABLE_BRANCH);
+
+        $branchResult = Database::select('title', $branchTable, array(
+                    'where' => array(
+                        'id = ?' => intval($branchId)
+                    )
+        ));
+
+        if (!empty($branchResult)) {
+            $branch = current($branchResult);
+
+            return $branch['title'];
+        }
+
+        return get_lang('None');
+    }
+
 } 

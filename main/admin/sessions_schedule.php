@@ -146,9 +146,9 @@ if ($sessions != false) {
                         <th><?php echo get_lang('Room') ?></th>
                         <th><?php echo get_lang('Course') ?></th>
                         <th><?php echo get_lang('Teacher') ?></th>
-                        <th><?php echo get_lang('In') ?></th>
-                        <th><?php echo get_lang('Out') ?></th>
-                        <th><?php echo get_lang('Actions') ?></th>
+                        <th><?php echo get_lang('InAt') ?></th>
+                        <th><?php echo get_lang('OutAt') ?></th>
+                        <th><?php echo get_lang('Substitute') ?></th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -157,9 +157,9 @@ if ($sessions != false) {
                         <th><?php echo get_lang('Room') ?></th>
                         <th><?php echo get_lang('Course') ?></th>
                         <th><?php echo get_lang('Teacher') ?></th>
-                        <th><?php echo get_lang('In') ?></th>
-                        <th><?php echo get_lang('Out') ?></th>
-                        <th><?php echo get_lang('Actions') ?></th>
+                        <th><?php echo get_lang('InAt') ?></th>
+                        <th><?php echo get_lang('OutAt') ?></th>
+                        <th><?php echo get_lang('Substitute') ?></th>
                     </tr>
                 </tfoot>
                 <tbody>

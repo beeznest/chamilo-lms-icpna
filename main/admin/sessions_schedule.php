@@ -200,7 +200,6 @@ if ($sessions != false) {
                                         'id_session' => $session['id'],
                                         'room' => $session['room'],
                                         'course' => $session['course'],
-                                        'coach' => $session['coach'],
                                         'schedule_display' => $session['schedule'],
                                         'course_code' => $session['courseCode']
                                     );

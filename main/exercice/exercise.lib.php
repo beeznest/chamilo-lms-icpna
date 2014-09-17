@@ -2783,46 +2783,34 @@ function getAllExerciseWithExtraFieldPlexPerStudent($studentId, $courseId)
             WHERE
             field_variable = 'plex' and
             exe_user_id = %s and
-            te. status = 'incomplete' and
             c.id = %s";
     $sql = sprintf($sql, $studentId, $courseId);
-    $incompResult = Database::query($sql);
-    if ($incompResult !== false && Database::num_rows($incompResult)) {
-        return array('score' => false, 'course' => 1);
-    }
-    $sql = "SELECT te.*, s.field_value, cq.pass_percentage FROM exercise_field_values s
-            INNER JOIN exercise_field sf ON (s.field_id = sf.id)
-            INNER JOIN c_quiz cq ON cq.c_id = s.c_id and s.exercise_id = cq.id
-            INNER JOIN course c ON c.id = cq.c_id
-            INNER JOIN track_e_exercices te ON te.exe_exo_id = cq.id and te.exe_cours_id = c.code
-            WHERE
-            field_variable = 'plex' and
-            exe_user_id = %s and
-            te. status <> 'incomplete' and
-            c.id = %s
-            ORDER BY te.start_date";
-    $sql = sprintf($sql, $studentId, $courseId);
-
     $result = Database::query($sql);
-
     if ($result !== false && Database::num_rows($result)) {
+        $now = new \DateTime('now');
+        $now = api_get_utc_datetime($now->format('Y-m-d H:i:s'));
         $list = Database::store_result($result, 'ASSOC');
-        $result = array();
-        foreach($list as $exe) {
-            $percentage = getSuccessExerciseResultPercentage
-                                (
-                $exe['exe_result'],
-                $exe['exe_weighting'],
-                                    $exe['pass_percentage']
-                                );
-            if (is_success_exercise_result(
-                $exe['exe_result'],
-                $exe['exe_weighting'],
-                $exe['pass_percentage']
-            )) {
-                $successRs = array('score' => $percentage, 'course' => $exe['field_value']);
+        foreach ($list as $exe) {
+            $expiredAt = $exe['expired_time_control'];
+            if ($expiredAt > $now) {
+
+                return array('score' => false, 'course' => 1);
             } else {
-                $failedRs = array('score' => $percentage, 'course' => 1);
+                $percentage = getSuccessExerciseResultPercentage
+                (
+                    $exe['exe_result'],
+                    $exe['exe_weighting'],
+                    $exe['pass_percentage']
+                );
+                if (is_success_exercise_result(
+                    $exe['exe_result'],
+                    $exe['exe_weighting'],
+                    $exe['pass_percentage']
+                )) {
+                    $successRs = array('score' => $percentage, 'course' => $exe['field_value']);
+                } else {
+                    $failedRs = array('score' => $percentage, 'course' => 1);
+                }
             }
         }
 

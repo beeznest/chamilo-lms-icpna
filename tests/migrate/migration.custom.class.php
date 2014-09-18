@@ -1434,6 +1434,86 @@ class MigrationCustom {
     }
 
     /**
+     * This transaction is used to send substitute teachers
+     * session information
+     * @param $data
+     * @param $webServiceDetails
+     * @return array
+     */
+    static function transaction_537($data, $webServiceDetails) {
+        // Is Disabled because is not completed - refs BT#8566
+        return 537;
+        $tableTrackTeachers = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
+        $tableTrackTeacherAttendance = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
+        $tableUser = Database::get_main_table(TABLE_MAIN_USER);
+        $tableBranchRoom = Database::get_main_table(TABLE_BRANCH_ROOM);
+        $tableBranch = Database::get_main_table(TABLE_BRANCH);
+
+        $whereCondition = array(
+            'where' => array(
+                'id = ?' => array(
+                    $data['id']
+                )
+            )
+        );
+        $dataTrackTeachers = Database::select('*', $tableTrackTeachers, $whereCondition);
+        if (!empty($dataTrackTeachers)) {
+            $sql = "SELECT
+            u.username,
+            br.title as room,
+            tck.log_in_course_date,
+            tck.log_out_course_date,
+            tck.id as track_id
+            FROM
+            $tableTrackTeacherAttendance tck
+            INNER JOIN $tableUser u ON u.user_id = tck.user_id
+            INNER JOIN $tableBranchRoom br ON br.id = tck.room_id
+            WHERE tck.id = {$data['item_id']}
+            ";
+
+            $result = Database::query($sql);
+            while ($row = Database::fetch_array($result)) {
+                $dataTrackInOut = $row;
+            }
+
+            if ($data['dest_id'] == 'IN') {
+                $dataTrackInOut['log_in_course_date'] = api_get_local_time($dataTrackInOut['log_in_course_date']);
+                $dateTime = self::explodeDateTime($dataTrackInOut['log_in_course_date']);
+            } else {
+                $dataTrackInOut['log_out_course_date'] = api_get_local_time($dataTrackInOut['log_out_course_date']);
+                $dateTime = self::explodeDateTime($dataTrackInOut['log_out_course_date']);
+            }
+
+            $wsParams = array(
+                'chraula' => $dataTrackInOut['room'],
+                'vchcodigorrhh' => $dataTrackInOut['username'],
+                'chrtipomarcacion' => $data['dest_id'],
+                'chrfechamarcacion' => $dateTime['date'],
+                'chrhoramarcacion' => $dateTime['time'],
+                'intidsede' => $data['branch_id'],
+                'uidIdPrograma' => $data['dest_id']
+            );
+            $serviceResponse = Migration::soap_call(
+                $webServiceDetails,
+                'insAsistenciaDocente',
+                $wsParams
+            );
+
+            if ($serviceResponse['error'] == false) {
+                return array(
+                    'entity' => 'track_e_teacher_in_out',
+                    'before' => '',
+                    'after'  => '',
+                    'message' => "{$data['dest_id']} sent to ICPNAs WS",
+                    'status_id' => self::TRANSACTION_STATUS_SUCCESSFUL
+                );
+            } else {
+                return $wsParams;
+            }
+        }
+    }
+
+    /**
      * @param $data
      * @param $param
      * @return array

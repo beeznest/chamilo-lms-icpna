@@ -1699,7 +1699,7 @@ class SessionManager {
         $tbl_user    = Database::get_main_table(TABLE_MAIN_USER);
         $status = ROLE_COACH_SUBSTITUTE;
 
-        $rs_check_user = Database::query("SELECT * FROM $tbl_user WHERE status='1' AND user_id = '$user_id'");
+        $rs_check_user = Database::query("SELECT * FROM $tbl_user WHERE status= 1 AND user_id = $user_id");
         $countUser = Database::num_rows($rs_check_user);
         $dataSerialNow = array(
             'admin' => api_get_user_id(),
@@ -1711,7 +1711,7 @@ class SessionManager {
 
         if ($countUser > 0) {
             event_system('session_substitute', 'MISC', serialize($dataSerialNow), null, null, null, $session_id);
-            $flagTransaction = self::_generateNewTransaccion($session_id, $user_id);
+            $flagTransaction = self::_generateNewTransaction($session_id, $user_id);
             $return = $flagTransaction;
 
             if ($flagTransaction == true) {
@@ -1737,9 +1737,9 @@ class SessionManager {
     }
 
     /**
-     * Genera new record,in branch_transaction
+     * Generates a new record in the branch_transaction table
      */
-    private static function _generateNewTransaccion($idSession, $idCoach)
+    private static function _generateNewTransaction($idSession, $idCoach)
     {
         // 01
         $flag = true;
@@ -1760,7 +1760,9 @@ class SessionManager {
 
         //05
         $array['branch_id'] = $branch->getBranchId($idSession);
-        $array['branch_id'] = intval($array['branch_id']) + 500; // value 500  Note (transaction_id, branch_id) key unique
+        // Add a 500000 increment to avoid hitting against existing branches
+        // Note: (transaction_id, branch_id) key unique
+        $array['branch_id'] = intval($array['branch_id']) + 500;
 
         //06
         $transaction_id = 0;

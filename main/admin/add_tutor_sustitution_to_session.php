@@ -1,4 +1,11 @@
 <?php
+/* For licensing terms, see /license.txt */
+/**
+ *	This script allows platform admins and teacher admins to register a
+ * teacher substitution.
+ *	@package chamilo.admin
+ *	@author Anibal Copitan <anibal.copitan@beeznest.com>
+ */
 $language_file='admin';
 // resetting the course id
 $cidReset = true;
@@ -8,6 +15,7 @@ require_once '../inc/global.inc.php';
 if (!api_is_teacher_admin() || intval($_GET['id_session']) <= 0) {
     api_not_allowed(true);
 }
+
 $id_session = intval($_GET['id_session']);
 
 $this_section = IN_OUT_MANAGEMENT;

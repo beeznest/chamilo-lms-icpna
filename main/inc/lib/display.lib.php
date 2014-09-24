@@ -700,7 +700,7 @@ class Display {
         $extra = '';
         $default_id =  'id="'.$name.'" ';
         if (!empty($extra_attributes) && is_array($extra_attributes)) {
-            foreach($extra_attributes as $key=>$parameter) {
+            foreach ($extra_attributes as $key=>$parameter) {
                 if ($key == 'id') {
                     $default_id = '';
                 }

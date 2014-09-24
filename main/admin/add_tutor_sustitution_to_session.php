@@ -5,7 +5,7 @@
  * @author Anibal Copitan <anibal.copitan@beeznest.com>
  * @package chamilo.admin
  */
-
+$language_file = array('admin', 'registration');
 $cidReset = true;
 require_once '../inc/global.inc.php';
 

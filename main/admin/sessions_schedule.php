@@ -36,6 +36,7 @@ if (isset($_REQUEST['branch'])) {
 }
 
 $statusSelected = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'all';
+$selectedSubstitutionStatus = isset($_REQUEST['substitution_status']) ? $_REQUEST['substitution_status'] : 'all';
 
 $branches = array();
 
@@ -70,7 +71,7 @@ if ($_GET['action'] == 'show_message' && true == $check) {
     Security::clear_token();
 }
 
-$sessions = getSessionsList($scheduleIdSelected, $dateSelected, $branchSelected, $statusSelected);
+$sessions = getSessionsList($scheduleIdSelected, $dateSelected, $branchSelected, $statusSelected, $selectedSubstitutionStatus);
 
 if ($sessions != false) {
     ?>
@@ -109,27 +110,53 @@ if ($sessions != false) {
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label" for="alt-date"><?php echo get_lang('Date') . ' ' . get_lang('And') . ' ' . get_lang('Schedule') ?></label>
+        <label class="control-label" for="date"><?php echo get_lang('Date') . ' ' . get_lang('And') . ' ' . get_lang('Schedule') ?></label>
         <div class="controls">
             <?php
-            echo Display::input('date', 'date', $dateSelected, array(
+            $dateInputAttributes = array(
                 'readonly' => '',
                 'id' => 'date',
                 'class' => 'input-small'
-            ))
+            );
+
+            echo Display::input('date', 'date', $dateSelected, $dateInputAttributes);
             ?>
             <?php echo Display::select('schedule', $schedules, $scheduleIdSelected, null, false) ?>
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label" for="status"><?php echo get_lang('Status') ?></label>
+        <label class="control-label" for="status"><?php echo get_lang('InOutStatus') ?></label>
         <div class="controls">
             <?php
-            echo Display::select('status', array(
+            $statusSelectValues = array(
                 'all' => get_lang('All'),
-                'reg' => get_lang('Registrered'),
-                'noreg' => get_lang('NoRegistrered')), $statusSelected, array(
-                'class' => 'input-large'), false)
+                'reg' => get_lang('Registered'),
+                'noreg' => get_lang('NotRegistered')
+            );
+
+            $statusSelectAttributes = array(
+                'class' => 'input-medium'
+            );
+
+            echo Display::select('status', $statusSelectValues, $statusSelected, $statusSelectAttributes, false)
+            ?>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="substitution_status"><?php echo get_lang('SubstitutionStatus') ?></label>
+        <div class="controls">
+            <?php
+            $substitutionStatusSelectValues = array(
+                'all' => get_lang('All'),
+                'with' => get_lang('OnlyWithSubstitution'),
+                'without' => get_lang('OnlyWithoutSubstitution')
+            );
+
+            $substitutionStatusSelectAttributes = array(
+                'class' => 'input-large'
+            );
+
+            echo Display::select('substitution_status', $substitutionStatusSelectValues, $selectedSubstitutionStatus, $substitutionStatusSelectAttributes, false)
             ?>
         </div>
     </div>
@@ -199,6 +226,7 @@ if ($sessions != false) {
                                         'date' => $dateSelected,
                                         'schedule' => $scheduleIdSelected,
                                         'status' => $statusSelected,
+                                        'substitution_status' => $selectedSubstitutionStatus,
                                         'id_session' => $session['id'],
                                         'room' => $session['room'],
                                         'course' => $session['course'],
@@ -234,6 +262,10 @@ if ($sessions != false) {
 <?php
 Display::display_footer();
 
+/**
+ * Get the list of sessions
+ * @return array The list
+ */
 function getSchedulesList()
 {
     $sessionExtras = new ExtraField('session');
@@ -253,6 +285,11 @@ function getSchedulesList()
     return $schedules;
 }
 
+/**
+ * Get the room data (id, title)
+ * @param int $sessionId The session id
+ * @return array The room data. Otherwise return false
+ */
 function getRoom($sessionId)
 {
     $branchRoomTable = Database::get_statistic_table(TABLE_BRANCH_ROOM);
@@ -296,6 +333,12 @@ function getRoom($sessionId)
     return false;
 }
 
+/**
+ * Get the schedule start time
+ * @param string $scheduleDisplayText The schedule
+ * @param string $format The format to get the schedule start
+ * @return array
+ */
 function getScheduleStart($scheduleDisplayText, $format = 'string')
 {
     $scheduleDisplayText = trim($scheduleDisplayText);
@@ -317,6 +360,13 @@ function getScheduleStart($scheduleDisplayText, $format = 'string')
     }
 }
 
+/**
+ * Calculate the income time. Time - 5 minutes
+ * @param string $hours The hours
+ * @param string $minutes The minutes
+ * @param string $format The formart to get the calculated time
+ * @return array The teacher income time. Depending the format
+ */
 function calculateInTime($hours, $minutes, $format = 'string')
 {
     $datetime = new DateTime();
@@ -341,6 +391,15 @@ function calculateInTime($hours, $minutes, $format = 'string')
     }
 }
 
+/**
+ * Get the teacher in/out inside a room for a course in session
+ * @param int $sessionId The session id
+ * @param int $courseId The course id
+ * @param int $roomId The room id
+ * @param date $date The report date
+ * @param array $schedule The schedule data
+ * @return array The in/out data
+ */
 function getInOut($sessionId, $courseId, $roomId, $date, $schedule)
 {
     $trackIOTable = Database::get_statistic_table(TABLE_TRACK_E_TEACHER_IN_OUT);
@@ -360,6 +419,12 @@ function getInOut($sessionId, $courseId, $roomId, $date, $schedule)
     return current($trackResult);
 }
 
+/**
+ * Check if the course in the session has a substitute
+ * @param int $sessionId The session id
+ * @param int $courseCode The course code
+ * @return boolean True has a subtitue
+ */
 function hasSubstitute($sessionId, $courseCode)
 {
     $sql = "SELECT COUNT(1) AS is_io FROM session_rel_course_rel_user "
@@ -380,7 +445,16 @@ function hasSubstitute($sessionId, $courseCode)
     return false;
 }
 
-function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all')
+/**
+ * Get the list of sessions for the in/out and substitution tracking
+ * @param int $scheduleId The schedule id
+ * @param date $date The report date
+ * @param int $branchId The 
+ * @param string $listFilter The filter type for in/out status
+ * @param string $substitutionFilter The filter type for susbtitution status
+ * @return array The list. Otherwise return false
+ */
+function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all', $substitutionFilter = 'all')
 {
     $scheduleFieldOption = new ExtraFieldOption('session');
     $branchFieldOption = new ExtraFieldOption('session');
@@ -402,7 +476,7 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all')
                 . "AND valBr.field_id = '{$branch['field_id']}' "
                 . "AND '$date' BETWEEN DATE(s.access_start_date) AND DATE(s.access_end_date) "
                 . "AND s.id_coach = scu.id_user";
-
+                
         $listResult = Database::query($sql);
 
         $scheduleData = getScheduleStart($schedule['option_display_text'], 'array');
@@ -437,22 +511,37 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all')
                     'out' => empty($inOut) ? null : $inOut['log_out_course_date'],
                     'hasSubstitute' => $hasSubstitute
                 );
-
+                
+                switch ($substitutionFilter) {
+                    case 'with':
+                        if (!$hasSubstitute) {
+                            $row = array();
+                        }
+                        break;
+                    
+                    case 'without':
+                        if ($hasSubstitute) {
+                            $row = array();
+                        }
+                        break;
+                }
+                
                 switch ($listFilter) {
                     case 'reg':
-                        if ($inOut) {
-                            $rows[] = $row;
+                        if (empty($inOut)) {
+                            $row = array();
                         }
                         break;
 
                     case 'noreg':
-                        if (empty($inOut)) {
-                            $rows[] = $row;
+                        if (!empty($inOut)) {
+                            $row = array();
                         }
                         break;
-
-                    default :
-                        $rows[] = $row;
+                }
+                
+                if (!empty($row)) {
+                    $rows[] = $row;
                 }
             }
         }
@@ -463,6 +552,13 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all')
     return false;
 }
 
+/**
+ * Convert the data to array for to be exported
+ * @param int $scheduleId The schedule id
+ * @param date $date The report date
+ * @param int $branchId The branch Id
+ * @return array The converted data
+ */
 function convertToArray($scheduleId, $date, $branchId)
 {
     $extraFieldOption = new ExtraFieldOption('session');
@@ -533,6 +629,13 @@ function convertToArray($scheduleId, $date, $branchId)
     return $arrayData;
 }
 
+/**
+ * Export the data to a XLS file
+ * @param int $scheduleId
+ * @param date $date
+ * @param ind $branchId
+ * @return void;
+ */
 function exportToXLS($scheduleId, $date, $branchId)
 {
     $dataToConvert = convertToArray($scheduleId, $date, $branchId);
@@ -543,6 +646,13 @@ function exportToXLS($scheduleId, $date, $branchId)
     die;
 }
 
+/**
+ * Export the data to a PDF file
+ * @param int $scheduleId The schedule id
+ * @param date $date The report date
+ * @param int $branchId The branch id
+ * @return void;
+ */
 function exportToPDF($scheduleId, $date, $branchId)
 {
     $dataToConvert = convertToArray($scheduleId, $date, $branchId);

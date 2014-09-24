@@ -1413,6 +1413,13 @@ $DisplayColumn = "Show column";
 $LegalAgreementAccepted = "Legal agreement accepted";
 $UniqueAnswerImage = "Unique answer image";
 $MediaQuestion = "Media question";
+$InOut = "In/Out";
 $InAt = "In at";
 $OutAt = "Out at";
+$InOutStatus = "In/Out status";
+$NotRegistered = "Not registered";
+$Registered = "Registered";
+$SubstitutionStatus = "Substitution status";
+$OnlyWithSubstitution = "Only with substitution";
+$OnlyWithoutSubstitution = "Only without substitution";
 ?>

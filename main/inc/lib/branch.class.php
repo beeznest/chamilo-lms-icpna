@@ -156,9 +156,9 @@ class Branch
     }
 
     /**
-     * 
-     * @param type $branchId
-     * @return type
+     * Get the name of the branch from its id
+     * @param int $branchId Branch id
+     * @return string Branch name
      */
     public static function getName($branchId)
     {

@@ -1,7 +1,10 @@
 <?php
 /* For licensing terms, see /license.txt */
 /**
- * 	@package chamilo.admin
+ * Form for the In/Out Management
+ * @author Angel Fernando Quiroz Campos <angel.quiroz@beeznest.com>
+ * @author Anibal Copitan <anibal.copitan@beeznest.com>
+ * @package chamilo.admin
  */
 $language_file = array('admin', 'registration');
 $cidReset = true;

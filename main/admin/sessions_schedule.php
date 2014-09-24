@@ -110,11 +110,13 @@ if ($sessions != false) {
         <label class="control-label" for="alt-date"><?php echo get_lang('Date') . ' ' . get_lang('And') . ' ' . get_lang('Schedule') ?></label>
         <div class="controls">
             <?php
-            echo Display::input('date', 'date', $dateSelected, array(
+            $dateInputAttributes = array(
                 'readonly' => '',
                 'id' => 'date',
                 'class' => 'input-small'
-            ))
+            );
+
+            echo Display::input('date', 'date', $dateSelected, $dateInputAttributes);
             ?>
             <?php echo Display::select('schedule', $schedules, $scheduleIdSelected, null, false) ?>
         </div>
@@ -123,11 +125,17 @@ if ($sessions != false) {
         <label class="control-label" for="status"><?php echo get_lang('Status') ?></label>
         <div class="controls">
             <?php
-            echo Display::select('status', array(
+            $statusSelectValues = array(
                 'all' => get_lang('All'),
-                'reg' => get_lang('Registrered'),
-                'noreg' => get_lang('NoRegistrered')), $statusSelected, array(
-                'class' => 'input-large'), false)
+                'reg' => get_lang('Registered'),
+                'noreg' => get_lang('NotRegistered')
+            );
+
+            $statusSelectAttributes = array(
+                'class' => 'input-medium'
+            );
+
+            echo Display::select('status', $statusSelectValues, $statusSelected, $statusSelectAttributes, false)
             ?>
         </div>
     </div>
@@ -400,7 +408,7 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all')
                 . "AND valBr.field_id = '{$branch['field_id']}' "
                 . "AND '$date' BETWEEN DATE(s.access_start_date) AND DATE(s.access_end_date) "
                 . "AND s.id_coach = scu.id_user";
-
+                
         $listResult = Database::query($sql);
 
         $scheduleData = getScheduleStart($schedule['option_display_text'], 'array');
@@ -435,7 +443,7 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all')
                     'out' => empty($inOut) ? null : $inOut['log_out_course_date'],
                     'hasSubstitute' => $hasSubstitute
                 );
-
+                
                 switch ($listFilter) {
                     case 'reg':
                         if ($inOut) {
@@ -448,9 +456,9 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all')
                             $rows[] = $row;
                         }
                         break;
-
+                
                     default :
-                        $rows[] = $row;
+                    $rows[] = $row;
                 }
             }
         }

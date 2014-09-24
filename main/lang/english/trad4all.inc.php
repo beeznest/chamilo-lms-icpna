@@ -1415,4 +1415,6 @@ $UniqueAnswerImage = "Unique answer image";
 $MediaQuestion = "Media question";
 $InAt = "In at";
 $OutAt = "Out at";
+$NotRegistered = "Not registered";
+$Registered = "Registered";
 ?>

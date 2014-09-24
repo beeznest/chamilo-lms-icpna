@@ -1417,4 +1417,7 @@ $InAt = "In at";
 $OutAt = "Out at";
 $NotRegistered = "Not registered";
 $Registered = "Registered";
+$SubstitutionStatus = "Substitution status";
+$OnlyWithSubstitution = "Only with substitution";
+$OnlyWithoutSubstitution = "Only without substitution";
 ?>

@@ -34,6 +34,7 @@ if (isset($_REQUEST['branch'])) {
 }
 
 $statusSelected = isset($_REQUEST['status']) ? $_REQUEST['status'] : 'all';
+$selectedSubstitutionStatus = isset($_REQUEST['substitution_status']) ? $_REQUEST['substitution_status'] : 'all';
 
 $branches = array();
 
@@ -68,7 +69,7 @@ if ($_GET['action'] == 'show_message' && true == $check) {
     Security::clear_token();
 }
 
-$sessions = getSessionsList($scheduleIdSelected, $dateSelected, $branchSelected, $statusSelected);
+$sessions = getSessionsList($scheduleIdSelected, $dateSelected, $branchSelected, $statusSelected, $selectedSubstitutionStatus);
 
 if ($sessions != false) {
     ?>
@@ -136,6 +137,24 @@ if ($sessions != false) {
             );
 
             echo Display::select('status', $statusSelectValues, $statusSelected, $statusSelectAttributes, false)
+            ?>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="substitution_status"><?php echo get_lang('SubstitutionStatus') ?></label>
+        <div class="controls">
+            <?php
+            $substitutionStatusSelectValues = array(
+                'all' => get_lang('All'),
+                'with' => get_lang('OnlyWithSubstitution'),
+                'without' => get_lang('OnlyWithoutSubstitution')
+            );
+
+            $substitutionStatusSelectAttributes = array(
+                'class' => 'input-large'
+            );
+
+            echo Display::select('substitution_status', $substitutionStatusSelectValues, $selectedSubstitutionStatus, $substitutionStatusSelectAttributes, false)
             ?>
         </div>
     </div>
@@ -386,7 +405,7 @@ function hasSubstitute($sessionId, $courseCode)
     return false;
 }
 
-function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all')
+function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all', $substitutionFilter = 'all')
 {
     $scheduleFieldOption = new ExtraFieldOption('session');
     $branchFieldOption = new ExtraFieldOption('session');
@@ -444,20 +463,35 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all')
                     'hasSubstitute' => $hasSubstitute
                 );
                 
+                switch ($substitutionFilter) {
+                    case 'with':
+                        if (!$hasSubstitute) {
+                            $row = array();
+                        }
+                        break;
+                    
+                    case 'without':
+                        if ($hasSubstitute) {
+                            $row = array();
+                        }
+                        break;
+                }
+                
                 switch ($listFilter) {
                     case 'reg':
-                        if ($inOut) {
-                            $rows[] = $row;
+                        if (empty($inOut)) {
+                            $row = array();
                         }
                         break;
 
                     case 'noreg':
-                        if (empty($inOut)) {
-                            $rows[] = $row;
+                        if (!empty($inOut)) {
+                            $row = array();
                         }
                         break;
+                }
                 
-                    default :
+                if (!empty($row)) {
                     $rows[] = $row;
                 }
             }

@@ -224,6 +224,7 @@ if ($sessions != false) {
                                         'date' => $dateSelected,
                                         'schedule' => $scheduleIdSelected,
                                         'status' => $statusSelected,
+                                        'substitution_status' => $selectedSubstitutionStatus,
                                         'id_session' => $session['id'],
                                         'room' => $session['room'],
                                         'course' => $session['course'],

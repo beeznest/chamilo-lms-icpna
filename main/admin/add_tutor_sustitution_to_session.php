@@ -153,7 +153,8 @@ if (isset($_POST['formSent']) && $_POST['formSent']) {
                 'schedule' => $dataHeader['schedule'],
                 'branch' => $dataHeader['branch'],
                 'date' => $dataHeader['date'],
-                'status' => $dataHeader['status']
+                'status' => $dataHeader['status'],
+                'substitution_status' => $dataHeader['substitution_status']
             );
             
             header('Location: sessions_schedule.php?' . http_build_query($redirectParams));

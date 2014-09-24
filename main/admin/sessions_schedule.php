@@ -123,7 +123,7 @@ if ($sessions != false) {
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label" for="status"><?php echo get_lang('Status') ?></label>
+        <label class="control-label" for="status"><?php echo get_lang('InOutStatus') ?></label>
         <div class="controls">
             <?php
             $statusSelectValues = array(

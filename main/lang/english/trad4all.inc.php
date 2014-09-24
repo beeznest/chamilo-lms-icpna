@@ -1415,6 +1415,7 @@ $UniqueAnswerImage = "Unique answer image";
 $MediaQuestion = "Media question";
 $InAt = "In at";
 $OutAt = "Out at";
+$InOutStatus = "In Out status";
 $NotRegistered = "Not registered";
 $Registered = "Registered";
 $SubstitutionStatus = "Substitution status";

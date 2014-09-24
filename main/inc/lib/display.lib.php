@@ -699,11 +699,13 @@ class Display {
         $html = '';
         $extra = '';
         $default_id =  'id="'.$name.'" ';
-        foreach($extra_attributes as $key=>$parameter) {
-            if ($key == 'id') {
-                $default_id = '';
+        if (!empty($extra_attributes) && is_array($extra_attributes)) {
+            foreach($extra_attributes as $key=>$parameter) {
+                if ($key == 'id') {
+                    $default_id = '';
+                }
+                $extra .= $key.'="'.$parameter.'"';
             }
-            $extra .= $key.'="'.$parameter.'"';
         }
         $html .= '<select name="'.$name.'" '.$default_id.' '.$extra.'>';
 

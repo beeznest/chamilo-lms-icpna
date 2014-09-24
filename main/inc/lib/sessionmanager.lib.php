@@ -2591,6 +2591,20 @@ class SessionManager {
         return 0;
     }
 
+    static function getSessionCourseCoachesSubstitute($courseCode, $sessionId)
+    {
+        $tblUser = Database::get_main_table(TABLE_MAIN_USER);
+        $tblSessionRelCourseRelUser    = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);        
+        $rolSubstitute = ROLE_COACH_SUBSTITUTE;
+
+        $sql = "SELECT sr.id_user, u.lastname, u.firstname, u.username FROM  $tblSessionRelCourseRelUser sr
+        INNER JOIN user u on sr.id_user = u.user_id
+        WHERE sr.id_session = '$sessionId'
+        AND sr.course_code = '" . $courseCode . "'
+        AND sr.status = '$rolSubstitute' ";
+
+        return Database::query($sql);
+    }
     /**
      * Get the list of coaches (only user ids)
      * @param string course_code

@@ -13,6 +13,8 @@ if (!api_is_teacher_admin()) {
     api_not_allowed(true);
 }
 
+$this_section = IN_OUT_MANAGEMENT;
+
 // setting breadcrumbs
 $interbreadcrumb[] = array('url' => 'index.php', 'name' => get_lang('PlatformAdmin'));
 $interbreadcrumb[] = array('url' => '#', 'name' => get_lang('InOut'));

@@ -108,7 +108,7 @@ if ($sessions != false) {
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label" for="alt-date"><?php echo get_lang('Date') . ' ' . get_lang('And') . ' ' . get_lang('Schedule') ?></label>
+        <label class="control-label" for="date"><?php echo get_lang('Date') . ' ' . get_lang('And') . ' ' . get_lang('Schedule') ?></label>
         <div class="controls">
             <?php
             $dateInputAttributes = array(

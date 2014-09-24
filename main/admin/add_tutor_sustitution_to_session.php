@@ -1,4 +1,10 @@
 <?php
+/* For licensing terms, see /license.txt */
+/**
+ * Form for the In/Out Management
+ * @author Anibal Copitan <anibal.copitan@beeznest.com>
+ * @package chamilo.admin
+ */
 
 $cidReset = true;
 require_once '../inc/global.inc.php';
@@ -61,7 +67,7 @@ if (isset($_POST['formSent']) && $_POST['formSent']) {
     $userId  = (!empty($_POST['usersList'][0])) ? $_POST['usersList'][0] : 0;
     $errorMsg = (0 == $userId) ? get_lang('SelectedCoachSubstituteError') : '';
     if ($userId >= 0 && $idSession > 0  && !empty($dataHeader['course_code'])) {
-        $flagOperation = SessionManager::set_coach_sustitution_to_course_session($userId, $idSession, $dataHeader['course_code']);
+        $flagOperation = SessionManager::setCoachSustitutionToCourseSession($userId, $idSession, $dataHeader['course_code']);
 
         Security::clear_token();
         $tok = Security::get_token();

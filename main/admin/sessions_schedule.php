@@ -1,7 +1,10 @@
 <?php
 /* For licensing terms, see /license.txt */
 /**
- * 	@package chamilo.admin
+ * Form for the In/Out Management
+ * @author Angel Fernando Quiroz Campos <angel.quiroz@beeznest.com>
+ * @author Anibal Copitan <anibal.copitan@beeznest.com>
+ * @package chamilo.admin
  */
 $language_file = array('admin', 'registration');
 $cidReset = true;
@@ -14,6 +17,8 @@ if (!api_is_teacher_admin()) {
 }
 
 $this_section = IN_OUT_MANAGEMENT;
+
+
 
 // setting breadcrumbs
 $interbreadcrumb[] = array('url' => 'index.php', 'name' => get_lang('PlatformAdmin'));

@@ -103,24 +103,24 @@ if (!empty($message)) {
 $session_info = SessionManager::fetch($idSession);
 $coacheNames = SessionManager::get_session_course_coaches_to_string($dataHeader['course_code'], $dataHeader['id_session']);
 
-$headerInformation = <<<EOD
-<table class="data_table">
+$headerInformation = "".
+"<table class=\"data_table\">
     <tr>
-        <td>Course</td>
-        <td colspan="3"><strong>{$dataHeader['course']}</strong></td>
-        <td>Room</td>
+        <td>" . get_lang('Course') . "</td>
+        <td colspan=\"3\"><strong>{$dataHeader['course']}</strong></td>
+        <td>" . get_lang('Room') . "</td>
         <td><strong>{$dataHeader['room']}</strong></td>
     </tr>
     <tr>
-        <td>Date</td>
+        <td>" . get_lang('Date') . "</td>
         <td><strong>{$dataHeader['date']}</strong></td>
-        <td>Schedule</td>
+        <td>" . get_lang('Schedule') . "</td>
         <td><strong>{$dataHeader['schedule_display']}</strong></td>
-        <td>Teacher</td>
+        <td>" . get_lang('Teacher') . "</td>
         <td><strong>$coacheNames</strong></td>
     </tr>
-</table>
-EOD;
+</table>";
+
 echo $headerInformation;
 
 $sessionCoach = array();

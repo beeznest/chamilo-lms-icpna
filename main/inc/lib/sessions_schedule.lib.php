@@ -96,6 +96,7 @@ function getScheduleList($date, $branchId) {
             $schedules[$scheduleId] = getFormatedSchedule($fieldValueData['option_display_text']);
         }
     }
+    asort($schedules, SORT_STRING );
 
     return $schedules;
 }

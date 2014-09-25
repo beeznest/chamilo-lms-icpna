@@ -2602,17 +2602,25 @@ class SessionManager {
         return 0;
     }
 
-    static function getSessionCourseCoachesSubstitute($courseCode, $sessionId)
+    /**
+     * Get the list of substitute coaches by course in session in the date
+     * @param string $courseCode The course code
+     * @param int $sessionId The session id
+     * @param date $date The report date
+     * @return resource The mysql resource
+     */
+    static function getSessionCourseCoachesSubstitute($courseCode, $sessionId, $date)
     {
         $tblUser = Database::get_main_table(TABLE_MAIN_USER);
-        $tblSessionRelCourseRelUser    = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);        
+        $tblSessionRelCourseRelUserRelDate    = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER_DATE);        
         $rolSubstitute = ROLE_COACH_SUBSTITUTE;
 
-        $sql = "SELECT sr.id_user, u.lastname, u.firstname, u.username FROM  $tblSessionRelCourseRelUser sr
-        INNER JOIN user u on sr.id_user = u.user_id
-        WHERE sr.id_session = '$sessionId'
-        AND sr.course_code = '" . $courseCode . "'
-        AND sr.status = '$rolSubstitute' ";
+        $sql = "SELECT sr.user_id, u.lastname, u.firstname, u.username FROM  $tblSessionRelCourseRelUserRelDate sr "
+                . "INNER JOIN user u on sr.user_id = u.user_id "
+                . "WHERE sr.session_id = '$sessionId' "
+                . "AND sr.course_code = '$courseCode' "
+                . "AND sr.status = '$rolSubstitute' "
+                . "AND sr.date = '$date'";
 
         return Database::query($sql);
     }

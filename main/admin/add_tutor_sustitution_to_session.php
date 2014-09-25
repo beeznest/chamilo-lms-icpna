@@ -125,7 +125,7 @@ $sessionCoach = array();
 $sqlNotIn = '';
 if ($idSession > 0 && !empty($dataHeader['course_code'])) {
 
-    $resultSubs = SessionManager::getSessionCourseCoachesSubstitute($dataHeader['course_code'], $idSession);
+    $resultSubs = SessionManager::getSessionCourseCoachesSubstitute($dataHeader['course_code'], $idSession, $dataHeader['date']);
     $userSubstitute = array();
     if (Database::num_rows($resultSubs) > 0) {
         $sqlNotIn = ' AND u.user_id NOT IN (';

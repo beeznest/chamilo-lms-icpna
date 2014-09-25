@@ -11,6 +11,7 @@ $cidReset = true;
 
 require_once '../inc/global.inc.php';
 require_once api_get_path(LIBRARY_PATH) . 'export.lib.inc.php';
+require_once api_get_path(LIBRARY_PATH) . 'sessions_schedule.lib.php';
 
 if (!api_is_teacher_admin()) {
     api_not_allowed(true);
@@ -45,17 +46,37 @@ foreach (Branch::getAll() as $branchId => $branch) {
     $branches[$branchId] = $branch['title'];
 }
 
-$schedules = getSchedulesList();
+$schedules = getScheduleList($dateSelected, $branchSelected);
 
-$htmlHeadXtra[] = <<<EOD
-<script>
+$htmlHeadXtra[] = "" .
+"<script>
     $(document).on('ready', function() {
         $('#date').datepicker({
             dateFormat: 'yy-mm-dd'
         });
+
+        $('#date').on('change', function () {
+            var url = '" . api_get_path(WEB_AJAX_PATH) . "sessions_schedule.ajax.php';
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'json',
+                data: {
+                    date: $('#date').val(),
+                    branch: $('#branch').val()
+                },
+                success: function (response) {
+                    $('#schedule').empty();
+
+                    $.each(response, function (index, schedule){
+                        $('#schedule').append('<option value=\"' + schedule.id + '\">' + schedule.optionDisplayText + '</option>');
+                    });
+                }
+            });
+        });
     });
-</script>
-EOD;
+</script>";
 
 if ($_GET['action'] == 'export') {
     if ($_GET['type'] == 'xls') {

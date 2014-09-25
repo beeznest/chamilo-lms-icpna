@@ -2948,17 +2948,19 @@ class SessionManager {
      * Get the list of substitute coaches (only user ids)
      * @param int $courseCode Course code
      * @param int $sessionId Session id
+     * @param date $date The report date
      * @return array Substitue coaches. Otherwise return false
      */
-    static public function getSessionCourseSubstituteCoaches($courseCode, $sessionId)
+    static public function getSessionCourseSubstituteCoaches($courseCode, $sessionId, $date)
     {
-        $sessionCourseUserTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
+        $sessionCourseUserDateTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER_DATE);
 
-        $usersId = Database::select('id_user', $sessionCourseUserTable, array(
+        $usersId = Database::select('user_id', $sessionCourseUserDateTable, array(
                     'where' => array(
-                        'id_session = ? AND ' => intval($sessionId),
+                        'session_id = ? AND ' => intval($sessionId),
                         'course_code = ? AND ' => Database::escape_string($courseCode),
-                        'status = ?' => ROLE_COACH_SUBSTITUTE
+                        'status = ? AND ' => ROLE_COACH_SUBSTITUTE,
+                        "date = '?'" => $date
                     )
         ));
 
@@ -2969,16 +2971,17 @@ class SessionManager {
      * Get the info of substitute coaches
      * @param int $courseCode Course code
      * @param int $sessionId Session id
+     * @param date $date The report date
      * @return string Names
      */
-    static public function getSessionCourseSubstituteCoachesWithInfo($courseCode, $sessionId)
+    static public function getSessionCourseSubstituteCoachesWithInfo($courseCode, $sessionId, $date)
     {
         $coaches = array();
-        $usersId = self::getSessionCourseSubstituteCoaches($courseCode, $sessionId);
+        $usersId = self::getSessionCourseSubstituteCoaches($courseCode, $sessionId, $date);
 
         if (!empty($usersId)) {
             foreach ($usersId as $userId) {
-                $coaches[] = api_get_user_info($userId['id_user']);
+                $coaches[] = api_get_user_info($userId['user_id']);
             }
         }
 

@@ -233,7 +233,7 @@ if ($sessions != false) {
                                     }
 
                                     if ($session['hasSubstitute']) {
-                                        foreach ($session['susbtitutes'] as $coachSubstitute) {
+                                        foreach ($session['substitutes'] as $coachSubstitute) {
                                             $profileURL = api_get_path(WEB_PATH) . "main/social/profile.php?u=" . $coachSubstitute['user_id'];
                                             ?>
                                             <strong>
@@ -260,10 +260,10 @@ if ($sessions != false) {
                                         'course_code' => $session['courseCode']
                                     );
 
-                                    $addSusbtituteFormURL = api_get_path(WEB_PATH) . 'main/admin/add_tutor_sustitution_to_session.php';
-                                    $addSusbtituteFormURL .= '?' . http_build_query($urlParams);
+                                    $addSubstituteFormURL = api_get_path(WEB_PATH) . 'main/admin/add_tutor_sustitution_to_session.php';
+                                    $addSubstituteFormURL .= '?' . http_build_query($urlParams);
                                     ?>
-                                    <a href="<?php echo $addSusbtituteFormURL ?>">
+                                    <a href="<?php echo $addSubstituteFormURL ?>">
                                         <?php
                                         if ($session['hasSubstitute']) {
                                             echo Display::display_icon('group.gif', get_lang('Substitute'));
@@ -477,7 +477,7 @@ function hasSubstitute($sessionId, $courseCode)
  * @param date $date The report date
  * @param int $branchId The 
  * @param string $listFilter The filter type for in/out status
- * @param string $substitutionFilter The filter type for susbtitution status
+ * @param string $substitutionFilter The filter type for substitution status
  * @return array The list. Otherwise return false
  */
 function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all', $substitutionFilter = 'all')
@@ -523,7 +523,7 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all', $su
                 $inOut = getInOut($session['id'], $course['id'], $room['id'], $date, $scheduleData);
                 $hasSubstitute = hasSubstitute($session['id'], $course['code']);
 
-                $substitutes = SessionManager::getSessionCourseSusbtituteCoachesWithInfo($course['code'], $session['id']);
+                $substitutes = SessionManager::getSessionCourseSubstituteCoachesWithInfo($course['code'], $session['id']);
 
                 $row = array(
                     'id' => $session['id'],
@@ -532,7 +532,7 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all', $su
                     'courseCode' => $course['code'],
                     'schedule' => $schedule['option_display_text'],
                     'coaches' => $coaches,
-                    'susbtitutes' => $substitutes,
+                    'substitutes' => $substitutes,
                     'in' => empty($inOut) ? null : $inOut['log_in_course_date'],
                     'out' => empty($inOut) ? null : $inOut['log_out_course_date'],
                     'hasSubstitute' => $hasSubstitute
@@ -642,7 +642,7 @@ function convertToArray($scheduleId, $date, $branchId)
         if ($session['hasSubstitute']) {
             $substituteNames = array();
 
-            foreach ($session['susbtitutes'] as $substitute) {
+            foreach ($session['substitutes'] as $substitute) {
                 $substituteNames[] = $substitute['complete_name_with_username'];
             }
 

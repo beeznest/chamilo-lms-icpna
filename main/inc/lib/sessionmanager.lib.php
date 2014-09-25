@@ -1715,7 +1715,7 @@ class SessionManager {
             $return = $flagTransaction;
 
             if ($flagTransaction == true) {
-                // Clear record of couch susbtitute for adding one.
+                // Clear record of couch substitute for adding one.
                 $sqlClear = "DELETE FROM $tbl_session_rel_course_rel_user WHERE id_session = '$sessionId' ".
                     "AND course_code = '$courseCode' AND status = $status ";
                 Database::query($sqlClear);
@@ -2965,7 +2965,7 @@ class SessionManager {
      * @param int $sessionId Session id
      * @return string Names
      */
-    static public function getSessionCourseSusbtituteCoachesWithInfo($courseCode, $sessionId)
+    static public function getSessionCourseSubstituteCoachesWithInfo($courseCode, $sessionId)
     {
         $coaches = array();
         $usersId = self::getSessionCourseSubstituteCoaches($courseCode, $sessionId);

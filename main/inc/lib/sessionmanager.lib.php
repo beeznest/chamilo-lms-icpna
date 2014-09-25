@@ -1684,50 +1684,50 @@ class SessionManager {
 
     /**
      * Update or Insert Coach Sustitute
-     * @param int $user_id WHEN user_id = 0 Not send coach.
-     * @param int $session_id
-     * @param string $course_code
+     * @param int $userId when user_id = 0 Not send coach.
+     * @param int $sessionId id session
+     * @param string $courseCode code course
      * @return bool
      */
-    public static function set_coach_sustitution_to_course_session($user_id, $session_id = 0, $course_code = '')
+    public static function setCoachSustitutionToCourseSession($userId, $sessionId = 0, $courseCode = '')
     {
         $return = true;
-        $user_id = intval($user_id);
-        $session_id = !empty($session_id) ? intval($session_id) : 0;
+        $userId = intval($userId);
+        $sessionId = !empty($sessionId) ? intval($sessionId) : 0;
 
         $tbl_session_rel_course_rel_user = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
-        $tbl_user    = Database::get_main_table(TABLE_MAIN_USER);
+        $tbl_user = Database::get_main_table(TABLE_MAIN_USER);
         $status = ROLE_COACH_SUBSTITUTE;
 
-        $rs_check_user = Database::query("SELECT * FROM $tbl_user WHERE status='1' AND user_id = '$user_id'");
+        $rs_check_user = Database::query("SELECT * FROM $tbl_user WHERE status = 1 AND user_id = '$userId'");
         $countUser = Database::num_rows($rs_check_user);
         $dataSerialNow = array(
             'admin' => api_get_user_id(),
-            'coach' => $user_id,
-            'session_id' => $session_id,
-            'course_code' => $course_code,
+            'coach' => $userId,
+            'session_id' => $sessionId,
+            'course_code' => $courseCode,
             'create_at' => api_get_utc_datetime()
         );
 
         if ($countUser > 0) {
-            event_system('session_substitute', 'MISC', serialize($dataSerialNow), null, null, null, $session_id);
-            $flagTransaction = self::_generateNewTransaccion($session_id, $user_id);
-            $return = $flagTransaction;
+            event_system('session_substitute', 'MISC', serialize($dataSerialNow), null, null, null, $sessionId);
+            $flagTransaccion = self::_generateNewTransaccion($sessionId, $userId);
+            $return = $flagTransaccion;
 
-            if ($flagTransaction == true) {
+            if ($flagTransaccion == true) {
                 // Clear record of couch susbtitute for adding one.
-                $sqlClear = "DELETE FROM $tbl_session_rel_course_rel_user WHERE id_session = '$session_id' ".
-                    "AND course_code = '$course_code' AND status = '$status'";
+                $sqlClear = "DELETE FROM $tbl_session_rel_course_rel_user WHERE id_session = '$sessionId' ".
+                    "AND course_code = '$courseCode' AND status = $status ";
                 Database::query($sqlClear);
 
-                $sql = " INSERT INTO $tbl_session_rel_course_rel_user(id_session, course_code, id_user, status) VALUES('$session_id', '$course_code', '$user_id', '$status')";
+                $sql = " INSERT INTO $tbl_session_rel_course_rel_user(id_session, course_code, id_user, status) VALUES($sessionId, '$courseCode', $userId, $status)";
                 Database::query($sql);
             }
         } elseif ($countUser == 0) {
-            event_system('session_substitute', 'MISC', serialize($dataSerialNow), null, null, null, $session_id);
+            event_system('session_substitute', 'MISC', serialize($dataSerialNow), null, null, null, $sessionId);
 
-            $sqlClear = "DELETE FROM $tbl_session_rel_course_rel_user WHERE id_session = '$session_id' ".
-                "AND course_code = '$course_code' AND status = '$status'";
+            $sqlClear = "DELETE FROM $tbl_session_rel_course_rel_user WHERE id_session = '$sessionId' ".
+                "AND course_code = '$courseCode' AND status = $status";
             Database::query($sqlClear);
         } else {
             $return = false;
@@ -1737,9 +1737,12 @@ class SessionManager {
     }
 
     /**
-     * Genera new record,in branch_transaction
+     * Generates a new record in the branch_transaction table
+     * @param int $idSession id session
+     * @param int $idCoach id
+     * @return bool
      */
-    private static function _generateNewTransaccion($idSession, $idCoach)
+    private static function _generateNewTransaction($idSession, $idCoach)
     {
         // 01
         $flag = true;
@@ -1760,38 +1763,40 @@ class SessionManager {
 
         //05
         $array['branch_id'] = $branch->getBranchId($idSession);
-        $array['branch_id'] = intval($array['branch_id']) + 500; // value 500  Note (transaction_id, branch_id) key unique
+        // Add a 500000 increment to avoid hitting against existing branches
+        // Note: (transaction_id, branch_id) key unique
+        $array['branch_id'] = intval($array['branch_id']) + 500;
 
         //06
-        $transaction_id = 0;
+        $transactionId = 0;
         $sqlMaxOne = "SELECT MAX(transaction_id) transaction_id FROM branch_transaction LIMIT 1";
         $rMaxOne = Database::query($sqlMaxOne);
         if (Database::num_rows($rMaxOne) > 0) {
             while ($row = Database::fetch_assoc($rMaxOne)) {
-                $transaction_id = intval($row['transaction_id']) + 1;
+                $transactionId = intval($row['transaction_id']) + 1;
             }
         } else {
-            $transaction_id = $transaction_id + 1;
+            $transactionId = $transactionId + 1;
         }
-        $array['transaction_id'] = $transaction_id;
+        $array['transaction_id'] = $transactionId;
 
         //07
         $array['status_id'] = 1;
 
         //08
-        $session_field = 0;
+        $sessionField = 0;
         $sqlFieldId = "SELECT id, field_variable FROM session_field";
         $r = Database::query($sqlFieldId);
         while ($row = Database::fetch_assoc($r)) {
             if ($row['field_variable'] == 'horario') {
-                $session_field = $row['id'];
+                $sessionField = $row['id'];
                 break;
             }
         }
 
-        if (!empty($session_field)) {
+        if (!empty($sessionField)) {
             $obj = new SessionFieldValue();
-            $result = $obj->get_values_by_handler_and_field_id($idSession, $session_field, false);
+            $result = $obj->get_values_by_handler_and_field_id($idSession, $sessionField, false);
             $array['info'] = $result['field_value'];
         } else {
             $flag = false;
@@ -1799,7 +1804,7 @@ class SessionManager {
 
         // 09
         $array['time_insert'] = api_get_utc_datetime(); //api_get_local_time();
-        $last_id = false;
+        $lastId = false;
         if ($flag && is_array($array) && count($array) > 0) {
             $fields = '';
             $values = '';
@@ -1812,10 +1817,10 @@ class SessionManager {
 
             $sql = "INSERT INTO branch_transaction ($fields) VALUES ($values)";
             $result = Database::query($sql) or die (Database::error());
-            $last_id = Database::insert_id();
+            $lastId = Database::insert_id();
         }
 
-        return ($flag == true && ($last_id > 0)) ? true : false;
+        return ($flag == true && ($lastId > 0)) ? true : false;
     }
 
 
@@ -2591,6 +2596,20 @@ class SessionManager {
         return 0;
     }
 
+    static function getSessionCourseCoachesSubstitute($courseCode, $sessionId)
+    {
+        $tblUser = Database::get_main_table(TABLE_MAIN_USER);
+        $tblSessionRelCourseRelUser    = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);        
+        $rolSubstitute = ROLE_COACH_SUBSTITUTE;
+
+        $sql = "SELECT sr.id_user, u.lastname, u.firstname, u.username FROM  $tblSessionRelCourseRelUser sr
+        INNER JOIN user u on sr.id_user = u.user_id
+        WHERE sr.id_session = '$sessionId'
+        AND sr.course_code = '" . $courseCode . "'
+        AND sr.status = '$rolSubstitute' ";
+
+        return Database::query($sql);
+    }
     /**
      * Get the list of coaches (only user ids)
      * @param string course_code

@@ -15,7 +15,8 @@
  * @param date $date The date
  * @return array The session list
  */
-function getSessionIdByDate($date, $branchId) {
+function getSessionIdByDate($date, $branchId)
+{
     $sessionTable = Database::get_main_table(TABLE_MAIN_SESSION);
     $fieldOptionTable = Database::get_main_table(TABLE_MAIN_SESSION_FIELD_OPTIONS);
     $fieldValueTable = Database::get_main_table(TABLE_MAIN_SESSION_FIELD_VALUES);
@@ -48,7 +49,8 @@ function getSessionIdByDate($date, $branchId) {
  * @param string $displayText The display text
  * @return string The formated display text
  */
-function getFormatedSchedule($displayText) {
+function getFormatedSchedule($displayText)
+{
     $displayText = trim($displayText);
     $parts = preg_split("/(\ )+/", $displayText);
 
@@ -69,7 +71,8 @@ function getFormatedSchedule($displayText) {
  * @param int $branchId The branch id
  * @return array The list
  */
-function getScheduleList($date, $branchId) {
+function getScheduleList($date, $branchId)
+{
     $schedules = array();
 
     $sessionsId = getSessionIdByDate($date, $branchId);
@@ -92,7 +95,7 @@ function getScheduleList($date, $branchId) {
     if ($fieldsResult != false) {
         while ($fieldValueData = Database::fetch_assoc($fieldsResult)) {
             $scheduleId = $fieldValueData['id'];
-            
+
             $schedules[$scheduleId] = getFormatedSchedule($fieldValueData['option_display_text']);
         }
     }

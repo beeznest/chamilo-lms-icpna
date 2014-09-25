@@ -1700,7 +1700,7 @@ class SessionManager {
         $date = Database::escape_string($date);
 
         $tbl_session_rel_course_rel_user = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
-        $sessionCourseUserTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER_DATE);
+        $sessionCourseUserDateTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER_DATE);
         $tbl_user = Database::get_main_table(TABLE_MAIN_USER);
         $status = ROLE_COACH_SUBSTITUTE;
 
@@ -1728,7 +1728,7 @@ class SessionManager {
                 $sql = " INSERT INTO $tbl_session_rel_course_rel_user(id_session, course_code, id_user, status) VALUES($sessionId, '$courseCode', $userId, $status)";
                 Database::query($sql);
 
-                $sql = "INSERT INTO $sessionCourseUserTable(session_id, course_id, user_id, status, date) VALUES ($sessionId, $courseId, $userId, $status, '$date')";
+                $sql = "INSERT INTO $sessionCourseUserDateTable(session_id, course_id, user_id, status, date) VALUES ($sessionId, $courseId, $userId, $status, '$date')";
                 Database::query($sql);
             }
         } elseif ($countUser == 0) {

@@ -1711,10 +1711,10 @@ class SessionManager {
 
         if ($countUser > 0) {
             event_system('session_substitute', 'MISC', serialize($dataSerialNow), null, null, null, $sessionId);
-            $flagTransaccion = self::_generateNewTransaccion($sessionId, $userId);
-            $return = $flagTransaccion;
+            $flagTransaction = self::_generateNewTransaction($sessionId, $userId);
+            $return = $flagTransaction;
 
-            if ($flagTransaccion == true) {
+            if ($flagTransaction == true) {
                 // Clear record of couch susbtitute for adding one.
                 $sqlClear = "DELETE FROM $tbl_session_rel_course_rel_user WHERE id_session = '$sessionId' ".
                     "AND course_code = '$courseCode' AND status = $status ";

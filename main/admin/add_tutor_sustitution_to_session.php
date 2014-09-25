@@ -107,11 +107,13 @@ $headerInformation = <<<EOD
 <table class="data_table">
     <tr>
         <td>Course</td>
-        <td><strong>{$dataHeader['course']}</strong></td>
+        <td colspan="3"><strong>{$dataHeader['course']}</strong></td>
         <td>Room</td>
         <td><strong>{$dataHeader['room']}</strong></td>
     </tr>
     <tr>
+        <td>Date</td>
+        <td><strong>{$dataHeader['date']}</strong></td>
         <td>Schedule</td>
         <td><strong>{$dataHeader['schedule_display']}</strong></td>
         <td>Teacher</td>

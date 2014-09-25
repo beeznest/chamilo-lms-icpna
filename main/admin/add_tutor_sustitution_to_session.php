@@ -68,7 +68,7 @@ if (isset($_POST['formSent']) && $_POST['formSent']) {
     $userId  = (!empty($_POST['usersList'][0])) ? $_POST['usersList'][0] : 0;
     $errorMsg = (0 == $userId) ? get_lang('SelectedCoachSubstituteError') : '';
     if ($userId >= 0 && $idSession > 0  && !empty($dataHeader['course_code'])) {
-        $flagOperation = SessionManager::setCoachSustitutionToCourseSession($userId, $idSession, $dataHeader['course_code']);
+        $flagOperation = SessionManager::setCoachSustitutionToCourseSession($userId, $idSession, $dataHeader['course_code'], $dataHeader['date']);
 
         Security::clear_token();
         $tok = Security::get_token();

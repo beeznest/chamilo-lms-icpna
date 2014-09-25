@@ -1687,15 +1687,20 @@ class SessionManager {
      * @param int $userId when user_id = 0 Not send coach.
      * @param int $sessionId id session
      * @param string $courseCode code course
+     * @param date $date The substitution date
      * @return bool
      */
-    public static function setCoachSustitutionToCourseSession($userId, $sessionId = 0, $courseCode = '')
+    public static function setCoachSustitutionToCourseSession($userId, $sessionId = 0, $courseCode = '', $date)
     {
         $return = true;
         $userId = intval($userId);
         $sessionId = !empty($sessionId) ? intval($sessionId) : 0;
+        $courseId = CourseManager::get_course_information($courseCode);
+        $courseId = $courseId['id'];
+        $date = Database::escape_string($date);
 
         $tbl_session_rel_course_rel_user = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
+        $sessionCourseUserTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER_DATE);
         $tbl_user = Database::get_main_table(TABLE_MAIN_USER);
         $status = ROLE_COACH_SUBSTITUTE;
 
@@ -1721,6 +1726,9 @@ class SessionManager {
                 Database::query($sqlClear);
 
                 $sql = " INSERT INTO $tbl_session_rel_course_rel_user(id_session, course_code, id_user, status) VALUES($sessionId, '$courseCode', $userId, $status)";
+                Database::query($sql);
+
+                $sql = "INSERT INTO $sessionCourseUserTable(session_id, course_id, user_id, status, date) VALUES ($sessionId, $courseId, $userId, $status, '$date')";
                 Database::query($sql);
             }
         } elseif ($countUser == 0) {

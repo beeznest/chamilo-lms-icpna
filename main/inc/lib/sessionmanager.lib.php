@@ -1728,10 +1728,10 @@ class SessionManager {
                 Database::query($sql);
                 
                 $sqlClear = "DELETE FROM $sessionCourseUserDateTable WHERE session_id = $sessionId ".
-                    "AND course_id = $courseId AND status = $status AND date = '$date'";
+                    "AND course_id = $courseId AND status = $status AND substitution_date = '$date'";
                 Database::query($sqlClear);
 
-                $sql = "INSERT INTO $sessionCourseUserDateTable(session_id, course_id, user_id, status, date) VALUES ($sessionId, $courseId, $userId, $status, '$date')";
+                $sql = "INSERT INTO $sessionCourseUserDateTable(session_id, course_id, user_id, status, substitution_date) VALUES ($sessionId, $courseId, $userId, $status, '$date')";
                 Database::query($sql);
             }
         } elseif ($countUser == 0) {
@@ -2627,7 +2627,7 @@ class SessionManager {
                 . "WHERE sr.session_id = '$sessionId' "
                 . "AND sr.course_id = $courseId "
                 . "AND sr.status = '$rolSubstitute' "
-                . "AND sr.date = '$date'";
+                . "AND sr.substitution_date = '$date'";
 
         return Database::query($sql);
     }
@@ -2975,7 +2975,7 @@ class SessionManager {
                         'session_id = ? AND ' => intval($sessionId),
                         'course_id = ? AND ' => intval($courseId),
                         'status = ? AND ' => ROLE_COACH_SUBSTITUTE,
-                        "date = '?'" => $date
+                        "substitution_date = '?'" => $date
                     )
         ));
 

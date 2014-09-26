@@ -461,7 +461,7 @@ function hasSubstitute($sessionId, $courseId, $date)
             . "WHERE session_id = $sessionId "
             . "AND course_id = $courseId "
             . "AND status = " . ROLE_COACH_SUBSTITUTE . " "
-            . "AND date = '$date'";
+            . "AND substitution_date = '$date'";
 
     $result = Database::query($sql);
 

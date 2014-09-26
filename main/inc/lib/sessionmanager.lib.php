@@ -1696,6 +1696,7 @@ class SessionManager {
         $userId = intval($userId);
         $sessionId = !empty($sessionId) ? intval($sessionId) : 0;
         $date = Database::escape_string($date);
+        $courseId = CourseManager::getCourseIdFromCourseCode($courseCode);
 
         $tbl_session_rel_course_rel_user = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
         $sessionCourseUserDateTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER_DATE);
@@ -1726,7 +1727,7 @@ class SessionManager {
                 $sql = " INSERT INTO $tbl_session_rel_course_rel_user(id_session, course_code, id_user, status) VALUES($sessionId, '$courseCode', $userId, $status)";
                 Database::query($sql);
 
-                $sql = "INSERT INTO $sessionCourseUserDateTable(session_id, course_code, user_id, status, date) VALUES ($sessionId, '$courseCode', $userId, $status, '$date')";
+                $sql = "INSERT INTO $sessionCourseUserDateTable(session_id, course_id, user_id, status, date) VALUES ($sessionId, $courseId, $userId, $status, '$date')";
                 Database::query($sql);
             }
         } elseif ($countUser == 0) {

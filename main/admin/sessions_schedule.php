@@ -454,19 +454,14 @@ function getInOut($sessionId, $courseId, $roomId, $date, $schedule)
  */
 function hasSubstitute($sessionId, $courseCode, $date)
 {
-    $sessionCourseUserTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
     $sessionCourseUserDateTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER_DATE);
     
     $sql = "SELECT COUNT(1) AS is_io "
-            . "FROM $sessionCourseUserTable AS scu, $sessionCourseUserDateTable AS scud "
-            . "WHERE scu.id_session = $sessionId "
-            . "AND scu.course_code = '$courseCode' "
-            . "AND scu.status = " . ROLE_COACH_SUBSTITUTE . " "
-            . "AND scu.id_session = scud.session_id "
-            . "AND scu.course_code = scud.course_code "
-            . "AND scu.id_user = scud.user_id "
-            . "AND scu.status = scu.status "
-            . "AND scud.date = '$date'";
+            . "FROM $sessionCourseUserDateTable "
+            . "WHERE session_id = $sessionId "
+            . "AND course_code = '$courseCode' "
+            . "AND status = " . ROLE_COACH_SUBSTITUTE . " "
+            . "AND date = '$date'";
 
     $result = Database::query($sql);
 

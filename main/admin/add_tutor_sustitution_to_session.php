@@ -133,8 +133,8 @@ if ($idSession > 0 && !empty($dataHeader['course_code'])) {
         $sqlNotIn = ' AND u.user_id NOT IN (';
         $users = Database::store_result($resultSubs, 'ASSOC');
         foreach($users as $user) {
-            $userSubstitute[$user['id_user']] = $user ;
-            $sqlNotIn .= "'" . $user['id_user']. "',";
+            $userSubstitute[$user['user_id']] = $user ;
+            $sqlNotIn .= "'" . $user['user_id']. "',";
         }
         $sqlNotIn = substr($sqlNotIn, 0, -1);
         $sqlNotIn .= ") ";

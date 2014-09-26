@@ -1726,6 +1726,10 @@ class SessionManager {
 
                 $sql = " INSERT INTO $tbl_session_rel_course_rel_user(id_session, course_code, id_user, status) VALUES($sessionId, '$courseCode', $userId, $status)";
                 Database::query($sql);
+                
+                $sqlClear = "DELETE FROM $sessionCourseUserDateTable WHERE session_id = $sessionId ".
+                    "AND course_id = $courseId AND status = $status AND date = '$date'";
+                Database::query($sqlClear);
 
                 $sql = "INSERT INTO $sessionCourseUserDateTable(session_id, course_id, user_id, status, date) VALUES ($sessionId, $courseId, $userId, $status, '$date')";
                 Database::query($sql);
@@ -2616,10 +2620,12 @@ class SessionManager {
         $tblSessionRelCourseRelUserRelDate    = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER_DATE);        
         $rolSubstitute = ROLE_COACH_SUBSTITUTE;
 
+        $courseId = CourseManager::getCourseIdFromCourseCode($courseCode);
+
         $sql = "SELECT sr.user_id, u.lastname, u.firstname, u.username FROM  $tblSessionRelCourseRelUserRelDate sr "
                 . "INNER JOIN user u on sr.user_id = u.user_id "
                 . "WHERE sr.session_id = '$sessionId' "
-                . "AND sr.course_code = '$courseCode' "
+                . "AND sr.course_id = $courseId "
                 . "AND sr.status = '$rolSubstitute' "
                 . "AND sr.date = '$date'";
 
@@ -2955,19 +2961,19 @@ class SessionManager {
     
     /**
      * Get the list of substitute coaches (only user ids)
-     * @param int $courseCode Course code
+     * @param int $courseId Course id
      * @param int $sessionId Session id
      * @param date $date The report date
      * @return array Substitue coaches. Otherwise return false
      */
-    static public function getSessionCourseSubstituteCoaches($courseCode, $sessionId, $date)
+    static public function getSessionCourseSubstituteCoaches($courseId, $sessionId, $date)
     {
         $sessionCourseUserDateTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER_DATE);
 
         $usersId = Database::select('user_id', $sessionCourseUserDateTable, array(
                     'where' => array(
                         'session_id = ? AND ' => intval($sessionId),
-                        'course_code = ? AND ' => Database::escape_string($courseCode),
+                        'course_id = ? AND ' => intval($courseId),
                         'status = ? AND ' => ROLE_COACH_SUBSTITUTE,
                         "date = '?'" => $date
                     )
@@ -2978,15 +2984,15 @@ class SessionManager {
 
     /**
      * Get the info of substitute coaches
-     * @param int $courseCode Course code
+     * @param int $courseId Course id
      * @param int $sessionId Session id
      * @param date $date The report date
      * @return string Names
      */
-    static public function getSessionCourseSubstituteCoachesWithInfo($courseCode, $sessionId, $date)
+    static public function getSessionCourseSubstituteCoachesWithInfo($courseId, $sessionId, $date)
     {
         $coaches = array();
-        $usersId = self::getSessionCourseSubstituteCoaches($courseCode, $sessionId, $date);
+        $usersId = self::getSessionCourseSubstituteCoaches($courseId, $sessionId, $date);
 
         if (!empty($usersId)) {
             foreach ($usersId as $userId) {

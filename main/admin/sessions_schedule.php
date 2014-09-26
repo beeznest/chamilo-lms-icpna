@@ -703,8 +703,6 @@ function exportToPDF($scheduleId, $date, $branchId)
 
     $pdfContent = Export::convert_array_to_html($dataToConvert);
 
-    print_r($pdfContent);
-
     Export::export_html_to_pdf($pdfContent, $params);
     exit;
 }

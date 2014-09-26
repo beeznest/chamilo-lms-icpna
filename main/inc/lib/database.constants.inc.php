@@ -39,6 +39,7 @@ define('TABLE_MAIN_SESSION_COURSE',         'session_rel_course');
 define('TABLE_MAIN_SESSION_USER',           'session_rel_user');
 define('TABLE_MAIN_SESSION_CLASS',          'session_rel_class');
 define('TABLE_MAIN_SESSION_COURSE_USER',    'session_rel_course_rel_user');
+define('TABLE_MAIN_SESSION_COURSE_USER_DATE',    'session_rel_course_rel_user_date');
 define('TABLE_MAIN_SHARED_SURVEY',          'shared_survey');
 define('TABLE_MAIN_SHARED_SURVEY_QUESTION', 'shared_survey_question');
 define('TABLE_MAIN_SHARED_SURVEY_QUESTION_OPTION', 'shared_survey_question_option');

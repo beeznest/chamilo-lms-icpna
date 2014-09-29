@@ -140,7 +140,7 @@ if ($idSession > 0 && !empty($dataHeader['course_code'])) {
     }
 
     $sql = "SELECT u.user_id, u.lastname, u.firstname, u.username
-            FROM $tblUser AS u WHERE u.status = 1 $sqlNotIn order by u.lastname";
+            FROM $tblUser AS u WHERE u.status = 1 AND u.active = 1 $sqlNotIn order by u.lastname";
     $result = Database::query($sql);
     $coaches = Database::store_result($result);
     foreach($coaches as $coach) {

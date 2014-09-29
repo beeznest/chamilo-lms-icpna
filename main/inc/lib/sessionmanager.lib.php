@@ -1684,16 +1684,16 @@ class SessionManager {
 
     /**
      * Update or Insert Coach Sustitute
-     * @param int $userId when user_id = 0 Not send coach.
+     * @param Array $userId array of user_id = 0 Not send coach.
      * @param int $sessionId id session
      * @param string $courseCode code course
      * @param date $date The substitution date
      * @return bool
      */
-    public static function setCoachSustitutionToCourseSession($userId, $sessionId = 0, $courseCode = '', $date)
+    public static function setCoachSustitutionToCourseSession($userArrayId, $sessionId = 0, $courseCode = '', $date)
     {
         $return = true;
-        $userId = intval($userId);
+        $userArrayId = is_array($userArrayId) ? $userArrayId : intval($userArrayId);
         $sessionId = !empty($sessionId) ? intval($sessionId) : 0;
         $date = Database::escape_string($date);
         $courseId = CourseManager::getCourseIdFromCourseCode($courseCode);
@@ -1703,45 +1703,57 @@ class SessionManager {
         $tbl_user = Database::get_main_table(TABLE_MAIN_USER);
         $status = ROLE_COACH_SUBSTITUTE;
 
-        $rs_check_user = Database::query("SELECT * FROM $tbl_user WHERE status = 1 AND user_id = '$userId'");
-        $countUser = Database::num_rows($rs_check_user);
         $dataSerialNow = array(
             'admin' => api_get_user_id(),
-            'coach' => $userId,
+            'coach' => $userArrayId,
             'session_id' => $sessionId,
             'course_code' => $courseCode,
             'create_at' => api_get_utc_datetime()
         );
 
-        if ($countUser > 0) {
-            event_system('session_substitute', 'MISC', serialize($dataSerialNow), null, null, null, $sessionId);
-            $flagTransaction = self::_generateNewTransaction($sessionId, $userId);
-            $return = $flagTransaction;
+        if (is_array($userArrayId)) { // is array loop
+            for($i=0; $i < count($userArrayId); $i++) {
+                $userId = intval($userArrayId[$i]);
+                $rs_check_user = Database::query("SELECT * FROM $tbl_user WHERE status = 1 AND user_id = '$userId'");
+                $countUser = Database::num_rows($rs_check_user);
 
-            if ($flagTransaction == true) {
-                // Clear record of couch substitute for adding one.
-                $sqlClear = "DELETE FROM $tbl_session_rel_course_rel_user WHERE id_session = '$sessionId' ".
-                    "AND course_code = '$courseCode' AND status = $status ";
-                Database::query($sqlClear);
+                if ($countUser > 0) {
+                    $dataSerialNow['coach'] = $userId;
+                    event_system('session_substitute', 'MISC', serialize($dataSerialNow), null, null, null, $sessionId);
+                    $flagTransaction = self::_generateNewTransaction($sessionId, $userId);
+                    $return = $flagTransaction;
 
-                $sql = " INSERT INTO $tbl_session_rel_course_rel_user(id_session, course_code, id_user, status) VALUES($sessionId, '$courseCode', $userId, $status)";
-                Database::query($sql);
-                
-                $sqlClear = "DELETE FROM $sessionCourseUserDateTable WHERE session_id = $sessionId ".
-                    "AND course_id = $courseId AND status = $status AND substitution_date = '$date'";
-                Database::query($sqlClear);
+                    if ($flagTransaction == true) {
+                        // Clear record of couch substitute for adding one.
+                        if ($i == 0) {
+                            $sqlClear = "DELETE FROM $tbl_session_rel_course_rel_user WHERE id_session = '$sessionId' ".
+                                "AND course_code = '$courseCode' AND status = $status ";
+                            Database::query($sqlClear);
 
-                $sql = "INSERT INTO $sessionCourseUserDateTable(session_id, course_id, user_id, status, substitution_date) VALUES ($sessionId, $courseId, $userId, $status, '$date')";
-                Database::query($sql);
+                            $sqlClear = "DELETE FROM $sessionCourseUserDateTable WHERE session_id = $sessionId ".
+                                "AND course_id = $courseId AND status = $status AND substitution_date = '$date'";
+                            Database::query($sqlClear);
+                        }
+
+                        $sql = " INSERT INTO $tbl_session_rel_course_rel_user(id_session, course_code, id_user, status) VALUES($sessionId, '$courseCode', $userId, $status)";
+                        Database::query($sql);
+
+                        $sql = "INSERT INTO $sessionCourseUserDateTable(session_id, course_id, user_id, status, substitution_date) VALUES ($sessionId, $courseId, $userId, $status, '$date')";
+                        Database::query($sql);
+                    }
+                }
             }
-        } elseif ($countUser == 0) {
+
+        } else {
             event_system('session_substitute', 'MISC', serialize($dataSerialNow), null, null, null, $sessionId);
 
             $sqlClear = "DELETE FROM $tbl_session_rel_course_rel_user WHERE id_session = '$sessionId' ".
                 "AND course_code = '$courseCode' AND status = $status";
             Database::query($sqlClear);
-        } else {
-            $return = false;
+
+            $sqlClear = "DELETE FROM $sessionCourseUserDateTable WHERE session_id = $sessionId ".
+                "AND course_id = $courseId AND status = $status AND substitution_date = '$date'";
+            Database::query($sqlClear);
         }
 
         return $return;

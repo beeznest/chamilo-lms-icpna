@@ -64,8 +64,7 @@ function listOrderBy(needle)
 $formSent = 0;
 $errorMsg = '';
 if (isset($_POST['formSent']) && $_POST['formSent']) {
-
-    $userId  = (!empty($_POST['usersList'][0])) ? $_POST['usersList'][0] : 0;
+    $userId  = (!empty($_POST['usersList']) && is_array($_POST['usersList'])) ? $_POST['usersList'] : 0;
     $errorMsg = (0 == $userId) ? get_lang('SelectedCoachSubstituteError') : '';
     if ($userId >= 0 && $idSession > 0  && !empty($dataHeader['course_code'])) {
         $flagOperation = SessionManager::setCoachSustitutionToCourseSession($userId, $idSession, $dataHeader['course_code'], $dataHeader['date']);
@@ -175,7 +174,7 @@ unset($coaches);
         <tr>
             <td width="45%" align="center">
                 <div id="ajax_list_users_multiple">
-                    <select id="origin" name="noUsersList[]" size="20" style="width:360px;">
+                    <select id="origin" name="noUsersList[]" multiple="multiple" size="20" style="width:360px;">
                         <?php foreach($sessionCoach as $enreg) { ?>
                             <option value="<?php echo $enreg['user_id']; ?>"><?php echo api_get_person_name($enreg['firstname'], $enreg['lastname'], null, PERSON_NAME_EASTERN_ORDER).' ('.$enreg['username'].')'; ?></option>
                         <?php } unset($sessionCoach); ?>
@@ -190,8 +189,8 @@ unset($coaches);
             </td>
             <td width="45%" align="center">
                 <select id='destination' name="usersList[]" multiple="multiple" size="20" style="width:360px;">
-                    <?php foreach($userSubstitute as $enreg) : ?>
-                        <option value="<?php echo $enreg['id_user']; ?>"><?php echo api_get_person_name($enreg['firstname'], $enreg['lastname'], null, PERSON_NAME_EASTERN_ORDER).' ('.$enreg['username'].')'; ?></option>
+                    <?php foreach($userSubstitute as $enreg) :  ?>
+                        <option value="<?php echo $enreg['user_id']; ?>"><?php echo api_get_person_name($enreg['firstname'], $enreg['lastname'], null, PERSON_NAME_EASTERN_ORDER).' ('.$enreg['username'].')'; ?></option>
                     <?php endforeach; unset($userSubstitute); ?>
                 </select>
             </td>
@@ -201,27 +200,17 @@ unset($coaches);
 
 <script type="text/javascript">
     <!--
-    function moveItem(origin , destination) {
+    function moveItem(origin , destination){
 
-        if('origin' == origin.id) {
-            if (destination.length == 0) { // only first coach.
-                _helper(origin, destination);
+        for(var i = 0 ; i<origin.options.length ; i++) {
+            if(origin.options[i].selected) {
+                destination.options[destination.length] = new Option(origin.options[i].text,origin.options[i].value);
+                origin.options[i]=null;
+                i = i-1;
             }
-        } else if ('destination' == origin.id) {
-            _helper(origin, destination);
-        };
-
-        function _helper(origin, destination) {
-            for(var i = 0 ; i<origin.options.length ; i++) {
-                if(origin.options[i].selected) {
-                    destination.options[destination.length] = new Option(origin.options[i].text,origin.options[i].value);
-                    origin.options[i] = null;
-                    i = i-1;
-                }
-            }            
-            destination.selectedIndex = -1;
-            sortOptions(destination.options);            
         }
+        destination.selectedIndex = -1;
+        sortOptions(destination.options);
     }
 
     function sortOptions(options) {

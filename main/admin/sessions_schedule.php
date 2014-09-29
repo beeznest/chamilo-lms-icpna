@@ -82,7 +82,7 @@ $htmlHeadXtra[] = "" .
     });
 </script>";
 
-if ($_GET['action'] == 'export') {
+if (isset($_GET['action']) && $_GET['action'] == 'export') {
     if ($_GET['type'] == 'xls') {
         exportToXLS($scheduleIdSelected, $dateSelected, $branchSelected);
     } elseif ($_GET['type'] == 'pdf') {
@@ -92,7 +92,7 @@ if ($_GET['action'] == 'export') {
 
 Display::display_header();
 $check = Security::check_token('get');
-if ($_GET['action'] == 'show_message' && true == $check) {
+if (isset($_GET['action']) && $_GET['action'] == 'show_message' && true == $check) {
     Display::display_confirmation_message(Security::remove_XSS(stripslashes($_GET['message'])));
     Security::clear_token();
 }

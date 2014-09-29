@@ -68,7 +68,7 @@ switch ($action) {
             $needle = api_convert_encoding($needle, $charset, 'utf-8');
 
             $sql = 'SELECT u.user_id, u.username, u.lastname, u.firstname FROM '.$tblUser.' u
-                    WHERE u.lastname  LIKE "'.$needle.'%" AND u.status = 1  '.$sqlNotIn.' order by u.lastname';
+                    WHERE u.lastname  LIKE "'.$needle.'%" AND u.status = 1 AND u.active = 1  '.$sqlNotIn.' order by u.lastname';
             $rs = Database::query($sql);
 
             $return .= '<select id="origin" name="usersList[]" multiple="multiple" size="20" style="width:360px;">';

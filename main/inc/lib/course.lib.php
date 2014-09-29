@@ -5046,4 +5046,26 @@ class CourseManager {
         rmdir($tmp_dir_name);
         return $course_properties;
     }
+
+    /**
+     * Get the id of a course from its code
+     * @param string $courseCode The course code
+     * @return int The course id
+     */
+    public static function getCourseIdFromCourseCode($courseCode)
+    {
+        $courseTable = Database::get_main_table(TABLE_MAIN_COURSE);
+
+        $courseResult = Database::select('id', $courseTable, array(
+                    'where' => array(
+                        "code = '?'" => $courseCode
+                    )), 'first');
+
+        if ($courseResult != false) {
+            return intval($courseResult['id']);
+        }
+
+        return 0;
+    }
+
 } //end class CourseManager

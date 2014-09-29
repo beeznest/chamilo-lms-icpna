@@ -68,7 +68,7 @@ if (isset($_POST['formSent']) && $_POST['formSent']) {
     $userId  = (!empty($_POST['usersList'][0])) ? $_POST['usersList'][0] : 0;
     $errorMsg = (0 == $userId) ? get_lang('SelectedCoachSubstituteError') : '';
     if ($userId >= 0 && $idSession > 0  && !empty($dataHeader['course_code'])) {
-        $flagOperation = SessionManager::setCoachSustitutionToCourseSession($userId, $idSession, $dataHeader['course_code']);
+        $flagOperation = SessionManager::setCoachSustitutionToCourseSession($userId, $idSession, $dataHeader['course_code'], $dataHeader['date']);
 
         Security::clear_token();
         $tok = Security::get_token();
@@ -103,36 +103,38 @@ if (!empty($message)) {
 $session_info = SessionManager::fetch($idSession);
 $coacheNames = SessionManager::get_session_course_coaches_to_string($dataHeader['course_code'], $dataHeader['id_session']);
 
-$headerInformation = <<<EOD
-<table class="data_table">
+$headerInformation = "".
+"<table class=\"data_table\">
     <tr>
-        <td>Course</td>
-        <td><strong>{$dataHeader['course']}</strong></td>
-        <td>Room</td>
+        <td>" . get_lang('Course') . "</td>
+        <td colspan=\"3\"><strong>{$dataHeader['course']}</strong></td>
+        <td>" . get_lang('Room') . "</td>
         <td><strong>{$dataHeader['room']}</strong></td>
     </tr>
     <tr>
-        <td>Schedule</td>
+        <td>" . get_lang('Date') . "</td>
+        <td><strong>{$dataHeader['date']}</strong></td>
+        <td>" . get_lang('Schedule') . "</td>
         <td><strong>{$dataHeader['schedule_display']}</strong></td>
-        <td>Teacher</td>
+        <td>" . get_lang('Teacher') . "</td>
         <td><strong>$coacheNames</strong></td>
     </tr>
-</table>
-EOD;
+</table>";
+
 echo $headerInformation;
 
 $sessionCoach = array();
 $sqlNotIn = '';
 if ($idSession > 0 && !empty($dataHeader['course_code'])) {
 
-    $resultSubs = SessionManager::getSessionCourseCoachesSubstitute($dataHeader['course_code'], $idSession);
+    $resultSubs = SessionManager::getSessionCourseCoachesSubstitute($dataHeader['course_code'], $idSession, $dataHeader['date']);
     $userSubstitute = array();
     if (Database::num_rows($resultSubs) > 0) {
         $sqlNotIn = ' AND u.user_id NOT IN (';
         $users = Database::store_result($resultSubs, 'ASSOC');
         foreach($users as $user) {
-            $userSubstitute[$user['id_user']] = $user ;
-            $sqlNotIn .= "'" . $user['id_user']. "',";
+            $userSubstitute[$user['user_id']] = $user ;
+            $sqlNotIn .= "'" . $user['user_id']. "',";
         }
         $sqlNotIn = substr($sqlNotIn, 0, -1);
         $sqlNotIn .= ") ";
@@ -141,7 +143,7 @@ if ($idSession > 0 && !empty($dataHeader['course_code'])) {
     }
 
     $sql = "SELECT u.user_id, u.lastname, u.firstname, u.username
-            FROM $tblUser AS u WHERE u.status = 1 $sqlNotIn order by u.lastname";
+            FROM $tblUser AS u WHERE u.status = 1 AND u.active = 1 $sqlNotIn order by u.lastname";
     $result = Database::query($sql);
     $coaches = Database::store_result($result);
     foreach($coaches as $coach) {

@@ -448,15 +448,20 @@ function getInOut($sessionId, $courseId, $roomId, $date, $schedule)
 /**
  * Check if the course in the session has a substitute
  * @param int $sessionId The session id
- * @param int $courseCode The course code
+ * @param int $courseId The course id
+ * @param date $date The substitution date
  * @return boolean True has a subtitue
  */
-function hasSubstitute($sessionId, $courseCode)
+function hasSubstitute($sessionId, $courseId, $date)
 {
-    $sql = "SELECT COUNT(1) AS is_io FROM session_rel_course_rel_user "
-            . "WHERE id_session = $sessionId "
-            . "AND course_code = '$courseCode' "
-            . "AND status = " . ROLE_COACH_SUBSTITUTE;
+    $sessionCourseUserDateTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER_DATE);
+    
+    $sql = "SELECT COUNT(1) AS is_io "
+            . "FROM $sessionCourseUserDateTable "
+            . "WHERE session_id = $sessionId "
+            . "AND course_id = $courseId "
+            . "AND status = " . ROLE_COACH_SUBSTITUTE . " "
+            . "AND substitution_date = '$date'";
 
     $result = Database::query($sql);
 
@@ -482,6 +487,10 @@ function hasSubstitute($sessionId, $courseCode)
  */
 function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all', $substitutionFilter = 'all')
 {
+    $sessionTable = Database::get_main_table(TABLE_MAIN_SESSION);
+    $sessionCourseUserTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
+    $sessionFieldValuesTable = Database::get_main_table(TABLE_MAIN_SESSION_FIELD_VALUES);
+    
     $scheduleFieldOption = new ExtraFieldOption('session');
     $branchFieldOption = new ExtraFieldOption('session');
 
@@ -492,10 +501,10 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all', $su
         $rows = array();
 
         $sql = "SELECT s.id, s.id_coach, s.nbr_courses, s.access_start_date, s.access_end_date "
-                . "FROM session as s "
-                . "INNER JOIN session_rel_course_rel_user AS scu ON s.id = scu.id_session "
-                . "INNER JOIN session_field_values as valSch ON s.id = valSch.session_id "
-                . "INNER JOIN session_field_values AS valBr ON s.id = valBr.session_id "
+                . "FROM $sessionTable as s "
+                . "INNER JOIN $sessionCourseUserTable AS scu ON s.id = scu.id_session "
+                . "INNER JOIN $sessionFieldValuesTable as valSch ON s.id = valSch.session_id "
+                . "INNER JOIN $sessionFieldValuesTable AS valBr ON s.id = valBr.session_id "
                 . "AND valSch.field_value = '{$schedule['option_value']}' "
                 . "AND valSch.field_id = '{$schedule['field_id']}' "
                 . "AND valBr.field_value = '{$branch['option_value']}' "
@@ -521,9 +530,9 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all', $su
                 }
 
                 $inOut = getInOut($session['id'], $course['id'], $room['id'], $date, $scheduleData);
-                $hasSubstitute = hasSubstitute($session['id'], $course['code']);
+                $hasSubstitute = hasSubstitute($session['id'], $course['id'], $date);
 
-                $substitutes = SessionManager::getSessionCourseSubstituteCoachesWithInfo($course['code'], $session['id']);
+                $substitutes = SessionManager::getSessionCourseSubstituteCoachesWithInfo($course['id'], $session['id'], $date);
 
                 $row = array(
                     'id' => $session['id'],
@@ -693,8 +702,6 @@ function exportToPDF($scheduleId, $date, $branchId)
     );
 
     $pdfContent = Export::convert_array_to_html($dataToConvert);
-
-    print_r($pdfContent);
 
     Export::export_html_to_pdf($pdfContent, $params);
     exit;

@@ -58,7 +58,7 @@ function getFormatedSchedule($displayText) {
         $formated .= "{$parts[2]} ";
     }
 
-    $formated .= "({$parts['0']})";
+    // $formated .= "({$parts['0']})";
 
     return $formated;
 }

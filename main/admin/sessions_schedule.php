@@ -82,7 +82,7 @@ $htmlHeadXtra[] = "" .
     });
 </script>";
 
-if ($_GET['action'] == 'export') {
+if (isset($_GET['action']) && $_GET['action'] == 'export') {
     if ($_GET['type'] == 'xls') {
         exportToXLS($scheduleIdSelected, $dateSelected, $branchSelected);
     } elseif ($_GET['type'] == 'pdf') {
@@ -92,7 +92,7 @@ if ($_GET['action'] == 'export') {
 
 Display::display_header();
 $check = Security::check_token('get');
-if ($_GET['action'] == 'show_message' && true == $check) {
+if (isset($_GET['action']) && $_GET['action'] == 'show_message' && true == $check) {
     Display::display_confirmation_message(Security::remove_XSS(stripslashes($_GET['message'])));
     Security::clear_token();
 }
@@ -496,6 +496,8 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all', $su
 
     $schedule = $scheduleFieldOption->get($scheduleId);
     $branch = $branchFieldOption->get($branchId);
+    
+    $scheduleDisplayText = getFormatedSchedule($schedule['option_display_text']);
 
     if (!empty($schedule)) {
         $rows = array();
@@ -539,7 +541,7 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all', $su
                     'room' => $room['title'],
                     'course' => $course['title'],
                     'courseCode' => $course['code'],
-                    'schedule' => $schedule['option_display_text'],
+                    'schedule' => $scheduleDisplayText,
                     'coaches' => $coaches,
                     'substitutes' => $substitutes,
                     'in' => empty($inOut) ? null : $inOut['log_in_course_date'],
@@ -598,6 +600,7 @@ function convertToArray($scheduleId, $date, $branchId)
 {
     $extraFieldOption = new ExtraFieldOption('session');
     $schedule = $extraFieldOption->get($scheduleId);
+    $scheduleDisplayText = getFormatedSchedule($schedule['option_display_text']);
 
     $arrayData = array(
         array(
@@ -613,7 +616,7 @@ function convertToArray($scheduleId, $date, $branchId)
             $date,
             '',
             get_lang('Schedule'),
-            $schedule['option_display_text']
+            $scheduleDisplayText
         ),
         null,
         array(

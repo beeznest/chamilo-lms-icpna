@@ -481,21 +481,18 @@ $administrator['name']  = isset($administrator['name']) ? $administrator['name']
 $mail_conf = api_get_path(CONFIGURATION_PATH).'mail.conf.php';
 
 if (file_exists($mail_conf)) {
-	require_once $mail_conf;
+    require_once $mail_conf;
+    $app->register(new Silex\Provider\SwiftmailerServiceProvider(), array(
+         'swiftmailer.options' =>  array(
+            'host' => $platform_email['SMTP_HOST'],
+            'port' => $platform_email['SMTP_PORT'],
+            'username' => $platform_email['SMTP_USER'],
+            'password' => $platform_email['SMTP_PASS'],
+            'encryption' => null,
+            'auth_mode' => null
+        )
+    ));        
 }
-
-$mail_settings = array();
-
-$app->register(new Silex\Provider\SwiftmailerServiceProvider(), array(
-     'swiftmailer.options' =>  array(
-        'host' => $platform_email['SMTP_HOST'],
-        'port' => $platform_email['SMTP_PORT'],
-        'username' => $platform_email['SMTP_USER'],
-        'password' => $platform_email['SMTP_PASS'],
-        'encryption' => null,
-        'auth_mode' => null
-    )
-));
 
 //if (isset($platform_email['SMTP_MAILER']) && $platform_email['SMTP_MAILER'] == 'smtp') {
 $app['mailer'] = $app->share(function ($app) {

@@ -481,20 +481,21 @@ $administrator['name']  = isset($administrator['name']) ? $administrator['name']
 $mail_conf = api_get_path(CONFIGURATION_PATH).'mail.conf.php';
 
 if (file_exists($mail_conf)) {
-    require_once $mail_conf;
-    $app->register(new Silex\Provider\SwiftmailerServiceProvider(), array(
-         'swiftmailer.options' =>  array(
-            'host' => $platform_email['SMTP_HOST'],
-            'port' => $platform_email['SMTP_PORT'],
-            'username' => $platform_email['SMTP_USER'],
-            'password' => $platform_email['SMTP_PASS'],
-            'encryption' => null,
-            'auth_mode' => null
-        )
-    ));        
+    require_once $mail_conf;      
 }
 
-//if (isset($platform_email['SMTP_MAILER']) && $platform_email['SMTP_MAILER'] == 'smtp') {
+// Here is create the resource SwiftmailerServiceProvider : util for send mail
+$app->register(new Silex\Provider\SwiftmailerServiceProvider(), array(
+     'swiftmailer.options' =>  array(
+        'host' => isset($platform_email['SMTP_HOST']) ? $platform_email['SMTP_HOST'] : null,
+        'port' => isset($platform_email['SMTP_PORT']) ? $platform_email['SMTP_PORT'] : null,
+        'username' => isset($platform_email['SMTP_USER']) ? $platform_email['SMTP_USER'] : null,
+        'password' => isset($platform_email['SMTP_PASS']) ? $platform_email['SMTP_PASS'] : null,
+        'encryption' => null,
+        'auth_mode' => null
+    )
+));
+
 $app['mailer'] = $app->share(function ($app) {
     return new \Swift_Mailer($app['swiftmailer.transport']);
 });

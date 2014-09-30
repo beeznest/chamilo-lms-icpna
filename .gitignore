@@ -5,3 +5,7 @@ archive/*
 main/upload/users/*
 tests/migrate/php_errors.log
 tests/migrate/ws.conf.php
+
+# IDE
+.idea/*
+nbproject/*

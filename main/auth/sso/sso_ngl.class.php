@@ -7,7 +7,8 @@
  * using chamilo as a SSO server
  * @package chamilo.auth.sso
  */
-class SSONGL {
+class SSONGL
+{
 
     /**
      * This is used to get the url with the SSO params
@@ -18,13 +19,18 @@ class SSONGL {
     public function getUrl($refererSso, $additionalParams = array())
     {
         if (!empty($refererSso)) {
+            $userId = api_get_user_id();
+            $userExtraFieldValue = new ExtraFieldValue('user');
+            $eWorkbookLoginData = $userExtraFieldValue->get_values_by_handler_and_field_variable($userId, 'eworkbooklogin');
+            $hasEWorkbookLogin = ($eWorkbookLoginData != false);
+
             $getParams = parse_url($refererSso, PHP_URL_QUERY);
             $userInfo = api_get_user_info(api_get_user_id(), false, true);
             $chamiloUrl = api_get_path(WEB_PATH);
             $params = '';
 
             $sso = array(
-                'username' => ($userInfo['eworkbooklogin'] != null) ? $userInfo['eworkbooklogin'] : $userInfo['username'],
+                'username' => ($hasEWorkbookLogin) ? $eWorkbookLoginData['field_value'] : $userInfo['username'],
                 'secret' => sha1($userInfo['password']),
                 'master_domain' => $chamiloUrl,
                 'master_auth_uri' => $chamiloUrl . '?submitAuth=true',

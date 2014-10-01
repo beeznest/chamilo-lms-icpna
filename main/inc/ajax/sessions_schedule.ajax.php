@@ -12,9 +12,9 @@
 require_once '../global.inc.php';
 require_once api_get_path(LIBRARY_PATH) . 'sessions_schedule.lib.php';
 
-$allowAccess = !api_is_teacher_admin() && !api_is_platform_admin();
+$preventAccess = !api_is_teacher_admin() && !api_is_platform_admin();
 
-if ($allowAccess) {
+if ($preventAccess) {
     api_not_allowed(true);
 }
 

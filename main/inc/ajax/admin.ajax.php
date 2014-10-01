@@ -7,9 +7,9 @@
 require_once '../global.inc.php';
 
 // first valid to teacher coach
-$allowAccess = !api_is_teacher_admin() && !api_is_platform_admin();
+$preventAccess = !api_is_teacher_admin() && !api_is_platform_admin();
 
-if ($allowAccess) {
+if ($preventAccess) {
     api_protect_admin_script(true);
 }
 

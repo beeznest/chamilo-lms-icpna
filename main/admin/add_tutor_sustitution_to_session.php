@@ -10,9 +10,9 @@ $language_file = array('admin', 'registration');
 $cidReset = true;
 require_once '../inc/global.inc.php';
 
-$allowAccess = (!api_is_teacher_admin() && !api_is_platform_admin()) || intval($_GET['id_session']) <= 0;
+$preventAccess = (!api_is_teacher_admin() && !api_is_platform_admin()) || intval($_GET['id_session']) <= 0;
 
-if ($allowAccess) {
+if ($preventAccess) {
     api_not_allowed(true);
 }
 $idSession = intval($_GET['id_session']);

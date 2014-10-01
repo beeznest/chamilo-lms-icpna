@@ -960,7 +960,7 @@ class Template {
             $navigation['platform_admin']['title'] = get_lang('PlatformAdmin');
         }
 
-        if (api_is_teacher_admin()) {
+        if (api_is_teacher_admin() || api_is_platform_admin()) {
             $navigation['inOutManagement']['url'] = api_get_path(WEB_CODE_PATH).'admin/sessions_schedule.php';
             $navigation['inOutManagement']['title'] = get_lang('InOutManagement');
         }
@@ -1218,7 +1218,7 @@ class Template {
             }
 
             // inOutManagement
-            if (api_is_teacher_admin()) {
+            if (api_is_teacher_admin() || api_is_platform_admin()) {
                 $navigation['inOutManagement'] = $possible_tabs['inOutManagement'];
             }
 

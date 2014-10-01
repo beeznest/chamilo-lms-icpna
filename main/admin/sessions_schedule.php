@@ -492,17 +492,17 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all', $su
     $sessionTable = Database::get_main_table(TABLE_MAIN_SESSION);
     $sessionCourseUserTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
     $sessionFieldValuesTable = Database::get_main_table(TABLE_MAIN_SESSION_FIELD_VALUES);
-    
-    $scheduleFieldOption = new ExtraFieldOption('session');
-    $branchFieldOption = new ExtraFieldOption('session');
 
-    $schedule = $scheduleFieldOption->get($scheduleId);
-    $branch = $branchFieldOption->get($branchId);
-    
-    $scheduleDisplayText = getFormatedSchedule($schedule['option_display_text']);
-
-    if (!empty($schedule)) {
+    if (!empty($scheduleId)) {
         $rows = array();
+
+        $scheduleFieldOption = new ExtraFieldOption('session');
+        $branchFieldOption = new ExtraFieldOption('session');
+
+        $schedule = $scheduleFieldOption->get($scheduleId);
+        $branch = $branchFieldOption->get($branchId);
+
+        $scheduleDisplayText = getFormatedSchedule($schedule['option_display_text']);
 
         $sql = "SELECT s.id, s.id_coach, s.nbr_courses, s.access_start_date, s.access_end_date "
                 . "FROM $sessionTable as s "

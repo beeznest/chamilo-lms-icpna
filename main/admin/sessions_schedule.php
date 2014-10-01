@@ -237,7 +237,7 @@ if ($sessions != false) {
                                             $profileURL = api_get_path(WEB_PATH) . "main/social/profile.php?u=" . $coachSubstitute['user_id'];
                                             ?>
                                             <strong>
-                                                &xrarr; <a href="<?php echo $profileURL ?>"><?php echo $coachSubstitute['complete_name_with_username']; ?></a>
+                                                &gt;&gt;&gt; <a href="<?php echo $profileURL ?>"><?php echo $coachSubstitute['complete_name_with_username']; ?></a>
                                             </strong><br>
                                             <?php
                                         }

@@ -1,8 +1,20 @@
 <?php
 
+/* For licensing terms, see /license.txt */
+
+/**
+ * ExternalPageNGL Plugin Class
+ * @author Angel Fernando Quiroz Campos <angel.quiroz@beeznest.com
+ * @package chamilo.plugin.externalPageNGL
+ */
 class ExternalPageNGLPlugin extends Plugin
 {
 
+    /**
+     * Instance the class
+     * @staticvar null $result Object instance
+     * @return ExternalPageNGLPlugin
+     */
     static function create()
     {
         static $result = null;
@@ -10,11 +22,18 @@ class ExternalPageNGLPlugin extends Plugin
         return $result ? $result : $result = new self();
     }
 
+    /**
+     * Get the plugin name
+     * @return string
+     */
     public function get_name()
     {
         return 'external_page_ngl';
     }
 
+    /**
+     * Class constructor
+     */
     protected function __construct()
     {
         $parameters = array(
@@ -27,6 +46,11 @@ class ExternalPageNGLPlugin extends Plugin
         parent::__construct('1.0', 'Angel Fernando Quiroz Campos', $parameters);
     }
 
+    /**
+     * Save the addition configuration when the plugin was installed
+     * @param array $params Configuration params
+     * @return void
+     */
     public function saveAdditionalConfiguration($params)
     {
         $toolTable = Database::get_course_table(TABLE_TOOL_LIST);
@@ -71,6 +95,10 @@ class ExternalPageNGLPlugin extends Plugin
         }
     }
 
+    /**
+     * Get the login user for sign-ing
+     * @return string
+     */
     public function getLoginUser()
     {
         /* $userId = api_get_user_id();
@@ -97,6 +125,10 @@ class ExternalPageNGLPlugin extends Plugin
         return 'ICPNA_S1';
     }
 
+    /**
+     * Get the login password for sign-ing
+     * @return string
+     */
     public function getLoginPassword()
     {
         /* $userId = api_get_user_id();
@@ -121,6 +153,10 @@ class ExternalPageNGLPlugin extends Plugin
         return 'natgeo';
     }
 
+    /**
+     * Install the plugin
+     * @return void
+     */
     public function install()
     {
         $setting = $this->get_info();
@@ -130,21 +166,33 @@ class ExternalPageNGLPlugin extends Plugin
         $this->generateLoginExtraField();
     }
 
+    /**
+     * Unistall the plugin
+     * @return void
+     */
     public function uninstall()
     {
         $this->removeLoginExtraField();
     }
 
+    /**
+     * Generate a user extra field for register the login username when the plugin was installed
+     * @return void
+     */
     private function generateLoginExtraField()
     {
         $extraField = new ExtraField('user');
         $data = $extraField->get_handler_field_info_by_field_variable('eworkbooklogin');
-        
+
         if ($data == false) {
             $fielId = UserManager::create_extra_field('eworkbooklogin', ExtraField::FIELD_TYPE_TEXT, 'E-Workbook Login', '');
         }
     }
 
+    /**
+     * Delete the user extra field when the plugin was uninstalled
+     * @return void
+     */
     private function removeLoginExtraField()
     {
         $extraField = new ExtraField('user');
@@ -153,6 +201,10 @@ class ExternalPageNGLPlugin extends Plugin
         $extraField->delete($data['id']);
     }
 
+    /**
+     * Delete all registered data to config the plugin
+     * @return void
+     */
     private function deleteAllData()
     {
         $toolTable = Database::get_course_table(TABLE_TOOL_LIST);

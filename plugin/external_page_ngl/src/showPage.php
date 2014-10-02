@@ -1,5 +1,11 @@
 <?php
 
+/* For licensing terms, see /license.txt */
+/**
+ * Show the page to sign-in to NGL
+ * @author Angel Fernando Quiroz Campos <angel.quiroz@beeznest.com
+ * @package chamilo.plugin.externalPageNGL
+ */
 include_once '../../../main/inc/global.inc.php';
 include_once 'external_page_ngl_plugin.class.php';
 include_once '../../../main/auth/sso/sso_ngl.class.php';

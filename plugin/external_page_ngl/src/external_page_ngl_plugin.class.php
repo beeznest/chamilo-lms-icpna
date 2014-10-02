@@ -1,6 +1,7 @@
 <?php
 
-class ExternalPageNGLPlugin extends Plugin {
+class ExternalPageNGLPlugin extends Plugin
+{
 
     static function create()
     {
@@ -68,6 +69,56 @@ class ExternalPageNGLPlugin extends Plugin {
                 Database::insert($toolTable, $attributes);
             }
         }
+    }
+
+    public function getLoginUser()
+    {
+        /* $userId = api_get_user_id();
+
+          $userExtraFieldValue = new ExtraFieldValue('user');
+          $eWorkbookLoginData = $userExtraFieldValue->get_values_by_handler_and_field_variable($userId, 'eworkbooklogin');
+
+          $hasEWorkbookLogin = ($eWorkbookLoginData != false);
+
+          if ($hasEWorkbookLogin) {
+          return $eWorkbookLoginData['field_value'];
+          } else {
+          $userTable = Database::get_main_table(TABLE_MAIN_USER);
+
+          $userData = Database::select('username', $userTable, array(
+          'where' => array(
+          'user_id = ?' => $userId,
+          ),
+          'order' => 'user_id'), 'first');
+
+          return 'ICPNA_' . $userData['username'];
+          } */
+
+        return 'ICPNA_S1';
+    }
+
+    public function getLoginPassword()
+    {
+        /* $userId = api_get_user_id();
+          $userTable = Database::get_main_table(TABLE_MAIN_USER);
+
+          $userData = Database::select('username', $userTable, array(
+          'where' => array(
+          'user_id = ?' => $userId,
+          ),
+          'order' => 'user_id'), 'first');
+
+          $usernameParts = str_split($userData['username'], 4);
+
+          $first = $usernameParts[0];
+
+          $second = 'ICPNA';
+
+          $loginReversedUsername = strrev($first . $second);
+
+          $loginUsername = sha1($loginReversedUsername); */
+
+        return 'natgeo';
     }
 
 }

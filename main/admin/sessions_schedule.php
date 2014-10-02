@@ -27,7 +27,7 @@ $this_section = IN_OUT_MANAGEMENT;
 $interbreadcrumb[] = array('url' => 'index.php', 'name' => get_lang('PlatformAdmin'));
 $interbreadcrumb[] = array('url' => '#', 'name' => get_lang('InOut'));
 
-$scheduleIdSelected = isset($_REQUEST['schedule']) ? $_REQUEST['schedule'] : 0;
+$scheduleIdSelected = isset($_REQUEST['schedule']) ? $_REQUEST['schedule'] : 'all';
 $dateSelected = isset($_REQUEST['date']) ? $_REQUEST['date'] : date('Y-m-d');
 
 if (isset($_REQUEST['branch'])) {
@@ -480,7 +480,7 @@ function hasSubstitute($sessionId, $courseId, $date)
 
 /**
  * Get the list of sessions for the in/out and substitution tracking
- * @param int $scheduleId The schedule id
+ * @param int|stirng $scheduleId The schedule id or 'all'
  * @param date $date The report date
  * @param int $branchId The 
  * @param string $listFilter The filter type for in/out status
@@ -495,34 +495,47 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all', $su
 
     if (!empty($scheduleId)) {
         $rows = array();
+        
+        if ($scheduleId != 'all') { // The schedule id is a integer
+            $scheduleFieldOption = new ExtraFieldOption('session');
+            $schedule = $scheduleFieldOption->get($scheduleId);
+            $scheduleDisplayText = getFormatedSchedule($schedule['option_display_text']);
+            $scheduleData = getScheduleStart($schedule['option_display_text'], 'array');
+        }
 
-        $scheduleFieldOption = new ExtraFieldOption('session');
         $branchFieldOption = new ExtraFieldOption('session');
-
-        $schedule = $scheduleFieldOption->get($scheduleId);
+        
         $branch = $branchFieldOption->get($branchId);
-
-        $scheduleDisplayText = getFormatedSchedule($schedule['option_display_text']);
-
+        
         $sql = "SELECT s.id, s.id_coach, s.nbr_courses, s.access_start_date, s.access_end_date "
                 . "FROM $sessionTable as s "
                 . "INNER JOIN $sessionCourseUserTable AS scu ON s.id = scu.id_session "
-                . "INNER JOIN $sessionFieldValuesTable as valSch ON s.id = valSch.session_id "
-                . "INNER JOIN $sessionFieldValuesTable AS valBr ON s.id = valBr.session_id "
-                . "AND valSch.field_value = '{$schedule['option_value']}' "
-                . "AND valSch.field_id = '{$schedule['field_id']}' "
-                . "AND valBr.field_value = '{$branch['option_value']}' "
+                . "INNER JOIN $sessionFieldValuesTable AS valBr ON s.id = valBr.session_id ";
+        
+        if ($scheduleId != 'all') {
+            $sql.= "INNER JOIN $sessionFieldValuesTable as valSch ON s.id = valSch.session_id "
+                    . "AND valSch.field_value = '{$schedule['option_value']}' "
+                    . "AND valSch.field_id = '{$schedule['field_id']}' ";
+        }
+
+        $sql.= "AND valBr.field_value = '{$branch['option_value']}' "
                 . "AND valBr.field_id = '{$branch['field_id']}' "
                 . "AND '$date' BETWEEN DATE(s.access_start_date) AND DATE(s.access_end_date) "
                 . "AND s.id_coach = scu.id_user";
                 
         $listResult = Database::query($sql);
 
-        $scheduleData = getScheduleStart($schedule['option_display_text'], 'array');
-
         while ($session = Database::fetch_assoc($listResult)) {
             $room = getRoom($session['id']);
             $courses = SessionManager::get_course_list_by_session_id($session['id']);
+            
+            if ($scheduleId == 'all') {
+                $sessionScheduleValue = new ExtraFieldValue('session');
+                $schedule = $sessionScheduleValue->get_values_by_handler_and_field_id($session['id'], 4, true);
+                
+                $scheduleData = getScheduleStart($schedule['field_value'], 'array');
+                $scheduleDisplayText = getFormatedSchedule($schedule['field_value']);
+            }
 
             foreach ($courses as $course) {
                 $coachesId = SessionManager::get_session_course_coaches($course['code'], $session['id']);

@@ -501,6 +501,9 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all', $su
             $schedule = $scheduleFieldOption->get($scheduleId);
             $scheduleDisplayText = getFormatedSchedule($schedule['option_display_text']);
             $scheduleData = getScheduleStart($schedule['option_display_text'], 'array');
+        } else {
+            $scheduleField = new ExtraField('session');
+            $scheduleFieldData = $scheduleField->get_handler_field_info_by_field_variable('horario');
         }
 
         $branchFieldOption = new ExtraFieldOption('session');
@@ -531,7 +534,7 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all', $su
             
             if ($scheduleId == 'all') {
                 $sessionScheduleValue = new ExtraFieldValue('session');
-                $schedule = $sessionScheduleValue->get_values_by_handler_and_field_id($session['id'], 4, true);
+                $schedule = $sessionScheduleValue->get_values_by_handler_and_field_id($session['id'], $scheduleFieldData['id'], true);
                 
                 $scheduleData = getScheduleStart($schedule['field_value'], 'array');
                 $scheduleDisplayText = getFormatedSchedule($schedule['field_value']);

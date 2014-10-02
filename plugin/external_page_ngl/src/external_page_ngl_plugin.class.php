@@ -121,4 +121,46 @@ class ExternalPageNGLPlugin extends Plugin
         return 'natgeo';
     }
 
+    public function install()
+    {
+        $setting = $this->get_info();
+
+        $this->saveAdditionalConfiguration($setting);
+
+        $this->generateLoginExtraField();
+    }
+
+    public function uninstall()
+    {
+        $this->removeLoginExtraField();
+    }
+
+    private function generateLoginExtraField()
+    {
+        $extraField = new ExtraField('user');
+        $data = $extraField->get_handler_field_info_by_field_variable('eworkbooklogin');
+        
+        if ($data == false) {
+            $fielId = UserManager::create_extra_field('eworkbooklogin', ExtraField::FIELD_TYPE_TEXT, 'E-Workbook Login', '');
+        }
+    }
+
+    private function removeLoginExtraField()
+    {
+        $extraField = new ExtraField('user');
+        $data = $extraField->get_handler_field_info_by_field_variable('eworkbooklogin');
+
+        $extraField->delete($data['id']);
+    }
+
+    private function deleteAllData()
+    {
+        $toolTable = Database::get_course_table(TABLE_TOOL_LIST);
+        $whereCondition = array(
+            'link like ?' => '%external_page_ngl_plugin=1%'
+        );
+
+        Database::delete($toolTable, $whereCondition);
+    }
+
 }

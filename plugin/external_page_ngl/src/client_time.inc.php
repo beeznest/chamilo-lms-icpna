@@ -2,8 +2,6 @@
 
 function getClientTime()
 {
-    include('../../main/inc/lib/main_api.lib.php');
-
     $year = date('Y');
 
     $begin = new DateTime();

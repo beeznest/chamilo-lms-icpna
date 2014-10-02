@@ -10,24 +10,18 @@ if (isset($_GET['sso_cookie'])) {
     $url = $cookieInformation['loginprocess'];
 
     $params = array(
-        'normalLogin' => urlencode($username),
-        'time' => urlencode(getClientTime()),
-        'normalPassword' => urlencode($password),
-        'closePriorIfNotResumeSession' => urlencode('true'),
-        'closePrior' => urlencode('true'),
-        'resumeSession' => urlencode('false'),
-        'login' => urlencode($username),
-        'password' => urlencode($password),
-        'prod' => urlencode('')
+        'normalLogin' => $username,
+        'time' => getClientTime(),
+        'normalPassword' => $password,
+        'closePriorIfNotResumeSession' => 'true',
+        'closePrior' => 'true',
+        'resumeSession' => 'false',
+        'login' => $username,
+        'password' => $password,
+        'prod' => ''
     );
 
-    $paramsString = '';
-
-    foreach ($params as $key => $value) {
-        $paramsString .= $key . '=' . $value . '&';
-    }
-
-    rtrim($paramsString, '&');
+    $paramsString = http_build_query($params);
 
     $ch = curl_init();
 

@@ -90,6 +90,8 @@ function getScheduleList($date, $branchId) {
     $fieldsResult = Database::query($sql);
 
     if ($fieldsResult != false) {
+        $schedules['all'] = get_lang('All');
+        
         while ($fieldValueData = Database::fetch_assoc($fieldsResult)) {
             $scheduleId = $fieldValueData['id'];
             

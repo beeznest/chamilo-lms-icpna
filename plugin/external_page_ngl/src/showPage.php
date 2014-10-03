@@ -3,7 +3,7 @@
 /* For licensing terms, see /license.txt */
 /**
  * Show the page to sign-in to NGL
- * @author Angel Fernando Quiroz Campos <angel.quiroz@beeznest.com
+ * @author Angel Fernando Quiroz Campos <angel.quiroz@beeznest.com>
  * @package chamilo.plugin.externalPageNGL
  */
 include_once '../../../main/inc/global.inc.php';

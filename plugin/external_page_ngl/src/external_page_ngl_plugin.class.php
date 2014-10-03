@@ -4,7 +4,7 @@
 
 /**
  * ExternalPageNGL Plugin Class
- * @author Angel Fernando Quiroz Campos <angel.quiroz@beeznest.com
+ * @author Angel Fernando Quiroz Campos <angel.quiroz@beeznest.com>
  * @package chamilo.plugin.externalPageNGL
  */
 class ExternalPageNGLPlugin extends Plugin
@@ -96,7 +96,7 @@ class ExternalPageNGLPlugin extends Plugin
     }
 
     /**
-     * Get the login user for sign-ing
+     * Get the login user for sign-in
      * @return string
      */
     public function getLoginUser()
@@ -126,7 +126,7 @@ class ExternalPageNGLPlugin extends Plugin
     }
 
     /**
-     * Get the login password for sign-ing
+     * Get the login password for sign-in
      * @return string
      */
     public function getLoginPassword()

@@ -1,7 +1,20 @@
 <?php
 
-class ExternalPageNGLPlugin extends Plugin {
+/* For licensing terms, see /license.txt */
 
+/**
+ * ExternalPageNGL Plugin Class
+ * @author Angel Fernando Quiroz Campos <angel.quiroz@beeznest.com
+ * @package chamilo.plugin.externalPageNGL
+ */
+class ExternalPageNGLPlugin extends Plugin
+{
+
+    /**
+     * Instance the class
+     * @staticvar null $result Object instance
+     * @return ExternalPageNGLPlugin
+     */
     static function create()
     {
         static $result = null;
@@ -9,11 +22,18 @@ class ExternalPageNGLPlugin extends Plugin {
         return $result ? $result : $result = new self();
     }
 
+    /**
+     * Get the plugin name
+     * @return string
+     */
     public function get_name()
     {
         return 'external_page_ngl';
     }
 
+    /**
+     * Class constructor
+     */
     protected function __construct()
     {
         $parameters = array(
@@ -26,6 +46,11 @@ class ExternalPageNGLPlugin extends Plugin {
         parent::__construct('1.0', 'Angel Fernando Quiroz Campos', $parameters);
     }
 
+    /**
+     * Save the addition configuration when the plugin was installed
+     * @param array $params Configuration params
+     * @return void
+     */
     public function saveAdditionalConfiguration($params)
     {
         $toolTable = Database::get_course_table(TABLE_TOOL_LIST);
@@ -68,6 +93,126 @@ class ExternalPageNGLPlugin extends Plugin {
                 Database::insert($toolTable, $attributes);
             }
         }
+    }
+
+    /**
+     * Get the login user for sign-ing
+     * @return string
+     */
+    public function getLoginUser()
+    {
+        /* $userId = api_get_user_id();
+
+          $userExtraFieldValue = new ExtraFieldValue('user');
+          $eWorkbookLoginData = $userExtraFieldValue->get_values_by_handler_and_field_variable($userId, 'eworkbooklogin');
+
+          $hasEWorkbookLogin = ($eWorkbookLoginData != false);
+
+          if ($hasEWorkbookLogin) {
+          return $eWorkbookLoginData['field_value'];
+          } else {
+          $userTable = Database::get_main_table(TABLE_MAIN_USER);
+
+          $userData = Database::select('username', $userTable, array(
+          'where' => array(
+          'user_id = ?' => $userId,
+          ),
+          'order' => 'user_id'), 'first');
+
+          return 'ICPNA_' . $userData['username'];
+          } */
+
+        return 'ICPNA_S1';
+    }
+
+    /**
+     * Get the login password for sign-ing
+     * @return string
+     */
+    public function getLoginPassword()
+    {
+        /* $userId = api_get_user_id();
+          $userTable = Database::get_main_table(TABLE_MAIN_USER);
+
+          $userData = Database::select('username', $userTable, array(
+          'where' => array(
+          'user_id = ?' => $userId,
+          ),
+          'order' => 'user_id'), 'first');
+
+          $usernameParts = str_split($userData['username'], 4);
+
+          $first = $usernameParts[0];
+
+          $second = 'ICPNA';
+
+          $loginReversedUsername = strrev($first . $second);
+
+          $loginUsername = sha1($loginReversedUsername); */
+
+        return 'natgeo';
+    }
+
+    /**
+     * Install the plugin
+     * @return void
+     */
+    public function install()
+    {
+        $setting = $this->get_info();
+
+        $this->saveAdditionalConfiguration($setting);
+
+        $this->generateLoginExtraField();
+    }
+
+    /**
+     * Unistall the plugin
+     * @return void
+     */
+    public function uninstall()
+    {
+        $this->removeLoginExtraField();
+    }
+
+    /**
+     * Generate a user extra field for register the login username when the plugin was installed
+     * @return void
+     */
+    private function generateLoginExtraField()
+    {
+        $extraField = new ExtraField('user');
+        $data = $extraField->get_handler_field_info_by_field_variable('eworkbooklogin');
+
+        if ($data == false) {
+            $fielId = UserManager::create_extra_field('eworkbooklogin', ExtraField::FIELD_TYPE_TEXT, 'E-Workbook Login', '');
+        }
+    }
+
+    /**
+     * Delete the user extra field when the plugin was uninstalled
+     * @return void
+     */
+    private function removeLoginExtraField()
+    {
+        $extraField = new ExtraField('user');
+        $data = $extraField->get_handler_field_info_by_field_variable('eworkbooklogin');
+
+        $extraField->delete($data['id']);
+    }
+
+    /**
+     * Delete all registered data to config the plugin
+     * @return void
+     */
+    private function deleteAllData()
+    {
+        $toolTable = Database::get_course_table(TABLE_TOOL_LIST);
+        $whereCondition = array(
+            'link like ?' => '%external_page_ngl_plugin=1%'
+        );
+
+        Database::delete($toolTable, $whereCondition);
     }
 
 }

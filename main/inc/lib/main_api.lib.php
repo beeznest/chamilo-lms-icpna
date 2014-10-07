@@ -1147,8 +1147,6 @@ function _api_format_user($user, $add_password = false) {
     if (isset($user['username'])) {
         $result['username']         = $user['username'];
     }
-    
-    $result['eworkbooklogin'] = $user['eworkbooklogin'];
 
     $result['theme']            = $user['theme'];
     $result['language']         = $user['language'];

@@ -131,26 +131,19 @@ class ExternalPageNGLPlugin extends Plugin
      */
     public function getLoginPassword()
     {
-        /* $userId = api_get_user_id();
-          $userTable = Database::get_main_table(TABLE_MAIN_USER);
+        $userId = api_get_user_id();
+        $userTable = Database::get_main_table(TABLE_MAIN_USER);
 
-          $userData = Database::select('username', $userTable, array(
-          'where' => array(
-          'user_id = ?' => $userId,
-          ),
-          'order' => 'user_id'), 'first');
+        $userData = Database::select('username', $userTable, array(
+                    'where' => array(
+                        'user_id = ?' => $userId,
+                    ),
+                    'order' => 'user_id'
+        ), 'first');
 
-          $usernameParts = str_split($userData['username'], 4);
+        $loginReversedUsername = strrev($userData['username'] . "ICPNA");
 
-          $first = $usernameParts[0];
-
-          $second = 'ICPNA';
-
-          $loginReversedUsername = strrev($first . $second);
-
-          $loginUsername = sha1($loginReversedUsername); */
-
-        return 'natgeo';
+        return sha1($loginReversedUsername);
     }
 
     /**

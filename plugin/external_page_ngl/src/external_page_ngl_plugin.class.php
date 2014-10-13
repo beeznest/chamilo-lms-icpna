@@ -101,28 +101,26 @@ class ExternalPageNGLPlugin extends Plugin
      */
     public function getLoginUser()
     {
-        /* $userId = api_get_user_id();
+        $userId = api_get_user_id();
 
-          $userExtraFieldValue = new ExtraFieldValue('user');
-          $eWorkbookLoginData = $userExtraFieldValue->get_values_by_handler_and_field_variable($userId, 'eworkbooklogin');
+        $userExtraFieldValue = new ExtraFieldValue('user');
+        $eWorkbookLoginData = $userExtraFieldValue->get_values_by_handler_and_field_variable($userId, 'eworkbooklogin');
 
-          $hasEWorkbookLogin = ($eWorkbookLoginData != false);
+        $hasEWorkbookLogin = ($eWorkbookLoginData != false);
 
-          if ($hasEWorkbookLogin) {
-          return $eWorkbookLoginData['field_value'];
-          } else {
-          $userTable = Database::get_main_table(TABLE_MAIN_USER);
+        if ($hasEWorkbookLogin) {
+            return $eWorkbookLoginData['field_value'];
+        } else {
+            $userTable = Database::get_main_table(TABLE_MAIN_USER);
 
-          $userData = Database::select('username', $userTable, array(
-          'where' => array(
-          'user_id = ?' => $userId,
-          ),
-          'order' => 'user_id'), 'first');
+            $userData = Database::select('username', $userTable, array(
+                        'where' => array(
+                            'user_id = ?' => $userId,
+                        ),
+                        'order' => 'user_id'), 'first');
 
-          return 'ICPNA_' . $userData['username'];
-          } */
-
-        return 'ICPNA_S1';
+            return 'ICPNA_' . $userData['username'];
+        }
     }
 
     /**

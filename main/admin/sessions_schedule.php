@@ -362,64 +362,6 @@ function getRoom($sessionId)
 }
 
 /**
- * Get the schedule start time
- * @param string $scheduleDisplayText The schedule
- * @param string $format The format to get the schedule start
- * @return array
- */
-function getScheduleStart($scheduleDisplayText, $format = 'string')
-{
-    $scheduleDisplayText = trim($scheduleDisplayText);
-    $parts = preg_split("/(\ )+/", $scheduleDisplayText);
-
-    $time = $parts[1];
-
-    switch ($format) {
-        case 'array':
-            $timeParts = explode(':', $time);
-
-            return array(
-                'hours' => $timeParts[0],
-                'minutes' => $timeParts[1]
-            );
-
-        default:
-            return $time;
-    }
-}
-
-/**
- * Calculate the income time. Time - 5 minutes
- * @param string $hours The hours
- * @param string $minutes The minutes
- * @param string $format The formart to get the calculated time
- * @return array The teacher income time. Depending the format
- */
-function calculateInTime($hours, $minutes, $format = 'string')
-{
-    $datetime = new DateTime();
-    $datetime->setTime($hours, $minutes);
-
-    $datetime->modify('-5 minutes');
-
-    $inTime = $datetime->format('h:i:s');
-
-    switch ($format) {
-        case 'array':
-            $inTimeParts = explode(':', $inTime);
-
-            return array(
-                'hours' => $inTimeParts[0],
-                'minutes' => $inTimeParts[1],
-                'seconds' => $inTimeParts[2]
-            );
-
-        default:
-            return $inTime;
-    }
-}
-
-/**
  * Get the teacher in/out inside a room for a course in session
  * @param int $sessionId The session id
  * @param int $courseId The course id

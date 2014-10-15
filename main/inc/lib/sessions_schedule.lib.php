@@ -164,6 +164,14 @@ function calculateInTime($hours, $minutes, $format = 'string')
     }
 }
 
+/**
+ * Guess the session id when a In is registred
+ * @param int $userId The id of the user making the record
+ * @param date $date The record date
+ * @param tine $branchId The branch of a room
+ * @param string $roomName The room title
+ * @return int The session id
+ */
 function searchSession($userId, $date, $branchId, $roomName)
 {
     $sessionTable = Database::get_main_table(TABLE_MAIN_SESSION);
@@ -190,6 +198,11 @@ function searchSession($userId, $date, $branchId, $roomName)
     return $sessionData['id_session'];
 }
 
+/**
+ * Get the course id of a session
+ * @param int $sessionId The session id
+ * @return int The course id
+ */
 function searchCourse($sessionId)
 {
     $courses = SessionManager::get_course_list_by_session_id($sessionId);

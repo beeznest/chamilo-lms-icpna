@@ -316,9 +316,10 @@ function getSchedulesList()
 /**
  * Get the room data (id, title)
  * @param int $sessionId The session id
+ * @param int $branchId The branch id
  * @return array The room data. Otherwise return false
  */
-function getRoom($sessionId)
+function getRoom($sessionId, $branchId)
 {
     $branchRoomTable = Database::get_statistic_table(TABLE_BRANCH_ROOM);
     $fieldTable = Database::get_statistic_table(TABLE_MAIN_SESSION_FIELD);
@@ -346,7 +347,8 @@ function getRoom($sessionId)
             $optionRoomData = Database::fetch_assoc($optionRoomResult);
 
             $sql = "SELECT id, title FROM $branchRoomTable "
-                    . "WHERE title = {$optionRoomData['option_display_text']}";
+                    . "WHERE title = {$optionRoomData['option_display_text']} "
+                    . "AND branch_id = $branchId";
 
             $roomResult = Database::query($sql);
 
@@ -471,7 +473,7 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all', $su
         $listResult = Database::query($sql);
 
         while ($session = Database::fetch_assoc($listResult)) {
-            $room = getRoom($session['id']);
+            $room = getRoom($session['id'], $branchId);
             $courses = SessionManager::get_course_list_by_session_id($session['id']);
             
             if ($scheduleId == 'all') {

@@ -498,6 +498,23 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all', $su
 
                 $substitutes = SessionManager::getSessionCourseSubstituteCoachesWithInfo($course['id'], $session['id'], $date);
 
+                if (empty($inOut)) {
+                    $inDateTime = null;
+                    $outDateTime = null;
+                } else {
+                    if (!empty($inOut['log_in_course_date'])) {
+                        $inDateTime = api_get_local_time($inOut['log_in_course_date']);
+                    } else {
+                        $inDateTime = null;
+                    }
+
+                    if (!empty($inOut['log_out_course_date'])) {
+                        $outDateTime = api_get_local_time($inOut['log_out_course_date']);
+                    } else {
+                        $outDateTime = null;
+                    }
+                }
+
                 $row = array(
                     'id' => $session['id'],
                     'room' => $room['title'],
@@ -506,8 +523,8 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all', $su
                     'schedule' => $scheduleDisplayText,
                     'coaches' => $coaches,
                     'substitutes' => $substitutes,
-                    'in' => empty($inOut) ? null : $inOut['log_in_course_date'],
-                    'out' => empty($inOut) ? null : $inOut['log_out_course_date'],
+                    'in' => $inDateTime,
+                    'out' => $outDateTime,
                     'hasSubstitute' => $hasSubstitute
                 );
                 

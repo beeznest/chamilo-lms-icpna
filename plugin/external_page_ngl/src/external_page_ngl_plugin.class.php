@@ -82,7 +82,7 @@ class ExternalPageNGLPlugin extends Plugin
                     'name' => $tool['name'],
                     'link' => $tool['link'],
                     'image' => $tool['image'],
-                    'visibility' => 2,
+                    'visibility' => 1,
                     'admin' => 1,
                     'address' => '',
                     'added_tool' => 0,

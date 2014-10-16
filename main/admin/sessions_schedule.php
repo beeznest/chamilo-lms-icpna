@@ -480,7 +480,7 @@ function hasSubstitute($sessionId, $courseId, $date)
 
 /**
  * Get the list of sessions for the in/out and substitution tracking
- * @param int|stirng $scheduleId The schedule id or 'all'
+ * @param int|string $scheduleId The schedule id or 'all'
  * @param date $date The report date
  * @param int $branchId The 
  * @param string $listFilter The filter type for in/out status

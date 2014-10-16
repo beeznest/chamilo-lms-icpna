@@ -469,6 +469,8 @@ switch ($action) {
          * ($columns, $table_name, $conditions = array(), $type_result = 'all', $option = 'ASSOC')
          */
         require_once '../global.inc.php';
+        require_once api_get_path(LIBRARY_PATH) . 'sessions_schedule.lib.php';
+
         $userId = api_get_user_id();
         $courseId = $sessionId = 0;
         /*
@@ -508,6 +510,10 @@ switch ($action) {
                     'room_id = ?' => $roomId
                 )
             );
+
+            $sessionId = searchSession($userId, api_get_utc_datetime(), $branchId, $room);
+            $courseId = searchCourse($sessionId);
+
             $attributes = array(
                 'course_id' => $courseId,
                 'user_id' => $userId,

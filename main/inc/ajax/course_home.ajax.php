@@ -511,7 +511,12 @@ switch ($action) {
                 )
             );
 
-            $sessionId = searchSession($userId, api_get_utc_datetime(), $branchId, $room);
+            $sessionId = api_get_session_id();
+
+            if (empty($sessionId)) {
+                $sessionId = searchSession($userId, api_get_utc_datetime(), $branchId, $room);
+            }
+
             $courseId = searchCourse($sessionId);
 
             $attributes = array(

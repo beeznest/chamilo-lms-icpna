@@ -473,14 +473,14 @@ switch ($action) {
 
         $userId = api_get_user_id();
         $courseId = $sessionId = 0;
-        /*
+
         if (!empty($_GET['course_id'])) {
             $courseId = intval($_GET['course_id']);
         }
         if (!empty($_GET['session_id'])) {
             $sessionId = intval($_GET['session_id']);
         }
-        */
+
         $trackTeacherInOut = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
         $branchTransaction = Database::get_main_table(TABLE_BRANCH_TRANSACTION);
 
@@ -498,8 +498,8 @@ switch ($action) {
         // if there is no such register with an open "OUT", insert new line
         if (empty($dataTable)) {
             $objBranch = new Branch();
-            if (!empty($_GET['session_id'])) {
-                $branchId = $objBranch->getBranchId($_GET['sessionId']);
+            if (!empty($sessionId)) {
+                $branchId = $objBranch->getBranchId($sessionId);
             } else {
                 $branchId = $objBranch->getBranchFromIP(api_get_real_ip());
             }
@@ -511,13 +511,13 @@ switch ($action) {
                 )
             );
 
-            $sessionId = api_get_session_id();
-
-            if (empty($sessionId)) {
+            if (empty($sessionId)) {    // Guess session id
                 $sessionId = searchSession($userId, api_get_utc_datetime(), $branchId, $room);
             }
 
-            $courseId = searchCourse($sessionId);
+            if (empty($courseId)) {     // Guess course id
+                $courseId = searchCourse($sessionId);
+            }
 
             $attributes = array(
                 'course_id' => $courseId,

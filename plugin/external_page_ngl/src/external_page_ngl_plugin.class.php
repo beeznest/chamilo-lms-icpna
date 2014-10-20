@@ -1,5 +1,4 @@
 <?php
-
 /* For licensing terms, see /license.txt */
 
 /**
@@ -141,7 +140,11 @@ class ExternalPageNGLPlugin extends Plugin
 
         $loginReversedUsername = strrev($userData['username'] . "ICPNA");
 
-        return sha1($loginReversedUsername);
+        $encrypted = sha1($loginReversedUsername);
+
+        $newPassword = substr($encrypted, 13, 14);
+
+        return $newPassword;
     }
 
     /**

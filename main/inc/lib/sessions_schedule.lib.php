@@ -291,22 +291,18 @@ function getRoom($sessionId, $branchId)
  * @param int $courseId The course id
  * @param int $roomId The room id
  * @param date $date The report date
- * @param array $schedule The schedule data
  * @return array The in/out data
  */
-function getInOut($sessionId, $courseId, $roomId, $date, $schedule)
+function getInOut($sessionId, $courseId, $roomId, $date)
 {
     $trackIOTable = Database::get_statistic_table(TABLE_TRACK_E_TEACHER_IN_OUT);
-
-    $inTime = calculateInTime($schedule['hours'], $schedule['minutes']);
-    $inDatetime = "$date $inTime";
 
     $trackResult = Database::select('*', $trackIOTable, array(
                 'where' => array(
                     "session_id = ? AND " => $sessionId,
                     "course_id = ? AND " => $courseId,
                     "room_id = ? AND " => $roomId,
-                    "log_in_course_date >= '?'" => $inDatetime
+                    "log_in_course_date LIKE %?%" => $date
                 ),
         'order' => 'log_in_course_date'
     ));

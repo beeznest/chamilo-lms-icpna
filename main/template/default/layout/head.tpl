@@ -312,6 +312,11 @@ $(document).ready(function () {
 
         var logoutButtonRef = this.href;
 
+        $('body').append('<div class="modal-backdrop fade in"></div>');
+        $('body').append('<div style="display: block;" class="modal hide fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false"><div class="modal-body">' +
+                '<h4><center>{{ 'langLogout' | get_lang }}</center></h4>' + 
+                '</div></div>');
+
         var getLogoutXhr = $.getJSON(branchLogoutAjaxURL);
 
         $.when(getLogoutXhr).done(function (response) {
@@ -330,7 +335,7 @@ $(document).ready(function () {
                 promises.push(deferred.promise());
             });
 
-            $.when.apply($, promises).done(function () {
+            $.when.apply($, promises).then(function () {
                 location.href = logoutButtonRef;
             });
         });

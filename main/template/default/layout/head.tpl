@@ -312,8 +312,27 @@ $(document).ready(function () {
 
         var logoutButtonRef = this.href;
 
-        $.get(branchLogoutAjaxURL).always(function () {
-            location.href = logoutButtonRef;
+        var getLogoutXhr = $.getJSON(branchLogoutAjaxURL);
+
+        $.when(getLogoutXhr).done(function (response) {
+            var promises = new Array();
+
+            $.each(response, function (index, urlLogout) {
+                var deferred = $.Deferred();
+
+                $('<iframe>', {
+                    src: urlLogout,
+                    load: function () {
+                        deferred.resolve();
+                    }
+                }).css('display', 'none').appendTo('body');
+
+                promises.push(deferred.promise());
+            });
+
+            $.when.apply($, promises).done(function () {
+                location.href = logoutButtonRef;
+            });
         });
     });
 });

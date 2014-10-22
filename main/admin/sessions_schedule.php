@@ -245,8 +245,16 @@ if ($sessions != false) {
                                         }
                                     }
                                     ?></td>
-                                <td><?php echo $session['in'] ?></td>
-                                <td><?php echo $session['out'] ?></td>
+                                <td>
+                                    <?php foreach ($session['in'] as $in) { ?>
+                                        <p><?php echo $in ?></p>
+                                    <?php } ?>
+                                </td>
+                                <td>
+                                    <?php foreach ($session['out'] as $out) { ?>
+                                        <p><?php echo $out ?></p>
+                                    <?php } ?>
+                                </td>
                                 <td>
                                     <?php
                                     $urlParams = array(

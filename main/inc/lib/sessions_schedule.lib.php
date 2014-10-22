@@ -307,10 +307,11 @@ function getInOut($sessionId, $courseId, $roomId, $date, $schedule)
                     "course_id = ? AND " => $courseId,
                     "room_id = ? AND " => $roomId,
                     "log_in_course_date >= '?'" => $inDatetime
-                )
+                ),
+        'order' => 'log_in_course_date'
     ));
 
-    return current($trackResult);
+    return $trackResult;
 }
 
 /**
@@ -421,19 +422,21 @@ function getSessionsList($scheduleId, $date, $branchId, $listFilter = 'all', $su
                 $substitutes = SessionManager::getSessionCourseSubstituteCoachesWithInfo($course['id'], $session['id'], $date);
 
                 if (empty($inOut)) {
-                    $inDateTime = null;
-                    $outDateTime = null;
+                    $inDateTime = array();
+                    $outDateTime = array();
                 } else {
-                    if (!empty($inOut['log_in_course_date'])) {
-                        $inDateTime = api_get_local_time($inOut['log_in_course_date']);
-                    } else {
-                        $inDateTime = null;
-                    }
+                    foreach ($inOut as $io) {
+                        if (!empty($io['log_in_course_date'])) {
+                            $inDateTime[] = api_get_local_time($io['log_in_course_date']);
+                        } else {
+                            $outDateTime[] = "&nbsp;";
+                        }
 
-                    if (!empty($inOut['log_out_course_date'])) {
-                        $outDateTime = api_get_local_time($inOut['log_out_course_date']);
-                    } else {
-                        $outDateTime = null;
+                        if (!empty($io['log_out_course_date'])) {
+                            $outDateTime[] = api_get_local_time($io['log_out_course_date']);
+                        } else {
+                            $outDateTime[] = "&nbsp;";
+                        }
                     }
                 }
 

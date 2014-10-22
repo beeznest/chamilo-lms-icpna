@@ -312,8 +312,32 @@ $(document).ready(function () {
 
         var logoutButtonRef = this.href;
 
-        $.get(branchLogoutAjaxURL).always(function () {
-            location.href = logoutButtonRef;
+        $('body').append('<div class="modal-backdrop fade in"></div>');
+        $('body').append('<div style="display: block;" class="modal hide fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false"><div class="modal-body">' +
+                '<h4><center>{{ 'langLogout' | get_lang }}</center></h4>' + 
+                '</div></div>');
+
+        var getLogoutXhr = $.getJSON(branchLogoutAjaxURL);
+
+        $.when(getLogoutXhr).done(function (response) {
+            var promises = new Array();
+
+            $.each(response, function (index, urlLogout) {
+                var deferred = $.Deferred();
+
+                $('<iframe>', {
+                    src: urlLogout,
+                    load: function () {
+                        deferred.resolve();
+                    }
+                }).css('display', 'none').appendTo('body');
+
+                promises.push(deferred.promise());
+            });
+
+            $.when.apply($, promises).then(function () {
+                location.href = logoutButtonRef;
+            });
         });
     });
 });

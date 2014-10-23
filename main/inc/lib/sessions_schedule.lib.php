@@ -134,6 +134,37 @@ function getScheduleStart($scheduleDisplayText, $format = 'string')
 }
 
 /**
+ * Get the schedule end time
+ * @param string $scheduleDisplayText The schedule
+ * @param string $format The format to get the schedule start
+ * @return array
+ */
+function getScheduleEnd($scheduleDisplayText, $format = 'string')
+{
+    $scheduleDisplayText = trim($scheduleDisplayText);
+    $parts = preg_split("/(\ )+/", $scheduleDisplayText);
+
+    if (array_key_exists(2, $parts)) {
+        $time = $parts[2];
+
+        switch ($format) {
+            case 'array':
+                $timeParts = explode(':', $time);
+
+                return array(
+                    'hours' => $timeParts[0],
+                    'minutes' => $timeParts[1]
+                );
+
+            default:
+                return $time;
+        }
+    }
+
+    return false;
+}
+
+/**
  * Calculate the income time. Time - 5 minutes
  * @param string $hours The hours
  * @param string $minutes The minutes
@@ -174,6 +205,8 @@ function calculateInTime($hours, $minutes, $format = 'string')
  */
 function searchSession($userId, $date, $branchId, $roomName)
 {
+    $sessionId = 0;
+
     $sessionTable = Database::get_main_table(TABLE_MAIN_SESSION);
     $scuTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
     $sessionFieldOptionsTable = Database::get_main_table(TABLE_MAIN_SESSION_FIELD_OPTIONS);
@@ -193,9 +226,38 @@ function searchSession($userId, $date, $branchId, $roomName)
 
     $sessionResult = Database::query($sql);
 
-    $sessionData = Database::fetch_assoc($sessionResult);
+    while ($sessionData = Database::fetch_assoc($sessionResult)) {
+        $extraValue = new ExtraFieldValue('session');
+        $scheduleValue = $extraValue->get_values_by_handler_and_field_variable($sessionData['id_session'], 'horario', true);
 
-    return $sessionData['id_session'];
+        $extraOption = new ExtraFieldOption('session');
+        $scheduleOption = $extraOption->get_field_option_by_field_and_option($scheduleValue['field_id'], $scheduleValue['field_value']);
+        $scheduleOption = current($scheduleOption);
+
+        $scheduleStartData = getScheduleStart($scheduleOption['option_display_text'], 'array');
+        $scheduleEndData = getScheduleEnd($scheduleOption['option_display_text'], 'array');
+
+        $scheduleInData = calculateInTime($scheduleStartData['hours'], $scheduleStartData['minutes'], 'array');
+
+        $timezone = _api_get_timezone();
+
+        $scheduleIn = new DateTime('now', new DateTimeZone($timezone));
+        $scheduleIn->setTime($scheduleInData['hours'], $scheduleInData['minutes']);
+        $scheduleIn->setTimezone(new DateTimeZone('UTC'));
+
+        $scheduleEnd = new DateTime('now', new DateTimeZone($timezone));
+        $scheduleEnd->setTime($scheduleEndData['hours'], $scheduleEndData['minutes']);
+        $scheduleEnd->setTimezone(new DateTimeZone('UTC'));
+
+        $currentTime = new DateTime($date, new DateTimeZone('UTC'));
+
+        if ($currentTime >= $scheduleIn && $currentTime <= $scheduleEnd) {
+            $sessionId = $sessionData['id_session'];
+            break;
+        }
+    }
+
+    return $sessionId;
 }
 
 /**

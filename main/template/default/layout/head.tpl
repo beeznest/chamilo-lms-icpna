@@ -314,7 +314,7 @@ $(document).ready(function () {
 
         $('body').append('<div class="modal-backdrop fade in"></div>');
         $('body').append('<div style="display: block;" class="modal hide fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false"><div class="modal-body">' +
-                '<h4><center>{{ 'langLogout' | get_lang }}</center></h4>' + 
+                '<h4><center>{{ 'ClosingSession' | get_lang }}</center></h4>' + 
                 '</div></div>');
 
         var getLogoutXhr = $.getJSON(branchLogoutAjaxURL);

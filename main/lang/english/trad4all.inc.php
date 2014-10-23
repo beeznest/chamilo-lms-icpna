@@ -1422,4 +1422,5 @@ $Registered = "Registered";
 $SubstitutionStatus = "Substitution status";
 $OnlyWithSubstitution = "Only with substitution";
 $OnlyWithoutSubstitution = "Only without substitution";
+$ClosingSession = 'Closing session...';
 ?>

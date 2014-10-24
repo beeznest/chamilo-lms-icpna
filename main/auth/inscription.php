@@ -246,7 +246,10 @@ if (!CustomPages::enabled()) {
     }
 
     // Forbidden to self-register
-    if (api_get_setting('allow_registration') == 'false') {
+    if (
+        api_get_setting('allow_terms_conditions') == 'false' &&
+        api_get_setting('allow_registration') == 'false'
+    ) {
         api_not_allowed(true);
     }
 
@@ -517,7 +520,8 @@ if ($form->validate()) {
         }
     }
 
-    $form_register = new FormValidator('form_register', 'post', $form_data['action']);
+    // Form with GET method because target only allow HTTP GET
+    $form_register = new FormValidator('form_register', 'get', $form_data['action']);
     if (!empty($form_data['message'])) {
         $form_register->addElement('html', $form_data['message'].'<br /><br />');
     }

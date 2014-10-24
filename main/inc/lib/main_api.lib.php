@@ -6508,7 +6508,7 @@ function api_get_js_simple($file) {
 
 
 function api_set_settings_and_plugins() {
-    global $_configuration;
+    global $_setting, $_configuration;
     //error_log('Loading settings from DB');
     $_setting = array();
     $_plugins = array();

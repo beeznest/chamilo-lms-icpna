@@ -51,23 +51,15 @@
                     </div>
                     <div id="header_right" class="span5">
                         {# NOTIFICATIONS #}
-                        <div id="notifications-container">
-                            <ul id="notifications" class="nav nav-pills pull-right">
-                                {{ notification_menu }}
-                            </ul>
-
-                            {# plugin_header right #}
-                            {% if plugin_header_right is not null %}
-                                <div id="plugin_header_right">
-                                    {{ plugin_header_right }}
-                                </div>
-                            {% endif %}
-                            &nbsp;
-                        </div>
-                        {# END NOTIFICATIONS #}
+                        {# plugin_header right #}
+                        {% if plugin_header_right is not null %}
+                            <div id="plugin_header_right">
+                                {{ plugin_header_right }}
+                            </div>
+                        {% endif %}
                         {# IN/OUT #}
                         {% if _u.status == 1 and _p.is_in_room %}
-                            <div id="in-out-buttons" class="text-center pagination-centered pull-right">
+                            <div id="in-out-buttons" class="in-out-buttons-space">
                                 <button class="btn  btn-large btn-success {% if _p.count_active_in > 0 %} hide-important {% endif %}" type="button" id="btn_in_session" name="btn_in_session">IN</button>
                                 <button class="btn btn-large btn-danger {% if _p.count_active_in == 0 %} hide-important {% endif %}" type="button" id="btn_out_session" name="btn_out_session">OUT</button>
                                 <input type="hidden" name="in_course_id" id="in_course_id" value="{{ _u.coach_course_id }}" />
@@ -75,6 +67,13 @@
                             </div>
                         {% endif %}
                         {# END IN/OUT #}
+                        <div class="notifications-container">
+                            <ul id="notifications" class="nav nav-pills pull-right">
+                                {{ notification_menu }}
+                            </ul>
+
+                        </div>
+                        {# END NOTIFICATIONS #}
                     </div>
                 </div>
 

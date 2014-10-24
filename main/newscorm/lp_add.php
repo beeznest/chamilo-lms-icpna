@@ -133,7 +133,8 @@ $form -> addElement('html','<div id="options" style="display:none">');
 
 $items = learnpath::get_category_from_course_into_select(api_get_course_int_id());
 if (!empty($items)) {
-    $items = array_merge(array(get_lang('SelectACategory')), $items);
+    $items[0] = get_lang('SelectACategory');
+    ksort($items);
 }
 $form->addElement('select', 'category_id', get_lang('Category'), $items);
 

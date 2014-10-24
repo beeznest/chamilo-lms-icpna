@@ -8,7 +8,6 @@
  */
 include_once '../../../main/inc/global.inc.php';
 include_once 'external_page_ngl_plugin.class.php';
-include_once '../../../main/auth/sso/sso_ngl.class.php';
 
 if (api_is_course_admin() || api_is_teacher_admin()) {
     api_not_allowed(true);

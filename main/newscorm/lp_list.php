@@ -301,7 +301,7 @@ foreach ($categories as $item) {
         } else {
             echo '<th width="50%">'.get_lang('Title').'</th>';
             echo '<th>'.get_lang('Progress')."</th>";
-            echo '<th>'.get_lang('Actions')."</th>";
+            //echo '<th>'.get_lang('Actions')."</th>";
         }
         echo '</tr>';
 
@@ -639,7 +639,9 @@ foreach ($categories as $item) {
                 }
             } else { // end if ($is_allowedToEdit)
                 //Student
-                $export_icon = ' <a href="'.api_get_self().'?'.api_get_cidreq().'&action=export_to_pdf&lp_id='.$id.'">'.Display::return_icon('pdf.png', get_lang('ExportToPDF'), '', ICON_SIZE_SMALL).'</a>';
+                $dsp_edit = null;
+                $dsp_edit_close = null;
+                $export_icon = null;
             }
 
             if ($isCoach) {

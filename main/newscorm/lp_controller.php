@@ -377,7 +377,15 @@ switch ($action) {
         }
 
         break;
+    case 'move_up_category':
+        if (isset($_REQUEST['id'])) {
+            learnpath::moveUpLPCategory($_REQUEST['id'], $course_id);
+        }
 
+        require 'lp_list.php';
+        break;
+    case 'move_down_category':
+        break;
     case 'admin_view':
         if (!$is_allowed_to_edit) {
             api_not_allowed(true);

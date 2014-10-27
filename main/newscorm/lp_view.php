@@ -420,8 +420,6 @@ echo '<div id="learning_path_main" style="width:100%;height:100%;">';
     <?php
         // hub 26-05-2010 Fullscreen or not fullscreen
         $height = '100%';
-        // Replace &amp; by & because &amp; will break URL with params
-        $src = !empty($src) ? str_replace('&amp;', '&', $src) : '';
         if ($_SESSION['oLP']->mode == 'fullscreen') {
             echo '<iframe id="content_id_blank" name="content_name_blank" src="blank.php" border="0" frameborder="0" style="width:100%;height:'.$height.'" webkitAllowFullScreen mozallowfullscreen allowFullScreen ></iframe>';
         } else {

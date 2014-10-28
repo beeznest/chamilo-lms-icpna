@@ -9421,10 +9421,14 @@ EOD;
 
     static function create_category($params) {
         global $app;
+        
+        $newOrder = self::getNewCategoryOrder($params['c_id']);
+
         $em = $app['orm.em'];
         $item = new Entity\EntityCLpCategory();
         $item->setName($params['name']);
         $item->setCId($params['c_id']);
+        $item->setDisplayOrder($newOrder);
         $em->persist($item);
         $em->flush();
     }
@@ -9439,6 +9443,35 @@ EOD;
             $em->persist($item);
             $em->flush();
         }
+    }
+
+    /**
+     * Get the new display order for a LP category
+     * @param int $courseId The category id
+     * @return int Whether the if set the course id return the new display order. Otherwise return false
+     */
+    static function getNewCategoryOrder($courseId)
+    {
+        $courseId = intval($courseId);
+
+        if (empty($courseId)) {
+            return false;
+        }
+
+        $categoryTable = Database::get_course_table(TABLE_LP_CATEGORY);
+
+        $sql = "SELECT (display_order + 1) as new_order FROM $categoryTable "
+                . "WHERE c_id = $courseId "
+                . "ORDER BY display_order DESC "
+                . "LIMIT 1";
+
+        $row = Database::fetch_assoc(Database::query($sql));
+
+        if ($row !== false) {
+            return $row['new_order'];
+        }
+
+        return 2;
     }
 
     static function get_categories($course_id) {

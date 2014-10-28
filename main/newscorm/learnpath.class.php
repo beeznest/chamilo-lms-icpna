@@ -9561,6 +9561,70 @@ EOD;
             }
         }
     }
+
+    /**
+     * Move to down position a LP category
+     * @param int $categoryId The LP category id
+     * @param int $courseId The course id
+     * @return boolean
+     */
+    public static function moveDownLPCategory($categoryId, $courseId) {
+        $lpCategoryTable = Database::get_course_table(TABLE_LP_CATEGORY);
+
+        $courseId = intval($courseId);
+
+        $currentCategory = Database::select(
+            'display_order',
+            $lpCategoryTable,
+            array(
+                'where' => array(
+                    'c_id = ? AND ' => $courseId,
+                    'id = ?' => $categoryId
+                ),
+                'order' => 'display_order'
+            ),
+            'first'
+        );
+
+        if ($currentCategory !== false) {
+            $categoryOrder = $currentCategory['display_order'];
+            $categoryNewOrder = $categoryOrder + 1;
+
+            $belowCategory = Database::select(
+                'id',
+                $lpCategoryTable,
+                array(
+                    'where' => array(
+                        'c_id = ? AND ' => $courseId,
+                        'display_order = ?' => $categoryNewOrder
+                    )
+                ),
+                'first'
+            );
+
+            if ($belowCategory !== false) {
+                Database::update(
+                    $lpCategoryTable,
+                    array(
+                        'display_order' => $categoryOrder
+                    ),
+                    array(
+                        'id = ?' => $belowCategory['id']
+                    )
+                );
+
+                Database::update(
+                    $lpCategoryTable,
+                    array(
+                        'display_order' => $categoryNewOrder
+                    ),
+                    array(
+                        'id = ?' => $categoryId
+                    )
+                );
+            }
+        }
+    }
 }
 
 if (!function_exists('trim_value')) {

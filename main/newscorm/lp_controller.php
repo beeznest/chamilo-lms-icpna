@@ -385,6 +385,11 @@ switch ($action) {
         require 'lp_list.php';
         break;
     case 'move_down_category':
+        if (isset($_REQUEST['id'])) {
+            learnpath::moveDownLPCategory($_REQUEST['id'], $course_id);
+        }
+
+        require 'lp_list.php';
         break;
     case 'admin_view':
         if (!$is_allowed_to_edit) {

@@ -9536,7 +9536,7 @@ EOD;
                     )
                 ),
                 'first'
-            );print_r($aboveCategory);
+            );
 
             if ($aboveCategory !== false) {
                 Database::update(
@@ -9547,7 +9547,7 @@ EOD;
                     array(
                         'id = ?' => $aboveCategory['id']
                     )
-                );echo Database::error();
+                );
 
                 Database::update(
                     $lpCategoryTable,
@@ -9557,7 +9557,7 @@ EOD;
                     array(
                         'id = ?' => $categoryId
                     )
-                );echo Database::error();
+                );
             }
         }
     }

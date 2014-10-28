@@ -9444,7 +9444,7 @@ EOD;
     static function get_categories($course_id) {
         global $app;
         $em = $app['orm.em'];
-        $items = $em->getRepository('Entity\EntityCLpCategory')->findBy(array('cId' => $course_id), array('name' => 'ASC'));
+        $items = $em->getRepository('Entity\EntityCLpCategory')->findBy(array('cId' => $course_id), array('displayOrder' => 'ASC'));
         return $items;
     }
 

@@ -53,8 +53,9 @@ $(function() {
         collapsible: true,
 		header: '.page-header'
 	});
-    $('#category_accordion .page-header a').live('click', function (e) {
-        location.href = this.href;
+    $('#category_accordion a').on('click', function (e) {
+        window.location = this.href;
+        return false;
     });
 });
 

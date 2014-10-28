@@ -9542,55 +9542,47 @@ EOD;
 
         $courseId = intval($courseId);
 
-        $currentCategory = Database::select(
-            'display_order',
-            $lpCategoryTable,
-            array(
-                'where' => array(
-                    'c_id = ? AND ' => $courseId,
-                    'id = ?' => $categoryId
-                ),
-                'order' => 'display_order'
-            ),
-            'first'
-        );
+        $sql = "SELECT * FROM $lpCategoryTable "
+                . "WHERE c_id = $courseId ORDER BY display_order ";
 
-        if ($currentCategory !== false) {
-            $categoryOrder = $currentCategory['display_order'];
-            $categoryNewOrder = $categoryOrder - 1;
+        $categoriesResult = Database::query($sql);
 
-            $aboveCategory = Database::select(
-                'id',
-                $lpCategoryTable,
-                array(
-                    'where' => array(
-                        'c_id = ? AND ' => $courseId,
-                        'display_order = ?' => $categoryNewOrder
-                    )
-                ),
-                'first'
-            );
+        if ($categoriesResult === false) {
+            return false;
+        }
 
-            if ($aboveCategory !== false) {
-                Database::update(
-                    $lpCategoryTable,
-                    array(
-                        'display_order' => $categoryOrder
-                    ),
-                    array(
-                        'id = ?' => $aboveCategory['id']
-                    )
-                );
+        $cats = array();
+        $catsOrder = array();
 
-                Database::update(
-                    $lpCategoryTable,
-                    array(
-                        'display_order' => $categoryNewOrder
-                    ),
-                    array(
-                        'id = ?' => $categoryId
-                    )
-                );
+        $countRows = Database::num_rows($categoriesResult);
+
+        if ($countRows > 0) {
+            $i = 1;
+            while ($category = Database::fetch_assoc($categoriesResult)) {
+                if ($category['display_order'] != $i) {
+                    $sql = "UPDATE $lpCategoryTable SET display_order = $i "
+                            . "WHERE c_id = $courseId AND id = {$category['id']}";
+                    Database::query($sql);
+                    echo "$sql<br>";
+                }
+
+                $category['display_order'] = $i;
+                $cats[$category['id']] = $category;
+                $catsOrder[$i] = $category['id'];
+                $i++;
+            }
+        }
+        if ($countRows > 1) {
+            $order = $cats[$categoryId]['display_order'];
+
+            if ($order > 1) {
+                $sql = "UPDATE $lpCategoryTable SET display_order = $order "
+                        . "WHERE c_id = $courseId AND id = {$catsOrder[$order - 1]}";
+                Database::query($sql);
+
+                $sql = "UPDATE $lpCategoryTable SET display_order = " . ($order - 1) . " "
+                        . "WHERE c_id = $courseId AND id = $categoryId";
+                Database::query($sql);
             }
         }
     }
@@ -9606,55 +9598,49 @@ EOD;
 
         $courseId = intval($courseId);
 
-        $currentCategory = Database::select(
-            'display_order',
-            $lpCategoryTable,
-            array(
-                'where' => array(
-                    'c_id = ? AND ' => $courseId,
-                    'id = ?' => $categoryId
-                ),
-                'order' => 'display_order'
-            ),
-            'first'
-        );
+        $sql = "SELECT * FROM $lpCategoryTable "
+                . "WHERE c_id = $courseId ORDER BY display_order ";
 
-        if ($currentCategory !== false) {
-            $categoryOrder = $currentCategory['display_order'];
-            $categoryNewOrder = $categoryOrder + 1;
+        $categoriesResult = Database::query($sql);
 
-            $belowCategory = Database::select(
-                'id',
-                $lpCategoryTable,
-                array(
-                    'where' => array(
-                        'c_id = ? AND ' => $courseId,
-                        'display_order = ?' => $categoryNewOrder
-                    )
-                ),
-                'first'
-            );
+        if ($categoriesResult === false) {
+            return false;
+        }
 
-            if ($belowCategory !== false) {
-                Database::update(
-                    $lpCategoryTable,
-                    array(
-                        'display_order' => $categoryOrder
-                    ),
-                    array(
-                        'id = ?' => $belowCategory['id']
-                    )
-                );
+        $cats = array();
+        $catsOrder = array();
 
-                Database::update(
-                    $lpCategoryTable,
-                    array(
-                        'display_order' => $categoryNewOrder
-                    ),
-                    array(
-                        'id = ?' => $categoryId
-                    )
-                );
+        $countRows = Database::num_rows($categoriesResult);
+        $max = 0;
+
+        if ($countRows > 0) {
+            $i = 1;
+            while ($category = Database::fetch_assoc($categoriesResult)) {
+                $max = $i;
+                if ($category['display_order'] != $i) {
+                    $sql = "UPDATE $lpCategoryTable SET display_order = $i "
+                            . "WHERE c_id = $courseId AND id = {$category['id']}";
+                    Database::query($sql);
+                    echo "$sql<br>";
+                }
+
+                $category['display_order'] = $i;
+                $cats[$category['id']] = $category;
+                $catsOrder[$i] = $category['id'];
+                $i++;
+            }
+        }
+        if ($countRows > 1) {
+            $order = $cats[$categoryId]['display_order'];
+
+            if ($order < $max) {
+                $sql = "UPDATE $lpCategoryTable SET display_order = $order "
+                        . "WHERE c_id = $courseId AND id = {$catsOrder[$order + 1]}";
+                Database::query($sql);
+
+                $sql = "UPDATE $lpCategoryTable SET display_order = " . ($order + 1) . " "
+                        . "WHERE c_id = $courseId AND id = $categoryId";
+                Database::query($sql);
             }
         }
     }

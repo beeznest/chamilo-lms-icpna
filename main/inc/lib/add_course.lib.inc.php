@@ -1360,7 +1360,7 @@ function create_course_tables($course_db_name = null) {
             . "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, "
             . "c_id INT UNSIGNED NOT NULL, "
             . "name VARCHAR(255) NOT NULL, "
-            . "display_order INT NOT NULL DEFAULT 1);";
+            . "display_order INT NOT NULL DEFAULT 0);";
     Database::query($sql);
 
     $sql = "CREATE TABLE IF NOT EXISTS `$TABLELPVIEW` (

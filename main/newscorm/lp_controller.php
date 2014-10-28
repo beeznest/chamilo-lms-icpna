@@ -378,18 +378,26 @@ switch ($action) {
 
         break;
     case 'move_up_category':
+        if (!$is_allowed_to_edit || api_is_coach()) {
+            api_not_allowed(true);
+        }
+
         if (isset($_REQUEST['id'])) {
             learnpath::moveUpLPCategory($_REQUEST['id'], $course_id);
-        }
 
-        header('Location: ' . api_get_path(WEB_PATH) . 'main/newscorm/lp_controller.php?' .  api_get_cidreq());
+            header('Location: ' . api_get_path(WEB_PATH) . 'main/newscorm/lp_controller.php?' .  api_get_cidreq());
+        }
         break;
     case 'move_down_category':
-        if (isset($_REQUEST['id'])) {
-            learnpath::moveDownLPCategory($_REQUEST['id'], $course_id);
+        if (!$is_allowed_to_edit || api_is_coach()) {
+            api_not_allowed(true);
         }
 
-        header('Location: ' . api_get_path(WEB_PATH) . 'main/newscorm/lp_controller.php?' .  api_get_cidreq());
+        if (isset($_REQUEST['id'])) {
+            learnpath::moveDownLPCategory($_REQUEST['id'], $course_id);
+
+            header('Location: ' . api_get_path(WEB_PATH) . 'main/newscorm/lp_controller.php?' .  api_get_cidreq());
+        }
         break;
     case 'admin_view':
         if (!$is_allowed_to_edit) {

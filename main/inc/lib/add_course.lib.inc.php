@@ -243,6 +243,7 @@ function get_course_tables() {
     $tables[]= 'dropbox_category';
     $tables[]= 'dropbox_feedback';
     $tables[]= 'lp';
+    $tables[]= 'lp_category';
     $tables[]= 'lp_item';
     $tables[]= 'lp_view';
     $tables[]= 'lp_item_view';
@@ -389,6 +390,7 @@ function create_course_tables($course_db_name = null) {
     $TABLELPITEMVIEW            = $course_db_name . 'lp_item_view';
     $TABLELPIVINTERACTION       = $course_db_name . 'lp_iv_interaction';
     $TABLELPIVOBJECTIVE         = $course_db_name . 'lp_iv_objective';
+    $lpCategoryTable            = $course_db_name . 'lp_category';
 
     // Blogs
     $tbl_blogs                  = $course_db_name . 'blog';
@@ -1349,6 +1351,16 @@ function create_course_tables($course_db_name = null) {
     	 PRIMARY KEY  (c_id, id)
         )" . $charset_clause;
 
+    Database::query($sql);
+
+    $sql = "ALTER TABLE $TABLELP ADD COLUMN category_id INT UNSIGNED NOT NULL DEFAULT 0;";
+    Database::query($sql);
+
+    $sql = "CREATE TABLE IF NOT EXISTS $lpCategoryTable ("
+            . "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+            . "c_id INT UNSIGNED NOT NULL, "
+            . "name VARCHAR(255) NOT NULL, "
+            . "display_order INT NOT NULL DEFAULT 1);";
     Database::query($sql);
 
     $sql = "CREATE TABLE IF NOT EXISTS `$TABLELPVIEW` (

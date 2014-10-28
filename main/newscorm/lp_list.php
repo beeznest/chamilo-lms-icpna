@@ -53,6 +53,10 @@ $(function() {
         collapsible: true,
 		header: '.page-header'
 	});
+    $('#category_accordion  a').click(function(){
+        window.location = $(this).attr('href');
+        return false;
+    });
 });
 
 </script>
@@ -121,7 +125,7 @@ if ($is_allowed_to_edit) {
     }
 
     echo '<div class="actions">';
-    if (api_is_allowed_to_edit() && !api_is_coach()) {
+    if (api_is_allowed_to_edit() || api_is_coach()) {
         echo Display::url(
             Display::return_icon(
                 'new_folder.png',
@@ -163,10 +167,6 @@ $test_mode = api_get_setting('server_type');
 $lp_showed = false;
 $counterCategories = 1;
 $total = count($categories);
-$isCoach = api_is_coach();
-if (api_is_course_admin()) {
-    $isCoach = false;
-}
 
 echo '<div id="category_accordion">';
 foreach ($categories as $item) {
@@ -204,47 +204,77 @@ foreach ($categories as $item) {
     */
 
     if ($item->getId() > 0 && $is_platform_admin && api_get_session_id() == 0) {
-        $url = 'lp_controller.php?' . api_get_cidreq(
-            ) . '&action=add_lp_category&id=' . $item->getId();
-        $edit_link = Display::url(
-            Display::return_icon('edit.png', get_lang('Edit')),
-            $url
-        );
-        $delete_url = 'lp_controller.php?' . api_get_cidreq(
-            ) . '&action=delete_lp_category&id=' . $item->getId();
-        $moveUpUrl = 'lp_controller.php?' . api_get_cidreq(
-            ) . '&action=move_up_category&id=' . $item->getId();
-        $moveDownUrl = 'lp_controller.php?' . api_get_cidreq(
-            ) . '&action=move_down_category&id=' . $item->getId();
-
-        if ($counterCategories == 1) {
-            $moveUpLink = Display::url(
-                Display::return_icon('up_na.png', get_lang('Move')),
-                '#'
+            $url = 'lp_controller.php?' . api_get_cidreq(
+                ) . '&action=add_lp_category&id=' . $item->getId();
+            $edit_link = Display::url(
+                Display::return_icon('edit.png', get_lang('Edit')),
+                $url
             );
-        } else {
-            $moveUpLink = Display::url(
-                Display::return_icon('up.png', get_lang('Move')),
-                $moveUpUrl
+            $delete_url = 'lp_controller.php?' . api_get_cidreq(
+                ) . '&action=delete_lp_category&id=' . $item->getId();
+            $moveUpUrl = 'lp_controller.php?' . api_get_cidreq(
+                ) . '&action=move_up_category&id=' . $item->getId();
+            $moveDownUrl = 'lp_controller.php?' . api_get_cidreq(
+                ) . '&action=move_down_category&id=' . $item->getId();
+
+            if ($counterCategories == 1) {
+                $moveUpLink = Display::url(
+                    Display::return_icon('up_na.png', get_lang('Move')),
+                    '#'
+                );
+            } else {
+                $moveUpLink = Display::url(
+                    Display::return_icon('up.png', get_lang('Move')),
+                    $moveUpUrl
+                );
+            }
+
+            if (($total - 1) == $counterCategories) {
+                $moveDownLink = Display::url(
+                    Display::return_icon('down_na.png', get_lang('Move')),
+                    '#'
+                );
+            } else {
+                $moveDownLink = Display::url(
+                    Display::return_icon('down.png', get_lang('Move')),
+                    $moveDownUrl
+                );
+            }
+            $delete_link = Display::url(
+                Display::return_icon('delete.png', get_lang('Delete')),
+                $delete_url
+            );
+            $counterCategories++;
+
+    } else {
+        // verificar si este couch creo esta categoria
+        if (api_get_user_id() == $item->getUserCreator()) {
+            $url = 'lp_controller.php?' . api_get_cidreq(
+                ) . '&action=add_lp_category&id=' . $item->getId();
+            $edit_link = Display::url(
+                Display::return_icon('edit.png', get_lang('Edit')),
+                $url
+            );
+            $delete_url = 'lp_controller.php?' . api_get_cidreq(
+                ) . '&action=delete_lp_category&id=' . $item->getId();
+            $delete_link = Display::url(
+                Display::return_icon('delete.png', get_lang('Delete')),
+                $delete_url
+            );
+        } else if (api_get_session_id() == $item->getSessionCreator() && api_get_user_id() == $item->getUserCreator()) {
+            $url = 'lp_controller.php?' . api_get_cidreq(
+                ) . '&action=add_lp_category&id=' . $item->getId();
+            $edit_link = Display::url(
+                Display::return_icon('edit.png', get_lang('Edit')),
+                $url
+            );
+            $delete_url = 'lp_controller.php?' . api_get_cidreq(
+                ) . '&action=delete_lp_category&id=' . $item->getId();
+            $delete_link = Display::url(
+                Display::return_icon('delete.png', get_lang('Delete')),
+                $delete_url
             );
         }
-
-        if (($total - 1) == $counterCategories) {
-            $moveDownLink = Display::url(
-                Display::return_icon('down_na.png', get_lang('Move')),
-                '#'
-            );
-        } else {
-            $moveDownLink = Display::url(
-                Display::return_icon('down.png', get_lang('Move')),
-                $moveDownUrl
-            );
-        }
-        $delete_link = Display::url(
-            Display::return_icon('delete.png', get_lang('Delete')),
-            $delete_url
-        );
-        $counterCategories++;
     }
 
     //echo '<div class="group-category">';
@@ -640,24 +670,6 @@ foreach ($categories as $item) {
             } else { // end if ($is_allowedToEdit)
                 //Student
                 $export_icon = ' <a href="'.api_get_self().'?'.api_get_cidreq().'&action=export_to_pdf&lp_id='.$id.'">'.Display::return_icon('pdf.png', get_lang('ExportToPDF'), '', ICON_SIZE_SMALL).'</a>';
-            }
-
-            if ($isCoach) {
-                $dsp_edit_lp = null;
-                $dsp_export = null;
-                //$dsp_edit = null;
-                $dsp_build = null;
-
-                //$dsp_visible.
-                $dsp_publish = null;
-                $dsp_reinit = null;
-                $dsp_default_view = null;
-                $dsp_debug = null;
-                $dsp_disk = null;
-                $copy = null;
-                $lp_auto_lunch_icon = null;
-                $export_icon = null;
-                $dsp_delete = null;
             }
 
             echo $dsp_line.$start_time.$end_time.$dsp_progress.$dsp_desc.$dsp_export.$dsp_edit.$dsp_build.$dsp_edit_lp.$dsp_visible.$dsp_publish.$dsp_reinit.

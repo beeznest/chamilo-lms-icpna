@@ -40,6 +40,20 @@ class EntityCLpCategory
     private $name;
 
     /**
+     * @var integer
+     *
+     * @Column(name="user_creator", type="integer")
+     */
+    private $userCreator;
+
+    /**
+     * @var integer
+     *
+     * @Column(name="session_creator", type="integer")
+     */
+    private $sessionCreator;
+
+    /**
      * Set cId
      *
      * @param integer $cId
@@ -105,5 +119,49 @@ class EntityCLpCategory
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Set userCreator
+     *
+     * @param integer idUser
+     * @return EntityCLpCategory
+     */
+    public function setUserCreator($idUser)
+    {
+        $this->userCreator = $idUser;
+        return $this;
+    }
+
+    /**
+     * Get userCreator
+     *
+     * @return integer
+     */
+    public function getUserCreator()
+    {
+        return $this->userCreator;
+    }
+
+    /**
+     * Set sessionCreator
+     *
+     * @param integer idUser
+     * @return EntityCLpCategory
+     */
+    public function setSessionCreator($idSession)
+    {
+        $this->sessionCreator = $idSession;
+        return $this;
+    }
+
+    /**
+     * Get sessionCreator
+     *
+     * @return integer
+     */
+    public function getSessionCreator()
+    {
+        return $this->sessionCreator;
     }
 }

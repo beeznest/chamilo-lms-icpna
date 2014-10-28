@@ -382,14 +382,14 @@ switch ($action) {
             learnpath::moveUpLPCategory($_REQUEST['id'], $course_id);
         }
 
-        require 'lp_list.php';
+        header('Location: ' . api_get_path(WEB_PATH) . 'main/newscorm/lp_controller.php?' .  api_get_cidreq());
         break;
     case 'move_down_category':
         if (isset($_REQUEST['id'])) {
             learnpath::moveDownLPCategory($_REQUEST['id'], $course_id);
         }
 
-        require 'lp_list.php';
+        header('Location: ' . api_get_path(WEB_PATH) . 'main/newscorm/lp_controller.php?' .  api_get_cidreq());
         break;
     case 'admin_view':
         if (!$is_allowed_to_edit) {

@@ -40,6 +40,14 @@ class EntityCLpCategory
     private $name;
 
     /**
+     *
+     * @var int
+     * 
+     * @Column(name="display_order", type="integer")
+     */
+    private $displayOrder;
+
+    /**
      * Set cId
      *
      * @param integer $cId
@@ -106,4 +114,17 @@ class EntityCLpCategory
     {
         return $this->name;
     }
+    
+    public function setDisplayOrder($displayOrder)
+    {
+        $this->displayOrder = $displayOrder;
+
+        return $this;
+    }
+
+    public function getDisplayOrder()
+    {
+        return $this->displayOrder;
+    }
+
 }

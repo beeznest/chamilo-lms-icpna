@@ -9423,10 +9423,14 @@ EOD;
 
     static function create_category($params) {
         global $app;
+        
+        $newOrder = self::getNewCategoryOrder($params['c_id']);
+
         $em = $app['orm.em'];
         $item = new Entity\EntityCLpCategory();
         $item->setName($params['name']);
         $item->setCId($params['c_id']);
+        $item->setDisplayOrder($newOrder);
         $em->persist($item);
         $em->flush();
     }
@@ -9443,10 +9447,39 @@ EOD;
         }
     }
 
+    /**
+     * Get the new display order for a LP category
+     * @param int $courseId The category id
+     * @return int Whether the if set the course id return the new display order. Otherwise return false
+     */
+    static function getNewCategoryOrder($courseId)
+    {
+        $courseId = intval($courseId);
+
+        if (empty($courseId)) {
+            return false;
+        }
+
+        $categoryTable = Database::get_course_table(TABLE_LP_CATEGORY);
+
+        $sql = "SELECT (display_order + 1) as new_order FROM $categoryTable "
+                . "WHERE c_id = $courseId "
+                . "ORDER BY display_order DESC "
+                . "LIMIT 1";
+
+        $row = Database::fetch_assoc(Database::query($sql));
+
+        if ($row !== false) {
+            return $row['new_order'];
+        }
+
+        return 2;
+    }
+
     static function get_categories($course_id) {
         global $app;
         $em = $app['orm.em'];
-        $items = $em->getRepository('Entity\EntityCLpCategory')->findBy(array('cId' => $course_id), array('name' => 'ASC'));
+        $items = $em->getRepository('Entity\EntityCLpCategory')->findBy(array('cId' => $course_id), array('displayOrder' => 'ASC'));
         return $items;
     }
 
@@ -9498,6 +9531,120 @@ EOD;
             }
         }
         return $cats;
+    }
+
+    /**
+     * Move to up position a LP category
+     * @param int $categoryId The LP category id
+     * @param int $courseId The course id
+     * @return boolean
+     */
+    public static function moveUpLPCategory($categoryId, $courseId) {
+        $lpCategoryTable = Database::get_course_table(TABLE_LP_CATEGORY);
+
+        $courseId = intval($courseId);
+
+        $sql = "SELECT * FROM $lpCategoryTable "
+                . "WHERE c_id = $courseId ORDER BY display_order ";
+
+        $categoriesResult = Database::query($sql);
+
+        if ($categoriesResult === false) {
+            return false;
+        }
+
+        $cats = array();
+        $catsOrder = array();
+
+        $countRows = Database::num_rows($categoriesResult);
+
+        if ($countRows > 0) {
+            $i = 1;
+            while ($category = Database::fetch_assoc($categoriesResult)) {
+                if ($category['display_order'] != $i) {
+                    $sql = "UPDATE $lpCategoryTable SET display_order = $i "
+                            . "WHERE c_id = $courseId AND id = {$category['id']}";
+                    Database::query($sql);
+                    echo "$sql<br>";
+                }
+
+                $category['display_order'] = $i;
+                $cats[$category['id']] = $category;
+                $catsOrder[$i] = $category['id'];
+                $i++;
+            }
+        }
+        if ($countRows > 1) {
+            $order = $cats[$categoryId]['display_order'];
+
+            if ($order > 1) {
+                $sql = "UPDATE $lpCategoryTable SET display_order = $order "
+                        . "WHERE c_id = $courseId AND id = {$catsOrder[$order - 1]}";
+                Database::query($sql);
+
+                $sql = "UPDATE $lpCategoryTable SET display_order = " . ($order - 1) . " "
+                        . "WHERE c_id = $courseId AND id = $categoryId";
+                Database::query($sql);
+            }
+        }
+    }
+
+    /**
+     * Move to down position a LP category
+     * @param int $categoryId The LP category id
+     * @param int $courseId The course id
+     * @return boolean
+     */
+    public static function moveDownLPCategory($categoryId, $courseId) {
+        $lpCategoryTable = Database::get_course_table(TABLE_LP_CATEGORY);
+
+        $courseId = intval($courseId);
+
+        $sql = "SELECT * FROM $lpCategoryTable "
+                . "WHERE c_id = $courseId ORDER BY display_order ";
+
+        $categoriesResult = Database::query($sql);
+
+        if ($categoriesResult === false) {
+            return false;
+        }
+
+        $cats = array();
+        $catsOrder = array();
+
+        $countRows = Database::num_rows($categoriesResult);
+        $max = 0;
+
+        if ($countRows > 0) {
+            $i = 1;
+            while ($category = Database::fetch_assoc($categoriesResult)) {
+                $max = $i;
+                if ($category['display_order'] != $i) {
+                    $sql = "UPDATE $lpCategoryTable SET display_order = $i "
+                            . "WHERE c_id = $courseId AND id = {$category['id']}";
+                    Database::query($sql);
+                    echo "$sql<br>";
+                }
+
+                $category['display_order'] = $i;
+                $cats[$category['id']] = $category;
+                $catsOrder[$i] = $category['id'];
+                $i++;
+            }
+        }
+        if ($countRows > 1) {
+            $order = $cats[$categoryId]['display_order'];
+
+            if ($order < $max) {
+                $sql = "UPDATE $lpCategoryTable SET display_order = $order "
+                        . "WHERE c_id = $courseId AND id = {$catsOrder[$order + 1]}";
+                Database::query($sql);
+
+                $sql = "UPDATE $lpCategoryTable SET display_order = " . ($order + 1) . " "
+                        . "WHERE c_id = $courseId AND id = $categoryId";
+                Database::query($sql);
+            }
+        }
     }
 }
 

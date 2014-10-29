@@ -18,6 +18,8 @@
                 {#  Plugins for footer section #}
                 {% if plugin_footer_left is not null %}
                     <div id="plugin_footer_left">
+                    
+                
                         {{ plugin_footer_left }}
                     </div>
                 {% endif %}

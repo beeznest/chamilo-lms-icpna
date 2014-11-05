@@ -318,8 +318,13 @@ class learnpathItem {
             // Check the status in the database rather than in the object, as checking in the object
             // would always return "no-credit" when we want to set it to completed.
             if (self::debug > 2) { error_log('learnpathItem::get_credit() - get_prevent_reinit!=0 and status is '.$status, 0); }
-            //0=not attempted - 1 = incomplete
-            if ($status != $this->possible_status[0] && $status != $this->possible_status[1]) {
+            // If isn't failed, incomplete or not attempted
+            // 0 = not attempted, 1 = incomplete, 4 = failed
+            if (
+                $status != $this->possible_status[4] &&
+                $status != $this->possible_status[0] &&
+                $status != $this->possible_status[1]
+            ) {
                 $credit = 'no-credit';
             }
         } else {
@@ -547,8 +552,13 @@ class learnpathItem {
 	public function get_lesson_mode() {
 		$mode = 'normal';
 		if ($this->get_prevent_reinit() != 0) { // If prevent_reinit == 0
-			$my_status = $this->get_status();
-			if ($my_status != $this->possible_status[0] && $my_status != $this->possible_status[1]) {
+			$status = $this->get_status();
+            // If isn't failed, incomplete or not attempted
+			if (
+                $status != $this->possible_status[4] &&
+                $status != $this->possible_status[0] &&
+                $status != $this->possible_status[1]
+            ) {
 				$mode = 'review';
 			}
 		}
@@ -2349,12 +2359,8 @@ class learnpathItem {
          $rs_verified = Database::query($sql_verified);
 		$row_verified = Database::fetch_array($rs_verified);
 
-         if (!empty($_configuration['kids'])) {
-             // Remove 'failed' from status completed array - see BT#8443
-             $my_case_completed = array('completed', 'passed', 'browsed');
-         } else {
-             $my_case_completed = array('completed', 'passed', 'browsed', 'failed'); // Added by Isaac Flores.
-         }
+        // Remove 'failed' from status completed array - see BT#8443
+        $my_case_completed = array('completed', 'passed', 'browsed');
         $save = true;
 
         if (isset($row_verified) && isset($row_verified['status'])) {

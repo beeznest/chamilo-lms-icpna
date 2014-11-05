@@ -141,7 +141,9 @@
 
             $loginForm.submit();
 
-            location.href = '{{ back_to }}';
+            window.setTimeout(function () {
+                location.href = '{{ back_to }}';
+            }, 100);
         }
     });
 </script>

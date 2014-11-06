@@ -86,7 +86,8 @@ class ExternalPageNGLPlugin extends Plugin
                     'address' => '',
                     'added_tool' => 0,
                     'category' => 'interaction',
-                    'session_id' => $row['session_id']
+                    'session_id' => $row['session_id'],
+                    'target' => '_blank'
                 );
 
                 Database::insert($toolTable, $attributes);

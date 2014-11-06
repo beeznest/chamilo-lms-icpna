@@ -3,7 +3,7 @@
         <div style="margin: 0;" class="page-header">{{ name }}</div>
         <div class="row-fluid" style="height: 100%">
             <div class="span6 offset3">
-                <form id="loginForm" name="loginForm" method="post" action="{{ path }}" target="_blank">
+                <form id="loginForm" name="loginForm" method="post" action="{{ path }}">
                     <input name="time" value="" type="hidden">
                     <input name="prod" value="" type="hidden">
                     <input name="login" id="login" value="{{ username }}" type="hidden">
@@ -137,13 +137,9 @@
         if (txtNormalLogin && txtNormalPassword) {
             var clientTime = getClientTime();
 
-            $loginForm.find('time').val(clientTime);
+            $loginForm.find('[name="time"]').val(clientTime);
 
-            $loginForm.submit();
-
-            window.setTimeout(function () {
-                location.href = '{{ back_to }}';
-            }, 100);
+            $loginForm.trigger('submit');
         }
     });
 </script>

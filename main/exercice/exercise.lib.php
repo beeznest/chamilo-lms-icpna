@@ -2783,34 +2783,56 @@ function getAllExerciseWithExtraFieldPlexPerStudent($studentId, $courseId)
             WHERE
             field_variable = 'plex' and
             exe_user_id = %s and
-            c.id = %s";
+            c.id = %s
+            ORDER BY te.exe_id ASC";
     $sql = sprintf($sql, $studentId, $courseId);
     $result = Database::query($sql);
     if ($result !== false && Database::num_rows($result)) {
         $now = new \DateTime('now');
         $now = api_get_utc_datetime($now->format('Y-m-d H:i:s'));
         $list = Database::store_result($result, 'ASSOC');
-        foreach ($list as $exe) {
-            $expiredAt = $exe['expired_time_control'];
-            if ($expiredAt > $now) {
+        $lastPlexAttempt = end($list);
+        if ($lastPlexAttempt['expired_time_control'] > $now) {
+            $attemptTable = Database::get_main_table(TABLE_STATISTIC_TRACK_E_ATTEMPT);
+            $exeId = $lastPlexAttempt['exe_id'];
+            // Total number of question for
+            $numQuestions = substr_count($lastPlexAttempt['data_tracking'], ',') + 1;
+            // Count attempts
+            $count = Database::select(
+                'COUNT(*)',
+                $attemptTable,
+                array(
+                    'WHERE' => array(
+                        'exe_id = ? AND user_id = ?' => array(
+                            $exeId,
+                            $studentId
+                        )
+                    )
+                )
+            );
+            $count = current(current($count));
+            // If student has answered all
+            if ($count < $numQuestions) {
 
                 return array('score' => false, 'course' => 1);
+            }
+        }
+
+        foreach ($list as $exe) {
+            $percentage = getSuccessExerciseResultPercentage
+            (
+                $exe['exe_result'],
+                $exe['exe_weighting'],
+                $exe['pass_percentage']
+            );
+            if (is_success_exercise_result(
+                $exe['exe_result'],
+                $exe['exe_weighting'],
+                $exe['pass_percentage']
+            )) {
+                $successRs = array('score' => $percentage, 'course' => $exe['field_value']);
             } else {
-                $percentage = getSuccessExerciseResultPercentage
-                (
-                    $exe['exe_result'],
-                    $exe['exe_weighting'],
-                    $exe['pass_percentage']
-                );
-                if (is_success_exercise_result(
-                    $exe['exe_result'],
-                    $exe['exe_weighting'],
-                    $exe['pass_percentage']
-                )) {
-                    $successRs = array('score' => $percentage, 'course' => $exe['field_value']);
-                } else {
-                    $failedRs = array('score' => $percentage, 'course' => 1);
-                }
+                $failedRs = array('score' => $percentage, 'course' => 1);
             }
         }
 

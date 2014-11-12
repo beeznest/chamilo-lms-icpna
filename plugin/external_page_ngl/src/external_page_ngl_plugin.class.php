@@ -109,18 +109,34 @@ class ExternalPageNGLPlugin extends Plugin
         $hasEWorkbookLogin = ($eWorkbookLoginData != false);
 
         if ($hasEWorkbookLogin) {
-            return $eWorkbookLoginData['field_value'];
-        } else {
-            $userTable = Database::get_main_table(TABLE_MAIN_USER);
+            $fieldValue = trim($eWorkbookLoginData['field_value']);
 
-            $userData = Database::select('username', $userTable, array(
-                        'where' => array(
-                            'user_id = ?' => $userId,
-                        ),
-                        'order' => 'user_id'), 'first');
+            if (empty($fieldValue)) {
+                return $this->generateLoginUser($userId);
+            }
 
-            return 'ICPNA_' . $userData['username'];
-        }
+            return $fieldValue;
+        } 
+  
+        return $this->generateLoginUser($userId);
+    }
+
+    /**
+     * Generate a login username for an user
+     * @param int $userId The user id
+     * @return string The login username
+     */
+    public function generateLoginUser($userId)
+    {
+        $userTable = Database::get_main_table(TABLE_MAIN_USER);
+
+        $userData = Database::select('username', $userTable, array(
+                'where' => array(
+                    'user_id = ?' => $userId,
+                ),
+                'order' => 'user_id'), 'first');
+
+        return 'ICPNA_' . $userData['username'];
     }
 
     /**

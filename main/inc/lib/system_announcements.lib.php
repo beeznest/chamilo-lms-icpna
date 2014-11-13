@@ -620,7 +620,7 @@ class SystemAnnouncementManager {
 		$announcements = Database::query($sql);
 		$html = '';
 		if (Database::num_rows($announcements) > 0) {
-			$html .=  Display::page_header(get_lang('SystemAnnouncements'));
+			//$html .=  Display::page_header(get_lang('SystemAnnouncements'));
 			$html .=  '<div id="container-slider" class="span6"><ul id="slider">';
 			while ($announcement = Database::fetch_object($announcements)) {
                 $content = $announcement->content;

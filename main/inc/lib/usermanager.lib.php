@@ -2290,7 +2290,9 @@ class UserManager {
             if ($option['moved_to'] == true) {
                 $condition_date_end1 .= " AND su.moved_status > 0";
             } else {
-                $condition_date_end1 .= " AND su.moved_status = 0";
+                if (!api_is_teacher()) {
+                    $condition_date_end1 .= " AND su.moved_status = 0";
+                }
             }
         }
 
@@ -2312,9 +2314,13 @@ class UserManager {
                    " session_category.date_end session_category_date_end, ".
                    " id_coach ";
 
-         $select_1 = ", moved_to, ".
-                     " moved_status, ".
-                     " scu.id_user";
+        $select_1 = '';
+
+        if (!api_is_teacher()) {
+            $select_1 = ", moved_to, " .
+                " moved_status, " .
+                " scu.id_user";
+        }
 
         if ($get_count) {
             $select = "SELECT count(session.id) as total_rows ";
@@ -2330,10 +2336,14 @@ class UserManager {
                    ." ON (session_category_id = session_category.id) ";
 
         $sql1 = $select1 . " INNER JOIN $tbl_session_course_user as scu "
-                ." ON (scu.id_session = session.id and scu.id_user = $user_id) "
-                ." LEFT JOIN $tbl_session_user su "
-                ." ON su.id_session = session.id AND su.id_user = scu.id_user "
-                ." WHERE scu.id_user = $user_id $condition_date_end1 $order";
+                ." ON (scu.id_session = session.id and scu.id_user = $user_id) ";
+
+        if (!api_is_teacher()) {
+            $sql1 .= "LEFT JOIN $tbl_session_user su "
+                . "ON su.id_session = session.id AND su.id_user = scu.id_user ";
+        }
+
+        $sql1 .= "WHERE scu.id_user = $user_id $condition_date_end1 $order";
 
         // select specific to session coaches
         $select2 = " $select FROM $tbl_session as session LEFT JOIN $tbl_session_category session_category ON (session_category_id = session_category.id) ";

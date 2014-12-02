@@ -503,10 +503,12 @@ class scorm extends learnpath {
         $manifest_list = array();
 
         // The following loop should be stopped as soon as we found the right imsmanifest.xml (how to recognize it?).
+        $realFileSize = 0;
         foreach ($zipContentArray as $thisContent) {
             $thisContent['filename'];
             //error_log('Looking at  '.$thisContent['filename'], 0);
             if (preg_match('~.(php.*|phtml)$~i', $thisContent['filename'])) {
+                $file = $thisContent['filename'];
                 $this->set_error_msg("File $file contains a PHP script");
                 //return api_failure::set_failure('php_file_in_zip_file');
             } elseif (stristr($thisContent['filename'], 'imsmanifest.xml')) {

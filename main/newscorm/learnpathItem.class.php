@@ -318,8 +318,13 @@ class learnpathItem {
             // Check the status in the database rather than in the object, as checking in the object
             // would always return "no-credit" when we want to set it to completed.
             if (self::debug > 2) { error_log('learnpathItem::get_credit() - get_prevent_reinit!=0 and status is '.$status, 0); }
-            //0=not attempted - 1 = incomplete
-            if ($status != $this->possible_status[0] && $status != $this->possible_status[1]) {
+            // If isn't failed, incomplete or not attempted
+            // 0 = not attempted, 1 = incomplete, 4 = failed
+            if (
+                $status != $this->possible_status[4] &&
+                $status != $this->possible_status[0] &&
+                $status != $this->possible_status[1]
+            ) {
                 $credit = 'no-credit';
             }
         } else {
@@ -483,13 +488,20 @@ class learnpathItem {
 	 * @params  bool    Whether to check directly into the database (default no)
 	 * @return  string  An empty string if no interaction, a JS array definition otherwise
 	 */
-	public function get_interactions_js_array($checkdb = false) {
+    public function get_interactions_js_array($checkdb = false)
+    {
 		$return = '';
 		if ($checkdb) {
 			$this->load_interactions(true);
 		}
 		foreach ($this->interactions as $id => $in) {
-			$return .= "['$id','".$in[1]."','".$in[2]."','".$in[3]."','".$in[4]."','".$in[5]."','".$in[6]."','".$in[7]."'],";
+            $return .= "['$id','" . addslashes($in[1]) . "','" . addslashes(
+                    $in[2]
+                ) . "','" . addslashes($in[3]) . "','" . addslashes(
+                    $in[4]
+                ) . "','" . addslashes($in[5]) . "','" . addslashes(
+                    $in[6]
+                ) . "','" . addslashes($in[7]) . "'],";
 		}
 		if (!empty($return)) {
 			$return = substr($return, 0, -1);
@@ -540,8 +552,13 @@ class learnpathItem {
 	public function get_lesson_mode() {
 		$mode = 'normal';
 		if ($this->get_prevent_reinit() != 0) { // If prevent_reinit == 0
-			$my_status = $this->get_status();
-			if ($my_status != $this->possible_status[0] && $my_status != $this->possible_status[1]) {
+			$status = $this->get_status();
+            // If isn't failed, incomplete or not attempted
+			if (
+                $status != $this->possible_status[4] &&
+                $status != $this->possible_status[0] &&
+                $status != $this->possible_status[1]
+            ) {
 				$mode = 'review';
 			}
 		}
@@ -575,7 +592,7 @@ class learnpathItem {
 		if ($this->type == 'sco') {
 			if (!empty($this->view_max_score) && $this->view_max_score > 0) {
 				return $this->view_max_score;
-			} elseif ($this->view_max_score === '') {
+            } elseif (isset($this->view_max_score) && $this->view_max_score === '') {
 				return $this->view_max_score;
 			} else {
 				if (!empty($this->max_score)) { return $this->max_score; } else { return 100; }
@@ -1040,10 +1057,22 @@ class learnpathItem {
 	/**
 	 * Gets the suspend data
 	 */
-	public function get_suspend_data() {
-		if (self::debug > 0) { error_log('learnpathItem::get_suspend_data()', 0); }
+    public function get_suspend_data()
+    {
+        if (self::debug > 0) {
+            error_log('learnpathItem::get_suspend_data()', 0);
+        }
+
 		// TODO: Improve cleaning of breaklines ... it works but is it really a beautiful way to do it ?
-		if (!empty($this->current_data)) { return str_replace(array("\r", "\n"), array('\r', '\n'), $this->current_data); } else { return ''; }
+        if (!empty($this->current_data)) {
+            return str_replace(
+                array("\r", "\n", "'"),
+                array('\r', '\n', "\\'"),
+                $this->current_data
+            );
+        } else {
+            return '';
+        }
 	}
 
 	/**
@@ -1462,7 +1491,7 @@ class learnpathItem {
 								// Nothing found there either. Now return the value of the corresponding resource completion status.
 								if (self::debug > 1) { error_log('New LP - Didnt find any group, returning value for '.$prereqs_string, 0); }
 
-								if (isset($items[$refs_list[$prereqs_string]])) {
+                                if (isset($refs_list[$prereqs_string]) && isset($items[$refs_list[$prereqs_string]])) {
 									if ($items[$refs_list[$prereqs_string]]->type == 'quiz') {
 
 										// 1. Checking the status in current items.
@@ -2330,12 +2359,8 @@ class learnpathItem {
          $rs_verified = Database::query($sql_verified);
 		$row_verified = Database::fetch_array($rs_verified);
 
-         if (!empty($_configuration['kids'])) {
-             // Remove 'failed' from status completed array - see BT#8443
-             $my_case_completed = array('completed', 'passed', 'browsed');
-         } else {
-             $my_case_completed = array('completed', 'passed', 'browsed', 'failed'); // Added by Isaac Flores.
-         }
+        // Remove 'failed' from status completed array - see BT#8443
+        $my_case_completed = array('completed', 'passed', 'browsed');
         $save = true;
 
         if (isset($row_verified) && isset($row_verified['status'])) {

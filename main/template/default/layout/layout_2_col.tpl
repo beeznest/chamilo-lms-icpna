@@ -28,7 +28,7 @@
                     <div class="options">
                         <div class="row-fluid">
                             <div class="span6 help"><a herf="#"><img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/icon_help.png"> Ayuda</a></div>
-                            <div class="span6 closed"><a herf="{{ logout_link }}">{{ "Logout" |get_lang }}<img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/icon_closed.png"> </a></div>
+                            <div class="span6 closedr"><a herf="{{ logout_link }}">{{ "Logout" |get_lang }}<img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/icon_closed.png"> </a></div>
                         </div>
                     </div>
                 </div>

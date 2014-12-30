@@ -35,8 +35,8 @@ body{
   clear:both;
 }
 footer{
-  height: 255px;
-  margin: -196px auto 0;
+  height: 200px;
+  margin: -200px auto 0;
 }
 header .logo-icpna{
     text-align: right;
@@ -586,9 +586,6 @@ footer .red-social{
   color: #ffffff;
   cursor: pointer;
 }
-.bloque-user .closed a{
-  cursor: pointer;
-}
 .bloque-user .options{
   margin-top: 30px;
 }
@@ -602,3 +599,93 @@ footer .red-social{
 .modulos{
   margin-top: 90px;
 }
+
+
+/* CSS PARA CHAMILO */
+.course-tool{
+  width: 142px;
+}
+.course-tool .content h4 a{
+  font-weight: normal;
+  font-size: 14px;
+}
+.course-tool .big_icon img{
+  background-color: #ffffff;
+}
+#course_tools .big_icon {
+  padding: 5px;
+  text-align: center;
+}
+.page-header{
+  padding: 0;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  box-shadow: none;
+  border: none;
+}
+.page-header h3{
+  font-size: 20px;
+  font-weight: normal;
+  margin: 0;
+  padding: 0;
+  line-height: 20px;
+}
+.navbar-fixed-top .navbar-inner, .navbar-static-top .navbar-inner {
+  box-shadow: none;
+  border: none;
+}
+.navbar-inner{
+  background: #569edd; /* Old browsers */
+  background: -moz-linear-gradient(top, #569edd 0%, #528ad5 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#569edd), color-stop(100%,#528ad5)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, #569edd 0%,#528ad5 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, #569edd 0%,#528ad5 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, #569edd 0%,#528ad5 100%); /* IE10+ */
+  background: linear-gradient(to bottom, #569edd 0%,#528ad5 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#569edd', endColorstr='#528ad5',GradientType=0 ); /* IE6-9 */
+}
+.navbar .nav > li > a {
+  color: #ffffff;
+  text-shadow: none;
+}
+.navbar .nav li.dropdown > .dropdown-toggle .caret {
+  border-bottom-color: #ffffff;
+  border-top-color: #ffffff;
+}
+.navbar .brand {
+  color: #ffffff;
+  display: block;
+  float: left;
+  font-size: 20px;
+  font-weight: 200;
+  margin-left: -20px;
+  padding-bottom: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 10px;
+  text-shadow: none;
+}
+.navbar .nav > .active > a, .navbar .nav > .active > a:hover, .navbar .nav > .active > a:focus {
+  background-color: #4586B2;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.125) inset;
+  color: #ffffff;
+}
+.navbar .nav > li > a:focus, .navbar .nav > li > a:hover {
+  background-color: #4586B2;
+  color: #ffffff;
+}
+.navbar .nav li.dropdown.open > .dropdown-toggle, .navbar .nav li.dropdown.active > .dropdown-toggle, .navbar .nav li.dropdown.open.active > .dropdown-toggle {
+  background-color: #4586B2;
+  color: #ffffff;
+}
+.navbar .nav li.dropdown.open > .dropdown-toggle .caret, .navbar .nav li.dropdown.active > .dropdown-toggle .caret, .navbar .nav li.dropdown.open.active > .dropdown-toggle .caret {
+  border-bottom-color: #ffffff;
+  border-top-color: #ffffff;
+}
+.navbar-search .search-query {
+  border: none;
+}
+#topbar_push {
+  height: 45px;
+}
+/* FIN DE CSS CHAMILO */o

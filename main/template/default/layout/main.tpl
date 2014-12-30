@@ -6,6 +6,7 @@
 <head>
     {% include "default/layout/head.tpl" %}
 </head>
+<body>
 {% block header %}
 {% endblock %}
 <!-- START PAGE -->

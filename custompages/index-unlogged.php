@@ -40,70 +40,91 @@ if (isset($_GET['loginFailed'])){
  * HTML output
  */
 ?>
+
+
+<!DOCTYPE html>
 <html>
 <head>
-	<title>Custompage - login</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<!--[if !IE 6]><!-->
-	<link rel="stylesheet" type="text/css" href="<?php echo $rootWeb ?>custompages/style.css" />
-	<!--<![endif]-->
-	<!--[if IE 6]>
-	<link rel="stylesheet" type="text/css" href="/custompages/style-ie6.css" />
-	<![endif]-->
+    <title>V-learning</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="<?php echo $rootWeb ?>custompages/css/bootstrap.css" rel="stylesheet" media="screen">
+    <link href="<?php echo $rootWeb ?>custompages/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="<?php echo $rootWeb ?>custompages/css/font-awesome.min.css" rel="stylesheet" media="screen">
+    <link href="<?php echo $rootWeb ?>custompages/css/style.css" rel="stylesheet" media="screen">
+    <script src="<?php echo $rootWeb ?>custompages/js/jquery.js"></script>
+    <script src="<?php echo $rootWeb ?>custompages/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            if (top.location != location)
+                top.location.href = document.location.href ;
 
-	<script type="text/javascript" src="<?php echo $rootWeb ?>main/inc/lib/javascript/jquery.min.js"></script>
-        
-	<script type="text/javascript">
-		$(document).ready(function() {
-			if (top.location != location) 
-				top.location.href = document.location.href ;
-
-			// Handler pour la touche retour
-			$('input').keyup(function(e) { 
-				if (e.keyCode == 13) {
-					$('#login-form').submit();
-				}
-			});
-		});
-	</script>
+            // Handler pour la touche retour
+            $('input').keyup(function(e) {
+                if (e.keyCode == 13) {
+                    $('#login-form').submit();
+                }
+            });
+        });
+    </script>
 </head>
 <body>
-	<div id="backgroundimage">
-		<img src="<?php echo api_get_path(WEB_PATH)?>/custompages/images/page-background.png" class="backgroundimage" />
-	</div>
-	<div id="wrapper">
-		<div id="header">
-			<img src="<?php echo api_get_path(WEB_PATH)?>/custompages/images/header.png" alt="Logo" />
-		</div> <!-- #header -->
-		<div id="login-form-box" class="form-box">
-      <div id="login-form-info" class="form-info">
-        <?php if (isset($content['info']) && !empty($content['info'] )) {
-          echo $content['info'];
-        }?>
-      </div>
-		<?php if (isset($error_message)) {
-			echo '<div id="login-form-info" class="form-error">'.$error_message.'</div>';
-		}?> 
-			<form id="login-form" class="form" action="<?php echo api_get_path(WEB_PATH)?>index.php" method="post">
-				<div>
-        <label for="login">*<?php echo custompages_get_lang('User');?></label>
-					<input name="login" type="text" /><br />
-          <label for="password">*<?php echo custompages_get_lang('langPass');?></label>
-					<input name="password" type="password" /><br />
-				</div>
-			</form>
-			<div id="login-form-submit" class="form-submit" onclick="document.forms['login-form'].submit();">
-      <span><?php echo custompages_get_lang('LoginEnter');?></span>
-			</div> <!-- #form-submit -->
-			<div id="links">
-      <a href="<?php echo api_get_path(WEB_PATH)?>main/auth/inscription.php"><?php echo custompages_get_lang('langReg')?></a><br />
-      <a href="<?php echo api_get_path(WEB_PATH)?>main/auth/lostPassword.php"><?php echo custompages_get_lang('langLostPassword')?></a>
-			</div>
-		</div> <!-- #form -->
-		<div id="footer">
-			<img src="<?php echo api_get_path(WEB_PATH)?>/custompages/images/footer.png" />
-		</div> <!-- #footer -->
-	</div> <!-- #wrapper -->
-        
+<div class="page">
+    <div class="container">
+        <div class="row">
+
+            <div class="span4 offset4">
+
+                <!-- Login user -->
+                <div id="login-user">
+                    <div class="logo">
+                        <img src="<?php echo $rootWeb ?>custompages/img/logo-vlearning.png">
+                    </div>
+                    <?php if (isset($content['info']) && !empty($content['info'] )) {
+                        echo $content['info'];
+                    }?>
+                    <?php if (isset($error_message)) {
+                        echo '<div class="alert alert-error">'.$error_message.'</div>';
+                    }?>
+                    <div id="login-form">
+                        <form action="<?php echo api_get_path(WEB_PATH)?>index.php" method="post" id="login-form">
+                            <div class="form-login">
+                                <!-- Inicia el formulario de ingreso -->
+
+                                <div class="input-prepend">
+                                    <label for="username"><?php echo custompages_get_lang('User');?>:</label>
+                                    <span class="add-on"><i class="fa fa-user"></i></span>
+                                    <input type="text" id="username" name="login" value=""autofocus="1">
+                                </div>
+                                <div class="input-prepend">
+                                    <label for="password"><?php echo custompages_get_lang('langPass');?>:</label>
+                                    <span class="add-on"><i class="fa fa-lock"></i></span>
+                                    <input type="password" id="password" name="password">
+                                </div>
+                                <div class="pass">
+                                    <a href="<?php echo api_get_path(WEB_PATH)?>main/auth/inscription.php"><?php echo custompages_get_lang('langReg')?></a><br />
+                                    <a href="<?php echo api_get_path(WEB_PATH)?>main/auth/lostPassword.php"><?php echo custompages_get_lang('langLostPassword')?></a>
+                                </div>
+                            </div>
+                            <div class="ingresa">
+                                <div id="entrar" class="btn btn-large btn-primary" type="button"  onclick="document.forms['login-form'].submit();"><?php echo custompages_get_lang('LoginEnter');?></div>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- Termina el formulario de ingreso -->
+                    <div class="logo-movistar"><img src="<?php echo $rootWeb ?>custompages/img/logo-movistar217x115.png"></div>
+                </div>
+                <!-- fin login user -->
+            </div>
+            <div class="span4">
+                <div class="logo-icpna">
+                    <img src="<?php echo $rootWeb ?>custompages/img/logo-icpna.png" class="pull-right">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

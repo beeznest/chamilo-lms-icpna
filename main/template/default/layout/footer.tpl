@@ -35,9 +35,9 @@
         <div class="container">
             <div class="row">
                 <div class="span6">
-                    <a href="#">Preguntas Frecuentes</a> &nbsp| &nbsp
-                    <a href="#">Términos y condiciones</a> &nbsp| &nbsp
-                    <a href="#">Beneficios</a>
+                    <a href="#" data-toggle="modal" data-target="#FAQ">Preguntas Frecuentes</a> &nbsp| &nbsp
+                    <a href="#" data-toggle="modal" data-target="#terminos">Términos y condiciones</a> &nbsp| &nbsp
+                    <a href="#" data-toggle="modal" data-target="#beneficios">Beneficios</a>
                 </div>
                 <div class="span6">
                     Programa V-learning ICPNA / Copyright 2014 ICPNA - Todos los derechos reservados

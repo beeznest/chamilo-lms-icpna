@@ -17,7 +17,7 @@
                 <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-vlearning.png">
             </div>
             <div class="profile">
-                <div class="home"><a href="#"><img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/home.png"></a></div>
+                <div class="home"><a href="{{ _p.web_modules }}"><img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/home.png"></a></div>
                 <div class="user-datos">
                     <div class="image-user">
                         <div class="img-user-width">

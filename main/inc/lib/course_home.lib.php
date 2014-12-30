@@ -1270,16 +1270,16 @@ class CourseHome {
                 }
             }
 
-            $show = '<div class="span2 center">'
+            $show = '<div class="cube-lesson">'
 
-              . ($tool['visibility']==1 ? ' <a href="'.$tool['tool']['link'].'" class="state-icon-link">' : '')
-              . '   <span class="state-icon-' . $state . '">'
+              . ($tool['visibility']==1 ? '' : '')
+              . '   <div class="lesson-' . $state . '">'
               . $tool['pure_icon']
-              . '   </span>'
-              . ($tool['visibility'] ? ' </a>':'')
-              . '<div class="center-items">'
+              . '   </div>'
+              . ($tool['visibility'] ? '':'')
+              . ''
               . ($tool['visibility']==1 ? '<a href="'.$tool['tool']['link'].'">'.$toolName.'</a>' : $toolName)
-               . '</div></div>';
+               . '</div>';
             $search = array("{{ ".$toolName." }}", "{{".$toolName."}}", "((".$toolName."))", "(( ".$toolName." ))");
             if (!$editMode) {
                 $text = str_replace($search, $show, $text);

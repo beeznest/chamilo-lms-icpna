@@ -463,7 +463,7 @@ class SocialManager extends UserManager {
 
             $html .= '<div class="social-content-image">';
                 $html .= '<div class="well social-background-content">';
-                $html .= Display::url('<img src='.$big['file'].' class="social-groups-image" /> </a><br /><br />', api_get_path(WEB_PATH).'main/social/groups.php?id='.$group_id);
+                /*$html .= Display::url('<img src='.$big['file'].' class="social-groups-image" /> </a><br /><br />', api_get_path(WEB_PATH).'main/social/groups.php?id='.$group_id);*/
                 if (GroupPortalManager::is_group_admin($group_id, api_get_user_id())) {
                     $html .= '<div id="edit_image" class="hidden_message" style="display:none"><a href="'.api_get_path(WEB_PATH).'main/social/group_edit.php?id='.$group_id.'">'.get_lang('EditGroup').'</a></div>';
                 }
@@ -477,7 +477,7 @@ class SocialManager extends UserManager {
             $normal_image = $img_array['dir'].$img_array['file'].'?'.uniqid();
 
               //--- User image
-            $html.='<div class="siderbar-social">';
+           /* $html.='<div class="siderbar-social">';
             $html .= '<div class="social-background-content">';
             $htm ='<div class="frame">';
                 if ($img_array['file'] != 'unknown.jpg') {
@@ -493,7 +493,7 @@ class SocialManager extends UserManager {
 //                    $html .= '<a href="'.api_get_path(WEB_PATH).'main/auth/profile.php">('.get_lang('EditProfile').')</a>';
                 }
             $html .= '</div>';
-            $htm .='</div>';
+            $htm .='</div>';*/
           }
 
         if (!in_array($show, array('shared_profile', 'groups', 'group_edit', 'member_list','waiting_list','invite_friends'))) {

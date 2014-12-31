@@ -17,11 +17,12 @@ a:hover{
   text-decoration: none;
 }
 body{
-	font-family: 'Roboto Condensed', sans-serif;
-	background-image: url(img/bgimage.jpg);
+	  font-family: 'Roboto Condensed', sans-serif;
+	  background-image: url(img/bgimage.jpg);
     background-position: center 0;
     background-size: cover;
-  color: #797979;
+    color: #797979;
+    background-repeat: no-repeat;
 }
 #page-wrap{
   margin: auto;
@@ -386,8 +387,6 @@ header .logo-icpna{
   color: #ffffff;
 }
 .divisor-line{
-  border-top: solid 1px #cccccc;
-  border-bottom: solid 1px #cccccc;
   margin-top: 75px;
   padding-top: 1em;
   padding-bottom: 1em;
@@ -687,5 +686,28 @@ footer .red-social{
 }
 #topbar_push {
   height: 45px;
+}
+.block-settings{
+  background-color:#ffffff;
+  padding: 10px;
+  border: 1px solid #ffffff;
+  margin-bottom: 20px;
+  min-height: 300px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+.block-settings .options{
+  margin-bottom: 0;
+  margin-left: 20px;
+}
+.block-settings .options li{
+  font-size: 14px;
+}
+.block-settings .form-search .span3{
+  width: 215px;
+}
+.block-settings h4{
+  font-size: 16px;
 }
 /* FIN DE CSS CHAMILO */o

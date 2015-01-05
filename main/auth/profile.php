@@ -13,6 +13,7 @@
  */
 
 // Language files that should be included.
+
 $language_file = array('registration', 'messages', 'userInfo');
 $cidReset = true;
 require_once '../inc/global.inc.php';

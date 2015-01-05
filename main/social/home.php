@@ -60,29 +60,29 @@ $user_info = UserManager :: get_user_info_by_id(api_get_user_id());
 
 $social_left_content = SocialManager::show_social_menu('home');
 
-$social_right_content = '<div class="span5">';
-$social_right_content .= '<div class="well_border">';
-$social_right_content .= '<h3>'.get_lang('Profile').'</h3>';
+$social_right_content = '<div class="span8">';
+$social_right_content .= '<div class="page-show">';
+$social_right_content .= '<h3 class="titulo">'.get_lang('Profile').'</h3>';
 
 $list = array(
     array(
-        'title' => 'Usuario (DNI o CE)',
+        'title' => 'Usuario (DNI o CE) :',
         'content' => (!empty($user_info['extra']['DNI'])) ? $user_info['extra']['DNI'] : $user_info['username'] ,
     ),
     array(
-        'title' => 'Nombre',
+        'title' => 'Nombre  :',
         'content' => $user_info['firstname']
     ),
     array(
-        'title' => 'Apellido Paterno',
+        'title' => 'Apellido Paterno :',
         'content' => $user_info['lastname']
     ),
     array(
-        'title' => 'Apellido Materno',
+        'title' => 'Apellido Materno :',
         'content' => $user_info['extra']['middlename']
     ),
     array(
-        'title' => 'Correo electrónico',
+        'title' => 'Correo electrónico :',
         'content' => $user_info['email']
     ),
     array(
@@ -91,7 +91,8 @@ $list = array(
     ),
 );
 // information current user
-$social_right_content .= '<div>'.Display::description($list).'</div>';
+$social_right_content .= '<div class="frame-page">'.Display::description($list);
+$social_right_content .= '<div class="edit-button"><a href="'.api_get_path(WEB_PATH).'main/auth/profile.php" class="btn btn-large btn-red">Editar Perfil</a></div></div>';
 /*$social_right_content .= '
     <div class="form-actions">
     <a class="btn" href="'.api_get_path(WEB_PATH).'main/auth/profile.php">

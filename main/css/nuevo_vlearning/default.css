@@ -710,4 +710,109 @@ footer .red-social{
 .block-settings h4{
   font-size: 16px;
 }
-/* FIN DE CSS CHAMILO */o
+.social-menu .nav-list > .active > a,.social-menu .nav-list > .active > a:hover {
+    background: none;
+    text-shadow: none;
+}
+.social-menu .nav > li > a:hover {
+    background-color: transparent;
+    text-decoration: none;
+}
+.social-menu .label-warning, .badge-warning {
+    background-color: #FFDF00;
+    margin-left: 25px;
+}
+.social-menu .label, .badge {
+    color: #cc0000;
+    font-size: 11.844px;
+    font-weight: normal;
+    line-height: 14px;
+    text-shadow: none;
+}
+.icon_profile{
+    background:url("img/userlogin/icon_user.png") no-repeat 0px center;
+    padding-left: 20px;
+    border-top: 1px solid #ccc;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+.icon_profile.active {
+    background:url("img/userlogin/icon_user_hover.png") no-repeat 0px center;
+    padding-left: 20px;
+}
+.icon_profile.active > a,
+.icon_messages.active > a,
+.icon_whereiam.active > a,
+.icon_myperformance.active > a{
+    color: #cc0000;
+}
+.icon_profile.active > a:hover,
+.icon_messages.active > a:hover,
+.icon_whereiam.active > a:hover,
+.icon_myperformance.active > a:hover{
+    color: #333;
+}
+.icon_messages {
+    background:url("img/userlogin/icon_message.png") no-repeat 0px center;
+    padding-left: 20px;
+    border-top: 1px solid #ccc;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+.icon_messages.active {
+    background:url("img/userlogin/icon_message_hover.png") no-repeat 0px center;
+    padding-left: 20px;
+}
+.icon_whereiam {
+    background:url("img/userlogin/icon_dondeestoy.png") no-repeat 0px center;
+    padding-left: 20px;
+    border-top: 1px solid #ccc;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+.icon_whereiam.active {
+    background:url("img/userlogin/icon_dondeestoy_hover.png") no-repeat 0px center;
+    padding-left: 20px;
+}
+.icon_myperformance {
+    background:url("img/userlogin/icon_desempeno.png") no-repeat 0px center;
+    padding-left: 20px;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+.icon_myperformance.active {
+    background:url("img/userlogin/icon_desempeno_hover.png") no-repeat 0px center;
+    padding-left: 20px;
+}
+.frame-page{
+    background-color: #fff;
+    padding-bottom: 20px;
+    padding-top: 20px;
+    -webkit-box-shadow: 0px 0px 6px 0px rgba(50, 50, 50, 0.7);
+    -moz-box-shadow:    0px 0px 6px 0px rgba(50, 50, 50, 0.7);
+    box-shadow:         0px 0px 6px 0px rgba(50, 50, 50, 0.7);
+}
+.frame-page dl{
+    margin-bottom: 0px;
+}
+.page-show{
+    padding-top: 2.5em;
+}
+.edit-button{
+    text-align: right;
+    padding-right: 20px;
+}
+.btn-red{
+    background: #D80300;
+    border: none;
+    color: #ffffff;
+    text-shadow: none;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+    font-size: 14px;
+    padding: 9px 25px;
+}
+/* FIN DE CSS CHAMILO */

@@ -23,11 +23,15 @@ if ($isAdult) {
     define('NUM_COURSES', 6);
     define('NUM_PHASES', 4);
     define('TOTAL_COURSES', NUM_COURSES * NUM_PHASES);
+    $Elementary = Display::return_icon('mi_elemental-kids.png',get_lang('Elementary'));
+    $HighElementary = Display::return_icon('mi_elemental-alto-kids.png',get_lang('High - Elementary'));
+    $BasicKids = Display::return_icon('mi-basico-kids.png',get_lang('High - Elementary'));
+    $HighBasicKids = Display::return_icon('mi-basico-alto-kids.png',get_lang('High - Elementary'));
     $phase_title = array(
-        1 => 'Elementary',
-        2 => 'High - Elementary',
-        3 => 'Basic',
-        4 => 'High - Basic',
+        1 => $Elementary,
+        2 => $HighElementary,
+        3 => $BasicKids,
+        4 => $HighBasicKids,
     );
 }
 
@@ -66,8 +70,8 @@ function createDiv($seq, $sid) {
             $score = getCourseScore($course_array[$seq][0],$course_array[$seq][1], $sid);
         }
         $text .= '<div class="list_performance">
-                                    <div class="icon-complet">' . $course_array[$seq][2] . '</div>
-                                    <div class="top-note">' . $score . '/100</div>
+                                    <div class="item-list">' . $course_array[$seq][2] . '</div>
+                                    <div class="item-list">' . $score . '/100</div>
                                 </div>';
         if ($index == 0) {
             $text .= '</div></div>';

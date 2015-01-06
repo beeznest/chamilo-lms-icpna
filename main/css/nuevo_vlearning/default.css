@@ -836,10 +836,25 @@ footer .red-social{
   margin-left: 10px;
   margin-right: 10px;
 }
-.myperformance .span2{
-  width: 180px;
+.edit-button-in{
+    float: right;
+    margin-right: 20px;
 }
 .list_performance{
-  
+  margin-left: -30px;
+  display: inline-block;
+}
+.list_performance:after{
+  clear: both;
+}
+.list_performance:before{
+  display: table;
+  line-height: 0;
+  content: "";
+}
+.list_performance .item-list{
+  float: left;
+  min-height: 1px;
+  margin-left: 30px;
 }
 /* FIN DE CSS CHAMILO */

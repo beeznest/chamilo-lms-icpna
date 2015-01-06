@@ -123,7 +123,7 @@ if ($user_data !== false) {
 /*
  * Initialize the form.
  */
-$form = new FormValidator('profile', 'post', api_get_self()."?".str_replace('&fe=1', '', $_SERVER['QUERY_STRING']), null, array('style' => 'width: 70%; float: '.($text_dir == 'rtl' ? 'right;' : 'left;')));
+$form = new FormValidator('profile', 'post', api_get_self()."?".str_replace('&fe=1', '', $_SERVER['QUERY_STRING']), null, array('style' => 'width: 100%; float: '.($text_dir == 'rtl' ? 'right;' : 'left;')));
 $form->addElement('text', 'username',  'Usuario (DNI o CE)',  array('size' => 40, 'disabled' => 'disabled'));
 $form->addElement('text', 'firstname', 'Nombre', array('size' => 40));
 $form->addElement('text', 'lastname',  'Apellido Paterno',  array('size' => 40));
@@ -302,7 +302,7 @@ if (api_get_setting('profile', 'apikeys') == 'true') {
 }
 //	SUBMIT
 if (is_profile_editable()) {
-	$form->addElement('style_submit_button', 'apply_change', get_lang('SaveSettings'), 'class="save"');
+	$form->addElement('style_submit_button', 'apply_change', get_lang('SaveSettings'), 'class="btn btn-large btn-red save edit-button-in"');
 } else {
 	$form->freeze();
 }
@@ -706,8 +706,9 @@ if ($form->validate()) {
 
 
 /*  		MAIN DISPLAY SECTION  */
+$allowSocialTool = api_get_setting('allow_social_tool') == 'true' ? true : false;
 // the header
-Display::display_header(get_lang('ModifyProfile'));
+Display::display_header(get_lang('ModifyProfile'), null, null, $allowSocialTool);
 
 if (api_get_setting('allow_social_tool') != 'true') {
 
@@ -785,15 +786,13 @@ $big_image_width    = $big_image_size['width'];
 $big_image_height   = $big_image_size['height'];
 $url_big_image      = $big_image.'?rnd='.time();
 
-$show_delete_account_button = api_get_setting('platform_unsubscribe_allowed') == 'true' ? true : false;
 
 if (api_get_setting('allow_social_tool') == 'true') {
-	echo '<div class="row-fluid">';
-		echo '<div class="span3">';
-		echo SocialManager::show_social_menu('home', null, api_get_user_id(), false, $show_delete_account_button);
-		echo '</div>';
-		echo '<div class="span9">';
-        $form->display();
+    echo '<div class="row-fluid">';
+    echo '<h3 class="titulo"> ' . get_lang('EditProfile') . ' </h3>';
+    echo '<div class="span12 frame-page">';
+    $form->display();
+	echo '</div>';
 	echo '</div>';
 } else {
 	// Style position:absolute has been removed for Opera-compatibility.

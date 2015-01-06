@@ -66,13 +66,19 @@ function createDiv($seq, $sid) {
         }
         if (empty($sid)) {
             $score = '--';
+            $itemClasses = 'item-list module-closed-small ';
         } else {
             $score = getCourseScore($course_array[$seq][0],$course_array[$seq][1], $sid);
+            if ($score == '--') {
+                $itemClasses = 'item-list module-process-small';
+            } else {
+                $itemClasses = 'item-list module-completed-small';
+            }
         }
         $text .= '<div class="list_performance">
-                                    <div class="item-list">' . $course_array[$seq][2] . '</div>
-                                    <div class="item-list">' . $score . '/100</div>
-                                </div>';
+            <div class="' . $itemClasses . '">' . $course_array[$seq][2] . '</div>
+            <div class="item-list item-list-score">' . $score . '/100</div>
+        </div>';
         if ($index == 0) {
             $text .= '</div></div>';
         }
@@ -104,11 +110,11 @@ function getAllCourses() {
             $course_code = 'COURSE'. twoOrMoreDigitString($i);
         }
         $id = CourseManager::get_course_id_from_course_code($course_code);
-        $title = CourseManager::get_course_title_from_course_id($id);
+        //$title = CourseManager::get_course_title_from_course_id($id);
         $course_array[$i] = array(
             $id,
             $course_code,
-            $title,
+            twoOrMoreDigitString($i),
         );
     }
     return $course_array;

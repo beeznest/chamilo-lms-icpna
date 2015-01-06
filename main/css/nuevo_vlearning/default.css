@@ -950,4 +950,8 @@ footer .red-social{
     padding: 7px 15px 7px 15px;
     margin: 1px;
 }
+.date-message{
+  text-align: right;
+  padding-right: 110px;
+}
 /* FIN DE CSS CHAMILO */

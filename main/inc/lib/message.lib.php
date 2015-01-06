@@ -725,7 +725,7 @@ class MessageManager
     		}
     	}
 */      $message_content .= '<div class="frame-page">';
-		$message_content .=' <div style="float:right">'.get_lang('Date').':  '.api_get_local_time($row['send_date']).'</div>';
+		$message_content .=' <div class="date-message">'.get_lang('Date').':  '.api_get_local_time($row['send_date']).'</div>';
         $message_content .= str_replace("\\","",$content);
         $message_content .= '<div id="message-attach">'.(!empty($files_attachments)?implode('<br />',$files_attachments):'').'</div>
 		        ';

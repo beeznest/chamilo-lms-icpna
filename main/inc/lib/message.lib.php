@@ -125,7 +125,7 @@ class MessageManager
             }
             $message[1] = '<a '.$class.' href="view_message.php?id='.$result[0].$link.'">'.$result[2].'</a><br />'.GetFullUserName(($result[1]));
             $message[3] = //'<a href="new_message.php?re_id='.$result[0].$link.'">'.Display::return_icon('message_reply.png',get_lang('ReplyToMessage')).'</a>'.
-                      '&nbsp;&nbsp;<a onclick="javascript:if(!confirm('."'".addslashes(api_htmlentities(get_lang('ConfirmDeleteMessage')))."'".')) return false;" href="inbox.php?action=deleteone&id='.$result[0].$link.'">'.Display::return_icon('delete.png',get_lang('DeleteMessage')).'</a>';
+                      '&nbsp;&nbsp;<a onclick="javascript:if(!confirm('."'".addslashes(api_htmlentities(get_lang('ConfirmDeleteMessage')))."'".')) return false;" href="inbox.php?action=deleteone&id='.$result[0].$link.'">'.Display::return_icon('deleted_hover.png',get_lang('DeleteMessage')).'</a>';
 
 			$message[2] = api_convert_and_format_date($result[3], DATE_TIME_FORMAT_LONG); //date stays the same
 			foreach($message as $key => $value) {
@@ -1223,7 +1223,7 @@ class MessageManager
         }
 
         // display sortable table with messages of the current user
-        $table = new SortableTable('message_inbox', array('MessageManager','get_number_of_messages'), array('MessageManager','get_message_data'),3,20,'DESC');
+        $table = new SortableTable('message_inbox', array('MessageManager','get_number_of_messages'), array('MessageManager','get_message_data'),3, 10,'DESC');
         $table->set_header(0, '', false,array ('style' => 'width:15px;'));
 
         $table->set_header(1,get_lang('Messages'),false);

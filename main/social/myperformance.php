@@ -58,16 +58,16 @@ function createDiv($seq, $sid) {
         if ($index == 1) {
             $text .= '<div class="span2">
                                 <div class="bloque-item">
-                                   ' . $phase_title[$phase_id];
+                                <div class="item-img-title">' . $phase_title[$phase_id].'</div>';
         }
         if (empty($sid)) {
             $score = '--';
         } else {
             $score = getCourseScore($course_array[$seq][0],$course_array[$seq][1], $sid);
         }
-        $text .= '<div class="span2">
-                                    <div class="span3"><div class="icon-complet">' . $course_array[$seq][2] . '</div></div>
-                                    <div class="span3"><div class="nota-aprueba top-note">' . $score . '/100</div></div>
+        $text .= '<div class="list_performance">
+                                    <div class="icon-complet">' . $course_array[$seq][2] . '</div>
+                                    <div class="top-note">' . $score . '/100</div>
                                 </div>';
         if ($index == 0) {
             $text .= '</div></div>';
@@ -211,7 +211,7 @@ if (!empty($user_id)) {
     $social_right_content =
         '<div class="row">
         <div class="span9"><h3 class="titulo">Mi Desempeño</h3></div>
-           </div><div class="row">';
+           </div><div class="row myperformance">';
     $session_list = SessionManager::get_course_session_list_by_user($user_id);
     $sequence_int = 0;
     foreach ($session_list as $session) {

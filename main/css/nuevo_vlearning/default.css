@@ -720,7 +720,7 @@ footer .red-social{
 }
 .social-menu .label-warning, .badge-warning {
     background-color: #FFDF00;
-    margin-left: 25px;
+    margin-left: 25px;git re
 }
 .social-menu .label, .badge {
     color: #cc0000;
@@ -856,5 +856,20 @@ footer .red-social{
   float: left;
   min-height: 1px;
   margin-left: 30px;
+}
+.module-completed{
+    margin: 1px;
+    padding: 20px;
+    background: #0000ff;
+}
+.module-process{
+    margin: 1px;
+    padding: 20px;
+    background: greenyellow;
+}
+.module-closed{
+    margin: 1px;
+    padding: 20px;
+    background: #f0f0f0;
 }
 /* FIN DE CSS CHAMILO */

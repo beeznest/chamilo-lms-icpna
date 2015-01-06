@@ -940,4 +940,14 @@ footer .red-social{
 .myperformance .bloque-item{
   padding-bottom: 30px;
 }
+.frame-inbox{
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.btn-gray{
+    display: inline-block;
+    background-color: #AAA;
+    padding: 7px 15px 7px 15px;
+    margin: 1px;
+}
 /* FIN DE CSS CHAMILO */

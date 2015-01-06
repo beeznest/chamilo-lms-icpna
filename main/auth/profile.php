@@ -787,10 +787,11 @@ $big_image_height   = $big_image_size['height'];
 $url_big_image      = $big_image.'?rnd='.time();
 
 
+
 if (api_get_setting('allow_social_tool') == 'true') {
-    echo '<div class="row-fluid">';
+    echo '<div class="row">';
     echo '<h3 class="titulo"> ' . get_lang('EditProfile') . ' </h3>';
-    echo '<div class="span12 frame-page">';
+    echo '<div class="span9 frame-page">';
     $form->display();
 	echo '</div>';
 	echo '</div>';

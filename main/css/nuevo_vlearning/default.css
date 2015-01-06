@@ -857,19 +857,49 @@ footer .red-social{
   min-height: 1px;
   margin-left: 30px;
 }
+.location-course {
+  margin-left: 7px;
+  display: inline-block;
+}
+.location-course:after {
+  clear: both;
+}
+.location-course:before{
+  display: table;
+  line-height: 0;
+  content: "";
+}
+.location-course .item-list{
+  float: left;
+  min-height: 1px;
+  margin-left: 5px;
+  width: 65px;
+  text-align: center;
+}
 .module-completed{
     margin: 1px;
-    padding: 20px;
-    background: #0000ff;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    background: url("img/icon-gorrita-trans.png") no-repeat center center #90b4e5;
+    font-size: 25px;
+    font-weight: normal;
+    color: #ffffff;
 }
 .module-process{
     margin: 1px;
-    padding: 20px;
-    background: greenyellow;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    background: url("img/icon-gorrita-trans.png") no-repeat center center #14478c;
+    font-size: 25px;
+    font-weight: normal;
+    color: #ffffff;
 }
 .module-closed{
     margin: 1px;
-    padding: 20px;
-    background: #f0f0f0;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    background: url("img/icon-gorrita.png") no-repeat center center #e5e5e5;
+    font-size: 25px;
+    font-weight: normal;
 }
 /* FIN DE CSS CHAMILO */

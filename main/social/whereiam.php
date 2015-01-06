@@ -133,14 +133,14 @@ if (!empty($user_id)) {
         if (!empty($course_sequences[$i])) {
             // if user have completed a course or its in progress
             if ($i == $max_int) {
-                $social_right_content .= '<span class="module-process"><a href="#">'.$course_sequences[$i].'</a></span>';
+                $social_right_content .= '<div class="item-list"><div class="module-process">'.$course_sequences[$i].'</div></div>';
             } else {
-                $social_right_content .= '<span class="module-completed"><a href="#">'.$course_sequences[$i].'</a></span>';
+                $social_right_content .= '<div class="item-list"><div class="module-completed">'.$course_sequences[$i].'</div></div>';
             }
         } elseif ($i< 10) {
-            $social_right_content .= '<span class="module-closed"><a href="#">0' . $i . '</a></span>';
+            $social_right_content .= '<div class="item-list"><div class="module-closed">0' . $i . '</div></div>';
         } else {
-            $social_right_content .= '<span class="module-closed"><a href="#">' . $i . '</a></span>';
+            $social_right_content .= '<div class="item-list"><div class="module-closed">' . $i . '</div></div>';
         }
     }
 }

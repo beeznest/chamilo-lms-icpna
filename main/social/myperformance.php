@@ -7,12 +7,17 @@ if ($isAdult) {
     define('NUM_COURSES', 5);
     define('NUM_PHASES', 5);
     define('TOTAL_COURSES', NUM_COURSES * NUM_PHASES);
+    $basic_adulto = Display::return_icon('mi-basico-adulto.png',get_lang('Basic'));
+    $basic_alto_adulto = Display::return_icon('mi-basico-alto-adulto.png',get_lang('High - Basic'));
+    $Intermediate = Display::return_icon('mi-intermedio-adulto.png',get_lang('Intermediate'));
+    $HighIntermediate = Display::return_icon('mi-intermedio-alto-adulto.png',get_lang('High - Intermediate'));
+    $Advanced = Display::return_icon('mi-avanzado-adulto.png',get_lang('Advanced'));
     $phase_title = array(
-        1 => 'Basic',
-        2 => 'High - Basic',
-        3 => 'Intermediate',
-        4 => 'High - Intermediate',
-        5 => 'Advanced',
+        1 => $basic_adulto,
+        2 => $basic_alto_adulto,
+        3 => $Intermediate,
+        4 => $HighIntermediate,
+        5 => $Advanced,
     );
 } else {
     define('NUM_COURSES', 6);
@@ -51,22 +56,21 @@ function createDiv($seq, $sid) {
     $phase_id = ceil($seq / NUM_COURSES);
     if ($seq <= TOTAL_COURSES) {
         if ($index == 1) {
-            $text .= '<div class="row nivel">
-                                <div class="span9">
-                                   <h3 class="icon-nivel">' . $phase_title[$phase_id] . '</h3>
-                                </div>';
+            $text .= '<div class="span2">
+                                <div class="bloque-item">
+                                   ' . $phase_title[$phase_id];
         }
         if (empty($sid)) {
             $score = '--';
         } else {
             $score = getCourseScore($course_array[$seq][0],$course_array[$seq][1], $sid);
         }
-        $text .= '<div class="span9">
+        $text .= '<div class="span2">
                                     <div class="span3"><div class="icon-complet">' . $course_array[$seq][2] . '</div></div>
                                     <div class="span3"><div class="nota-aprueba top-note">' . $score . '/100</div></div>
                                 </div>';
         if ($index == 0) {
-            $text .= '</div>';
+            $text .= '</div></div>';
         }
     } else {
         $text .= '</div>
@@ -205,15 +209,9 @@ $user_id = api_get_user_id();
 $social_left_content = $social_left_content = SocialManager::show_social_menu('myperformance');
 if (!empty($user_id)) {
     $social_right_content =
-        '<div class="well_border">
-                <div class="span9">
-                    <div class="row">
-                        <h3>Mi Desempeño</h3>
-                        <div class="span8">
-                            <div class="row seccion-info-notas">
-                                <div class="span4"><div class="letra">Courses</div></div>
-                                <div class="span3"><div class="letra">Notes</div></div>
-                            </div>';
+        '<div class="row">
+        <div class="span9"><h3 class="titulo">Mi Desempeño</h3></div>
+           </div><div class="row">';
     $session_list = SessionManager::get_course_session_list_by_user($user_id);
     $sequence_int = 0;
     foreach ($session_list as $session) {

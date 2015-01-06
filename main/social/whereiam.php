@@ -7,22 +7,32 @@ if ($isAdult) {
     define('NUM_COURSES', 5);
     define('NUM_PHASES', 5);
     define('TOTAL_COURSES', NUM_COURSES * NUM_PHASES);
+
+    $basic_adulto = Display::return_icon('donde_basico_adulto.png',get_lang('Basic'));
+    $basic_alto_adulto = Display::return_icon('donde_basico_alto_adulto.png',get_lang('High - Basic'));
+    $Intermediate = Display::return_icon('donde_intermedio-adulto.png',get_lang('Intermediate'));
+    $HighIntermediate = Display::return_icon('donde_intermedio-alto-adultos.png',get_lang('High - Intermediate'));
+    $Advanced = Display::return_icon('donde_avanzado-adulto.png',get_lang('Advanced'));
     $phase_title = array(
-        1 => 'Basic',
-        2 => 'High - Basic',
-        3 => 'Intermediate',
-        4 => 'High - Intermediate',
-        5 => 'Advanced',
+        1 => $basic_adulto,
+        2 => $basic_alto_adulto,
+        3 => $Intermediate,
+        4 => $HighIntermediate,
+        5 => $Advanced,
     );
 } else {
     define('NUM_COURSES', 6);
     define('NUM_PHASES', 4);
     define('TOTAL_COURSES', NUM_COURSES * NUM_PHASES);
+    $Elementary = Display::return_icon('donde_elemental-kids.png',get_lang('Elementary'));
+    $HighElementary = Display::return_icon('donde_elemental-alto-kids.png',get_lang('High - Elementary'));
+    $BasicKids = Display::return_icon('donde_basico-kids.png',get_lang('High - Elementary'));
+    $HighBasicKids = Display::return_icon('donde_basico-alto-kids.png',get_lang('High - Elementary'));
     $phase_title = array(
-        1 => 'Elementary',
-        2 => 'High - Elementary',
-        3 => 'Basic',
-        4 => 'High - Basic',
+        1 => $Elementary,
+        2 => $HighElementary,
+        3 => $BasicKids,
+        4 => $HighBasicKids,
     );
 }
 function createDiv($course_id) {
@@ -61,22 +71,22 @@ function createDiv($course_id) {
             if ($phase_id != 1) {
                 $text .= '</div>
                           <div class="number-hours">N° de Horas: 125 </div>
-                      </div>';
+                      </div></div>';
                 $text .= '</div>';
             }
-            $text .= '<div class="span8">';
+            $text .= '<div class="span9">';
         } else {
             $text .= '</div>
                           <div class="number-hours">N° de Horas: 125 </div>
-                      </div>';
+                      </div></div>';
         }
-        $text .= '    <div class="span3">
+        $text .= '<div class="span4"><div class="bloque-item">
                           <div class="' . $phase_class[$phase_id] . '">' . $phase_title[$phase_id] . '</div>
                           <div class="location-course">';
     } elseif ($course_id == (TOTAL_COURSES + 1)) {
         $text .= '</div>
                       <div class="number-hours">N° de Horas: 125 </div>
-                  </div>
+                  </div></div>
             </div>
         </div>
         ';
@@ -86,10 +96,8 @@ function createDiv($course_id) {
 $user_id = api_get_user_id();
 $social_left_content = $social_left_content = SocialManager::show_social_menu('whereiam');
 if (!empty($user_id)) {
-    $social_right_content =
-        '<div class="well_border">
-                <div class="row">
-                    <h3>¿Dónde Estoy?</h3>';
+    $social_right_content =  '<div class="row"><div class="span9 altura"><h3 class="titulo">¿Dónde Estoy?</h3>';
+    $social_right_content .= '<div class="row">';
     $session_list = SessionManager::get_course_session_list_by_user($user_id);
     $sequence_int = 0;
     $max_int = 0;

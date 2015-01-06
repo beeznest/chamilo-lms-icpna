@@ -843,6 +843,11 @@ footer .red-social{
 .list_performance{
   margin-left: 10px;
   display: inline-block;
+  border-bottom: 1px dashed #cccccc;
+  margin-bottom: -8px;
+}
+.item-img-title{
+  margin-bottom: 18px;
 }
 .list_performance:after{
   clear: both;
@@ -853,10 +858,9 @@ footer .red-social{
   content: "";
 }
 .list_performance .item-list{
-  font-size: large;
   float: left;
   min-height: 1px;
-  margin-left: 10px;
+  margin-left: 5px;
 }
 .location-course {
   margin-left: 7px;
@@ -905,21 +909,31 @@ footer .red-social{
 }
 .module-completed-small{
     margin: 1px;
-    padding: 10px;
-    background: #00ffff;
+    padding: 10px 15px;
+    background: url("img/icon-gorrita-trans-small.png") no-repeat center center #90b4e5;
+    border-bottom: 2px solid #ffffff;
 }
 .module-process-small{
     margin: 1px;
-    padding: 10px;
-    background: #008000;
+    padding: 10px 15px;
+    background: url("img/icon-gorrita-trans-small.png") no-repeat center center #14478c;
+    border-bottom: 2px solid #ffffff;
 }
 .module-closed-small{
     margin: 1px;
-    padding: 10px;
-    background: #800080;
+    padding: 10px 15px;
+    background: url("img/icon-gorrita-small.png") no-repeat center center #e5e5e5;
+    border-bottom: 2px solid #ffffff;
 }
 .item-list-score{
     margin-bottom: 10px;
     margin-top: 10px;
+    width: 90px;
+    padding-right: 5px;
+    font-size: 15px;
+    text-align: right;
+}
+.myperformance .bloque-item{
+  padding-bottom: 30px;
 }
 /* FIN DE CSS CHAMILO */

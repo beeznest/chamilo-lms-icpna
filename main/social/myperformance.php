@@ -220,7 +220,7 @@ $social_left_content = $social_left_content = SocialManager::show_social_menu('m
 if (!empty($user_id)) {
     $social_right_content =
         '<div class="row">
-        <div class="span9"><h3 class="titulo">Mi Desempeño</h3></div>
+        <div class="span9 page-show"><h3 class="titulo">Mi Desempeño</h3></div>
            </div><div class="row myperformance">';
     $session_list = SessionManager::get_course_session_list_by_user($user_id);
     $sequence_int = 0;

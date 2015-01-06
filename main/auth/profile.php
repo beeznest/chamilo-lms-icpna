@@ -790,7 +790,7 @@ $url_big_image      = $big_image.'?rnd='.time();
 
 if (api_get_setting('allow_social_tool') == 'true') {
     echo '<div class="row">';
-    echo '<div class="span9"><h3 class="titulo"> ' . get_lang('EditProfile') . ' </h3></div>';
+    echo '<div class="span9 page-show"><h3 class="titulo"> ' . get_lang('EditProfile') . ' </h3></div>';
     echo '<div class="span9 frame-page">';
     $form->display();
 	echo '</div>';

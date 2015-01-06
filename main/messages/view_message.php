@@ -63,13 +63,15 @@ $message  = '';
 //LEFT COLUMN
 if (api_get_setting('allow_social_tool') == 'true') {
     $social_left_content = SocialManager::show_social_menu($show_menu);
-    $message .='<div class="span9">';
+    $message .='<div class="span9 page-show">';
+
 }
 //MAIN CONTENT
 $message .= MessageManager::show_message_box($id_message,$source);
 
 if (api_get_setting('allow_social_tool') == 'true') {
     $message .='</div>';
+
 }
 
 if (!empty($message)) {

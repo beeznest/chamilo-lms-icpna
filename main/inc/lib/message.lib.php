@@ -724,14 +724,9 @@ class MessageManager
     			$message_content .= get_lang('From').':&nbsp;'.$name.'</b> '.api_strtolower(get_lang('To')).' <b>'.get_lang('Me').'</b>';
     		}
     	}
-*/
+*/      $message_content .= '<div class="frame-page">';
 		$message_content .=' <div style="float:right">'.get_lang('Date').':  '.api_get_local_time($row['send_date']).'</div>';
-
-        $message_content .= '<br />';
-
         $message_content .= str_replace("\\","",$content);
-        $message_content .= '<br />';
-
         $message_content .= '<div id="message-attach">'.(!empty($files_attachments)?implode('<br />',$files_attachments):'').'</div>
 		        ';
 		    $social_link = '';

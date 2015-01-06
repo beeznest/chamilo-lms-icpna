@@ -96,7 +96,7 @@ function createDiv($course_id) {
 $user_id = api_get_user_id();
 $social_left_content = $social_left_content = SocialManager::show_social_menu('whereiam');
 if (!empty($user_id)) {
-    $social_right_content =  '<div class="row"><div class="span9 altura"><h3 class="titulo">¿Dónde Estoy?</h3>';
+    $social_right_content =  '<div class="row"><div class="span9 page-show"><h3 class="titulo">¿Dónde Estoy?</h3>';
     $social_right_content .= '<div class="row">';
     $session_list = SessionManager::get_course_session_list_by_user($user_id);
     $sequence_int = 0;

@@ -50,12 +50,6 @@
                     <div class="page-content">
                         <div class="logo-icpna"><img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png"> </div>
                     </div>
-                </div>
-                {% if show_header == true %}
-                {% include "default/layout/page_body.tpl" %}
-                {% endif %}
-        </div>
-    </div>
-</div>
+
 
 </body>

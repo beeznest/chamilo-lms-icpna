@@ -3953,9 +3953,10 @@ a.forum_group_link {
 #learning_path_left_zone {
     float:left;
     width:280px;
-    height:100%;
+    height:700px;
     padding-left: 8px;
     padding-right: 4px;
+    overflow-y: scroll;
 }
 
 #learning_path_left_zone #header {

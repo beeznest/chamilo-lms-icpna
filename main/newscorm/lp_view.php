@@ -460,7 +460,7 @@ echo '<div id="learning_path_main" style="width:100%;height:100%;">';
         if ($_SESSION['oLP']->mode == 'fullscreen') {
             echo '<iframe id="content_id_blank" name="content_name_blank" src="blank.php" border="0" frameborder="0" style="width:100%;height:'.$height.'" ></iframe>';
         } else {
-            echo '<iframe id="content_id" name="content_name" src="'.$src.'" border="0" frameborder="0"  style="width:92%;height:700px;max-height:'.$height.'; margin-left:14px;"></iframe>';
+            echo '<iframe id="content_id" name="content_name" src="'.$src.'" border="0" frameborder="0"  style="height:700px;max-height:'.$height.'; margin-left:14px;"></iframe>';
         }
     ?>
     </div>

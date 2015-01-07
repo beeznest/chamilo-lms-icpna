@@ -12,7 +12,7 @@
         </div>
     {% endif %}
     <div class="row">
-        <div id="learning_path_left_zone" class="col-md-2">
+        <div id="learning_path_left_zone cosa" class="col-md-2">
             <div id="header">
                 <a href="{{ _p.web_code_path }}lp_controller.php?action=return_to_course_homepage&{{ course_url }}" target="_self" onclick="javascript: window.parent.API.save_asset();">
                     <img src="{{ _p.web_img_path }}lp_arrow.gif" />

@@ -301,7 +301,7 @@ if ($_SESSION['oLP']->mode == 'fullscreen') {
 }
 
 // Not in fullscreen mode.
-Display::display_header($nameTools); //para fullscreen el scroom
+//Display::display_header($nameTools); //para fullscreen el scroom
 
 // Check if audio recorder needs to be in studentview.
 if (isset($_SESSION['status']) && $_SESSION['status'][$course_code] == 5) {

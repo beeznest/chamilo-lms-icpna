@@ -217,7 +217,7 @@ header .logo-icpna{
 .user-advanced span{
   position: absolute;
   bottom: 15px;
-  right: -35px;
+  right: -10px;
 }
 .title-course{
   margin: 0 0 10px 0;
@@ -953,5 +953,17 @@ footer .red-social{
 .date-message{
   text-align: right;
   padding-right: 110px;
+}
+.btn-white{
+    background:#FFFFFF;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+    border:none;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 700;
+    padding-right: 40px;
+    padding-left: 40px;
+    text-shadow: none;
 }
 /* FIN DE CSS CHAMILO */

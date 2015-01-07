@@ -348,12 +348,16 @@ if (Database::num_rows($res_media) > 0) {
         if (!empty($row_media['audio'])) {$show_audioplayer = true; break;}
     }
 }
-echo '<div class="span9"> <button style="float: left">BTNL</button> <button style="float: right">BTNR</button> </div>';
-echo '<div class="span9">';
+echo '<div><div class = "btn btn-large btn-white" style="float: left" onclick="javascript:history.back(1)">' . get_lang('GoBack') . '</div>' .
+    '<div class = "btn btn-large btn-white" style="float: right">' . get_lang('Vlearning') . ' / ' . api_get_course_id() . '</div>' .
+    '</div>';
+echo '<div class="page-show"></div>';
+echo '<div class="span4 offset6 user-advanced">';
 echo $progress_bar;
 echo '</div>';
 echo '</div>';
 echo '</div>';
+echo '<div class="frame-page span12">';
 echo '<div id="learning_path_main" style="width:100%;height:100%;">';
     $is_allowed_to_edit = api_is_allowed_to_edit(null, true, false, false);
     /*
@@ -462,6 +466,7 @@ echo '<div id="learning_path_main" style="width:100%;height:100%;">';
     </div>
 
     <!-- end right Zone -->
+</div>
 </div>
 
 <script>

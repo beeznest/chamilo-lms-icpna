@@ -301,7 +301,7 @@ if ($_SESSION['oLP']->mode == 'fullscreen') {
 }
 
 // Not in fullscreen mode.
-//Display::display_header($nameTools); //para fullscreen el scroom
+Display::display_header($nameTools, null, null, 0); //para fullscreen el scroom
 
 // Check if audio recorder needs to be in studentview.
 if (isset($_SESSION['status']) && $_SESSION['status'][$course_code] == 5) {
@@ -348,7 +348,12 @@ if (Database::num_rows($res_media) > 0) {
         if (!empty($row_media['audio'])) {$show_audioplayer = true; break;}
     }
 }
-
+echo '<div class="span9"> <button style="float: left">BTNL</button> <button style="float: right">BTNR</button> </div>';
+echo '<div class="span9">';
+echo $progress_bar;
+echo '</div>';
+echo '</div>';
+echo '</div>';
 echo '<div id="learning_path_main" style="width:100%;height:100%;">';
     $is_allowed_to_edit = api_is_allowed_to_edit(null, true, false, false);
     /*

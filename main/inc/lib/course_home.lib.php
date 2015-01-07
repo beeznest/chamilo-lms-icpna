@@ -1270,8 +1270,8 @@ class CourseHome {
                 }
             }
 
+            // Sequence Lessons
             $show = '<div class="cube-lesson">'
-
               . ($tool['visibility']==1 ? '' : '')
               . '   <div class="lesson-' . $state . '">'
               . $tool['pure_icon']
@@ -1281,6 +1281,33 @@ class CourseHome {
               . ($tool['visibility']==1 ? '<a href="'.$tool['tool']['link'].'">'.$toolName.'</a>' : $toolName)
                . '</div>';
             $search = array("{{ ".$toolName." }}", "{{".$toolName."}}", "((".$toolName."))", "(( ".$toolName." ))");
+            if (!$editMode) {
+                $text = str_replace($search, $show, $text);
+            }
+
+            // Information lessons
+            $show = '<div class="item-top">'
+                . ($tool['visibility']==1 ? '<a href="'.$tool['tool']['link'].'">'. $tool['pure_icon'] . $toolName.'</a>' : $tool['pure_icon'] . $toolName)
+                . '</div>';
+            $search = array("{i{ ".$toolName." }i}", "{i{".$toolName."}i}", "(i(".$toolName.")i)", "(i( ".$toolName." )i)");
+            if (!$editMode) {
+                $text = str_replace($search, $show, $text);
+            }
+
+            // Extras lessons
+            $show = '<div class="item-top">'
+                . ($tool['visibility']==1 ? '<a href="'.$tool['tool']['link'].'">'. $toolName.'</a>' : $toolName)
+                . '</div>';
+            $search = array("{o{ ".$toolName." }o}", "{o{".$toolName."}o}", "(o(".$toolName.")o)", "(o( ".$toolName." )o)");
+            if (!$editMode) {
+                $text = str_replace($search, $show, $text);
+            }
+
+            // Exams lessons
+            $show = '<div class="item-ex">'
+                . ($tool['visibility']==1 ? '<a href="'.$tool['tool']['link'].'">'. $tool['pure_icon'] . $toolName.'</a>' : $tool['pure_icon'] . $toolName)
+                . '</div>';
+            $search = array("{x{ ".$toolName." }x}", "{x{".$toolName."}x}", "(x(".$toolName.")x)", "(x( ".$toolName." )x)");
             if (!$editMode) {
                 $text = str_replace($search, $show, $text);
             }

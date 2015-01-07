@@ -1311,6 +1311,20 @@ class CourseHome {
             if (!$editMode) {
                 $text = str_replace($search, $show, $text);
             }
+
+            // Progress bar
+            $courseProgress = ceil(tracking::get_avg_student_progress(api_get_user_id(), api_get_course_id(), null, api_get_session_id(), false, true)) . '%';
+            $show = '<div id="bar-animation" class="user-advanced">' .
+                '<div class="progress progress-striped" style="margin-right: 35px">' .
+                '<div id="progress_bar_value" class="bar" style="width: ' . $courseProgress . ';">' .
+                '</div>' .
+                '</div>' .
+                '<span class="progresstext" id="progress_text" style="bottom: -5px">' . $courseProgress . '</span>' .
+                '</div';
+            $search = array('{{course_progress_bar}}', '{{ course_progress_bar }}', '((course_progress_bar))', '(( course_progress_bar ))');
+            if (!$editMode) {
+                $text = str_replace($search, $show, $text);
+            }
         }
         return $text;
     }

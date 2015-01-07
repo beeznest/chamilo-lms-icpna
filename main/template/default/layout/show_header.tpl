@@ -16,15 +16,11 @@
     <div class="container">
         <div class="row">
             <div class="span3">
-
-                {# if user is not login show the login form #}
-                {% if _u.logged  == 0 %}
-                {% include "default/layout/login_form.tpl" %}
-                {% endif %}
                 <div class="bloque-user">
                     <div class="header-logo">
                         <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-vlearning.png">
                     </div>
+                {% if social >= 1 %}
                     <div class="profile">
                         <div class="home"><a href="{{ _p.web_modules }}"><img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/home.png"></a></div>
                         <div class="user-datos">
@@ -44,10 +40,10 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                {% endif %}
                 </div>
-                </div>
-                <div class="span9">
-                    <div class="page-content">
-                        <div class="logo-icpna"><img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png"> </div>
-                        <div class="page-show"></div>
+            </div>
+            <div class="span9">
+                <div class="page-content">
+                    <div class="logo-icpna"><img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png"> </div>
+                    <div class="page-show"></div>

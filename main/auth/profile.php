@@ -706,9 +706,9 @@ if ($form->validate()) {
 
 
 /*  		MAIN DISPLAY SECTION  */
-$allowSocialTool = api_get_setting('allow_social_tool') == 'true' ? true : false;
+$displaySocial = api_get_setting('allow_social_tool') == 'true' ? 2 : 1;
 // the header
-Display::display_header(get_lang('ModifyProfile'), null, null, $allowSocialTool);
+Display::display_header(get_lang('ModifyProfile'), null, null, $displaySocial);
 
 if (api_get_setting('allow_social_tool') != 'true') {
 

@@ -48,4 +48,20 @@
                 <div class="page-content">
                     <div class="logo-icpna"><img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png"> </div>
                     <div class="page-show"></div>
+                    {% if lesson_progress_bar is defined %}
+                    <div>
+                        <div class = "btn btn-large btn-white" style="float: left" onclick="javascript:history.back(1)">{{ "GoBak" |get_lang }}</div>
+                        <div class = "btn btn-large btn-white" style="float: right">
+                            <a href="{{_p.web_modules}}">{{ "Vlearning" |get_lang }}</a>
+                            /
+                            <a href="{{_p.web_course}}{{_c.code}}/?id_session={{_c.session_id}}">{{ _c.title }}</a>
+                        </div>
+                    </div>
+                    <div class="page-show"></div>
+                    <div class="span4 offset6 user-advanced">
+                        {{lesson_progress_bar}}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
 {% endif %}

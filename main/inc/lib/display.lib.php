@@ -31,10 +31,11 @@ class Display {
      * @param string $help
      * @param string $page_header
      * @param int $social
+     * @param array $extra
      * @internal param \The $string name of the page (will be showed in the page title)
      * @internal param \Optional $string help file name
      */
-    public static function display_header($tool_name ='', $help = null, $page_header = null, $social = 0) {
+    public static function display_header($tool_name ='', $help = null, $page_header = null, $social = 0, $extras = array()) {
         self::$global_template = new Template($tool_name);
         self::$global_template->set_help($help);
         self::$global_template->assign('social', $social);
@@ -49,6 +50,11 @@ class Display {
         if ($social >= 2) {
             $show_delete_account_button = api_get_setting('platform_unsubscribe_allowed') == 'true' ? true : false;
             self::$global_template->assign('social_left_content', SocialManager::show_social_menu('home', null, api_get_user_id(), false, $show_delete_account_button));
+        }
+        if (!empty($extras) && is_array($extras)) {
+            foreach ($extras as $k => $v) {
+                self::$global_template->assign($k, $v);
+            }
         }
         echo self::$global_template->show_header_template();
     }

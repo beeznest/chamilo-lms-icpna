@@ -470,3 +470,18 @@
         </div>
     </div>
 </div>
+<!--Modal Video Help-->
+<div class="modal fade large" style="display: none;" id="help" tabindex="-1" role="dialog" aria-labelledby="helplabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+
+            <div class="modal-body">
+
+            </div>
+
+        </div>
+    </div>
+</div>

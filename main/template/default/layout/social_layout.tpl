@@ -30,7 +30,7 @@
                 {{ social_left_content }}
                 <div class="options">
                     <div class="row-fluid">
-                        <div class="span6 help"><a herf="#" data-toggle="modal" data-target="#FAQ"><img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/icon_help.png">{{"Help"|get_lang}}</a></div>
+                        <div class="span6 help"><a herf="#" data-toggle="modal" data-target="#help"><img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/icon_help.png">{{"Help"|get_lang}}</a></div>
                         <div class="span6 closed"><a href="{{ logout_link }}">{{ "Logout" |get_lang }}<img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/icon_closed.png"/> </a></div>
                     </div>
                 </div>

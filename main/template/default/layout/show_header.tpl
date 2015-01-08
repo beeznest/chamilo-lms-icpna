@@ -7,12 +7,12 @@
     {% include "default/layout/head.tpl" %}
 </head>
 <body {% if social is not defined %} class="no-background" {% endif %}>
+    {% if social is defined %}
 {% include "default/layout/main_header.tpl" %}
 {#
     show_header and show_footer templates are only called when using the Display::display_header and Display::display_footer
     for backward compatibility we suppose that the default layout is one column which means using a div with class span12
 #}
-    {% if social is defined %}
 <div class="page-wrap">
     <div class="container">
         <div class="row">

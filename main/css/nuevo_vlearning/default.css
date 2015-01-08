@@ -969,4 +969,8 @@ footer .red-social{
     padding-left: 40px;
     text-shadow: none;
 }
+
+.no-background{
+    background: none;
+}
 /* FIN DE CSS CHAMILO */

@@ -1049,4 +1049,7 @@ footer .red-social{
 .modal-body .span6.movistar{
   text-align: right;
 }
+#help.modal{
+  width: 830px;
+}
 /* FIN DE CSS CHAMILO */

@@ -1313,7 +1313,7 @@ class CourseHome {
             }
 
             // Progress bar
-            $courseProgress = ceil(tracking::get_avg_student_progress(api_get_user_id(), api_get_course_id(), null, api_get_session_id(), false, true)) . '%';
+            $courseProgress = ceil(Tracking::get_avg_student_progress(api_get_user_id(), api_get_course_id(), null, api_get_session_id(), false, true)) . '%';
             $show = '<div id="bar-animation" class="user-advanced">' .
                 '<div class="progress progress-striped" style="margin-right: 35px">' .
                 '<div id="progress_bar_value" class="bar" style="width: ' . $courseProgress . ';">' .

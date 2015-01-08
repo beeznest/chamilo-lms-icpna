@@ -1316,7 +1316,7 @@ class Template {
             // if we know the user and we are in a course, get the total course
             // progress to show globally from the template (header, breadcrumb, etc)
             require_once api_get_path(LIBRARY_PATH).'tracking.lib.php';
-            $progress = tracking::get_avg_student_progress($user_id, $course_code, null, $session_id, false, true);
+            $progress = Tracking::get_avg_student_progress($user_id, $course_code, null, $session_id, false, true);
             $this->assign('course_progress', ceil($progress));
         }
 

@@ -300,8 +300,6 @@ if ($_SESSION['oLP']->mode == 'fullscreen') {
     $htmlHeadXtra[] = "<script>window.open('$src','content_id','toolbar=0,location=0,status=0,scrollbars=1,resizable=1');</script>";
 }
 
-// Not in fullscreen mode.
-Display::display_header($nameTools, null, null, 0); //para fullscreen el scroom
 
 // Check if audio recorder needs to be in studentview.
 if (isset($_SESSION['status']) && $_SESSION['status'][$course_code] == 5) {
@@ -348,15 +346,10 @@ if (Database::num_rows($res_media) > 0) {
         if (!empty($row_media['audio'])) {$show_audioplayer = true; break;}
     }
 }
-echo '<div><div class = "btn btn-large btn-white" style="float: left" onclick="javascript:history.back(1)">' . get_lang('GoBack') . '</div>' .
-    '<div class = "btn btn-large btn-white" style="float: right">' . get_lang('Vlearning') . ' / ' . api_get_course_id() . '</div>' .
-    '</div>';
-echo '<div class="page-show"></div>';
-echo '<div class="span4 offset6 user-advanced">';
-echo $progress_bar;
-echo '</div>';
-echo '</div>';
-echo '</div>';
+
+// Not in fullscreen mode.
+Display::display_header($nameTools, null, null, 0, array('lesson_progress_bar' => $progress_bar)); //para fullscreen el scroom
+
 echo '<div class="frame-page span12">';
 echo '<div id="learning_path_main" style="width:100%;height:100%;">';
     $is_allowed_to_edit = api_is_allowed_to_edit(null, true, false, false);

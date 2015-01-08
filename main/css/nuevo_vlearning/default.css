@@ -18,13 +18,16 @@ a:hover{
 }
 body{
 	  font-family: 'Roboto Condensed', sans-serif;
-	  background-image: url(img/bgimage.jpg);
+    background-image: url("img/bgfilecolor.jpg");
+    background-repeat: repeat-y;
     background-position: center 0;
-    background-size: cover;
     color: #797979;
-    background-repeat: no-repeat;
+
 }
 #page-wrap{
+  background-image: url(img/bgimage.jpg);
+  background-position: center 0;
+  background-repeat: no-repeat;
   margin: auto;
   height: auto;
   min-height:100%;

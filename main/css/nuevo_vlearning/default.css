@@ -973,4 +973,77 @@ footer .red-social{
 .no-background{
     background: none;
 }
+
+.modal{
+  border-radius: 0px;
+  -moz-border-radius: 0px;
+  -webkit-border-radius: 0px;
+  border: none;
+}
+.modal-header{
+  background-color: #528ad5;
+  color: #ffffff;
+}
+.title-yellow{
+  background-color: #ffd200;
+  color: #bd5b40;
+  font-size: 18px;
+  font-weight: normal;
+  padding-left: 30px;
+}
+.title-purple{
+  background-color: #b670db;
+  color: #eceef2;
+  font-size: 18px;
+  font-weight: normal;
+  padding-left: 30px;
+}
+.title-green{
+  background-color: #87c10b;
+  color: #4a6d00;
+  font-size: 18px;
+  font-weight: normal;
+  padding-left: 30px;
+}
+
+.modal-title-content{
+  font-size: 18px;
+  padding: 0;
+  margin: 0;
+  color: #525252;
+}
+.list-red{
+  list-style-image: url("img/vineta-red.png");
+}
+.list-purple{
+  list-style-image: url("img/vineta-purple.png");
+}
+.list-rosa{
+  list-style-image: url("img/vineta-rosa.png");
+  margin-left: 40px;
+}
+.table-modal{
+  background-color: #e5e5e5;
+  margin-bottom: 10px;
+  border-color: #ffffff;
+}
+.table-modal .bold{
+  font-weight: bold;
+  vertical-align: middle;
+}
+.modal-header .close {
+  position: fixed;
+  top: 18%;
+  z-index: 9999;
+}
+.modal-header .close.btn{
+  background-color: #ffffff;
+  padding-bottom: 5px;
+  width: 25px;
+  font-size: 20px;
+  border-radius: 50%;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  margin-left: 530px;
+}
 /* FIN DE CSS CHAMILO */

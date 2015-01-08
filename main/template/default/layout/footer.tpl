@@ -36,7 +36,7 @@
             <div class="row">
                 <div class="span6">
                     <a href="#" data-toggle="modal" data-target="#FAQ">Preguntas Frecuentes</a> &nbsp| &nbsp
-                    <a href="#" data-toggle="modal" data-target="#terminos">Términos y condiciones</a> &nbsp| &nbsp
+                    <a href="#" data-toggle="modal" data-target="#terminos-condiciones">Términos y condiciones</a> &nbsp| &nbsp
                     <a href="#" data-toggle="modal" data-target="#beneficios">Beneficios</a>
                 </div>
                 <div class="span6">

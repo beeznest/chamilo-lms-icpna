@@ -325,7 +325,7 @@ if ($time_control) {
 $html .=  $message;
 
 if (!empty($exercise_url_button)) {
-    $html .=  Display::div(Display::div($exercise_url_button, array('class'=>'exercise_overview_options span12')), array('class'=>' row'));
+    $html .=  Display::div(Display::div($exercise_url_button, array('class'=>'exercise_overview_options')), array('class'=>' row'));
 }
 
 $html .= $table_content;

@@ -729,7 +729,7 @@ footer .red-social{
 }
 .social-menu .label-warning, .badge-warning {
     background-color: #FFDF00;
-    margin-left: 25px;git re
+    margin-left: 25px;
 }
 .social-menu .label, .badge {
     color: #cc0000;
@@ -1067,5 +1067,8 @@ footer .red-social{
 }
 .block-lesson{
   margin-bottom: 30px;
+}
+.page-content.header-bar {
+    margin-bottom: inherit;
 }
 /* FIN DE CSS CHAMILO */

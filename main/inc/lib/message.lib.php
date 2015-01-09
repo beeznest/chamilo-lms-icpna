@@ -123,7 +123,7 @@ class MessageManager
             if (isset($_GET['f']) && $_GET['f'] =='social') {
                 $link = '&f=social';
             }
-            $message[1] = '<a '.$class.' href="view_message.php?id='.$result[0].$link.'">'.$result[2].'</a><br />'.GetFullUserName(($result[1]));
+            $message[1] = '<a '.$class.' href="view_message.php?id='.$result[0].$link.'">'.$result[2].'</a><div class="username-inbox">'.GetFullUserName(($result[1])).'</div>';
             $message[3] = //'<a href="new_message.php?re_id='.$result[0].$link.'">'.Display::return_icon('message_reply.png',get_lang('ReplyToMessage')).'</a>'.
                       '&nbsp;&nbsp;<a onclick="javascript:if(!confirm('."'".addslashes(api_htmlentities(get_lang('ConfirmDeleteMessage')))."'".')) return false;" href="inbox.php?action=deleteone&id='.$result[0].$link.'">'.Display::return_icon('deleted_hover.png',get_lang('DeleteMessage')).'</a>';
 
@@ -1222,8 +1222,8 @@ class MessageManager
         $table->set_header(0, '', false,array ('style' => 'width:15px;'));
 
         $table->set_header(1,get_lang('Messages'),false);
-        $table->set_header(2,get_lang('Date'),true, array('style' => 'width:180px;'));
-        $table->set_header(3,get_lang('DeleteInbox'),false,array ('style' => 'width:70px;'));
+        $table->set_header(2,get_lang('Date'),true, array('style' => 'width:280px;'));
+        $table->set_header(3,get_lang('DeleteInbox'),false,array ('style' => 'width:35px;'));
 
         if (isset($_REQUEST['f']) && $_REQUEST['f']=='social') {
             $parameters['f'] = 'social';

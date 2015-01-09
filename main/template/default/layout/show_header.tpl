@@ -66,7 +66,7 @@
     {% if lesson_progress_bar %}
         <div class="span12" style="background-color: #EEE;" id="page-wrap-tab">
         <a href="#">
-            <div style="text-align: center"><i class="icon-chevron-up"></i></div>
+            <div style="text-align: center"><i class="icon-chevron-down"></i></div>
         </a>
         </div>
     {% endif %}

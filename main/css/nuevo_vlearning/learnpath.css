@@ -26,10 +26,21 @@ CSS Diseño V-learning 2015
     background-color: #DDD;
 }
 .scorm_item{
-    padding: 30px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 10px;
+    padding-left: 35px;
     margin-bottom: 1px;
     color: white;
     font-size: 1.5em;
+    background-image: url("img/arrows-scrom.png") ;
+    background-position: 270px center;
+    background-repeat: no-repeat;
+}
+.scorm-status-completed{
+    background-image: url("img/check.png") ;
+    background-position: 10px center;
+    background-repeat: no-repeat;
 }
 .scorm_item a{
     color: white;
@@ -38,10 +49,16 @@ CSS Diseño V-learning 2015
     color: #a9a9a9;
 }
 .scorm_item_highlight{
-    padding: 30px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-right: 10px;
+  padding-left: 35px;
     margin-bottom: 1px;
     font-size: 1.5em;
     background-color: #0134A1;
+  background-image: url("img/arrows-scrom.png") ;
+  background-position: 270px center;
+  background-repeat: no-repeat;
 }
 .scorm_item_highlight a{
     color: white;

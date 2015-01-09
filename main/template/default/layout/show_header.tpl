@@ -16,7 +16,7 @@
 <div id="page-wrap">
     <div class="container">
         <div class="row">
-            <div class="span3 header-bar">
+            <div class="span3 {% if lesson_progress_bar %}header-bar" style="display: none;"{% endif %}">
                 <div class="bloque-user">
                     <div class="header-logo">
                         <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-vlearning.png">
@@ -46,7 +46,7 @@
             </div>
             <div class="offset3">
             <div class="logo-icpna" style="text-align: right;"><img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png"> </div>
-            <div class="page-content header-bar">
+            <div class="page-content {% if lesson_progress_bar %}header-bar" style="display: none;"{% endif %}">
                     <div class="page-show"></div>
                     {% if lesson_progress_bar is defined %}
                     <div class="">

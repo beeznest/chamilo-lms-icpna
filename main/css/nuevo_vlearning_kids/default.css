@@ -1,0 +1,10 @@
+/*
+ * Importamos los Estilos Generales
+*/
+
+@import url('../nuevo_vlearning/default.css');
+
+.location-course .item-list{
+  width: 53px;
+  text-align: center;
+}

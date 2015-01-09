@@ -166,7 +166,8 @@ header .logo-icpna{
   background: url("img/curso/barrita.png") repeat-x;
   display: inline-block;
   width: 100%;
-  margin-bottom: 10px;
+  margin-bottom: 30px;
+  border-top: 3px solid #528AD5;
 }
 .course .link{
   margin-top: 35px;
@@ -1055,5 +1056,16 @@ footer .red-social{
 }
 .phase-title a {
   color: inherit;
+}
+.block-info {
+  margin-bottom: 30px;
+}
+.info{
+  margin-bottom: 35px;
+  font-size: 14px;
+  font-weight: bold;
+}
+.block-lesson{
+  margin-bottom: 30px;
 }
 /* FIN DE CSS CHAMILO */

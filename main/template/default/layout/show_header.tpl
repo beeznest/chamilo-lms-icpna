@@ -16,7 +16,7 @@
 <div id="page-wrap">
     <div class="container">
         <div class="row">
-            <div class="span3 header">
+            <div class="span3 {% if lesson_progress_bar %}header-bar" style="display: none;"{% endif %}">
                 <div class="bloque-user">
                     <div class="header-logo">
                         <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-vlearning.png">
@@ -45,11 +45,11 @@
                 </div>
             </div>
             <div class="offset3">
-                <div class="page-content">
-                    <div class="logo-icpna"><img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png"> </div>
-                    <div class="page-show header"></div>
+            <div class="logo-icpna" style="text-align: right;"><img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png"> </div>
+            <div class="page-content {% if lesson_progress_bar %}header-bar" style="display: none;"{% endif %}">
+                    <div class="page-show"></div>
                     {% if lesson_progress_bar is defined %}
-                    <div class="header">
+                    <div class="">
                         <div class = "btn btn-large btn-white" style="float: left" onclick="javascript:history.back(1)">{{ "GoBack" |get_lang }}</div>
                         <div class = "btn btn-large btn-white" style="float: right">
                             <a href="{{_p.web_modules}}">{{ "Vlearning" |get_lang }}</a>
@@ -57,7 +57,7 @@
                             <a href="{{_p.web_course}}{{_c.code}}/?id_session={{_c.session_id}}">{{ _c.title }}</a>
                         </div>
                     </div>
-                    <div class="span4 offset6 user-advanced header">
+                    <div class="span4 offset6 user-advanced">
                         {{lesson_progress_bar}}
                     </div>
                     {% endif %}

@@ -1052,4 +1052,7 @@ footer .red-social{
 #help.modal{
   width: 830px;
 }
+.phase-title a {
+  color: inherit;
+}
 /* FIN DE CSS CHAMILO */

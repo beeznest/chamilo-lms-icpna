@@ -1314,14 +1314,26 @@ class CourseHome {
 
             // Progress bar
             $courseProgress = ceil(Tracking::get_avg_student_progress(api_get_user_id(), api_get_course_id(), null, api_get_session_id(), false, true)) . '%';
-            $show = '<div id="bar-animation" class="user-advanced">' .
-                '<div class="progress progress-striped" style="margin-right: 35px">' .
-                '<div id="progress_bar_value" class="bar" style="width: ' . $courseProgress . ';">' .
-                '</div>' .
-                '</div>' .
-                '<span class="progresstext" id="progress_text" style="bottom: -5px">' . $courseProgress . '</span>' .
-                '</div';
+            $show = '<div class="span4 user-advanced"><div class="progress"><div class="bar" style="width: ' . $courseProgress . '"></div></div><span>' . $courseProgress . '</span></div>';
+
             $search = array('{{course_progress_bar}}', '{{ course_progress_bar }}', '((course_progress_bar))', '(( course_progress_bar ))');
+            if (!$editMode) {
+                $text = str_replace($search, $show, $text);
+            }
+
+            global $extAuthSource;
+
+            // Course title
+            $show = '<span class="phase-title"><a href="' . $extAuthSource['modules_path'] . '"> ' . $extAuthSource[$courseInfo['code']] .  '</a></span>';
+
+            $search = array('{{phase_title}}', '{{ phase_title }}', '((phase_title))', '(( phase_title ))');
+            if (!$editMode) {
+                $text = str_replace($search, $show, $text);
+            }
+
+            // Course phase
+            $show = '<span class="course-title"> ' . $courseInfo['title'] . '</span>';
+            $search = array('{{course_title}}', '{{ course_title }}', '((course_title))', '(( course_title ))');
             if (!$editMode) {
                 $text = str_replace($search, $show, $text);
             }

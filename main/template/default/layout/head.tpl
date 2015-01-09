@@ -316,7 +316,38 @@ $(function() {
 
 <!-- Animated progress bar -->
 <script type="text/javascript">
-$(document).ready(function(){
+    $(document).ready(function(){
        $(".blue-back-bar").filter(':not(:animated)').animate({width:'{{ course_progress }}%'},{duration:2000});
 });
 </script>
+{% if hide_bar %}
+<script type="text/javascript">
+$(document).ready(function(){
+        try{
+            $(document).on("click", "#page-wrap-tab a", function(event) {
+                $(".header").slideToggle()
+                toggleArrowIcon($(this).find("i"));
+                event.preventDefault();
+            });
+        } catch (e) {
+            console.log(e);
+        }
+});
+
+    function toggleArrowIcon(obj){
+        if (obj.hasClass("icon-chevron-up")) {
+            obj.addClass("icon-chevron-down");
+            obj.removeClass("icon-chevron-up");
+        } else if (obj.hasClass("icon-chevron-down")) {
+            obj.addClass("icon-chevron-up");
+            obj.removeClass("icon-chevron-down");
+        }else if (obj.hasClass("icon-chevron-left")) {
+            obj.addClass("icon-chevron-right");
+            obj.removeClass("icon-chevron-left");
+        } else if (obj.hasClass("icon-chevron-right")) {
+            obj.addClass("icon-chevron-left");
+            obj.removeClass("icon-chevron-right");
+        }
+    }
+</script>
+{% endif %}

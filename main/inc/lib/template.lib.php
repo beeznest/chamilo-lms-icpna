@@ -340,7 +340,8 @@ class Template {
             'software_name' => $_configuration['software_name'],
             'system_version' => $_configuration['system_version'],
             'site_name' => api_get_setting('siteName'),
-            'institution' => api_get_setting('Institution')
+            'institution' => api_get_setting('Institution'),
+            'kids' => intval($_configuration['kids']),
         );
         $this->assign('_s', $_s);
     }

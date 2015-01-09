@@ -388,11 +388,11 @@ if ($tool == TOOL_COURSE_HOMEPAGE && !isset($_GET['intro_cmdEdit'])) {
 	} 
 }
 
-$introduction_section .= '<div class="row"><div class="span12">';
+$introduction_section .= '<div class="row"><div class="span9">';
 $introduction_section .=  $thematic_description_html;
 $introduction_section .=  '</div>';
 
-$introduction_section .=  '<div class="span12">';
+$introduction_section .=  '<div class="span9">';
 if ($intro_dispDefault) {
     $intro_content = $intro_content;
     if (!empty($intro_content))	{

@@ -245,7 +245,7 @@ class SortableTable extends HTML_Table {
 			
 			//Only show pagination info when there are items to paginate	
             
-            if ($this->get_total_number_of_items() > $this->default_items_per_page) {
+            //if ($this->get_total_number_of_items() > $this->default_items_per_page) {
     			$html  = '<table class="data_table_pagination">';
     			$html .= '<tr>';
     			$html .= '<td style="width:25%;">';
@@ -259,7 +259,7 @@ class SortableTable extends HTML_Table {
     			$html .= '</td>';
     			$html .= '</tr>';
     			$html .= '</table>';
-            }
+            //}
             
 			
 			if (count($this->form_actions) > 0) {
@@ -646,9 +646,11 @@ class SortableTable extends HTML_Table {
 	 */
 	public function get_page_select_form () {
 		$total_number_of_items = $this->get_total_number_of_items();		
-		if ($total_number_of_items <= $this->default_items_per_page) {
+		/*
+	    if ($total_number_of_items <= $this->default_items_per_page) {
 			return '';
 		}
+		*/
 		$result[] = '<form method="GET" action="'.api_get_self().'" style="display:inline;">';
 		$param[$this->param_prefix.'direction'] = $this->direction;
 		$param[$this->param_prefix.'page_nr'] = $this->page_nr;

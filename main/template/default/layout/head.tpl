@@ -325,7 +325,7 @@ $(function() {
 $(document).ready(function(){
         try{
             $(document).on("click", "#page-wrap-tab a", function(event) {
-                $(".header").slideToggle()
+                $(".header-bar").slideToggle()
                 toggleArrowIcon($(this).find("i"));
                 event.preventDefault();
             });

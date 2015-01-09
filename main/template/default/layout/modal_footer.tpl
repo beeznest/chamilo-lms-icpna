@@ -474,10 +474,7 @@
 <div class="modal fade large" style="display: none;" id="help" tabindex="-1" role="dialog" aria-labelledby="helplabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-
-
             <div class="modal-body">
                 <video controls="controls" height="381" width="830">
                     <source src="http://vlearning.icpna.edu.pe/html/welcome_vlearning.mp4" type="video/mp4">

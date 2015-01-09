@@ -23,8 +23,8 @@ if ($isAdult) {
     define('NUM_COURSES', 6);
     define('NUM_PHASES', 4);
     define('TOTAL_COURSES', NUM_COURSES * NUM_PHASES);
-    $Elementary = Display::return_icon('mi_elemental-kids.png',get_lang('Elementary'));
-    $HighElementary = Display::return_icon('mi_elemental-alto-kids.png',get_lang('High - Elementary'));
+    $Elementary = Display::return_icon('mi-elemental-kids.png',get_lang('Elementary'));
+    $HighElementary = Display::return_icon('mi-elemental-alto-kids.png',get_lang('High - Elementary'));
     $BasicKids = Display::return_icon('mi-basico-kids.png',get_lang('High - Elementary'));
     $HighBasicKids = Display::return_icon('mi-basico-alto-kids.png',get_lang('High - Elementary'));
     $phase_title = array(

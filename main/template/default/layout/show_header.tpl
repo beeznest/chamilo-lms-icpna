@@ -16,7 +16,7 @@
 <div id="page-wrap">
     <div class="container">
         <div class="row">
-            <div class="span3">
+            <div class="span3 header">
                 <div class="bloque-user">
                     <div class="header-logo">
                         <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-vlearning.png">
@@ -44,12 +44,12 @@
                 {% endif %}
                 </div>
             </div>
-            <div class="span9">
+            <div class="offset3">
                 <div class="page-content">
                     <div class="logo-icpna"><img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png"> </div>
-                    <div class="page-show"></div>
+                    <div class="page-show header"></div>
                     {% if lesson_progress_bar is defined %}
-                    <div>
+                    <div class="header">
                         <div class = "btn btn-large btn-white" style="float: left" onclick="javascript:history.back(1)">{{ "GoBack" |get_lang }}</div>
                         <div class = "btn btn-large btn-white" style="float: right">
                             <a href="{{_p.web_modules}}">{{ "Vlearning" |get_lang }}</a>
@@ -57,11 +57,17 @@
                             <a href="{{_p.web_course}}{{_c.code}}/?id_session={{_c.session_id}}">{{ _c.title }}</a>
                         </div>
                     </div>
-                    <div class="page-show"></div>
-                    <div class="span4 offset6 user-advanced">
+                    <div class="span4 offset6 user-advanced header">
                         {{lesson_progress_bar}}
                     </div>
                     {% endif %}
                 </div>
             </div>
+    {% if lesson_progress_bar %}
+        <div class="span12" style="background-color: #EEE;" id="page-wrap-tab">
+        <a href="#">
+            <div style="text-align: center"><i class="icon-chevron-up"></i></div>
+        </a>
+        </div>
+    {% endif %}
 {% endif %}

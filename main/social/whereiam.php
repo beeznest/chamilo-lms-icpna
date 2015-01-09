@@ -1,8 +1,7 @@
 <?php
 $language_file = array('registration', 'messages', 'userInfo');
 require_once '../inc/global.inc.php';
-$plexcode = CourseManager::get_course_code_from_original_id(50,'cs_course_id');
-$isAdult = !empty($plexcode);
+$isAdult = $_configuration['kids'] !== 1;
 if ($isAdult) {
     define('NUM_COURSES', 5);
     define('NUM_PHASES', 5);

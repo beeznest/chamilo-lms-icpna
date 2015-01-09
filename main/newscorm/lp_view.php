@@ -348,7 +348,7 @@ if (Database::num_rows($res_media) > 0) {
 }
 
 // Not in fullscreen mode.
-Display::display_header($nameTools, null, null, 0, array('lesson_progress_bar' => $progress_bar)); //para fullscreen el scroom
+Display::display_header($nameTools, null, null, 0, array('lesson_progress_bar' => $progress_bar, 'hide_bar' => 1)); //para fullscreen el scroom
 
 echo '<div class="frame-page span12">';
 echo '<div id="learning_path_main" style="width:100%;height:100%;">';

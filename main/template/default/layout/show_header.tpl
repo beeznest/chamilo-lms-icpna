@@ -50,7 +50,7 @@
                     <div class="page-show"></div>
                     {% if lesson_progress_bar is defined %}
                     <div>
-                        <div class = "btn btn-large btn-white" style="float: left" onclick="javascript:history.back(1)">{{ "GoBak" |get_lang }}</div>
+                        <div class = "btn btn-large btn-white" style="float: left" onclick="javascript:history.back(1)">{{ "GoBack" |get_lang }}</div>
                         <div class = "btn btn-large btn-white" style="float: right">
                             <a href="{{_p.web_modules}}">{{ "Vlearning" |get_lang }}</a>
                             /

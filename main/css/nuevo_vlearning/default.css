@@ -1095,4 +1095,12 @@ footer .red-social{
   vertical-align: top;
   border-right: 1px solid #ddd;
 }
+.course.plex .cube-lesson {
+  width: 200px;
+  float: left;
+  margin-left: 20px;
+  min-height: 1px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
 /* FIN DE CSS CHAMILO */

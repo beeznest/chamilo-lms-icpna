@@ -146,7 +146,6 @@ abstract class Question
         $TBL_EXERCICE_QUESTION = Database::get_course_table(TABLE_QUIZ_TEST_QUESTION);
 
         $sql = "SELECT question,description,ponderation,position,type,picture,level, extra, parent_id FROM $TBL_QUESTIONS WHERE c_id = $course_id AND id = $id ";
-
         $result = Database::query($sql);
 
         // if the question has been found
@@ -1193,6 +1192,7 @@ abstract class Question
         $type = $this->type;
         $level = intval($this->level);
         $extra = $this->extra;
+        $picture = $this->picture;
 
         //Using the same method used in the course copy to transform URLs
 
@@ -1215,14 +1215,15 @@ abstract class Question
         $options = self::readQuestionOption($this->id, $this->course['real_id']);
 
         //Inserting in the new course db / or the same course db
-        $sql = "INSERT INTO $TBL_QUESTIONS (c_id, question, description, ponderation, position, type, level, extra )
+        $sql = "INSERT INTO $TBL_QUESTIONS (c_id, question, description, ponderation, position, type, level, extra, picture)
 				VALUES ('$course_id', '".Database::escape_string($question)."','".Database::escape_string(
             $description
         )."','".Database::escape_string($weighting)."','".Database::escape_string(
             $position
         )."','".Database::escape_string($type)."' ,'".Database::escape_string($level)."' ,'".Database::escape_string(
             $extra
-        )."'  )";
+        )."', '".$picture."'  )";
+
         Database::query($sql);
 
         $new_question_id = Database::insert_id();

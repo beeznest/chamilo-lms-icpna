@@ -66,4 +66,27 @@ CSS Diseño V-learning 2015
 .scorm_item_highlight a:hover{
     color: #a9a9a9;
 }
+
+
+/* Large desktop - PC Escritorio */
+@media (min-width: 1200px) {
+
+}
+
+/* Portrait tablet to landscape and desktop - Escritorio pequeño o Tablet */
+@media (min-width: 768px) and (max-width: 979px) {
+
+}
+
+/* Landscape phone to portrait tablet - Tablet o Smartphone Horizontal */
+@media (max-width: 767px) {
+
+
+}
+/* Landscape phones and down  - Solo Smartphone*/
+@media (max-width: 480px) {
+
+
+}
+
 /* FIN DE CSS CHAMILO */

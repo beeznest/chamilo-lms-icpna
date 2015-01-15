@@ -42,7 +42,7 @@ if (!empty($_GET['id']) || $_GET['id'] === '0') {
 
     $objTpl = new Template($names[$id]);
     $objTpl->assign('path', $getNewPath);
-    $content = $objTpl->fetch('add_external_pages/views/showpage.tpl');
+    $content = $objTpl->fetch('icpna_number_messages/views/showpage.tpl');
     $objTpl->assign('content', $content);
     $objTpl->display_one_col_template();
 }

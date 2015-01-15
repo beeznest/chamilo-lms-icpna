@@ -58,7 +58,7 @@
                             </div>
                         {% endif %}
                         {# IN/OUT #}
-                        {% if _u.status == 1 and _p.is_in_room %}
+                        {% if _u.status == 1 and _p.is_in_room and _u.coach_session_id > 0 %}
                             <div id="in-out-buttons" class="in-out-buttons-space">
                                 <button class="btn  btn-large btn-success {% if _p.count_active_in > 0 %} hide-important {% endif %}" type="button" id="btn_in_session" name="btn_in_session">IN</button>
                                 <button class="btn btn-large btn-danger {% if _p.count_active_in == 0 %} hide-important {% endif %}" type="button" id="btn_out_session" name="btn_out_session">OUT</button>

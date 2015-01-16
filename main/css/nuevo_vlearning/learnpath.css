@@ -85,8 +85,52 @@ CSS Diseño V-learning 2015
 }
 /* Landscape phones and down  - Solo Smartphone*/
 @media (max-width: 480px) {
+    .user-advanced {
+        clear: both;
+        width: 100%;
+    }
+    .user-advanced .progress{
+        margin-right: 60px;
+    }
+    .user-advanced .progresstext {
+        bottom: 0;
+        float: right;
+        position: static;
+        right: 0px;
+    }
+    #buttons-progressbar .btn {
+        display: block;
+        float: none;
+    }
 
+    .page-content {
+        margin-bottom: 0;
+    }
 
+    #learning_path_main {
+        height: 100%;
+        overflow: hidden;
+        width: 100%;
+    }
+    #learning_path_left_zone {
+        clear: left;
+        margin: auto;
+        padding: 0;
+        width: 90%;
+    }
+    #hide_bar {
+        width: 10%;
+    }
+    #learning_path_right_zone {
+    }
+    #learning_path_right_zone.Mostrar {
+        margin-left: 100%;
+        width: 0%;
+    }
+    #learning_path_right_zone.Ocultar {
+        margin-left: 10%;
+        width: 90%;
+    }
 }
 
 /* FIN DE CSS CHAMILO */

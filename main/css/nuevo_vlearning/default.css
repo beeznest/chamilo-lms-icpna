@@ -1104,6 +1104,11 @@ footer .red-social{
   margin-top: 10px;
 }
 
+#hide_bar {
+    float: left;
+    width: 15px;
+    height: 700px;
+}
 
 /* Large desktop - PC Escritorio */
 @media (min-width: 1200px) {
@@ -1112,18 +1117,36 @@ footer .red-social{
 
 /* Portrait tablet to landscape and desktop - Escritorio pequeño o Tablet */
 @media (min-width: 768px) and (max-width: 979px) {
-
+    #topbar_push,
+    .logo-icpna {
+        display: none;
+    }
+    #buttons-progressbar {
+        width: 100%;
+    }
 }
 
 /* Landscape phone to portrait tablet - Tablet o Smartphone Horizontal */
 @media (max-width: 767px) {
-
-
+    #topbar_push,
+    .logo-icpna  {
+        display: none;
+    }
+    #buttons-progressbar {
+        margin-left: 0;
+        width: 100%;
+    }
 }
 /* Landscape phones and down  - Solo Smartphone*/
 @media (max-width: 480px) {
-
-
+    #topbar_push,
+    .logo-icpna  {
+        display: none;
+    }
+    #buttons-progressbar {
+        margin-left: 0;
+        width: 100%;
+    }
 }
 
 /* FIN DE CSS CHAMILO */

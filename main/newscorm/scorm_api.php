@@ -53,7 +53,7 @@ $autocomplete_when_80pct = 0;
 $user = api_get_user_info();
 header('Content-type: text/javascript');
 
-?>var scorm_logs=<?php echo ((empty($oLP->scorm_debug) or (!api_is_course_admin() && !api_is_platform_admin()) )?'0':'3');?>; //debug log level for SCORM. 0 = none, 1=light, 2=a lot, 3=all - displays logs in log frame
+?>var scorm_logs=3; //debug log level for SCORM. 0 = none, 1=light, 2=a lot, 3=all - displays logs in log frame
 var lms_logs=0; //debug log level for LMS actions. 0=none, 1=light, 2=a lot, 3=all
 
 // API Object initialization (eases access later on)
@@ -1483,6 +1483,10 @@ function switch_item(current_item, next_item){
 
     <?php } else { ?>
             cont_f.attr("src",mysrc);
+
+            $('#hide_bar').trigger('click');
+
+            window.scrollTo(0, 0);
     <?php } ?>
 
     if (olms.lms_lp_type==1 || olms.lms_item_type == 'asset'){
@@ -1501,8 +1505,8 @@ function switch_item(current_item, next_item){
         }
     });
 
-    window.frames['content_id'].GetRemoteTrackingAndSaveIt();
-    return true;
+    //window.frames['content_id'].GetRemoteTrackingAndSaveIt();
+    return false;
 }
 
 /**

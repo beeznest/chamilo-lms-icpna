@@ -21,12 +21,12 @@
                     <div class="header-logo">
                         <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-vlearning.png">
                     </div>
-                    <div class="header-logo visible-phone">
-                        <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png">
-                    </div>
                 {% if social >= 1 or isInLP %}
                     <div class="profile {{ isInLP ? 'visible-phone' : '' }}">
-                        <div class="home {{ isInLP ? 'visible-desktop' : '' }}"><a href="{{ _p.web_modules }}"><img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/home.png"></a></div>
+                        <div class="home"><a href="{{ _p.web_modules }}"><img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/home.png"></a></div>
+                        <div class="header-logo-icpna visible-phone">
+                            <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png">
+                        </div>
                         <div class="user-datos">
                             <div class="image-user">
                                 <div class="img-user-width">

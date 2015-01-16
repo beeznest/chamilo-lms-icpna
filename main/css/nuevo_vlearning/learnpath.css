@@ -66,6 +66,20 @@ CSS Diseño V-learning 2015
 .scorm_item_highlight a:hover{
     color: #a9a9a9;
 }
+.scorm_item {
+    background-image: url("img/lp-item-check.png");
+    background-position: 8px center;
+    background-repeat: no-repeat;
+}
+.scorm_item .toc_inner,
+.scorm_item_highlight .toc_inner {
+    background-image: url("img/lp-item-chevron.png");
+    background-position: right center;
+    background-repeat: no-repeat;
+}
+.scorm_item_highlight {
+    background-image: none;
+}
 
 
 /* Large desktop - PC Escritorio */
@@ -80,11 +94,20 @@ CSS Diseño V-learning 2015
 
 /* Landscape phone to portrait tablet - Tablet o Smartphone Horizontal */
 @media (max-width: 767px) {
+    body {
+        margin: 0 10px;
+    }
 
+    #topbar {
+        display: none;
+    }
 
-}
-/* Landscape phones and down  - Solo Smartphone*/
-@media (max-width: 480px) {
+    .bloque-user .header-logo-icpna {
+        background-color: #FFF;
+        padding: 1.5em 0;
+        text-align: center;
+    }
+
     .user-advanced {
         clear: both;
         width: 100%;
@@ -131,6 +154,11 @@ CSS Diseño V-learning 2015
         margin-left: 10%;
         width: 90%;
     }
+}
+/* Landscape phones and down  - Solo Smartphone*/
+@media (max-width: 480px) {
+
+
 }
 
 /* FIN DE CSS CHAMILO */

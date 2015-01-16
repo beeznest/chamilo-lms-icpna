@@ -3042,6 +3042,7 @@ class learnpath
 
             //if ($scorm_color_background != '') {
                 $html .= '<div id="toc_' . $item['id'] . '" class="' . $add_class_level . ' ' . $add_class . ' ' . $scorm_color_background . ' ' . (($style != $scorm_color_background)?$style:'') . '">';
+                $html .= '<div class="toc_inner">';
             //}
 
             // The anchor will let us center the TOC on the currently viewed item &^D
@@ -3101,6 +3102,7 @@ class learnpath
             }
             */
 
+            $html .= "</div>";
             $html .= "</div>";
             /*
             if ($scorm_color_background != '') {

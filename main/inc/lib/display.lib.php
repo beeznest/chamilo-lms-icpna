@@ -93,9 +93,14 @@ class Display {
 
     /**
      * Display the page footer
+     * @param array $params Optional. Aditional variables to display the footer
      */
-    public static function display_footer() {
-        echo self::$global_template ->show_footer_template();
+    public static function display_footer($params = array()) {
+        foreach ($params as $paramKey => $paramValue) {
+            self::$global_template->assign($paramKey, $paramValue);
+        }
+
+        echo self::$global_template ->show_footer_template($params);
     }
 
     public static function page()

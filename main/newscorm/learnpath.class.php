@@ -2202,10 +2202,10 @@ class learnpath
         }
         $text = $percentage . $text_add;
         //@todo use Display::display_progress();
-        $output = '<div class="progress progress-striped" style="margin-right: 35px">
+        $output = '<span class="progresstext" id="progress_text">' . $text . '</span>
+                    <div class="progress progress-striped">
                         <div id="progress_bar_value" class="bar" style="width: '.$text.';"></div>
-                    </div>
-                    <span class="progresstext" id="progress_text">' . $text . '</span>';
+                    </div>';
 
         return $output;
     }

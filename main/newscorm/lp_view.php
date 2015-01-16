@@ -348,10 +348,15 @@ if (Database::num_rows($res_media) > 0) {
 }
 
 // Not in fullscreen mode.
-Display::display_header($nameTools, null, null, 0, array('lesson_progress_bar' => $progress_bar, 'hide_bar' => 1)); //para fullscreen el scroom
+Display::display_header($nameTools, null, null, 0, array(
+    'lesson_progress_bar' => $progress_bar,
+    'hide_bar' => 1,
+    'isInLP' => true
+)); //para fullscreen el scroom
 
 echo '<div class="frame-page span12">';
 echo '<div id="learning_path_main" style="width:100%;height:100%;">';
+echo '<div id="scorm_title" class="visible-phone scorm_title">'.Security::remove_XSS($_SESSION['oLP']->get_name()) . '</div>';
     $is_allowed_to_edit = api_is_allowed_to_edit(null, true, false, false);
     /*
     if ($is_allowed_to_edit) {
@@ -543,4 +548,6 @@ $_setting['show_navigation_menu'] = $save_setting;
 if ($debug) {
     error_log(' ------- end lp_view.php ------');
 }
-Display::display_footer();
+Display::display_footer(array(
+    'isInLP' => true
+));

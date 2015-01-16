@@ -693,7 +693,7 @@ class Template {
         $this->display($tpl);
     }
 
-    function show_footer_template() {
+    function show_footer_template($params = array()) {
         $tpl = $this->get_template('layout/show_footer.tpl');
         $this->display($tpl);
     }

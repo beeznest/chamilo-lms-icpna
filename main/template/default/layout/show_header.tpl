@@ -16,14 +16,17 @@
 <div id="page-wrap">
     <div class="container">
         <div class="row">
-            <div class="span3 {% if lesson_progress_bar %}header-bar" style="display: none;"{% endif %}">
+            <div class="span3 {% if lesson_progress_bar %}header-bar" style="display: none;{% endif %}">
                 <div class="bloque-user">
                     <div class="header-logo">
                         <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-vlearning.png">
                     </div>
-                {% if social >= 1 %}
-                    <div class="profile">
+                {% if social >= 1 or isInLP %}
+                    <div class="profile {{ isInLP ? 'visible-phone' : '' }}">
                         <div class="home"><a href="{{ _p.web_modules }}"><img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/home.png"></a></div>
+                        <div class="header-logo-icpna visible-phone">
+                            <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png">
+                        </div>
                         <div class="user-datos">
                             <div class="image-user">
                                 <div class="img-user-width">
@@ -41,17 +44,18 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
                 {% endif %}
                 </div>
             </div>
-            <div class="offset3">
+            <div class="offset3" id="buttons-progressbar">
             <div class="logo-icpna" style="text-align: right;"><img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png"> </div>
-            <div class="page-content {% if lesson_progress_bar %}header-bar" style="display: none;"{% endif %}">
-                    <div class="page-show"></div>
+            <div class="page-content {% if lesson_progress_bar %}header-bar" style="display: none;{% endif %}">
+                    <div class="page-show hidden-phone"></div>
                     {% if lesson_progress_bar is defined %}
                     <div class="">
-                        <div class = "btn btn-large btn-white" style="float: left" onclick="javascript:history.back(1)">{{ "GoBack" |get_lang }}</div>
-                        <div class = "btn btn-large btn-white" style="float: right">
+                        <div class = "btn btn-large btn-white hidden-phone pull-left" onclick="javascript:history.back(1)">{{ "GoBack" |get_lang }}</div>
+                        <div class = "btn btn-large btn-white pull-right">
                             <a href="{{_p.web_modules}}">{{ "Vlearning" |get_lang }}</a>
                             /
                             <a href="{{_p.web_course}}{{_c.code}}/?id_session={{_c.session_id}}">{{ _c.title }}</a>

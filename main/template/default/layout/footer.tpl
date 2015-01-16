@@ -2,7 +2,7 @@
     <div class="divisor-line">
         <div class="container">
             <div class="row">
-                <div class="span2">
+                <div class="span2 {{ isInLP is defined ? 'visible-desktop' : '' }}">
                     <h4>Sobre V-learning</h4>
                     <ul>
                         <li><a href="#" title="¿Quienes somos?">¿Quienes somos?</a> </li>
@@ -10,7 +10,7 @@
                         <li><a href="#" title="Socios">Socios</a> </li>
                     </ul>
                 </div>
-                <div class="span2">
+                <div class="span2 {{ isInLP is defined ? 'visible-desktop' : '' }}">
                     <h4>Prensa</h4>
                     <ul>
                         <li><a href="#" title="Calendario de Medios">Calendario de medios</a> </li>

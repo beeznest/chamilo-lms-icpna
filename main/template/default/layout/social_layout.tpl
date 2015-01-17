@@ -18,6 +18,9 @@
         </div>
         <div class="profile">
             <div class="home"><a href="{{ _p.web_modules }}"><img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/home.png"></a></div>
+            <div class="logo-icpna-movil">
+                <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png">
+            </div>
             <div class="user-datos">
                 <div class="image-user">
                     <div class="img-user-width">
@@ -26,12 +29,24 @@
                 </div>
                 <div class="name">{{_u.firstname}}</div>
                 <div class="lastname">{{_u.lastname}}</div>
-                <div class="cuenta"><a href="{{ _p.web_main }}social/home.php" class="item-cuenta">Mi cuenta</a></div>
+                <div class="cuenta">
+                    <div class="boton-movil">
+                        <a href="{{ _p.web_main }}social/home.php" class="item-cuenta">Mi cuenta</a>
+                    </div>
+                </div>
                 {{ social_left_content }}
                 <div class="options">
                     <div class="row-fluid">
-                        <div class="span6 help"><a herf="#" data-toggle="modal" data-target="#help"><img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/icon_help.png">{{"Help"|get_lang}}</a></div>
-                        <div class="span6 closed"><a href="{{ logout_link }}">{{ "Logout" |get_lang }}<img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/icon_closed.png"/> </a></div>
+                        <div class="span6 help">
+                            <div class="boton-movil">
+                                <a herf="#" data-toggle="modal" data-target="#help"><img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/icon_help.png">{{"Help"|get_lang}}</a>
+                            </div>
+                        </div>
+                        <div class="span6 closed">
+                            <div class="boton-movil boton-exit">
+                                <a href="{{ logout_link }}">{{ "Logout" |get_lang }}<img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/icon_closed.png"/> </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

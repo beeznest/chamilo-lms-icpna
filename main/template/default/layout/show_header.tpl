@@ -56,7 +56,9 @@
                                 </div>
                             </div>
                         </div>
+                        {% if isInLP %}
                     </div>
+                    {% endif %}
                 {% endif %}
                 </div>
             </div>

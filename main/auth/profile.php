@@ -123,12 +123,30 @@ if ($user_data !== false) {
 /*
  * Initialize the form.
  */
-$form = new FormValidator('profile', 'post', api_get_self()."?".str_replace('&fe=1', '', $_SERVER['QUERY_STRING']), null, array('style' => 'width: 100%; float: '.($text_dir == 'rtl' ? 'right;' : 'left;')));
-$form->addElement('text', 'username',  'Usuario (DNI o CE)',  array('size' => 40, 'disabled' => 'disabled'));
-$form->addElement('text', 'firstname', 'Nombre', array('size' => 40));
-$form->addElement('text', 'lastname',  'Apellido Paterno',  array('size' => 40));
-$form->addElement('text', 'extra_middlename',  'Apellido Materno',  array('size' => 40));
-$form->addElement('select', 'extra_gender',  'Sexo',  array('m'=>'Masculino', 'f'=>Femenino));
+$form = new FormValidator('profile', 'post', api_get_self()."?".str_replace('&fe=1', '', $_SERVER['QUERY_STRING']), null, array('style' => 'width: 100%;'));
+$form->addElement('text', 'username',  'Usuario (DNI o CE)',  array(
+    'size' => 40,
+    'disabled' => 'disabled',
+    'class' => 'span2'
+));
+$form->addElement('text', 'firstname', 'Nombre', array(
+    'size' => 40,
+    'class' => 'span3'
+));
+$form->addElement('text', 'lastname',  'Apellido Paterno',  array(
+    'size' => 40,
+    'class' => 'span3'
+));
+$form->addElement('text', 'extra_middlename',  'Apellido Materno',  array(
+    'size' => 40,
+    'class' => 'span3'
+));
+$form->addElement('select', 'extra_gender',  'Sexo',  array(
+    'm'=>'Masculino',
+    'f'=>'Femenino'
+), array(
+    'class' => 'span2'
+));
 $form->applyFilter(array('lastname', 'firstname'), 'stripslashes');
 $form->applyFilter(array('lastname', 'firstname'), 'trim');
 
@@ -137,16 +155,28 @@ $form->addRule('firstname', get_lang('ThisFieldIsRequired'), 'required');
 $form->addRule('extra_middlename', get_lang('ThisFieldIsRequired'), 'required');
 
 //	EMAIL
-$form->addElement('email', 'email', get_lang('Email'), array('size' => 40));
+$form->addElement('email', 'email', get_lang('Email'), array(
+    'size' => 40,
+    'class' => 'span4'
+));
 if (api_get_setting('profile', 'email') !== 'true') {
     $form->freeze('email');
 }
 
 //	PASSWORD, if auth_source is platform
 if (is_platform_authentication() && is_profile_editable() && api_get_setting('profile', 'password') == 'true') {
-    $form->addElement('password', 'password0', array(get_lang('CurrentPass')), array('size' => 40));
-    $form->addElement('password', 'password1', get_lang('NewPass'), array('size' => 40));
-    $form->addElement('password', 'password2', get_lang('Confirmation'), array('size' => 40));
+    $form->addElement('password', 'password0', array(get_lang('CurrentPass')), array(
+        'size' => 40,
+        'class' => 'span3'
+    ));
+    $form->addElement('password', 'password1', get_lang('NewPass'), array(
+        'size' => 40,
+        'class' => 'span3'
+    ));
+    $form->addElement('password', 'password2', get_lang('Confirmation'), array(
+        'size' => 40,
+        'class' => 'span3'
+    ));
     //	user must enter identical password twice so we can prevent some user errors
     $form->addRule(array('password1', 'password2'), get_lang('PassTwo'), 'compare');
 
@@ -189,7 +219,10 @@ if (api_get_setting('registration', 'email') == 'true' &&  api_get_setting('prof
 
 // OPENID URL
 if (is_profile_editable() && api_get_setting('openid_authentication') == 'true') {
-	$form->addElement('text', 'openid', get_lang('OpenIDURL'), array('size' => 40));
+	$form->addElement('text', 'openid', get_lang('OpenIDURL'), array(
+        'size' => 40,
+        'class' => 'span3'
+    ));
 	if (api_get_setting('profile', 'openid') !== 'true') {
 		$form->freeze('openid');
 	}
@@ -213,7 +246,10 @@ $form->addRule('phone', get_lang('EmailWrong'), 'email');*/
 
 //	PICTURE
 if (is_profile_editable() && api_get_setting('profile', 'picture') == 'true') {
-	$form->addElement('file', 'picture', ($user_data['picture_uri'] != '' ? get_lang('UpdateImage') : get_lang('AddImage')), ' accept="image/*"');
+	$form->addElement('file', 'picture', ($user_data['picture_uri'] != '' ? get_lang('UpdateImage') : get_lang('AddImage')), array(
+        'class' => 'span4',
+        'accept' => 'image/*'
+    ));
 	$form->add_progress_bar();
 	if (!empty($user_data['picture_uri'])) {
 		$form->addElement('checkbox', 'remove_picture', null, get_lang('DelImage'));
@@ -230,7 +266,9 @@ if (api_get_setting('profile', 'language') !== 'true') {
 
 //THEME
 if (is_profile_editable() && api_get_setting('user_selected_theme') == 'true') {
-    $form->addElement('select_theme', 'theme', get_lang('Theme'));
+    $form->addElement('select_theme', 'theme', get_lang('Theme'), array(
+        'class' => 'span3'
+    ));
     if (api_get_setting('profile', 'theme') !== 'true') {
         $form->freeze('theme');
     }
@@ -296,7 +334,11 @@ $(document).ready(function(){
 
 if (api_get_setting('profile', 'apikeys') == 'true') {
 	$form->addElement('html', '<div id="div_api_key">');
-	$form->addElement('text', 'api_key_generate', get_lang('MyApiKey'), array('size' => 40, 'id' => 'id_api_key_generate'));
+	$form->addElement('text', 'api_key_generate', get_lang('MyApiKey'), array(
+        'size' => 40,
+        'id' => 'id_api_key_generate',
+        'class' => 'span3'
+    ));
 	$form->addElement('html', '</div>');
 	$form->addElement('button', 'generate_api_key', get_lang('GenerateApiKey'), array('id' => 'id_generate_api_key', 'onclick' => 'generate_open_id_form()')); //generate_open_id_form()
 }

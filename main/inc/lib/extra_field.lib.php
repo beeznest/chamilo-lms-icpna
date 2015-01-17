@@ -456,7 +456,7 @@ class ExtraField extends Model
                         $field_details['field_display_text'] = get_lang($field_details['field_display_text']);
                     }
                     //chzn-select doesn't work for sessions??
-                    $form->addElement('select','extra_'.$field_details['field_variable'], $field_details['field_display_text'], $options, array('class'=>'', 'id'=>'extra_'.$field_details['field_variable']));
+                    $form->addElement('select','extra_'.$field_details['field_variable'], $field_details['field_display_text'], $options, array('class'=>'span4', 'id'=>'extra_'.$field_details['field_variable']));
                     if (!$admin_permissions) {
                         if ($field_details['field_visible'] == 0) {
                             $form->freeze('extra_'.$field_details['field_variable']);

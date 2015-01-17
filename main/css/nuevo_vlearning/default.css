@@ -1353,6 +1353,22 @@ footer .red-social{
     margin-right: 10px;
     margin-bottom: 20px;
   }
+
+  .edit-button-in {
+      display: block;
+  }
+
+  fieldset {
+      padding: 0 10px;
+  }
+  fieldset .alert {
+      margin-left: -10px;
+      margin-right: -10px;
+  }
+
+  div.push {
+      height: 1em;
+  }
 }
 /* Landscape phones and down  - Solo Smartphone*/
 @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
@@ -1442,7 +1458,6 @@ footer .red-social{
     padding-right: 10px;
     font-size: 12px;
   }
-  .
 }
 @media (min-width : 480px) and (max-width: 768px) {
   body{

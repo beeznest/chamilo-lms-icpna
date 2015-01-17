@@ -312,16 +312,16 @@ $(document).ready(function(){
         if ($(\'[name="password0"]\').parent().parent()) {
             $(\'[name="password0"]\').parent()
             .parent().html("<div class=\'alert alert-warning alert-dismissable\'> " +
-            "<button type=\'button\' class=\'close\' data-dismiss=\'alert\' aria-hidden=\'true\'>&times;</button><b>' .  
-            get_lang('Enter2passToChange') . ' </b></div>" + 
+            "<button type=\'button\' class=\'close\' data-dismiss=\'alert\' aria-hidden=\'true\'>&times;</button>' .
+            get_lang('Enter2passToChange') . ' </div>" +
             $(\'[name="password0"]\').parent().parent().html());
         }
 
         if ($(\'[name="picture"]\').parent().parent()) {
             $(\'[name="picture"]\').parent()
             .parent().html("<div class=\'alert alert-warning alert-dismissable\'> " +
-            "<button type=\'button\' class=\'close\' data-dismiss=\'alert\' aria-hidden=\'true\'>&times;</button><b>' .  
-            get_lang('OnlyImagesAllowed').' ('.implode(',', $allowed_picture_types).')' . ' </b></div>" + 
+            "<button type=\'button\' class=\'close\' data-dismiss=\'alert\' aria-hidden=\'true\'>&times;</button>' .
+            get_lang('OnlyImagesAllowed').' ('.implode(',', $allowed_picture_types).')' . '</div>" +
             $(\'[name="picture"]\').parent().parent().html());
         }
 

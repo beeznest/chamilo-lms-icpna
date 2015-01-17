@@ -1425,11 +1425,79 @@ footer .red-social{
     #data-table-pagination #data-table-pagination-navigation {
         width: 15%;
     }
+  .location-course .item-list {
+    float: left;
+    min-height: 1px;
+    margin-left: 5px;
+    width: 47px;
+    text-align: center;
+  }
+  .module-closed {
+    margin: 1px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background: url("img/icon-gorrita.png") no-repeat scroll center center #E5E5E5;
+    font-size: 17px;
+    font-weight: normal;
+  }
+  .module-process {
+    margin: 1px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background: url("img/icon-gorrita-trans.png") no-repeat scroll center center #14478C;
+    font-size: 17px;
+    font-weight: normal;
+    color: #FFF;
+  }
 }
 @media (max-width: 767px) and (orientation: landscape) {
     #footer-in-lp {
         display: none;
     }
+  .location-course .item-list {
+    float: left;
+    min-height: 1px;
+    margin-left: 5px;
+    width: 70px;
+    text-align: center;
+  }
+  .module-closed {
+    margin: 1px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    background: url("img/icon-gorrita.png") no-repeat scroll center center #E5E5E5;
+    font-size: 20px;
+    font-weight: normal;
+  }
+  .module-process {
+    margin: 1px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    background: url("img/icon-gorrita-trans.png") no-repeat scroll center center #14478C;
+    font-size: 20px;
+    font-weight: normal;
+    color: #FFF;
+  }
+  .title-nivel-01 {
+    background-color: #528AD5;
+    text-align: center;
+  }
+  .title-nivel-02 {
+    background-color: #FFD200;
+    text-align: center;
+  }
+  .title-nivel-03 {
+    background-color: #87C10B;
+    text-align: center;
+  }
+  .title-nivel-04 {
+    background-color: #B670DB;
+    text-align: center;
+  }
+  .title-nivel-05 {
+    background-color: #FF633D;
+    text-align: center;
+  }
 }
 /* Landscape phones and down  - Solo Smartphone*/
 @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {

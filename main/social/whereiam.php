@@ -44,7 +44,7 @@ function createDiv($course_id) {
             2 => 'title-nivel-02',
             3 => 'title-nivel-03',
             4 => 'title-nivel-04',
-            5 => 'title-nivel-04',
+            5 => 'title-nivel-05',
         );
 
         if ($isAdult) {

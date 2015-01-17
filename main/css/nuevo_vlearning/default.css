@@ -1387,6 +1387,14 @@ footer .red-social{
   .page-show {
     padding-top: 1.5em;
   }
+
+  #hide-profile-bar {
+      background-color: #EEE;
+  }
+  #hide-profile-bar #hide-profile-toggle {
+      display: block;
+      text-align: center;
+  }
 }
 /* Landscape phones and down  - Solo Smartphone*/
 @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {

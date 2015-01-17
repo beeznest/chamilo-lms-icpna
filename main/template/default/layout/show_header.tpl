@@ -22,7 +22,7 @@
                         <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-vlearning.png">
                     </div>
                 {% if social >= 1 or isInLP %}
-                    <div class="profile {{ isInLP ? 'visible-phone' : '' }}">
+                    <div class="profile {{ isInLP ? 'visible-phone' : '' }}" id="profile-block">
                         <div class="home"><a href="{{ _p.web_modules }}"><img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/home.png"></a></div>
                         <div class="logo-icpna-movil">
                             <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png">
@@ -81,6 +81,13 @@
                     {% endif %}
                 </div>
             </div>
+            {% if not isInLP %}
+            <div class="span12 visible-phone" id="hide-profile-bar">
+                <a href="#" id="hide-profile-toggle">
+                    <i class="icon-chevron-up"></i>
+                </a>
+            </div>
+            {% endif %}
     {% if lesson_progress_bar %}
         <div class="span12" style="background-color: #EEE;" id="page-wrap-tab">
         <a href="#">

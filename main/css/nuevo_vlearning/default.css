@@ -1110,6 +1110,28 @@ footer .red-social{
     height: 700px;
 }
 
+.logo-icpna-movil{
+  display: none;
+  background-color:#ffffff;
+  padding-top: 20px;
+  padding-bottom: 0px;
+  text-align: center;
+}
+.term-movil .logo-icpna-movil{
+  padding-bottom: 20px;
+}
+.control-botones{
+  text-align: center;
+  padding-top: 10px;
+  margin-top: 10px;
+}
+.red-social-movil{
+  display: none;
+}
+.lista-movil{
+  display: none;
+}
+
 /* Large desktop - PC Escritorio */
 @media (min-width: 1200px) {
 
@@ -1117,6 +1139,7 @@ footer .red-social{
 
 /* Portrait tablet to landscape and desktop - Escritorio pequeño o Tablet */
 @media (min-width: 768px) and (max-width: 979px) {
+  /* de Angel */
     #topbar_push,
     .logo-icpna {
         display: none;
@@ -1124,10 +1147,13 @@ footer .red-social{
     #buttons-progressbar {
         width: 100%;
     }
+    /* Fin de Angel */
+
 }
 
 /* Landscape phone to portrait tablet - Tablet o Smartphone Horizontal */
 @media (max-width: 767px) {
+  /* de Angel */
     #topbar_push,
     .logo-icpna  {
         display: none;
@@ -1136,9 +1162,154 @@ footer .red-social{
         margin-left: 0;
         width: 100%;
     }
+  /* Fin de Angel */
+  body{
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  #login-user{
+    padding-left: 0px;
+    width: auto;
+  }
+  .logo-icpna-movil{
+    display: block;
+  }
+  .logo-icpna{
+    display: none;
+  }
+  .logo-movistar{
+    padding-bottom: 35px;
+  }
+  footer{
+    height: auto;
+    background-color: #ffffff;
+    margin: auto;
+  }
+  footer a{
+    color: #282828;
+  }
+  .bg-footer-movil{
+    background-color: #EEEEEE;
+    padding: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+  .text-copyright{
+    text-align: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 25px;
+    padding-bottom: 10px;
+    font-size: 12px;
+    color:#282828;
+  }
+  .links-footer{
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 14px;
+    text-align: center;
+  }
+  .red-social{
+    display: none;
+  }
+  .red-social-movil{
+    display: block;
+  }
+  .red-social-movil .icons-red-social{
+    text-align: center;
+  }
+  .red-social-movil .icons-red-social a{
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .red-social-movil .icons-red-social a img{
+    border: 2px solid #ffffff;
+  }
+  footer h4{
+    font-size: 18px;
+    padding-left: 10px;
+  }
+  .logo-movistar-terminos{
+    text-align: center;
+    padding-bottom: 25px;
+  }
+
+  .titulo{
+    font-size: 20px;
+    padding-left: 10px;
+    line-height: 24px;
+  }
+  .alert{
+    margin-top: 20px;
+  }
+  .bloque-item{
+    margin-right: 10px;
+    margin-left: 10px;
+  }
+  #page-wrap:after{
+    width: 100%;
+    height:auto;
+    display:block;
+    clear:auto;
+  }
+  .modulos{
+    margin-top: 10px;
+  }
+  .divisor-line{
+    margin-top: -85px;
+  }
+  .bloque-user .help{
+    background-color: #ffffff;
+    padding-left: 0px;
+    text-align: center;
+  }
+  .bloque-user .help a{
+    color: #08C;
+    font-weight: bold;
+  }
+  .bloque-user .closed{
+    text-align: center;
+    padding-right: 0px;
+  }
+  .bloque-user .closed img,
+  .options .span6.help img {
+    display: none;
+  }
+  .bloque-user .options {
+    margin-bottom: 20px;
+    margin-top: 5px;
+  }
+  .boton-movil{
+    background-color: #f8f8f8;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+  }
+  .boton-exit{
+    background-color:#c83314;
+  }
+  .boton-exit a{
+    color: #ffffff;
+    font-weight: bold;
+  }
+  .bloque-user .cuenta{
+    padding-bottom: 0px;
+  }
+  .bloque-user .cuenta .boton-movil{
+    margin-bottom: 5px;
+  }
+  .bloque-user .lastname{
+    margin-bottom: 10px;
+  }
 }
 /* Landscape phones and down  - Solo Smartphone*/
-@media (max-width: 480px) {
+@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+   /* de Angel */
     #topbar_push,
     .logo-icpna  {
         display: none;
@@ -1147,6 +1318,146 @@ footer .red-social{
         margin-left: 0;
         width: 100%;
     }
+  /* fin de Angel */
+  body{
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  #login-user{
+    padding-left: 0px;
+  }
+  .logo-icpna-movil{
+    display: block;
+  }
+  .logo-icpna{
+    display: none;
+  }
+  .logo-movistar{
+    padding-bottom: 35px;
+  }
+  .titulo{
+    font-size: 20px;
+    padding-left: 10px;
+    line-height: 24px;
+  }
+  #login-user {
+    width: 100%;
+    padding-left: 0px;
+  }
+
+  footer{
+    background-color: #ffffff;
+  }
+  footer h4{
+    font-size: 18px;
+    padding-left: 10px;
+  }
+  .control-botones{
+    text-align: center;
+    padding-top: 10px;
+    margin-top: 10px;
+  }
+  .logo-movistar-terminos{
+    text-align: center;
+    padding-bottom: 25px;
+  }
+  .red-social{
+    display: none;
+  }
+  .red-social-movil{
+    display: block;
+  }
+  .red-social-movil .icons-red-social{
+    text-align: center;
+  }
+  .red-social-movil .icons-red-social a{
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .red-social-movil .icons-red-social a img{
+    border: 2px solid #ffffff;
+  }
+  .bg-footer-movil{
+    background-color: #EEEEEE;
+    padding: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+  .text-copyright{
+    text-align: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 25px;
+    padding-bottom: 10px;
+  }
+  .links-footer{
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 12px;
+  }
+}
+@media (min-width : 480px) and (max-width: 768px) {
+  body{
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  #login-user .form-login{
+    padding-left: 25%;
+  }
+  .logo-icpna-movil{
+    display: block;
+  }
+  .logo-icpna{
+    display: none;
+  }
+  .titulo{
+    font-size: 25px;
+    padding-left: 10px;
+  }
+  footer{
+    background-color: #ffffff;
+  }
+  .bg-footer-movil{
+    background-color: #EEEEEE;
+    padding: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+  .text-copyright{
+    text-align: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 25px;
+    padding-bottom: 10px;
+    font-size: 16px;
+  }
+  .links-footer{
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 16px;
+    text-align: center;
+  }
+  .red-social{
+    display: none;
+  }
+  .red-social-movil{
+    display: block;
+  }
+  .red-social-movil .icons-red-social{
+    text-align: center;
+  }
+  .red-social-movil .icons-red-social a{
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .red-social-movil .icons-red-social a img{
+    border: 2px solid #ffffff;
+  }
+  footer h4{
+    font-size: 18px;
+    padding-left: 10px;
+  }
+
 }
 
 /* FIN DE CSS CHAMILO */

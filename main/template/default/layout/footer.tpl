@@ -4,7 +4,7 @@
             <div class="row">
                 <div class="span2 {{ isInLP is defined ? 'visible-desktop' : '' }}">
                     <h4>Sobre V-learning</h4>
-                    <ul>
+                    <ul class="bg-footer-movil">
                         <li><a href="#" title="¿Quienes somos?">¿Quienes somos?</a> </li>
                         <li><a href="#" title="Nuestro Equipo">Nuestro Equipo</a> </li>
                         <li><a href="#" title="Socios">Socios</a> </li>
@@ -12,7 +12,7 @@
                 </div>
                 <div class="span2 {{ isInLP is defined ? 'visible-desktop' : '' }}">
                     <h4>Prensa</h4>
-                    <ul>
+                    <ul class="bg-footer-movil">
                         <li><a href="#" title="Calendario de Medios">Calendario de medios</a> </li>
                         <li><a href="#" title="Premios">Premios</a> </li>
 
@@ -26,6 +26,15 @@
                         <a href="#" title="Nuestro Youtube" target="_blank"><img src="{{ _p.web_css }}nuevo_vlearning/img/icon-youtube.png"></a>
                     </div>
 
+                    <div class="red-social-movil">
+                        <div class="title-red-social"><h4>Contactanos</h4></div>
+                        <div class="icons-red-social">
+                            <a href="#" title="Nuestro Facebook" target="_blank"><img src="{{ _p.web_css }}nuevo_vlearning/img/facebook-48.png"></a>
+                            <a href="#" title="Nuestro Twitter" target="_blank"><img src="{{ _p.web_css }}nuevo_vlearning/img/twitter-48.png"></a>
+                            <a href="#" title="Nuestro Youtube" target="_blank"><img src="{{ _p.web_css }}nuevo_vlearning/img/youtube-48.png"></a>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -35,12 +44,14 @@
         <div class="container">
             <div class="row">
                 <div class="span6">
-                    <a href="#" data-toggle="modal" data-target="#FAQ">Preguntas Frecuentes</a> &nbsp| &nbsp
-                    <a href="#" data-toggle="modal" data-target="#terminos-condiciones">Términos y condiciones</a> &nbsp| &nbsp
-                    <a href="#" data-toggle="modal" data-target="#beneficios">Beneficios</a>
+                    <div class="links-footer">
+                        <a href="#" data-toggle="modal" data-target="#FAQ">Preguntas Frecuentes</a> &nbsp| &nbsp
+                        <a href="#" data-toggle="modal" data-target="#terminos-condiciones">Términos y condiciones</a> &nbsp| &nbsp
+                        <a href="#" data-toggle="modal" data-target="#beneficios">Beneficios</a>
+                    </div>
                 </div>
                 <div class="span6">
-                    Programa V-learning ICPNA / Copyright 2014 ICPNA - Todos los derechos reservados
+                    <div class="text-copyright">Programa V-learning ICPNA / Copyright 2014 ICPNA - Todos los derechos reservados</div>
                 </div>
             </div>
         </div>

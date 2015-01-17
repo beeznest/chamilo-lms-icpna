@@ -1,4 +1,4 @@
-<footer> <!-- start of #footer section -->
+<footer {{ isInLP is defined ? 'id="footer-in-lp"' : '' }}> <!-- start of #footer section -->
     <div class="divisor-line">
         <div class="container">
             <div class="row">

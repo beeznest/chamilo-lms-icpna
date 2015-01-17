@@ -1149,7 +1149,9 @@ footer .red-social{
 .modal {
     outline: 0 none;
 }
-
+.perfomance-movil{
+  display: none;
+}
 /* Large desktop - PC Escritorio */
 @media (min-width: 1200px) {
 
@@ -1453,6 +1455,22 @@ footer .red-social{
     font-weight: normal;
     color: #FFF;
   }
+  .perfomance-movil{
+    display: block;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    background-color: #f8f8f8;
+  }
+  .item-img-title{
+    display: none;
+  }
+  .item-list-score{
+    width: 180px;
+  }
 }
 @media (max-width: 767px) and (orientation: landscape) {
     #footer-in-lp {
@@ -1501,6 +1519,9 @@ footer .red-social{
   .title-nivel-05 {
     background-color: #FF633D;
     text-align: center;
+  }
+  .item-list-score{
+    width: 340px;
   }
 }
 /* Landscape phones and down  - Solo Smartphone*/

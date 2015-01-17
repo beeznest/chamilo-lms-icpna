@@ -1131,7 +1131,9 @@ footer .red-social{
 .lista-movil{
   display: none;
 }
-
+.bloque-title{
+  display: none;
+}
 /* Large desktop - PC Escritorio */
 @media (min-width: 1200px) {
 
@@ -1310,6 +1312,47 @@ footer .red-social{
   .bloque-user .lastname{
     margin-bottom: 10px;
   }
+  .bloque-title{
+    display: block;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    padding-left: 20px;
+    background-color:#528AD5;
+    color: #ffffff;
+    font-size: 20px;
+  }
+  .bloque-title-examen{
+    display: block;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    padding-left: 20px;
+    background-color:#C83314;
+    color: #ffffff;
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  .bloque-item .item-title, .bloque-item .lesson-top, .bloque-item .examen-title{
+    display: none;
+  }
+  .course .item{
+    height: 60px;
+  }
+  .block-extras .course .item{
+    height: 50px;
+  }
+  .course .item-top, .block-extras .course .item .item-top{
+    padding-top: 15px;
+  }
+  .cube-lesson{
+    margin-bottom: 10px;
+    margin-top: 10px;
+  }
+  .intro-course .info{
+    font-weight: normal;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 20px;
+  }
 }
 /* Landscape phones and down  - Solo Smartphone*/
 @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
@@ -1399,6 +1442,7 @@ footer .red-social{
     padding-right: 10px;
     font-size: 12px;
   }
+  .
 }
 @media (min-width : 480px) and (max-width: 768px) {
   body{

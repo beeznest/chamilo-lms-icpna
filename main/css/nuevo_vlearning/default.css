@@ -1146,6 +1146,10 @@ footer .red-social{
     width: 25%;
 }
 
+.modal {
+    outline: 0 none;
+}
+
 /* Large desktop - PC Escritorio */
 @media (min-width: 1200px) {
 

@@ -1262,7 +1262,7 @@ footer .red-social{
     margin-top: 10px;
   }
   .divisor-line{
-    margin-top: 0px;
+    margin-top: 10px;
   }
   .bloque-user .help{
     background-color: #ffffff;
@@ -1394,6 +1394,14 @@ footer .red-social{
   #hide-profile-bar #hide-profile-toggle {
       display: block;
       text-align: center;
+  }
+  .frame-page{
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .btn-red{
+    width: 95%;
+    padding: 9px 14px;
   }
 }
 /* Landscape phones and down  - Solo Smartphone*/

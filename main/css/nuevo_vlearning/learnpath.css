@@ -106,10 +106,10 @@ CSS Diseño V-learning 2015
 
     .user-advanced {
         clear: both;
-        width: 100%;
+        /*width: 100%;*/
     }
     .user-advanced .progress{
-        margin-right: 60px;
+        margin-right: auto;
     }
     .user-advanced .progresstext {
         bottom: 0;

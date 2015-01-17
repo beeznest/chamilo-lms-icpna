@@ -1164,6 +1164,7 @@ footer .red-social{
     }
   /* Fin de Angel */
   body{
+    background-image: url(img/bgimage.jpg);;
     padding-left: 10px;
     padding-right: 10px;
   }
@@ -1256,7 +1257,7 @@ footer .red-social{
     margin-top: 10px;
   }
   .divisor-line{
-    margin-top: -85px;
+    margin-top: 0px;
   }
   .bloque-user .help{
     background-color: #ffffff;

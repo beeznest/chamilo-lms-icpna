@@ -1426,6 +1426,11 @@ footer .red-social{
         width: 15%;
     }
 }
+@media (max-width: 767px) and (orientation: landscape) {
+    #footer-in-lp {
+        display: none;
+    }
+}
 /* Landscape phones and down  - Solo Smartphone*/
 @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
    /* de Angel */

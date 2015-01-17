@@ -1134,6 +1134,18 @@ footer .red-social{
 .bloque-title, .bloque-title-examen{
   display: none;
 }
+
+#data-table-pagination #data-table-pagination-actions{
+    width: 25%;
+}
+#data-table-pagination #data-table-pagination-title {
+    text-align: center;
+}
+#data-table-pagination #data-table-pagination-navigation {
+    text-align: right;
+    width: 25%;
+}
+
 /* Large desktop - PC Escritorio */
 @media (min-width: 1200px) {
 
@@ -1403,6 +1415,16 @@ footer .red-social{
     width: 95%;
     padding: 9px 14px;
   }
+
+    #data-table-pagination #data-table-pagination-actions{
+        width: auto;
+    }
+    #data-table-pagination #data-table-pagination-title {
+        width: 15%;
+    }
+    #data-table-pagination #data-table-pagination-navigation {
+        width: 15%;
+    }
 }
 /* Landscape phones and down  - Solo Smartphone*/
 @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {

@@ -351,3 +351,22 @@ $(document).ready(function(){
     }
 </script>
 {% endif %}
+<script>
+    $(document).on('ready', function() {
+        $('a#hide-profile-toggle').on('click', function(e) {
+            e.preventDefault();
+
+            var $self = $(this);
+
+            $('#profile-block').slideToggle('fast', function () {
+                var $icon = $self.find('i');
+
+                if ($icon.hasClass('icon-chevron-down')) {
+                    $icon.removeClass('icon-chevron-down').addClass('icon-chevron-up');
+                } else {
+                    $icon.removeClass('icon-chevron-up').addClass('icon-chevron-down');
+                }
+            });
+        });
+    });
+</script>

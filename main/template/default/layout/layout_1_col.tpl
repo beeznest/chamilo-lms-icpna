@@ -16,7 +16,7 @@
         <div class="header-logo">
             <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-vlearning.png">
         </div>
-        <div class="profile">
+        <div class="profile" id="profile-block">
             <div class="home"><a href="{{ _p.web_modules }}"><img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/home.png"></a></div>
             <div class="logo-icpna-movil">
                 <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png">
@@ -51,6 +51,11 @@
             </div>
         </div>
 
+        <div class="span12 visible-phone" id="hide-profile-bar">
+            <a href="#" id="hide-profile-toggle">
+                <i class="icon-chevron-up"></i>
+            </a>
+        </div>
     </div>
 </div>
     <div class="span9">

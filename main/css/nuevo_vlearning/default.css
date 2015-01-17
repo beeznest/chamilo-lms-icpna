@@ -1131,7 +1131,7 @@ footer .red-social{
 .lista-movil{
   display: none;
 }
-.bloque-title{
+.bloque-title, .bloque-title-examen{
   display: none;
 }
 /* Large desktop - PC Escritorio */

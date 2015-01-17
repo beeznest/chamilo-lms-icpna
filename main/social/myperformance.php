@@ -18,6 +18,13 @@ if ($isAdult) {
         4 => $HighIntermediate,
         5 => $Advanced,
     );
+    $phase_color = array(
+        1 => "blue",
+        2 => "yellow",
+        3 => "green",
+        4 => "purple",
+        5 => "orange",
+    );
     $phase_title_movil = array(
         1 => "Básico",
         2 => "Básico Alto",
@@ -38,6 +45,12 @@ if ($isAdult) {
         2 => $HighElementary,
         3 => $BasicKids,
         4 => $HighBasicKids,
+    );
+    $phase_color = array(
+        1 => "blue",
+        2 => "yellow",
+        3 => "green",
+        4 => "purple",
     );
     $phase_title_movil = array(
         1 => "Elemental",
@@ -67,7 +80,7 @@ if ($isAdult) {
 $course_array = getAllCourses();
 function createDiv($seq, $sid) {
     $text = '';
-    global $phase, $phase_title, $phase_title_movil ,$course_array;
+    global $phase, $phase_title, $phase_title_movil, $phase_color ,$course_array;
     $index = $seq % NUM_COURSES;
     $phase_id = ceil($seq / NUM_COURSES);
     if ($seq <= TOTAL_COURSES) {
@@ -75,7 +88,7 @@ function createDiv($seq, $sid) {
             $text .= '<div class="span2">
                                 <div class="bloque-item">
                                 <div class="item-img-title">' . $phase_title[$phase_id].'</div>
-                                <div class="perfomance-movil">'.$phase_title_movil[$phase_id].'</div>';
+                                <div class="perfomance-movil '.$phase_color[$phase_id].'">'.$phase_title_movil[$phase_id].'</div>';
         }
         if (empty($sid)) {
             $score = '--';

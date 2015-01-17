@@ -1460,7 +1460,7 @@ footer .red-social{
     padding-top: 10px;
     padding-bottom: 10px;
     margin-bottom: 10px;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
     text-align: center;
     background-color: #f8f8f8;
@@ -1470,6 +1470,26 @@ footer .red-social{
   }
   .item-list-score{
     width: 180px;
+  }
+  .blue{
+    color: #ffffff;
+    background-color: #528AD5;
+  }
+  .green{
+    color: #4A6D00;
+    background-color: #87C10B;
+  }
+  .yellow{
+    color: #BD5B40;
+    background-color: #FFD200;
+  }
+  .purple{
+    color: #622384;
+    background-color: #B670DB;
+  }
+  .orange{
+    color: #ffffff;
+    background-color: #FF633D;
   }
 }
 @media (max-width: 767px) and (orientation: landscape) {

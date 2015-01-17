@@ -1153,6 +1153,9 @@ footer .red-social{
 
 /* Landscape phone to portrait tablet - Tablet o Smartphone Horizontal */
 @media (max-width: 767px) {
+    #page-wrap {
+        min-height: 0;
+    }
   /* de Angel */
     #topbar_push,
     .logo-icpna  {

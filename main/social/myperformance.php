@@ -18,6 +18,13 @@ if ($isAdult) {
         4 => $HighIntermediate,
         5 => $Advanced,
     );
+    $phase_title_movil = array(
+        1 => "Básico",
+        2 => "Básico Alto",
+        3 => "Intermedio",
+        4 => "Intermedio Alto",
+        5 => "Avanzado",
+    );
 } else {
     define('NUM_COURSES', 6);
     define('NUM_PHASES', 4);
@@ -31,6 +38,12 @@ if ($isAdult) {
         2 => $HighElementary,
         3 => $BasicKids,
         4 => $HighBasicKids,
+    );
+    $phase_title_movil = array(
+        1 => "Elemental",
+        2 => "Elemental Alto",
+        3 => "Básico",
+        4 => "Básico Alto",
     );
 }
 
@@ -54,14 +67,15 @@ if ($isAdult) {
 $course_array = getAllCourses();
 function createDiv($seq, $sid) {
     $text = '';
-    global $phase, $phase_title, $course_array;
+    global $phase, $phase_title, $phase_title_movil ,$course_array;
     $index = $seq % NUM_COURSES;
     $phase_id = ceil($seq / NUM_COURSES);
     if ($seq <= TOTAL_COURSES) {
         if ($index == 1) {
             $text .= '<div class="span2">
                                 <div class="bloque-item">
-                                <div class="item-img-title">' . $phase_title[$phase_id].'</div>';
+                                <div class="item-img-title">' . $phase_title[$phase_id].'</div>
+                                <div class="perfomance-movil">'.$phase_title_movil[$phase_id].'</div>';
         }
         if (empty($sid)) {
             $score = '--';

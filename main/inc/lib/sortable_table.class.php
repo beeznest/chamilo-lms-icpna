@@ -246,15 +246,15 @@ class SortableTable extends HTML_Table {
 			//Only show pagination info when there are items to paginate	
             
             //if ($this->get_total_number_of_items() > $this->default_items_per_page) {
-    			$html  = '<table class="data_table_pagination">';
+    			$html  = '<table class="data_table_pagination" id="data-table-pagination">';
     			$html .= '<tr>';
-    			$html .= '<td style="width:25%;">';
+    			$html .= '<td id="data-table-pagination-actions">';
     			$html .= $form;
     			$html .= '</td>';
-    			$html .= '<td style="text-align:center;">';
+    			$html .= '<td id="data-table-pagination-title">';
     			$html .= $this->get_table_title();
     			$html .= '</td>';
-    			$html .= '<td style="text-align:right;width:25%;">';
+    			$html .= '<td id="data-table-pagination-navigation">';
     			$html .= $nav;
     			$html .= '</td>';
     			$html .= '</tr>';

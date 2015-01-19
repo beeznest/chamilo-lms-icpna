@@ -1107,7 +1107,7 @@ footer .red-social{
 #hide_bar {
     float: left;
     width: 15px;
-    height: 700px;
+    min-height: 700px;
 }
 
 .logo-icpna-movil{
@@ -1491,6 +1491,10 @@ footer .red-social{
     color: #ffffff;
     background-color: #FF633D;
   }
+
+    #hide_bar {
+        min-height: 0px;
+    }
 }
 @media (max-width: 767px) and (orientation: landscape) {
     #footer-in-lp {

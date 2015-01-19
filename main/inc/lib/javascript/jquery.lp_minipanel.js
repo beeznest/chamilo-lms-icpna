@@ -45,10 +45,10 @@ $(document).ready(function() {
         '<table style="border: 0 none; width: 100%; height: 100%; cursor: pointer; background-color: #EEEEEE">' +
         '<tr><td></td></tr></table></div>');
 
-    var learningPathViewHeight = $('#learning_path_left_zone').height();
+    var learningPathViewHeight = $('#learning_path_right_zone').height();
 
     $('#hide_bar').height(learningPathViewHeight);
-    $('#learning_path_right_zone').height(learningPathViewHeight);
+    //$('#learning_path_right_zone').height(learningPathViewHeight);
     
     $('#hide_bar table').css({
         backgroundImage: "url(../img/hide0.png)", 

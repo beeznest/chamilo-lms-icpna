@@ -1506,6 +1506,11 @@ function switch_item(current_item, next_item){
     });
 
     //window.frames['content_id'].GetRemoteTrackingAndSaveIt();
+
+    var learningPathViewHeight = $('#learning_path_right_zone').height();
+
+    $('#hide_bar').height(learningPathViewHeight);
+
     return false;
 }
 

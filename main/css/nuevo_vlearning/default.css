@@ -1033,11 +1033,6 @@ footer .red-social{
   font-weight: bold;
   vertical-align: middle;
 }
-.modal-header .close {
-  position: fixed;
-  top: 18%;
-  z-index: 9999;
-}
 .modal-header .close.btn{
   background-color: #ffffff;
   padding-bottom: 5px;

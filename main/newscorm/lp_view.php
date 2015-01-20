@@ -371,8 +371,9 @@ echo '<div id="scorm_title" class="visible-phone scorm_title">'.Security::remove
         echo '</div>';
     }
     */
-
-    echo '<div id="learning_path_left_zone" class="help-left-zone"> ';
+    ?>
+    <div id="learning_path_left_zone" class="help-left-zone">
+    <?php
     /*
     echo '<div id="header">
             <table>
@@ -452,15 +453,11 @@ echo '<div id="scorm_title" class="visible-phone scorm_title">'.Security::remove
     <!-- right zone -->
     <!-- <div id="learning_path_right_zone"  style="margin-left:<?php echo $margin_left;?>;height:100%" >  Antiguo -->
     <div id="learning_path_right_zone" class="Mostrar">
-    <?php
-        // hub 26-05-2010 Fullscreen or not fullscreen
-        $height = '100%';
-        if ($_SESSION['oLP']->mode == 'fullscreen') {
-            echo '<iframe id="content_id_blank" name="content_name_blank" src="blank.php" border="0" frameborder="0" style="width:100%;height:'.$height.'" ></iframe>';
-        } else {
-            echo '<iframe id="content_id" name="content_name" src="'.$src.'" border="0" frameborder="0"  style="height:700px;max-height:'.$height.'; margin-left:14px;"></iframe>';
-        }
-    ?>
+        <?php if ($_SESSION['oLP']->mode == 'fullscreen') { ?>
+            <iframe id="content_id_blank" name="content_name_blank" src="blank.php" border="0" frameborder="0" style="width:100%; height:100%;" ></iframe>
+        <?php } else { ?>
+            <iframe id="content_id" name="content_name" src="<?php echo $src ?>" border="0" frameborder="0"  style="margin-left:14px;"></iframe>
+        <?php } ?>
     </div>
 
     <!-- end right Zone -->

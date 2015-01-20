@@ -136,11 +136,14 @@ CSS Diseño V-learning 2015
         margin: auto;
         padding: 0;
         width: 90%;
+        min-height: 0px;
     }
     #hide_bar {
         width: 10%;
+        min-height: 0px;
     }
     #learning_path_right_zone {
+        min-height: 0px;
     }
     #learning_path_right_zone.Mostrar {
         margin-left: 100%;

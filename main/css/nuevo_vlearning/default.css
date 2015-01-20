@@ -1104,10 +1104,31 @@ footer .red-social{
   margin-top: 10px;
 }
 
+#learning_path_left_zone {
+    clear: left;
+    margin: auto;
+    padding: 0;
+    width: 90%;
+    min-height: 700px;
+}
 #hide_bar {
     float: left;
     width: 15px;
     min-height: 700px;
+}
+#learning_path_right_zone {
+    min-height: 700px;
+}
+#learning_path_right_zone.Mostrar {
+    margin-left: 100%;
+    width: 0%;
+}
+#learning_path_right_zone.Ocultar {
+    margin-left: 10%;
+    width: 90%;
+}
+#learning_path_right_zone iframe {
+    height: 100%;
 }
 
 .logo-icpna-movil{

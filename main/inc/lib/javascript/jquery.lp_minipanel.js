@@ -45,9 +45,17 @@ $(document).ready(function() {
         '<table style="border: 0 none; width: 100%; height: 100%; cursor: pointer; background-color: #EEEEEE">' +
         '<tr><td></td></tr></table></div>');
 
-    var learningPathViewHeight = $('#learning_path_right_zone').height();
+    var lpLeftZoneHeight = $('#learning_path_left_zone').height();
+    var lpRightZoneHeight = $('#learning_path_right_zone').height();
 
-    $('#hide_bar').height(learningPathViewHeight);
+    if (lpLeftZoneHeight > lpRightZoneHeight) {
+        $('#hide_bar').height(lpLeftZoneHeight);
+        $('#learning_path_right_zone').height(lpLeftZoneHeight);
+    } else {
+        $('#hide_bar').height(lpRightZoneHeight);
+        $('#learning_path_left_zone').height(lpRightZoneHeight);
+    }
+
     //$('#learning_path_right_zone').height(learningPathViewHeight);
     
     $('#hide_bar table').css({
@@ -58,11 +66,11 @@ $(document).ready(function() {
     
     // Adding funcionality
     $("#hide_bar").click(function() {
-        var disp = $("#inner_lp_toc").css("display");
+        var disp = $("#learning_path_left_zone").css("display");
         // var frmWidth = $('#content_id').width();
         
         if (disp == 'block') {
-            $("#inner_lp_toc").css('display', 'none');
+            $("#learning_path_left_zone").css('display', 'none');
             // $("#learning_path_right_zone").css('margin-left', '10px');
             $('#learning_path_right_zone').removeClass('Mostrar').addClass('Ocultar'); //Añadimos Clase Ocultar
             // $("#content_id").width(frmWidth + 250);
@@ -72,7 +80,7 @@ $(document).ready(function() {
                 backgroundPosition: "center center"
             });
         } else {
-            $("#inner_lp_toc").css("display", "block");
+            $("#learning_path_left_zone").css("display", "block");
             // $("#learning_path_right_zone").css('margin-left', marginLeftIni);
             $('#learning_path_right_zone').removeClass('Ocultar').addClass('Mostrar'); //Añadimos Clase Mostrar
             // $('#content_id').width();

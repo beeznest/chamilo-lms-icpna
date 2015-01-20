@@ -6,7 +6,7 @@
 {% include "default/layout/topbar.tpl" %}
 
     {#  2 column  #}
-    <div class="span3">
+    <div class="span3 fulluser">
         
         {# if user is not login show the login form #}
         {% if _u.logged  == 0 %}
@@ -53,7 +53,7 @@
         </div>
 
     </div>
-    <div class="span9">
+    <div class="span9 fullpage">
         <div class="page-content">
             <div class="logo-icpna"><img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png"> </div>
             <div class="modulos">

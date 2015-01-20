@@ -1365,6 +1365,10 @@ footer .red-social{
   footer.tablet .container .row{
     padding-top: 0px;
   }
+  .fullpage .span8{
+    margin-left: 10px;
+    width: 450px;
+  }
 }
 
 /* Landscape phone to portrait tablet - Tablet o Smartphone Horizontal */

@@ -1189,7 +1189,170 @@ footer .red-social{
         width: 100%;
     }
     /* Fin de Angel */
-
+  .course .item-title{
+    display: none;
+  }
+  .lesson-top{
+    display: none;
+  }
+  .examen-title{
+    display: none;
+  }
+  .logo-login-tablet{
+    width: 270px;
+  }
+  .bloque-user .help{
+    background-color: #ffffff;
+    padding-left: 0px;
+    text-align: center;
+  }
+  .bloque-user .help a{
+    color: #08C;
+    font-weight: bold;
+  }
+  .bloque-user .closed{
+    text-align: center;
+    padding-right: 0px;
+  }
+  .bloque-user .closed img,
+  .options .span6.help img {
+    display: none;
+  }
+  .bloque-user .options {
+    margin-bottom: 20px;
+    margin-top: 5px;
+  }
+  .boton-movil{
+    background-color: #f8f8f8;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+  }
+  .boton-exit{
+    background-color:#c83314;
+  }
+  .boton-exit a{
+    color: #ffffff;
+    font-weight: bold;
+  }
+  .bloque-user .cuenta{
+    padding-bottom: 0px;
+  }
+  .bloque-user .cuenta .boton-movil{
+    margin-bottom: 5px;
+  }
+  .bloque-user .lastname{
+    margin-bottom: 10px;
+  }
+  .fulluser{
+    width: 250px;
+  }
+  .fullpage{
+    width: 465px;
+  }
+  .options .row-fluid .span6{
+    display: block;
+    float: none;
+    width: 100%;
+    box-sizing: border-box;
+    margin-left: 0px;
+  }
+  .bloque-title, .bloque-title-examen {
+    display: block;
+  }
+  .bloque-title{
+    display: block;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    padding-left: 20px;
+    background-color:#528AD5;
+    color: #ffffff;
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+  .bloque-title-examen{
+    display: block;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    padding-left: 20px;
+    background-color:#C83314;
+    color: #ffffff;
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  .intro-course .span2{
+    float: auto;
+    width: 450px;
+  }
+  .intro-course .span7{
+    width: 450px;
+  }
+  .user-advanced{
+    width: 400px;
+    padding-top: 5px;
+  }
+  .user-advanced span{
+    font-size: 20px;
+  }
+  .page-show{
+    padding-top: 0.5em;
+  }
+  .info{
+    font-weight: normal;
+    margin-bottom: 25px;
+  }
+  .block-extras .course .item .item-top {
+    padding-top: 10px;
+  }
+  .course .item{
+    height: 55px;
+  }
+  .course .item-top {
+    padding-top: 5px;
+  }
+  .divisor-line{
+    margin-top: 65px;
+    padding-top: 1em;
+    padding-bottom: 1em;
+  }
+  .red-social-movil.tablet{
+    display: none;
+  }
+  footer.tablet{
+    background: none;
+  }
+  footer.tablet .red-social{
+    display: block;
+  }
+  footer.tablet .span2{
+    width: 180px;
+  }
+  footer.tablet .span8{
+    width: 330px;
+  }
+  footer.tablet .links-footer{
+    font-size: 12px;
+  }
+  footer.tablet .text-copyright{
+    font-size: 12px;
+    padding: 0px;
+  }
+  footer.tablet .bg-footer-movil{
+    background: none;
+    padding: 0px;
+    font-size: 12px;
+  }
+  footer.tablet h4{
+    font-size: 16px;
+  }
+  footer.tablet .container .row{
+    padding-top: 0px;
+  }
 }
 
 /* Landscape phone to portrait tablet - Tablet o Smartphone Horizontal */

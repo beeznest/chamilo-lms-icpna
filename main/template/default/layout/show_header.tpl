@@ -16,7 +16,7 @@
 <div id="page-wrap">
     <div class="container">
         <div class="row">
-            <div class="span3 {% if lesson_progress_bar %}header-bar" style="display: none;{% endif %}">
+            <div class="span3 fulluser {% if lesson_progress_bar %}header-bar" style="display: none;{% endif %}">
                 <div class="bloque-user">
                     <div class="header-logo">
                         <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-vlearning.png">

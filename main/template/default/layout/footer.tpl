@@ -1,4 +1,4 @@
-<footer {{ isInLP is defined ? 'id="footer-in-lp"' : '' }}> <!-- start of #footer section -->
+<footer {{ isInLP is defined ? 'id="footer-in-lp"' : '' }} class="tablet"> <!-- start of #footer section -->
     <div class="divisor-line">
         <div class="container">
             <div class="row">
@@ -26,7 +26,7 @@
                         <a href="#" title="Nuestro Youtube" target="_blank"><img src="{{ _p.web_css }}nuevo_vlearning/img/icon-youtube.png"></a>
                     </div>
 
-                    <div class="red-social-movil">
+                    <div class="red-social-movil tablet">
                         <div class="title-red-social"><h4>Contactanos</h4></div>
                         <div class="icons-red-social">
                             <a href="#" title="Nuestro Facebook" target="_blank"><img src="{{ _p.web_css }}nuevo_vlearning/img/facebook-48.png"></a>

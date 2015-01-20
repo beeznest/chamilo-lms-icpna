@@ -223,7 +223,7 @@ $(function() {
     }
 
     //Fixes buttons to the new btn class
-    if (!$('#button').hasClass('btn')) {
+    if (!$('#button').hasClass('btn') && !$('button').hasClass('close')) {
         $("button").addClass('btn');
     }
 

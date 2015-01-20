@@ -76,6 +76,7 @@ CSS Diseño V-learning 2015
     background-image: url("img/lp-item-chevron.png");
     background-position: right center;
     background-repeat: no-repeat;
+    padding-right: 16px;
 }
 .scorm_item_highlight {
     background-image: none;

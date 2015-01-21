@@ -671,3 +671,59 @@ function exportToPDF($scheduleId, $date, $branchId)
     Export::export_html_to_pdf($pdfContent, $params);
     exit;
 }
+
+/**
+ * Get the user attendaces by a date
+ * @param int $userId The user ID
+ * @param string $date The date
+ */
+function getUserAttendanceByDate($userId, $date)
+{
+    $sessionTable = Database::get_main_table(TABLE_MAIN_SESSION);
+    $sessionCourseUserTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
+    $trackIOTable = Database::get_statistic_table(TABLE_TRACK_E_TEACHER_IN_OUT);
+    $courseTable = Database::get_main_table(TABLE_MAIN_COURSE);
+
+    $attendances = array();
+
+    $sql = "SELECT s.id, c.title, io.log_in_course_date, io.log_out_course_date "
+        . "FROM $sessionTable s "
+        . "INNER JOIN $sessionCourseUserTable scu ON s.id = scu.id_session "
+        . "INNER JOIN $trackIOTable io ON s.id = io.session_id "
+        . "INNER JOIN $courseTable c ON io.course_id = c.id "
+        . "WHERE scu.id_user = $userId "
+        . "AND DATE(log_in_course_date) = '$date'";
+
+    $result = Database::query($sql);
+
+    $sessionFieldValue = new ExtraFieldValue('session');
+    
+    $sessionOption = new ExtraFieldOption('session');
+
+    while ($row = Database::fetch_assoc($result)) {
+        $scheduleValue = $sessionFieldValue->get_values_by_handler_and_field_variable($row['id'], 'horario', true);
+        $roomValue = $sessionFieldValue->get_values_by_handler_and_field_variable($row['id'], 'aula', true);
+        
+        $scheduleField = $sessionOption->get_field_option_by_field_and_option(
+            $scheduleValue['field_id'],
+            $scheduleValue['field_value']
+        );
+        $roomField = $sessionOption->get_field_option_by_field_and_option(
+            $roomValue['field_id'],
+            $roomValue['field_value']
+        );
+
+        $schedule = current($scheduleField);
+        $room = current($roomField);
+
+        $attendances[] = array(
+            'schedule' => getFormatedSchedule($schedule['option_display_text']),
+            'room' => $room['option_display_text'],
+            'course' => $row['title'],
+            'inAt' => $row['log_in_course_date'],
+            'outAt' => $row['log_out_course_date']
+        );
+    }
+
+    return $attendances;
+}

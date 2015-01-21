@@ -965,6 +965,11 @@ class Template {
             $navigation['inOutManagement']['title'] = get_lang('InOutManagement');
         }
 
+        if (api_is_teacher() && !api_is_platform_admin()) {
+            $navigation['inOutManagement']['url'] = api_get_path(WEB_CODE_PATH).'attendance/teacher.php';
+            $navigation['inOutManagement']['title'] = get_lang('InOutManagement');
+        }
+
         return $navigation;
     }
 
@@ -1218,7 +1223,7 @@ class Template {
             }
 
             // inOutManagement
-            if (api_is_teacher_admin() || api_is_platform_admin()) {
+            if (api_is_teacher_admin() || api_is_platform_admin() || api_is_teacher()) {
                 $navigation['inOutManagement'] = $possible_tabs['inOutManagement'];
             }
 

@@ -1174,6 +1174,21 @@ footer .red-social{
   display: none;
 }
 
+.lesson-top-buttons {
+    margin-top: 20px;
+}
+
+.lesson-bar {
+    margin-top: 15px;
+    padding-right: 35px;
+}
+.lesson-bar span#progress_text {
+    position: absolute;
+    bottom: 15px;
+    right: -11px;
+    font-size: 20px;
+}
+
 /* Large desktop - PC Escritorio */
 @media (max-width: 1200px) {
   .frame-inbox{

@@ -16,7 +16,7 @@
 <div id="page-wrap">
     <div class="container">
         <div class="row">
-            <div class="span3 fulluser {% if lesson_progress_bar %}header-bar" style="display: none;{% endif %}">
+            <div class="span3 fulluser header-bar">
                 <div class="bloque-user">
                     <div class="header-logo">
                         <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-vlearning.png">
@@ -63,7 +63,37 @@
                 </div>
             </div>
                 {% if isInLP %}
-                    <div class="offset3" id="buttons-progressbar">
+                    <div class="span9">
+                        <div class="row">
+                            <div class="span9">
+                                <div class="logo-icpna" style="text-align: right;"><img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png"> </div>
+                            </div>
+                        </div>
+                        {% if lesson_progress_bar is defined %}
+                            <div class="row-fluid lesson-top-buttons">
+                                <div class="span6">
+                                    <a class = "btn btn-large btn-white hidden-phone pull-left" href="javascript:history.back(1);">{{ "GoBack" |get_lang }}</a>
+                                </div>
+                                <div class="span6">
+                                    <div class = "btn btn-large btn-white pull-right">
+                                        <a href="{{_p.web_modules}}">{{ "Vlearning" |get_lang }}</a>
+                                        /
+                                        <a href="{{_p.web_course}}{{_c.code}}/?id_session={{_c.session_id}}">{{ _c.title }}</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row-fluid">
+                                <div class="span8"></div>
+                                <div class="span4 user-advanced">
+                                    <div class="lesson-bar">
+                                        {{lesson_progress_bar}}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- <div class="offset3" id="buttons-progressbar">
                         <div class="logo-icpna" style="text-align: right;"><img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png"> </div>
                         <div class="page-content {% if lesson_progress_bar %}header-bar" style="display: none;{% endif %}">
                             <div class="page-show hidden-phone"></div>
@@ -81,7 +111,7 @@
                                 </div>
                             {% endif %}
                         </div>
-                    </div>
+                    </div> -->
                 {% endif %}
             {% if not isInLP %}
             <div class="span12 visible-phone" id="hide-profile-bar">

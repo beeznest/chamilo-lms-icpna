@@ -1219,7 +1219,7 @@ footer .red-social{
     width: 670px;
   }
   .frame-inbox{
-    width: 700px;
+    width: 680px;
   }
   .page-show .span4{
     width: 330px;
@@ -1473,12 +1473,16 @@ footer .red-social{
     font-size: 20px;
   }
   .location-course .item-list{
-    width: 60px;
+    width: 55px;
     margin-left: 18px;
   }
 
   .page-show .span9{
     width: 445px;
+  }
+  .frame-inbox{
+    padding-left: 10px;
+    padding-right: 10px;
   }
   .page-show .span9 .span4{
     width: 400px;

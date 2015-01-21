@@ -27,4 +27,7 @@
   .location-course .item-list{
     width: 50px;
   }
+  .page-show .span9 {
+    width: 92%;
+  }
 }

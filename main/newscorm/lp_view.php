@@ -354,7 +354,7 @@ Display::display_header($nameTools, null, null, 0, array(
     'isInLP' => true
 )); //para fullscreen el scroom
 
-echo '<div class="frame-page span12">';
+echo '<div class="frame-page-lesson span12">';
 echo '<div id="learning_path_main" style="width:100%;height:100%;">';
 echo '<div id="scorm_title" class="visible-phone scorm_title">'.Security::remove_XSS($_SESSION['oLP']->get_name()) . '</div>';
     $is_allowed_to_edit = api_is_allowed_to_edit(null, true, false, false);

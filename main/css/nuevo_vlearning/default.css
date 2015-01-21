@@ -531,6 +531,10 @@ footer .red-social{
 #forgot_password .fa-user{
   color: #ECD1B7;
 }
+.btn-red:hover{
+  background-color: #c83314;
+  color: #ffffff;
+}
 .logo-icpna{
   padding-top: 25px;
 }
@@ -1189,6 +1193,43 @@ footer .red-social{
   .info{
     font-weight: normal;
   }
+  .fulluser{
+    margin-left: 0px;
+  }
+  .frame-page{
+    width: 720px;
+  }
+  .frame-inbox{
+    width: 700px;
+  }
+  .page-show .span4{
+    width: 330px;
+  }
+  .location-course .item-list {
+    float: left;
+    min-height: 1px;
+    margin-left: 5px;
+    width: 55px;
+    text-align: center;
+  }
+  .module-process{
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+  .module-closed{
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+  .module-completed{
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+  .myperformance .span2{
+    width: 160px;
+  }
+  .myperformance .item-list-score{
+    width: 80px;
+  }
 }
 /* Portrait tablet to landscape and desktop - Escritorio pequeño o Tablet */
 @media (min-width: 768px) and (max-width: 979px) {
@@ -1368,6 +1409,97 @@ footer .red-social{
   .fullpage .span8{
     margin-left: 10px;
     width: 450px;
+  }
+  .frame-page, .page-show{
+    width: 450px;
+  }
+  .page-content{
+    margin-bottom: 0em;
+  }
+  .controls .edit-button-in{
+    width: 100%;
+    margin-right: 40px;
+  }
+  .btn-red:hover{
+    background-color: #c83314;
+    color: #ffffff;
+  }
+  #data-table-pagination #data-table-pagination-actions {
+    width: auto;
+  }
+  .frame-inbox {
+    width: 415px;
+  }
+  .module-process, .module-closed, .module-completed{
+    padding-top: 15px;
+    padding-bottom: 15px;
+    font-size: 20px;
+  }
+  .location-course .item-list{
+    width: 60px;
+    margin-left: 18px;
+  }
+
+  .page-show .span9{
+    width: 470px;
+  }
+  .page-show .span9 .span4{
+    width: 435px;
+  }
+  .title-nivel-01{
+    background-color: #528AD5;
+    text-align: center;
+  }
+  .title-nivel-02 {
+    background-color: #FFD200;
+    text-align: center;
+  }
+  .title-nivel-03 {
+    background-color: #87C10B;
+    text-align: center;
+  }
+  .title-nivel-04 {
+    background-color: #B670DB;
+    text-align: center;
+  }
+  .title-nivel-05 {
+    background-color: #FF633D;
+    text-align: center;
+  }
+  .myperformance .span2{
+    width: 210px;
+  }
+  .myperformance .item-img-title{
+    display: none;
+  }
+  .myperformance .perfomance-movil{
+    display: block;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+  }
+  .blue{
+    color: #ffffff;
+    background-color: #528AD5;
+  }
+  .green{
+    color: #4A6D00;
+    background-color: #87C10B;
+  }
+  .yellow{
+    color: #BD5B40;
+    background-color: #FFD200;
+  }
+  .purple{
+    color: #622384;
+    background-color: #B670DB;
+  }
+  .orange{
+    color: #ffffff;
+    background-color: #FF633D;
   }
 }
 

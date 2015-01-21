@@ -62,25 +62,27 @@
                 {% endif %}
                 </div>
             </div>
-            <div class="offset3" id="buttons-progressbar">
-            <div class="logo-icpna" style="text-align: right;"><img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png"> </div>
-            <div class="page-content {% if lesson_progress_bar %}header-bar" style="display: none;{% endif %}">
-                    <div class="page-show hidden-phone"></div>
-                    {% if lesson_progress_bar is defined %}
-                    <div class="">
-                        <div class = "btn btn-large btn-white hidden-phone pull-left" onclick="javascript:history.back(1)">{{ "GoBack" |get_lang }}</div>
-                        <div class = "btn btn-large btn-white pull-right">
-                            <a href="{{_p.web_modules}}">{{ "Vlearning" |get_lang }}</a>
-                            /
-                            <a href="{{_p.web_course}}{{_c.code}}/?id_session={{_c.session_id}}">{{ _c.title }}</a>
+                {% if isInLP %}
+                    <div class="offset3" id="buttons-progressbar">
+                        <div class="logo-icpna" style="text-align: right;"><img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png"> </div>
+                        <div class="page-content {% if lesson_progress_bar %}header-bar" style="display: none;{% endif %}">
+                            <div class="page-show hidden-phone"></div>
+                            {% if lesson_progress_bar is defined %}
+                                <div class="">
+                                    <div class = "btn btn-large btn-white hidden-phone pull-left" onclick="javascript:history.back(1)">{{ "GoBack" |get_lang }}</div>
+                                    <div class = "btn btn-large btn-white pull-right">
+                                        <a href="{{_p.web_modules}}">{{ "Vlearning" |get_lang }}</a>
+                                        /
+                                        <a href="{{_p.web_course}}{{_c.code}}/?id_session={{_c.session_id}}">{{ _c.title }}</a>
+                                    </div>
+                                </div>
+                                <div class="span4 offset6 user-advanced">
+                                    {{lesson_progress_bar}}
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
-                    <div class="span4 offset6 user-advanced">
-                        {{lesson_progress_bar}}
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
+                {% endif %}
             {% if not isInLP %}
             <div class="span12 visible-phone" id="hide-profile-bar">
                 <a href="#" id="hide-profile-toggle">

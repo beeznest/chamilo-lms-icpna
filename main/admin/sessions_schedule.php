@@ -104,6 +104,9 @@ $sessions = getSessionsList($scheduleIdSelected, $dateSelected, $branchSelected,
 if ($sessions != false) {
     ?>
     <div class="actions">
+        <a href="<?php echo api_get_path(WEB_CODE_PATH) ?>attendance/teacher.php" title="<?php echo get_lang('MyAttendance') ?>">
+            <img src="<?php echo api_get_path(WEB_IMG_PATH) ?>icons/32/attendance.png" alt="<?php echo get_lang('MyAttendance') ?>">
+        </a>
         <span style="float:right; padding-top: 0px;">
             <?php
             $exportXLSURL = api_get_self() . '?' . http_build_query(array(

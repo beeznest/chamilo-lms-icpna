@@ -826,6 +826,7 @@ $EditProfile = "Edit profile";
 $TabsDashboard = "Dashboard";
 $Dashboard = "Dashboard";
 $InOutManagement = "Attendance Viewer";
+$MyAttendance = "My attendance";
 $DashboardPlugins = "Dashboard plugins";
 $SelectBlockForDisplayingInsideBlocksDashboardView = "Select blocks to display in the dashboard blocks view";
 $ColumnPosition = "Position (column)";

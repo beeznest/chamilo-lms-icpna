@@ -1172,9 +1172,12 @@ footer .red-social{
 .perfomance-movil{
   display: none;
 }
-/* Large desktop - PC Escritorio */
-@media (min-width: 1200px) {
 
+/* Large desktop - PC Escritorio */
+@media (max-width: 1200px) {
+  .frame-inbox{
+    width: 810px;
+  }
 }
 @media (min-width: 1024px) {
   .bloque-user .header-logo {

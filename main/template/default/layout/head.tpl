@@ -13,6 +13,7 @@
 <title>{{ title_string }}</title>
 {{ css_file_to_string }}
 {{ css_style_print }}
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 {{ js_file_to_string }}
 {{ extra_headers }}
 <script>

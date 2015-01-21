@@ -1201,7 +1201,7 @@ footer .red-social{
     margin-left: 20px;
   }
   .frame-page{
-    width: 720px;
+    width: 670px;
   }
   .frame-inbox{
     width: 700px;
@@ -1318,6 +1318,7 @@ footer .red-social{
   }
   .fulluser{
     width: 250px;
+    margin-left: 30px;
   }
   .fullpage{
     width: 465px;
@@ -1357,7 +1358,14 @@ footer .red-social{
     width: 450px;
   }
   .intro-course .span7{
-    width: 450px;
+    width: 440px;
+  }
+  .cube-lesson {
+    width: 190px;
+    float: left;
+    margin-left: 20px;
+    min-height: 1px;
+    margin-bottom: 15px;
   }
   .user-advanced{
     width: 400px;
@@ -1455,10 +1463,10 @@ footer .red-social{
   }
 
   .page-show .span9{
-    width: 470px;
+    width: 445px;
   }
   .page-show .span9 .span4{
-    width: 435px;
+    width: 400px;
   }
   .title-nivel-01{
     background-color: #528AD5;

@@ -1230,6 +1230,15 @@ footer .red-social{
   .myperformance .item-list-score{
     width: 80px;
   }
+  .page-show{
+    padding-top: .5em;
+  }
+  .page-show.hidden-phone{
+    display: none;
+  }
+  .page-content{
+    margin-bottom: 0px;
+  }
 }
 /* Portrait tablet to landscape and desktop - Escritorio pequeño o Tablet */
 @media (min-width: 768px) and (max-width: 979px) {

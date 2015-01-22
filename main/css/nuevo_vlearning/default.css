@@ -1112,6 +1112,7 @@ footer .red-social{
 }
 #learning_path_right_zone {
     min-height: 700px;
+    float: left;
 }
 #learning_path_right_zone.Mostrar {
     margin-left: 100%;
@@ -1123,6 +1124,7 @@ footer .red-social{
 }
 #learning_path_right_zone iframe {
     height: 100%;
+    width: 100%;
 }
 
 .logo-icpna-movil{

@@ -354,9 +354,11 @@ Display::display_header($nameTools, null, null, 0, array(
     'isInLP' => true
 )); //para fullscreen el scroom
 
-echo '<div class="frame-page-lesson span12">';
-echo '<div id="learning_path_main" style="width:100%;height:100%;">';
-echo '<div id="scorm_title" class="visible-phone scorm_title">'.Security::remove_XSS($_SESSION['oLP']->get_name()) . '</div>';
+?>
+    <div class="frame-page-lesson span12">
+    <div id="learning_path_main">
+    <div id="scorm_title" class="visible-phone scorm_title"><?php echo Security::remove_XSS($_SESSION['oLP']->get_name()) ?></div>
+<?php
     $is_allowed_to_edit = api_is_allowed_to_edit(null, true, false, false);
     /*
     if ($is_allowed_to_edit) {
@@ -372,7 +374,7 @@ echo '<div id="scorm_title" class="visible-phone scorm_title">'.Security::remove
     }
     */
     ?>
-    <div id="learning_path_left_zone" class="help-left-zone">
+    <div id="learning_path_left_zone">
     <?php
     /*
     echo '<div id="header">
@@ -452,11 +454,11 @@ echo '<div id="scorm_title" class="visible-phone scorm_title">'.Security::remove
 
     <!-- right zone -->
     <!-- <div id="learning_path_right_zone"  style="margin-left:<?php echo $margin_left;?>;height:100%" >  Antiguo -->
-    <div id="learning_path_right_zone" class="Mostrar">
+    <div id="learning_path_right_zone">
         <?php if ($_SESSION['oLP']->mode == 'fullscreen') { ?>
             <iframe id="content_id_blank" name="content_name_blank" src="blank.php" border="0" frameborder="0" style="width:100%; height:100%;" ></iframe>
         <?php } else { ?>
-            <iframe id="content_id" name="content_name" src="<?php echo $src ?>" border="0" frameborder="0"  style="margin-left:14px;"></iframe>
+            <iframe id="content_id" name="content_name" src="<?php echo $src ?>" border="0" frameborder="0" ></iframe>
         <?php } ?>
     </div>
 

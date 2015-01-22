@@ -1,6 +1,6 @@
 <footer {{ isInLP is defined ? 'id="footer-in-lp"' : '' }} class="tablet"> <!-- start of #footer section -->
     <div class="divisor-line">
-        <div class="container">
+        <!-- <div class="container">
             <div class="row">
                 <div class="span2 {{ isInLP is defined ? 'visible-desktop' : '' }}">
                     <h4>Sobre V-learning</h4>
@@ -37,7 +37,7 @@
 
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 
     <div class="subfooter">

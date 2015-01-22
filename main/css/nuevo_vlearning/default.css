@@ -2015,6 +2015,9 @@ footer .red-social{
     padding-right: 10px;
     font-size: 12px;
   }
+  .course.plex .item{
+    height: 80px;
+  }
 }
 @media (min-width : 480px) and (max-width: 768px) {
   body{

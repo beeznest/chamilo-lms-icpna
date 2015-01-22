@@ -31,18 +31,15 @@ body{
   background-repeat: no-repeat; */
   margin: auto;
   height: auto;
-  min-height:100%;
+  min-height: 93%;
 }
 #page-wrap:after{
-  width: 100%;
-  height:255px;
+  width:  100%;
+  height: 100%;
   display:block;
   clear:both;
 }
-footer{
-  height: 200px;
-  margin: -200px auto 0;
-}
+
 header .logo-icpna{
     text-align: right;
     padding-top: 30px;
@@ -397,13 +394,9 @@ header .logo-icpna{
   color: #ffffff;
 }
 .divisor-line{
-  margin-top: 75px;
-  padding-top: 1em;
-  padding-bottom: 1em;
+  margin-top: 10px;
 }
-footer{
 
-}
 footer ul{
   list-style: none;
   margin: 0;

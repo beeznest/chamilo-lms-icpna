@@ -1552,6 +1552,16 @@ footer .red-social{
   }
 }
 
+#hide-profile-bar,
+#hide-header-bar {
+    background-color: #EEE;
+}
+#hide-profile-bar #hide-profile-toggle,
+#hide-header-bar #hide-header-toggle {
+    display: block;
+    text-align: center;
+}
+
 /* Landscape phone to portrait tablet - Tablet o Smartphone Horizontal */
 @media (max-width: 767px) {
     #page-wrap {
@@ -1778,8 +1788,17 @@ footer .red-social{
     padding-top: 10px;
     width: 85%;
     position: relative;
-    padding-left: 12px;
   }
+
+  .lesson-bar {
+      padding-right: 0;
+  }
+  .lesson-bar span#progress_text {
+      margin-left: 10px;
+      margin-top: -5px;
+      position: static;
+  }
+
   .title-course{
     margin: 0px 10px 10px;
   }
@@ -1787,13 +1806,6 @@ footer .red-social{
     padding-top: 1.5em;
   }
 
-  #hide-profile-bar {
-      background-color: #EEE;
-  }
-  #hide-profile-bar #hide-profile-toggle {
-      display: block;
-      text-align: center;
-  }
   .frame-page{
     padding-left: 20px;
     padding-right: 20px;
@@ -1875,6 +1887,11 @@ footer .red-social{
 
     #hide_bar {
         min-height: 0px;
+    }
+
+    .btn-white {
+        display: block;
+        float: none;
     }
 }
 @media (max-width: 767px) and (orientation: landscape) {

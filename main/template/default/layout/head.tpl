@@ -322,35 +322,25 @@ $(function() {
 });
 </script>
 {% if hide_bar %}
-<script type="text/javascript">
-$(document).ready(function(){
-        try{
-            $(document).on("click", "#page-wrap-tab a", function(event) {
-                $(".header-bar").slideToggle()
-                toggleArrowIcon($(this).find("i"));
-                event.preventDefault();
-            });
-        } catch (e) {
-            console.log(e);
-        }
-});
+    <script type="text/javascript">
+        $(document).on('ready', function() {
+            $('a#hide-header-toggle').on('click', function(e) {
+                e.preventDefault();
 
-    function toggleArrowIcon(obj){
-        if (obj.hasClass("icon-chevron-up")) {
-            obj.addClass("icon-chevron-down");
-            obj.removeClass("icon-chevron-up");
-        } else if (obj.hasClass("icon-chevron-down")) {
-            obj.addClass("icon-chevron-up");
-            obj.removeClass("icon-chevron-down");
-        }else if (obj.hasClass("icon-chevron-left")) {
-            obj.addClass("icon-chevron-right");
-            obj.removeClass("icon-chevron-left");
-        } else if (obj.hasClass("icon-chevron-right")) {
-            obj.addClass("icon-chevron-left");
-            obj.removeClass("icon-chevron-right");
-        }
-    }
-</script>
+                var $self = $(this);
+
+                $('#header-container').slideToggle('fast', function () {
+                    var $icon = $self.find('i');
+
+                    if ($icon.hasClass('icon-chevron-down')) {
+                        $icon.removeClass('icon-chevron-down').addClass('icon-chevron-up');
+                    } else {
+                        $icon.removeClass('icon-chevron-up').addClass('icon-chevron-down');
+                    }
+                });
+            });
+        });
+    </script>
 {% endif %}
 <script>
     $(document).on('ready', function() {

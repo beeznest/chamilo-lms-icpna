@@ -16,6 +16,7 @@
 <div id="page-wrap">
     <div class="container">
         <div class="row">
+            <div id="header-container" {% if isInLP %} style="display: none;" {% endif %}>
             <div class="span3 fulluser header-bar">
                 <div class="bloque-user">
                     <div class="header-logo">
@@ -71,8 +72,8 @@
                         </div>
                         {% if lesson_progress_bar is defined %}
                             <div class="row-fluid lesson-top-buttons">
-                                <div class="span6">
-                                    <a class = "btn btn-large btn-white hidden-phone pull-left" href="javascript:history.back(1);">{{ "GoBack" |get_lang }}</a>
+                                <div class="span6 hidden-phone">
+                                    <a class = "btn btn-large btn-white pull-left" href="javascript:history.back(1);">{{ "GoBack" |get_lang }}</a>
                                 </div>
                                 <div class="span6">
                                     <div class = "btn btn-large btn-white pull-right">
@@ -83,7 +84,7 @@
                                 </div>
                             </div>
                             <div class="row-fluid">
-                                <div class="span8"></div>
+                                <div class="span8 hidden-phone"></div>
                                 <div class="span4 user-advanced">
                                     <div class="lesson-bar">
                                         {{lesson_progress_bar}}
@@ -92,27 +93,8 @@
                             </div>
                         {% endif %}
                     </div>
-
-                    <!-- <div class="offset3" id="buttons-progressbar">
-                        <div class="logo-icpna" style="text-align: right;"><img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png"> </div>
-                        <div class="page-content {% if lesson_progress_bar %}header-bar" style="display: none;{% endif %}">
-                            <div class="page-show hidden-phone"></div>
-                            {% if lesson_progress_bar is defined %}
-                                <div class="">
-                                    <div class = "btn btn-large btn-white hidden-phone pull-left" onclick="javascript:history.back(1)">{{ "GoBack" |get_lang }}</div>
-                                    <div class = "btn btn-large btn-white pull-right">
-                                        <a href="{{_p.web_modules}}">{{ "Vlearning" |get_lang }}</a>
-                                        /
-                                        <a href="{{_p.web_course}}{{_c.code}}/?id_session={{_c.session_id}}">{{ _c.title }}</a>
-                                    </div>
-                                </div>
-                                <div class="span4 offset6 user-advanced">
-                                    {{lesson_progress_bar}}
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div> -->
                 {% endif %}
+        </div>
             {% if not isInLP %}
             <div class="span12 visible-phone" id="hide-profile-bar">
                 <a href="#" id="hide-profile-toggle">
@@ -121,10 +103,10 @@
             </div>
             {% endif %}
     {% if lesson_progress_bar %}
-        <div class="span12" style="background-color: #EEE;" id="page-wrap-tab">
-        <a href="#">
-            <div style="text-align: center"><i class="icon-chevron-down"></i></div>
-        </a>
+        <div class="span12" id="hide-header-bar">
+            <a href="#" id="hide-header-toggle">
+                <i class="icon-chevron-down"></i>
+            </a>
         </div>
     {% endif %}
 {% endif %}

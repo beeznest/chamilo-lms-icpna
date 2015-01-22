@@ -6,12 +6,7 @@ CSS Diseño V-learning 2015
 */
 /* CSS LEARNPATH */
 #learning_path_left_zone{
-    float: left;
-    width: 25%;
-    height: auto;
-    padding-left: 8px;
-    padding-right: 4px;
-    overflow-y: inherit;
+    
 }
 .Mostrar #content_id{
     width: 70%;

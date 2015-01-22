@@ -1,0 +1,114 @@
+.frame-page-lesson-container {
+    padding: 20px 8px;
+}
+
+.frame-page-lesson {
+    padding-bottom: 56.25%;
+    position: relative;
+}
+.frame-page-lesson #learning_path_main {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+#learning_path_main {
+    clear: both;
+}
+
+#learning_path_left_zone {
+    min-height: 0px;
+    height: 100%;
+    width: 300px;
+}
+#learning_path_main.folded #learning_path_left_zone{
+    width: 0px;
+}
+
+#hide_bar {
+    min-height: 0px;
+    height: 100%;
+    position: relative;
+    width: 15px;
+}
+#hide_bar table {
+    background-image: url("/main/img/hide0.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+#learning_path_main.folded #hide_bar table {
+    background-image: url("/main/img/hide2.png");
+}
+
+#learning_path_right_zone {
+    min-height: 0px;
+    height: 100%;
+    position: relative;
+    width: 625px;
+}
+#learning_path_right_zone iframe {
+    height: 100%;
+    position: absolute;
+}
+#learning_path_main.folded #learning_path_right_zone{
+    width: 925px;
+}
+
+@media (min-width: 1200px) {
+    #learning_path_left_zone {
+        width: 300px;
+    }
+    #learning_path_main.folded #learning_path_left_zone{
+        width: 0px;
+    }
+    #learning_path_right_zone {
+        width: 855px;
+    }
+    #learning_path_main.folded #learning_path_right_zone{
+        width: 1155px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 979px) {
+    #learning_path_left_zone {
+        width: 200px;
+    }
+    #hide_bar {
+        width: 20px;
+    }
+    #learning_path_right_zone {
+        width: 504px;
+    }
+    #learning_path_main.folded #learning_path_right_zone{
+        width: 704px;
+    }
+}
+
+@media (max-width: 767px) {
+    #learning_path_left_zone {
+        width: 95%;
+    }
+    #learning_path_main.folded #learning_path_left_zone{
+        width: 0;
+    }
+    #hide_bar {
+        width: 5%;
+    }
+    #learning_path_right_zone {
+        width: 0;
+    }
+    #learning_path_main.folded #learning_path_right_zone{
+        width: 95%;
+    }
+}
+
+@media (max-width: 480px) {
+
+}

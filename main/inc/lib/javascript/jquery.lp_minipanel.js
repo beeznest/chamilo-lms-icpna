@@ -44,28 +44,23 @@ $(document).ready(function() {
     $('#learning_path_right_zone').before('<div id="hide_bar">' +
         '<table style="border: 0 none; width: 100%; height: 100%; cursor: pointer; background-color: #EEEEEE">' +
         '<tr><td></td></tr></table></div>');
-
-    var lpLeftZoneHeight = $('#learning_path_left_zone').height();
-    var lpRightZoneHeight = $('#learning_path_right_zone').height();
-
-    if (lpLeftZoneHeight > lpRightZoneHeight) {
-        $('#hide_bar').height(lpLeftZoneHeight);
-        $('#learning_path_right_zone').height(lpLeftZoneHeight);
-    } else {
-        $('#hide_bar').height(lpRightZoneHeight);
-        $('#learning_path_left_zone').height(lpRightZoneHeight);
-    }
-
-    //$('#learning_path_right_zone').height(learningPathViewHeight);
     
-    $('#hide_bar table').css({
+    /*$('#hide_bar table').css({
         backgroundImage: "url(../img/hide0.png)", 
         backgroundRepeat: "no-repeat", 
         backgroundPosition: "center center"
+    });*/
+    
+    $('#hide_bar').on('click', function (e) {
+        e.preventDefault();
+
+        var $learningPathMain = $('#learning_path_main');
+
+        $learningPathMain.toggleClass('folded');
     });
     
     // Adding funcionality
-    $("#hide_bar").click(function() {
+    /*$("#hide_bar").click(function() {
         var disp = $("#learning_path_left_zone").css("display");
         // var frmWidth = $('#content_id').width();
         
@@ -91,7 +86,7 @@ $(document).ready(function() {
                 backgroundPosition: "center center"
             });
         }
-    });
+    });*/
     
     // $('#content_id').load(function() {
     //     var cntHeight = $(this).contents().height() + 10;

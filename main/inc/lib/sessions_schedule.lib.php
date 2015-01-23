@@ -694,6 +694,7 @@ function getUserAttendanceByDate($userId, $date)
         . "INNER JOIN $courseTable c ON io.course_id = c.id "
         . "INNER JOIN $branchRoomTable br ON io.room_id = br.id "
         . "WHERE scu.id_user = $userId "
+        . "AND io.user_id = $userId "
         . "AND DATE(log_in_course_date) = '$date'";
 
     $result = Database::query($sql);

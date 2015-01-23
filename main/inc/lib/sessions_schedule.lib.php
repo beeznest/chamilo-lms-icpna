@@ -713,12 +713,23 @@ function getUserAttendanceByDate($userId, $date)
 
         $schedule = current($scheduleField);
 
+        $inAt = '&nbsp;';
+        $outAt = '&nbsp;';
+
+        if (!empty($row['log_in_course_date'])) {
+            $inAt = api_get_local_time($row['log_in_course_date']);
+        }
+
+        if (!empty($row['log_out_course_date'])) {
+            $outAt = api_get_local_time($row['log_out_course_date']);
+        }
+
         $attendances[] = array(
             'schedule' => getFormatedSchedule($schedule['option_display_text']),
             'room' => $row['room'],
             'course' => $row['title'],
-            'inAt' => api_get_local_time($row['log_in_course_date']),
-            'outAt' => api_get_local_time($row['log_out_course_date'])
+            'inAt' => $inAt,
+            'outAt' => $outAt
         );
     }
 

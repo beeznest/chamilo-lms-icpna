@@ -890,7 +890,7 @@ if ((isset($uidReset) && $uidReset) || (isset($cidReset) && $cidReset)) {
                         "       session_rcru.course_code = '$_cid' AND ".
                         "       (session_rcru.id_user     = '$user_id' or session.id_coach = '$user_id') AND ".
                         "       session_rcru.id_session  = $session_id AND ".
-                        "       session_rcru.status      = 2 ";
+                        "       session_rcru.status IN(2, " . ROLE_COACH_SUBSTITUTE . ") ";
                         
                 $result = Database::query($sql);
                 $row     = Database::store_result($result);
@@ -944,6 +944,16 @@ if ((isset($uidReset) && $uidReset) || (isset($cidReset) && $cidReset)) {
                                     break;
                                 case '0': //Student
                                     $_courseUser['role'] = '';
+                                    $is_courseMember     = true;
+                                    $is_courseTutor      = false;
+                                    $is_courseAdmin      = false;
+                                    $is_courseCoach      = false;
+                                    $is_sessionAdmin     = false;
+    
+                                    Session::write('_courseUser', $_courseUser);
+                                    break;
+                                case ROLE_COACH_SUBSTITUTE:
+                                    $_courseUser['role'] = 'Substitute';
                                     $is_courseMember     = true;
                                     $is_courseTutor      = false;
                                     $is_courseAdmin      = false;

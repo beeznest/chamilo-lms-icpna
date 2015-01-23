@@ -683,15 +683,18 @@ function getUserAttendanceByDate($userId, $date)
     $sessionCourseUserTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
     $trackIOTable = Database::get_statistic_table(TABLE_TRACK_E_TEACHER_IN_OUT);
     $courseTable = Database::get_main_table(TABLE_MAIN_COURSE);
+    $branchRoomTable = Database::get_main_table(TABLE_BRANCH_ROOM);
 
     $attendances = array();
 
-    $sql = "SELECT s.id, c.title, io.log_in_course_date, io.log_out_course_date "
+    $sql = "SELECT s.id, c.title, io.log_in_course_date, io.log_out_course_date, br.title room "
         . "FROM $sessionTable s "
         . "INNER JOIN $sessionCourseUserTable scu ON s.id = scu.id_session "
         . "INNER JOIN $trackIOTable io ON s.id = io.session_id "
         . "INNER JOIN $courseTable c ON io.course_id = c.id "
+        . "INNER JOIN $branchRoomTable br ON io.room_id = br.id "
         . "WHERE scu.id_user = $userId "
+        . "AND io.user_id = $userId "
         . "AND DATE(log_in_course_date) = '$date'";
 
     $result = Database::query($sql);
@@ -702,26 +705,31 @@ function getUserAttendanceByDate($userId, $date)
 
     while ($row = Database::fetch_assoc($result)) {
         $scheduleValue = $sessionFieldValue->get_values_by_handler_and_field_variable($row['id'], 'horario', true);
-        $roomValue = $sessionFieldValue->get_values_by_handler_and_field_variable($row['id'], 'aula', true);
         
         $scheduleField = $sessionOption->get_field_option_by_field_and_option(
             $scheduleValue['field_id'],
             $scheduleValue['field_value']
         );
-        $roomField = $sessionOption->get_field_option_by_field_and_option(
-            $roomValue['field_id'],
-            $roomValue['field_value']
-        );
 
         $schedule = current($scheduleField);
-        $room = current($roomField);
+
+        $inAt = '&nbsp;';
+        $outAt = '&nbsp;';
+
+        if (!empty($row['log_in_course_date'])) {
+            $inAt = api_get_local_time($row['log_in_course_date']);
+        }
+
+        if (!empty($row['log_out_course_date'])) {
+            $outAt = api_get_local_time($row['log_out_course_date']);
+        }
 
         $attendances[] = array(
             'schedule' => getFormatedSchedule($schedule['option_display_text']),
-            'room' => $room['option_display_text'],
+            'room' => $row['room'],
             'course' => $row['title'],
-            'inAt' => $row['log_in_course_date'],
-            'outAt' => $row['log_out_course_date']
+            'inAt' => $inAt,
+            'outAt' => $outAt
         );
     }
 

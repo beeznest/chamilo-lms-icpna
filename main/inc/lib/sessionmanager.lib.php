@@ -2670,7 +2670,7 @@ class SessionManager {
                 WHERE   session_rcru.id_user = user.user_id AND
                         session_rcru.id_session = '".intval($session_id)."' AND
                         session_rcru.course_code ='".Database::escape_string($course_code)."' AND
-                        session_rcru.status=2";
+                        session_rcru.status IN(2, " . ROLE_COACH_SUBSTITUTE . ")";
         $result = Database::query($sql);
         return Database::store_result($result);
     }

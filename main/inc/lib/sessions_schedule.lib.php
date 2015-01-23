@@ -720,8 +720,8 @@ function getUserAttendanceByDate($userId, $date)
             'schedule' => getFormatedSchedule($schedule['option_display_text']),
             'room' => $room['option_display_text'],
             'course' => $row['title'],
-            'inAt' => $row['log_in_course_date'],
-            'outAt' => $row['log_out_course_date']
+            'inAt' => api_get_local_time($row['log_in_course_date']),
+            'outAt' => api_get_local_time($row['log_out_course_date'])
         );
     }
 

@@ -92,7 +92,17 @@ CSS Diseño V-learning 2015
 
 /* Portrait tablet to landscape and desktop - Escritorio pequeño o Tablet */
 @media (min-width: 768px) and (max-width: 979px) {
-
+  #header-container .span9{
+    width: 495px;
+  }
+  #header-container .fulluser{
+    width: 180px;
+    margin-bottom: 10px;
+  }
+  #header-container .fulluser .bloque-user .header-logo{
+    padding-left: 10px;
+    padding-right: 10px;
+  }
 }
 
 /* Landscape phone to portrait tablet - Tablet o Smartphone Horizontal */

@@ -829,6 +829,7 @@ $is_courseCoach     = false; //course coach
 
 //Course - User permissions
 $is_sessionAdmin    = false;
+$isCoachSubstitute = false;
 
 if ((isset($uidReset) && $uidReset) || (isset($cidReset) && $cidReset)) {
 
@@ -903,6 +904,7 @@ if ((isset($uidReset) && $uidReset) || (isset($cidReset) && $cidReset)) {
                     $is_courseAdmin      = false;
                     $is_courseCoach      = false;
                     $is_sessionAdmin     = true;
+                    $isCoachSubstitute = false;
                 } else {
                     //Am I a session coach?
                     $sql = "SELECT id, id_coach FROM $tbl_session session INNER JOIN $tbl_session_course sc ON sc.id_session = session.id WHERE session.id = $session_id AND session.id_coach = $user_id AND sc.course_code = '$_cid'";
@@ -913,6 +915,7 @@ if ((isset($uidReset) && $uidReset) || (isset($cidReset) && $cidReset)) {
                         $is_courseTutor      = false;
                         $is_courseCoach      = true;
                         $is_sessionAdmin     = false;
+                        $isCoachSubstitute = false;
                     } else {
                         //Im a coach or a student?
                         $sql = "SELECT cu.id_user, cu.status FROM $tbl_session_course_user cu ".
@@ -934,6 +937,7 @@ if ((isset($uidReset) && $uidReset) || (isset($cidReset) && $cidReset)) {
                                     $is_courseTutor      = true;
                                     $is_courseCoach      = true;
                                     $is_sessionAdmin     = false;
+                                    $isCoachSubstitute = false;
     
                                     if (api_get_setting('extend_rights_for_coach') == 'true') {
                                         $is_courseAdmin = true;
@@ -949,6 +953,7 @@ if ((isset($uidReset) && $uidReset) || (isset($cidReset) && $cidReset)) {
                                     $is_courseAdmin      = false;
                                     $is_courseCoach      = false;
                                     $is_sessionAdmin     = false;
+                                    $isCoachSubstitute = false;
     
                                     Session::write('_courseUser', $_courseUser);
                                     break;
@@ -959,6 +964,7 @@ if ((isset($uidReset) && $uidReset) || (isset($cidReset) && $cidReset)) {
                                     $is_courseAdmin      = false;
                                     $is_courseCoach      = false;
                                     $is_sessionAdmin     = false;
+                                    $isCoachSubstitute = true;
     
                                     Session::write('_courseUser', $_courseUser);
                                     break;
@@ -970,6 +976,7 @@ if ((isset($uidReset) && $uidReset) || (isset($cidReset) && $cidReset)) {
                                     $is_courseAdmin      = false;
                                     $is_sessionAdmin     = false;
                                     $is_courseCoach      = false;
+                                    $isCoachSubstitute = false;
                                     Session::erase('_courseUser');
                                     break;
                             }
@@ -980,6 +987,7 @@ if ((isset($uidReset) && $uidReset) || (isset($cidReset) && $cidReset)) {
                             $is_courseAdmin      = false;
                             $is_sessionAdmin     = false;
                             $is_courseCoach      = false;
+                            $isCoachSubstitute = false;
                             Session::erase('_courseUser');
                         }
                     }
@@ -998,6 +1006,7 @@ if ((isset($uidReset) && $uidReset) || (isset($cidReset) && $cidReset)) {
         $is_courseTutor     = false;
         $is_courseCoach     = false;
         $is_sessionAdmin    = false;
+        $isCoachSubstitute = false;
         Session::erase('_courseUser');
     }
 
@@ -1034,6 +1043,7 @@ if ((isset($uidReset) && $uidReset) || (isset($cidReset) && $cidReset)) {
             $is_courseTutor     = false;
             $is_courseCoach     = false;
             $is_sessionAdmin    = false;
+            $isCoachSubstitute = false;
             $is_allowed_in_course = false;
         }
     }
@@ -1063,6 +1073,7 @@ if ((isset($uidReset) && $uidReset) || (isset($cidReset) && $cidReset)) {
     Session::write('is_courseCoach', $is_courseCoach);
     Session::write('is_allowed_in_course', $is_allowed_in_course);
     Session::write('is_sessionAdmin', $is_sessionAdmin);
+    Session::write('isCoachSubstitute', $isCoachSubstitute);
 } else { // continue with the previous values
 
     if (isset($_SESSION['_courseUser'])) {

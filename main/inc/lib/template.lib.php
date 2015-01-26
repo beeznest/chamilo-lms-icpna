@@ -279,7 +279,7 @@ class Template {
                 $user_info['is_admin'] = 1;
             }
             $user_info['is_course_coach'] = 0;
-            if (!empty($_SESSION['is_courseCoach'])) {
+            if (!empty($_SESSION['is_courseCoach']) || !empty($_SESSION['isCoachSubstitute'])) {
                 $user_info['is_course_coach'] = 1;
                 $user_info['coach_course_id'] = $_SESSION['_course']['real_id'];
                 $user_info['coach_session_id'] = $_SESSION['id_session'];

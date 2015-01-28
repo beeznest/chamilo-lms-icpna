@@ -1484,7 +1484,9 @@ function switch_item(current_item, next_item){
     <?php } else { ?>
             cont_f.attr("src",mysrc);
 
-            $('#hide_bar').trigger('click');
+            if ($('#profile-block').css('display') !== 'none') {
+                $('#hide_bar').trigger('click');
+            }
 
             window.scrollTo(0, 0);
     <?php } ?>

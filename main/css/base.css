@@ -348,24 +348,9 @@ body {
     z-index:9000; /* bug when using full area fckeditor */
 }
 
-footer {
-    margin-top: 17px;
-    padding-top: 17px;
-    height: 9em;
-    width: 100%;
-}
-
 /* Sticky footer*/
 .push {
     height: 9em; /* Very important */
-}
-
-footer .container .row {
-    padding-top: 50px;
-}
-
-#footer_right #admin_name, #footer_right #software_name{
-    text-align:right;
 }
 
 .page-header {
@@ -3963,30 +3948,15 @@ a.forum_group_link {
     padding-top:8px;
 }
 
-footer {
-    /* Default gray footer */
-    background-color: #F5F5F5; /* Old browsers */
-    background-repeat: repeat-x; /* Repeat the gradient */
-    background-image: -moz-linear-gradient(top, #F5F5F5 0%, #EEEEEE 100%); /* FF3.6+ */
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#F5F5F5), color-stop(100%,#EEEEEE)); /* Chrome,Safari4+ */
-    background-image: -webkit-linear-gradient(top, #F5F5F5 0%, #EEEEEE 100%); /* Chrome 10+,Safari 5.1+ */
-    background-image: -ms-linear-gradient(top, #F5F5F5 0%,#EEEEEE 100%); /* IE10+ */
-    background-image: -o-linear-gradient(top, #F5F5F5 0%,#EEEEEE 100%); /* Opera 11.10+ */
-    /* Fixes bug in ie8 */
-    /* filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#F5F5F5', endColorstr='#EEEEEE',GradientType=0 ); */ /* IE6-9 */
-    background-image: linear-gradient(top, #F5F5F5 0%, #EEEEEE 100%); /* W3C */
-}
-
-
-
 /* Default LP left column values */
 
 #learning_path_left_zone {
     float:left;
     width:280px;
-    height:100%;
+    height:700px;
     padding-left: 8px;
     padding-right: 4px;
+    overflow-y: scroll;
 }
 
 #learning_path_left_zone #header {

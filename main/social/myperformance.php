@@ -1,28 +1,62 @@
 <?php
 $language_file = array('registration', 'messages', 'userInfo');
 require_once '../inc/global.inc.php';
-$plexcode = CourseManager::get_course_code_from_original_id(50,'cs_course_id');
-$isAdult = !empty($plexcode);
+$isAdult = $_configuration['kids'] !== 1;
 if ($isAdult) {
     define('NUM_COURSES', 5);
     define('NUM_PHASES', 5);
     define('TOTAL_COURSES', NUM_COURSES * NUM_PHASES);
+    $basic_adulto = Display::return_icon('mi-basico-adulto.png',get_lang('Basic'));
+    $basic_alto_adulto = Display::return_icon('mi-basico-alto-adulto.png',get_lang('High - Basic'));
+    $Intermediate = Display::return_icon('mi-intermedio-adulto.png',get_lang('Intermediate'));
+    $HighIntermediate = Display::return_icon('mi-intermedio-alto-adulto.png',get_lang('High - Intermediate'));
+    $Advanced = Display::return_icon('mi-avanzado-adulto.png',get_lang('Advanced'));
     $phase_title = array(
-        1 => 'Basic',
-        2 => 'High - Basic',
-        3 => 'Intermediate',
-        4 => 'High - Intermediate',
-        5 => 'Advanced',
+        1 => $basic_adulto,
+        2 => $basic_alto_adulto,
+        3 => $Intermediate,
+        4 => $HighIntermediate,
+        5 => $Advanced,
+    );
+    $phase_color = array(
+        1 => "blue",
+        2 => "yellow",
+        3 => "green",
+        4 => "purple",
+        5 => "orange",
+    );
+    $phase_title_movil = array(
+        1 => "Básico",
+        2 => "Básico Alto",
+        3 => "Intermedio",
+        4 => "Intermedio Alto",
+        5 => "Avanzado",
     );
 } else {
     define('NUM_COURSES', 6);
     define('NUM_PHASES', 4);
     define('TOTAL_COURSES', NUM_COURSES * NUM_PHASES);
+    $Elementary = Display::return_icon('mi-elemental-kids.png',get_lang('Elementary'));
+    $HighElementary = Display::return_icon('mi-elemental-alto-kids.png',get_lang('High - Elementary'));
+    $BasicKids = Display::return_icon('mi-basico-kids.png',get_lang('High - Elementary'));
+    $HighBasicKids = Display::return_icon('mi-basico-alto-kids.png',get_lang('High - Elementary'));
     $phase_title = array(
-        1 => 'Elementary',
-        2 => 'High - Elementary',
-        3 => 'Basic',
-        4 => 'High - Basic',
+        1 => $Elementary,
+        2 => $HighElementary,
+        3 => $BasicKids,
+        4 => $HighBasicKids,
+    );
+    $phase_color = array(
+        1 => "blue",
+        2 => "yellow",
+        3 => "green",
+        4 => "purple",
+    );
+    $phase_title_movil = array(
+        1 => "Elemental",
+        2 => "Elemental Alto",
+        3 => "Básico",
+        4 => "Básico Alto",
     );
 }
 
@@ -46,27 +80,33 @@ if ($isAdult) {
 $course_array = getAllCourses();
 function createDiv($seq, $sid) {
     $text = '';
-    global $phase, $phase_title, $course_array;
+    global $phase, $phase_title, $phase_title_movil, $phase_color ,$course_array;
     $index = $seq % NUM_COURSES;
     $phase_id = ceil($seq / NUM_COURSES);
     if ($seq <= TOTAL_COURSES) {
         if ($index == 1) {
-            $text .= '<div class="row nivel">
-                                <div class="span9">
-                                   <h3 class="icon-nivel">' . $phase_title[$phase_id] . '</h3>
-                                </div>';
+            $text .= '<div class="span2">
+                                <div class="bloque-item">
+                                <div class="item-img-title">' . $phase_title[$phase_id].'</div>
+                                <div class="perfomance-movil '.$phase_color[$phase_id].'">'.$phase_title_movil[$phase_id].'</div>';
         }
         if (empty($sid)) {
             $score = '--';
+            $itemClasses = 'item-list module-closed-small ';
         } else {
             $score = getCourseScore($course_array[$seq][0],$course_array[$seq][1], $sid);
+            if ($score == '--') {
+                $itemClasses = 'item-list module-process-small';
+            } else {
+                $itemClasses = 'item-list module-completed-small';
+            }
         }
-        $text .= '<div class="span9">
-                                    <div class="span3"><div class="icon-complet">' . $course_array[$seq][2] . '</div></div>
-                                    <div class="span3"><div class="nota-aprueba top-note">' . $score . '/100</div></div>
-                                </div>';
+        $text .= '<div class="list_performance">
+            <div class="' . $itemClasses . '">' . $course_array[$seq][2] . '</div>
+            <div class="item-list item-list-score">' . $score . '/100</div>
+        </div>';
         if ($index == 0) {
-            $text .= '</div>';
+            $text .= '</div></div>';
         }
     } else {
         $text .= '</div>
@@ -96,11 +136,11 @@ function getAllCourses() {
             $course_code = 'COURSE'. twoOrMoreDigitString($i);
         }
         $id = CourseManager::get_course_id_from_course_code($course_code);
-        $title = CourseManager::get_course_title_from_course_id($id);
+        //$title = CourseManager::get_course_title_from_course_id($id);
         $course_array[$i] = array(
             $id,
             $course_code,
-            $title,
+            twoOrMoreDigitString($i),
         );
     }
     return $course_array;
@@ -205,15 +245,9 @@ $user_id = api_get_user_id();
 $social_left_content = $social_left_content = SocialManager::show_social_menu('myperformance');
 if (!empty($user_id)) {
     $social_right_content =
-        '<div class="well_border">
-                <div class="span9">
-                    <div class="row">
-                        <h3>Mi Desempeño</h3>
-                        <div class="span8">
-                            <div class="row seccion-info-notas">
-                                <div class="span4"><div class="letra">Courses</div></div>
-                                <div class="span3"><div class="letra">Notes</div></div>
-                            </div>';
+        '<div class="row">
+        <div class="span9 page-show"><h3 class="titulo">Mi Desempeño</h3></div>
+           </div><div class="row myperformance">';
     $session_list = SessionManager::get_course_session_list_by_user($user_id);
     $sequence_int = 0;
     foreach ($session_list as $session) {

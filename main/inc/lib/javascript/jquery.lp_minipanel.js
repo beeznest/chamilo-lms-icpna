@@ -41,23 +41,31 @@ function toogle_minipanel() {
 
 $(document).ready(function() {
     //Adding div to hide panel
-    $('#learning_path_right_zone').before('<div id="hide_bar" style="float: left; width: 15px; height: 700px; ">' +
+    $('#learning_path_right_zone').before('<div id="hide_bar">' +
         '<table style="border: 0 none; width: 100%; height: 100%; cursor: pointer; background-color: #EEEEEE">' +
         '<tr><td></td></tr></table></div>');
     
-    $('#hide_bar table').css({
+    /*$('#hide_bar table').css({
         backgroundImage: "url(../img/hide0.png)", 
         backgroundRepeat: "no-repeat", 
         backgroundPosition: "center center"
+    });*/
+    
+    $('#hide_bar').on('click', function (e) {
+        e.preventDefault();
+
+        var $learningPathMain = $('#learning_path_main');
+
+        $learningPathMain.toggleClass('folded');
     });
     
     // Adding funcionality
-    $("#hide_bar").click(function() {
-        var disp = $("#inner_lp_toc").css("display");
+    /*$("#hide_bar").click(function() {
+        var disp = $("#learning_path_left_zone").css("display");
         // var frmWidth = $('#content_id').width();
         
         if (disp == 'block') {
-            $("#inner_lp_toc").css('display', 'none');
+            $("#learning_path_left_zone").css('display', 'none');
             // $("#learning_path_right_zone").css('margin-left', '10px');
             $('#learning_path_right_zone').removeClass('Mostrar').addClass('Ocultar'); //Añadimos Clase Ocultar
             // $("#content_id").width(frmWidth + 250);
@@ -67,7 +75,7 @@ $(document).ready(function() {
                 backgroundPosition: "center center"
             });
         } else {
-            $("#inner_lp_toc").css("display", "block");
+            $("#learning_path_left_zone").css("display", "block");
             // $("#learning_path_right_zone").css('margin-left', marginLeftIni);
             $('#learning_path_right_zone').removeClass('Ocultar').addClass('Mostrar'); //Añadimos Clase Mostrar
             // $('#content_id').width();
@@ -78,7 +86,7 @@ $(document).ready(function() {
                 backgroundPosition: "center center"
             });
         }
-    });
+    });*/
     
     // $('#content_id').load(function() {
     //     var cntHeight = $(this).contents().height() + 10;

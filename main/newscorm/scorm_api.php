@@ -1483,6 +1483,12 @@ function switch_item(current_item, next_item){
 
     <?php } else { ?>
             cont_f.attr("src",mysrc);
+
+            if ($('#profile-block').css('display') !== 'none') {
+                $('#hide_bar').trigger('click');
+            }
+
+            window.scrollTo(0, 0);
     <?php } ?>
 
     if (olms.lms_lp_type==1 || olms.lms_item_type == 'asset'){
@@ -1501,8 +1507,13 @@ function switch_item(current_item, next_item){
         }
     });
 
-    window.frames['content_id'].GetRemoteTrackingAndSaveIt();
-    return true;
+    //window.frames['content_id'].GetRemoteTrackingAndSaveIt();
+
+    var learningPathViewHeight = $('#learning_path_right_zone').height();
+
+    $('#hide_bar').height(learningPathViewHeight);
+
+    return false;
 }
 
 /**

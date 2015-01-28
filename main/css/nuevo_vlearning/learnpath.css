@@ -1,0 +1,176 @@
+/*
+CSS Diseño V-learning 2015
+*/
+/* 
+    Author     : alex.aragon@beeznest.com
+*/
+/* CSS LEARNPATH */
+#learning_path_left_zone{
+    
+}
+.Mostrar #content_id{
+    width: 70%;
+}
+.Ocultar #content_id{
+    width: 96%;
+}
+.scorm-status-completed{
+    background-color: #528AD5;
+}
+.scorm-status-not-attempted{
+    background-color: #DDD;
+}
+.scorm_item{
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 10px;
+    padding-left: 35px;
+    margin-bottom: 1px;
+    color: white;
+    font-size: 14px;
+    background-image: url("img/arrows-scrom.png") ;
+    background-position: 270px center;
+    background-repeat: no-repeat;
+}
+.scorm-status-completed{
+    background-image: url("img/check.png") ;
+    background-position: 10px center;
+    background-repeat: no-repeat;
+}
+.scorm_item a{
+    color: white;
+}
+.scorm_item a:hover{
+    color: #a9a9a9;
+}
+.scorm_item_highlight{
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-right: 10px;
+  padding-left: 35px;
+    margin-bottom: 1px;
+    font-size: 1.5em;
+    background-color: #0134A1;
+  background-image: url("img/arrows-scrom.png") ;
+  background-position: 270px center;
+  background-repeat: no-repeat;
+}
+.scorm_item_highlight a{
+    color: white;
+}
+.scorm_item_highlight a:hover{
+    color: #a9a9a9;
+}
+.scorm_item {
+    background-image: url("img/lp-item-check.png");
+    background-position: 8px center;
+    background-repeat: no-repeat;
+}
+.scorm_item .toc_inner,
+.scorm_item_highlight .toc_inner {
+    background-image: url("img/lp-item-chevron.png");
+    background-position: right center;
+    background-repeat: no-repeat;
+    padding-right: 16px;
+}
+.scorm_item_highlight {
+    background-image: none;
+}
+
+.frame-page-lesson {
+    background-color: #FFF;
+    padding-bottom: 20px;
+    padding-top: 20px;
+    box-shadow: 0px 0px 6px 0px rgba(50, 50, 50, 0.7);
+}
+
+
+/* Large desktop - PC Escritorio */
+@media (min-width: 1200px) {
+
+}
+
+/* Portrait tablet to landscape and desktop - Escritorio pequeño o Tablet */
+@media (min-width: 768px) and (max-width: 979px) {
+  #header-container .span9{
+    width: 495px;
+  }
+  #header-container .fulluser{
+    width: 180px;
+    margin-bottom: 10px;
+  }
+  #header-container .fulluser .bloque-user .header-logo{
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+/* Landscape phone to portrait tablet - Tablet o Smartphone Horizontal */
+@media (max-width: 767px) {
+    #topbar {
+        display: none;
+    }
+
+    .bloque-user .header-logo-icpna {
+        background-color: #FFF;
+        padding: 1.5em 0;
+        text-align: center;
+    }
+
+    .user-advanced {
+        clear: both;
+        /*width: 100%;*/
+    }
+    .user-advanced .progress{
+        margin-right: auto;
+    }
+    .user-advanced .progresstext {
+        bottom: 0;
+        float: right;
+        position: static;
+        right: 0px;
+    }
+    #buttons-progressbar .btn {
+        display: block;
+        float: none;
+    }
+
+    .page-content {
+        margin-bottom: 0;
+    }
+
+    #learning_path_main {
+        height: 100%;
+        overflow: hidden;
+        width: 100%;
+    }
+    #learning_path_left_zone {
+        clear: left;
+        margin: auto;
+        padding: 0;
+        width: 90%;
+        min-height: 0px;
+    }
+    #hide_bar {
+        width: 10%;
+        min-height: 0px;
+    }
+    #learning_path_right_zone {
+        min-height: 0px;
+    }
+    #learning_path_right_zone.Mostrar {
+        margin-left: 100%;
+        width: 0%;
+    }
+    #learning_path_right_zone.Ocultar {
+        margin-left: 10%;
+        width: 90%;
+    }
+}
+/* Landscape phones and down  - Solo Smartphone*/
+@media (max-width: 480px) {
+
+
+}
+
+/* FIN DE CSS CHAMILO */

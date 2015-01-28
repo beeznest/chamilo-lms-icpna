@@ -1,20 +1,25 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html lang="{{ document_language }}" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>    <html lang="{{ document_language }}" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>    <html lang="{{ document_language }}" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--><html lang="{{ document_language }}" class="no-js"> <!--<![endif]-->
+<head>
+    {% include "default/layout/head.tpl" %}
+</head>
+<body>
 {% block header %}
-{% include "default/layout/main_header.tpl" %}    
 {% endblock %}
+<!-- START PAGE -->
+<div id="page-wrap">
+    <div class="container">
+        <div class="row">
+                {% block body %}
+                {% endblock %}
+        </div>
+    </div>
 
-{% block body %}	
-	{% if show_sniff == 1 %}
-	 	{% include "default/layout/sniff.tpl" %}
-	{% endif %}
-{% endblock %}
-
+</div>
+<!-- FIN PAGE -->
 {% block footer %}
-    {#  Footer  #}
-    {% if show_footer == true %}
-        </div> <!-- end of #row" -->
-        </div> <!-- end of #main" -->
-        <div class="push"></div>
-        </div> <!-- end of #wrapper section -->
-    {% endif %}
 {% include "default/layout/main_footer.tpl" %}
 {% endblock %}

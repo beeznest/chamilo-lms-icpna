@@ -1,0 +1,604 @@
+/*
+CSS Diseño V-learning 2015
+*/
+/* 
+    Author     : alex.aragon@beeznest.com
+*/
+/* CSS GENERALES */
+@import url(http://fonts.googleapis.com/css?family=Roboto+Condensed:400,300,300italic,400italic,700,700italic);
+a{
+  color: #797979;
+}
+html,body{
+  height:100%;
+}
+a:hover{
+  color: #282828;
+  text-decoration: none;
+}
+body{
+	font-family: 'Roboto Condensed', sans-serif;
+	background-image: url(../img/bgimage.jpg);
+    background-position: center 0;
+    background-size: cover;
+  color: #797979;
+}
+#page-wrap{
+  margin: auto;
+  height: auto;
+  min-height:100%;
+}
+#page-wrap:after{
+  width: 100%;
+  height:255px;
+  display:block;
+  clear:both;
+}
+footer{
+  height: 255px;
+  margin: -196px auto 0;
+}
+header .logo-icpna{
+    text-align: right;
+    padding-top: 30px;
+}
+.logobg{
+  background-color: #528ad5;
+  text-align: center;
+  padding-top: 1.5em;
+  padding-bottom: 1.5em;
+}
+
+.titulo{
+  font-weight: 300;
+  font-size: 35px;
+  margin-bottom: 1em;
+}
+.bg-group01{
+  background-color: #528ad5;
+}
+.bg-group02{
+  background-color: #ffd200;
+}
+.bg-group03{
+  background-color: #87c10b;
+}
+.bg-group04{
+  background-color: #b670db;
+}
+.bg-group05{
+  background-color: #ff633d;
+}
+.bg-disabled{
+  background-color: #e5e5e5;
+}
+
+.bloque-item{
+  background-color: #ffffff;
+  border: solid 1px #cccccc;
+  position: relative;
+  margin-bottom: 15px;
+}
+.bloque-item:before, .bloque-item:after {
+  z-index: -1;
+  position: absolute;
+  content: "";
+  bottom: 15px;
+  left: 10px;
+  width: 50%;
+  top: 10%;
+  max-width:300px;
+  background: rgba(0, 0, 0, 0.7);
+  -webkit-box-shadow: 0 15px 10px rgba(0,0,0, 0.7);
+  -moz-box-shadow: 0 15px 10px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 15px 10px rgba(0, 0, 0, 0.7);
+  -webkit-transform: rotate(-3deg);
+  -moz-transform: rotate(-3deg);
+  -o-transform: rotate(-3deg);
+}
+
+.bloque-item:after {
+  -webkit-transform: rotate(3deg);
+  -moz-transform: rotate(3deg);
+  -o-transform: rotate(3deg);
+  right: 10px;
+  left: auto;
+}
+.bloque-item .icon{
+  width: auto;
+  display: inline-block;
+}
+.bloque-item .text{
+  display: inline-block;
+  padding-left: 10px;
+}
+.page-content {
+  margin-bottom: 8em;
+}
+.row-fluid.modulo {
+  margin-bottom: 15px;
+}
+/* GRUPOS DE MODULOS */
+.course{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.course:after{
+  clear: both;
+}
+.course:before, .course:after{
+  content: "";
+  display: table;
+  line-height: 0;
+}
+.course .item{
+  width: 140px;
+  height: 78px;
+  float: left;
+  margin-left: 20px;
+  padding-right: 10px;
+  min-height: 1px;
+}
+.course .item-title{
+  width: 145px;
+  float: left;
+  margin-left: 0px;
+  min-height: 1px;
+}
+.course .item-top{
+  padding-top: 25px;
+}
+.item-ex{
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+}
+.lesson-top{
+  background: url("../img/curso/barrita.png") repeat-x;
+  display: inline-block;
+  width: 100%;
+  margin-bottom: 10px;
+}
+.course .link{
+  margin-top: 35px;
+  margin-bottom: 30px;
+  padding-left: 35px;
+  display: block;
+}
+.cube-lesson{
+  width: 200px;
+  float: left;
+  margin-left: 20px;
+  min-height: 1px;
+  margin-bottom: 15px;
+}
+.lesson-completed{
+  background: url("../img/curso/icon-item-completed.png") no-repeat 0px center;
+  display: inline-block;
+}
+.lesson-progress{
+  background: url("../img/curso/icon-item-progress.png") no-repeat 0px center;
+  display: inline-block;
+}
+.lesson-closed{
+  background: url("../img/curso/icon-item-closed.png") no-repeat 0px center;
+  display: inline-block;
+}
+.lesson-completed img,.lesson-closed img, .lesson-progress img{
+  margin-right: 10px;
+}
+.block-lesson .row-fluid{
+  padding-bottom: 10px;
+}
+.block-extras .course .item-title{
+  width: 120px;
+}
+.block-extras .course .item .item-top{
+  padding-top: 30px;
+}
+.user-advanced{
+  padding-top: 15px;
+  width: 230px;
+  position: relative;
+}
+.user-advanced .progress{
+  height: 10px;
+  position: relative;
+}
+.user-advanced .progress .bar{
+  background: #b670db;
+}
+.user-advanced span{
+  position: absolute;
+  bottom: 15px;
+  right: -35px;
+}
+.title-course{
+  margin: 0 0 10px 0;
+  padding: 0;
+  list-style: none;
+}
+.title-course li{
+  display: inline-block;
+}
+.title-course h3, .title-course h4{
+  margin: 0;
+  padding: 0;
+}
+.title-course h4{
+  color: #528AD5;
+}
+.group05 {
+  list-style: none;
+  margin-left: -30px;
+  margin-bottom: 0px;
+}
+
+.group01:after,
+.group02:after,
+.group03:after,
+.group04:after,
+.group05:after {
+  clear: both;
+}
+.group01:before, .group01:after,
+.group02:before, .group02:after,
+.group03:before, .group03:after,
+.group04:before, .group04:after,
+.group05:before, .group05:after
+{
+  content: "";
+  display: table;
+  line-height: 0;
+}
+
+.group01 .item,
+.group02 .item,
+.group03 .item,
+.group04 .item,
+.group05 .item
+{
+  width: 92px;
+  height: 78px;
+  float: left;
+  margin-left: 20px;
+  padding-right: 10px;
+  min-height: 1px;
+  border-right: 1px solid #cccccc;;
+}
+.group01 .item-title,
+.group02 .item-title,
+.group03 .item-title,
+.group04 .item-title,
+.group05 .item-title
+{
+  width: 130px;
+  float: left;
+  margin-left: 30px;
+  min-height: 1px;
+}
+.group01 .closed,
+.group02 .closed,
+.group03 .closed,
+.group04 .closed,
+.group05 .closed{
+  background: url("../img/modulos/icon-clase-cerrada.png") no-repeat 10px 3px;
+}
+.group01 .finalized{
+  background: url("../img/modulos/icon-clase-finalizada-group01.png") no-repeat center 5px;
+}
+.group01 .open{
+  background: url("../img/modulos/icon-clase-progreso-group01.png") no-repeat center 5px;
+}
+.group02 .finalized{
+  background: url("../img/modulos/icon-clase-finalizada-group02.png") no-repeat center 5px;
+}
+.group02 .open{
+  background: url("../img/modulos/icon-clase-progreso-group02.png") no-repeat center 5px;
+}
+.group03 .finalized{
+  background: url("../img/modulos/icon-clase-finalizada-group03.png") no-repeat center 5px;
+}
+.group03 .open{
+  background: url("../img/modulos/icon-clase-progreso-group03.png") no-repeat center 5px;
+}
+.group04 .finalized{
+  background: url("../img/modulos/icon-clase-finalizada-group04.png") no-repeat center 5px;
+}
+.group04 .open{
+  background: url("../img/modulos/icon-clase-progreso-group04.png") no-repeat center 5px;
+}
+.group05 .finalized{
+  background: url("../img/modulos/icon-clase-finalizada-group05.png") no-repeat center 5px;
+}
+.group05 .open{
+  background: url("../img/modulos/icon-clase-progreso-group05.png") no-repeat center 5px;
+}
+/* FIN DE GRUPOS DE MODULOS */
+
+.text-closed{
+  font-size: 12px;
+  padding-right: 40px;
+  padding-top: 32px;
+  text-align: right;
+  color: #ffffff;
+}
+.text-finalized{
+  font-size: 12px;
+  padding-right: 26px;
+  padding-top: 30px;
+  text-align: right;
+  color: #ffffff;
+}
+.text-open{
+  font-size: 12px;
+  padding-right: 23px;
+  padding-top: 30px;
+  text-align: right;
+}
+.group01 .text-open a {
+  color: #14478C;
+}
+.group02 .text-open a {
+  color: #D75B3C;
+}
+.group03 .text-open a {
+  color: #316D00;
+}
+.group04 .text-open a {
+  color: #711E88;
+}
+.group05 .text-open a {
+  color: #A72E13;
+}
+.text-group{
+  color: #ffffff;
+  background-color: #528ad5;
+}
+#terminos{
+  width: 380px;
+  height: 250px;
+  overflow-y: scroll;
+  background-color: #a3a3a3;
+  color: #ffffff;
+  padding: 20px;
+}
+.boton-continuar{
+ padding-top: 2.5em;
+  text-align: right;
+}
+.btn-blue{
+  background:#528ad5;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  border:none;
+  font-family: 'Roboto Condensed', sans-serif;
+  font-weight: 700;
+  padding-right: 40px;
+  padding-left: 40px;
+  color:#ffffff;
+  text-shadow: none;
+}
+.btn-blue:hover{
+  background:#467dc8;
+  color: #ffffff;
+}
+.divisor-line{
+  border-top: solid 1px #cccccc;
+  border-bottom: solid 1px #cccccc;
+  margin-top: 75px;
+  padding-top: 1em;
+  padding-bottom: 1em;
+}
+footer{
+
+}
+footer ul{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+footer h4{
+  font-size: 14px;
+  color: #797979;
+}
+footer a{
+  color: #797979;
+}
+.subfooter{
+  color: #797979;
+  padding-top: 1em;
+  padding-bottom: 1em;
+}
+.logo-movistar-terminos{
+  padding-top: 2em;
+}
+footer .red-social a{
+  border: none;
+  margin-right: 5px;
+}
+footer .red-social{
+  float: right;
+}
+ /* CSS LOGIN USER */
+ #login-user{
+ 	
+ 	width: 300px;
+ 	padding-left: 70px;
+ }
+ #login-user .logo{
+ 	background-color: #528ad5;
+ 	text-align: center;
+ 	padding-top: 45px;
+ 	padding-bottom: 35px;
+ }
+.logo-movistar{
+ 	text-align: center;
+ 	padding-top: 5px;
+ }
+ #login-user .form-login{
+ 	padding-left: 8%;
+ 	padding-top: 55px;
+ 	padding-bottom: 40px;
+ 	background-color: #FFF;
+ }
+ #login-user .ingresa{
+ 	text-align: center;
+ 	background-color: #FFF;
+ 	border-bottom: 6px solid #528ad5;
+ }
+ #login-user .alert{
+ 	margin-bottom: 0;
+ 	-webkit-border-radius: 0px;
+	-moz-border-radius: 0px;
+	border-radius: 0px;
+ }
+ #login-user label{
+ 	color: #797979;
+ }
+ #login-user .pass{
+ 	text-align: right;
+ 	padding-right: 25px;
+ 	font-style: italic;
+ }
+ #login-user .pass a{
+ 	color: #797979;
+ }
+ #login-user .pass a:hover{
+ 	color: #797979;
+ 	text-decoration: none;
+ }
+
+ #login-user .ingresa .btn-primary{
+ 	background:#528ad5;
+ 	-webkit-border-radius: 0px;
+	-moz-border-radius: 0px;
+	border-radius: 0px;
+	border:none;
+	font-family: 'Roboto Condensed', sans-serif;
+	font-weight: 700;
+	width: 150px;
+ }
+ #login-user .ingresa .btn-primary:hover{
+ 	background:#467dc8;
+ }
+ .form-login .input-append .add-on,.form-login .input-prepend .add-on{
+ 	background-color: #C50D00;
+ 	border: solid 1px #C50D00;
+ 	text-shadow:none;
+ }
+ .form-login .fa-lock, .form-login .fa-user{
+ 	color: #ECD1B7;
+ }
+#forgot_password{
+  background-color: #ffffff;
+  padding-top: 2em;
+}
+#forgot_password h4{
+  margin: 0 0 10px 0;
+  padding: 0;
+  color: #797979;
+}
+#forgot_password .pass{
+  text-align: right;
+  padding-right: 25px;
+  font-style: italic;
+}
+#forgot_password .linkform{
+  color: #797979;
+}
+#forgot_password .ingresa{
+  padding-top: 2.5em;
+}
+#forgot_password .content-forgot-pass{
+  padding-left: 8%;
+}
+#forgot_password .input-append .add-on,#forgot_password .input-prepend .add-on{
+  background-color: #C50D00;
+  border: solid 1px #C50D00;
+  text-shadow:none;
+}
+#forgot_password .fa-user{
+  color: #ECD1B7;
+}
+.logo-icpna{
+  padding-top: 25px;
+}
+/* Bloque User */
+.bloque-user .header-logo{
+  background-color: #528ad5;
+  text-align: center;
+  padding-top: 1.5em;
+  padding-bottom: 1.5em;
+}
+.bloque-user .profile{
+  background: #ffffff;
+}
+.bloque-user .home{
+  text-align: center;
+}
+.bloque-user .image-user{
+  text-align: center;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+.img-responsive{
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.bloque-user .img-circle{
+  border: 6px solid #e3e3e3;
+  width: 88px;
+  height: auto;
+}
+.bloque-user .img-user-width{
+  margin: auto;
+}
+.bloque-user .name,.bloque-user .lastname, .bloque-user .cuenta{
+  text-align: center;
+}
+.bloque-user .name{
+  font-weight: bold;
+  font-size: 18px;
+}
+.bloque-user .cuenta{
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+.bloque-user .cuenta a{
+  color: #c83314;
+  font-size: 14px;
+  font-weight: bold;
+}
+.bloque-user .closed{
+  text-align: right;
+  padding-right: 10px;
+}
+.bloque-user .help{
+  padding-left: 10px;
+  background-color: #528ad5;
+  padding-top: 4px;
+}
+.bloque-user .help a{
+  color: #ffffff;
+  cursor: pointer;
+}
+.bloque-user .closed a{
+  cursor: pointer;
+}
+.bloque-user .options{
+  margin-top: 30px;
+}
+.bloque-user .profile{
+  border-bottom: 4px solid #528ad5;
+}
+.page-content .logo-icpna{
+  text-align: right;
+}
+/*Modulos*/
+.modulos{
+  margin-top: 90px;
+}

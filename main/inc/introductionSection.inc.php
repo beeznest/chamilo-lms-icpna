@@ -220,13 +220,13 @@ if ($intro_editAllowed) {
                 //Check if directory exists or create it if it doesn't
                 $dir = api_get_path(SYS_COURSE_PATH).api_get_course_path().'/upload/course_home_icons';
                 if (!is_dir($dir)) {  //if (!file_exists($path)) {
-                    if (!mkdir($dir, api_get_permissions_for_new_directories())) {
+                    if (!mkdir($dir, api_get_permissions_for_new_directories(), true)) {
                         //error message
                     }
                 }
 
                 //change filename if already exists
-                /*$i = '';
+                $i = '';
                 $ext = explode('.', basename($_FILES['icon']['tmp_name']));
                 if (count($ext) > 1) {
                     $ext = array_pop($ext);
@@ -240,7 +240,7 @@ if ($intro_editAllowed) {
                     $i++;
                     $new_file_name = $file_name_no_ext.'_'.$i.$ext;
                     $file_exists = file_exists($path.$new_file_name);
-                }*/
+                }
 
                 //Resize image if it is larger than 64px
                 $temp = new Image($_FILES['icon']['tmp_name']);
@@ -388,11 +388,11 @@ if ($tool == TOOL_COURSE_HOMEPAGE && !isset($_GET['intro_cmdEdit'])) {
 	} 
 }
 
-$introduction_section .= '<div class="row"><div class="span12">';
+$introduction_section .= '<div class="row"><div class="span9">';
 $introduction_section .=  $thematic_description_html;
 $introduction_section .=  '</div>';
 
-$introduction_section .=  '<div class="span12">';
+$introduction_section .=  '<div class="span9">';
 if ($intro_dispDefault) {
     $intro_content = $intro_content;
     if (!empty($intro_content))	{

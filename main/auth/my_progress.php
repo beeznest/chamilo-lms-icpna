@@ -87,7 +87,7 @@ if (!empty($dates)) {
     if (!empty($content)) {
         $content .= '<br /><br />';
     }
-    $content .= '<div class="row"><div class="span12">'.Display::page_subheader(get_lang('Timeline')).'</div>';
+    $content .= '<div class="row"><div class="span9">'.Display::page_subheader(get_lang('Timeline')).'</div>';
 
     $content .= '<div id="my_timeline">
         <div class="actions">

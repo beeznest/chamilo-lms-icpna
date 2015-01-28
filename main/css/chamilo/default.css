@@ -667,10 +667,8 @@ color: #fff;
   width:100%;
 }
 #learning_path_left_zone {
+    clear: left;
     float: left;
-    padding-left: 8px;
-    padding-right: 4px;
-    width: 235px;
 }
 /*FIN DEL ESTILO PARA MODULO DE SCROOM*/
 .new_actions-fixed {

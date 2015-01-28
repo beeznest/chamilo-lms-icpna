@@ -300,8 +300,6 @@ if ($_SESSION['oLP']->mode == 'fullscreen') {
     $htmlHeadXtra[] = "<script>window.open('$src','content_id','toolbar=0,location=0,status=0,scrollbars=1,resizable=1');</script>";
 }
 
-// Not in fullscreen mode.
-Display::display_header($nameTools); //para fullscreen el scroom
 
 // Check if audio recorder needs to be in studentview.
 if (isset($_SESSION['status']) && $_SESSION['status'][$course_code] == 5) {
@@ -349,7 +347,18 @@ if (Database::num_rows($res_media) > 0) {
     }
 }
 
-echo '<div id="learning_path_main" style="width:100%;height:100%;">';
+// Not in fullscreen mode.
+Display::display_header($nameTools, null, null, 0, array(
+    'lesson_progress_bar' => $progress_bar,
+    'hide_bar' => 1,
+    'isInLP' => true
+)); //para fullscreen el scroom
+
+?>
+    <div class="frame-page-lesson span12">
+    <div id="learning_path_main">
+    <div id="scorm_title" class="visible-phone scorm_title"><?php echo Security::remove_XSS($_SESSION['oLP']->get_name()) ?></div>
+<?php
     $is_allowed_to_edit = api_is_allowed_to_edit(null, true, false, false);
     /*
     if ($is_allowed_to_edit) {
@@ -364,8 +373,9 @@ echo '<div id="learning_path_main" style="width:100%;height:100%;">';
         echo '</div>';
     }
     */
-
-    echo '<div id="learning_path_left_zone" class="help-left-zone"> ';
+    ?>
+    <div id="learning_path_left_zone">
+    <?php
     /*
     echo '<div id="header">
             <table>
@@ -444,19 +454,16 @@ echo '<div id="learning_path_main" style="width:100%;height:100%;">';
 
     <!-- right zone -->
     <!-- <div id="learning_path_right_zone"  style="margin-left:<?php echo $margin_left;?>;height:100%" >  Antiguo -->
-    <div id="learning_path_right_zone" class="Mostrar">
-    <?php
-        // hub 26-05-2010 Fullscreen or not fullscreen
-        $height = '100%';
-        if ($_SESSION['oLP']->mode == 'fullscreen') {
-            echo '<iframe id="content_id_blank" name="content_name_blank" src="blank.php" border="0" frameborder="0" style="width:100%;height:'.$height.'" ></iframe>';
-        } else {
-            echo '<iframe id="content_id" name="content_name" src="'.$src.'" border="0" frameborder="0"  class="redimension-scorm"></iframe>';
-        }
-    ?>
+    <div id="learning_path_right_zone">
+        <?php if ($_SESSION['oLP']->mode == 'fullscreen') { ?>
+            <iframe id="content_id_blank" name="content_name_blank" src="blank.php" border="0" frameborder="0" style="width:100%; height:100%;" ></iframe>
+        <?php } else { ?>
+            <iframe id="content_id" name="content_name" src="<?php echo $src ?>" border="0" frameborder="0" ></iframe>
+        <?php } ?>
     </div>
 
     <!-- end right Zone -->
+</div>
 </div>
 
 <script>
@@ -540,4 +547,6 @@ $_setting['show_navigation_menu'] = $save_setting;
 if ($debug) {
     error_log(' ------- end lp_view.php ------');
 }
-Display::display_footer();
+Display::display_footer(array(
+    'isInLP' => true
+));

@@ -295,9 +295,7 @@
                         </ol>
                 </ol>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
-            </div>
+
         </div>
     </div>
 </div>
@@ -338,13 +336,11 @@
                     Juan de Arona 786, piso 11, San Isidro, Lima, Perú; o
                     al correo electrónico: <a HREF="mailto:alicia.delcorral@telefonica.com"><u>alicia.delcorral@telefonica.com</u></a></p>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
-            </div>
+
         </div>
     </div>
 </div>
-<div class="modal fade"  style="display: none;" id="terminos" tabindex="-1" role="dialog" aria-labelledby="terminosLabel" aria-hidden="true">
+<div class="modal fade"  style="display: none;" id="terminos-condiciones" tabindex="-1" role="dialog" aria-labelledby="terminosLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -352,163 +348,79 @@
                 <h4 class="modal-title" id="terminosLabel">T&eacute;rminos y Condiciones del servicio</h4>
             </div>
             <div class="modal-body">
-                <p CLASS="western" ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                <u><B>Descripción
-                        del curso</B></u></p>
-                <p CLASS="western" ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                </p>
-                <p CLASS="western" ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                    El Curso tiene dos
-                    (2) tipos de programas:</p>
-                <ul>
-                    <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                            Niños (6 a 9
-                            años):</p>
-                        <ul>
-                            <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                                    Compuesto por dos
-                                    (2) niveles, cada uno con 12 módulos de 10 horas de dictado
-                                    obligatorio y 5
-                                    horas de estudio práctico.</p>
-                            <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">Es requisito que
-                                    el alumno tenga al menos 6 años cumplidos al momento de la
-                                    inscripción.</p>
+
+                <h2 class="modal-title-content">Descripción del curso</h2>
+                <p>El Curso tiene dos (2) tipos de programas:</p>
+                <h2 class="title-yellow">Niños (6 a 9 años):</h2>
+                <ul class="list-red">
+                    <li>Compuesto por dos (2) niveles, cada uno con 12 módulos de 10 horas de dictado obligatorio y 5 horas de estudio práctico.</li>
+                    <li>Es requisito que el alumno tenga al menos 6 años cumplidos al momento de la nscripción.</li>
+                </ul>
+                </ul>
+                <h2 class="title-purple"> Jóvenes-Adultos (10 años a más): </h2>
+                <ul class="list-purple">
+                    <li>Compuesto por tres (3) niveles:</li>
+                </ul>
+                        <ul class="list-rosa">
+                            <li>Básico con 10 módulos.</li>
+                            <li>Intermedio con 10 módulos.</li>
+                            <li>Avanzado con 5 módulos.</li>
                         </ul>
+                    <ul class="list-purple">
+                    <li>Cada módulo cuenta con 20 horas de dictado obligatorio y 10
+                        horas de estudio práctico.</li>
+                    <li>Es requisito que el alumno tenga al menos 10 años cumplidos al momento de la inscripción.</li>
                 </ul>
-                <p ALIGN=JUSTIFY STYLE="margin-left: 1cm; margin-bottom: 0.11cm; line-height: 100%">
-                </p>
-                <ul>
-                    <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                            Jóvenes-Adultos
-                            (10 años a más):
-                        </p>
-                        <ul>
-                            <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                                    Compuesto por tres
-                                    (3) niveles:</p>
-                                <ul>
-                                    <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                                            Básico con 10 módulos.</p>
-                                    <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                                            Intermedio con 10 módulos.</p>
-                                    <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                                            Avanzado con 5 módulos.</p>
-                                </ul>
-                        </ul>
                 </ul>
-                <p ALIGN=JUSTIFY STYLE="margin-left: 1.5cm; margin-bottom: 0.11cm; line-height: 100%">
-                </p>
-                <ul>
-                    <ul>
-                        <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                                Cada módulo cuenta con 20 horas de dictado obligatorio y 10
-                                horas de estudio práctico.</p>
-                        <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                                Es requisito que
-                                el alumno tenga al menos 10 años cumplidos al momento de la
-                                inscripción.</p>
-                    </ul>
-                </ul>
-                <p ALIGN=JUSTIFY STYLE="margin-left: 1cm; margin-bottom: 0.11cm; line-height: 100%">
-                </p>
-                <ol>
-                    <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                        En el primer acceso al curso, el alumno tendrá la opción (por única vez) de rendir un examen de clasificación o podrá optar por empezar el curso desde el primer módulo.</p>
+                <p>En el primer acceso al curso, el alumno tendrá la opción (por única vez) de rendir un examen de clasificación o podrá optar por empezar el curso desde el primer módulo.</p>
+
+                <p>Para avanzar de un módulo a otro, el alumno deberá acceder al total de horas obligatorias, y haber aprobado el examen final con una nota de 70%, equivalente a 14/20. En el programa de niños, el alumno tendrá 3 oportunidades para aprobar el examen final, en un tiempo máximo de 30 minutos. En el programa de jóvenes/adultos, habrá 1 oportunidad en un tiempo máximo de 20 minutos. </p>
+                <p>Si el estudiante reprueba el examen final o no finaliza las horas de dictado en el plazo de 60 días (2 meses), no podrá acceder al siguiente módulo y se considerará reprobado.</p>
                 </ol>
-                <p ALIGN=JUSTIFY STYLE="margin-left: 0.5cm; margin-bottom: 0.11cm; line-height: 100%">
-                </p>
-                <ol START=2>
-                    <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                         Para avanzar de un módulo a otro, el alumno deberá acceder al total de horas obligatorias, y haber aprobado el examen final con una nota de 70%, equivalente a 14/20. En el programa de niños, el alumno tendrá 3 oportunidades para aprobar el examen final, en un tiempo máximo de 30 minutos. En el programa de jóvenes/adultos, habrá 1 oportunidad en un tiempo máximo de 20 minutos. </p>
-                </ol>
-                <p STYLE="margin-left: 1.27cm; margin-bottom: 0.35cm; line-height: 100%">
-                </p>
-                <ol START=3>
-                    <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                          Si el estudiante reprueba el examen final o no finaliza las horas de dictado en el plazo de 60 días (2 meses), no podrá acceder al siguiente módulo y se considerará reprobado.</p>
-                </ol>
-                <p ALIGN=JUSTIFY STYLE="margin-left: 0.5cm; margin-bottom: 0.11cm; line-height: 100%">
-                </p>
-                <ol START=4>
-                    <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                         El alumno podrá imprimir un certificado digital de finalización de cada nivel y/o finalización del curso si concluye el 70% de las horas del módulo y aprueba el examen final.</p>
-                </ol>
-                <p ALIGN=JUSTIFY STYLE="margin-left: 1cm; margin-bottom: 0.11cm; line-height: 100%">
-                </p>
-                <ol START=5>
-                    <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                        El ritmo de avance en el curso es flexible y depende de la programación del tiempo del alumno. Se puede avanzar como máximo tres (3) módulos al mes.</p>
-                </ol>
-                <p ALIGN=JUSTIFY STYLE="margin-left: 0.5cm; margin-bottom: 0.11cm; line-height: 100%">
-                </p>
-                <ol START=6>
-                    <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                            Si el alumno no
-                            registra avance en el Curso en 60 días, se procederá a su
-                            desafiliación de manera automática</p>
-                </ol>
-                <ol START=7>
-                    <li><p ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                            El alumno deberá tener en cuenta que la Lección A debe trabajarse en una PC o Laptop. Para seguir practicando donde lo desee, la Lección B se puede trabajar en cualquier dispositivo móvil.</p>
-                </ol>
-                <p CLASS="western" STYLE="margin-bottom: 0.35cm">
-                </p>
-                <p CLASS="western" ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                <u><b>Requerimientos técnicos para acceder al curso</b></u></p>
-                <p CLASS="western" ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                   El alumno deberá contar con una PC o Laptop con acceso a Internet, con las siguientes características:
-                </p>
-                <p CLASS="western" ALIGN=JUSTIFY STYLE="margin-bottom: 0.11cm; line-height: 100%">
-                </p>
-                <table class="table" WIDTH=574 CELLPADDING=7 CELLSPACING=0>
-                    <col WIDTH=192>
-                    <col WIDTH=355>
-                    <tr VALIGN=TOp>
-                        <td WIDTH=192 STYLE="border: none; padding: 0cm">
-                            <p CLASS="western" ALIGN=CENTER><B>Sistema
-                                    Operativo</B></p>
+                <p>El alumno podrá imprimir un certificado digital de finalización de cada nivel y/o finalización del curso si concluye el 70% de las horas del módulo y aprueba el examen final.</p>
+                <p>El ritmo de avance en el curso es flexible y depende de la programación del tiempo del alumno. Se puede avanzar como máximo tres (3) módulos al mes.</p>
+                <p>Si el alumno no registra avance en el Curso en 60 días, se procederá a su desafiliación de manera automática</p>
+                <p>El alumno deberá tener en cuenta que la Lección A debe trabajarse en una PC o Laptop. Para seguir practicando donde lo desee, la Lección B se puede trabajar en cualquier dispositivo móvil.</p>
+
+                <h2 class="title-green">Requerimientos técnicos para acceder al curso</h2>
+
+                <p>El alumno deberá contar con una PC o Laptop con acceso a Internet, con las siguientes características: </p>
+
+                <table class="table-modal" border="3">
+                    <tr>
+                        <td class="bold">
+                            Sistema Operativo
                         </td>
-                        <td WIDTH=355 STYLE="border: none; padding: 0cm">
-                            <p CLASS="western" ALIGN=JUSTIFY STYLE="margin-bottom: 0.2cm"><SPAN LANG="en-US">Windows
-                                    XP/7/8, Linux, MAC, Android</span></p>
+                        <td>
+                            Windows XP/7/8, Linux, MAC, Android
                         </td>
                     </tr>
-                    <tr VALIGN=TOp>
-                        <td WIDTH=192 STYLE="border: none; padding: 0cm">
-                            <p CLASS="western" ALIGN=CENTER><B>Características
-                                    de la PC o laptop</B></p>
+                    <tr>
+                        <td class="bold">
+                            Características de la PC o laptop
                         </td>
-                        <td WIDTH=355 STYLE="border: none; padding: 0cm">
-                            <p CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0.0cm; text-indent: -0cm; margin-bottom: 0.11cm">
-                                * Procesador Pentium IV o superiores</BR>* 512 MB de memoria RAM</BR>* Resolución de 1024 x 768.</BR>* Flash Player Versión 10 o superior</BR>* Java 7.0</BR>* Software de reconocimiento de voz</BR>* Contar con dispositivos de salida y entrada de audio (parlantes o audífonos).</BR>* Capacidad de reproducir sonidos MP3</BR>* Adobe Reader última versión.</p>
+                        <td>
+                            * Procesador Pentium IV o superiores</BR>* 512 MB de memoria RAM</BR>* Resolución de 1024 x 768.</BR>* Flash Player Versión 10 o superior</BR>* Java 7.0</BR>* Software de reconocimiento de voz</BR>* Contar con dispositivos de salida y entrada de audio (parlantes o audífonos).</BR>* Capacidad de reproducir sonidos MP3</BR>* Adobe Reader última versión.</p>
                         </td>
                     </tr>
-                    <tr VALIGN=TOp>
-                        <td WIDTH=192 STYLE="border: none; padding: 0cm">
-                            <p CLASS="western" ALIGN=CENTER STYLE="margin-bottom: 0.2cm"><B>Características
-                                    de la conexión a Internet</B></p>
+                    <tr>
+                        <td class="bold">
+                            Características de la conexión a Internet
                         </td>
-                        <td WIDTH=355 STYLE="border: none; padding: 0cm">
-                            <p CLASS="western" ALIGN=JUSTIFY>Ancho
-                                de Banda: Mínimo: 0.6 MB / Óptimo: 1 MB en adelante.</p>
+                        <td>
+                            Ancho de Banda: Mínimo: 0.6 MB / Óptimo: 1 MB en adelante.
                         </td>
                     </tr>
-                    <tr VALIGN=TOp>
-                        <td WIDTH=192 STYLE="border: none; padding: 0cm">
-                            <p CLASS="western" ALIGN=CENTER><SPAN LANG="en-US"><B>Navegadores
-                                    </B></span>
-                            </p>
+                    <tr>
+                        <td class="bold">
+                            Navegadores
+
                         </td>
-                        <td WIDTH=355 STYLE="border: none; padding: 0cm">
-                            <p CLASS="western" ALIGN=JUSTIFY STYLE="background: transparent"><SPAN STYLE="background: transparent">Es
-                                    necesario usar Mozilla Firefox 17 o superior (Recomendado), y/o
-                                    Google Chrome.</span></p>
+                        <td>
+                            Es necesario usar Mozilla Firefox 17 o superior (Recomendado), y/o Google Chrome.</p>
                         </td>
                     </tr>
                 </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
@@ -530,42 +442,54 @@
                         <li>
                             Los programas de estudio en linea ofrecen una mayor cantidad de horas de enseñanza y aprendizajes que cualquier otra plataforma similar en el mercado (ej. V-Learning = 750 horas; V-Learning Kids = 360 horas), lo cual permite un solido desarrollo del idioma inglés en diversas competencias y destrezas.
                         </li>
-
                         <li>Los alumnos podrán contar con tutoriales y guías que los orienten sobre el uso y funcionalidad de la   plataforma que están usando. Además, las instrucciones están redactadas en inglés y español hasta que se familiaricen con el idioma.</li>
-
                         <li>Las destrezas y competencias desarrolladas incluyen la compresión auditiva y lectora, el habla, la escritura, vocabulario, gramática, y pronunciación, entre otros aspectos.</li>
-
                         <li>Los ejercicios cuentan con retroalimentación de tipo metalingüístico, lo cual explica por qué una respuesta fue correcta o incorrecta.</li>
-
                         <li>Las plataformas cuentan con contenidos “extra” para prácticas adicionales cuando se hayan terminado las lecciones A y B, como “Trace Effects, un mundo virtual 3D que le permite al alumno usar el inglés de manera interactiva y divertida con diversos personajes o Winnie's World, que representa un “mundo” imaginario para niños.</li>
-
                         <li>Los cursos cuenta con exámenes de practica para que los alumnos puedan afianzar sus aprendizaje y sentir mayor confianza antes de rendir la evaluación final.</li>
-
                         <li>Los self-assessments o auto-evaluaciones, permite a los alumnos ver un resumen de lo que han aprendido y comparar sus destreza oral con modelos tanto de inglés americano como de inglés internacional.</li>
-
                         <li>Los alumnos podrán ver las metas y objetivos del curso, así como confirmar sus logros de aprendizaje.</li>
-
                         <li>Los contenidos son accesibles mediante una PC (Lecciones A & B) o dispositivo móvil (Lección B).</li>
-
-                        <li>Los contenidos están alineados con exámenes y estándares internacionales, lo cual le permitirá a alumno tener mayores posibilidades de éxito cuanto tome un examen con el TOEIC, TOEFL u otros.	</li>
+                        <li>Los contenidos están alineados con exámenes y estándares internacionales, lo cual le permitirá a alumno tener mayores posibilidades de éxito cuanto tome un examen con el TOEIC, TOEFL u otros. </li>
                     </ol>
                 </div>
                 <div class="beneficios-footer">
                     <div class="cont-padding">
-                        <div class="row">
-                            <div class="span4 icpna">
+                        <div class="row-fluid">
+                            <div class="span6 icpna">
                                 <img src="/main/css/icpnatdp/images/logoicpna.png">
                             </div>
-                            <div class="span4 movistar">
+                            <div class="span6 movistar">
                                 <img src="/main/css/icpnatdp/images/logomovistar.png">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+
+        </div>
+    </div>
+</div>
+<!--Modal Video Help-->
+<div class="modal fade large" style="display: none;" id="help" tabindex="-1" role="dialog" aria-labelledby="helplabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <div class="modal-body">
+                <video controls="controls" height="381" width="830">
+                    <source src="http://vlearning.icpna.edu.pe/html/welcome_vlearning.mp4" type="video/mp4">
+                    <source src="http://vlearning.icpna.edu.pe/html/welcome_vlearning.webm" type="video/webm">
+                    <source src="http://vlearning.icpna.edu.pe/html/welcome_vlearning.ogv" type="video/ogg">
+                    <object type="application/x-shockwave-flash" data="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf" height="360" width="640">
+                        <param name="movie" value="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf">
+                        <param name="allowFullScreen" value="true">
+                        <param name="wmode" value="transparent">
+                        <param name="flashVars" value="config={'playlist':['/bundles/applicationsubscriber/images/header-logo.png',{'url':'http://vlearning.icpna.edu.pe/html/welcome_vlearning.mp4','autoPlay':false}]}">
+                        <img alt="V-Learning" src="/bundles/applicationsubscriber/images/header-logo.png" title="No video playback capabilities, please download the video below" height="360" width="640">
+                    </object>
+                </video>
             </div>
+
         </div>
     </div>
 </div>

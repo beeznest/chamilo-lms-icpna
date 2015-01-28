@@ -2202,10 +2202,10 @@ class learnpath
         }
         $text = $percentage . $text_add;
         //@todo use Display::display_progress();
-        $output = '<div class="progress progress-striped">
+        $output = '<span class="progresstext" id="progress_text">' . $text . '</span>
+                    <div class="progress progress-striped">
                         <div id="progress_bar_value" class="bar" style="width: '.$text.';"></div>
-                    </div>
-                    <div class="progresstext" id="progress_text">' . $text . '</div>';
+                    </div>';
 
         return $output;
     }
@@ -3042,6 +3042,7 @@ class learnpath
 
             //if ($scorm_color_background != '') {
                 $html .= '<div id="toc_' . $item['id'] . '" class="' . $add_class_level . ' ' . $add_class . ' ' . $scorm_color_background . ' ' . (($style != $scorm_color_background)?$style:'') . '">';
+                $html .= '<div class="toc_inner">';
             //}
 
             // The anchor will let us center the TOC on the currently viewed item &^D
@@ -3101,6 +3102,7 @@ class learnpath
             }
             */
 
+            $html .= "</div>";
             $html .= "</div>";
             /*
             if ($scorm_color_background != '') {

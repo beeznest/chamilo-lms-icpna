@@ -1,0 +1,33 @@
+/*
+ * Importamos los Estilos Generales
+*/
+
+@import url('../nuevo_vlearning/default.css');
+
+.location-course .item-list{
+  width: 53px;
+  text-align: center;
+}
+@media (min-width: 1024px) {
+  .location-course .item-list{
+    width: 45px;
+  }
+  .module-closed{
+    font-size: 20px;
+  }
+  .module-completed{
+    font-size: 20px;
+  }
+  .module-process{
+    font-size: 20px;
+  }
+}
+/* Portrait tablet to landscape and desktop - Escritorio pequeño o Tablet */
+@media (min-width: 768px) and (max-width: 979px) {
+  .location-course .item-list{
+    width: 50px;
+  }
+  .page-show .span9 {
+    width: 92%;
+  }
+}

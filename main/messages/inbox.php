@@ -147,10 +147,11 @@ if (api_get_setting('allow_social_tool') == 'true') {
         $social_right_content .= '</div>';
         $social_right_content .= '</div>';
     */
-        $social_right_content .= '<div class="span9">';
+        $social_right_content .= '<div class="row page-show">';
 }
 //MAIN CONTENT
-
+$social_right_content .= '<div class="span9"><h3 class="titulo"> ' . get_lang('Messages') . ' </h3></div>';
+$social_right_content .= '<div class="span9 frame-page frame-inbox">';
 if (!isset($_GET['del_msg'])) {
     $social_right_content .= MessageManager::inbox_display();
 } else {
@@ -163,6 +164,7 @@ if (!isset($_GET['del_msg'])) {
     }
     $social_right_content .= MessageManager::inbox_display();
 }
+$social_right_content .= '</div>';
 
 if (api_get_setting('allow_social_tool') == 'true') {
     $social_right_content .= '</div>';

@@ -1270,17 +1270,70 @@ class CourseHome {
                 }
             }
 
-            $show = '<div class="span2 center">'
-
-              . ($tool['visibility']==1 ? ' <a href="'.$tool['tool']['link'].'" class="state-icon-link">' : '')
-              . '   <span class="state-icon-' . $state . '">'
+            // Sequence Lessons
+            $show = '<div class="cube-lesson">'
+              . ($tool['visibility']==1 ? '' : '')
+              . '   <div class="lesson-' . $state . '">'
               . $tool['pure_icon']
-              . '   </span>'
-              . ($tool['visibility'] ? ' </a>':'')
-              . '<div class="center-items">'
+              . '   </div>'
+              . ($tool['visibility'] ? '':'')
+              . ''
               . ($tool['visibility']==1 ? '<a href="'.$tool['tool']['link'].'">'.$toolName.'</a>' : $toolName)
-               . '</div></div>';
+               . '</div>';
             $search = array("{{ ".$toolName." }}", "{{".$toolName."}}", "((".$toolName."))", "(( ".$toolName." ))");
+            if (!$editMode) {
+                $text = str_replace($search, $show, $text);
+            }
+
+            // Information lessons
+            $show = '<div class="item-top">'
+                . ($tool['visibility']==1 ? '<a href="'.$tool['tool']['link'].'">'. $tool['pure_icon'] . $toolName.'</a>' : $tool['pure_icon'] . $toolName)
+                . '</div>';
+            $search = array("{i{ ".$toolName." }i}", "{i{".$toolName."}i}", "(i(".$toolName.")i)", "(i( ".$toolName." )i)");
+            if (!$editMode) {
+                $text = str_replace($search, $show, $text);
+            }
+
+            // Extras lessons
+            $show = '<div class="item-top">'
+                . ($tool['visibility']==1 ? '<a href="'.$tool['tool']['link'].'">'. $toolName.'</a>' : $toolName)
+                . '</div>';
+            $search = array("{o{ ".$toolName." }o}", "{o{".$toolName."}o}", "(o(".$toolName.")o)", "(o( ".$toolName." )o)");
+            if (!$editMode) {
+                $text = str_replace($search, $show, $text);
+            }
+
+            // Exams lessons
+            $show = '<div class="item-ex">'
+                . ($tool['visibility']==1 ? '<a href="'.$tool['tool']['link'].'">'. $tool['pure_icon'] . $toolName.'</a>' : $tool['pure_icon'] . $toolName)
+                . '</div>';
+            $search = array("{x{ ".$toolName." }x}", "{x{".$toolName."}x}", "(x(".$toolName.")x)", "(x( ".$toolName." )x)");
+            if (!$editMode) {
+                $text = str_replace($search, $show, $text);
+            }
+
+            // Progress bar
+            $courseProgress = ceil(Tracking::get_avg_student_progress(api_get_user_id(), api_get_course_id(), null, api_get_session_id(), false, true)) . '%';
+            $show = '<div class="span4 user-advanced"><div class="progress"><div class="bar" style="width: ' . $courseProgress . '"></div></div><span>' . $courseProgress . '</span></div>';
+
+            $search = array('{{course_progress_bar}}', '{{ course_progress_bar }}', '((course_progress_bar))', '(( course_progress_bar ))');
+            if (!$editMode) {
+                $text = str_replace($search, $show, $text);
+            }
+
+            global $extAuthSource;
+
+            // Course title
+            $show = '<span class="phase-title"><a href="' . $extAuthSource['modules_path'] . '"> ' . $extAuthSource[$courseInfo['code']] .  '</a></span>';
+
+            $search = array('{{phase_title}}', '{{ phase_title }}', '((phase_title))', '(( phase_title ))');
+            if (!$editMode) {
+                $text = str_replace($search, $show, $text);
+            }
+
+            // Course phase
+            $show = '<span class="course-title"> ' . $courseInfo['title'] . '</span>';
+            $search = array('{{course_title}}', '{{ course_title }}', '((course_title))', '(( course_title ))');
             if (!$editMode) {
                 $text = str_replace($search, $show, $text);
             }

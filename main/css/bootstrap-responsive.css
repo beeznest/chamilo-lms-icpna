@@ -863,7 +863,7 @@
     margin: 0;
   }
   .modal.fade.in {
-    top: auto;
+    top: 20px;
   }
 }
 

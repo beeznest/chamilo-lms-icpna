@@ -463,7 +463,7 @@ class SocialManager extends UserManager {
 
             $html .= '<div class="social-content-image">';
                 $html .= '<div class="well social-background-content">';
-                $html .= Display::url('<img src='.$big['file'].' class="social-groups-image" /> </a><br /><br />', api_get_path(WEB_PATH).'main/social/groups.php?id='.$group_id);
+                /*$html .= Display::url('<img src='.$big['file'].' class="social-groups-image" /> </a><br /><br />', api_get_path(WEB_PATH).'main/social/groups.php?id='.$group_id);*/
                 if (GroupPortalManager::is_group_admin($group_id, api_get_user_id())) {
                     $html .= '<div id="edit_image" class="hidden_message" style="display:none"><a href="'.api_get_path(WEB_PATH).'main/social/group_edit.php?id='.$group_id.'">'.get_lang('EditGroup').'</a></div>';
                 }
@@ -477,7 +477,7 @@ class SocialManager extends UserManager {
             $normal_image = $img_array['dir'].$img_array['file'].'?'.uniqid();
 
               //--- User image
-            $html.='<div class="siderbar-social">';
+           /* $html.='<div class="siderbar-social">';
             $html .= '<div class="social-background-content">';
             $htm ='<div class="frame">';
                 if ($img_array['file'] != 'unknown.jpg') {
@@ -493,20 +493,20 @@ class SocialManager extends UserManager {
 //                    $html .= '<a href="'.api_get_path(WEB_PATH).'main/auth/profile.php">('.get_lang('EditProfile').')</a>';
                 }
             $html .= '</div>';
-            $htm .='</div>';
+            $htm .='</div>';*/
           }
 
         if (!in_array($show, array('shared_profile', 'groups', 'group_edit', 'member_list','waiting_list','invite_friends'))) {
 
             $html .= '<div class="sidebar-nav"><ul class="nav nav-list">';
             $active = $show=='home' ? 'active' : null;
-            $html .= '<li class="'.$active.'"><a href="'.api_get_path(WEB_PATH).'main/auth/profile.php">'.Display::return_icon('profile.png',get_lang('Home'),array()). get_lang('Profile') .'</a></li>';
+            $html .= '<li class="icon_profile '.$active.'"><a href="'.api_get_path(WEB_PATH).'main/auth/profile.php">'. get_lang('Profile') .'</a></li>';
             $active = $show=='messages' ? 'active' : null;
-            $html .= '<li class="'.$active.'"><a href="'.api_get_path(WEB_PATH).'main/messages/inbox.php?f=social">'.Display::return_icon('instant_message-new.png',get_lang('Messages'),array()).get_lang('Messages').$count_unread_message.'</a></li>';
+            $html .= '<li class="icon_messages '.$active.'"><a href="'.api_get_path(WEB_PATH).'main/messages/inbox.php?f=social">'.get_lang('Messages').$count_unread_message.'</a></li>';
             $active = $show=='whereiam' ? 'active' : null;
-            $html .= '<li class="'.$active.'"><a href="'.api_get_path(WEB_PATH).'main/social/whereiam.php">'.Display::return_icon('instant_message-new.png',get_lang('Messages'),array()).get_lang('WhereIAm').'</a></li>';$active = $show=='whereiam' ? 'active' : null;
+            $html .= '<li class="icon_whereiam '.$active.'"><a href="'.api_get_path(WEB_PATH).'main/social/whereiam.php">'.get_lang('WhereIAm').'</a></li>';$active = $show=='whereiam' ? 'active' : null;
             $active = $show=='myperformance' ? 'active' : null;
-            $html .= '<li class="'.$active.'"><a href="'.api_get_path(WEB_PATH).'main/social/myperformance.php">'.Display::return_icon('instant_message-new.png',get_lang('Messages'),array()).get_lang('MyPerformance').'</a></li>';
+            $html .= '<li class="icon_myperformance '.$active.'"><a href="'.api_get_path(WEB_PATH).'main/social/myperformance.php">'.get_lang('MyPerformance').'</a></li>';
 
 /*
             //Invitations
@@ -851,7 +851,7 @@ class SocialManager extends UserManager {
     public static function social_wrapper_div($content, $span_count) {
         $span_count = intval($span_count);
         $html = '<div class="span'.$span_count.'">';
-        $html .= '<div class="well_border">';
+        $html .= '<div class="">';
         $html .= $content;
         $html .= '</div></div>';
         return $html;

@@ -5,10 +5,10 @@
  * @package chamilo.main
 */
 
-if ((!isset($_GET['admin789']) or empty($_GET['admin789'])) && empty($_REQUEST['login']) && empty($_REQUEST['logout'])) {
+/* if ((!isset($_GET['admin789']) or empty($_GET['admin789'])) && empty($_REQUEST['login']) && empty($_REQUEST['logout'])) {
     header('location: http://vlearning.icpna.edu.pe/in/web');
     exit;
-}
+}*/
 define('CHAMILO_HOMEPAGE', true);
 
 $language_file = array('courses', 'index');

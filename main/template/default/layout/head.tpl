@@ -13,6 +13,7 @@
 <title>{{ title_string }}</title>
 {{ css_file_to_string }}
 {{ css_style_print }}
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 {{ js_file_to_string }}
 {{ extra_headers }}
 <script>
@@ -223,7 +224,7 @@ $(function() {
     }
 
     //Fixes buttons to the new btn class
-    if (!$('#button').hasClass('btn')) {
+    if (!$('#button').hasClass('btn') && !$('button').hasClass('close')) {
         $("button").addClass('btn');
     }
 
@@ -316,7 +317,47 @@ $(function() {
 
 <!-- Animated progress bar -->
 <script type="text/javascript">
-$(document).ready(function(){
+    $(document).ready(function(){
        $(".blue-back-bar").filter(':not(:animated)').animate({width:'{{ course_progress }}%'},{duration:2000});
 });
+</script>
+{% if hide_bar %}
+    <script type="text/javascript">
+        $(document).on('ready', function() {
+            $('a#hide-header-toggle').on('click', function(e) {
+                e.preventDefault();
+
+                var $self = $(this);
+
+                $('#header-container').slideToggle('fast', function () {
+                    var $icon = $self.find('i');
+
+                    if ($icon.hasClass('icon-chevron-down')) {
+                        $icon.removeClass('icon-chevron-down').addClass('icon-chevron-up');
+                    } else {
+                        $icon.removeClass('icon-chevron-up').addClass('icon-chevron-down');
+                    }
+                });
+            });
+        });
+    </script>
+{% endif %}
+<script>
+    $(document).on('ready', function() {
+        $('a#hide-profile-toggle').on('click', function(e) {
+            e.preventDefault();
+
+            var $self = $(this);
+
+            $('#profile-block').slideToggle('fast', function () {
+                var $icon = $self.find('i');
+
+                if ($icon.hasClass('icon-chevron-down')) {
+                    $icon.removeClass('icon-chevron-down').addClass('icon-chevron-up');
+                } else {
+                    $icon.removeClass('icon-chevron-up').addClass('icon-chevron-down');
+                }
+            });
+        });
+    });
 </script>

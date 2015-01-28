@@ -258,7 +258,7 @@ $content = Display::return_introduction_section(TOOL_COURSE_HOMEPAGE, $result['t
 );
 
 $content .= $result['content'];
-$content = '<div id="course_tools">'.$content.'</div>';
+$content = '<div id="course_tools" class="page-show">'.$content.'</div>';
 $tpl = new Template(null);
 
 $tpl->assign('message', $show_message);

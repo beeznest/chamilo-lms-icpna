@@ -20,26 +20,41 @@ class Display {
 
     /* The main template*/
     static $global_template;
-    static $preview_style = null;
+    static $preview_style = 'nuevo_vlearning';
 
     public function __construct() {
     }
 
-     /**
+    /**
      * Displays the page header
-     * @param string The name of the page (will be showed in the page title)
-     * @param string Optional help file name
+     * @param string $tool_name
+     * @param string $help
+     * @param string $page_header
+     * @param int $social
+     * @param array $extra
+     * @internal param \The $string name of the page (will be showed in the page title)
+     * @internal param \Optional $string help file name
      */
-    public static function display_header($tool_name ='', $help = null, $page_header = null) {
+    public static function display_header($tool_name ='', $help = null, $page_header = null, $social = 0, $extras = array()) {
         self::$global_template = new Template($tool_name);
         self::$global_template->set_help($help);
-        if (!empty(self::$preview_style)) {
+        self::$global_template->assign('social', $social);
+        //if (!empty(self::$preview_style)) {
             self::$global_template->preview_theme = self::$preview_style;
             self::$global_template->set_css_files();
             self::$global_template->set_js_files();
-        }
+        //}
         if (!empty($page_header)) {
             self::$global_template->assign('header', $page_header);
+        }
+        if ($social >= 2) {
+            $show_delete_account_button = api_get_setting('platform_unsubscribe_allowed') == 'true' ? true : false;
+            self::$global_template->assign('social_left_content', SocialManager::show_social_menu('home', null, api_get_user_id(), false, $show_delete_account_button));
+        }
+        if (!empty($extras) && is_array($extras)) {
+            foreach ($extras as $k => $v) {
+                self::$global_template->assign($k, $v);
+            }
         }
         echo self::$global_template->show_header_template();
     }
@@ -78,9 +93,14 @@ class Display {
 
     /**
      * Display the page footer
+     * @param array $params Optional. Aditional variables to display the footer
      */
-    public static function display_footer() {
-        echo self::$global_template ->show_footer_template();
+    public static function display_footer($params = array()) {
+        foreach ($params as $paramKey => $paramValue) {
+            self::$global_template->assign($paramKey, $paramValue);
+        }
+
+        echo self::$global_template ->show_footer_template($params);
     }
 
     public static function page()

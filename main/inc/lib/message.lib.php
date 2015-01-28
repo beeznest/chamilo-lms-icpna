@@ -123,9 +123,9 @@ class MessageManager
             if (isset($_GET['f']) && $_GET['f'] =='social') {
                 $link = '&f=social';
             }
-            $message[1] = '<a '.$class.' href="view_message.php?id='.$result[0].$link.'">'.$result[2].'</a><br />'.GetFullUserName(($result[1]));
+            $message[1] = '<a '.$class.' href="view_message.php?id='.$result[0].$link.'">'.$result[2].'</a><div class="username-inbox">'.GetFullUserName(($result[1])).'</div>';
             $message[3] = //'<a href="new_message.php?re_id='.$result[0].$link.'">'.Display::return_icon('message_reply.png',get_lang('ReplyToMessage')).'</a>'.
-                      '&nbsp;&nbsp;<a onclick="javascript:if(!confirm('."'".addslashes(api_htmlentities(get_lang('ConfirmDeleteMessage')))."'".')) return false;" href="inbox.php?action=deleteone&id='.$result[0].$link.'">'.Display::return_icon('delete.png',get_lang('DeleteMessage')).'</a>';
+                      '&nbsp;&nbsp;<a onclick="javascript:if(!confirm('."'".addslashes(api_htmlentities(get_lang('ConfirmDeleteMessage')))."'".')) return false;" href="inbox.php?action=deleteone&id='.$result[0].$link.'">'.Display::return_icon('deleted_hover.png',get_lang('DeleteMessage')).'</a>';
 
 			$message[2] = api_convert_and_format_date($result[3], DATE_TIME_FORMAT_LONG); //date stays the same
 			foreach($message as $key => $value) {
@@ -724,14 +724,9 @@ class MessageManager
     			$message_content .= get_lang('From').':&nbsp;'.$name.'</b> '.api_strtolower(get_lang('To')).' <b>'.get_lang('Me').'</b>';
     		}
     	}
-*/
-		$message_content .=' <div style="float:right">'.get_lang('Date').':  '.api_get_local_time($row['send_date']).'</div>';
-
-        $message_content .= '<br />';
-
+*/      $message_content .= '<div class="frame-page">';
+		$message_content .=' <div class="date-message">'.get_lang('Date').':  '.api_get_local_time($row['send_date']).'</div>';
         $message_content .= str_replace("\\","",$content);
-        $message_content .= '<br />';
-
         $message_content .= '<div id="message-attach">'.(!empty($files_attachments)?implode('<br />',$files_attachments):'').'</div>
 		        ';
 		    $social_link = '';
@@ -1223,12 +1218,12 @@ class MessageManager
         }
 
         // display sortable table with messages of the current user
-        $table = new SortableTable('message_inbox', array('MessageManager','get_number_of_messages'), array('MessageManager','get_message_data'),3,20,'DESC');
+        $table = new SortableTable('message_inbox', array('MessageManager','get_number_of_messages'), array('MessageManager','get_message_data'),3, 10,'DESC');
         $table->set_header(0, '', false,array ('style' => 'width:15px;'));
 
         $table->set_header(1,get_lang('Messages'),false);
-        $table->set_header(2,get_lang('Date'),true, array('style' => 'width:180px;'));
-        $table->set_header(3,get_lang('DeleteInbox'),false,array ('style' => 'width:70px;'));
+        $table->set_header(2,get_lang('Date'),true, array('style' => 'width:280px;'));
+        $table->set_header(3,get_lang('DeleteInbox'),false,array ('style' => 'width:35px;'));
 
         if (isset($_REQUEST['f']) && $_REQUEST['f']=='social') {
             $parameters['f'] = 'social';

@@ -340,7 +340,8 @@ class Template {
             'software_name' => $_configuration['software_name'],
             'system_version' => $_configuration['system_version'],
             'site_name' => api_get_setting('siteName'),
-            'institution' => api_get_setting('Institution')
+            'institution' => api_get_setting('Institution'),
+            'kids' => intval($_configuration['kids']),
         );
         $this->assign('_s', $_s);
     }
@@ -692,7 +693,7 @@ class Template {
         $this->display($tpl);
     }
 
-    function show_footer_template() {
+    function show_footer_template($params = array()) {
         $tpl = $this->get_template('layout/show_footer.tpl');
         $this->display($tpl);
     }
@@ -1316,7 +1317,7 @@ class Template {
             // if we know the user and we are in a course, get the total course
             // progress to show globally from the template (header, breadcrumb, etc)
             require_once api_get_path(LIBRARY_PATH).'tracking.lib.php';
-            $progress = tracking::get_avg_student_progress($user_id, $course_code, null, $session_id, false, true);
+            $progress = Tracking::get_avg_student_progress($user_id, $course_code, null, $session_id, false, true);
             $this->assign('course_progress', ceil($progress));
         }
 

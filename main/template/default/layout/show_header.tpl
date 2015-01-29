@@ -66,13 +66,14 @@
                             {% if isInLP %}
                                 <div class="span9">
                                     <div class="row">
-                                        <div class="span9">
+                                        <div class="span3">
+                                            <div class="closed-scrom">
+                                                 <a class="btn btn-white" href="{{ _p.web }}index.php?logout=logout&uid=4862">Logout<img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/icon_closed.png"> </a>
+                                            </div>
+                                        </div>
+                                        <div class="span6">
                                             <div class="logo-icpna" style="text-align: right;">
-                                                <span class="closed">
-                                                    <span class="boton-movil boton-exit">
-                                                        <a href="{{ _p.web }}index.php?logout=logout&uid=4862">Logout<img src="http://virtual.icpna.dev/main/css/nuevo_vlearning/img/userlogin/icon_closed.png"> </a>
-                                                    </span>
-                                                </span>
+
                                                 <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png">
                                             </div>
                                         </div>

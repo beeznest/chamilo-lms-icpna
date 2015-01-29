@@ -67,7 +67,14 @@
                                 <div class="span9">
                                     <div class="row">
                                         <div class="span9">
-                                            <div class="logo-icpna" style="text-align: right;"><img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png"> </div>
+                                            <div class="logo-icpna" style="text-align: right;">
+                                                <span class="closed">
+                                                    <span class="boton-movil boton-exit">
+                                                        <a href="{{ _p.web }}index.php?logout=logout&uid=4862">Logout<img src="http://virtual.icpna.dev/main/css/nuevo_vlearning/img/userlogin/icon_closed.png"> </a>
+                                                    </span>
+                                                </span>
+                                                <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png">
+                                            </div>
                                         </div>
                                     </div>
                                     {% if lesson_progress_bar is defined %}

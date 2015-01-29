@@ -84,6 +84,12 @@ CSS Diseño V-learning 2015
     box-shadow: 0px 0px 6px 0px rgba(50, 50, 50, 0.7);
 }
 
+.logo-icpna .closed .boton-movil {
+    background-color: #FFF;
+    margin-right: 50px;
+    padding: 10px 3px 10px 10px;
+}
+
 
 /* Large desktop - PC Escritorio */
 @media (min-width: 1200px) {

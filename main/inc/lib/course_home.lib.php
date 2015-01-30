@@ -1274,7 +1274,7 @@ class CourseHome {
             $show = '<div class="cube-lesson">'
               . ($tool['visibility']==1 ? '' : '')
               . '   <div class="lesson-' . $state . '">'
-              . $tool['pure_icon']
+              . ($tool['visibility'] == 1 ? '<a href="' . $tool['tool']['link'] . '">' . $tool['pure_icon'] . '</a>' : $tool['pure_icon'])
               . '   </div>'
               . ($tool['visibility'] ? '':'')
               . ''

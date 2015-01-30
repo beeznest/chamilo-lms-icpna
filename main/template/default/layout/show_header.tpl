@@ -20,7 +20,9 @@
                             <div class="span3 fulluser header-bar">
                                 <div class="bloque-user">
                                     <div class="header-logo">
-                                        <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-vlearning.png">
+                                        <a href="{{ _p.web_modules }}">
+                                            <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-vlearning.png">
+                                        </a>
                                     </div>
                                     {% if social >= 1 or isInLP %}
                                         <div class="profile {{ isInLP ? 'visible-phone' : '' }}" id="profile-block">

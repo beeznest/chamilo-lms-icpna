@@ -3956,7 +3956,7 @@ a.forum_group_link {
     height:700px;
     padding-left: 8px;
     padding-right: 4px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 #learning_path_left_zone #header {

@@ -355,9 +355,10 @@ Display::display_header($nameTools, null, null, 0, array(
 )); //para fullscreen el scroom
 
 ?>
-    <div class="frame-page-lesson span12">
-    <div id="learning_path_main">
-    <div id="scorm_title" class="visible-phone scorm_title"><?php echo Security::remove_XSS($_SESSION['oLP']->get_name()) ?></div>
+    <div class="span12">
+        <div id="scorm_title" class="visible-phone scorm_title"><?php echo Security::remove_XSS($_SESSION['oLP']->get_name()) ?></div>
+        <div class="frame-page-lesson">
+            <div id="learning_path_main">
 <?php
     $is_allowed_to_edit = api_is_allowed_to_edit(null, true, false, false);
     /*
@@ -443,7 +444,7 @@ Display::display_header($nameTools, null, null, 0, array(
         <!-- end media player layout -->
 
         <!-- TOC layout -->
-        <div id="toc_id" name="toc_name" style="overflow: auto; padding:0;margin-top:0px;width:100%;float:left">
+        <div id="toc_id" name="toc_name" style="width:100%;float:left">
             <div id="learning_path_toc">
                 <?php echo $_SESSION['oLP']->get_html_toc($get_toc_list); ?>
             </div>
@@ -463,8 +464,9 @@ Display::display_header($nameTools, null, null, 0, array(
     </div>
 
     <!-- end right Zone -->
-</div>
-</div>
+            </div>
+        </div>
+    </div>
 
 <script>
     $(function() {

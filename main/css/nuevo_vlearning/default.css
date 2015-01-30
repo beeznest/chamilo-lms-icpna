@@ -1184,7 +1184,13 @@ footer .red-social{
     right: -11px;
     font-size: 20px;
 }
-
+.closed-scrom{
+    padding-top: 30px;
+}
+.closed-scrom .btn-white{
+  padding-left: 35px;
+  padding-right: 35px;
+}
 /* Large desktop - PC Escritorio */
 @media (max-width: 1200px) {
   .frame-inbox{

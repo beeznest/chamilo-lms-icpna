@@ -20,7 +20,9 @@
                             <div class="span3 fulluser header-bar">
                                 <div class="bloque-user">
                                     <div class="header-logo">
-                                        <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-vlearning.png">
+                                        <a href="{{ _p.web_modules }}">
+                                            <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-vlearning.png">
+                                        </a>
                                     </div>
                                     {% if social >= 1 or isInLP %}
                                         <div class="profile {{ isInLP ? 'visible-phone' : '' }}" id="profile-block">
@@ -66,8 +68,16 @@
                             {% if isInLP %}
                                 <div class="span9">
                                     <div class="row">
-                                        <div class="span9">
-                                            <div class="logo-icpna" style="text-align: right;"><img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png"> </div>
+                                        <div class="span3">
+                                            <div class="closed-scrom">
+                                                 <a class="btn btn-white" href="{{ _p.web }}index.php?logout=logout&uid=4862">Logout<img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/icon_closed.png"> </a>
+                                            </div>
+                                        </div>
+                                        <div class="span6">
+                                            <div class="logo-icpna" style="text-align: right;">
+
+                                                <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png">
+                                            </div>
                                         </div>
                                     </div>
                                     {% if lesson_progress_bar is defined %}

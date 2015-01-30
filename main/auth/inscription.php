@@ -532,8 +532,8 @@ if ($form->validate()) {
     Session::erase('course_redirect');
     Session::erase('exercise_redirect');
 
-    Display :: display_header($tool_name);
-    echo Display::page_header($tool_name);
+    Display :: display_header();
+    echo Display::div(Display::page_header($tool_name), array('class' => 'terms-conditions-title'));
 
     echo $content;
     echo $text_after_registration;
@@ -543,8 +543,8 @@ if ($form->validate()) {
     }
 } else {
 
-    Display :: display_header($tool_name);
-    echo Display::page_header($tool_name);
+    Display :: display_header();
+    echo Display::div(Display::page_header($tool_name), array('class' => 'terms-conditions-title'));
 
     echo $content;
 

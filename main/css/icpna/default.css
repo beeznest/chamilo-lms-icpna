@@ -217,8 +217,11 @@ button.arrowl, input.arrowl {
 }
 
 .legal-terms {
-    height: auto;
-    width: 80%;
-    overflow: inherit;
-    align-items: center;
+    height: 250px;
+    width: 100%;
+}
+
+#registration .btn-right {
+    float: right;
+    margin-right: 80px;
 }

@@ -46,7 +46,7 @@ class IcpnaNumberMessagesPlugin extends Plugin
         if ($params['tool_enable'] == "true") {
             $tabUrl = api_get_path(WEB_PLUGIN_PATH) . "icpna_number_messages/src/show_page.php?id=0";
 
-            $this->addTab(self::FIELD_VARIABLE, $tabUrl);
+            $this->addTab(self::FIELD_VARIABLE, $tabUrl, parent::TAB_FILTER_NO_STUDENT);
 
             $params['tab_name'] = rtrim($params['tab_name'], ';');
 
@@ -56,7 +56,7 @@ class IcpnaNumberMessagesPlugin extends Plugin
                 $tabName = $tabs[$i];
                 $tabUrl = api_get_path(WEB_PLUGIN_PATH) . "icpna_number_messages/src/show_page.php?id=$i";
 
-                $this->addTab($tabName, $tabUrl);
+                $this->addTab($tabName, $tabUrl, parent::TAB_FILTER_NO_STUDENT);
             }
         }
     }

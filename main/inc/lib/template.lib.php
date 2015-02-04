@@ -1434,7 +1434,15 @@ class Template {
         $customTabs = array();
 
         while ($row = Database::fetch_assoc($result)) {
-            $customTabs[] = $row;
+            $shouldAdd = true;
+
+            if (strpos($row['subkey'], Plugin::TAB_FILTER_NO_STUDENT) !== false && api_is_student()) {
+                $shouldAdd = false;
+            }
+
+            if ($shouldAdd) {
+                $customTabs[] = $row;
+            }
         }
 
         return $customTabs;

@@ -44,6 +44,8 @@ class Plugin {
      */
     public  $course_settings_callback = false;
 
+    const TAB_FILTER_NO_STUDENT = '::no-student';
+
     /**
      * Default constructor for the plugin class. By default, it only sets
      * a few attributes of the object
@@ -412,10 +414,10 @@ class Plugin {
     * Add a tab to platform
     * @param string   $tabName
     * @param string   $url
-    *
+    * @param string $userFilter Optional. Filter tab type
     * @return boolean
     */
-    public function addTab($tabName, $url)
+    public function addTab($tabName, $url, $userFilter = null)
     {
         $sql = "SELECT * FROM settings_current "
                 . "WHERE variable = 'show_tabs' "
@@ -447,6 +449,14 @@ class Plugin {
         //End Check
 
         $subkey = 'custom_tab_' . $tabNum;
+
+        if (!empty($userFilter)) {
+            switch ($userFilter) {
+                case self::TAB_FILTER_NO_STUDENT:
+                    $subkey .= $userFilter;
+                    break;
+            }
+        }
 
         $attributes = array(
             'variable' => 'show_tabs',

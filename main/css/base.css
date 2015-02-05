@@ -4825,3 +4825,9 @@ i.size-32.icon-new-work{
 .hide-important {
     display: none !important;
 }
+
+.btn-xlarge {
+    line-height: 50px;
+    padding-left: 25px;
+    padding-right: 25px;
+}

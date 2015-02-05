@@ -7,7 +7,6 @@
  * @package chamilo.admin
  */
 $language_file = array('admin', 'registration');
-$cidReset = true;
 
 require_once '../inc/global.inc.php';
 require_once api_get_path(LIBRARY_PATH) . 'export.lib.inc.php';
@@ -21,10 +20,6 @@ if ($preventAccess) {
 
 $this_section = IN_OUT_MANAGEMENT;
 
-
-
-// setting breadcrumbs
-$interbreadcrumb[] = array('url' => 'index.php', 'name' => get_lang('PlatformAdmin'));
 $interbreadcrumb[] = array('url' => '#', 'name' => get_lang('InOut'));
 
 $scheduleIdSelected = isset($_REQUEST['schedule']) ? $_REQUEST['schedule'] : 'all';

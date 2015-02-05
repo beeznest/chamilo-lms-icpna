@@ -6,7 +6,6 @@
  * @package chamilo.admin
  */
 $language_file = array('admin', 'registration');
-$cidReset = true;
 
 require_once '../inc/global.inc.php';
 require_once api_get_path(LIBRARY_PATH) . 'export.lib.inc.php';
@@ -20,7 +19,7 @@ if ($preventAccess) {
     api_not_allowed(true);
 }
 
-$toolName = '';
+$toolName = get_lang('MyAttendance');;
 
 if (api_is_platform_admin()) {
     $interbreadcrumb[] = array('url' => 'index.php', 'name' => get_lang('PlatformAdmin'));
@@ -28,8 +27,6 @@ if (api_is_platform_admin()) {
         'url' => api_get_path(WEB_CODE_PATH) . 'admin/sessions_schedule.php',
         'name' => get_lang('InOut')
     );
-
-    $toolName = get_lang('MyAttendance');
 }
 
 $userId = api_get_user_id();

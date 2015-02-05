@@ -14,7 +14,7 @@ require_once api_get_path(LIBRARY_PATH) . 'sessions_schedule.lib.php';
 
 $this_section = IN_OUT_MANAGEMENT;
 
-$preventAccess = !api_is_teacher();
+$preventAccess = !api_is_teacher() && !api_is_teacher_admin();
 
 if ($preventAccess) {
     api_not_allowed(true);

@@ -291,11 +291,11 @@ if (api_get_setting('allow_terms_conditions') == 'true') {
         $form->addRule('legal_accept',  get_lang('ThisFieldIsRequired'), 'required');
     } else {
         $preview = LegalManager::show_last_condition($term_preview);
-        $form->addElement('label', null, $preview);
+        $form->addElement('html', $preview);
     }
 }
 
-$form->addElement('button', 'submit', get_lang('RegisterUser'), array('class' => 'btn btn-primary btn-large'));
+$form->addElement('button', 'submit', get_lang('RegisterUser'), array('class' => 'btn btn-primary btn-large btn-right'));
 
 if ($form->validate()) {
 
@@ -532,8 +532,8 @@ if ($form->validate()) {
     Session::erase('course_redirect');
     Session::erase('exercise_redirect');
 
-    Display :: display_header($tool_name);
-    echo Display::page_header($tool_name);
+    Display :: display_header();
+    echo Display::div(Display::page_header($tool_name), array('class' => 'terms-conditions-title'));
 
     echo $content;
     echo $text_after_registration;
@@ -543,8 +543,8 @@ if ($form->validate()) {
     }
 } else {
 
-    Display :: display_header($tool_name);
-    echo Display::page_header($tool_name);
+    Display :: display_header();
+    echo Display::div(Display::page_header($tool_name), array('class' => 'terms-conditions-title'));
 
     echo $content;
 

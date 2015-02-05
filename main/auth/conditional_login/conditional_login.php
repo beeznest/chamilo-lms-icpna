@@ -42,10 +42,22 @@ function dc_check_phone_number($user){
  * @param array $user
  * @return boolean true if user pass, false otherwise
  */
-function check_platform_legal_conditions($user) {             
+function check_platform_legal_conditions($user)
+{
+    global $_configuration;
     if (api_get_setting('allow_terms_conditions') == 'true') {
         $term_and_condition_status = api_check_term_condition($user['user_id']);
         // @todo not sure why we need the login password and update_term_status
+        //check if terms and conditions are only for students
+        if (
+            isset($_configuration['terms_only_students']) &&
+            $_configuration['terms_only_students']
+        ) {
+            if ($user['status'] != STUDENT) {
+                //No validation user can pass
+                return true;
+            }
+        }
         if ($term_and_condition_status == false) {
             $_SESSION['term_and_condition'] = array('user_id'           => $user['user_id'],
                                                     //'login'             => $user['username'],

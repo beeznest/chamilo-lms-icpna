@@ -211,3 +211,17 @@ button.arrowl, input.arrowl {
 .attendance-users-table td, .attendance-calendar-table td {
     height: 40px;
 }
+
+.terms-conditions-title h1 {
+    text-align: center;
+}
+
+.legal-terms {
+    height: 250px;
+    width: 100%;
+}
+
+#registration .btn-right {
+    float: right;
+    margin-right: 80px;
+}

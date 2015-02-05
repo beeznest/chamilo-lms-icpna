@@ -68,14 +68,28 @@ class IcpnaNumberMessagesPlugin extends Plugin
     {
         $settings = $this->get_settings();
 
-        $lastTabSetting = current($settings);
+        $lastTabSubKey = null;
 
-        $lastTabSubKey = $lastTabSetting['comment'];
+        foreach ($settings as $setting) {
+            if (!empty($setting['comment'])) {
+                $lastTabSubKey = $setting['comment'];
+                break;
+            }
+        }
+
+        if (empty($lastTabSubKey)) {
+            return;
+        }
 
         $lastTabNumber = str_replace('custom_tab_', '', $lastTabSubKey);
+        $lastTabNumber = str_replace(parent::TAB_FILTER_NO_STUDENT, '', $lastTabNumber);
+        $lastTabNumber = intval($lastTabNumber);
 
-        for ($i = $lastTabNumber; $i > 0; $i--) {
-            $this->deleteTab("custom_tab_$i");
+        var_dump('lastTabNumber', $lastTabNumber);
+
+        for ($i = $lastTabNumber; $i >= 1; $i--) {
+            var_dump("custom_tab_$i" . parent::TAB_FILTER_NO_STUDENT);
+            $this->deleteTab("custom_tab_$i" . parent::TAB_FILTER_NO_STUDENT);
         }
     }
 

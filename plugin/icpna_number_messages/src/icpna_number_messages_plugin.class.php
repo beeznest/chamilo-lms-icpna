@@ -1,5 +1,10 @@
 <?php
-
+/* For licensing terms, see /license.txt */
+/**
+ * IcpnaNumberMessagesPlugin Plugin Class
+ * @author Angel Fernando Quiroz Campos <angel.quiroz@beeznest.com
+ * @package chamilo.plugin.icpnaNumberMessagesPlugin
+ */
 class IcpnaNumberMessagesPlugin extends Plugin
 {
 

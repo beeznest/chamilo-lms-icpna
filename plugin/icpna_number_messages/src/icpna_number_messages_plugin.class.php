@@ -90,10 +90,7 @@ class IcpnaNumberMessagesPlugin extends Plugin
         $lastTabNumber = str_replace(parent::TAB_FILTER_NO_STUDENT, '', $lastTabNumber);
         $lastTabNumber = intval($lastTabNumber);
 
-        var_dump('lastTabNumber', $lastTabNumber);
-
         for ($i = $lastTabNumber; $i >= 1; $i--) {
-            var_dump("custom_tab_$i" . parent::TAB_FILTER_NO_STUDENT);
             $this->deleteTab("custom_tab_$i" . parent::TAB_FILTER_NO_STUDENT);
         }
     }

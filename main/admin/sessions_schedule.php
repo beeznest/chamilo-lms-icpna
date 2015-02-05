@@ -30,6 +30,10 @@ $interbreadcrumb[] = array('url' => '#', 'name' => get_lang('InOut'));
 $scheduleIdSelected = isset($_REQUEST['schedule']) ? $_REQUEST['schedule'] : 'all';
 $dateSelected = isset($_REQUEST['date']) ? $_REQUEST['date'] : date('Y-m-d');
 
+if (!apiCheckDate($dateSelected)) {
+    $dateSelected = date('Y-m-d');
+}
+
 if (isset($_REQUEST['branch'])) {
     $branchSelected = intval($_REQUEST['branch']);
 } else {
@@ -145,7 +149,6 @@ if ($sessions != false) {
         <div class="controls">
             <?php
             $dateInputAttributes = array(
-                'readonly' => '',
                 'id' => 'date',
                 'class' => 'input-small'
             );

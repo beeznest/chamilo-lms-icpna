@@ -90,13 +90,16 @@ class AppPlugin {
         } else {
             $access_url_id = intval($access_url_id);
         }
-        api_delete_settings_params(array('category = ? AND access_url = ? AND subkey = ? ' =>
-                                   array('Plugins', $access_url_id, $plugin_name)));
+        // First call the custom uninstall to allow full access to global settings
         $pluginpath = api_get_path(SYS_PLUGIN_PATH).$plugin_name.'/uninstall.php';
         if (is_file($pluginpath) && is_readable($pluginpath)) {
             //execute the uninstall procedure
             require $pluginpath;
         }
+        // Second remove all remaining global settings
+        api_delete_settings_params(
+            array('category = ? AND access_url = ? AND subkey = ? ' => array('Plugins', $access_url_id, $plugin_name))
+        );
     }
 
     function get_areas_by_plugin($plugin_name) {

@@ -6820,3 +6820,16 @@ function api_mail_html($recipient_name, $recipient_email, $subject, $body, $send
 
     return 1;
 }
+
+/**
+ * Check whether a date exists
+ * @param string $date The date to validate
+ * @param string $format Optional. The input date format
+ * @return boolean
+ */
+function apiCheckDate($date, $format = 'Y-m-d')
+{
+    $tempDate = DateTime::createFromFormat($format, $date);
+
+    return $tempDate && $tempDate->format($format) == $date;
+}

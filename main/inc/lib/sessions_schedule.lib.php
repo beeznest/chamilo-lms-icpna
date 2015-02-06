@@ -331,7 +331,7 @@ function getRoom($sessionId, $branchId)
             $optionRoomData = Database::fetch_assoc($optionRoomResult);
 
             $sql = "SELECT id, title FROM $branchRoomTable "
-                    . "WHERE title = {$optionRoomData['option_display_text']} "
+                    . "WHERE title = '{$optionRoomData['option_display_text']}' "
                     . "AND branch_id = $branchId";
 
             $roomResult = Database::query($sql);

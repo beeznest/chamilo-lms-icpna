@@ -12,6 +12,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{{ title_string }}</title>
 {{ css_file_to_string }}
+<!--[if lt IE 9]>
+<link rel="stylesheet" type="text/css" media="all" href="{{ _p.web_css }}/nuevo_vlearning/default-ie.css"/>
+<![endif]-->
 {{ css_style_print }}
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 {{ js_file_to_string }}

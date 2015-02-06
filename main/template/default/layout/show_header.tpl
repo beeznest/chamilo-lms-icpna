@@ -3,8 +3,10 @@
 <!--[if IE 7]>    <html lang="{{ document_language }}" class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>    <html lang="{{ document_language }}" class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]><!--><html lang="{{ document_language }}" class="no-js"> <!--<![endif]-->
+
     <head>
         {% include "default/layout/head.tpl" %}
+
     </head>
     <body {% if social is not defined %} class="no-background" {% endif %}>
         {% if social is defined %}

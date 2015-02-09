@@ -749,6 +749,7 @@ $status_options[STUDENT] = get_lang('Student');
 $status_options[COURSEMANAGER] = get_lang('Teacher');
 $status_options[DRH] = get_lang('Drh');
 $status_options[SESSIONADMIN] = get_lang('Administrator');
+$status_options[ROLE_TEACHER_ADMIN] = get_lang('RoleTeacherAdmin');
 $form->addElement('select','keyword_status',get_lang('Profile'),$status_options, array('style'=>'margin-left:17px'));
 $form->addElement('html', '</td></tr>');
 

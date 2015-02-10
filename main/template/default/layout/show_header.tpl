@@ -3,8 +3,10 @@
 <!--[if IE 7]>    <html lang="{{ document_language }}" class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>    <html lang="{{ document_language }}" class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]><!--><html lang="{{ document_language }}" class="no-js"> <!--<![endif]-->
+
     <head>
         {% include "default/layout/head.tpl" %}
+
     </head>
     <body {% if social is not defined %} class="no-background" {% endif %}>
         {% if social is defined %}
@@ -83,13 +85,13 @@
                                     {% if lesson_progress_bar is defined %}
                                         <div class="row-fluid lesson-top-buttons">
                                             <div class="span6 hidden-phone">
-                                                <a class = "btn btn-large btn-white pull-left" href="javascript:history.back(1);">{{ "GoBack" |get_lang }}</a>
+                                                <div class="btn btn-large btn-white pull-left">
+                                                    <a href="{{_p.web_course}}{{_c.code}}/?id_session={{_c.session_id}}">{{ _c.title }}</a>
+                                                </div>
                                             </div>
                                             <div class="span6">
                                                 <div class = "btn btn-large btn-white pull-right">
                                                     <a href="{{_p.web_modules}}">{{ "Vlearning" |get_lang }}</a>
-                                                    /
-                                                    <a href="{{_p.web_course}}{{_c.code}}/?id_session={{_c.session_id}}">{{ _c.title }}</a>
                                                 </div>
                                             </div>
                                         </div>

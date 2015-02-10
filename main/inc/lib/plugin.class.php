@@ -515,8 +515,12 @@ class Plugin {
                 $tabs = Database::store_result($result, 'ASSOC');
                 $i = 1;
                 foreach ($tabs as $row) {
+                    $newSubKey = "custom_tab_$i";
+                    if (strpos($row['subkey'], self::TAB_FILTER_NO_STUDENT) !== false) {
+                        $newSubKey .= self::TAB_FILTER_NO_STUDENT;
+                    }
                     $attributes = array(
-                        'subkey' => 'custom_tab_' . $i
+                        'subkey' => $newSubKey
                     );
                     $this->updateTab($row['subkey'], $attributes);
                     $i++;

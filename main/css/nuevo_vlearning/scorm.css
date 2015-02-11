@@ -52,6 +52,10 @@
     height: 100%;
     position: relative;
     width: 625px;
+    /* Safari Scroll hack */
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+    /* end Safari Scroll hack */
 }
 #learning_path_right_zone iframe {
     height: 100%;

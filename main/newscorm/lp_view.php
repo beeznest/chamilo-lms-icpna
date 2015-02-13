@@ -444,7 +444,7 @@ Display::display_header($nameTools, null, null, 0, array(
         <!-- end media player layout -->
 
         <!-- TOC layout -->
-        <div id="toc_id" name="toc_name" style="width:100%;float:left">
+        <div id="toc_id" name="toc_name">
             <div id="learning_path_toc">
                 <?php echo $_SESSION['oLP']->get_html_toc($get_toc_list); ?>
             </div>

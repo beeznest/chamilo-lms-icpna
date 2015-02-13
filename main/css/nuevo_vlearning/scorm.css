@@ -25,6 +25,7 @@
 }
 #learning_path_main.folded #learning_path_left_zone{
     width: 0px;
+    display: none;
 }
 
 #hide_bar {
@@ -73,9 +74,11 @@
         width: 0px;
     }
     #learning_path_right_zone {
+        display: none;
         width: 855px;
     }
     #learning_path_main.folded #learning_path_right_zone{
+        display: block;
         width: 1155px;
     }
 }

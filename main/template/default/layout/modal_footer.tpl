@@ -471,25 +471,25 @@
     </div>
 </div>
 <!--Modal Video Help-->
-<div class="modal fade large" style="display: none;" id="help" tabindex="-1" role="dialog" aria-labelledby="helplabel" aria-hidden="true">
+<div class="modal fade hide" id="help" tabindex="-1" role="dialog" aria-labelledby="helplabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <div class="modal-body">
-                <video controls="controls" height="381" width="830">
-                    <source src="http://vlearning.icpna.edu.pe/html/welcome_vlearning.mp4" type="video/mp4">
-                    <source src="http://vlearning.icpna.edu.pe/html/welcome_vlearning.webm" type="video/webm">
-                    <source src="http://vlearning.icpna.edu.pe/html/welcome_vlearning.ogv" type="video/ogg">
-                    <object type="application/x-shockwave-flash" data="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf" height="360" width="640">
-                        <param name="movie" value="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf">
-                        <param name="allowFullScreen" value="true">
-                        <param name="wmode" value="transparent">
-                        <param name="flashVars" value="config={'playlist':['/bundles/applicationsubscriber/images/header-logo.png',{'url':'http://vlearning.icpna.edu.pe/html/welcome_vlearning.mp4','autoPlay':false}]}">
-                        <img alt="V-Learning" src="/bundles/applicationsubscriber/images/header-logo.png" title="No video playback capabilities, please download the video below" height="360" width="640">
-                    </object>
-                </video>
-            </div>
-
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            Ayuda
+        </div>
+        <div class="modal-body">
+            <video controls="controls">
+                <source src="http://vlearning.icpna.edu.pe/html/welcome_vlearning.ogv" type="video/ogg">
+                <source src="http://vlearning.icpna.edu.pe/html/welcome_vlearning.webm" type="video/webm">
+                <source src="http://vlearning.icpna.edu.pe/html/welcome_vlearning.mp4" type="video/mp4">
+                <object type="application/x-shockwave-flash" data="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf" height="360" width="640">
+                    <param name="movie" value="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf">
+                    <param name="allowFullScreen" value="true">
+                    <param name="wmode" value="transparent">
+                    <param name="flashVars" value="config={'playlist':['/bundles/applicationsubscriber/images/header-logo.png',{'url':'http://vlearning.icpna.edu.pe/html/welcome_vlearning.mp4','autoPlay':false}]}">
+                    <img alt="V-Learning" src="/bundles/applicationsubscriber/images/header-logo.png" title="No video playback capabilities, please download the video below" height="360" width="640">
+                </object>
+            </video>
         </div>
     </div>
 </div>

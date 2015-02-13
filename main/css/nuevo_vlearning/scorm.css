@@ -74,7 +74,6 @@
         width: 0px;
     }
     #learning_path_right_zone {
-        display: none;
         width: 855px;
     }
     #learning_path_main.folded #learning_path_right_zone{
@@ -109,6 +108,7 @@
         width: 5%;
     }
     #learning_path_right_zone {
+        display: none;
         width: 0;
     }
     #learning_path_main.folded #learning_path_right_zone{

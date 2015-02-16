@@ -1243,7 +1243,10 @@ class MigrationCustom {
 
         if (!empty($course_code)) {
             if (empty($uidIdPrograma) && !empty($uidIdProgramaDestination) && !empty($destination_session_id)) {
+                $sessionInfo = SessionManager::fetch($destination_session_id);
+
                 SessionManager::add_courses_to_session($destination_session_id, array($course_code));
+                SessionManager::set_coach_to_course_session($sessionInfo['id_coach'], $destination_session_id, $course_code);
                 return array(
                    'message' => "Session updated $uidIdPrograma",
                    'status_id' => self::TRANSACTION_STATUS_SUCCESSFUL

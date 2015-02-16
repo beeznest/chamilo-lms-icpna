@@ -1905,10 +1905,6 @@ footer .red-social{
         display: block;
         float: none;
     }
-
-    #hide-header-bar #hide-header-toggle .hide-header-message {
-        display: none;
-    }
 }
 @media (max-width: 767px) and (orientation: landscape) {
     #footer-in-lp {

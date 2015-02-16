@@ -58,14 +58,17 @@
                             </div>
                         {% endif %}
                         {# IN/OUT #}
-                        {% if _u.status == 1 and _p.is_in_room and _u.coach_session_id > 0 %}
-                            <div id="in-out-buttons" class="in-out-buttons-space">
+                        <div id="in-out-buttons" class="in-out-buttons-space">
+                            {% if _p.roomName %}
+                                <span class="header-room-name">{{ _p.roomName }}</span>
+                            {% endif %}
+                            {% if _u.status == 1 and _p.is_in_room and _u.coach_session_id > 0 %}
                                 <button class="btn btn-large btn-success btn-xlarge {% if _p.count_active_in > 0 %} hide-important {% endif %}" type="button" id="btn_in_session" name="btn_in_session">IN</button>
                                 <button class="btn btn-large btn-danger btn-xlarge {% if _p.count_active_in == 0 %} hide-important {% endif %}" type="button" id="btn_out_session" name="btn_out_session">OUT</button>
                                 <input type="hidden" name="in_course_id" id="in_course_id" value="{{ _u.coach_course_id }}" />
                                 <input type="hidden" name="in_session_id" id="in_session_id" value="{{ _u.coach_session_id }}" />
-                            </div>
-                        {% endif %}
+                            {% endif %}
+                        </div>
                         {# END IN/OUT #}
                         <div class="notifications-container">
                             <ul id="notifications" class="nav nav-pills pull-right">

@@ -301,6 +301,7 @@ class Template {
         $sessionId = api_get_session_id();
         $inBranch = false;
         $inRoom = false;
+        $roomName = null;
         if (isset($_COOKIE['room']) && !empty($_COOKIE['room'])) {
             if (!empty($sessionId)) {
                 $inBranch = $objTracking->isInBranch($sessionId);
@@ -313,6 +314,7 @@ class Template {
             //if the branch is set and the room is set, consider the user is
             // physically in the room
             $inRoom = $inBranch;
+            $roomName = Security::remove_XSS($_COOKIE['room']);
         }
 
         //Setting app paths/URLs
@@ -327,6 +329,7 @@ class Template {
             'web_lib' => api_get_path(WEB_LIBRARY_PATH),
             'is_in_room' => $inRoom,
             'count_active_in' => $objTracking->countActiveTeacherIn(),
+            'roomName' => $roomName
         );
         $this->assign('_p', $_p);
 

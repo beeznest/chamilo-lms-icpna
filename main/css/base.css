@@ -31,8 +31,19 @@ legend {
 #header_right #notifications {
     padding:0;
 }
+.header-room-name {
+    color: #0033A0;
+    display: inline-block;
+    font-size: 50px;
+    font-weight: bold;
+    line-height: 70px;
+    vertical-align: middle;
+}
 .in-out-buttons-space{
   padding-top:1em;  
+}
+.in-out-buttons-space button {
+    margin-left: 10px;
 }
 header #logo {
     padding: 1em 0px 15px 0px;

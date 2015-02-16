@@ -1422,3 +1422,4 @@ $langSelectAtLeastOne = "Seleccione al menos uno";
 $XEnabled = "%s habilitado";
 $XDisabled = "%s deshabilitado";
 $SeriousGameMode = "Modo juego serio";
+$ClickHereToSeeOptions = "Click aquí para ver las opciones de la cabecera";

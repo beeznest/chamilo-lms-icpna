@@ -1417,3 +1417,4 @@ $WeHaveDetectedExamNotFinish = "We have detected you could NOT complete the exam
 $XEnabled = "%s enabled";
 $XDisabled = "%s disabled";
 $SeriousGameMode = "Serious game mode";
+$ClickHereToSeeOptions = "Click here to see the header options";

@@ -1045,9 +1045,6 @@ footer .red-social{
 .modal-body .span6.movistar{
   text-align: right;
 }
-#help.modal{
-  width: 830px;
-}
 .phase-title a {
   color: inherit;
 }
@@ -1191,6 +1188,15 @@ footer .red-social{
   padding-left: 35px;
   padding-right: 35px;
 }
+
+.modal {
+    position: absolute;
+}
+.modal video {
+    height: 100%;
+    width: 100%;
+}
+
 /* Large desktop - PC Escritorio */
 @media (max-width: 1200px) {
   .frame-inbox{
@@ -1898,6 +1904,10 @@ footer .red-social{
     .btn-white {
         display: block;
         float: none;
+    }
+
+    #hide-header-bar #hide-header-toggle .hide-header-message {
+        display: none;
     }
 }
 @media (max-width: 767px) and (orientation: landscape) {

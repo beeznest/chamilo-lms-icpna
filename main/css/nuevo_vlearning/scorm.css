@@ -24,6 +24,7 @@
     width: 300px;
 }
 #learning_path_main.folded #learning_path_left_zone{
+    display: none;
     width: 0px;
 }
 
@@ -70,12 +71,14 @@
         width: 300px;
     }
     #learning_path_main.folded #learning_path_left_zone{
+        display: none;
         width: 0px;
     }
     #learning_path_right_zone {
         width: 855px;
     }
     #learning_path_main.folded #learning_path_right_zone{
+        display: block;
         width: 1155px;
     }
 }
@@ -106,9 +109,11 @@
         width: 5%;
     }
     #learning_path_right_zone {
+        display: none;
         width: 0;
     }
     #learning_path_main.folded #learning_path_right_zone{
+        display: block;
         width: 95%;
     }
 }

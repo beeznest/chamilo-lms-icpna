@@ -84,7 +84,7 @@
                                     </div>
                                     {% if lesson_progress_bar is defined %}
                                         <div class="row-fluid lesson-top-buttons">
-                                            <div class="span6 hidden-phone">
+                                            <div class="span6">
                                                 <div class="btn btn-large btn-white pull-left">
                                                     <a href="{{_p.web_course}}{{_c.code}}/?id_session={{_c.session_id}}">{{ _c.title }}</a>
                                                 </div>
@@ -117,6 +117,7 @@
                         {% if lesson_progress_bar %}
                             <div class="span12" id="hide-header-bar">
                                 <a href="#" id="hide-header-toggle">
+                                    <span class="hide-header-message">{{ 'ClickHereToSeeOptions' | get_lang }}</span>
                                     <i class="icon-chevron-down"></i>
                                 </a>
                             </div>

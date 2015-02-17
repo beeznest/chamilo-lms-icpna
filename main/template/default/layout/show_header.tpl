@@ -117,7 +117,6 @@
                         {% if lesson_progress_bar %}
                             <div class="span12" id="hide-header-bar">
                                 <a href="#" id="hide-header-toggle">
-                                    <span class="hide-header-message">{{ 'ClickHereToSeeOptions' | get_lang }}</span>
                                     <i class="icon-chevron-down"></i>
                                 </a>
                             </div>

@@ -193,7 +193,7 @@ header .logo-icpna{
   background: url("img/curso/icon-item-closed.png") no-repeat 0px center;
   display: inline-block;
 }
-.lesson-completed img,.lesson-closed img, .lesson-progress img{
+.lesson-completed img,.lesson-closed img, .lesson-progress img, .lesson-process img {
   margin-right: 10px;
 }
 .block-lesson .row-fluid{

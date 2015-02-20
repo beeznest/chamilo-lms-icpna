@@ -143,7 +143,15 @@ if ($counter == $objExercise->attempts) {
 //2. Exercise button
 //Notice we not add there the lp_item_view_id because is not already generated
 $exercise_url = api_get_path(WEB_CODE_PATH).'exercice/exercise_submit.php?'.api_get_cidreq().'&exerciseId='.$objExercise->id.'&origin='.$origin.'&learnpath_id='.$learnpath_id.'&learnpath_item_id='.$learnpath_item_id.$extra_params;
-$exercise_url_button = Display::url($label, $exercise_url, array('class'=>'btn btn-primary btn-large'));
+$exercise_url_button = Display::url(
+    $label,
+    "javascript://",
+    array(
+        'class' => 'btn btn-primary btn-large',
+        'onmousedown' => "(function(url){window.location = url;})('$exercise_url'); return false;",
+        'ontouchstart' => "(function(url){window.location = url;})('$exercise_url');return false;"
+    )
+);
 
 //3. Checking visibility of the exercise (overwrites the exercise button)
 $visible_return = $objExercise->is_visible($learnpath_id, $learnpath_item_id, null, false);

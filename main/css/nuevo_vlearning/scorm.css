@@ -3,7 +3,7 @@
 }
 
 .frame-page-lesson {
-    padding-bottom: 56.25%;
+    padding-bottom: 125%;
     position: relative;
 }
 .frame-page-lesson #learning_path_main {
@@ -26,6 +26,9 @@
 #learning_path_main.folded #learning_path_left_zone{
     display: none;
     width: 0px;
+}
+#learning_path_main.folded #learning_path_left_zone #toc_id{
+    display: none;
 }
 
 #hide_bar {
@@ -66,6 +69,16 @@
     width: 925px;
 }
 
+.profile-block-mobile {
+    display: none;
+}
+
+@media (orientation : landscape) {
+    .frame-page-lesson {
+        padding-bottom: 56.25%;
+    }
+}
+
 @media (min-width: 1200px) {
     #learning_path_left_zone {
         width: 300px;
@@ -99,6 +112,10 @@
 }
 
 @media (max-width: 767px) {
+    .profile-block-mobile {
+        display: block;
+    }
+
     #learning_path_left_zone {
         width: 95%;
     }

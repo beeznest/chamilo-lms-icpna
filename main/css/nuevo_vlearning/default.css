@@ -1198,6 +1198,10 @@ footer .red-social{
     width: 100%;
 }
 
+.btn {
+    -webkit-appearance: none !important;
+}
+
 /* Large desktop - PC Escritorio */
 @media (max-width: 1200px) {
   .frame-inbox{

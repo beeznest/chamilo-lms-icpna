@@ -2403,7 +2403,7 @@ class Exercise
                 if ($this->type == ONE_PER_PAGE) {
                     if ($questionNum != 1) {
                         $prev_question = $questionNum - 2;
-                        $all_button .= '<a href="javascript://" class="btn" onclick="previous_question_and_save('.$prev_question.', '.$question_id.' ); ">'.get_lang(
+                        $all_button .= '<a class="btn" href="javascript://" onmousedown="previous_question_and_save('.$prev_question.', '.$question_id.' );" ontouchstart="previous_question_and_save('.$prev_question.', '.$question_id.' );">'.get_lang(
                             'PreviousQuestion'
                         ).'</a>';
                     }
@@ -2411,9 +2411,9 @@ class Exercise
                     //Next question
                     if (!empty($questions_in_media)) {
                         $questions_in_media = "['".implode("','", $questions_in_media)."']";
-                        $all_button .= '&nbsp;<a href="javascript://" class="'.$class.'" onclick="save_question_list('.$questions_in_media.'); ">'.$label.'</a>';
+                        $all_button .= '&nbsp;<a class="'.$class.'" href="javascript://" onmousedown="save_question_list('.$questions_in_media.');" ontouchstart="save_question_list('.$questions_in_media.');">'.$label.'</a>';
                     } else {
-                        $all_button .= '&nbsp;<a href="javascript://" class="'.$class.'" onclick="save_now('.$question_id.'); ">'.$label.'</a>';
+                        $all_button .= '&nbsp;<a class="'.$class.'" href="javascript://" onmousedown="save_now('.$question_id.');" ontouchstart="save_now('.$question_id.');">'.$label.'</a>';
                     }
                     $all_button .= '<span id="save_for_now_'.$question_id.'" class="exercise_save_mini_message"></span>&nbsp;';
                     $html .= $all_button;
@@ -2425,7 +2425,7 @@ class Exercise
                         $all_label = get_lang('EndTest');
                         $class = 'btn btn-warning';
                     }
-                    $all_button = '&nbsp;<a href="javascript://" class="'.$class.'" onclick="validate_all(); ">'.$all_label.'</a>';
+                    $all_button = '&nbsp;<a class="'.$class.'" href="javascript://" onmousedown="validate_all();" ontouchstart="validate_all();">'.$all_label.'</a>';
                     $all_button .= '&nbsp;<span id="save_all_reponse"></span>';
                     $html .= $all_button;
                 }

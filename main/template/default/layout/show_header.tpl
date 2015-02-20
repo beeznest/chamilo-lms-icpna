@@ -27,7 +27,7 @@
                                         </a>
                                     </div>
                                     {% if social >= 1 or isInLP %}
-                                        <div class="profile {{ isInLP ? 'visible-phone' : '' }}" id="profile-block">
+                                        <div class="profile profile-block-mobile" id="profile-block">
                                             <div class="home"><a href="{{ _p.web_modules }}"><img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/home.png"></a></div>
                                             <div class="logo-icpna-movil">
                                                 <img src="{{ _p.web_css }}nuevo_vlearning/img/logo-icpna.png">

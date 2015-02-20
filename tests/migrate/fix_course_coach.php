@@ -1,7 +1,7 @@
 <?php
 /* For licensing terms, see /license.txt */
 /**
- * Set course coach if there is not assigned already one 
+ * Set course coach if there is not already one assigned
  * @author Angel Fernando Quiroz Campos <angel.quiroz@beeznest.com>
  * @package chamilo.migration
  */
@@ -17,6 +17,9 @@ $sessionTable = Database::get_main_table(TABLE_MAIN_SESSION);
 $sessionCourseTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE);
 $sessionCourseUserTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
 
+// The following query is very specific to a case where there is only one
+// course by session. This probably won't work for cases where there are
+// more than one course by session.
 $sql = "SELECT s.id, s.id_coach, sc.course_code 
     FROM $sessionTable s 
     INNER JOIN $sessionCourseTable sc ON s.id = sc.id_session 

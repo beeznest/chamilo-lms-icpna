@@ -28,7 +28,11 @@
                     }
                     $("#in-out-modal-label").html("Alert!");
                     $("#in-out-modal .modal-footer").html("<button type='button' class='btn' data-dismiss='modal' aria-hidden='true'>Close</button>");
-                    $("#in-out-modal").modal("show");
+                    $("#in-out-modal").modal({
+                        backdrop: 'static',
+                        keyborad: false,
+                        show: true
+                    });
                 }
             });
         });
@@ -39,10 +43,18 @@
             $("#in-out-modal .modal-body").html("<p style='color: gray'>Are you sure you want to log OUT?</p>");
             $("#in-out-modal .modal-footer").html("<button type='button' class='btn' data-dismiss='modal' aria-hidden='true'>No</button> \
                 <button type='button' name='confirm_out_session' id='confirm_out_session' class='btn btn-danger'>Yes</button>");
-            $("#in-out-modal").modal("show");
+            $("#in-out-modal").on('hidden', function (e, isDoneOut) {
+                if (isDoneOut === true) {
+                    $('#logout_button').trigger('click');
+                }
+            }).modal({
+                backdrop: 'static',
+                keyborad: false,
+                show: true
+            });
         });
 
-        $("#confirm_out_session").live("click", function () {
+        $("#in-out-modal").on("click", "#confirm_out_session", function () {
             $.ajax({
                 type: "GET",
                 dataType: "json",
@@ -60,9 +72,13 @@
                             Please contact the support team.</p>");
                     }
                     $("#in-out-modal-label").html("Alert!");
-                    $("#in-out-modal .modal-footer").html("<button type='button' class='btn' data-dismiss='modal' aria-hidden='true'>Close</button>");
+                    $("#in-out-modal .modal-footer").html("<button type='button' class='btn' data-dismiss='modal' id='out-close-modal'>Close</button>");
                 }
             });
+        });
+
+        $("#in-out-modal").on("click", "#out-close-modal", function () {
+            $("#in-out-modal").trigger('hidden', [true]);
         });
     });
 </script>

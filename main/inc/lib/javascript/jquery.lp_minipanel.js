@@ -93,4 +93,24 @@ $(document).ready(function() {
     //     $(this).height(cntHeight);
     //     $("#hide_bar").css('height', cntHeight);
     // });
+
+    (function bindHideBarMobile($) {
+        $('#mobile-back-to-lessons').on('click', function (e) {
+            e.preventDefault();
+
+            var $learningPathMain = $('#learning_path_main');
+
+            $learningPathMain.toggleClass('folded');
+        });
+    })(jQuery);
+
+    (function hackForAndroid(navigator) {
+        var ua = navigator.userAgent.toLowerCase(),
+            isMobile = /mobile/.test(ua),
+            isSafari = /mac os/.test(ua);
+
+        if(isMobile && !isSafari) {
+            $('#learning_path_right_zone iframe').height(600);
+        }
+    })(window.navigator);
 });

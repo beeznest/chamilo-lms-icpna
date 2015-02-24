@@ -1461,7 +1461,7 @@ function render_question($objExercise, $questionId, $attempt_list, $remind_list,
                 $exercise_actions .= $objExercise->show_button($questionId, $current_question);
                 break;
             case ALL_ON_ONE_PAGE:
-                $button  = '<a class="btn" onmousedown="save_now(\''.$questionId.'\');" ontouchstart="save_now(\''.$questionId.'\');" href="javascript://">'.get_lang('SaveForNow').'</a>';
+                $button  = '<a class="btn" onclick="save_now(\''.$questionId.'\');" href="javascript://">'.get_lang('SaveForNow').'</a>';
                 $button .= '<span id="save_for_now_'.$questionId.'" class="exercise_save_mini_message"></span>&nbsp;';
                 $exercise_actions  .= Display::div($button, array('class'=>'exercise_save_now_button'));
                 break;
@@ -1474,7 +1474,7 @@ function render_question($objExercise, $questionId, $attempt_list, $remind_list,
             $exercise_actions .= $objExercise->show_button($questionId, $current_question);*/
             $count_of_questions_inside_media = count($questions_in_media);
             if ($count_of_questions_inside_media > 1) {
-                $button  = '<a class="btn" onmousedown="save_now(\''.$questionId.'\', false, false);" ontouchstart="save_now(\''.$questionId.'\', false, false);" href="javascript:// ">'.get_lang('SaveForNow').'</a>';
+                $button  = '<a class="btn" onclick="save_now(\''.$questionId.'\', false, false);" href="javascript:// ">'.get_lang('SaveForNow').'</a>';
                 $button .= '<span id="save_for_now_'.$questionId.'" class="exercise_save_mini_message"></span>&nbsp;';
                 $exercise_actions  = Display::div($button, array('class'=>'exercise_save_now_button'));
             }

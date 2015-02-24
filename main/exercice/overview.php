@@ -145,11 +145,9 @@ if ($counter == $objExercise->attempts) {
 $exercise_url = api_get_path(WEB_CODE_PATH).'exercice/exercise_submit.php?'.api_get_cidreq().'&exerciseId='.$objExercise->id.'&origin='.$origin.'&learnpath_id='.$learnpath_id.'&learnpath_item_id='.$learnpath_item_id.$extra_params;
 $exercise_url_button = Display::url(
     $label,
-    "javascript://",
+    $exercise_url,
     array(
-        'class' => 'btn btn-primary btn-large',
-        'onmousedown' => "(function(url){window.location = url;})('$exercise_url'); return false;",
-        'ontouchstart' => "(function(url){window.location = url;})('$exercise_url');return false;"
+        'class' => 'btn btn-primary btn-large'
     )
 );
 

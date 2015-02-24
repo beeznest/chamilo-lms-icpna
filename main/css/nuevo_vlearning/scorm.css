@@ -116,22 +116,54 @@
         display: block;
     }
 
+    .frame-page-lesson {
+        padding: 0;
+        position: static;
+    }
+
+    .frame-page-lesson #learning_path_main {
+        position: static;
+    }
+
     #learning_path_left_zone {
-        width: 95%;
+        width: 100%;
     }
     #learning_path_main.folded #learning_path_left_zone{
         width: 0;
     }
     #hide_bar {
-        width: 5%;
-    }
-    #learning_path_right_zone {
         display: none;
         width: 0;
     }
+    #learning_path_right_zone {
+        position: static;
+    }
     #learning_path_main.folded #learning_path_right_zone{
         display: block;
-        width: 95%;
+        width: 100%;
+    }
+    #learning_path_main #learning_path_right_zone iframe {
+        display: none;
+    }
+    #learning_path_main.folded #learning_path_right_zone iframe {
+        background-color: #FFF;
+        display: block;
+        position: static;
+        right: 0;
+        top: 0;
+    }
+    #learning_path_main a#mobile-back-to-lessons {
+        background-color: #EEE;
+        background-image: url("/main/img/hide2.png");
+        background-position: 5px center;
+        background-repeat: no-repeat;
+        display: none;
+        font-weight: bold;
+        padding: 5px 5px 5px 16px;
+    }
+    #learning_path_main.folded a#mobile-back-to-lessons {
+        display: block;
+        background-image: url("/main/img/hide0.png");
     }
 }
 

@@ -1418,3 +1418,4 @@ $XEnabled = "%s enabled";
 $XDisabled = "%s disabled";
 $SeriousGameMode = "Serious game mode";
 $ClickHereToSeeOptions = "Click here to see the header options";
+$Lessons = "Lessons";

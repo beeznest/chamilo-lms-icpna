@@ -38,7 +38,7 @@
                     <div class="row-fluid">
                         <div class="span6 help">
                             <div class="boton-movil">
-                                <a herf="#" data-toggle="modal" data-target="#help"><img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/icon_help.png">{{"Help"|get_lang}}</a>
+                                <a href="#help" data-toggle="modal"><img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/icon_help.png">{{"Help"|get_lang}}</a>
                             </div>
                         </div>
                         <div class="span6 closed">

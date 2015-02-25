@@ -1,5 +1,5 @@
 <!-- Modal -->
-<div class="modal fade" style="display: none;" id="FAQ" tabindex="-1" role="dialog" aria-labelledby="FAQlabel" aria-hidden="true">
+<div class="modal fade hide" id="FAQ" tabindex="-1" role="dialog" aria-labelledby="FAQlabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -299,7 +299,7 @@
         </div>
     </div>
 </div>
-<div class="modal fade" style="display: none;" id="privacidad" tabindex="-1" role="dialog" aria-labelledby="privacidadLabel" aria-hidden="true">
+<div class="modal fade hide" id="privacidad" tabindex="-1" role="dialog" aria-labelledby="privacidadLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -340,7 +340,7 @@
         </div>
     </div>
 </div>
-<div class="modal fade"  style="display: none;" id="terminos-condiciones" tabindex="-1" role="dialog" aria-labelledby="terminosLabel" aria-hidden="true">
+<div class="modal fade hide" id="terminos-condiciones" tabindex="-1" role="dialog" aria-labelledby="terminosLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -426,7 +426,7 @@
     </div>
 </div>
 <!--Modal Beneficios-->
-<div class="modal fade large" style="display: none;" id="beneficios" tabindex="-1" role="dialog" aria-labelledby="beneficioslabel" aria-hidden="true">
+<div class="modal fade hide" id="beneficios" tabindex="-1" role="dialog" aria-labelledby="beneficioslabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -477,19 +477,6 @@
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             Ayuda
         </div>
-        <div class="modal-body">
-            <video controls="controls">
-                <source src="http://vlearning.icpna.edu.pe/html/welcome_vlearning.ogv" type="video/ogg">
-                <source src="http://vlearning.icpna.edu.pe/html/welcome_vlearning.webm" type="video/webm">
-                <source src="http://vlearning.icpna.edu.pe/html/welcome_vlearning.mp4" type="video/mp4">
-                <object type="application/x-shockwave-flash" data="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf" height="360" width="640">
-                    <param name="movie" value="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf">
-                    <param name="allowFullScreen" value="true">
-                    <param name="wmode" value="transparent">
-                    <param name="flashVars" value="config={'playlist':['/bundles/applicationsubscriber/images/header-logo.png',{'url':'http://vlearning.icpna.edu.pe/html/welcome_vlearning.mp4','autoPlay':false}]}">
-                    <img alt="V-Learning" src="/bundles/applicationsubscriber/images/header-logo.png" title="No video playback capabilities, please download the video below" height="360" width="640">
-                </object>
-            </video>
-        </div>
+        <div class="modal-body"></div>
     </div>
 </div>

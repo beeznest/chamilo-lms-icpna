@@ -456,11 +456,6 @@ Display::display_header($nameTools, null, null, 0, array(
     <!-- right zone -->
     <!-- <div id="learning_path_right_zone"  style="margin-left:<?php echo $margin_left;?>;height:100%" >  Antiguo -->
     <div id="learning_path_right_zone">
-        <div class="visible-phone">
-            <a href="#" id="mobile-back-to-lessons">
-                <?php echo get_lang('Lessons') ?>
-            </a>
-        </div>
         <?php if ($_SESSION['oLP']->mode == 'fullscreen') { ?>
             <iframe id="content_id_blank" name="content_name_blank" src="blank.php" border="0" frameborder="0" style="width:100%; height:100%;" ></iframe>
         <?php } else { ?>

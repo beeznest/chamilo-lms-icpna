@@ -315,6 +315,20 @@ $(function() {
         $(".td_actions").hide();
     });*/
 });
+
+$(document).on('ready', function() {
+    $('#help').modal({
+        show: false
+    }).on('shown', function () {
+        var $self = $(this);
+
+        $.get('{{ _p.web }}home/help-video.html', function (videoHTML) {
+            $self.find('.modal-body').html(videoHTML);
+        });
+    }).on('hide', function() {
+        $(this).find('.modal-body').empty();
+    });
+});
 </script>
 {{ header_extra_content }}
 

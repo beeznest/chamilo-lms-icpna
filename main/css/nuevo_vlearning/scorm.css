@@ -138,8 +138,8 @@
         width: 5%;
     }
     #learning_path_main.folded #hide_bar {
-        display: none;
-        width: 0;
+        display: block;
+        width: 5%;
     }
     #learning_path_right_zone {
         margin-left: 0;
@@ -147,7 +147,8 @@
     }
     #learning_path_main.folded #learning_path_right_zone{
         display: block;
-        width: 100%;
+        width: 95%;
+        margin-left: 5%;
     }
     #learning_path_main #learning_path_right_zone iframe {
         display: none;

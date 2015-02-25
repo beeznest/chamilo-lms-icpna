@@ -94,16 +94,6 @@ $(document).ready(function() {
     //     $("#hide_bar").css('height', cntHeight);
     // });
 
-    (function bindHideBarMobile($) {
-        $('#mobile-back-to-lessons').on('click', function (e) {
-            e.preventDefault();
-
-            var $learningPathMain = $('#learning_path_main');
-
-            $learningPathMain.toggleClass('folded');
-        });
-    })(jQuery);
-
     (function hackForAndroid(navigator) {
         var ua = navigator.userAgent.toLowerCase(),
             isMobile = /mobile/.test(ua),

@@ -4037,4 +4037,29 @@ class UserManager {
         $send_to['users'] = array_unique($userlist);
         return $send_to;
     }
+
+    /**
+     * Get the last login data for a user
+     * @param int $userId The user id
+     * @return array The login data. Otherwise return false
+     */
+    public static function getLastLogin($userId)
+    {
+        $loginTable = Database::get_main_table(TABLE_STATISTIC_TRACK_E_LOGIN);
+
+        $result = Database::select(
+            '*',
+            $loginTable,
+            array(
+                'where' => array(
+                    'login_user_id = ?' => intval($userId)
+                ),
+                'order' => 'login_id DESC',
+                'limit' => '1'
+            ),
+            'first'
+        );
+
+        return $result;
+    }
 }

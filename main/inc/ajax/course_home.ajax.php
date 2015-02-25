@@ -484,6 +484,8 @@ switch ($action) {
         $trackTeacherInOut = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
         $branchTransaction = Database::get_main_table(TABLE_BRANCH_TRANSACTION);
 
+        $teacherLogin = UserManager::getLastLogin($userId);
+
         $whereCondition = array(
             'where' => array(
                 'user_id = ?
@@ -522,7 +524,7 @@ switch ($action) {
             $attributes = array(
                 'course_id' => $courseId,
                 'user_id' => $userId,
-                'log_in_course_date' => api_get_utc_datetime(),
+                'log_in_course_date' => $teacherLogin['login_date'],
                 'session_id' => $sessionId,
                 'room_id' => $roomId
             );
@@ -531,7 +533,6 @@ switch ($action) {
             $lastTrackId = Database::insert_id();
             require_once api_get_path(SYS_SERVER_ROOT_PATH) . 'tests/migrate/migration.class.php';
             $lastTransactionId = Migration::get_latest_transaction_id_by_branch(500 + $branchId);
-            $utc = api_get_utc_datetime();
             $transactionParams = array(
                 'transaction_id' => $lastTransactionId + 1,
                 'branch_id' => 500 + $branchId,
@@ -539,19 +540,27 @@ switch ($action) {
                 'item_id' => $lastTrackId,
                 'orig_id' => $courseId . "-" . $userId . "-" . $sessionId . "-" . $roomId,
                 'dest_id' => 'IN',
-                'info' => $utc,
+                'info' => $teacherLogin['login_date'],
                 'status_id' => 0,
             );
             Migration::add_transaction($transactionParams);
             // End save in transaction table
-            $arrayResp = array('id' => 1, 'data' => 'SUCCESS', 'date' => api_get_local_time($utc));
+            $arrayResp = array(
+                'id' => 1,
+                'data' => 'SUCCESS',
+                'date' => api_get_local_time($teacherLogin['login_date'])
+            );
         } else {
             foreach ($dataTable as $key => $inOutRow) {
                 $session = api_get_session_info($inOutRow['session_id']);
                 $course = api_get_course_info_by_id($inOutRow['course_id']);
                 $dataTable[$key]['session_name'] = $session['name'];
             }
-            $arrayResp = array('id' => 2, 'data' => $dataTable, 'date' => api_get_local_time($utc));
+            $arrayResp = array(
+                'id' => 2,
+                'data' => $dataTable,
+                'date' => api_get_local_time($teacherLogin['login_date'])
+            );
         }
         echo json_encode($arrayResp);
         break;

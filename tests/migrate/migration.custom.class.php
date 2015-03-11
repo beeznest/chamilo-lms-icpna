@@ -1276,6 +1276,7 @@ class MigrationCustom {
             unset($session_info['error']);
             // check dates (only do this at session creation)
             self::fix_access_dates($session_info);
+            $session_info['id_coach'] = 0;
             $session_id = SessionManager::add($session_info);
             $session_info = api_get_session_info($session_id, true);
             if ($session_id) {

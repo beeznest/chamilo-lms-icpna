@@ -295,10 +295,12 @@ class Tracking
 
     /**
      * Get last user's connection date on the course
-     * @param     int         User id
-     * @param    string        Course code
-     * @param    int            Session id (optional, default=0)
-     * @return    string|bool    Date with format long without day or false if there is no date
+     * @param int $student_id User id
+     * @param string $course_code Course code
+     * @param int $session_id Optional. Session id
+     * @param boolean $convert_date Optional. Whether show formated date
+     * @param boolean $showWarning Optional. Whether show warning for last connection greater than 7 days
+     * @return boolean Date with format long without day. Otherwise return false
      */
     public static function get_last_connection_date_on_the_course(
         $student_id,

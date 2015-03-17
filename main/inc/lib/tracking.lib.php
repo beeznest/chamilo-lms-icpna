@@ -295,12 +295,20 @@ class Tracking
 
     /**
      * Get last user's connection date on the course
-     * @param     int         User id
-     * @param    string        Course code
-     * @param    int            Session id (optional, default=0)
-     * @return    string|bool    Date with format long without day or false if there is no date
+     * @param int $student_id User id
+     * @param string $course_code Course code
+     * @param int $session_id Optional. Session id
+     * @param boolean $convert_date Optional. Whether show formated date
+     * @param boolean $showWarning Optional. Whether show warning for last connection greater than 7 days
+     * @return boolean Date with format long without day. Otherwise return false
      */
-    public static function get_last_connection_date_on_the_course($student_id, $course_code, $session_id = 0, $convert_date = true)
+    public static function get_last_connection_date_on_the_course(
+        $student_id,
+        $course_code,
+        $session_id = 0,
+        $convert_date = true,
+        $showWarning = true
+    )
     {
 
         // protect data
@@ -330,7 +338,7 @@ class Tracking
                 $now = time();
                 //If the last connection is > than 7 days, the text is red
                 //345600 = 7 days in seconds
-                if ($now - $last_login_date_timestamp > 604800) {
+                if ($showWarning && ($now - $last_login_date_timestamp > 604800)) {
                     if ($convert_date) {
                         $last_login_date = api_convert_and_format_date($last_login_date, DATE_FORMAT_SHORT);
                         $icon = api_is_allowed_to_edit() ? '<a href="'.api_get_path(REL_CODE_PATH).'announcements/announcements.php?action=add&remind_inactive='.$student_id.'" title="'.get_lang('RemindInactiveUser').'"><img src="'.api_get_path(WEB_IMG_PATH).'messagebox_warning.gif" /> </a>' : null;
@@ -2352,7 +2360,7 @@ class Tracking
                     $time = api_time_to_hms($total_time_login);
                     $progress = Tracking :: get_avg_student_progress($user_id, $course_code);
                     $percentage_score = Tracking :: get_avg_student_score($user_id, $course_code, array());
-                    $last_connection = Tracking :: get_last_connection_date_on_the_course($user_id, $course_code);
+                    $last_connection = Tracking :: get_last_connection_date_on_the_course($user_id, $course_code, $session_id, true, false);
 
                     if (is_null($progress)) {
                         $progress = '0%';
@@ -2635,7 +2643,7 @@ class Tracking
                         'my_average' => $my_average);
 
                     $weighting = 0;
-                    $last_connection = Tracking :: get_last_connection_date_on_the_course($user_id, $course_code, $session_id_from_get);
+                    $last_connection = Tracking :: get_last_connection_date_on_the_course($user_id, $course_code, $session_id_from_get, true, false);
                     $progress = Tracking :: get_avg_student_progress($user_id, $course_code, array(), $session_id_from_get);
                     $total_time_login = Tracking :: get_time_spent_on_the_course($user_id, $course_code, $session_id_from_get);
                     $time = api_time_to_hms($total_time_login);
@@ -3896,7 +3904,7 @@ class TrackingCourseLog
             $user['count_assignments'] = Tracking::count_student_assignments($user['user_id'], $course_code, $session_id);
             $user['count_messages'] = Tracking::count_student_messages($user['user_id'], $course_code, $session_id);
             $user['first_connection'] = Tracking::get_first_connection_date_on_the_course($user['user_id'], $course_code, $session_id);
-            $user['last_connection'] = Tracking::get_last_connection_date_on_the_course($user['user_id'], $course_code, $session_id);
+            $user['last_connection'] = Tracking::get_last_connection_date_on_the_course($user['user_id'], $course_code, $session_id, true, false);
 
             // we need to display an additional profile field
             $user['additional'] = '';

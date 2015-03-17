@@ -320,9 +320,16 @@ $(document).on('ready', function() {
     $('#help').modal({
         show: false
     }).on('shown', function () {
-        var $self = $(this);
+        var $self = $(this),
+            videoUrl = "{{ _p.web }}";
 
-        $.get('{{ _p.web }}home/help-video.html', function (videoHTML) {
+        {% if _s.kids == 0 %}
+            videoUrl += "home/help-video.html";
+        {% else %}
+            videoUrl += "home/help-video-kids.html";
+        {% endif %}
+
+        $.get(videoUrl, function (videoHTML) {
             $self.find('.modal-body').html(videoHTML);
         });
     }).on('hide', function() {

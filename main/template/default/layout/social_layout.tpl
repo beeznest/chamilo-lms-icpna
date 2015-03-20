@@ -31,7 +31,7 @@
                 <div class="lastname">{{_u.lastname}}</div>
                 <div class="cuenta">
                     <div class="boton-movil">
-                        <a href="{{ _p.web_main }}social/home.php" class="item-cuenta">Mi cuenta</a>
+                        <a href="{{ _p.web_main }}social/home.php" class="item-cuenta">{{ "MyAccount" | get_lang }}</a>
                     </div>
                 </div>
                 {{ social_left_content }}

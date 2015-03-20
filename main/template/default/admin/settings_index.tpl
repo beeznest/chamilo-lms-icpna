@@ -25,7 +25,7 @@
                 </div>
                 <div class="name">{{_u.firstname}}</div>
                 <div class="lastname">{{_u.lastname}}</div>
-                <div class="cuenta"><a href="{{ _p.web_main }}social/home.php" class="item-cuenta">Mi cuenta</a></div>
+                <div class="cuenta"><a href="{{ _p.web_main }}social/home.php" class="item-cuenta">{{ "MyAccount" | get_lang }}</a></div>
                 <div class="options">
                     <div class="row-fluid">
                         <div class="span6 help"><a href="#FAQ" data-toggle="modal"><img src="{{ _p.web_css }}nuevo_vlearning/img/userlogin/icon_help.png">{{"Help"|get_lang}}</a></div>

@@ -36,17 +36,26 @@ $result = Database::query($sql);
 
 $numRows = Database::num_rows($result);
 
-echo "$numRows sessions without course coach\n\n";
+echo "$numRows sessions without course coach" . PHP_EOL . PHP_EOL;
 
 if ($numRows <= 0) {
-    die("Exit\n");
+    die("Exit" . PHP_EOL);
 }
 
 while ($resultData = Database::fetch_assoc($result)) {
-    echo "Inserting course coach ({$resultData['id_coach']}) "
-    . "in course ({$resultData['course_code']}) in session ({$resultData['id']})\n";
+    $coachId = intval($resultData['id_coach']);
+    $sessionId = intval($resultData['id']);
+    $courseCode = $resultData['course_code'];
 
-    SessionManager::set_coach_to_course_session($resultData['id_coach'], $resultData['id'], $resultData['course_code']);
+    if ($coachId === 0) {
+        echo "Trying insert course coach with id 0 in session $sessionId" . PHP_EOL;
+        continue;
+    }
+
+    echo "Inserting course coach ($coachId) "
+    . "in course ($coachId) in session ($sessionId)" . PHP_EOL;
+
+    SessionManager::set_coach_to_course_session($coachId, $sessionId, $courseCode);
 }
 
-echo "Finish\n";
+echo "Finish" . PHP_EOL;

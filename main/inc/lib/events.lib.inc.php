@@ -339,10 +339,14 @@ function update_event_exercice($exeid, $exo_id, $score, $weighting, $session_id,
     }
 
     if ($exeid != '') {
-        // Validation in case of fraud with actived control time
+        /*
+         * Code commented due BT#8423 do not change the score to 0.
+         *
+         * Validation in case of fraud with actived control time
         if (!exercise_time_control_is_valid($exo_id, $learnpath_id, $learnpath_item_id)) {
             $score = 0;
         }
+        */
 
         if (!isset($status) || empty($status)) {
             $status = '';

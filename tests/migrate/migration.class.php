@@ -659,7 +659,6 @@ class Migration {
     static function get_branches() {
         $table = Database::get_main_table(TABLE_BRANCH_TRANSACTION);
         $sql = "SELECT DISTINCT branch_id FROM $table ORDER BY branch_id";
-error_log($sql);
         $result = Database::query($sql);
         if (Database::num_rows($result) > 0) {
             return Database::store_result($result, 'ASSOC');

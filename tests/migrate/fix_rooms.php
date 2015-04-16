@@ -40,6 +40,8 @@ if ($res !== false) {
       echo $name."\n";
       $sql5 = "UPDATE $ts SET option_display_text = '$name' WHERE id = ".$row['id'];
       $res5 = Database::query($sql5);
+      //$sql6 = "UPDATE branch_room set title = '$name' WHERE title = '$name'";
+      //$res6 = Database::query($sql6);
     }
   }
 }

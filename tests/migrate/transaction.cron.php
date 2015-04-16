@@ -31,6 +31,7 @@ if (($argc < 2) or empty($argv[1])) {
 //  should be started at about 120 seconds intervals.
 $pidfile = __DIR__.'/chamilo.transaction.pid';
 $lastexecfile = __DIR__.'/chamilo.transaction.last';
+$lastexecfixfile = __DIR__.'/chamilo.transaction.fix.last';
 if ($mode == 'fix') {
   $pidfile = __DIR__.'/chamilo.transaction.fix.pid';
 }
@@ -84,6 +85,7 @@ foreach ($branches as $id => $branch) {
     $branch_id = $branch['branch_id'];
     //if ($branch_id != 5) continue; //put priority on branch 5
     //if ($branch_id != 4) continue; //put priority on branch 4
+    //if ($branch_id == 4) continue; //skip branch 4
     //if ($branch_id != 2) continue; //put priority on branch 4
     //if a specific branch was given, check only this one
     if (!empty($cli_branch)) {
@@ -140,6 +142,10 @@ error_log($mode.': Total time taken for transaction run: '.$cron_total.'s for '.
 if ($mode == 'process') {
   $time = time();
   @file_put_contents($lastexecfile,'x::'.$time.'::x');
+  error_log('YZYZ - written last with '.$time.'. Shutting down');
+} else {
+  $time = time();
+  @file_put_contents($lastexecfixfile,'x::'.$time.'::x');
   error_log('YZYZ - written last with '.$time.'. Shutting down');
 }
 exit();

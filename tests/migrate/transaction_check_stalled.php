@@ -44,7 +44,9 @@ if (is_file($pid_fix_file)) {
 /**
  * React
  */
-if ($failing) {
+if (!$failing) {
+    error_log('Checked locked files. No locked process found. All good.');
+} else {
     // if it failed, then we need to:
     echo "Sending mail to admins\n";
     // 1. send an e-mail alert

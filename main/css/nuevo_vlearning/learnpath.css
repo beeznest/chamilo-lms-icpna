@@ -18,7 +18,7 @@ CSS Diseño V-learning 2015
     background-color: #528AD5;
 }
 .scorm-status-not-attempted{
-    background-color: #DDD;
+    background-color: #BBB;
 }
 .scorm_item .toc_inner a{
   padding-top: 10px;
@@ -42,6 +42,9 @@ CSS Diseño V-learning 2015
 }
 .scorm_item a{
     color: white;
+}
+ .scorm-status-not-attempted.scorm_item .toc_inner a{
+  color: #fff;
 }
 .scorm_item a:hover{
     color: #0134A1;

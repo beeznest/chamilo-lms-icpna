@@ -85,14 +85,10 @@
                                     {% if lesson_progress_bar is defined %}
                                         <div class="row-fluid lesson-top-buttons">
                                             <div class="span6">
-                                                <div class="btn btn-large btn-white pull-left">
-                                                    <a href="{{_p.web_course}}{{_c.code}}/?id_session={{_c.session_id}}">{{ _c.title }}</a>
-                                                </div>
+                                                <a class="btn btn-large btn-white pull-left" href="{{_p.web_course}}{{_c.code}}/?id_session={{_c.session_id}}">{{ _c.title }}</a>
                                             </div>
                                             <div class="span6">
-                                                <div class = "btn btn-large btn-white pull-right">
-                                                    <a href="{{_p.web_modules}}">{{ "Vlearning" |get_lang }}</a>
-                                                </div>
+                                                    <a class= "btn btn-large btn-white pull-right" href="{{_p.web_modules}}">{{ "Vlearning" |get_lang }}</a>
                                             </div>
                                         </div>
                                         <div class="row-fluid">

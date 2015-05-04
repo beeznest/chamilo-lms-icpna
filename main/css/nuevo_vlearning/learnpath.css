@@ -20,11 +20,14 @@ CSS Diseño V-learning 2015
 .scorm-status-not-attempted{
     background-color: #DDD;
 }
+.scorm_item .toc_inner a{
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-right: 10px;
+  padding-left: 35px;
+  display: block;
+}
 .scorm_item{
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-right: 10px;
-    padding-left: 35px;
     margin-bottom: 1px;
     color: white;
     font-size: 14px;
@@ -41,15 +44,18 @@ CSS Diseño V-learning 2015
     color: white;
 }
 .scorm_item a:hover{
-    color: #a9a9a9;
+    color: #0134A1;
 }
-.scorm_item_highlight{
+.scorm_item_highlight a{
   padding-top: 10px;
   padding-bottom: 10px;
   padding-right: 10px;
   padding-left: 35px;
+  display: block;
+}
+.scorm_item_highlight{
     margin-bottom: 1px;
-    font-size: 1.5em;
+    font-size: 14px;
     background-color: #0134A1;
   background-image: url("img/arrows-scrom.png") ;
   background-position: 270px center;

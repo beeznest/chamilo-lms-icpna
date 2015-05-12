@@ -71,6 +71,8 @@
 #learning_path_right_zone iframe {
     height: 100%;
     position: absolute;
+    padding: 20px;
+    box-sizing: border-box;
 }
 #learning_path_main.folded #learning_path_right_zone{
     width: 925px;
@@ -110,6 +112,14 @@
     #learning_path_main.folded #learning_path_right_zone{
         width: 704px;
     }
+  #hide_bar {
+    bottom: 0px;
+    left: 200px;
+    position: absolute;
+    right: auto;
+    top: 0px;
+    width: 15px;
+  }
 }
 
 @media (max-width: 767px) {

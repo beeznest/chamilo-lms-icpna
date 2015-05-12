@@ -25,6 +25,20 @@ body{
     color: #797979;
 
 }
+/*Exercise  */
+.question_options .radio, .question_options .checkbox{
+  padding-left: 10px;
+}
+.question_description table{
+  max-width: 100%;
+  display: block;
+}
+.main_question{
+  padding: 15px;
+}
+.form-actions{
+  clear: both;
+}
 #page-wrap{
   /* background-image: url(img/bgimage.jpg);
   background-position: center 0;

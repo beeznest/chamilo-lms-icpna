@@ -4552,11 +4552,12 @@ function api_get_access_urls($from = 0, $to = 1000000, $order = 'url', $directio
 
 /**
  * Gets the access url info in an array
- * @param id of the access url
+ * @param int id of the access url
+ * @param bool $returnDefault Set to false if you want the real URL if URL 1 is still 'http://localhost/'
  * @return array Array with all the info (url, description, active, created_by, tms) from the access_url table
  * @author Julio Montoya Armas
  */
-function api_get_access_url($id) {
+function api_get_access_url($id, $returnDefault = true) {
     global $_configuration;
     $id = Database::escape_string(intval($id));
     // Calling the Database:: library dont work this is handmade.
@@ -4568,6 +4569,24 @@ function api_get_access_url($id) {
             FROM $table_access_url WHERE id = '$id' ";
     $res = Database::query($sql);
     $result = @Database::fetch_array($res);
+    // If the result url is 'http://localhost/' (the default) and the root_web
+    // (=current url) is different, and the $id is = 1 (which might mean
+    // api_get_current_access_url_id() returned 1 by default), then return the
+    // root_web setting instead of the current URL
+    // This is provided as an option to avoid breaking the storage of URL-specific
+    // homepages in home/localhost/
+    if ($id === 1 && $returnDefault === false) {
+        $currentUrl = api_get_current_access_url_id();
+        // only do this if we are on the main URL (=1), otherwise we could get
+        // information on another URL instead of the one asked as parameter
+        if ($currentUrl === 1) {
+            $rootWeb = api_get_path(WEB_PATH);
+            $default = 'http://localhost/';
+            if ($result['url'] === $default && $rootWeb != $default) {
+                $result['url'] = $rootWeb;
+            }
+        }
+    }
     return $result;
 }
 

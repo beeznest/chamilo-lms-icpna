@@ -1215,7 +1215,13 @@ footer .red-social{
 .btn {
     -webkit-appearance: none !important;
 }
-
+.scorm_item_section.scorm_item{
+  padding: 10px 35px;
+  background: #666666;
+}
+.scorm_item_section.scorm_item .toc_inner{
+  background: none;
+}
 /* Large desktop - PC Escritorio */
 @media (max-width: 1200px) {
   .frame-inbox{

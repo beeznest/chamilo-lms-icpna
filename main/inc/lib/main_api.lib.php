@@ -4559,7 +4559,7 @@ function api_get_access_urls($from = 0, $to = 1000000, $order = 'url', $directio
  */
 function api_get_access_url($id, $returnDefault = true) {
     global $_configuration;
-    $id = Database::escape_string(intval($id));
+    $id = intval($id);
     // Calling the Database:: library dont work this is handmade.
     //$table_access_url = Database::get_main_table(TABLE_MAIN_ACCESS_URL);
     $table = 'access_url';

@@ -737,7 +737,9 @@ class learnpath {
         if (empty($item)) {
             $item = $this->current;
         }
-        $parent_id = $this->items[$item]->get_parent();
+        if (is_object($this->items[$item])) {
+            $parent_id = $this->items[$item]->get_parent();
+        }
 
         if (isset($this->items[$item]) && is_object($this->items[$item]) and !empty($parent_id)) {
             // if $item points to an object and there is a parent.
@@ -3573,12 +3575,15 @@ class learnpath {
      * Updates learnpath attributes to point to the next element
      * The last part is similar to set_current_item but processing the other way around
      */
-    public function next() {
+    public function next()
+    {
         if ($this->debug > 0) {
             error_log('New LP - In learnpath::next()', 0);
         }
         $this->last = $this->get_current_item_id();
-        $this->items[$this->last]->save(false, $this->prerequisites_match($this->last));
+        if (is_object($this->items[$this->last])) {
+            $this->items[$this->last]->save(false, $this->prerequisites_match($this->last));
+        }
         $this->autocomplete_parents($this->last);
         $new_index = $this->get_next_index();
         if ($this->debug > 2) {

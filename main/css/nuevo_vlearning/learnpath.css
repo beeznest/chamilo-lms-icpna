@@ -85,7 +85,10 @@ CSS Diseño V-learning 2015
 .scorm_item_highlight {
     background-image: none;
 }
-
+.scorm-level-0.scorm-status-not-attempted.scorm_item_1.scorm_item{
+  background: #666;
+  padding: 10px 0px 10px 30px;
+}
 .frame-page-lesson {
     background-color: #FFF;
     padding-bottom: 20px;

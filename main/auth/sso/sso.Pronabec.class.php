@@ -139,10 +139,14 @@ class ssoPronabec {
                                             $sso_target = isset($sso['target']) ? $sso['target'] : api_get_path(WEB_PATH) .'.index.php';
                                         } else {
                                             //redirect to session
-                                            $sessionId = SessionManager::get_session_id_from_original_id($sso['uidIdPrograma'], 'uidIdPrograma'); 
-                                            $courses = SessionManager::get_course_list_by_session_id ($sessionId);
-                                            $code = current($courses)['code'];
-                                            $sso_target = api_get_path(WEB_PATH) . 'courses/' . $code . '/?id_session=' . $sessionId;
+                                            $sessionId = SessionManager::get_session_id_from_original_id($sso['uidIdPrograma'], 'uidIdPrograma');
+                                            if (isset ($sessionId) && $sessionId != '') {
+                                                $courses = SessionManager::get_course_list_by_session_id ($sessionId);
+                                                $code = current($courses)['code'];
+                                                if (isset ($code) && $code != '') {
+                                                    $sso_target = api_get_path(WEB_PATH) . 'courses/' . $code . '/?id_session=' . $sessionId;
+                                                }
+                                            }
                                         }
                                         header('Location: '. $sso_target);
                                         exit;
@@ -247,3 +251,4 @@ class ssoPronabec {
                    MCRYPT_MODE_ECB,$iv
                );
     }
+}

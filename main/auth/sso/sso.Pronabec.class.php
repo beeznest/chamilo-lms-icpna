@@ -237,7 +237,6 @@ class ssoPronabec {
         // referencias para que funciona la encrypción del lado ASP
         //http://stackoverflow.com/questions/24435502/aes128-encryption-using-php-mcrypt-is-not-outputting-same-as-asp-net
         //http://php.net//manual/en/function.mcrypt-encrypt.php#47973
-        //$chamiloSecurityKey = '86f4a2b878e383eb84893e11ca478c38';
         $key = substr(api_get_security_key(), 0, 10);
         $ivsize = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_ECB);
         $iv     = mcrypt_create_iv($ivsize);
@@ -248,27 +247,3 @@ class ssoPronabec {
                    MCRYPT_MODE_ECB,$iv
                );
     }
-
-    /**
-     * Generate the URL for profile editing
-     * @return string If the URL is obtained return the drupal_user_id. Otherwise return false 
-     */
-    public function generateProfileEditingURL()
-    {
-        $userId = api_get_user_id();
-
-        $userExtraFieldValue = new ExtraFieldValue('user');
-        $drupalUserIdData = $userExtraFieldValue->get_values_by_handler_and_field_variable($userId, 'drupal_user_id');
-
-        if ($drupalUserIdData === false) {
-            return false;
-        }
-
-        $drupalUserId = $drupalUserIdData['field_value'];
-
-        $url = "{$this->protocol}{$this->domain}/user/{$drupalUserId}/edit";
-
-        return $url;
-    }
-
-}

@@ -424,25 +424,25 @@ if (!empty($_SESSION['_user']['user_id']) && !($login || $logout)) {
             }
         } elseif(!$logout) {
             // Handle cookie comming from Master Server
-            if (!isset($_GET['sso_referer']) && !isset($_GET['loginFailed']) && isset($_GET['sso_cookie'])) {
+            if (!isset($_REQUEST['sso_referer']) && !isset($_REQUEST['loginFailed']) && isset($_REQUEST['sso_cookie'])) {
                 // Redirect to master server
                 $osso->ask_master();
-            } elseif (isset($_GET['sso_cookie'])) {
+            } elseif (isset($_REQUEST['sso_cookie'])) {
                 // Here we are going to check the origin of
                 // what the call says should be used for
                 // authentication, and ensure  we know it
                 $matches_domain = false;
-                if (isset($_GET['sso_referer'])) {
+                if (isset($_REQUEST['sso_referer'])) {
                     $protocol = api_get_setting('sso_authentication_protocol');
                     // sso_authentication_domain can list
                     // several, comma-separated, domains
-                    $master_urls = split(',',api_get_setting('sso_authentication_domain'));
+                    $master_urls = preg_split('/,/',api_get_setting('sso_authentication_domain'));
                     if (!empty($master_urls)) {
                         $master_auth_uri = api_get_setting('sso_authentication_auth_uri');
                         foreach ($master_urls as $mu) {
                             if (empty($mu)) { continue; }
                             // for each URL, check until we find *one* that matches the $_GET['sso_referer'], then skip the rest
-                            if ($protocol.trim($mu).$master_auth_uri === $_GET['sso_referer']) {
+                            if ($protocol.trim($mu).$master_auth_uri === $_REQUEST['sso_referer']) {
                                 $matches_domain = true;
                                 break;
                             }

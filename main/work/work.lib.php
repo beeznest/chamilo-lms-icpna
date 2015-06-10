@@ -1178,8 +1178,9 @@ function update_work_url($id, $new_path, $parent_id) {
  * @param	string new path
  */
 function update_dir_name($work_data, $new_name, $title) {
-	$course_id = api_get_course_int_id();
-	$work_id = intval($work_data['id']);
+    $course_id = api_get_course_int_id();
+    $work_id = intval($work_data['id']);
+    $sessionId = intval($work_data['session_id']);
     $path  = $work_data['url'];
 
     if ($work_data['title'] == $title) {
@@ -1187,17 +1188,17 @@ function update_dir_name($work_data, $new_name, $title) {
     }
     $title = Database::escape_string($title);
 
-	if (!empty($new_name)) {
-		global $base_work_dir;
+    if (!empty($new_name)) {
+//		global $base_work_dir;
 
-		$new_name = Security::remove_XSS($new_name);
-		$new_name = replace_dangerous_char($new_name);
-		$new_name = disable_dangerous_file($new_name);
-		my_rename($base_work_dir.'/'.$path, $new_name);
+//		$new_name = Security::remove_XSS($new_name);
+//		$new_name = replace_dangerous_char($new_name);
+//		$new_name = disable_dangerous_file($new_name);
+//		my_rename($base_work_dir.'/'.$path, $new_name);
 		$table = Database::get_course_table(TABLE_STUDENT_PUBLICATION);
 
 		//update all the files in the other directories according with the next query
-		$sql = "SELECT id, url FROM $table WHERE c_id = $course_id AND parent_id = $work_id"; // like binary (Case Sensitive)
+/*		$sql = "SELECT id, url FROM $table WHERE c_id = $course_id AND parent_id = $work_id"; // like binary (Case Sensitive)
 
 		$rs = Database::query($sql);
 		$work_len = strlen('work/'.$path);
@@ -1209,10 +1210,14 @@ function update_dir_name($work_data, $new_name, $title) {
 			$sql = 'UPDATE '.$table.' SET url= "'.$name.'" WHERE c_id = '.$course_id.' AND id= '.$work['id'];
 			Database::query($sql);
 		}
-
-        $sql = "UPDATE $table SET url= '/".$new_name."' , title = '".$title."' WHERE c_id = $course_id AND id = $work_id";
+*/
+        $sql = "UPDATE $table SET
+                    title = '".$title."'
+                WHERE
+                    c_id = $course_id AND
+                    id = $work_id";
         Database::query($sql);
-	}
+    }
 }
 
 /**

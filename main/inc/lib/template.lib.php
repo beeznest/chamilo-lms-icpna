@@ -623,7 +623,8 @@ class Template {
 
         if (api_get_setting('show_administrator_data') == 'true') {
             //Administrator name
-            $administrator_data = get_lang('Manager') . ' : ' . Display::encrypted_mailto_link(api_get_setting('emailAdministrator'), api_get_person_name(api_get_setting('administratorName'), api_get_setting('administratorSurname')));
+//            $administrator_data = get_lang('Manager') . ' : ' . Display::encrypted_mailto_link(api_get_setting('emailAdministrator'), api_get_person_name(api_get_setting('administratorName'), api_get_setting('administratorSurname')));
+            $administrator_data = get_lang('Manager') . ' : ' . api_get_person_name(api_get_setting('administratorName'), api_get_setting('administratorSurname'));
             $this->assign('administrator_name', $administrator_data);
         }
 
@@ -646,7 +647,8 @@ class Template {
                     $coachs_email = CourseManager::get_email_of_tutor_to_session($id_session, $id_course);
                     $email_link = array();
                     foreach ($coachs_email as $coach) {
-                        $email_link[] = Display::encrypted_mailto_link($coach['email'], $coach['complete_name']);
+//                        $email_link[] = Display::encrypted_mailto_link($coach['email'], $coach['complete_name']);
+                        $email_link[] = $coach['complete_name'];
                     }
                     if (count($coachs_email) > 1) {
                         $tutor_data .= get_lang('Coachs') . ' : ';
@@ -672,7 +674,8 @@ class Template {
                     $teachers_parsed = array();
                     foreach ($mail as $value) {
                         foreach ($value as $email => $name) {
-                            $teachers_parsed[] = Display::encrypted_mailto_link($email, $name);
+//                            $teachers_parsed[] = Display::encrypted_mailto_link($email, $name);
+                            $teachers_parsed[] = $name;
                         }
                     }
                     $label = get_lang('Teacher');

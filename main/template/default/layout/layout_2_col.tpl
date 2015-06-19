@@ -2,7 +2,7 @@
 
 {% block body %}
 	{# Main content #}
-
+<!--
 	{#  Right column  #}
 	<div class="span3 menu-column">
         {% if plugin_menu_top %}
@@ -60,6 +60,7 @@
             </div>
         {% endif %}
 	</div>
+-->
 	<div class="span9 content-column">
 
         {#  Plugin bottom  #}

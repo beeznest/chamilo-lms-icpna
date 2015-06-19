@@ -55,7 +55,8 @@
                 {% endif %}
 
                 <div id="software_name">
-                    {{ "Platform"|get_lang }} <a href="{{_p.web}}" target="_blank">{{_s.software_name}} {{_s.system_version}}</a>
+<!--                    {{ "Platform"|get_lang }} <a href="{{_p.web}}" target="_blank">{{_s.software_name}} {{_s.system_version}}</a> -->
+                    {{ "Platform"|get_lang }} {{_s.software_name}} {{_s.system_version}}
                     &copy; {{ "now"|date("Y") }}
                 </div>
                 {#   Plugins for footer section  #}

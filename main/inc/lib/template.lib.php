@@ -962,7 +962,8 @@ class Template {
             $navigation['platform_admin']['url'] = api_get_path(WEB_CODE_PATH).'admin/';
             $navigation['platform_admin']['title'] = get_lang('PlatformAdmin');
         }
-
+/**
+remove Attendance Viewer tab for Pronabec BT#9972
         if (api_is_teacher_admin() || api_is_platform_admin()) {
             $navigation['inOutManagement']['url'] = api_get_path(WEB_CODE_PATH).'admin/sessions_schedule.php';
             $navigation['inOutManagement']['title'] = get_lang('InOutManagement');
@@ -972,7 +973,7 @@ class Template {
             $navigation['inOutManagement']['url'] = api_get_path(WEB_CODE_PATH).'attendance/teacher.php';
             $navigation['inOutManagement']['title'] = get_lang('InOutManagement');
         }
-
+*/
         return $navigation;
     }
 

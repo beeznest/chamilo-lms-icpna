@@ -816,7 +816,7 @@ class Template {
                     $current = '';
                 }
                 if (!empty($navigation_info['title'])) {
-                    $pre_lis .= '<li'.$current.' ><a  href="'.$navigation_info['url'].'" target="_top">'.$navigation_info['title'].'</a></li>';
+                    $pre_lis .= '<li'.$current.' ><a  href="'.$navigation_info['url'].'" target="_self">'.$navigation_info['title'].'</a></li>';
                 }
             }
             $lis = $pre_lis.$lis;
@@ -1373,7 +1373,7 @@ remove Attendance Viewer tab for Pronabec BT#9972
                 if ($navigation_info['url'] == '#') {
                     $final_navigation[$index] = $navigation_info['title'];
                 } else {
-                    $final_navigation[$index] = '<a href="'.$navigation_info['url'].'" class="" target="_top">'.$navigation_info['title'].'</a>';
+                    $final_navigation[$index] = '<a href="'.$navigation_info['url'].'" class="" target="_self">'.$navigation_info['title'].'</a>';
                 }
                 $counter++;
             }

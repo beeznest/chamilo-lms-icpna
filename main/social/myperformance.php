@@ -122,9 +122,17 @@ function twoOrMoreDigitString($num) {
         return false;
     }
     if ($num < 10) {
-        return '0' . $num;
+        if ($isAdult) {
+            return '0' . $num;
+        } else {
+            return '00' . $num;
+        }
     } else {
-        return strval($num);
+        if ($isAdult) {
+            return strval($num);
+        } else {
+            return '0' . $num;
+        }
     }
 }
 

@@ -1190,7 +1190,11 @@ class learnpathItem
         }
         // TODO: Improve cleaning of breaklines ... it works but is it really a beautiful way to do it ?
         if (!empty($this->current_data)) {
-            return str_replace(array("\r", "\n"), array('\r', '\n'), $this->current_data);
+            return str_replace(
+                array("\r", "\n", "'"),
+                array('\r', '\n', "\\'"),
+                $this->current_data
+            );
         } else {
             return '';
         }

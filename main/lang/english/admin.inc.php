@@ -595,6 +595,7 @@ $SelectACoach = "Select a coach";
 $UserNameUsedTwice = "Login is used twice";
 $UserNameNotAvailable = "This login is not available";
 $UserNameTooLong = "This login is too long";
+$UserNameHasDash = "This login must not have dash '-'";
 $WrongStatus = "This status doesn't exist";
 $ClassNameNotAvailable = "This classname is not available";
 $FileImported = "File imported";

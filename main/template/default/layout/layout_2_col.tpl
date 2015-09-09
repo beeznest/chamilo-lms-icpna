@@ -10,13 +10,18 @@
                 {{plugin_menu_top}}
             </div>
         {% endif %}
+-->
+        {# if user is not login show the login form #}
+        {% if _u.logged  == 0 %}
 
-	    {# if user is not login show the login form #}
-		{% if _u.logged  == 0 %}
-			{% include "default/layout/login_form.tpl" %}
-		{% endif %}
+            {#  Right column  #}
+            <div class="span3 menu-column">
+                {% include "default/layout/login_form.tpl" %}
+            </div>
+        {% endif %}
+<!--
 
-		{#  User picture  #}
+	{#  User picture  #}
         {% include "default/index/user_image_block.tpl" %}
 
         {#  User Profile links #}

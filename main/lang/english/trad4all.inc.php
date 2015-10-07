@@ -1424,4 +1424,4 @@ $SubstitutionStatus = "Substitution status";
 $OnlyWithSubstitution = "Only with substitution";
 $OnlyWithoutSubstitution = "Only without substitution";
 $ClosingSession = 'Closing session...';
-?>
+$FolderDoesntExistsInFileSystem = "The folder you are trying to use does not exist and could not be created. Please report this issue to your teacher.";

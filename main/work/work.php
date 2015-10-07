@@ -579,11 +579,21 @@ switch ($action) {
                     $curdirpath = basename($my_folder_data['url']);
 
 					//if we come from the group tools the groupid will be saved in $work_table
-					$result = @move_uploaded_file($_FILES['file']['tmp_name'], $updir.$curdirpath.'/'.$new_file_name);
-                    if ($result) {
-                        $url = 'work/'.$curdirpath.'/'.$new_file_name;
-                        $contains_file = 1;
+					if (!is_dir($updir.$curdirpath) && !empty($curdirpath)) {
+                        $created_dir = create_unexisting_work_directory($updir, $curdirpath);
                     }
+
+					if (is_dir($updir.$curdirpath) || empty($curdirpath)) {
+						$result = @move_uploaded_file($_FILES['file']['tmp_name'], $updir.$curdirpath.'/'.$new_file_name);
+						if ($result) {
+							$url = 'work/'.$curdirpath.'/'.$new_file_name;
+							$contains_file = 1;
+						}
+					} else {
+						Display :: display_error_message(get_lang('FolderDoesntExistsInFileSystem'));
+                        $succeed = false;
+                        $stop = true;
+					}
 				}
 
 				if (empty($title)) {
@@ -595,7 +605,7 @@ switch ($action) {
                 $total_size = $filesize + $documents_total_space;
                 if ($total_size > $course_max_space) {
 			       $error_message = get_lang('NoSpace');
-                } else {
+                } elseif (empty($stop)) {
 
                     $active = '1';
 			        $sql_add_publication = "INSERT INTO " . $work_table . " SET

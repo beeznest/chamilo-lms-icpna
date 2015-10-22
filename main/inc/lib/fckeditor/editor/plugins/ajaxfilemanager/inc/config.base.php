@@ -37,13 +37,23 @@ define('CONFIG_SYS_THUMBNAIL_VIEW_ENABLE', true);//REMOVE THE thumbnail view if 
 //User Permissions
 //Hack by Juan Carlos Raña Trabado
 if(empty($_course['path']) || Security::remove_XSS($_GET['editor'])=="stand_alone") {
-	define('CONFIG_OPTIONS_DELETE', true);
-	define('CONFIG_OPTIONS_CUT', true);
-	define('CONFIG_OPTIONS_COPY', true);
-	define('CONFIG_OPTIONS_NEWFOLDER', true);
-	define('CONFIG_OPTIONS_RENAME', true);
-	define('CONFIG_OPTIONS_UPLOAD', true);
-	define('CONFIG_OPTIONS_EDITABLE', false); //disable image editor and text editor
+    if (api_is_teacher()) {
+        define('CONFIG_OPTIONS_DELETE', false);
+        define('CONFIG_OPTIONS_CUT', false);
+        define('CONFIG_OPTIONS_COPY', false);
+        define('CONFIG_OPTIONS_NEWFOLDER', false);
+        define('CONFIG_OPTIONS_RENAME', false);
+        define('CONFIG_OPTIONS_UPLOAD', false);
+        define('CONFIG_OPTIONS_EDITABLE', false); //disable image editor and text editor
+    } else {
+        define('CONFIG_OPTIONS_DELETE', true);
+        define('CONFIG_OPTIONS_CUT', true);
+        define('CONFIG_OPTIONS_COPY', true);
+        define('CONFIG_OPTIONS_NEWFOLDER', true);
+        define('CONFIG_OPTIONS_RENAME', true);
+        define('CONFIG_OPTIONS_UPLOAD', true);
+        define('CONFIG_OPTIONS_EDITABLE', false); //disable image editor and text editor
+    }
 } else {
 
 	if(api_is_allowed_to_edit()) {

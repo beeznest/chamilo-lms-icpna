@@ -1415,4 +1415,5 @@ $DataTableSearch = "Buscar";
 $HideColumn = "Ocultar columna";
 $DisplayColumn = "Mostrar columna";
 $LegalAgreementAccepted = "Condiciones legales aceptadas";
+$UploadAndEditActionsAreDisabled = "<strong>¡Atención!</strong> Las funciones de Subir y Editar han sido deshabilitadas.<br>Por favor, vaya a la opción OneDrive del menú para gestionar sus archivos. <a href=\"https://virtual.icpna.edu.pe/mediafiles/onedrive.html\" target=\"_blank\">Consulte el tutorial</a>.";
 ?>

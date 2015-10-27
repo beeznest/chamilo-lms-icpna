@@ -1425,3 +1425,4 @@ $OnlyWithSubstitution = "Only with substitution";
 $OnlyWithoutSubstitution = "Only without substitution";
 $ClosingSession = 'Closing session...';
 $FolderDoesntExistsInFileSystem = "The folder you are trying to use does not exist and could not be created. Please report this issue to your teacher.";
+$UploadAndEditActionsAreDisabled = "<strong>Atention!</strong> The Upload and Editing functions have been removed.<br>Please go to menu OneDrive to manage your files. <a href=\"https://virtual.icpna.edu.pe/mediafiles/onedrive.html\" target=\"_blank\">See tutorial</a>.";

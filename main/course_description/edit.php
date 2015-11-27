@@ -11,6 +11,7 @@
 api_protect_course_script(true);
 $original_id = $id;
 
+$error = isset($error) ? $error : null;
 if (!$error) {
 	$token = Security::get_token();
 }
@@ -67,7 +68,9 @@ if (api_get_setting('wcag_anysurfer_public_pages')=='true') {
 $form->addElement('style_submit_button', null, get_lang('Save'), 'class="save"');
 
 // Set some default values
+$description_title = isset($description_title) ? $description_title : null;
 $default['title'] = Security::remove_XSS($description_title);
+$description_content = isset($description_content) ? $description_content : null;
 $default['contentDescription'] = Security::remove_XSS($description_content,COURSEMANAGERLOWSECURITY);
 $default['description_type'] = $description_type;
 

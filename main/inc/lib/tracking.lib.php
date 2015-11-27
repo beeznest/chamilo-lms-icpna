@@ -3328,8 +3328,8 @@ class Tracking
             );
 
             $count = Database::select('count(*) as count', $trackTeacherInOut, $whereCondition);
-
-            return (int)$count[0]['count'];
+            $return = isset($count[0]['count']) ? $count[0]['count'] : false;
+            return (int)$return;
         } else {
             return 0;
         }

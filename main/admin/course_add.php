@@ -29,7 +29,8 @@ $order_clause = api_sort_by_first_name() ? ' ORDER BY firstname, lastname' : ' O
 $table_user = Database :: get_main_table(TABLE_MAIN_USER);
 $sql = "SELECT user_id,lastname,firstname FROM $table_user WHERE status=1".$order_clause;
 // Filtering teachers when creating a course.
-if ($_configuration['multiple_access_urls']) {
+$multiple_access_urls = isset($_configuration['multiple_access_urls']) ? $_configuration['multiple_access_urls'] : null;
+if ($multiple_access_urls) {
     $access_url_rel_user_table= Database :: get_main_table(TABLE_MAIN_ACCESS_URL_REL_USER);
     $sql = "SELECT u.user_id,lastname,firstname FROM $table_user as u
             INNER JOIN $access_url_rel_user_table url_rel_user
@@ -65,7 +66,7 @@ $form->addRule('visual_code', get_lang('Max'), 'maxlength', CourseManager::MAX_C
 $form->addElement('select', 'course_teachers', get_lang('CourseTeachers'), $teachers, ' id="course_teachers" class="chzn-select"  style="width:350px" multiple="multiple" ');
 $form->applyFilter('course_teachers', 'html_filter');
 
-$categories_select = $form->addElement('select', 'category_code', get_lang('CourseFaculty'), $categories, array('style' => 'width:350px', 'class'=>'chzn-select', 'id'=>'category_code'));
+$categories_select = $form->addElement('select', 'category_code', get_lang('CourseFaculty'), isset($categories) ? $categories : null, array('style' => 'width:350px', 'class'=>'chzn-select', 'id'=>'category_code'));
 $categories_select->addOption('-','');
 $form->applyFilter('category_code', 'html_filter');
 //This function fills the category_code select ...
@@ -157,7 +158,7 @@ if ($form->validate()) {
 $content = $form->return_form();
 
 $tpl = new Template($tool_name);
-$tpl->assign('actions', $actions);
-$tpl->assign('message', $message);
+$tpl->assign('actions', isset($actions) ? $actions : null);
+$tpl->assign('message', isset($message) ? $message : null);
 $tpl->assign('content', $content);
 $tpl->display_one_col_template();

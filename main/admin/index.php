@@ -395,7 +395,7 @@ function check_system_version() {
         );
 
         //$res = _http_request('version.chamilo.org', 80, '/version.php', $data, 0.1);
-
+        $res = isset($res) ? $res : null;
         if ($res !== false) {
             $version_info = $res;
 

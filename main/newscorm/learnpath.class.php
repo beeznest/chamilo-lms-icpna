@@ -3027,7 +3027,7 @@ class learnpath {
                             require_once api_get_path(LIBRARY_PATH).'link.lib.php';
                             if (is_youtube_link($file)) {
                                 $src  = get_youtube_video_id($file);
-                                $file = 'embed.php?type=youtube&src='.$src;
+                                $file = 'embed.php?type=youtube&source='.$src;
                             } else {
                                 // If the current site is HTTPS and the link is
                                 // HTTP, browsers will refuse opening the link

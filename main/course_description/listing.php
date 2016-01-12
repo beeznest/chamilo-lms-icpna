@@ -29,7 +29,7 @@ if (api_is_allowed_to_edit(null,true)) {
     $categories[ADD_BLOCK] = get_lang('NewBloc');
 
     $i=1;
-    
+
     if (api_is_platform_admin()) {
         echo '<div class="actions" style="margin-bottom:30px">';
         ksort($categories);
@@ -47,14 +47,6 @@ if (api_is_allowed_to_edit(null,true)) {
         echo '</div>';
     }
 }
-$littleCount = 1;
-echo '<ul class="nav nav-tabs">';
-foreach ($default_description_titles as $id => $title) {
-    $active = ($littleCount == 1) ? 'in active' : '';
-    $littleCount++;
-    echo '<li role="presentation" class="'. $active .'"><a href="#'. $id .'" data-toggle="tab">'. $title .'</a></li>';
-}
-echo '</ul>';
 
 $history = isset($history) ? $history : null;
 // display course description list
@@ -63,46 +55,114 @@ if ($history) {
 }
 $user_info = api_get_user_info();
 $catCount = 1;
-echo '<div class="tab-content">';
+
+$tabsData = array();
+
 foreach ($default_description_titles as $titles) {
-    $active = ($catCount == 1) ? 'in active' : '';
-    echo '<div role="tabpanel" class="tab-pane fade '. $active .'" id="'. $catCount .'" name='. $titles .'>';
     if (isset($descriptions) && count($descriptions) > 0) {
         foreach ($descriptions as $id => $description) {
-            if ($catCount == $description['description_type'] || ($catCount == 8 && intval($description['description_type']) >= 8) ) {
-                echo '<div class="sectiontitle">';
-                if (api_is_platform_admin()) {
-                    if (api_is_allowed_to_edit(null,true) && !$history) {
-                        if (api_get_session_id() == $description['session_id']) {
-                            $description['title'] = $description['title'].' '.api_get_session_image(api_get_session_id(), $user_info['status']);
-
-                            //delete
-                            echo '<a href="'.api_get_self().'?id='.$description['id'].'&cidReq='.api_get_course_id().'&id_session='.$description['session_id'].'&action=delete&description_type='.$description['description_type'].'" onclick="javascript:if(!confirm(\''.addslashes(api_htmlentities(get_lang('ConfirmYourChoice'),ENT_QUOTES,isset($charset) ? $charset : null)).'\')) return false;">';
-                            echo Display::return_icon('delete.png', get_lang('Delete'), array('style' => 'vertical-align:middle;float:right;'),ICON_SIZE_SMALL);
-                            echo '</a> ';
-
-                            //edit
-                            echo '<a href="'.api_get_self().'?id='.$description['id'].'&cidReq='.api_get_course_id().'&id_session='.$description['session_id'].'&action=edit&description_type='.$description['description_type'].'">';
-                            echo Display::return_icon('edit.png', get_lang('Edit'), array('style' => 'vertical-align:middle;float:right; padding-right:4px;'),ICON_SIZE_SMALL);
-                            echo '</a> ';
-                        } else {
-                            echo Display::return_icon('edit_na.png', get_lang('EditionNotAvailableFromSession'), array('style' => 'vertical-align:middle;float:right;'),ICON_SIZE_SMALL);
-
-                        }
-                    }
-                }
-
-            echo $description['title'];
-            echo '</div>';
-            echo '<div class="sectioncomment">';
-            echo $description['content'];
-            echo '</div>';
+            if (
+                $catCount == $description['description_type'] ||
+                ($catCount == 8 && intval($description['description_type']) >= 8)
+            ) {
+                $tabsData[] = array(
+                    'id' => $description['id'],
+                    'title' => $description['title'],
+                    'content' => $description['content'],
+                    'is_editable' => api_is_platform_admin() &&
+                        api_is_allowed_to_edit(null, true) &&
+                        !$history &&
+                        api_get_session_id() == $description['session_id'],
+                    'session_id' => $description['session_id'],
+                    'type' => $description['description_type']
+                );
             }
         }
-    } else {
-        echo '<em>'.get_lang('ThisCourseDescriptionIsEmpty').'</em>';
     }
     $catCount++;
+}
+
+$firstTab = $tabsData[0];
+
+echo '<ul class="nav nav-tabs" id="course-description-tabs">';
+
+foreach ($tabsData as $tab) {
+    if ($tab['is_editable']) {
+        $tab['title'] = $tab['title'] . ' ' . api_get_session_image(api_get_session_id(), $user_info['status']);
+    }
+
+    echo '<li class="' . ($firstTab['id'] == $tab['id'] ? 'active' : '') . '">';
+    echo '<a href="#tab-' . $tab['id'] . '">' . $tab['title'] . '</a>';
+    echo '</li>';
+}
+
+echo '</ul>';
+echo '<div class="tab-content">';
+
+foreach ($tabsData as $tab) {
+    echo '<div class="tab-pane ' . ($firstTab['id'] == $tab['id'] ? 'active' : '') . '" id="tab-' . $tab['id'] . '">';
+    echo '<div class="pull-right">';
+
+    if ($tab['is_editable']) {
+        //edit
+        echo Display::url(
+            Display::return_icon(
+                'edit.png',
+                get_lang('Edit'),
+                array(),
+                ICON_SIZE_SMALL
+            ),
+            api_get_self() . '?' . http_build_query(array(
+                'id' => $tab['id'],
+                'cidReq' => api_get_course_id(),
+                'id_session' => $tab['session_id'],
+                'action' => 'edit',
+                'description_type' => $tab['type']
+            ))
+        );
+
+        //delete
+        echo Display::url(
+            Display::return_icon(
+                'delete.png',
+                get_lang('Delete'),
+                array(),
+                ICON_SIZE_SMALL
+            ),
+            api_get_self() . '?' . http_build_query(array(
+                'id' => $tab['id'],
+                'cidReq' => api_get_course_id(),
+                'id_session' => $tab['session_id'],
+                'action' => 'delete',
+                'description_type' => $tab['type'],
+            )),
+            array('onclick' => "javascript:if(!confirm('" . addslashes(api_htmlentities(
+                get_lang('ConfirmYourChoice'),
+                ENT_QUOTES, isset($charset) ? $charset : null)) . "')) return false;"
+            )
+        );
+    }
+
+    echo '</div>';
+
+    if ($tab['is_editable']) {
+        echo '<br><br>';
+    }
+
+    echo '<div class="clearfix">';
+    echo $tab['content'];
+    echo '</div>';
     echo '</div>';
 }
+
 echo '</div>';
+
+echo "
+    <script>
+    $('#course-description-tabs a').click(function (e) {
+        e.preventDefault();
+
+        $(this).tab('show');
+    })
+    </script>
+";

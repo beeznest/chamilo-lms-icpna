@@ -103,6 +103,20 @@ foreach ($tabsData as $tab) {
     echo '<div class="tab-pane ' . ($firstTab['id'] == $tab['id'] ? 'active' : '') . '" id="tab-' . $tab['id'] . '">';
     echo '<div class="pull-right">';
 
+    echo Display::url(
+        Display::return_icon(
+            'print.png',
+            get_lang('Print'),
+            array(),
+            ICON_SIZE_SMALL
+        ),
+        '#',
+        array(
+            'role' => 'button',
+            'class' => 'btn-to-print'
+        )
+    );
+
     if ($tab['is_editable']) {
         //edit
         echo Display::url(
@@ -159,10 +173,22 @@ echo '</div>';
 
 echo "
     <script>
-    $('#course-description-tabs a').click(function (e) {
-        e.preventDefault();
+    $(document).on('ready', function () {
+        $('#course-description-tabs a').click(function (e) {
+            e.preventDefault();
 
-        $(this).tab('show');
-    })
+            $(this).tab('show');
+        });
+
+        $('.btn-to-print').on('click', function (e) {
+            e.preventDefault();
+
+            var printWindow = window.open('');
+            printWindow.document.body.innerHTML += '<h1>' + $('#course-description-tabs li.active a').text().trim() + '</h1>';
+            printWindow.document.body.innerHTML += $('#course-description-tabs').next().find('.tab-pane.active .clearfix').html();
+            printWindow.focus();
+            printWindow.print();
+        });
+    });
     </script>
 ";

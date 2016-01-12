@@ -65,6 +65,15 @@ if (api_get_setting('wcag_anysurfer_public_pages')=='true') {
 } else {
 	$form->add_html_editor('contentDescription', get_lang('Content'), true, false, array('ToolbarSet' => 'TrainingDescription', 'Width' => '100%', 'Height' => '200'));
 }
+$form->add_select(
+    'visibility',
+    get_lang('Visibility'),
+    array(
+        3 => get_lang('All'),
+        2 => get_lang('Students'),
+        1 => get_lang('Teachers')
+    )
+);
 $form->addElement('style_submit_button', null, get_lang('Save'), 'class="save"');
 
 // Set some default values
@@ -73,6 +82,8 @@ $default['title'] = Security::remove_XSS($description_title);
 $description_content = isset($description_content) ? $description_content : null;
 $default['contentDescription'] = Security::remove_XSS($description_content,COURSEMANAGERLOWSECURITY);
 $default['description_type'] = $description_type;
+$default['visibility'] = $description_visibility;
+var_dump($description_visibility);
 
 $form->setDefaults($default);
 

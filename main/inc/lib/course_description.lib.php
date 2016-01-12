@@ -22,6 +22,7 @@ class CourseDescription
     private $session_id;
     private $description_type;
     private $progress;
+    private $visibility;
 
    	/**
 	 * Constructor
@@ -167,6 +168,7 @@ class CourseDescription
 			$data['description_title']	 = $description['title'];
 			$data['description_content'] = $description['content'];
 			$data['progress'] 			 = $description['progress'];
+            $data['visibility'] = $description['visibility'];
 		}
 		return $data;
 	}
@@ -204,7 +206,8 @@ class CourseDescription
 				title 				= '".Database::escape_string($this->title)."', 
 				content 			= '".Database::escape_string($this->content)."', 
 				progress 			= '".intval($this->progress)."', 
-				session_id = '".intval($this->session_id)."' ";
+				session_id = '".intval($this->session_id)."',
+                visibility = '" . intval($this->visibility) . "'";
 		Database::query($sql);
 		$last_id = Database::insert_id();
 		$affected_rows = Database::affected_rows();
@@ -253,7 +256,8 @@ class CourseDescription
 		$sql = "UPDATE $tbl_course_description SET  
 						title       = '".Database::escape_string($this->title)."', 
 						content     = '".Database::escape_string($this->content)."', 
-						progress    = '".$this->progress."' 
+						progress    = '".$this->progress."',
+                        visibility = '" . intval($this->visibility) . "'
 				WHERE 	id          = '".intval($this->id)."' AND 
 						session_id  = '".$this->session_id."' AND
 						c_id = ".api_get_course_int_id()."
@@ -466,6 +470,15 @@ class CourseDescription
 		$this->progress = $progress;
 	}
 
+    /**
+     * Set visibility
+     * @param int $visibility
+     */
+    public function setVisibility($visibility)
+    {
+        $this->visibility = $visibility;
+    }
+
 	/**
 	 * get description id
 	 * @return int
@@ -513,4 +526,13 @@ class CourseDescription
 	public function get_progress() {
 		return $this->progress;
 	}
+
+    /**
+     * Get visibility
+     * @return int
+     */
+    public function getVisibility()
+    {
+        return $this->visibility;
+    }
 }

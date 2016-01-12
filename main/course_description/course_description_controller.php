@@ -85,10 +85,12 @@ class CourseDescriptionController { // extends Controller {
                         // If no corresponding description is found, edit a new one
                     }
                     $progress = isset($_POST['progress']) ? $_POST['progress'] : '';
+                    $visibility = $_POST['visibility'];
                     $course_description->set_description_type($description_type);
                     $course_description->set_title($title);
                     $course_description->set_content($content);
                     $course_description->set_progress($progress);
+                    $course_description->setVisibility($visibility);
                     $thematic_advance = $course_description->get_data_by_id($id);
 
                     if (!empty($thematic_advance)) {
@@ -113,6 +115,7 @@ class CourseDescriptionController { // extends Controller {
                 $data['description_title'] = $_POST['title'];
                 $data['description_content'] = $_POST['contentDescription'];
                 $data['description_type'] = $_POST['description_type'];
+                $data['description_visibility'] = $_POST['visibility'];
                 $data['progress'] = $_POST['progress'];
                 $data['descriptions'] = $course_description->get_data_by_id($_POST['id']);
                 // render to the view
@@ -151,6 +154,7 @@ class CourseDescriptionController { // extends Controller {
                 $data['description_title'] = $course_description_data['description_title'];
                 $data['description_content'] = $course_description_data['description_content'];
                 $data['progress'] = $course_description_data['progress'];
+                $data['description_visibility'] = $course_description_data['visibility'];
 		        $data['descriptions'] = $course_description->get_data_by_description_type(
                     $description_type,
                     null,

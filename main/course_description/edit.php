@@ -83,7 +83,6 @@ $description_content = isset($description_content) ? $description_content : null
 $default['contentDescription'] = Security::remove_XSS($description_content,COURSEMANAGERLOWSECURITY);
 $default['description_type'] = $description_type;
 $default['visibility'] = $description_visibility;
-var_dump($description_visibility);
 
 $form->setDefaults($default);
 

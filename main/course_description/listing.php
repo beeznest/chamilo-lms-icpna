@@ -113,7 +113,8 @@ foreach ($tabsData as $tab) {
         '#',
         array(
             'role' => 'button',
-            'class' => 'btn-to-print'
+            'class' => 'btn-to-print',
+            'data-id' => $tab['id']
         )
     );
 
@@ -183,11 +184,26 @@ echo "
         $('.btn-to-print').on('click', function (e) {
             e.preventDefault();
 
-            var printWindow = window.open('');
-            printWindow.document.body.innerHTML += '<h1>' + $('#course-description-tabs li.active a').text().trim() + '</h1>';
-            printWindow.document.body.innerHTML += $('#course-description-tabs').next().find('.tab-pane.active .clearfix').html();
-            printWindow.focus();
-            printWindow.print();
+            var self = $(this),
+                descriptionId = self.data('id');
+
+            if (!descriptionId) {
+                return;
+            }
+
+            var printWindow = window.open(
+                '" . api_get_path(WEB_CODE_PATH) . "course_description/print.php?description=' + descriptionId,
+                '',
+                'toolbar=no,menubar=no,location=no,status=no'
+            );
+            printWindow.onload = function () {
+                var descriptionContent = printWindow.document.getElementById('description-content');
+                descriptionContent.innerHTML += '<h2>' + $('#course-description-tabs li.active a').text().trim() + '</h2>';
+                descriptionContent.innerHTML += $('#course-description-tabs').next().find('.tab-pane.active .clearfix').html();
+
+                printWindow.focus();
+                printWindow.print();
+            };
         });
     });
     </script>

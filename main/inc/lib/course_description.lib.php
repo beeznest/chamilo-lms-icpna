@@ -24,6 +24,10 @@ class CourseDescription
     private $progress;
     private $visibility;
 
+    const VISIBILITY_ALL = 3;
+    const VISIBILITY_STUDENTS = 2;
+    const VISIBILITY_TEACHERS = 1;
+
    	/**
 	 * Constructor
 	 */

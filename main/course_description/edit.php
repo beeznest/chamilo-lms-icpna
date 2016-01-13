@@ -69,9 +69,9 @@ $form->add_select(
     'visibility',
     get_lang('Visibility'),
     array(
-        3 => get_lang('All'),
-        2 => get_lang('Students'),
-        1 => get_lang('Teachers')
+        CourseDescription::VISIBILITY_ALL => get_lang('All'),
+        CourseDescription::VISIBILITY_STUDENTS => get_lang('Students'),
+        CourseDescription::VISIBILITY_TEACHERS => get_lang('Teachers')
     )
 );
 $form->addElement('style_submit_button', null, get_lang('Save'), 'class="save"');

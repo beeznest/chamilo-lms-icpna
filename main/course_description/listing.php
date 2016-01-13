@@ -65,17 +65,32 @@ foreach ($default_description_titles as $titles) {
                 $catCount == $description['description_type'] ||
                 ($catCount == 8 && intval($description['description_type']) >= 8)
             ) {
-                $tabsData[] = array(
-                    'id' => $description['id'],
-                    'title' => $description['title'],
-                    'content' => $description['content'],
-                    'is_editable' => api_is_platform_admin() &&
-                        api_is_allowed_to_edit(null, true) &&
-                        !$history &&
-                        api_get_session_id() == $description['session_id'],
-                    'session_id' => $description['session_id'],
-                    'type' => $description['description_type']
-                );
+                $showTab = true;
+
+                if ($description['visibility'] == CourseDescription::VISIBILITY_STUDENTS) {
+                    if (!api_is_student()) {
+                        $showTab = false;
+                    }
+                } elseif ($description['visibility'] == CourseDescription::VISIBILITY_TEACHERS) {
+                    if (!api_is_teacher()) {
+                        $showTab = false;
+                    }
+                }
+
+                if ($showTab) {
+                    $tabsData[] = array(
+                        'id' => $description['id'],
+                        'title' => $description['title'],
+                        'content' => $description['content'],
+                        'is_editable' => api_is_platform_admin() &&
+                            api_is_allowed_to_edit(null, true) &&
+                            !$history &&
+                            api_get_session_id() == $description['session_id'],
+                        'session_id' => $description['session_id'],
+                        'type' => $description['description_type'],
+                        'visibility' => $description['visibility']
+                    );
+                }
             }
         }
     }
@@ -159,11 +174,7 @@ foreach ($tabsData as $tab) {
     }
 
     echo '</div>';
-
-    if ($tab['is_editable']) {
-        echo '<br><br>';
-    }
-
+    echo '<br><br>';
     echo '<div class="clearfix">';
     echo $tab['content'];
     echo '</div>';

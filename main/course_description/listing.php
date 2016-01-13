@@ -205,13 +205,9 @@ echo "
             var printWindow = window.open(
                 '" . api_get_path(WEB_CODE_PATH) . "course_description/print.php?description=' + descriptionId,
                 '',
-                'toolbar=no,menubar=no,location=no,status=no'
+                'location=no,scrollbars=yes'
             );
             printWindow.onload = function () {
-                var descriptionContent = printWindow.document.getElementById('description-content');
-                descriptionContent.innerHTML += '<h2>' + $('#course-description-tabs li.active a').text().trim() + '</h2>';
-                descriptionContent.innerHTML += $('#course-description-tabs').next().find('.tab-pane.active .clearfix').html();
-
                 printWindow.focus();
                 printWindow.print();
             };

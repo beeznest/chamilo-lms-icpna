@@ -26,7 +26,10 @@ echo  '
     <div class="container">
         <h2 class="page-header">' . $courseInfo['title'] . ' (' . $sessionInfo['name'] . ')</h2>
         <div class="row">
-            <div class="span12" id="description-content"></div>
+            <div class="span12" id="description-content">
+                <h2>' . $descriptionData['description_title'] . ' </h2>
+                ' . $descriptionData['description_content'] . '
+            </div>
         </div>
     </div>
 ';

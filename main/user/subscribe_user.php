@@ -425,7 +425,7 @@ function get_user_data($from, $number_of_items, $column, $direction) {
 				$sql .=	"WHERE cu.id_user IS NULL AND u.status=1 AND (u.official_code <> 'ADMIN' OR u.official_code IS NULL) ";
 			}
             
-            $sql .=	" AND access_url_id= $url_access_id";
+            $sql .=	" AND access_url_id= $url_access_id AND u.active = 1";
             
 		} else {
 		     // adding a teacher NOT through a session
@@ -468,6 +468,8 @@ function get_user_data($from, $number_of_items, $column, $direction) {
 					}
 				}
 			}
+
+            $sql .= ' AND u.active = 1';
 		}
 	} else {
 		// adding a student

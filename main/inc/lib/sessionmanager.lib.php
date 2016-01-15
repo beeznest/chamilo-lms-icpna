@@ -2755,7 +2755,7 @@ class SessionManager {
         $order_clause = api_sort_by_first_name() ? ' ORDER BY firstname, lastname, username' : ' ORDER BY lastname, firstname, username';
 
         $select ="SELECT user.user_id, lastname, firstname, username ";
-        $sql = " $select FROM $tbl_user user WHERE status='1'";
+        $sql = " $select FROM $tbl_user user WHERE status='1' AND active = 1";
 
         $tag = Database::escape_string($tag);
 

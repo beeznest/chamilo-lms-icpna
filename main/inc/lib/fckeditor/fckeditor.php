@@ -362,7 +362,7 @@ class FCKeditor
     private function & get_custom_configuration() {
         static $config;
         if (!isset($config)) {
-            require api_get_path(WEB_LIBRARY_PATH).'fckeditor/myconfig.php';
+            require api_get_path(LIBRARY_PATH).'fckeditor/myconfig.php';
         }
         $toolbar_dir = isset($config['ToolbarSets']['Directory']) ? $config['ToolbarSets']['Directory'] : 'default';
         $return = array_merge($config, $this->get_custom_toolbar_configuration($toolbar_dir));

@@ -80,7 +80,7 @@ class ExerciseShowFunctions {
 		global $feedback_type;
 
 		if (isset($nano)) {
-			echo $nano->show_audio_file();
+            echo $nano->showAudioFile();
 		}
 
 		if (empty($id)) {

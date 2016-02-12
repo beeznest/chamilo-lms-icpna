@@ -134,27 +134,32 @@ function showQuestion($questionId, $only_questions = false, $origin = false, $cu
             //Add nanog
             if (api_get_setting('enable_nanogong') == 'true') {
 
-                require_once api_get_path(LIBRARY_PATH).'nanogong.lib.php';
+                require_once api_get_path(LIBRARY_PATH) . 'WamiRecorder.php';
 
                 //@todo pass this as a parameter
                 global $exercise_stat_info, $exerciseId, $exe_id;
 
                 if (!empty($exercise_stat_info)) {
-                    $params = array(
-                        'exercise_id' => $exercise_stat_info['exe_exo_id'],
-                        'exe_id' => $exercise_stat_info['exe_id'],
-                        'question_id' => $questionId
+                    $wamiRecorder = new WamiRecorder(
+                        0,
+                        0,
+                        0,
+                        $exercise_stat_info['exe_exo_id'],
+                        $questionId,
+                        $exercise_stat_info['exe_id']
                     );
                 } else {
-                    $params = array(
-                        'exercise_id' => $exerciseId,
-                        'exe_id' => 'temp_exe',
-                        'question_id' => $questionId
+                    $wamiRecorder = new WamiRecorder(
+                        0,
+                        0,
+                        0,
+                        $exerciseId,
+                        $questionId,
+                        'temp_exe'
                     );
                 }
 
-                $nano = new Nanogong($params);
-                echo $nano->show_button();
+                echo $wamiRecorder->getButton();
             }
 
             $oFCKeditor = new FCKeditor("choice[".$questionId."]");

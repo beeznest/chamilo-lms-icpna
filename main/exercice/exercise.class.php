@@ -2497,9 +2497,11 @@ class Exercise
         }
 
         $nano = null;
+        $wamiRecorder = null;
 
         if ($answerType == ORAL_EXPRESSION) {
             require_once api_get_path(LIBRARY_PATH).'nanogong.lib.php';
+            require_once api_get_path(LIBRARY_PATH) . 'WamiRecorder.php';
             $exe_info = get_exercise_results_by_attempt($exeId);
             $exe_info = $exe_info[$exeId];
 
@@ -2512,6 +2514,14 @@ class Exercise
             $params['exe_id'] = isset($exe_info['exe_id']) ? $exe_info['exe_id'] : $exeId;
 
             $nano = new Nanogong($params);
+            $wamiRecorder = new WamiRecorder(
+                api_get_course_int_id(),
+                api_get_session_id(),
+                isset($exe_info['exe_user_id']) ? $exe_info['exe_user_id'] : api_get_user_id(),
+                isset($exe_info['exe_exo_id']) ? $exe_info['exe_exo_id'] : $this->id,
+                $questionId,
+                isset($exe_info['exe_id']) ? $exe_info['exe_id'] : $exeId
+            );
 
             //probably this attempt came in an exercise all question by page
             if ($feedback_type == 0) {
@@ -3199,7 +3209,7 @@ class Exercise
                                 $choice,
                                 0,
                                 0,
-                                $nano
+                                $wamiRecorder
                             );
                         } elseif ($answerType == HOT_SPOT) {
 //                            if ($origin != 'learnpath') {
@@ -3487,7 +3497,7 @@ class Exercise
                                 $choice,
                                 $exeId,
                                 $questionId,
-                                $nano
+                                $wamiRecorder
                             ).'</td>
 		                            </tr>
 		                            </table>';

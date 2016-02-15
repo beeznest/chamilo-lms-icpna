@@ -166,8 +166,8 @@ class FCKeditor
         // Adaptation for the Chamilo LMS
 
 		//@todo why the BasePath is relative ? we should use this constant WEB_PATH
-        $this->BasePath = api_get_path(REL_PATH).'main/inc/lib/fckeditor/';
-        //$this->BasePath = api_get_path(WEB_PATH).'main/inc/lib/fckeditor/';
+        //$this->BasePath = api_get_path(REL_PATH).'main/inc/lib/fckeditor/';
+        $this->BasePath = api_get_path(WEB_PATH).'main/inc/lib/fckeditor/';
 
         $config = $this->get_custom_configuration();
         $this->read_configuration($config);
@@ -428,7 +428,7 @@ class FCKeditor
      * @return array
      */
     private function & get_javascript_custom_configuration_file() {
-        $return_value = array('CustomConfigurationsPath' => api_get_path(REL_PATH).'main/inc/lib/fckeditor/myconfig.js');
+        $return_value = array('CustomConfigurationsPath' => api_get_path(WEB_PATH).'main/inc/lib/fckeditor/myconfig.js');
         return $return_value;
     }
 
@@ -437,7 +437,7 @@ class FCKeditor
      * @return array
      */
     private function & get_css_configuration() {
-        $config['EditorAreaCSS'] = api_get_path(REL_PATH).'main/css/'.api_get_setting('stylesheets').'/default.css';
+        $config['EditorAreaCSS'] = api_get_path(WEB_PATH).'main/css/'.api_get_setting('stylesheets').'/default.css';
         $config['ToolbarComboPreviewCSS'] = $config['EditorAreaCSS'];
         return $config;
     }

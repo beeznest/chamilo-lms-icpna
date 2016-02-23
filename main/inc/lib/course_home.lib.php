@@ -588,6 +588,16 @@ class CourseHome {
     {
         $patronKey = ':teacher';
         if ($course_tool_category == TOOL_STUDENT_VIEW) {
+            //Fix only coach can see external pages - see #8236 - icpna
+            if (api_is_coach()) {
+                foreach ($dataIcons as $indice => $array) {
+                    if (isset($array['name'])) {
+                        $dataIcons[$indice]['name'] = str_replace($patronKey, '', $array['name']);
+                    }
+                }
+                
+                return $dataIcons;
+            }
             $flagOrder = false;
             foreach ($dataIcons as $indice => $array) {
                 if (isset($array['name'])) {

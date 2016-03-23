@@ -52,7 +52,7 @@ echo Display::page_header($nameTools);
 
 /*	MAIN CODE */
 
-if ((isset($_POST['action']) && $_POST['action'] == 'course_select_form' ) || (isset($_POST['import_option']) && $_POST['import_option'] == 'full_backup' )) {
+if ((isset($_POST['action']) && $_POST['action'] == 'course_select_form' && $_POST['submitToken'] == $_SESSION['submitToken'] ) || (isset($_POST['import_option']) && $_POST['import_option'] == 'full_backup' && $_POST['submitToken'] == $_SESSION['submitToken'])) {
 	$error = false;
 	if (isset($_POST['action']) && $_POST['action'] == 'course_select_form') {
 		// Partial backup here we recover the documents posted
@@ -126,6 +126,8 @@ if ((isset($_POST['action']) && $_POST['action'] == 'course_select_form' ) || (i
 	}
 } else {
 	$user = api_get_user_info();
+    $submitToken = time();
+    $_SESSION['submitToken'] = $submitToken;
 	$backups = CourseArchiver::get_available_backups($is_platformAdmin ?null:$user['user_id']);
 	$backups_available = count($backups) > 0;
 
@@ -166,6 +168,7 @@ if ((isset($_POST['action']) && $_POST['action'] == 'course_select_form' ) || (i
 	$form->addElement('radio', 'same_file_name_option', '', get_lang('SameFilenameOverwrite'), FILE_OVERWRITE, 'id="same_file_name_option_3" class="checkbox"');
 
 	$form->addElement('html', '<br />');
+    $form->add_hidden('submitToken', $submitToken);
 	$form->addElement('style_submit_button', null, get_lang('ImportBackup'), 'class="save"');
 
 	$values['backup_type'] = 'local';

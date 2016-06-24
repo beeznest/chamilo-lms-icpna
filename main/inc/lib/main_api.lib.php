@@ -3320,9 +3320,10 @@ function api_item_property_update($_course, $tool, $item_id, $lastedit_type, $us
         default : // The item will be added or updated.
             $set_type = ", lastedit_type='$lastedit_type' ";
             $visibility = '1';
+            $linkVisibilityCondition = $lastedit_type == 'LinkAdded' ? ", visibility=$visibility" : '';
             $filter .= $to_filter;
             $sql = "UPDATE $TABLE_ITEMPROPERTY
-                    SET lastedit_date = '$time', lastedit_user_id='$user_id' $set_type
+                    SET lastedit_date = '$time', lastedit_user_id='$user_id' $linkVisibilityCondition $set_type
                     WHERE $filter";
     }
 

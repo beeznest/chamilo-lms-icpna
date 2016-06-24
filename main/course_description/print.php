@@ -28,7 +28,7 @@ echo  '
         <div class="row">
             <div class="span12" id="description-content">
                 <h2>' . $descriptionData['description_title'] . ' </h2>
-                ' . $descriptionData['description_content'] . '
+                ' . Security::remove_XSS($descriptionData['description_content'], STUDENT) . '
             </div>
         </div>
     </div>

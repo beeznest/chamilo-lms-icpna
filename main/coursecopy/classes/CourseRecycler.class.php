@@ -331,6 +331,10 @@ class CourseRecycler
 
             // Identifying again and deletion of the orphan questions, if it was desired.
             if ($delete_orphan_questions) {
+                //The following query is too complex (the join generates 3M resulting rows)
+                // and can last for several *HOURS* on some powerful servers,
+                // so we have split it in two below
+                /*
                 $sql = 'SELECT questions.id '.
                        ' FROM '.$table_qui_que.' as questions '.
                        ' LEFT JOIN '.$table_rel.' as quizz_questions '.
@@ -344,13 +348,52 @@ class CourseRecycler
                        '   quizz_questions.exercice_id IS NULL OR '.
                        '   exercices.active = -1';
                        // active = -1 means "deleted" test.
+                */
+                // First check for all the questions that are linked to this course
+                $sql = "SELECT question_id FROM $table_rel WHERE c_id = " . $this->course_id;
                 $db_result = Database::query($sql);
-                if (Database::num_rows($db_result) > 0) {
-                    $orphan_ids = array();
-                    while ($obj = Database::fetch_object($db_result)) {
-                        $orphan_ids[] = $obj->id;
-                    }
-                    $orphan_ids = implode(',', $orphan_ids);
+                $questions = array();
+                $questionsString = '';
+                while ($rowq = Database::fetch_assoc($db_result)) {
+                    $questions[] = $rowq['id'];
+                    $questionsString .= $rowq['id'].',';
+                }
+                $questionsString = substr($questionsString, 0, -1);
+                // Second, check all the questions that are linked to this course
+                // but are NOT in the list linked to any exercise
+                $sql = "SELECT id FROM $table_qui_que WHERE c_id = " . $this->course_id .
+                       " AND id NOT IN ($questionsString)";
+                $db_result = Database::query($sql);
+                $orphans = array();
+                $orphansString = '';
+                while ($rowq = Database::fetch_assoc($db_result)) {
+                    $orphans[] = $rowq['id'];
+                    $orphansString .= $rowq['id'].',';
+                }
+                $orphansString = substr($orphansString, 0, -1);
+                // Third, check the questions related to an exercise of the course
+                // that was deleted, and treat them as orphans too
+                $sql = "SELECT r.question_id FROM $table_rel as r, $table_qui as exe " .
+                       " WHERE r.c_id = " . $this->course_id . 
+                       " AND exe.c_id = r.c_id " .
+                       " AND r.exercice_id = exe.id " .
+                       " AND exe.active = -1";
+                $db_result = Database::query($sql);
+                $deleted = array();
+                $deletedString = '';
+                while ($rowq = Database::fetch_assoc($db_result)) {
+                    $deleted[] = $rowq['question_id'];
+                    $deletedString .= $rowq['question_id'].',';
+                }
+                // Now $orphans and $deleted can be combined in one single string
+                $orphan_ids = $deletedString . $orphansString;
+                //if (Database::num_rows($db_result) > 0) 
+                if (strlen($orphan_ids) > 0) {
+                    //$orphan_ids = array();
+                    //while ($obj = Database::fetch_object($db_result)) {
+                    //    $orphan_ids[] = $obj->id;
+                    //}
+                    //$orphan_ids = implode(',', $orphan_ids);
                     $sql = "DELETE FROM ".$table_rel." WHERE c_id = ".$this->course_id." AND question_id IN(".$orphan_ids.")";
                     Database::query($sql);
                     $sql = "DELETE FROM ".$table_qui_ans." WHERE c_id = ".$this->course_id." AND question_id IN(".$orphan_ids.")";

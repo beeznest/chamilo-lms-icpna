@@ -387,7 +387,7 @@ class CourseBuilder {
 	function build_tool_intro($session_id = 0, $course_code = '', $with_base_content = false, $id_list = array()) {
 		$table = Database :: get_course_table(TABLE_TOOL_INTRO);
 		$course_id = api_get_course_int_id();		
-		$sql = "SELECT * FROM $table WHERE c_id = $course_id ";
+		$sql = "SELECT * FROM $table WHERE c_id = $course_id AND session_id = 0";
 		$db_result = Database::query($sql);
 		while ($obj = Database::fetch_object($db_result)) {
 			$tool_intro = new ToolIntro($obj->id, $obj->intro_text);

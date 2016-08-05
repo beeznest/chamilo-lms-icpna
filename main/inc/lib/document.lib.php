@@ -313,9 +313,9 @@ class DocumentManager {
             //header('Content-Type: application/force-download');
             header('Content-length: '.$len);
             if (preg_match("/MSIE 5.5/", $_SERVER['HTTP_USER_AGENT'])) {
-                header('Content-Disposition: filename= '.$filename);
+                header('Content-Disposition: filename= "'.$filename.'"');
             } else {
-                header('Content-Disposition: attachment; filename= '.$filename);
+                header('Content-Disposition: attachment; filename= "'.$filename.'"');
             }
             if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')) {
                 header('Pragma: ');
@@ -355,9 +355,9 @@ class DocumentManager {
             header('Content-Length: '.$len);
             $user_agent = strtolower($_SERVER['HTTP_USER_AGENT']);
             if (strpos($user_agent, 'msie')) {
-                header('Content-Disposition: ; filename= '.$filename);
+                header('Content-Disposition: ; filename= "'.$filename.'"');
             } else {
-                header('Content-Disposition: inline; filename= '.$filename);
+                header('Content-Disposition: inline; filename= "'.$filename.'"');
             }
             readfile($full_file_name);
             return true;
@@ -386,9 +386,9 @@ class DocumentManager {
             //header('Content-Type: application/force-download');
             header('Content-length: '.$len);
             if (preg_match("/MSIE 5.5/", $_SERVER['HTTP_USER_AGENT'])) {
-                header('Content-Disposition: filename= '.$filename);
+                header('Content-Disposition: filename= "'.$filename.'"');
             } else {
-                header('Content-Disposition: attachment; filename= '.$filename);
+                header('Content-Disposition: attachment; filename= "'.$filename.'"');
             }
             if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')) {
                 header('Pragma: ');
@@ -431,9 +431,9 @@ class DocumentManager {
             header('Content-Length: '.$len);
             $user_agent = strtolower($_SERVER['HTTP_USER_AGENT']);
             if (strpos($user_agent, 'msie')) {
-                header('Content-Disposition: ; filename= '.$filename);
+                header('Content-Disposition: ; filename= "'.$filename.'"');
             } else {
-                header('Content-Disposition: inline; filename= '.$filename);
+                header('Content-Disposition: inline; filename= "'.$filename.'"');
             }
             echo($full_string);
             //You have to ensure that the calling script then stops processing (exit();)

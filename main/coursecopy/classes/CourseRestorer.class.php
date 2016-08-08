@@ -83,14 +83,21 @@ class CourseRestorer
      *
      * */
     var $add_text_in_items = false;
+    var $destination_course_id;
 
     /**
-     * Create a new CourseRestorer
+     * CourseRestorer constructor.
+     * @param Course $course
      */
     function __construct($course)
     {
         $this->course = $course;
         $course_info = api_get_course_info($this->course->code);
+        if (!empty($course_info)) {
+            $this->course_origin_id = $course_info['real_id'];
+        } else {
+            $this->course_origin_id = null;
+        }
         $this->course_origin_id = $course_info['real_id'];
         $this->file_option = FILE_RENAME;
         $this->set_tools_invisible_by_default = false;
@@ -1895,19 +1902,24 @@ class CourseRestorer
      */
     function get_new_id($tool, $ref)
     {
-        //transform $tool into one backup/restore constant
-        //just in case you copy the tool in the same course
-        //error_log($this->course_origin_id .' - '.$this->destination_course_id);
-        if ($this->course_origin_id == $this->destination_course_id) {
-            return $ref;
-        }
-
+        // Check if the value exist in the current array.
         if ($tool == 'hotpotatoes') {
             $tool = 'document';
         }
-        if (!empty($this->course->resources[$tool][$ref]->destination_id)) {
+
+        if (isset($this->course->resources[$tool][$ref]) &&
+            isset($this->course->resources[$tool][$ref]->destination_id) &&
+            !empty($this->course->resources[$tool][$ref]->destination_id)
+        ) {
             return $this->course->resources[$tool][$ref]->destination_id;
         }
+
+        // Check if the course is the same (last hope).
+        if ($this->course_origin_id == $this->destination_course_id) {
+
+            return $ref;
+        }
+
         return '';
     }
 

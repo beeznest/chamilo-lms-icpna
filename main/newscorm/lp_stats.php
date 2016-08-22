@@ -673,23 +673,68 @@ if (is_array($list) && count($list) > 0) {
                         $title = Display::url($title, $item_path_url, array('class' => 'ajax'));
                     }
 
-                    $output .= '<td>'.$extend_link.'</td>
+                    if ($num > 0) {
+                        $row_attempts = Database :: fetch_array($resultLastAttempt);
+                        $my_score = $row_attempts['exe_result'];
+                        $my_maxscore = $row_attempts['exe_weighting'];
+                        $mktime_start_date = api_strtotime($row_attempts['start_date'], 'UTC');
+                        $mktime_exe_date = api_strtotime($row_attempts['exe_date'], 'UTC');
+                        if ($mktime_start_date && $mktime_exe_date) {
+                            $mytime = ((int) $mktime_exe_date - (int) $mktime_start_date);
+                            $time_attemp = learnpathItem :: get_scorm_time('js', $mytime);
+                            $time_attemp = str_replace('NaN', '00' . $h . '00\'00"', $time_attemp);
+                        } else {
+                            $time_attemp = ' - ';
+                        }
+                        if (!$is_allowed_to_edit && $result_disabled_ext_all) {
+                            $view_score = Display::return_icon('invisible.gif', get_lang('ResultsHiddenByExerciseSetting'));
+                        } else {
+                            // Show only float when need it
+                            if ($my_score == 0) {
+                                $view_score = show_score(0, $my_maxscore, false);
+                            } else {
+                                if ($my_maxscore == 0) {
+                                    $view_score = $my_score;
+                                } else {
+                                    $view_score = show_score($my_score, $my_maxscore, false);
+                                }
+                            }
+                        }
+                        $my_lesson_status = $row_attempts['status'];
+
+                        if ($my_lesson_status == '') {
+                            $my_lesson_status = learnpathitem::humanize_status('completed');
+                        } elseif ($my_lesson_status == 'incomplete') {
+                            $my_lesson_status = learnpathitem::humanize_status('incomplete');
+                        }
+
+
+                        $output .= '<td>'.$extend_link.'</td>
+                                <td colspan="4">' . $title . '</td>
+                                <td colspan="2">' . $my_lesson_status . '</td>
+                                <td colspan="2">' . $view_score . '</td>
+                                <td colspan="2">' . $time_attemp . '</td>
+                                <td>' . $correct_test_link . '</td>';
+                        $output .= '</tr>';
+                    } else {
+                        $output .= '<td>'.$extend_link.'</td>
                                 <td colspan="4">' . $title . '</td>
                                 <td colspan="2">' . learnpathitem::humanize_status($lesson_status) .'</td>
                                 <td colspan="2">';
-                    if ($row['item_type'] == 'quiz') {
-                        if (!$is_allowed_to_edit && $result_disabled_ext_all) {
-                            $output .= Display::return_icon('invisible.gif', get_lang('ResultsHiddenByExerciseSetting'));
+                        if ($row['item_type'] == 'quiz') {
+                            if (!$is_allowed_to_edit && $result_disabled_ext_all) {
+                                $output .= Display::return_icon('invisible.gif', get_lang('ResultsHiddenByExerciseSetting'));
+                            } else {
+                                $output .= show_score($score, $maxscore, false);
+                            }
                         } else {
-                            $output .= show_score($score, $maxscore, false);
+                            $output .= ($score == 0 ? '/' : ($maxscore == 0 ? $score : $score . '/' . $maxscore));
                         }
-                    } else {
-                        $output .= ($score == 0 ? '/' : ($maxscore == 0 ? $score : $score . '/' . $maxscore));
-                    }
-                    $output .= '</td>
+                        $output .= '</td>
                                 <td colspan="2">'.$time.'</td>
                                  <td>'.$correct_test_link.'</td>';
-                    $output .= '</tr>';
+                        $output .= '</tr>';
+                    }
                 }
 
                 if (!empty($export_csv)) {

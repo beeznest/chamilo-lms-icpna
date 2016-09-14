@@ -20,6 +20,9 @@
 
         });
 
+        var iframe = $('#content_id');
+        console.log(iframe.get(0));
+
         $('#content_id').css({
             backgroundColor: '#FFF',
             height: 380,

@@ -33,7 +33,14 @@ class SessionModel extends model {
         $params['access_end_date']          = isset($params['access_end_date']) ? api_get_utc_datetime($params['access_end_date'], true) : null;
         $params['coach_access_start_date']  = isset($params['coach_access_start_date']) ? api_get_utc_datetime($params['coach_access_start_date'], true) : null;
         $params['coach_access_end_date']    = isset($params['coach_access_end_date']) ? api_get_utc_datetime($params['coach_access_end_date'], true) : null;
-        $params['id_coach']                 = is_array($params['id_coach']) ? $params['id_coach'][0] : $params['id_coach'];
+        //$params['id_coach']                 = is_array($params['id_coach']) ? $params['id_coach'][0] : $params['id_coach'];
+
+        if (is_array($params['id_coach'])) {
+            $params['id_coach'] = $params['id_coach'][0];
+        } else {
+            $coach = api_get_user_info(intval($params['id_coach']));
+            $params['id_coach'] = intval($coach['active']) ? $params['id_coach'] : 0;
+        }
                
         if (empty($params['access_end_date'])) {
             $params['visibility'] = SessionManager::DEFAULT_VISIBILITY;

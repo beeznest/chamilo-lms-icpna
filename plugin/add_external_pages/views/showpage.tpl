@@ -10,6 +10,7 @@
 
 <script>
     $(document).on('ready', function () {
+
         $('body').css('overflow', 'hidden');
 
         $('#content_id').css({

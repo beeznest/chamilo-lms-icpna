@@ -1079,6 +1079,8 @@ class Template {
             $html .= '</li>';
         }
 
+        /*
+        // The following code has been disabled upon request from PP from ICPNA
         $sessionId = api_get_session_id();
         $userInfo = api_get_user_info();
 
@@ -1094,8 +1096,8 @@ class Template {
                 //$branchId = $objBranch->getBranchFromIP(api_get_real_ip());
                 //$programUid = $objBranch->getUidProgram($sessionId);
                 // Test
-                /*$branchId = 1;
-                $programUid = '7B00C961-D8B4-49A2-911C-4B7CF0E21CCE';*/
+                //$branchId = 1;
+                //$programUid = '7B00C961-D8B4-49A2-911C-4B7CF0E21CCE';
                 ini_set("soap.wsdl_cache_enabled", "0");
                 try {
                     $soapClient = new SoapClient(
@@ -1135,6 +1137,7 @@ class Template {
                 }
             }
         }
+        */
 
 
 

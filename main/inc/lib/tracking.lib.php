@@ -2271,6 +2271,25 @@ class Tracking
     }
 
     /**
+     * Check if there is a course with code like @needle in @courseList
+     * @param string $needle
+     * @param array $courseList
+     * @return bool
+     */
+    public static function sessionContainsCourseWithCode($needle, $courseList)
+    {
+        foreach ($courseList as $courseInfo) {
+            if (strpos($courseInfo['code'], $needle) === false) {
+                continue;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Shows the user progress (when clicking in the Progress tab)
      * @param   int     user id
      * @return  string  html code
@@ -2421,8 +2440,13 @@ class Tracking
                 foreach ($course_in_session as $my_session_id => $session_data) {
 
                     $course_list = $session_data['course_list'];
-                    $session_name = $session_data['name'];
+                    $avoidSession = self::sessionContainsCourseWithCode('PLEX', $course_list) && api_is_student();
 
+                    if ($avoidSession) {
+                        continue;
+                    }
+
+                    $session_name = $session_data['name'];
                     $user_count = count(SessionManager::get_users_by_session($my_session_id));
 
                     $exercise_graph_name_list = array();
@@ -2508,6 +2532,12 @@ class Tracking
 
             foreach ($course_in_session as $my_session_id => $session_data) {
                 $course_list = $session_data['course_list'];
+                $avoidSession = self::sessionContainsCourseWithCode('PLEX', $course_list) && api_is_student();
+
+                if ($avoidSession) {
+                    continue;
+                }
+
                 $session_name = $session_data['name'];
 
                 if (isset($session_id) && !empty($session_id)) {

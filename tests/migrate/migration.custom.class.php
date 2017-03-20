@@ -1338,6 +1338,17 @@ class MigrationCustom {
             if ($session_info['error'] == false) {
                 self::fix_access_dates($session_info);
                 $session_info['id'] = $session_id;
+
+                if (isset($session_info['id_coach'])) {
+                    $coachId = $session_info['id_coach'];
+
+                    $efv = new ExtraFieldValue('user');
+                    $fieldValue = $efv->get_values_by_handler_and_field_variable($coachId, 'uidIdPersona');
+                    $uidIdPersona = trim($fieldValue['field_value']);
+
+                    $session_info['id_coach'] = empty($uidIdPersona) ? 0 : intval($coachId);
+                }
+
                 unset($session_info['error']);
                 $session_info_before = api_get_session_info($session_id, true);
                 SessionManager::update($session_info);

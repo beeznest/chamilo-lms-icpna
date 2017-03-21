@@ -1,1 +1,1 @@
-This plugin add a new tab for teacher or student zones
+This plugin add a new tab for trainers or learners zone.

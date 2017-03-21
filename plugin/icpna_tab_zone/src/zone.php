@@ -35,7 +35,7 @@ $additionalParams = [
 $zoneSsoUrl = $objSsoServer->getUrl($zonUrl, $additionalParams);
 
 $objTpl = new Template($tabName);
-$objTpl->assign('path', $getNewPath);
+$objTpl->assign('path', $zoneSsoUrl);
 
 $content = $objTpl->fetch('icpna_tab_zone/views/zone.tpl');
 

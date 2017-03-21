@@ -45,6 +45,7 @@ class Plugin {
     public  $course_settings_callback = false;
 
     const TAB_FILTER_NO_STUDENT = '::no-student';
+    const TAB_FILTER_ONLY_STUDENT = '::only-student';
 
     /**
      * Default constructor for the plugin class. By default, it only sets
@@ -518,6 +519,8 @@ class Plugin {
                     $newSubKey = "custom_tab_$i";
                     if (strpos($row['subkey'], self::TAB_FILTER_NO_STUDENT) !== false) {
                         $newSubKey .= self::TAB_FILTER_NO_STUDENT;
+                    } elseif (strpos($row['subkey'], self::TAB_FILTER_ONLY_STUDENT) !== false) {
+                        $newSubKey .= self::TAB_FILTER_ONLY_STUDENT;
                     }
                     $attributes = array(
                         'subkey' => $newSubKey

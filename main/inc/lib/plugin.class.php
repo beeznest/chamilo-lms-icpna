@@ -454,6 +454,8 @@ class Plugin {
         if (!empty($userFilter)) {
             switch ($userFilter) {
                 case self::TAB_FILTER_NO_STUDENT:
+                    //no break
+                case self::TAB_FILTER_ONLY_STUDENT:
                     $subkey .= $userFilter;
                     break;
             }

@@ -90,7 +90,7 @@ class IcpnaTabZonePlugin extends Plugin
 
         $this->deleteTab("custom_tab_$lastTabNumber");
 
-        $lastTabNumber--;
+        --$lastTabNumber;
 
         $this->deleteTab("custom_tab_$lastTabNumber");
     }

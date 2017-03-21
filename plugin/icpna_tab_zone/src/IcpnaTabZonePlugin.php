@@ -61,7 +61,8 @@ class IcpnaTabZonePlugin extends Plugin
 
         $tabUrl = api_get_path(WEB_PLUGIN_PATH) . "icpna_tab_zone/src/zone.php";
 
-        $this->addTab('Zone', $tabUrl);
+        $this->addTab($this->get_lang('TeachersZone'), $tabUrl, parent::TAB_FILTER_NO_STUDENT);
+        $this->addTab($this->get_lang('StudentsZone'), $tabUrl, parent::TAB_FILTER_ONLY_STUDENT);
     }
 
     /**
@@ -86,6 +87,10 @@ class IcpnaTabZonePlugin extends Plugin
 
         $lastTabNumber = str_replace('custom_tab_', '', $lastTabSubKey);
         $lastTabNumber = intval($lastTabNumber);
+
+        $this->deleteTab("custom_tab_$lastTabNumber");
+
+        $lastTabNumber--;
 
         $this->deleteTab("custom_tab_$lastTabNumber");
     }

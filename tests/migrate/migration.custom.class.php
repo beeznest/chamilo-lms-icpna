@@ -408,7 +408,6 @@ class MigrationCustom {
             'weight'    => '20',
             'max'       => '20'
         );*/
-
         self::fix_access_dates($data);
         // Here the $data variable has $data['course_code'] that will be added
         //   when creating the session
@@ -3210,42 +3209,45 @@ class MigrationCustom {
             $ny = $y = $matches[1];
             $nm = 1 + $m = $matches[2];
             //ignore current month
-            if ($y == $cy && $m == $cm) { break; }
-            if ($m == 12) {
-                $ny = $y+1;
-                $nm = 1;
+            if ($y == $cy && $m == $cm) { 
+                //do nothing
+            } else {
+                if ($m == 12) {
+                    $ny = $y+1;
+                    $nm = 1;
+                }
+                $start = new DateTime();
+                $end = new DateTime();
+                $start->setDate($y, $m, 1);
+                $end->setDate($ny, $nm, 1);
+                $end->modify('-1 day');
+                $vstart = $start->format('Y-m-d H:i:s');
+                $vend = $end->format('Y-m-d H:i:s');
             }
-            $start = new DateTime();
-            $end = new DateTime();
-            $start->setDate($y, $m, 1);
-            $end->setDate($ny, $nm, 1);
-            $end->modify('-1 day');
-            $vstart = $start->format('Y-m-d H:i:s');
-            $vend = $end->format('Y-m-d H:i:s');
         }
         // Now assess the situation
         if ($period != '000000') {
             if ($asd != $nt && $aed != $nt && $casd != $nt && $caed != $nt) {
                 //everything is defined, perfect, nothing to do
-                break;
-            }
-            if ($asd == $nt) {
-                //if access_start_date is undefined, re-use the period's date
-                $asd = $vstart;
-            }
-            if ($casd == $nt) {
-                //access_start_date is defined but not coach_access_start_date,
-                // so re-use access_start_date
-                $casd = $asd;
-            }
-            if ($aed == $nt) {
-                //if access_end_date is undefined, re-use the period's date
-                $aed = $vend;
-            }
-            if ($caed == $nt) {
-                //access_end_date is defined but not coach_access_end_date,
-                // so re-use access_end_date
-                $caed = $aed;
+            } else {
+                if ($asd == $nt) {
+                    //if access_start_date is undefined, re-use the period's date
+                    $asd = $vstart;
+                }
+                if ($casd == $nt) {
+                    //access_start_date is defined but not coach_access_start_date,
+                    // so re-use access_start_date
+                    $casd = $asd;
+                }
+                if ($aed == $nt) {
+                    //if access_end_date is undefined, re-use the period's date
+                    $aed = $vend;
+                }
+                if ($caed == $nt) {
+                    //access_end_date is defined but not coach_access_end_date,
+                    // so re-use access_end_date
+                    $caed = $aed;
+                }
             }
         } else {
             // if the period is not defined
@@ -3254,6 +3256,17 @@ class MigrationCustom {
             }
             if ($aed != $nt && $caed == $nt) {
                 $caed = $aed;
+            }
+        }
+        // If the session is not a "PLEX" session, we will give access to coaches one day before
+        if (!empty($data['name'])) {
+            $isPlex = preg_match('/PLEX/i', $data['name']);
+            // if the session is not a PLEX
+            if (!$isPlex) {
+                // Then coach date must be one day before the given date
+                $temp = new DateTime($casd);
+                $temp->modify('-1 day');
+                $casd = $temp->format('Y-m-d H:i:s');
             }
         }
         // Fix end dates at 23:59:59 if same as start date

@@ -55,11 +55,11 @@ class IcpnaTabZonePlugin extends Plugin
      */
     public function saveAdditionalConfiguration($params)
     {
+        $this->deleteTabs();
+
         if ($params['tool_enable'] != "true") {
             return;
         }
-
-        $this->deleteTabs();
 
         $tabUrl = api_get_path(WEB_PLUGIN_PATH) . "icpna_tab_zone/src/zone.php";
 
@@ -99,11 +99,10 @@ class IcpnaTabZonePlugin extends Plugin
         );
         $lastTabNumber = intval($lastTabNumber);
 
-        $this->deleteTab("custom_tab_$lastTabNumber");
-
-        --$lastTabNumber;
-
-        $this->deleteTab("custom_tab_$lastTabNumber");
+        for ($i = $lastTabNumber; $i > 0; $i--) {
+            $this->deleteTab('custom_tab_'.$lastTabNumber.parent::TAB_FILTER_NO_STUDENT);
+            $this->deleteTab('custom_tab_'.$lastTabNumber.parent::TAB_FILTER_ONLY_STUDENT);
+        }
     }
 
     /**

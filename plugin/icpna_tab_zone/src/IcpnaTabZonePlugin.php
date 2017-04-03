@@ -15,11 +15,13 @@ class IcpnaTabZonePlugin extends Plugin
     {
         $parameters = array(
             'tool_enable' => 'boolean',
+            'enable_student_zone' => 'boolean',
             'student_zone_url' => 'text',
+            'enable_teacher_zone' => 'boolean',
             'teacher_zone_url' => 'text'
         );
 
-        parent::__construct('1.0', 'Angel Fernando Quiroz Campos', $parameters);
+        parent::__construct('1.1', 'Angel Fernando Quiroz Campos', $parameters);
     }
 
     static function create()
@@ -53,22 +55,27 @@ class IcpnaTabZonePlugin extends Plugin
      */
     public function saveAdditionalConfiguration($params)
     {
-        $this->deleteAllData();
-
         if ($params['tool_enable'] != "true") {
             return;
         }
 
+        $this->deleteTabs();
+
         $tabUrl = api_get_path(WEB_PLUGIN_PATH) . "icpna_tab_zone/src/zone.php";
 
-        $this->addTab($this->get_lang('TeachersZone'), $tabUrl, parent::TAB_FILTER_NO_STUDENT);
-        $this->addTab($this->get_lang('StudentsZone'), $tabUrl, parent::TAB_FILTER_ONLY_STUDENT);
+        if ($params['enable_student_zone'] === 'true') {
+            $this->addTab($this->get_lang('StudentsZone'), $tabUrl, parent::TAB_FILTER_ONLY_STUDENT);
+        }
+
+        if ($params['enable_teacher_zone'] === 'true') {
+            $this->addTab($this->get_lang('TeachersZone'), $tabUrl, parent::TAB_FILTER_NO_STUDENT);
+        }
     }
 
     /**
-     * Delete data generador for this plugin into table c_tool
+     * Delete the custom tabs created by this plugin
      */
-    private function deleteAllData()
+    private function deleteTabs()
     {
         $settings = $this->get_settings();
 
@@ -85,7 +92,11 @@ class IcpnaTabZonePlugin extends Plugin
             return;
         }
 
-        $lastTabNumber = str_replace('custom_tab_', '', $lastTabSubKey);
+        $lastTabNumber = str_replace(
+            ['custom_tab_', parent::TAB_FILTER_ONLY_STUDENT, parent::TAB_FILTER_NO_STUDENT],
+            '',
+            $lastTabSubKey
+        );
         $lastTabNumber = intval($lastTabNumber);
 
         $this->deleteTab("custom_tab_$lastTabNumber");
@@ -93,6 +104,14 @@ class IcpnaTabZonePlugin extends Plugin
         --$lastTabNumber;
 
         $this->deleteTab("custom_tab_$lastTabNumber");
+    }
+
+    /**
+     * Delete data generador for this plugin
+     */
+    private function deleteAllData()
+    {
+        $this->deleteTabs();
     }
 
     /**

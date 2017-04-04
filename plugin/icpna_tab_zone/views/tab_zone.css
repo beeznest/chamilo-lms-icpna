@@ -1,0 +1,32 @@
+#content_id {
+    width: 100%;
+    background-color: #FFF;
+}
+
+/* Large desktop */
+@media (min-width: 1200px) {
+    #content_id {
+        min-height: 600px;
+    }
+}
+
+/* Portrait tablet to landscape and desktop */
+@media (min-width: 768px) and (max-width: 979px) {
+    #content_id {
+        min-height: 600px;
+    }
+}
+
+/* Landscape phone to portrait tablet */
+@media (max-width: 767px) {
+    #content_id {
+        min-height: 600px;
+    }
+}
+
+/* Landscape phones and down */
+@media (max-width: 480px) {
+    #content_id {
+        min-height: 399px;
+    }
+}

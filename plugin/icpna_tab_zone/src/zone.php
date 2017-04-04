@@ -34,6 +34,9 @@ $additionalParams = [
 
 $zoneSsoUrl = $objSsoServer->getUrl($zonUrl, $additionalParams);
 
+$htmlHeadXtra[] = '<style rel="stylesheet" href="'.api_get_path(WEB_PLUGIN_PATH).'icpna_tab_zone/views/tab_zone.css">'
+    .'</style>';
+
 $objTpl = new Template($tabName);
 $objTpl->assign('path', $zoneSsoUrl);
 

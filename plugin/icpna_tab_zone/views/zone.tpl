@@ -6,26 +6,3 @@
         </div>
     </div>
 </div>
-<script>
-    $(document).on('ready', function () {
-        var $iframe = $('#content_id');
-
-        $iframe.on('load', function () {
-            var height = this.scrollHeight + this.offsetTop;
-
-            $iframe.height(height);
-        });
-
-        $(window).on('resize', function () {
-            var ratioHeight = $iframe.width() / (4/3),
-                height = this.scrollHeight + this.offsetTop;
-
-            $iframe.height(ratioHeight > height ? ratioHeight : height);
-        });
-
-        $('#content_id').css({
-            backgroundColor: '#FFF',
-            width: '100%'
-        });
-    });
-</script>

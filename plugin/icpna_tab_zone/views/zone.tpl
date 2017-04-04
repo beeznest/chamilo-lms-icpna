@@ -8,7 +8,7 @@
 </div>
 <script>
     $(document).on('ready', function () {
-        var $iframe = $(temp0);
+        var $iframe = $('#content_id');
 
         $iframe.on('load', function () {
             var height = this.scrollHeight + this.offsetTop;

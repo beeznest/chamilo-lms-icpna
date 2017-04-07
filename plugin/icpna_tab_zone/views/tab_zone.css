@@ -22,3 +22,6 @@
 .embed-responsive-16by9 {
     padding-bottom: 56.25%;
 }
+.embed-responsive iframe {
+    -webkit-overflow-scrolling:touch !important;
+}

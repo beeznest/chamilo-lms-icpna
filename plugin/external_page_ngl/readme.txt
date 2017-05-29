@@ -10,7 +10,7 @@ Enable tool: Enable the plugin in the courses
 
 Button Name: Set a button name to show in the courses tool
 
-Login process: Set the URL to sing-in to NGL
+Login process: Set the URL to sign-in to NGL
 
 Image Path: Set the button image
 
@@ -18,9 +18,9 @@ Installation Notes
 ==================
 
 When you install the plugin, it creates an extra user field (called ewoorkbooklogin) to record the user name
-And add a button in the course page to access the established sing-in process
+And add a button in the course page to access the established sign-in process
 
 Unistallation Notes
 ===================
 
-When you install the plugin, it remove the extra user field (called ewoorkbooklogin)
+When you uninstall the plugin, it remove the extra user field (called ewoorkbooklogin)

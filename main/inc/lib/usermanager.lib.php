@@ -993,6 +993,21 @@ class UserManager {
         return (strlen($username) > USERNAME_MAX_LENGTH);
     }
 
+    /**
+     * Checks whether a username has dash '-'
+     * @param string $username
+     * @return bool
+     */
+    public static function is_username_has_dash($username)
+    {
+        $flag = false;
+        $pos = strpos($username, '-');
+        if ($pos !== false) {
+            $flag = true;
+        }
+        return $flag;
+    }
+
     public static function get_user_list_by_ids($ids = array(), $active = null)
     {
         if(empty($ids)) {

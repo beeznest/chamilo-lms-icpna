@@ -209,10 +209,10 @@ switch ($action) {
             return Display::return_message(get_lang('Error'), 'error');
         }
         if (api_is_allowed_to_edit(null, true)) {
-            $new_question_list = $_POST['question_id_list'];
+            $questionListIncludingMedia = $_POST['question_id_list'];
             $TBL_QUESTIONS = Database::get_course_table(TABLE_QUIZ_TEST_QUESTION);
             $counter = 1;
-            foreach ($new_question_list as $new_order_id) {
+            foreach ($questionListIncludingMedia as $new_order_id) {
                 Database::update(
                     $TBL_QUESTIONS,
                     array('question_order' => $counter),
@@ -341,6 +341,29 @@ switch ($action) {
             }
 
             Session::write('exe_id', $exe_id);
+
+            /* Is necessary transform the question_list to save */
+            $questionListIncludingMedia = $question_list;
+            $mediaQuestionsId = [];
+
+            /* Then, get the children question for media questions and */
+            /** @var int $questionId */
+            foreach ($question_list as $questionId) {
+                $objQuestion = Question::read($questionId);
+                $children = $objQuestion->getChildrenQuestions();
+
+                if ($objQuestion->type != MEDIA_QUESTION) {
+                    continue;
+                }
+
+                $mediaQuestionsId[] = $questionId;
+                $questionListIncludingMedia = array_merge($questionListIncludingMedia, $children);
+            }
+
+            /* Then, leave out the media questions ids from $question_list */
+            $question_list = array_filter($questionListIncludingMedia, function ($questionId) use ($mediaQuestionsId) {
+                return !in_array($questionId, $mediaQuestionsId);
+            });
 
             // Getting the total weight if the request is simple
             $total_weight = 0;

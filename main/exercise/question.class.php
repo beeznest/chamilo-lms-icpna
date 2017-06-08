@@ -1,7 +1,8 @@
 <?php
 /* For licensing terms, see /license.txt */
 
-use Chamilo\CourseBundle\Entity\CQuizAnswer;
+use Chamilo\CourseBundle\Entity\CQuizAnswer,
+    Chamilo\CourseBundle\Entity\CQuizQuestion;
 
 /**
  * Class Question
@@ -57,7 +58,7 @@ abstract class Question
         UNIQUE_ANSWER_IMAGE => ['UniqueAnswerImage.php', 'UniqueAnswerImage'],
         DRAGGABLE => ['Draggable.php', 'Draggable'],
         MATCHING_DRAGGABLE => ['MatchingDraggable.php', 'MatchingDraggable'],
-        //MEDIA_QUESTION => array('media_question.class.php' , 'MediaQuestion')
+        MEDIA_QUESTION => ['MediaQuestion.php' , 'MediaQuestion'],
         ANNOTATION => ['Annotation.php', 'Annotation'],
         READING_COMPREHENSION => ['ReadingComprehension.php', 'ReadingComprehension']
     );
@@ -157,6 +158,7 @@ abstract class Question
                 $objQuestion->level = (int) $object->level;
                 $objQuestion->extra = $object->extra;
                 $objQuestion->course = $course_info;
+                $objQuestion->parent_id = (int) $object->parent_id;
                 $objQuestion->feedback = isset($object->feedback) ? $object->feedback : '';
                 $objQuestion->category = TestCategory::getCategoryForQuestion($id);
 
@@ -950,6 +952,7 @@ abstract class Question
                 'picture' => $picture,
                 'extra' => $extra,
                 'level' => $level,
+                'parent_id' => $this->parent_id
             ];
             if ($exercise->questionFeedbackEnabled) {
                 $params['feedback'] = $this->feedback;
@@ -1663,8 +1666,8 @@ abstract class Question
             }
 
             //Medias
-            //$course_medias = self::prepare_course_media_select(api_get_course_int_id());
-            //$form->addElement('select', 'parent_id', get_lang('AttachToMedia'), $course_medias);
+            $course_medias = self::prepare_course_media_select(api_get_course_int_id());
+            $form->addElement('select', 'parent_id', get_lang('AttachToMedia'), $course_medias);
         }
 
         $form->addElement('html', '</div>');
@@ -1706,6 +1709,7 @@ abstract class Question
         $defaults['questionLevel'] = $this->level;
         $defaults['questionCategory'] = $this->category;
         $defaults['feedback'] = $this->feedback;
+        $defaults['parent_id'] = $this->parent_id;
 
         // Came from he question pool
         if (isset($_GET['fromExercise'])) {
@@ -1728,6 +1732,7 @@ abstract class Question
      */
     public function processCreation($form, $exercise)
     {
+        $this->updateParentId($form->getSubmitValue('parent_id'));
         $this->updateTitle($form->getSubmitValue('questionName'));
         $this->updateDescription($form->getSubmitValue('questionDescription'));
         $this->updateLevel($form->getSubmitValue('questionLevel'));
@@ -1788,6 +1793,9 @@ abstract class Question
         echo '<ul class="question_menu">';
 
         foreach ($question_type_custom_list as $i => $a_type) {
+            if ($i == MEDIA_QUESTION) {
+                continue;
+            }
             // include the class of the type
             require_once $a_type[0];
             // get the picture of the type and the langvar which describes it
@@ -2094,7 +2102,7 @@ abstract class Question
         $table_question = Database::get_course_table(TABLE_QUIZ_QUESTION);
         $default_where = array('c_id = ? AND parent_id = 0 AND type = ?' => array($course_id, MEDIA_QUESTION));
         $result = Database::select(
-            '*',
+            'iid id, question',
             $table_question,
             array(
                 'limit' => " $start, $limit",
@@ -2251,5 +2259,29 @@ abstract class Question
     public function returnFormatFeedback()
     {
         return '<br /><br />'.Display::return_message($this->feedback, 'normal', false);
+    }
+
+    /**
+     * Get the children question for question of MEDIA_QUESTION type
+     * @return array
+     */
+    public function getChildrenQuestions()
+    {
+        if ($this->type != MEDIA_QUESTION) {
+            return [];
+        }
+
+        $em = Database::getManager();
+        $questionRepo = $em->getRepository('ChamiloCourseBundle:CQuizQuestion');
+        $questions = $questionRepo->findBy(['parentId' => $this->id]);
+
+        $ids = [];
+
+        /** @var CQuizQuestion $question */
+        foreach ($questions as $question) {
+            $ids[] = $question->getIid();
+        }
+
+        return $ids;
     }
 }

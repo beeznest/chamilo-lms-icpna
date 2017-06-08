@@ -1794,7 +1794,7 @@ $allowed_actions = array(
     'get_user_skill_ranking',
     'get_extra_fields',
     'get_extra_field_options',
-    //'get_course_exercise_medias',
+    'get_course_exercise_medias',
     'get_user_course_report',
     'get_user_course_report_resumed',
     'get_exercise_grade',

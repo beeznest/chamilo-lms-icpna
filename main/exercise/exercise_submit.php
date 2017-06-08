@@ -1311,19 +1311,63 @@ if (!empty($error)) {
             }
         }
 
+        $countOfQuestionsInsideMedia = 0;
+        $lastQuestionInMedia = false;
+        $mediaQuestions = $objExercise->getMediaList();
+        $mediaQuestionList = [];
+
         echo '<div id="question_div_'.$questionId.'" class="main-question '.$remind_highlight.'" >';
 
-        // Shows the question and its answers
-        ExerciseLib::showQuestion(
-            $questionId,
-            false,
-            $origin,
-            $i,
-            true,
-            false,
-            $user_choice,
-            false
-        );
+        if (!empty($mediaQuestions) && isset($mediaQuestions[$questionId])) {
+            $mediaQuestionList = $mediaQuestions[$questionId];
+            $objQuestionTmp = Question::read($questionId);
+
+            $counter = 1;
+
+            if ($objQuestionTmp->type == MEDIA_QUESTION) {
+                echo $objQuestionTmp->show_media_content();
+
+                $countOfQuestionsInsideMedia = count($mediaQuestionList);
+
+                if ($countOfQuestionsInsideMedia) {
+                    foreach ($mediaQuestionList as $mediaQuestion) {
+                        if ($counter == $countOfQuestionsInsideMedia) {
+                            $lastQuestionInMedia = true;
+                        }
+
+                        echo '<div id="question_div_'.$mediaQuestion.'">';
+
+                        // Shows the question and its answers
+                        ExerciseLib::showQuestion(
+                            $mediaQuestion,
+                            false,
+                            $origin,
+                            $i,
+                            true,
+                            false,
+                            $user_choice,
+                            false
+                        );
+
+                        echo '</div>';
+
+                        $counter++;
+                    }
+                }
+            }
+        } else {
+            // Shows the question and its answers
+            ExerciseLib::showQuestion(
+                $questionId,
+                false,
+                $origin,
+                $i,
+                true,
+                false,
+                $user_choice,
+                false
+            );
+        }
 
         // Button save and continue
         switch ($objExercise->type) {
@@ -1344,6 +1388,25 @@ if (!empty($error)) {
                     array('class'=>'exercise_save_now_button')
                 );
                 break;
+        }
+
+        if ($countOfQuestionsInsideMedia) {
+            $button = [
+                Display::button(
+                    'save_now',
+                    get_lang('SaveForNow'),
+                    ['type' => 'button', 'class' => 'btn btn-info', 'data-question' => $questionId]
+                ),
+                '<span id="save_for_now_'.$questionId.'"></span>&nbsp;'
+            ];
+            $exercise_actions = Display::div(
+                implode(PHP_EOL, $button),
+                array('class'=>'exercise_save_now_button')
+            );
+
+            if ($lastQuestionInMedia) {
+                $exercise_actions = $objExercise->show_button($questionId, $current_question, $mediaQuestionList);
+            }
         }
 
         // Checkbox review answers

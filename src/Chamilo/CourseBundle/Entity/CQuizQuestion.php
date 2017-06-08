@@ -106,11 +106,18 @@ class CQuizQuestion
     private $questionCode;
 
     /**
+     * @var int
+     * @ORM\Column(name="parent_id", options={"default": 0})
+     */
+    private $parentId = 0;
+
+    /**
      * CQuizQuestion constructor.
      */
     public function __construct()
     {
         $this->ponderation = 0.0;
+        $this->parentId = 0;
     }
 
     /**
@@ -373,5 +380,26 @@ class CQuizQuestion
     public function getIid()
     {
         return $this->iid;
+    }
+
+    /**
+     * Set parentId
+     * @param int $parentId
+     * @return CQuizQuestion
+     */
+    public function setParentId($parentId)
+    {
+        $this->parentId = $parentId;
+
+        return $this;
+    }
+
+    /**
+     * Get parentId
+     * @return int
+     */
+    public function getParentId()
+    {
+        return $this->parentId;
     }
 }

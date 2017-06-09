@@ -103,6 +103,10 @@ class MigrationCustom {
         self::TRANSACTION_TYPE_EDIT_FASE,
     );
 
+    /**
+     * Gets all the possible transaction statutes
+     * @return array    List of data from the branch_transaction_status table
+     */
     static function get_transaction_status_list() {
         $table = Database::get_main_table(TABLE_BRANCH_TRANSACTION_STATUS);
         return Database::select("*", $table);
@@ -112,31 +116,44 @@ class MigrationCustom {
      * The only required method is the 'none' method, which will not trigger
      * any process at all
      * @param mixed Data
-     * @param mixed Unaltered data
+     * @return mixed The unaltered data
      */
     static function none($data) {
         return $data;
     }
 
+    /**
+     * Join elements of a string to form the final display of the 'horario' field
+     * @param mixed $data
+     * @param array $omigrate
+     * @param array $row_data Contains the 'horario' field details
+     * @return string A well formed schedule string ready to be displayed
+     */
     static function join_horario($data, &$omigrate, $row_data) {
         return '('.$row_data['chrIdHorario'].') '.$row_data['chrHoraInicial'].' '.$row_data['chrHoraFinal'];
     }
 
     /**
      * Converts 2008-02-01 12:20:20.540 to  2008-02-01 12:20:20
+     * @param   string  $date   A date, in 'yyyy-mm-dd hh:mm:ss.mmm' to be cut after the seconds value
+     * @return string A string in the 'yyyy-mm-dd hh:mm:ss' format
      */
     static function clean_date_time($date) {
         return substr($date, 0, 19);
     }
 
-    /* Converts 2009-09-30T00:00:00-05:00 to 2009-09-30 00:00:00*/
+    /**
+     * Converts 2009-09-30T00:00:00-05:00 to 2009-09-30 00:00:00
+     * @param string $date Date
+     * @return string A strin in the 'yyyy-mm-dd hh:mm:ss' format
+     */
     static function clean_date_time_from_ws($date) {
         $pre_clean = self::clean_date_time($date, 0, 19);
         return str_replace('T', ' ', $pre_clean);
     }
 
     /**
-     * Transform the uid identifiers from MSSQL to a string
+     * Transforms the uid identifiers recovered from MSSQL to a string
      * @param string Field name
      * @return string SQL select string to include in the final select
      */
@@ -150,13 +167,31 @@ class MigrationCustom {
         return " cast( $field  as varchar(50)) as $as_field ";
     }
 
+    /**
+     * Proxy for utf8_encode() function
+     * @param string $value
+     * @return string
+     */
     static function clean_utf8($value) {
         return utf8_encode($value);
     }
+
+    /**
+     * Proxy for the sha1() function
+     * @param string $value
+     * @return string
+     */
     static function make_sha1($value) {
         return sha1($value);
     }
 
+    /**
+     * Add months label to 'fase' extra field
+     * @param mixed $value
+     * @param mixed $data
+     * @param array $row_data
+     * @return string
+     */
     static function add_meses_label_to_extra_field_fase($value, $data, $row_data) {
         $label = 'meses';
         if ($row_data['chrOrdenFase'] == 1) {
@@ -166,10 +201,23 @@ class MigrationCustom {
         return self::clean_utf8($value);
     }
 
+    /**
+     * Removes any weird UTF-8 character from the session name
+     * @param mixed $value
+     * @param mixed $omigrate
+     * @param array $row_data
+     * @return string
+     */
     static function clean_session_name($value, &$omigrate, $row_data) {
         return self::clean_utf8($row_data['session_name']);
     }
 
+    /**
+     * Gets the real course code from an external uidIdCurso param
+     * @param string $data
+     * @param array $omigrate
+     * @return mixed
+     */
     static function get_real_course_code($data, &$omigrate=null) {
         if (is_array($omigrate) && $omigrate['boost_courses']) {
             if (isset($omigrate['courses'][$data])) {
@@ -186,6 +234,12 @@ class MigrationCustom {
         }
     }
 
+    /**
+     * Gets the session ID from a given (external) uidIdPrograma
+     * @param string $uidIdPrograma
+     * @param array $omigrate
+     * @return mixed
+     */
     static function get_session_id_by_programa_id($uidIdPrograma, &$omigrate=null) {
         if (is_array($omigrate) && $omigrate['boost_sessions']) {
             if (isset($omigrate['sessions'][$uidIdPrograma])) {
@@ -202,7 +256,12 @@ class MigrationCustom {
         }
     }
 
-    /* Not used */
+    /**
+     * Gets the user ID from the external uidIdPersona param
+     * @param string $uidIdPersona
+     * @param array $omigrate
+     * @return int  0 if not found
+     */
     static function get_user_id_by_persona_id($uidIdPersona, &$omigrate=null) {
         if (is_array($omigrate) && $omigrate['boost_users']) {
             if (isset($omigrate['users'][$uidIdPersona])) {
@@ -220,6 +279,12 @@ class MigrationCustom {
         }
     }
 
+    /**
+     * Gets the user id from the uidIdPersona of a teacher
+     * @param $uidIdPersona
+     * @param null $omigrate
+     * @return int
+     */
     static function get_real_teacher_id($uidIdPersona, &$omigrate=null) {
         $default_teacher_id = self::default_admin_id;
         if (empty($uidIdPersona)) {
@@ -348,7 +413,7 @@ class MigrationCustom {
         unset($data['uidIdPersona']);
         unset($data['uidIdAlumno']);
         unset($data['uidIdEmpleado']);
-	$data['encrypt_method'] = 'sha1';
+	    $data['encrypt_method'] = 'sha1';
 
         global $api_failureList;
         $api_failureList = array();
@@ -367,7 +432,10 @@ class MigrationCustom {
     }
 
     /**
-     * Manages the course creation based on the rules in db_matches.php
+     * Manages the course creation based on the rules in the db_matches.php file
+     * @param   array   $data
+     * @param   array   $omigrate
+     * @return  array   Return value of CourseManager::create_course();
      */
     static function create_course($data, &$omigrate=null) {
         //error_log('In create_course, received '.print_r($data,1));
@@ -397,6 +465,8 @@ class MigrationCustom {
     /**
      * Manages the session creation, based on data provided by the rules
      * in db_matches.php
+     * @param   array   $data
+     * @param   array   $omigrate
      * @return int The created (or existing) session ID
      */
     static function create_session($data, &$omigrate) {
@@ -426,6 +496,9 @@ class MigrationCustom {
 
     /**
      * Assigns a user to a session based on rules in db_matches.php
+     * @param   array   $data
+     * @param   array   $omigrate
+     * @return void
      */
     static function add_user_to_session($data, &$omigrate=null) {
         $session_id = null;
@@ -467,6 +540,10 @@ class MigrationCustom {
         }
     }
 
+    /**
+     * Create an attendance record based on a transaction record
+     * @param array $data
+     */
     static function create_attendance($data) {
         //error_log('create_attendance');
         $session_id = $data['session_id'];
@@ -531,7 +608,7 @@ class MigrationCustom {
                     }
                     // Now the attendance_sheet has been found or created, check the date
                     if ($attendance_sheet_id) {
-                        error_log('Processing attendance sheet '.$attendance_sheeet_id.' for session '.$session_id.', course '.$course_info['real_id'].', date '.$fecha);
+                        error_log('Processing attendance sheet '.$attendance_sheet_id.' for session '.$session_id.', course '.$course_info['real_id'].', date '.$fecha);
                         //Attendance date exists?
                         $cal_info = array();
                         $cal_id = null;
@@ -579,11 +656,21 @@ class MigrationCustom {
         }
     }
 
+    /**
+     * Convert attendance status from the external system to a correct internal value
+     * @param string $status
+     * @return mixed|null
+     */
     static function convert_attendance_status($status) {
         if (!in_array($status,array_keys(self::$attend_status))) { return null; }
         return self::$attend_status[$status];
     }
 
+    /**
+     * Create a thematic progress record based on external data
+     * @param array $data
+     * @return void
+     */
     static function create_thematic($data) {
         //error_log('create_thematic');
         $session_id = $data['session_id'];
@@ -3285,12 +3372,16 @@ class MigrationCustom {
         $data['display_end_date'] = $ded;
         $data['coach_access_start_date'] = $casd;
         $data['coach_access_end_date'] = $caed;
-	$data['name'] .= ' [#'.substr($dsd,8,2).']';
+	    $data['name'] .= ' [#'.substr($dsd,8,2).']';
 
         return true;
     }
 
-
+    /**
+     * Gets the value of the 'horario' field for a given session
+     * @param int $session_id The session ID
+     * @return string   The db-stored value of the 'horario' field for this session
+     */
     static function get_horario_value($session_id) {
          $extra_field_value = new ExtraFieldValue('session');
         //Getting horario info
@@ -3312,6 +3403,13 @@ class MigrationCustom {
         }
         return $time;
     }
+
+    /**
+     * Prepare an array of items to avoid many queries to the database afterwards, during the treatment
+     * of transactions. The data provided depends on the elements contained in the array passed as parameter.
+     * @param array $omigrate Reference of an array with main indexes of data to be filled
+     * @return bool Always returns true
+     */
     static function fill_data_list(&$omigrate) {
         if (is_array($omigrate) && isset($omigrate) && $omigrate['boost_users']) {
             // uidIdPersona field is ID 13 in user_field

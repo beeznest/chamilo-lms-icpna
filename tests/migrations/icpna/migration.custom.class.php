@@ -954,7 +954,7 @@ class MigrationCustom {
                                     'created_at' => $utc_datetime,
                                     'score' => $data['nota'],
                                 );
-                                $data_list['course_eval_results'][$eval_id][$user_id] = $res_id;
+                                //$data_list['course_eval_results'][$eval_id][$user_id] = $res_id;
                                 $limit = $data_list['create_eval_results_limit'];
                                 if (count($data_list['create_eval_results'])>$limit) {
                                     $data_list['create_eval_results'][] = $eval_data;
@@ -2444,7 +2444,7 @@ class MigrationCustom {
                         $link_to_gradebook = false;
                         $attendance_id = $attendance->attendance_add($link_to_gradebook, self::default_admin_id);
                         if (is_array($data_list) && isset($data_list) && $data_list['boost_sessions']) {
-                            $data_list['sessions_attendances'][$course_info['real_id']][$session_id][] = $attendance_sheet_id;
+                            $data_list['sessions_attendances'][$course_info['real_id']][$session_id][] = $attendance_id;
                         }
                         error_log("Attendance created in attendance_id = $attendance_id - course code: {$course_info['code']} - session_id: $session_id - $attendance_date");
                         //self::create_attendance($d);
@@ -3288,7 +3288,7 @@ class MigrationCustom {
         $ded = (!empty($data['display_end_date'])?$data['display_end_date']:$aed);
         $vstart = $vend = $nt;
         $matches = array();
-        $match = preg_match('/-\s(\d{4})(\d{2})\s-/',$row['name'],$matches);
+        $match = preg_match('/-\s(\d{4})(\d{2})\s-/',$data['name'],$matches);
         $now = new DateTime(null);
         $cy = $now->format('Y');
         $cm = $now->format('m');

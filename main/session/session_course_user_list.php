@@ -101,6 +101,9 @@ $sql = "
     LEFT JOIN $tbl_session_rel_course_rel_user scru
         ON (s.session_id = scru.session_id AND s.user_id = scru.user_id AND scru.c_id = $courseId)
     WHERE s.session_id = $id_session
+        AND (s.moved_to = 0 OR s.moved_to IS NULL)
+        AND s.moved_status != ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION."
+        AND s.relation_type != ".SESSION_RELATION_TYPE_RRHH."
     ORDER BY $sort $direction
     LIMIT $from,".($limit + 1);
 

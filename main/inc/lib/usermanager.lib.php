@@ -2650,6 +2650,8 @@ class UserManager
             return array();
         }
 
+        $userIsTeacher = api_is_teacher();
+
         // Get the list of sessions per user
         $now = new DateTime('now', new DateTimeZone('UTC'));
 
@@ -2663,11 +2665,27 @@ class UserManager
                     sc.dateStart AS session_category_date_start,
                     sc.dateEnd AS session_category_date_end,
                     s.coachAccessStartDate AS coach_access_start_date,
-                    s.coachAccessEndDate AS coach_access_end_date
+                    s.coachAccessEndDate AS coach_access_end_date";
+
+        if (!$userIsTeacher) {
+            $dql .= "
+                , su.movedTo, su.movedStatus
+            ";
+        }
+
+        $dql .= "
                 FROM ChamiloCoreBundle:Session AS s
                 INNER JOIN ChamiloCoreBundle:SessionRelCourseRelUser AS scu WITH scu.session = s
                 INNER JOIN ChamiloCoreBundle:AccessUrlRelSession AS url WITH url.sessionId = s.id
-                LEFT JOIN ChamiloCoreBundle:SessionCategory AS sc WITH s.category = sc
+                LEFT JOIN ChamiloCoreBundle:SessionCategory AS sc WITH s.category = sc";
+
+        if (!$userIsTeacher) {
+            $dql .= "
+                LEFT JOIN ChamiloCoreBundle:SessionRelUser su WITH su.session = s AND su.user = scu.user
+            ";
+        }
+
+        $dql .= "
                 WHERE (scu.user = :user OR s.generalCoach = :user) AND url.accessUrlId = :url
                 ORDER BY sc.name, s.name";
 
@@ -2787,7 +2805,9 @@ class UserManager
                 'access_end_date' => $row['access_end_date'] ? $row['access_end_date']->format('Y-m-d H:i:s') : null,
                 'coach_access_start_date' => $row['coach_access_start_date'] ? $row['coach_access_start_date']->format('Y-m-d H:i:s') : null,
                 'coach_access_end_date' => $row['coach_access_end_date'] ? $row['coach_access_end_date']->format('Y-m-d H:i:s') : null,
-                'courses' => $courseList
+                'courses' => $courseList,
+                'moved_to' => !$userIsTeacher ? $row['movedTo'] : null,
+                'moved_status' => !$userIsTeacher ? $row['movedStatus'] : null
             );
         }
 

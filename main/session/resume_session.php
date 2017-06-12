@@ -258,13 +258,19 @@ if (!empty($userList)) {
 
     $table->setHeaderContents(0, 0, get_lang('User'));
     $table->setHeaderContents(0, 1, get_lang('Status'));
-    $table->setHeaderContents(0, 2, get_lang('Actions'));
+    $table->setHeaderContents(0, 2, get_lang('Information'));
+    $table->setHeaderContents(0, 3, get_lang('Destination'));
+    $table->setHeaderContents(0, 4, get_lang('MovedAt'));
+    $table->setHeaderContents(0, 5, get_lang('Actions'));
 
     $row = 1;
     foreach ($userList as $user) {
         $userId = $user['user_id'];
         $userInfo = api_get_user_info($userId);
-
+        $information = '';
+        $origin = '';
+        $destination = '';
+        $movedDate = null;
         $userLink = '<a href="'.api_get_path(WEB_CODE_PATH).'admin/user_information.php?user_id='.$userId.'">'.
             api_htmlentities($userInfo['complete_name_with_username']).'</a>';
 
@@ -277,6 +283,57 @@ if (!empty($userList)) {
             Display::return_icon('course.png', get_lang('BlockCoursesForThisUser')),
             api_get_path(WEB_CODE_PATH).'session/session_course_user.php?id_user='.$user['user_id'].'&id_session='.$sessionId
         );
+
+        $moveUserLink = Display::url(
+            Display::return_icon('move.png', get_lang('ChangeUserSession')),
+            api_get_path(WEB_CODE_PATH).'session/change_user_session.php?'.http_build_query([
+                'user_id' => $userId,
+                'id_session' => $sessionId
+            ])
+        );
+
+        if ($user['moved_to']
+            || $user['moved_to'] == SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION
+        ) {
+            $information .= SessionManager::getSessionChangeUserReasonsVariationsById($user['moved_status'], 'to');
+            $movedDate = $user['moved_at'] && $user['moved_at'] != '0000-00-00 00:00:00'
+                ? api_get_local_time($user['moved_at'])
+                : null;
+
+            if ($user['moved_status'] != SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION) {
+                /** @var Session $toSession */
+                $toSession = Database::getManager()->find('ChamiloCoreBundle:Session', $user['moved_to']);
+
+                if ($toSession) {
+                    $destination = Display::url(
+                        $toSession->getName(),
+                        api_get_path(WEB_CODE_PATH)."session/resume_session.php?id_session={$toSession->getId()}"
+                    );
+                }
+            }
+        } else {
+            $criteria = Criteria::create()
+                ->where(
+                    Criteria::expr()->eq('user', api_get_user_entity($userId))
+                );
+            /** @var SessionRelUser $sessionOriginInfo */
+            $sessionOriginInfo = $session->getUsers()
+                ->matching($criteria)
+                ->first();
+
+            if ($sessionOriginInfo->getMovedAt()) {
+                $movedDate = api_get_local_time($sessionOriginInfo->getMovedAt());
+                $information .= SessionManager::getSessionChangeUserReasonsVariationsById(
+                    $sessionOriginInfo->getMovedStatus(),
+                    'from'
+                );
+                $origin = Display::url(
+                    $sessionOriginInfo->getSession()->getName(),
+                    api_get_path(WEB_CODE_PATH)
+                    ."session/resume_session.php?id_session={$sessionOriginInfo->getSession()->getId()}"
+                );
+            }
+        }
 
         $removeLink = Display::url(
             Display::return_icon('delete.png', get_lang('Delete')),
@@ -314,7 +371,7 @@ if (!empty($userList)) {
         }*/
 
         $table->setCellContents($row, 0, $userLink);
-        $link = $reportingLink.$courseUserLink.$removeLink.$addUserToUrlLink.$editUrl;
+        $link = $reportingLink.$courseUserLink.$moveUserLink.$removeLink.$addUserToUrlLink.$editUrl;
         switch ($user['relation_type']) {
             case 1:
                 $status = get_lang('Drh');
@@ -328,7 +385,10 @@ if (!empty($userList)) {
         }
 
         $table->setCellContents($row, 1, $status);
-        $table->setCellContents($row, 2, $link);
+        $table->setCellContents($row, 2, $information);
+        $table->setCellContents($row, 3, "$origin $destination");
+        $table->setCellContents($row, 4, $movedDate);
+        $table->setCellContents($row, 5, $link);
         $row++;
     }
     $userListToShow .= $table->toHtml();

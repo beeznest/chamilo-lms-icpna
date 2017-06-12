@@ -1681,6 +1681,7 @@ class CourseManager
         $tblSessionCourseUser = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
         $tblCourseUser = Database::get_main_table(TABLE_MAIN_COURSE_USER);
         $tblUrlUser = Database::get_main_table(TABLE_MAIN_ACCESS_URL_REL_USER);
+        $tblSessionUser = Database::get_main_table(TABLE_MAIN_SESSION_USER);
 
         $courseInfo = api_get_course_info($course_code);
         $courseId = $courseInfo['real_id'];
@@ -1696,6 +1697,11 @@ class CourseManager
                     ON user.user_id = session_course_user.user_id
                     AND session_course_user.c_id = $courseId
                     AND session_course_user.session_id = $session_id
+                INNER JOIN $tblSessionUser as su
+                    ON su.session_id = session_course_user.session_id
+                    AND user.user_id = su.user_id
+                    AND (su.moved_to = 0 OR su.moved_to IS NULL)
+                    AND su.moved_status <> ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION."
             ";
 
             $where[] = ' session_course_user.c_id IS NOT NULL ';

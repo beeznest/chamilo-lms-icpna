@@ -25,6 +25,11 @@ class SessionManager
 {
     public static $_debug = false;
 
+    const SESSION_CHANGE_USER_REASON_SCHEDULE = 1;
+    const SESSION_CHANGE_USER_REASON_CLASSROOM = 2;
+    const SESSION_CHANGE_USER_REASON_LOCATION = 3;
+    const SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION = 4;
+
     /**
      * Constructor
      */
@@ -8516,13 +8521,146 @@ class SessionManager
                 WHERE scu.course = :course
                     AND su.relationType != :rrhh
                     AND scu.session = :session
+                    AND (su.movedTo = 0 or su.movedTo IS NULL)
+                    AND su.movedStatus != :annulation
             ")
             ->setParameters([
                 'course' => $course->getId(),
                 'rrhh' => SESSION_RELATION_TYPE_RRHH,
-                'session' => $session->getId()
+                'session' => $session->getId(),
+                'annulation' => self::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION
             ])
             ->getSingleScalarResult();
 
+    }
+
+    /**
+     * Changes the user from one session to another due a reason
+     * @see \SessionManager::getSessionChangeUserReasons()
+     * @param int $userId
+     * @param int $oldSessionId
+     * @param int $newSessionId
+     * @param int $reasonId
+     */
+    public static function changeUserSession($userId, $oldSessionId, $newSessionId, $reasonId)
+    {
+        $em = Database::getManager();
+
+        // Update number of users
+        $em
+            ->createQuery('UPDATE ChamiloCoreBundle:Session s SET s.nbrUsers = s.nbrUsers - 1 WHERE s.id = :id')
+            ->execute(['id' => $oldSessionId]);
+
+        // Update number of users in this relation
+        $em
+            ->createQuery('
+                UPDATE ChamiloCoreBundle:SessionRelCourse sc SET sc.nbrUsers = sc.nbrUsers - 1
+                WHERE sc.session = :session
+            ')
+            ->execute(['session' => $oldSessionId]);
+
+        //Deal with reasons
+        switch ($reasonId) {
+            case self::SESSION_CHANGE_USER_REASON_SCHEDULE:
+                //no break
+            case self::SESSION_CHANGE_USER_REASON_CLASSROOM:
+                //no break
+            case self::SESSION_CHANGE_USER_REASON_LOCATION:
+                //Adding to the new session
+                self::subscribe_users_to_session($newSessionId, array($userId), null, false);
+
+                //Setting move_to if session was provided
+                $em
+                    ->createQuery('
+                        UPDATE ChamiloCoreBundle:SessionRelUser su SET su.movedTo = :new
+                        WHERE su.session = :old AND su.user = :user
+                    ')
+                    ->execute(['new' => $newSessionId, 'old' => $oldSessionId, 'user' => $userId]);
+                break;
+            case self::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION:
+                UserManager::deactivate_users([$userId]);
+                break;
+        }
+
+        $now = new DateTime('now', new DateTimezone('UTC'));
+        //Setting the moved_status
+        $em
+            ->createQuery('
+                UPDATE ChamiloCoreBundle:SessionRelUser su SET su.movedStatus = :status, su.movedAt = :at
+                WHERE su.session = :session AND su.user = :user
+            ')
+            ->execute(['status' => $reasonId, 'at' => $now, 'session' => $oldSessionId, 'user' => $userId]);
+    }
+
+    /**
+     * Get reasons to change user from session
+     * @return array
+     */
+    public static function getSessionChangeUserReasons()
+    {
+        return [
+            self::SESSION_CHANGE_USER_REASON_SCHEDULE => get_lang('ScheduleChanged'),
+            self::SESSION_CHANGE_USER_REASON_CLASSROOM => get_lang('ClassRoomChanged'),
+            self::SESSION_CHANGE_USER_REASON_LOCATION => get_lang('LocationChanged'),
+            //self::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION => get_lang('EnrollmentAnnulation')
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getSessionChangeUserReasonsVariations()
+    {
+        return [
+            self::SESSION_CHANGE_USER_REASON_SCHEDULE => [
+                'default' => get_lang('ScheduleChanged'),
+                'from' => get_lang('ScheduleChangedFrom'),
+                'to' => get_lang('ScheduleChangedTo')
+            ],
+            self::SESSION_CHANGE_USER_REASON_CLASSROOM => [
+                'default' => get_lang('ClassRoomChanged'),
+                'from' => get_lang('ClassRoomChangedFrom'),
+                'to' => get_lang('ClassRoomChangedTo')
+            ],
+            self::SESSION_CHANGE_USER_REASON_LOCATION => [
+                'default' => get_lang('LocationChanged'),
+                'from' => get_lang('LocationChangedFrom'),
+                'to' => get_lang('LocationChangedTo')
+            ]
+        ];
+    }
+
+    /**
+     * Get the reason name
+     * @param int $id
+     * @return string|null
+     */
+    public static function getSessionChangeUserReason($id)
+    {
+        $reasons = self::getSessionChangeUserReasons();
+
+        return isset($reasons[$id]) ? $reasons[$id] : null;
+    }
+
+    /**
+     * @param int $id
+     * @param string $type
+     * @return string|null
+     */
+    public static function getSessionChangeUserReasonsVariationsById($id, $type)
+    {
+        $reasons = self::getSessionChangeUserReasonsVariations();
+
+        if (!isset($reasons[$id])) {
+            return null;
+        }
+
+        $reason = $reasons[$id];
+
+        if (!isset($reason[$type])) {
+            return null;
+        }
+
+        return $reason[$type];
     }
 }

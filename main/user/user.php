@@ -204,6 +204,7 @@ if (api_is_allowed_to_edit(null, true)) {
                 // users subscribed to the course through a session.
                 if (api_get_session_id()) {
                     $table_session_course_user = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
+                    $tblSessionUser = Database::get_main_table(TABLE_MAIN_SESSION_USER);
                     $sql = "SELECT DISTINCT
                                 user.user_id, ".($is_western_name_order ? "user.firstname, user.lastname" : "user.lastname, user.firstname").",
                                 user.username,
@@ -213,14 +214,20 @@ if (api_is_allowed_to_edit(null, true)) {
                                 active
                                 $legal
                             FROM $table_session_course_user as session_course_user,
-                            $table_users as user ";
+                            $table_users as user,
+                            $tblSessionUser su
+                            ";
                     if (api_is_multiple_url_enabled()) {
                         $sql .= ' , '.Database::get_main_table(TABLE_MAIN_ACCESS_URL_REL_USER).' au ';
                     }
                     $sql .= "
                         WHERE c_id = $courseId
                             AND session_course_user.user_id = user.user_id
-                            AND session_id = $sessionId
+                            AND su.user_id = session_course_user.user_id
+                            AND session_course_user.session_id = su.session_id
+                            AND (su.moved_to = 0 OR su.moved_to IS NULL)
+                            AND su.moved_status != ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION."
+                            AND session_course_user.session_id = $sessionId
                     ";
 
                     if (api_is_multiple_url_enabled()) {

@@ -373,6 +373,8 @@ if ($ajax_search) {
             AND su.session_id = ".intval($id_session)."
         WHERE u.status<>".DRH."
             AND u.status <> 6
+            AND (su.moved_to = 0 IS su.moved_to IS NULL)
+            AND su.moved_status <> ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION."
         $order_clause
     ";
 
@@ -391,6 +393,8 @@ if ($ajax_search) {
                 WHERE access_url_id = $access_url_id
                     AND u.status <> ".DRH."
                     AND u.status <> 6
+                    AND (su.moved_to = 0 OR su.moved_to IS NULL)
+                    AND su.moved_status <> ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION."
                 $order_clause
             ";
         }
@@ -550,11 +554,15 @@ if ($ajax_search) {
     $sql = "
         SELECT  u.id, lastname, firstname, username, session_id, official_code
         FROM $tbl_user u
-        LEFT JOIN $tbl_session_rel_user
-        ON $tbl_session_rel_user.user_id = u.id
-            AND $tbl_session_rel_user.session_id = $id_session
-            AND $tbl_session_rel_user.relation_type <> ".SESSION_RELATION_TYPE_RRHH."
-        WHERE u.status <> ".DRH." AND u.status <> 6 $order_clause
+        LEFT JOIN $tbl_session_rel_user su
+        ON su.user_id = u.id
+            AND su.session_id = $id_session
+            AND su.relation_type <> ".SESSION_RELATION_TYPE_RRHH."
+        WHERE u.status <> ".DRH."
+            AND u.status <> 6
+            AND (su.moved_to = 0 OR su.moved_to IS NULL)
+            AND su.moved_status != ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION."
+        $order_clause
     ";
 
     if (api_is_multiple_url_enabled()) {
@@ -564,14 +572,16 @@ if ($ajax_search) {
             $sql = "
                 SELECT  u.id, lastname, firstname, username, session_id, official_code
                 FROM $tbl_user u
-                LEFT JOIN $tbl_session_rel_user
-                    ON $tbl_session_rel_user.user_id = u.id
-                    AND $tbl_session_rel_user.session_id = $id_session
-                    AND $tbl_session_rel_user.relation_type <> ".SESSION_RELATION_TYPE_RRHH."
+                LEFT JOIN $tbl_session_rel_user su
+                    ON su.user_id = u.id
+                    AND su.session_id = $id_session
+                    AND su.relation_type <> ".SESSION_RELATION_TYPE_RRHH."
                 INNER JOIN $tbl_user_rel_access_url url_user ON (url_user.user_id = u.id)
                 WHERE access_url_id = $access_url_id
                     AND u.status <> ".DRH."
                     AND u.status <> 6
+                    AND (su.moved_to = 0 OR su.moved_to IS NULL)
+                    AND su.moved_status != ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION."
                 $order_clause
             ";
         }

@@ -921,7 +921,7 @@ class MigrationCustom {
                         $eval = new Evaluation();
                         $evals_found = false;
                         if (isset($data_list['course_evals'][$course_data['code']][$gradebook['id']][$title])) {
-                            $evals_found = $data_list['course_evals'][$course_data['code']][$gradebook['id']][$title]; 
+                            $evals_found = $data_list['course_evals'][$course_data['code']][$gradebook['id']][$title];
                         }
                         if (empty($evals_found)) {
                             $eval->set_name($title);
@@ -1137,14 +1137,14 @@ class MigrationCustom {
 
             if (!empty($session_id) && !empty($destination_session_id)) {
 
-                $before1 = SessionManager::get_user_status_in_session($session_id, $user_id);
-                $before2 = SessionManager::get_user_status_in_session($destination_session_id, $user_id);
+                $before1 = SessionManager::getUserStatusInSession($user_id, $session_id);
+                $before2 = SessionManager::getUserStatusInSession($user_id, $destination_session_id);
 
                 //$reason_id = SESSION_CHANGE_USER_REASON_SCHEDULE;
                 //change schedule - see cases CONST in sessionmanager
-                $reason_id = 1; 
+                $reason_id = 1;
                 error_log('YYYY - Moving '.$user_id.' from one session to another');
-                SessionManager::change_user_session($user_id, $session_id, $destination_session_id, $reason_id);
+                SessionManager::changeUserSession($user_id, $session_id, $destination_session_id, $reason_id);
                 //error_log('YYYY - change_user_session called');
 
                 $befores = array($before1, $before2);
@@ -1166,7 +1166,7 @@ class MigrationCustom {
         if (!empty($uidIdPrograma) && empty($uidIdProgramaDestination)) {
             $session_id = self::getSessionIDByProgramID($uidIdPrograma, $data_list);
             if (!empty($session_id)) {
-                $before = SessionManager::get_user_status_in_session($session_id, $user_id);
+                $before = SessionManager::getUserStatusInSession($user_id, $session_id);
                 //SessionManager::suscribe_users_to_session($session_id, array($user_id), SESSION_VISIBLE_READ_ONLY, false, false);
                 SessionManager::unsubscribe_user_from_session($session_id, $user_id);
                 $message = "Move Session to empty";
@@ -1183,7 +1183,7 @@ class MigrationCustom {
         if (empty($uidIdPrograma) && !empty($uidIdProgramaDestination)) {
             $session_id = self::getSessionIDByProgramID($uidIdProgramaDestination, $data_list);
             if (!empty($session_id)) {
-                $before = SessionManager::get_user_status_in_session($session_id, $user_id);
+                $before = SessionManager::getUserStatusInSession($user_id, $session_id);
                 if (isset($status) && $status == 1) {
                     $course_list = SessionManager::get_course_list_by_session_id($session_id);
                     if (!empty($course_list)) {
@@ -1218,7 +1218,7 @@ class MigrationCustom {
      * @return array
      */
     static function isUserSubscribedToSession($user_id, $session_id, $message = null, $before = array()) {
-        $user_session_status = SessionManager::get_user_status_in_session($session_id, $user_id);
+        $user_session_status = SessionManager::getUserStatusInSession($user_id, $session_id);
         //error_log('YYYY - User status in session '.$session_id.' is '.print_r($user_session_status,1));
         if (!empty($user_session_status)) {
             return array(
@@ -2485,7 +2485,7 @@ class MigrationCustom {
                                     'status_id' => self::TRANSACTION_STATUS_SUCCESSFUL
                                 );
                             } else {
-                                // Gradebook result not found. Creating... 
+                                // Gradebook result not found. Creating...
                                 // @todo disable when moving to production
                                 $res->set_evaluation_id($eval_id);
                                 $res->set_user_id($user_id);
@@ -2584,7 +2584,7 @@ class MigrationCustom {
                             'status_id' => self::TRANSACTION_STATUS_FAILED
                         );
                     }
-                    // attendance are registered with date + time, so get time 
+                    // attendance are registered with date + time, so get time
                     // from session schedule
                     $time = self::get_horario_value($session_id);
                     $attendance_date .= " $time:00";
@@ -2636,7 +2636,7 @@ class MigrationCustom {
                         */
                         //only 1 course per session
                     } else {
-                    
+
                         $attendance_data = current($attendance_list);
                         $attendance_id = $attendance_data['id'];
                         error_log("Attendance found in attendance_id = $attendance_id - course code: {$course_info['code']} - session_id: $session_id - $attendance_date");
@@ -3549,7 +3549,7 @@ class MigrationCustom {
             $ny = $y = $matches[1];
             $nm = 1 + $m = $matches[2];
             //ignore current month
-            if ($y == $cy && $m == $cm) { 
+            if ($y == $cy && $m == $cm) {
                 //do nothing
             } else {
                 if ($m == 12) {
@@ -3736,7 +3736,7 @@ class MigrationCustom {
         // Browse through all transactions
         foreach ($transactions as $id => $t) {
             //If the item is in the "cleanable actions" list, register it.
-            //  Otherwise, just ignore (it won't be inserted in the excluded 
+            //  Otherwise, just ignore (it won't be inserted in the excluded
             //  list)
             if (in_array($t['ida'],self::$cleanableActions)) {
                 if (!$check_duplicates_in_db) {

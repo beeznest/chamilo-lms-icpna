@@ -9,6 +9,11 @@
 use Chamilo\CoreBundle\Entity\Repository\SequenceRepository;
 use Chamilo\CoreBundle\Entity\SequenceResource;
 use Chamilo\CoreBundle\Entity\Promotion;
+use Chamilo\CoreBundle\Entity\Session,
+    Doctrine\Common\Collections\Criteria,
+    Chamilo\CoreBundle\Entity\SessionRelUser,
+    Chamilo\CoreBundle\Entity\Repository\SessionRepository,
+    Chamilo\CoreBundle\Entity\SessionRelCourseRelUser;
 
 $cidReset = true;
 require_once __DIR__.'/../inc/global.inc.php';
@@ -46,8 +51,12 @@ $tbl_session_rel_course_rel_user = Database::get_main_table(TABLE_MAIN_SESSION_C
 $tbl_session_category = Database::get_main_table(TABLE_MAIN_SESSION_CATEGORY);
 $table_access_url_user = Database::get_main_table(TABLE_MAIN_ACCESS_URL_REL_USER);
 
+$em = Database::getManager();
 $sessionInfo = api_get_session_info($sessionId);
-$session = Database::getManager()->find('ChamiloCoreBundle:Session', $sessionId);
+/** @var SessionRepository $sessionRepository */
+$sessionRepository = $em->getRepository('ChamiloCoreBundle:Session');
+/** @var Session $session */
+$session = $sessionRepository->find($sessionId);
 $sessionCategory = $session->getCategory();
 
 $action = isset($_GET['action']) ? $_GET['action'] : null;
@@ -153,81 +162,43 @@ if ($sessionInfo['nbr_courses'] == 0) {
 } else {
     $count = 0;
     $courseItem = '';
-    /** @var \Chamilo\CoreBundle\Entity\Repository\SessionRepository $sessionRepository */
-    $sessionRepository = Database::getManager()->getRepository('ChamiloCoreBundle:Session');
     $courses = $sessionRepository->getCoursesOrderedByPosition($session);
 
     foreach ($courses as $course) {
         // Select the number of users
-        $sql = "SELECT count(*)
-                FROM $tbl_session_rel_user sru,
-                $tbl_session_rel_course_rel_user srcru
-                WHERE
-                    srcru.user_id = sru.user_id AND
-                    srcru.session_id = sru.session_id AND
-                    srcru.c_id = '".intval($course->getId())."' AND
-                    sru.relation_type <> ".SESSION_RELATION_TYPE_RRHH." AND
-                    srcru.session_id = '".intval($sessionId)."'";
-
-        $rs = Database::query($sql);
-        $numberOfUsers = Database::result($rs, 0, 0);
-
+        $numberOfUsers = SessionManager::getCountUsersInCourseSession($course, $session);
         // Get coachs of the courses in session
+        $namesOfCoaches = [];
+        $coachSubscriptions = $session
+            ->getUserCourseSubscriptionsByStatus($course, Session::COACH)
+            ->forAll(function ($index, SessionRelCourseRelUser $subscription) use (&$namesOfCoaches) {
+                $namesOfCoaches[] = $subscription->getUser()->getCompleteNameWithUserName();
 
-        $sql = "SELECT user.lastname, user.firstname, user.username
-                FROM $tbl_session_rel_course_rel_user session_rcru, $tbl_user user
-				WHERE
-				    session_rcru.user_id = user.user_id AND
-				    session_rcru.session_id = '".intval($sessionId)."' AND
-				    session_rcru.c_id ='".intval($course->getId())."' AND
-				    session_rcru.status=2";
-        $rs = Database::query($sql);
+                return true;
+            });
 
-        $coachs = array();
-        if (Database::num_rows($rs) > 0) {
-            while ($info_coach = Database::fetch_array($rs)) {
-                $coachs[] = api_get_person_name($info_coach['firstname'], $info_coach['lastname']).' ('.$info_coach['username'].')';
-            }
-        } else {
-            $coach = get_lang('None');
-        }
+        $orderButtons = '';
 
-        if (count($coachs) > 0) {
-            $coach = implode('<br />', $coachs);
-        } else {
-            $coach = get_lang('None');
-        }
+        if (SessionManager::orderCourseIsEnabled()) {
+            $orderButtons = Display::url(
+                Display::return_icon(
+                    !$count ? 'up_na.png' : 'up.png',
+                    get_lang('MoveUp')
+                ),
+                !$count
+                    ? '#'
+                    : api_get_self().'?id_session='.$sessionId.'&course_id='.$course->getId().'&action=move_up'
+            );
 
-        $orderButtons = null;
-
-        $upIcon = 'up.png';
-        $urlUp = api_get_self().'?id_session='.$sessionId.'&course_id='.$course->getId().'&action=move_up';
-
-        if ($count == 0) {
-            $upIcon = 'up_na.png';
-            $urlUp = '#';
-        }
-
-        $orderButtons = Display::url(
-            Display::return_icon($upIcon, get_lang('MoveUp')),
-            $urlUp
-        );
-
-        $downIcon = 'down.png';
-        $downUrl = api_get_self().'?id_session='.$sessionId.'&course_id='.$course->getId().'&action=move_down';
-
-        if ($count + 1 == count($courses)) {
-            $downIcon = 'down_na.png';
-            $downUrl = '#';
-        }
-
-        $orderButtons .= Display::url(
-            Display::return_icon($downIcon, get_lang('MoveDown')),
-            $downUrl
-        );
-
-        if (!SessionManager::orderCourseIsEnabled()) {
-            $orderButtons = '';
+            $orderButtons .= Display::url(
+                Display::return_icon(
+                    $count + 1 == count($courses) ? 'down_na.png'  : 'down.png',
+                    get_lang('MoveDown')
+                ),
+                $count + 1 == count($courses)
+                    ? '#'
+                    : api_get_self().'?id_session='.$sessionId.'&course_id='.$course->getId().'&action=move_down'
+            );
         }
 
         $courseUrl = api_get_course_url($course->getCode(), $sessionId);
@@ -240,7 +211,7 @@ if ($sessionInfo['nbr_courses'] == 0) {
                 $course->getTitle().' ('.$course->getVisualCode().')',
                 $courseUrl
             ).'</td>
-			<td>'.$coach.'</td>
+			<td>'.($namesOfCoaches ? implode('<br>', $namesOfCoaches) : get_lang('None')).'</td>
 			<td>'.$numberOfUsers.'</td>
 			<td>
                 <a href="'. $courseUrl.'">'.
@@ -287,13 +258,19 @@ if (!empty($userList)) {
 
     $table->setHeaderContents(0, 0, get_lang('User'));
     $table->setHeaderContents(0, 1, get_lang('Status'));
-    $table->setHeaderContents(0, 2, get_lang('Actions'));
+    $table->setHeaderContents(0, 2, get_lang('Information'));
+    $table->setHeaderContents(0, 3, get_lang('Destination'));
+    $table->setHeaderContents(0, 4, get_lang('MovedAt'));
+    $table->setHeaderContents(0, 5, get_lang('Actions'));
 
     $row = 1;
     foreach ($userList as $user) {
         $userId = $user['user_id'];
         $userInfo = api_get_user_info($userId);
-
+        $information = '';
+        $origin = '';
+        $destination = '';
+        $movedDate = null;
         $userLink = '<a href="'.api_get_path(WEB_CODE_PATH).'admin/user_information.php?user_id='.$userId.'">'.
             api_htmlentities($userInfo['complete_name_with_username']).'</a>';
 
@@ -306,6 +283,57 @@ if (!empty($userList)) {
             Display::return_icon('course.png', get_lang('BlockCoursesForThisUser')),
             api_get_path(WEB_CODE_PATH).'session/session_course_user.php?id_user='.$user['user_id'].'&id_session='.$sessionId
         );
+
+        $moveUserLink = Display::url(
+            Display::return_icon('move.png', get_lang('ChangeUserSession')),
+            api_get_path(WEB_CODE_PATH).'session/change_user_session.php?'.http_build_query([
+                'user_id' => $userId,
+                'id_session' => $sessionId
+            ])
+        );
+
+        if ($user['moved_to']
+            || $user['moved_to'] == SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION
+        ) {
+            $information .= SessionManager::getSessionChangeUserReasonsVariationsById($user['moved_status'], 'to');
+            $movedDate = $user['moved_at'] && $user['moved_at'] != '0000-00-00 00:00:00'
+                ? api_get_local_time($user['moved_at'])
+                : null;
+
+            if ($user['moved_status'] != SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION) {
+                /** @var Session $toSession */
+                $toSession = Database::getManager()->find('ChamiloCoreBundle:Session', $user['moved_to']);
+
+                if ($toSession) {
+                    $destination = Display::url(
+                        $toSession->getName(),
+                        api_get_path(WEB_CODE_PATH)."session/resume_session.php?id_session={$toSession->getId()}"
+                    );
+                }
+            }
+        } else {
+            $criteria = Criteria::create()
+                ->where(
+                    Criteria::expr()->eq('user', api_get_user_entity($userId))
+                );
+            /** @var SessionRelUser $sessionOriginInfo */
+            $sessionOriginInfo = $session->getUsers()
+                ->matching($criteria)
+                ->first();
+
+            if ($sessionOriginInfo->getMovedAt()) {
+                $movedDate = api_get_local_time($sessionOriginInfo->getMovedAt());
+                $information .= SessionManager::getSessionChangeUserReasonsVariationsById(
+                    $sessionOriginInfo->getMovedStatus(),
+                    'from'
+                );
+                $origin = Display::url(
+                    $sessionOriginInfo->getSession()->getName(),
+                    api_get_path(WEB_CODE_PATH)
+                    ."session/resume_session.php?id_session={$sessionOriginInfo->getSession()->getId()}"
+                );
+            }
+        }
 
         $removeLink = Display::url(
             Display::return_icon('delete.png', get_lang('Delete')),
@@ -343,7 +371,7 @@ if (!empty($userList)) {
         }*/
 
         $table->setCellContents($row, 0, $userLink);
-        $link = $reportingLink.$courseUserLink.$removeLink.$addUserToUrlLink.$editUrl;
+        $link = $reportingLink.$courseUserLink.$moveUserLink.$removeLink.$addUserToUrlLink.$editUrl;
         switch ($user['relation_type']) {
             case 1:
                 $status = get_lang('Drh');
@@ -357,14 +385,17 @@ if (!empty($userList)) {
         }
 
         $table->setCellContents($row, 1, $status);
-        $table->setCellContents($row, 2, $link);
+        $table->setCellContents($row, 2, $information);
+        $table->setCellContents($row, 3, "$origin $destination");
+        $table->setCellContents($row, 4, $movedDate);
+        $table->setCellContents($row, 5, $link);
         $row++;
     }
     $userListToShow .= $table->toHtml();
 }
 
 /** @var SequenceRepository $repo */
-$repo = Database::getManager()->getRepository('ChamiloCoreBundle:SequenceResource');
+$repo = $em->getRepository('ChamiloCoreBundle:SequenceResource');
 $requirementAndDependencies = $repo->getRequirementAndDependencies(
     $sessionId,
     SequenceResource::SESSION_TYPE
@@ -383,7 +414,7 @@ if (!empty($requirementAndDependencies['dependencies'])) {
 
 $promotion = null;
 if (!empty($sessionInfo['promotion_id'])) {
-    $promotion = Database::getManager()->getRepository('ChamiloCoreBundle:Promotion');
+    $promotion = $em->getRepository('ChamiloCoreBundle:Promotion');
     $promotion = $promotion->find($sessionInfo['promotion_id']);
 }
 

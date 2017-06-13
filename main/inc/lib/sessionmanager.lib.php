@@ -6,6 +6,8 @@ use \ExtraField as ExtraFieldModel;
 use Chamilo\CoreBundle\Entity\ExtraField;
 use Chamilo\CoreBundle\Entity\Session;
 use Chamilo\CoreBundle\Entity\SequenceResource;
+use Chamilo\CoreBundle\Entity\SessionRelUser;
+use Chamilo\CoreBundle\Entity\Course;
 
 /**
  * Class SessionManager
@@ -22,6 +24,11 @@ use Chamilo\CoreBundle\Entity\SequenceResource;
 class SessionManager
 {
     public static $_debug = false;
+
+    const SESSION_CHANGE_USER_REASON_SCHEDULE = 1;
+    const SESSION_CHANGE_USER_REASON_CLASSROOM = 2;
+    const SESSION_CHANGE_USER_REASON_LOCATION = 3;
+    const SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION = 4;
 
     /**
      * Constructor
@@ -3824,7 +3831,10 @@ class SessionManager
         $tbl_session_rel_user = Database::get_main_table(TABLE_MAIN_SESSION_USER);
         $table_access_url_user = Database::get_main_table(TABLE_MAIN_ACCESS_URL_REL_USER);
 
-        $selectedField = 'u.user_id,lastname, firstname, username, relation_type, access_url_id';
+        $selectedField = '
+            u.user_id, u.lastname, u.firstname, u.username, su.relation_type, au.access_url_id,
+            su.moved_to, su.moved_status, su.moved_at
+        ';
 
         if ($getCount) {
             $selectedField = 'count(1) AS count';
@@ -3832,23 +3842,23 @@ class SessionManager
 
         $sql = "SELECT $selectedField
                 FROM $tbl_user u
-                INNER JOIN $tbl_session_rel_user
-                ON u.user_id = $tbl_session_rel_user.user_id AND
-                $tbl_session_rel_user.session_id = $id
-                LEFT OUTER JOIN $table_access_url_user uu
-                ON (uu.user_id = u.user_id)
+                INNER JOIN $tbl_session_rel_user su
+                ON u.user_id = su.user_id AND
+                su.session_id = $id
+                LEFT OUTER JOIN $table_access_url_user au
+                ON (au.user_id = u.user_id)
                 ";
 
         $urlId = api_get_current_access_url_id();
         if (isset($status) && $status != '') {
             $status = intval($status);
-            $sql .= " WHERE relation_type = $status AND (access_url_id = $urlId OR access_url_id is null )";
+            $sql .= " WHERE su.relation_type = $status AND (au.access_url_id = $urlId OR su.access_url_id is null )";
         } else {
-            $sql .= " WHERE (access_url_id = $urlId OR access_url_id is null )";
+            $sql .= " WHERE (au.access_url_id = $urlId OR au.access_url_id is null )";
         }
 
-        $sql .= " ORDER BY relation_type, ";
-        $sql .= api_sort_by_first_name() ? ' firstname, lastname' : '  lastname, firstname';
+        $sql .= " ORDER BY su.relation_type, ";
+        $sql .= api_sort_by_first_name() ? ' u.firstname, u.lastname' : '  u.lastname, u.firstname';
 
         $result = Database::query($sql);
         if ($getCount) {
@@ -3947,32 +3957,23 @@ class SessionManager
 
     /**
      * Gets user status within a session
-     * @param int $user_id
-     * @param int $courseId
-     * @param $session_id
-     * @return int
-     * @assert (null,null,null) === false
+     *
+     * @param int $userId
+     * @param int $sessionId
+     *
+     * @return \Chamilo\CoreBundle\Entity\SessionRelUser
      */
-    public static function get_user_status_in_session($user_id, $courseId, $session_id)
+    public static function getUserStatusInSession($userId, $sessionId)
     {
-        if (empty($user_id) or empty($courseId) or empty($session_id)) {
-            return false;
-        }
-        $tbl_session_rel_course_rel_user = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
-        $tbl_user = Database::get_main_table(TABLE_MAIN_USER);
-        $sql = "SELECT session_rcru.status
-                FROM $tbl_session_rel_course_rel_user session_rcru, $tbl_user user
-                WHERE session_rcru.user_id = user.user_id AND
-                    session_rcru.session_id = '".intval($session_id)."' AND
-                    session_rcru.c_id ='" . intval($courseId)."' AND
-                    user.user_id = " . intval($user_id);
-        $result = Database::query($sql);
-        $status = false;
-        if (Database::num_rows($result)) {
-            $status = Database::fetch_row($result);
-            $status = $status['0'];
-        }
-        return $status;
+        $em = Database::getManager();
+        $subscriptions = $em
+            ->getRepository('ChamiloCoreBundle:SessionRelUser')
+            ->findBy(['session' => $sessionId, 'user' => $userId]);
+
+        /** @var SessionRelUser $subscription */
+        $subscription = current($subscriptions);
+
+        return $subscription;
     }
 
     /**
@@ -8501,5 +8502,165 @@ class SessionManager
                 }
             }
         }
+    }
+
+    /**
+     * @param \Chamilo\CoreBundle\Entity\Course $course
+     * @param \Chamilo\CoreBundle\Entity\Session $session
+     * @return int
+     */
+    public static function getCountUsersInCourseSession(Course $course, Session $session)
+    {
+        return Database::getManager()
+            ->createQuery("
+                SELECT COUNT(scu)
+                FROM ChamiloCoreBundle:SessionRelCourseRelUser scu
+                INNER JOIN ChamiloCoreBundle:SessionRelUser su
+                    WITH scu.user = su.user
+                    AND scu.session = su.session
+                WHERE scu.course = :course
+                    AND su.relationType != :rrhh
+                    AND scu.session = :session
+                    AND (su.movedTo = 0 or su.movedTo IS NULL)
+                    AND su.movedStatus != :annulation
+            ")
+            ->setParameters([
+                'course' => $course->getId(),
+                'rrhh' => SESSION_RELATION_TYPE_RRHH,
+                'session' => $session->getId(),
+                'annulation' => self::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION
+            ])
+            ->getSingleScalarResult();
+
+    }
+
+    /**
+     * Changes the user from one session to another due a reason
+     * @see \SessionManager::getSessionChangeUserReasons()
+     * @param int $userId
+     * @param int $oldSessionId
+     * @param int $newSessionId
+     * @param int $reasonId
+     */
+    public static function changeUserSession($userId, $oldSessionId, $newSessionId, $reasonId)
+    {
+        $em = Database::getManager();
+
+        // Update number of users
+        $em
+            ->createQuery('UPDATE ChamiloCoreBundle:Session s SET s.nbrUsers = s.nbrUsers - 1 WHERE s.id = :id')
+            ->execute(['id' => $oldSessionId]);
+
+        // Update number of users in this relation
+        $em
+            ->createQuery('
+                UPDATE ChamiloCoreBundle:SessionRelCourse sc SET sc.nbrUsers = sc.nbrUsers - 1
+                WHERE sc.session = :session
+            ')
+            ->execute(['session' => $oldSessionId]);
+
+        //Deal with reasons
+        switch ($reasonId) {
+            case self::SESSION_CHANGE_USER_REASON_SCHEDULE:
+                //no break
+            case self::SESSION_CHANGE_USER_REASON_CLASSROOM:
+                //no break
+            case self::SESSION_CHANGE_USER_REASON_LOCATION:
+                //Adding to the new session
+                self::subscribe_users_to_session($newSessionId, array($userId), null, false);
+
+                //Setting move_to if session was provided
+                $em
+                    ->createQuery('
+                        UPDATE ChamiloCoreBundle:SessionRelUser su SET su.movedTo = :new
+                        WHERE su.session = :old AND su.user = :user
+                    ')
+                    ->execute(['new' => $newSessionId, 'old' => $oldSessionId, 'user' => $userId]);
+                break;
+            case self::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION:
+                UserManager::deactivate_users([$userId]);
+                break;
+        }
+
+        $now = new DateTime('now', new DateTimezone('UTC'));
+        //Setting the moved_status
+        $em
+            ->createQuery('
+                UPDATE ChamiloCoreBundle:SessionRelUser su SET su.movedStatus = :status, su.movedAt = :at
+                WHERE su.session = :session AND su.user = :user
+            ')
+            ->execute(['status' => $reasonId, 'at' => $now, 'session' => $oldSessionId, 'user' => $userId]);
+    }
+
+    /**
+     * Get reasons to change user from session
+     * @return array
+     */
+    public static function getSessionChangeUserReasons()
+    {
+        return [
+            self::SESSION_CHANGE_USER_REASON_SCHEDULE => get_lang('ScheduleChanged'),
+            self::SESSION_CHANGE_USER_REASON_CLASSROOM => get_lang('ClassRoomChanged'),
+            self::SESSION_CHANGE_USER_REASON_LOCATION => get_lang('LocationChanged'),
+            //self::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION => get_lang('EnrollmentAnnulation')
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getSessionChangeUserReasonsVariations()
+    {
+        return [
+            self::SESSION_CHANGE_USER_REASON_SCHEDULE => [
+                'default' => get_lang('ScheduleChanged'),
+                'from' => get_lang('ScheduleChangedFrom'),
+                'to' => get_lang('ScheduleChangedTo')
+            ],
+            self::SESSION_CHANGE_USER_REASON_CLASSROOM => [
+                'default' => get_lang('ClassRoomChanged'),
+                'from' => get_lang('ClassRoomChangedFrom'),
+                'to' => get_lang('ClassRoomChangedTo')
+            ],
+            self::SESSION_CHANGE_USER_REASON_LOCATION => [
+                'default' => get_lang('LocationChanged'),
+                'from' => get_lang('LocationChangedFrom'),
+                'to' => get_lang('LocationChangedTo')
+            ]
+        ];
+    }
+
+    /**
+     * Get the reason name
+     * @param int $id
+     * @return string|null
+     */
+    public static function getSessionChangeUserReason($id)
+    {
+        $reasons = self::getSessionChangeUserReasons();
+
+        return isset($reasons[$id]) ? $reasons[$id] : null;
+    }
+
+    /**
+     * @param int $id
+     * @param string $type
+     * @return string|null
+     */
+    public static function getSessionChangeUserReasonsVariationsById($id, $type)
+    {
+        $reasons = self::getSessionChangeUserReasonsVariations();
+
+        if (!isset($reasons[$id])) {
+            return null;
+        }
+
+        $reason = $reasons[$id];
+
+        if (!isset($reason[$type])) {
+            return null;
+        }
+
+        return $reason[$type];
     }
 }

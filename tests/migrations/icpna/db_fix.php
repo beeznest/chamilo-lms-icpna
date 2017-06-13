@@ -19,18 +19,18 @@ $matches = array(
                    " INNER JOIN sede s ON s.uidIdSede = p.uidIdSede " .
                    "       AND s.intIdSede = $branch " .
                    " WHERE m.tinEstado = 1 ",        
-        'dest_table' => 'add_user_to_session',
-        'dest_func' => 'MigrationCustom::add_user_to_session',
+        'dest_table' => 'addUserToSession',
+        'dest_func' => 'MigrationCustom::addUserToSession',
         'fields_match' => array(
             array(
                 'orig' => 'm.uidIdPrograma',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'uidIdPrograma',
                 'func' => '',
             ),
             array(
                 'orig' => 'a.uidIdPersona',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'uidIdPersona',
                 'func' => '',
             )           

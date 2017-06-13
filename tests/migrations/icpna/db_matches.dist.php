@@ -26,7 +26,7 @@ $matches = array(
         /* If the SQL select has to alter the data before getting it in PHP,
            define the method that will return the right SQL select part
          */
-        'sql_alter' => 'sql_alter_unhash_50',
+        'sql_alter' => 'sqlAlterUnhash50',
         /* Destination field name - leave empty 
            and manage in func for complex operations */
         'dest' => 'user_id',

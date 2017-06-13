@@ -23,7 +23,7 @@ $matches = array(
                    ' LEFT JOIN Empleado e ON (e.uidIdEmpleado = p.uidIdProfesor) '.
                    '',
         'dest_table' => 'session',
-        'dest_func' => 'MigrationCustom::create_session',
+        'dest_func' => 'MigrationCustom::createSession',
         'order' => 'ORDER BY chrPeriodo',
         'extra_fields' => array(            
             /*'uidIdPrograma' => array(                
@@ -56,7 +56,7 @@ $matches = array(
                         ),        
                         array(
                             'orig' => 'uidIdAula',
-                            'sql_alter' => 'sql_alter_unhash_50',
+                            'sql_alter' => 'sqlAlterUnhash50',
                             'dest' => 'option_value',
                             'func' => null,
                         ),     
@@ -69,7 +69,7 @@ $matches = array(
                 'orig' => 'chrPeriodo',
                 'sql_alter' => '',
                 'dest' => 'name',
-                'func' => 'clean_session_name',
+                'func' => 'cleanSessionName',
             ),
             array(
                 'orig' => 'sdtFechaInicioClases',
@@ -98,26 +98,26 @@ $matches = array(
             //Getting info from chamilo
             array(
                 'orig' => 'p.uidIdCurso',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'course_code',
-                'func' => 'get_real_course_code',
+                'func' => 'getRealCourseCode',
             ),
             array(
                 'orig' => 'uidIdPersona',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'id_coach',
-                'func' => 'get_real_teacher_id',
+                'func' => 'getRealTeacherID',
             ),
             //Extra fields
             array(
                 'orig' => 'uidIdPrograma',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'extra_field_uidIdPrograma',
                 'func' => null,
             ),
             array (
                 'orig' => 'p.uidIdAula',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'extra_field_aula',
                 'func' => null,
             ),           

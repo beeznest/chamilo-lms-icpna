@@ -105,8 +105,8 @@ class Migration {
         error_log("\n" . '------------ ['.date('H:i:s').'] Migration->migrate function called ------------' . "\n");
         $extra_fields = array();
         global $data_list, $utc_datetime;
-        define('USER_FUNC_EXCEPTION_GRADEBOOK','MigrationCustom::add_gradebook_result_with_evaluation');
-        define('USER_FUNC_EXCEPTION_ATTENDANCE','MigrationCustom::create_attendance');
+        define('USER_FUNC_EXCEPTION_GRADEBOOK','MigrationCustom::addGradebookResultWithEvaluation');
+        define('USER_FUNC_EXCEPTION_ATTENDANCE','MigrationCustom::createAttendance');
         // Browsing through 1st-level arrays in db_matches.php
         foreach ($matches as $idx => $table) {
             if ($idx === 'web_service_calls') { continue;}
@@ -1001,9 +1001,11 @@ class Migration {
     }
 
     /**
-     *
-     * @param int Transaction id of the third party
-     *
+     * Load a specific transaction based on its external (3rd party) ID
+     * @param int $transaction_external_id Transaction id of the third party
+     * @param int $branch_id The branch on which this transaction was initially recorded
+     * @param bool $forced  Value to be passed to process_transaction()
+     * @return array
      */
     function load_transaction_by_third_party_id($transaction_external_id, $branch_id, $forced = false) {
         //Asking for 2 transactions by getting 1
@@ -1219,10 +1221,10 @@ class Migration {
             // Using call_user_func_array() has a serious impact on performance
             switch($table['dest_func']) {
                 case USER_FUNC_EXCEPTION_GRADEBOOK:
-                    MigrationCustom::add_gradebook_result_with_evaluation($dest_row);
+                    MigrationCustom::addGradebookResultWithEvaluation($dest_row);
                     break;
                 case USER_FUNC_EXCEPTION_ATTENDANCE:
-                    MigrationCustom::create_attendance($dest_row);
+                    MigrationCustom::createAttendance($dest_row);
                     break;
                 default:
                     $item_result = call_user_func_array($table['dest_func'], array($dest_row, $data_list));

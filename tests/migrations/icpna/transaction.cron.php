@@ -57,7 +57,7 @@ if (is_file($pidFile)) {
 $cron_start = time();
 require_once dirname(__FILE__).'/../../main/inc/global.inc.php';
 require_once 'config.php';
-require_once 'migration.class.php'; 
+require_once 'migration.class.php';
 $branch_id = 0;
 // We need $branch_id defined before calling db_matches.php
 // The only thing we need from db_matches is the definition of the web service

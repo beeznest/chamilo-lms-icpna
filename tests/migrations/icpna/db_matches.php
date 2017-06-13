@@ -18,7 +18,7 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                    'INNER JOIN Persona as p ON e.uidIdPersona = p.uidIdPersona '.
                    ' WHERE et.intidTipoEmpleado = 2 and e.vchCodigoRRHH is not null '.
                    'ORDER BY vchPrimerNombre, vchSegundoNombre, vchPaterno, vchMaterno',
-        'dest_func' => 'MigrationCustom::create_user',
+        'dest_func' => 'MigrationCustom::createUser',
         'dest_table' => 'user',
         'extra_fields' => array(
             'uidIdPersona' => array(                
@@ -31,13 +31,13 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
         'fields_match' => array(        
             array(
                 'orig' => 'e.uidIdEmpleado',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'uidIdEmpleado',
                 'func' => '',
             ),
             array(
                 'orig' => 'e.uidIdPersona',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'uidIdPersona',
                 'func' => '',
             ),    
@@ -45,25 +45,25 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                 'orig' => 'vchPaterno',
                 'sql_alter' => '',
                 'dest' => 'lastname',
-                'func' => 'clean_utf8',
+                'func' => 'cleanUTF8',
             ),
             array(
                 'orig' => 'vchMaterno',
                 'sql_alter' => '',
                 'dest' => 'lastname',
-                'func' => 'clean_utf8',
+                'func' => 'cleanUTF8',
             ),
             array(
                 'orig' => 'vchPrimerNombre',
                 'sql_alter' => '',
                 'dest' => 'firstname',
-                'func' => 'clean_utf8',
+                'func' => 'cleanUTF8',
             ),
             array(
                 'orig' => 'vchSegundoNombre',
                 'sql_alter' => '',
                 'dest' => 'firstname',
-                'func' => 'clean_utf8',
+                'func' => 'cleanUTF8',
             ),
             array(
                 'orig' => 'vchTelefonoPersona',
@@ -81,7 +81,7 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                 'orig' => 'chrPasswordT',
                 'sql_alter' => '',
                 'dest' => 'password',
-                'func' => 'make_sha1',
+                'func' => 'makeSHA1',
             ),
             /* el codigorrhh tiene duplicados! */
             array(
@@ -92,7 +92,7 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
             ),
             array(
                 'orig' => 'e.uidIdPersona',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'extra_field_uidIdPersona',
                 'func' => 'none',
             ),
@@ -117,7 +117,7 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                    ' INNER JOIN Aula au ON au.uidIdAula = pa.uidIdAula '.
                    ' INNER JOIN Curso c on c.uidIdCurso = pa.uidIdCurso '.
                    " WHERE et.vchDescripcionTipo <> 'Profesor' ",
-        'dest_func' => 'MigrationCustom::create_user',
+        'dest_func' => 'MigrationCustom::createUser',
         'dest_table' => 'user',
         'extra_fields' => array(
             'uidIdPersona' => array(                
@@ -130,13 +130,13 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
         'fields_match' => array(
             array(
                 'orig' => 'e.uidIdEmpleado',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'uidIdEmpleado',
                 'func' => '',
             ),
             array(
                 'orig' => 'e.uidIdPersona',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'uidIdPersona',
                 'func' => '',
             ),
@@ -144,25 +144,25 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                 'orig' => 'vchPaterno',
                 'sql_alter' => '',
                 'dest' => 'lastname',
-                'func' => 'clean_utf8',
+                'func' => 'cleanUTF8',
             ),
             array(
                 'orig' => 'vchMaterno',
                 'sql_alter' => '',
                 'dest' => 'lastname',
-                'func' => 'clean_utf8',
+                'func' => 'cleanUTF8',
             ),
             array(
                 'orig' => 'vchPrimerNombre',
                 'sql_alter' => '',
                 'dest' => 'firstname',
-                'func' => 'clean_utf8',
+                'func' => 'cleanUTF8',
             ),
             array(
                 'orig' => 'vchSegundoNombre',
                 'sql_alter' => '',
                 'dest' => 'firstname',
-                'func' => 'clean_utf8',
+                'func' => 'cleanUTF8',
             ),
             array(
                 'orig' => 'vchTelefonoPersona',
@@ -180,7 +180,7 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                 'orig' => 'chrPasswordT',
                 'sql_alter' => '',
                 'dest' => 'password',
-                'func' => 'make_sha1',
+                'func' => 'makeSHA1',
             ),
             /* el codigorrhh tiene duplicados! */
             array(
@@ -191,7 +191,7 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
             ),
             array(
                 'orig' => 'e.uidIdPersona',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'extra_field_uidIdPersona',
                 'func' => 'none',
             ),          
@@ -211,7 +211,7 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                    'FROM Alumno as a '.
                    'INNER JOIN Persona as p ON (a.uidIdPersona = p.uidIdPersona) '.
                    'ORDER BY vchPrimerNombre, vchSegundoNombre, vchPaterno, vchMaterno',
-        'dest_func' => 'MigrationCustom::create_user',
+        'dest_func' => 'MigrationCustom::createUser',
         'dest_table' => 'user',
         'extra_fields' => array(
             'uidIdPersona' => array(                
@@ -224,13 +224,13 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
         'fields_match' => array(            
             array(
                 'orig' => 'a.uidIdAlumno',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'uidIdAlumno',
                 'func' => '',
             ),
             array(
                 'orig' => 'a.uidIdPersona',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'uidIdPersona',
                 'func' => '',
             ),    
@@ -238,25 +238,25 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                 'orig' => 'vchPaterno',
                 'sql_alter' => '',
                 'dest' => 'lastname',
-                'func' => 'clean_utf8',
+                'func' => 'cleanUTF8',
             ),
             array(
                 'orig' => 'vchMaterno',
                 'sql_alter' => '',
                 'dest' => 'lastname',
-                'func' => 'clean_utf8',
+                'func' => 'cleanUTF8',
             ),
             array(
                 'orig' => 'vchPrimerNombre',
                 'sql_alter' => '',
                 'dest' => 'firstname',
-                'func' => 'clean_utf8',
+                'func' => 'cleanUTF8',
             ),
             array(
                 'orig' => 'vchSegundoNombre',
                 'sql_alter' => '',
                 'dest' => 'firstname',
-                'func' => 'clean_utf8',
+                'func' => 'cleanUTF8',
             ),
             array(
                 'orig' => 'vchTelefonoPersona',
@@ -274,11 +274,11 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                 'orig' => 'chrPasswordT',
                 'sql_alter' => '',
                 'dest' => 'password',
-                'func' => 'make_sha1',
+                'func' => 'makeSHA1',
             ),
             array(
                 'orig' => 'a.uidIdPersona',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'extra_field_uidIdPersona',
                 'func' => 'none',
             ),
@@ -304,7 +304,7 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                    'ORDER BY chrCursoCodigo',
         'dest_table' => 'course',
         'show_in_error_log' => false,
-        'dest_func' => 'MigrationCustom::create_course',
+        'dest_func' => 'MigrationCustom::createCourse',
         'extra_fields' => array(
             'fase' => array(   
                 'field_display_text' => 'Fase',
@@ -318,18 +318,18 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                             'orig' => 'vchNombreFase',
                             'sql_alter' => null,
                             'dest' => 'option_display_text',
-                            //'func' => 'add_meses_label_to_extra_field_fase',
+                            //'func' => 'addMonthsLabelToExtraFieldPhase',
                             'func' => 'none',
                         ),
                         array(
                             'orig' => 'uidIdFase',
-                            'sql_alter' => 'sql_alter_unhash_50',
+                            'sql_alter' => 'sqlAlterUnhash50',
                             'dest' => 'option_value',
                             'func' => 'none',
                         ),
 //                        array(
 //                            'orig' => 'chrOrdenFase',
-//                            'sql_alter' => 'sql_alter_unhash_50',
+//                            'sql_alter' => 'sqlAlterUnhash50',
 //                            'dest' => 'option_value',
 //                            'func' => 'none',
 //                        ),
@@ -349,11 +349,11 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                             'orig' => 'ChrOrdenFase',
                             'sql_alter' => null,
                             'dest' => 'option_display_text',
-                            'func' => 'clean_utf8',
+                            'func' => 'cleanUTF8',
                         ),
                         array(
                             'orig' => 'uidIdFase',
-                            'sql_alter' => 'sql_alter_unhash_50',
+                            'sql_alter' => 'sqlAlterUnhash50',
                             'dest' => 'option_value',
                             'func' => 'none',
                         ),
@@ -373,11 +373,11 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                             'orig' => 'vchFrecuenciaNombre',
                             'sql_alter' => null,
                             'dest' => 'option_display_text',
-                            'func' => 'clean_utf8',
+                            'func' => 'cleanUTF8',
                         ),
                         array(
                             'orig' => 'uidIdFrecuencia',
-                            'sql_alter' => 'sql_alter_unhash_50',
+                            'sql_alter' => 'sqlAlterUnhash50',
                             'dest' => 'option_value',
                             'func' => 'none',
                         ),
@@ -396,11 +396,11 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                             'orig' => 'vchIntensidadNombre',
                             'sql_alter' => null,
                             'dest' => 'option_display_text',
-                            'func' => 'clean_utf8',
+                            'func' => 'cleanUTF8',
                         ),
                         array(
                             'orig' => 'uidIdIntensidad',
-                            'sql_alter' => 'sql_alter_unhash_50',
+                            'sql_alter' => 'sqlAlterUnhash50',
                             'dest' => 'option_value',
                             'func' => 'none',
                         ),                   
@@ -417,51 +417,51 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
         'fields_match' => array(
             array(
                 'orig' => 'uidIdCurso',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'uidIdCurso',
                 'func' => '',
             ),
             array(
                 'orig' => 'vchNombreCurso',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'title',
-                'func' => 'clean_utf8',
+                'func' => 'cleanUTF8',
             ),
             array(
                 'orig' => 'chrCursoCodigo',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'wanted_code',
                 'func' => 'none',
             ),
             //Extra fields
             array(
                 'orig' => 'uidIdFrecuencia',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'extra_field_frecuencia',
                 'func' => 'none',
             ),
             array(
                 'orig' => 'uidIdIntensidad',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'extra_field_intensidad',
                 'func' => 'none',
             ),
             array(
                 'orig' => 'uidIdFase',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'extra_field_fase',
                 'func' => 'none',
             ),
 /*            array(
                 'orig' => 'uidIdFase',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'extra_field_meses',
                 'func' => 'none',
             ),
 */
             array(
                 'orig' => 'uidIdCurso',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'extra_field_uidIdCurso',
                 'func' => null,
             ),
@@ -480,7 +480,7 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                    ' LEFT JOIN Empleado e ON (e.uidIdEmpleado = p.uidIdProfesor) '.
                    '',
         'dest_table' => 'session',
-        'dest_func' => 'MigrationCustom::create_session',
+        'dest_func' => 'MigrationCustom::createSession',
         'order' => 'ORDER BY chrPeriodo',
         'extra_fields' => array(            
             'uidIdPrograma' => array(                
@@ -510,11 +510,11 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                             'orig' => 'vchNombreSede',
                             'sql_alter' => null,
                             'dest' => 'option_display_text',
-                            'func' => 'clean_utf8',
+                            'func' => 'cleanUTF8',
                         ),
                         array(
                             'orig' => 'uidIdSede',
-                            'sql_alter' => 'sql_alter_unhash_50',
+                            'sql_alter' => 'sqlAlterUnhash50',
                             'dest' => 'option_value',
                             'func' => null,
                         ),
@@ -536,7 +536,7 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                             'orig' => 'chrHoraInicial',
                             'sql_alter' => null,
                             'dest' => 'option_display_text',
-                            'func' => 'join_horario',
+                            'func' => 'joinScheduleString',
                         ),
                         array(
                             'orig' => 'chrHoraFinal',
@@ -546,7 +546,7 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                         ),
                         array(
                             'orig' => 'uidIdHorario',
-                            'sql_alter' => 'sql_alter_unhash_50',
+                            'sql_alter' => 'sqlAlterUnhash50',
                             'dest' => 'option_value',
                             'func' => null,
                         ),                  
@@ -582,7 +582,7 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                         ),        
                         array(
                             'orig' => 'uidIdAula',
-                            'sql_alter' => 'sql_alter_unhash_50',
+                            'sql_alter' => 'sqlAlterUnhash50',
                             'dest' => 'option_value',
                             'func' => null,
                         ),     
@@ -595,7 +595,7 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                 'orig' => 'chrPeriodo',
                 'sql_alter' => '',
                 'dest' => 'name',
-                'func' => 'clean_session_name',
+                'func' => 'cleanSessionName',
             ),
             array(
                 'orig' => 'sdtFechaInicioClases',
@@ -636,57 +636,57 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
             //getting uididprograma preventively to check session pre-existence
             array(
                 'orig' => 'uidIdPrograma',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'uididprograma',
                 'func' => 'none',
             ),
             //Getting info from chamilo
             array(
                 'orig' => 'p.uidIdCurso',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'course_code',
-                'func' => 'get_real_course_code',
+                'func' => 'getRealCourseCode',
             ),
             array(
                 'orig' => 'uidIdPersona',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'id_coach',
-                'func' => 'get_real_teacher_id',
+                'func' => 'getRealTeacherID',
             ),
             //Extra fields
             array(
                 'orig' => 'uidIdPrograma',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'extra_field_uidIdPrograma',
                 'func' => null,
             ),
             array (
                 'orig' => 'p.uidIdHorario',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'extra_field_horario',
                 'func' => null,
             ),
             array (
                 'orig' => 'p.uidIdSede',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'extra_field_sede',
                 'func' => null,
             ),            
             array (
                 'orig' => 'p.tinEstado',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'extra_field_estado',
                 'func' => null,
             ),
             array (
                 'orig' => 'chrPeriodo',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'extra_field_periodo',
                 'func' => null,
             ),
             array (
                 'orig' => 'p.uidIdAula',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'extra_field_aula',
                 'func' => null,
             ),           
@@ -703,18 +703,18 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                    " INNER JOIN sede s ON s.uidIdSede = p.uidIdSede " .
                    "       AND s.intIdSede = $branch " .
                    " WHERE m.tinEstado = 1 ",        
-        'dest_table' => 'add_user_to_session',
-        'dest_func' => 'MigrationCustom::add_user_to_session',
+        'dest_table' => 'addUserToSession',
+        'dest_func' => 'MigrationCustom::addUserToSession',
         'fields_match' => array(
             array(
                 'orig' => 'm.uidIdPrograma',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'uidIdPrograma',
                 'func' => '',
             ),
             array(
                 'orig' => 'a.uidIdPersona',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'uidIdPersona',
                 'func' => '',
             )           
@@ -729,24 +729,24 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                     INNER JOIN le_AlumnoAsistencia a ON (a.codigoPrograma = p.uidIdPrograma AND p.bitVigencia = 1 )
                     INNER JOIN Alumno al ON (al.uidIdAlumno = a.codigoAlumno AND al.bitVigencia = 1)
                     WHERE 1=1 ',
-        'dest_func' => 'MigrationCustom::create_attendance',
+        'dest_func' => 'MigrationCustom::createAttendance',
         'dest_table' => 'session',
         'fields_match' => array(        
             array(
                 'orig' => 'al.uidIdPersona',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'user_id',
-                'func' => 'get_user_id_by_persona_id',
+                'func' => 'getUserIDByPersonaID',
             ),
             array(
                 'orig' => 'p.uidIdPrograma',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'session_id',
-                'func' => 'get_session_id_by_programa_id',
+                'func' => 'getSessionIDByProgramID',
             ),
             array(
                 'orig' => 'a.fecha',
-                'sql_alter' => 'clean_date_time',
+                'sql_alter' => 'cleanDateTime',
                 'dest' => 'fecha',
                 'func' => '',
             ),
@@ -763,14 +763,14 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                     INNER JOIN le_AvanceCursoPrograma a ON (a.Programa = p.uidIdPrograma AND p.bitVigencia = 1)
                     INNER JOIN le_Unidad un ON (un.CodigoUnidad = a.Unidad)                    
                     ',
-        'dest_func' => 'MigrationCustom::create_thematic',
+        'dest_func' => 'MigrationCustom::createThematic',
         'dest_table' => 'session',
         'fields_match' => array(         
             array(
                 'orig' => 'p.uidIdPrograma',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'session_id',
-                'func' => 'get_session_id_by_programa_id',
+                'func' => 'getSessionIDByProgramID',
             ),
             array(
                 'orig' => 'un.Descripcion',
@@ -795,7 +795,7 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
         'query' => 'SELECT %s '.
                    ' FROM le_ConceptoCalificatorioTipo '.
                    ' WHERE 1 = 1 ',
-        'dest_func' => 'MigrationCustom::add_evaluation_type',
+        'dest_func' => 'MigrationCustom::addEvaluationType',
         'dest_table' => 'session',
         'fields_match' => array(
             array(
@@ -822,20 +822,20 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                     INNER JOIN le_Nota n ON (n.codigoPrograma = p.uidIdPrograma AND p.bitVigencia = 1 )
                     INNER JOIN le_ConceptoCalificatorio cc ON (cc.CodigoConcepto = n.CodigoConcepto)           
                     WHERE 1 = 1 ',
-        'dest_func' => 'MigrationCustom::create_gradebook_evaluation',
+        'dest_func' => 'MigrationCustom::createGradebookEvaluation',
         'dest_table' => 'session',
         'fields_match' => array(         
             array(
                 'orig' => 'p.uidIdPrograma',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'session_id',
-                'func' => 'get_session_id_by_programa_id',
+                'func' => 'getSessionIDByProgramID',
             ),
             array(
                 'orig' => 'cc.CodigoTipo',
                 'sql_alter' => '',
                 'dest' => 'gradebook_evaluation_type_id',
-                'func' => 'get_evaluation_type',
+                'func' => 'getEvaluationType',
             ),
             array(
                 'orig' => 'cc.Descripcion',
@@ -855,20 +855,20 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                    'INNER JOIN Nota n ON (n.uidIdPrograma = p.uidIdPrograma AND p.bitVigencia = 1 ) '.
                    'INNER JOIN Alumno a ON (a.uidIdAlumno = n.uidIdAlumno) '.
                    '',
-        'dest_func' => 'MigrationCustom::add_gradebook_result_with_evaluation',
+        'dest_func' => 'MigrationCustom::addGradebookResultWithEvaluation',
         'dest_table' => 'session',
         'fields_match' => array(         
             array(
                 'orig' => 'p.uidIdPrograma',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'session_id',
-                'func' => 'get_session_id_by_programa_id',
+                'func' => 'getSessionIDByProgramID',
             ),
             array(
                 'orig' => 'uidIdPersona',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'user_id',
-                'func' => 'get_user_id_by_persona_id',
+                'func' => 'getUserIDByPersonaID',
             ),
             array(
                 'orig' => 'tinNota',
@@ -900,20 +900,20 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                     INNER JOIN le_Nota n ON (n.codigoPrograma = p.uidIdPrograma AND p.bitVigencia = 1 )
                     INNER JOIN Alumno a ON (n.CodigoAlumno = a.uidIdAlumno)
                     WHERE YEAR(UltimaFechaModif) >= 2010',
-        'dest_func' => 'MigrationCustom::add_gradebook_result',
+        'dest_func' => 'MigrationCustom::addGradebookResult',
         'dest_table' => 'session',
         'fields_match' => array(         
             array(
                 'orig' => 'p.uidIdPrograma',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'session_id',
-                'func' => 'get_session_id_by_programa_id',
+                'func' => 'getSessionIDByProgramID',
             ),
             array(
                 'orig' => 'uidIdPersona',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'user_id',
-                'func' => 'get_user_id_by_persona_id',
+                'func' => 'getUserIDByPersonaID',
             ),
             array(
                 'orig' => 'Nota',
@@ -925,7 +925,7 @@ SELECT DISTINCT e.vchcodigorrhh FROM empleado e INNER JOIN empleadotipo et ON et
                 'orig' => 'UltimaFechaModif',
                 'sql_alter' => '',
                 'dest' => 'fecha',
-                'func' => 'clean_date_time',
+                'func' => 'cleanDateTime',
             ),
         )
     ),  

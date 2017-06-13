@@ -15,24 +15,24 @@ $matches = array(
                     INNER JOIN le_AlumnoAsistencia a ON (a.codigoPrograma = p.uidIdPrograma AND p.bitVigencia = 1 )
                     INNER JOIN Alumno al ON (al.uidIdAlumno = a.codigoAlumno AND al.bitVigencia = 1)
                     WHERE 1=1 ',
-        'dest_func' => 'MigrationCustom::create_attendance',
+        'dest_func' => 'MigrationCustom::createAttendance',
         'dest_table' => 'session',
         'fields_match' => array(        
             array(
                 'orig' => 'al.uidIdPersona',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'user_id',
-                'func' => 'get_user_id_by_persona_id',
+                'func' => 'getUserIDByPersonaID',
             ),
             array(
                 'orig' => 'p.uidIdPrograma',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'session_id',
-                'func' => 'get_session_id_by_programa_id',
+                'func' => 'getSessionIDByProgramID',
             ),
             array(
                 'orig' => 'a.fecha',
-                'sql_alter' => 'clean_date_time',
+                'sql_alter' => 'cleanDateTime',
                 'dest' => 'fecha',
                 'func' => '',
             ),
@@ -40,7 +40,7 @@ $matches = array(
                 'orig' => 'a.estado',
                 'sql_alter' => '',
                 'dest' => 'status',
-                'func' => 'convert_attendance_status',
+                'func' => 'convertAttendanceStatus',
             ),
         )
     ),
@@ -54,14 +54,14 @@ $matches = array(
                     INNER JOIN le_AvanceCursoPrograma a ON (a.Programa = p.uidIdPrograma AND p.bitVigencia = 1)
                     INNER JOIN le_Unidad un ON (un.CodigoUnidad = a.Unidad)                    
                     ',
-        'dest_func' => 'MigrationCustom::create_thematic',
+        'dest_func' => 'MigrationCustom::createThematic',
         'dest_table' => 'session',
         'fields_match' => array(         
             array(
                 'orig' => 'p.uidIdPrograma',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'session_id',
-                'func' => 'get_session_id_by_programa_id',
+                'func' => 'getSessionIDByProgramID',
             ),
             array(
                 'orig' => 'un.Descripcion',
@@ -85,7 +85,7 @@ $matches = array(
         'query' => 'SELECT %s '.
                    ' FROM le_ConceptoCalificatorioTipo '.
                    ' WHERE 1 = 1 ',
-        'dest_func' => 'MigrationCustom::add_evaluation_type',
+        'dest_func' => 'MigrationCustom::addEvaluationType',
         'dest_table' => 'session',
         'fields_match' => array(
             array(
@@ -111,20 +111,20 @@ $matches = array(
                     INNER JOIN le_ConceptoCalificatorio cc ON (cc.CodigoConcepto = n.CodigoConcepto)           
                     WHERE n.CodigoTipo = 5 AND n.CodigoConcepto = 1',
                     // 1 = 1 ',
-        'dest_func' => 'MigrationCustom::create_gradebook_evaluation',
+        'dest_func' => 'MigrationCustom::createGradebookEvaluation',
         'dest_table' => 'session',
         'fields_match' => array(         
             array(
                 'orig' => 'p.uidIdPrograma',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'session_id',
-                'func' => 'get_session_id_by_programa_id',
+                'func' => 'getSessionIDByProgramID',
             ),
             array(
                 'orig' => 'cc.CodigoTipo',
                 'sql_alter' => '',
                 'dest' => 'gradebook_evaluation_type_id',
-                'func' => 'get_evaluation_type',
+                'func' => 'getEvaluationType',
             ),
             array(
                 'orig' => 'cc.Descripcion',
@@ -142,20 +142,20 @@ $matches = array(
                    'INNER JOIN Nota n ON (n.uidIdPrograma = p.uidIdPrograma AND p.bitVigencia = 1 ) '.
                    'INNER JOIN Alumno a ON (a.uidIdAlumno = n.uidIdAlumno) '.
                    '',
-        'dest_func' => 'MigrationCustom::add_gradebook_result_with_evaluation',
+        'dest_func' => 'MigrationCustom::addGradebookResultWithEvaluation',
         'dest_table' => 'session',
         'fields_match' => array(         
             array(
                 'orig' => 'p.uidIdPrograma',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'session_id',
-                'func' => 'get_session_id_by_programa_id',
+                'func' => 'getSessionIDByProgramID',
             ),
             array(
                 'orig' => 'uidIdPersona',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'user_id',
-                'func' => 'get_user_id_by_persona_id',
+                'func' => 'getUserIDByPersonaID',
             ),
             array(
                 'orig' => 'tinNota',
@@ -187,20 +187,20 @@ $matches = array(
                     INNER JOIN le_Nota n ON (n.codigoPrograma = p.uidIdPrograma AND p.bitVigencia = 1 )
                     INNER JOIN Alumno a ON (n.CodigoAlumno = a.uidIdAlumno)
                     WHERE YEAR(UltimaFechaModif) >= 2010',
-        'dest_func' => 'MigrationCustom::add_gradebook_result',
+        'dest_func' => 'MigrationCustom::addGradebookResult',
         'dest_table' => 'session',
         'fields_match' => array(         
             array(
                 'orig' => 'p.uidIdPrograma',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'session_id',
-                'func' => 'get_session_id_by_programa_id',
+                'func' => 'getSessionIDByProgramID',
             ),
             array(
                 'orig' => 'uidIdPersona',
-                'sql_alter' => 'sql_alter_unhash_50',
+                'sql_alter' => 'sqlAlterUnhash50',
                 'dest' => 'user_id',
-                'func' => 'get_user_id_by_persona_id',
+                'func' => 'getUserIDByPersonaID',
             ),
             array(
                 'orig' => 'Nota',
@@ -212,7 +212,7 @@ $matches = array(
                 'orig' => 'UltimaFechaModif',
                 'sql_alter' => '',
                 'dest' => 'fecha',
-                'func' => 'clean_date_time',
+                'func' => 'cleanDateTime',
             ),
         )
     ),  

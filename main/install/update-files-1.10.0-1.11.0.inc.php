@@ -44,6 +44,21 @@ if (defined('SYSTEM_INSTALLATION')) {
         @rrmdir($skypePluginPath);
     }
 
+    // Delete files from ICPNA plugins
+    $pluginFileToDelete = [
+        'external_page_ngl/src/external_page_ngl_plugin.class.php',
+        'external_page_ngl/src/showPage.php'
+    ];
+    $pluginPath = api_get_path(SYS_PLUGIN_PATH);
+
+    foreach ($pluginFileToDelete as $filePath) {
+        if (!file_exists($pluginPath.$filePath)) {
+            continue;
+        }
+
+        @unlink($pluginPath.$filePath);
+    }
+
     if ($debug) {
         error_log('Folders cleaned up');
     }

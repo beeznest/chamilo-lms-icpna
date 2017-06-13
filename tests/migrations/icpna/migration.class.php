@@ -846,7 +846,7 @@ class Migration {
                     'intIdSede' => $branch['branch_id'],
                 );
                 error_log("B#".$branch['branch_id']." - Treating $number_of_transactions transaction(s) from #$last_transaction_id");
-                $transactions_found += MigrationCustom::process_transactions($params, $web_service_params);
+                $transactions_found += MigrationCustom::processTransactions($params, $web_service_params);
             }
         }
         return $transactions_found;
@@ -948,7 +948,7 @@ class Migration {
     function execute_transaction($transaction_info) {
         //Loading function. The action is now numeric, so we call a transaction_1() function, for example
 
-        $validate = MigrationCustom::validate_transaction($transaction_info);
+        $validate = MigrationCustom::validateTransaction($transaction_info);
         if (isset($validate['error']) && $validate['error']) {
             if ($transaction_info['failed_attempts'] >= 3) {
                 self::update_transaction(array('id' => $transaction_info['id'] , 'failed_attempts' => $transaction_info['failed_attempts']+1, 'status_id' => 5));
@@ -1004,7 +1004,7 @@ class Migration {
      * Load a specific transaction based on its external (3rd party) ID
      * @param int $transaction_external_id Transaction id of the third party
      * @param int $branch_id The branch on which this transaction was initially recorded
-     * @param bool $forced  Value to be passed to process_transaction()
+     * @param bool $forced  Value to be passed to processTransaction()
      * @return array
      */
     function load_transaction_by_third_party_id($transaction_external_id, $branch_id, $forced = false) {
@@ -1028,7 +1028,7 @@ class Migration {
                 $message = Display::return_message('Transaction id found in third party', 'info');
 
                 //Adding third party transaction to Chamilo
-                $transaction_result = MigrationCustom::process_transaction($result, null, $forced);
+                $transaction_result = MigrationCustom::processTransaction($result, null, $forced);
 
                 $transaction_chamilo_info = array();
 
@@ -1130,7 +1130,7 @@ class Migration {
         global $data_list;
         // Fill the data list, if possible
         if (count($data_list['users'])<1) {
-            MigrationCustom::fill_data_list($data_list);
+            MigrationCustom::fillDataList($data_list);
         }
 
 

@@ -12,7 +12,7 @@
  */
 class MigrationCustom {
 
-    const default_admin_id = 1;
+    const defaultAdminId = 1;
     const TRANSACTION_STATUS_TO_BE_EXECUTED = 1;
     const TRANSACTION_STATUS_SUCCESSFUL = 2;
     const TRANSACTION_STATUS_DEPRECATED = 3; //??
@@ -147,7 +147,7 @@ class MigrationCustom {
      * @param string $date Date
      * @return string A strin in the 'yyyy-mm-dd hh:mm:ss' format
      */
-    static function clean_date_time_from_ws($date) {
+    static function cleanDateTimeFromWS($date) {
         $pre_clean = self::cleanDateTime($date, 0, 19);
         return str_replace('T', ' ', $pre_clean);
     }
@@ -270,7 +270,7 @@ class MigrationCustom {
      * @return int
      */
     static function getRealTeacherID($uidIdPersona, &$omigrate=null) {
-        $default_teacher_id = self::default_admin_id;
+        $default_teacher_id = self::defaultAdminId;
         if (empty($uidIdPersona)) {
             //error_log('No teacher provided');
             return $default_teacher_id;
@@ -435,7 +435,7 @@ class MigrationCustom {
         /*
         $data['gradebook_params'] = array(
             'name'      => 'General evaluation',
-            'user_id'   => self::default_admin_id,
+            'user_id'   => self::defaultAdminId,
             'weight'    => '20',
             'max'       => '20'
         );*/
@@ -458,11 +458,11 @@ class MigrationCustom {
         $data['create_gradebook_evaluation'] = true;
         /*$data['gradebook_params'] = array(
             'name'      => 'General evaluation',
-            'user_id'   => self::default_admin_id,
+            'user_id'   => self::defaultAdminId,
             'weight'    => '20',
             'max'       => '20'
         );*/
-        self::fix_access_dates($data);
+        self::fixAccessDates($data);
         // Here the $data variable has $data['course_code'] that will be added
         //   when creating the session
         // If session already exists, it will return the existing session id
@@ -532,7 +532,7 @@ class MigrationCustom {
         //error_log('createAttendance');
         $session_id = $data['session_id'];
         $user_id    = $data['user_id'];
-        $time = self::get_horario_value($session_id);
+        $time = self::getScheduleValue($session_id);
         $fecha = $data['fecha']." $time:00";
 
         if (!empty($session_id) && !empty($user_id)) {
@@ -578,7 +578,7 @@ class MigrationCustom {
                         //$attendance->set_attendance_weight($_POST['attendance_weight']);
                         $link_to_gradebook = false;
                         //$attendance->category_id = $_POST['category_id'];
-                        $attendance_sheet_id = $attendance->attendance_add($link_to_gradebook, self::default_admin_id);
+                        $attendance_sheet_id = $attendance->attendance_add($link_to_gradebook, self::defaultAdminId);
                         if (is_array($data_list) && isset($data_list) && $data_list['boost_sessions']) {
                             $data_list['sessions_attendances'][$course_info['real_id']][$session_id][] = $attendance_sheet_id;
                         }
@@ -774,7 +774,7 @@ class MigrationCustom {
                             $eval->set_name($data['gradebook_description']);
                             $eval->set_description($data['gradebook_description']);
                             $eval->set_evaluation_type_id($data['gradebook_evaluation_type_id']);
-                            $eval->set_user_id(self::default_admin_id);
+                            $eval->set_user_id(self::defaultAdminId);
                             $eval->set_course_code($course_data['code']);
                             $eval->set_category_id($gradebook['id']);
 
@@ -926,7 +926,7 @@ class MigrationCustom {
                         if (empty($evals_found)) {
                             $eval->set_name($title);
                             //$eval->set_evaluation_type_id($data['gradebook_evaluation_type_id']);
-                            $eval->set_user_id(self::default_admin_id);
+                            $eval->set_user_id(self::defaultAdminId);
                             $eval->set_course_code($course_data['code']);
                             $eval->set_category_id($gradebook['id']);
 
@@ -1369,7 +1369,7 @@ class MigrationCustom {
         if ($session_info['error'] == false) {
             unset($session_info['error']);
             // check dates (only do this at session creation)
-            self::fix_access_dates($session_info);
+            self::fixAccessDates($session_info);
             $session_info['id_coach'] = 0;
             $session_id = SessionManager::add($session_info);
             $session_info = api_get_session_info($session_id, true);
@@ -1439,7 +1439,7 @@ class MigrationCustom {
         if (!empty($session_id)) {
             $session_info = Migration::soap_call($web_service_details, 'programaDetalles', array('intIdSede'=> $data['branch_id'], 'uididprograma' => $data['item_id']));
             if ($session_info['error'] == false) {
-                self::fix_access_dates($session_info);
+                self::fixAccessDates($session_info);
                 $session_info['id'] = $session_id;
 
                 if (isset($session_info['id_coach'])) {
@@ -2586,7 +2586,7 @@ class MigrationCustom {
                     }
                     // attendance are registered with date + time, so get time
                     // from session schedule
-                    $time = self::get_horario_value($session_id);
+                    $time = self::getScheduleValue($session_id);
                     $attendance_date .= " $time:00";
 
                     $attendance = new Attendance();
@@ -2615,7 +2615,7 @@ class MigrationCustom {
                         $attendance->set_name('Asistencia');
                         $attendance->set_description('');
                         $link_to_gradebook = false;
-                        $attendance_id = $attendance->attendance_add($link_to_gradebook, self::default_admin_id);
+                        $attendance_id = $attendance->attendance_add($link_to_gradebook, self::defaultAdminId);
                         if (is_array($data_list) && isset($data_list) && $data_list['boost_sessions']) {
                             $data_list['sessions_attendances'][$course_info['real_id']][$session_id][] = $attendance_id;
                         }
@@ -2759,7 +2759,7 @@ class MigrationCustom {
                         );
                     }
 
-                    $time = self::get_horario_value($session_id);
+                    $time = self::getScheduleValue($session_id);
                     $attendance_date .= " $time";
 
                     $attendance = new Attendance();
@@ -2886,7 +2886,7 @@ class MigrationCustom {
                         );
                     }
 
-                    $time = self::get_horario_value($session_id);
+                    $time = self::getScheduleValue($session_id);
                     $attendance_date .= " $time:00";
 
                     $attendance = new Attendance();
@@ -3008,7 +3008,7 @@ class MigrationCustom {
      * @param bool $check_duplicates_in_db
      * @return int
      */
-    static function process_transactions($params, $web_service_details, $check_duplicates_in_db = false) {
+    static function processTransactions($params, $web_service_details, $check_duplicates_in_db = false) {
         $transactions = Migration::soap_call($web_service_details, 'transacciones', $params);
         $transaction_status_list = self::getTransactionStatusList();
         $counter = 0;
@@ -3021,17 +3021,17 @@ class MigrationCustom {
             // YYYY Uncomment following line to get a detailed list of transactions read
             //error_log("Transactions: \n".print_r($transactions,1));
             $count = 1;
-            $exclude_list = self::check_transactions_duplicity($transactions, $check_duplicates_in_db);
+            $exclude_list = self::checkTransactionsDuplicity($transactions, $check_duplicates_in_db);
             if (!empty($transactions)) {
                 foreach ($transactions as $id => $transaction_info) {
                     $result = array();
                     //Add transactions here
                     if (in_array($id,$exclude_list)) {
                         // Insert as deprecated
-                        $result = self::process_transaction($transaction_info, $transaction_status_list, null, true);
+                        $result = self::processTransaction($transaction_info, $transaction_status_list, null, true);
                     } else {
                         // Do normal insert
-                        $result = self::process_transaction($transaction_info, $transaction_status_list);
+                        $result = self::processTransaction($transaction_info, $transaction_status_list);
                     }
                     $count++;
                     if ($result['error'] == true) {
@@ -3050,7 +3050,7 @@ class MigrationCustom {
      * @param $transaction_info
      * @return array|bool
      */
-    static function validate_transaction($transaction_info) {
+    static function validateTransaction($transaction_info) {
         if (empty($transaction_info) || empty($transaction_info['transaction_id']) || empty($transaction_info['action']) || empty($transaction_info['branch_id']) || empty($transaction_info['item_id'])) {
             return array(
                 'id' => null,
@@ -3070,7 +3070,7 @@ class MigrationCustom {
      * @param bool $deprecated Whether this transaction should be inserted as deprecated or not
      * @return int
      */
-    static function process_transaction($transaction_info, $transaction_status_list = array(), $forced = false, $deprecated = false) {
+    static function processTransaction($transaction_info, $transaction_status_list = array(), $forced = false, $deprecated = false) {
         if ($transaction_info) {
             if (empty($transaction_status_list)) {
                 $transaction_status_list = self::getTransactionStatusList();
@@ -3087,7 +3087,7 @@ class MigrationCustom {
                    'status_id'      => $deprecated ? self::TRANSACTION_STATUS_DEPRECATED : 0,
             );
 
-            $validate = self::validate_transaction($params);
+            $validate = self::validateTransaction($params);
 
             if (isset($validate['error']) && $validate['error']) {
                 return $validate;
@@ -3298,10 +3298,10 @@ class MigrationCustom {
         $result['extra_aula']           = strtoupper($result['uididaula']);
         $result['extra_periodo']        = strtoupper($result['chrperiodo']);
 
-        $result['display_start_date']   = MigrationCustom::clean_date_time_from_ws($result['display_start_date']);
-        $result['display_end_date']     = MigrationCustom::clean_date_time_from_ws($result['display_end_date']);
-        $result['access_start_date']    = MigrationCustom::clean_date_time_from_ws($result['access_start_date']);
-        $result['access_end_date']      = MigrationCustom::clean_date_time_from_ws($result['access_end_date']);
+        $result['display_start_date']   = MigrationCustom::cleanDateTimeFromWS($result['display_start_date']);
+        $result['display_end_date']     = MigrationCustom::cleanDateTimeFromWS($result['display_end_date']);
+        $result['access_start_date']    = MigrationCustom::cleanDateTimeFromWS($result['access_start_date']);
+        $result['access_end_date']      = MigrationCustom::cleanDateTimeFromWS($result['access_end_date']);
         //$result['estado'] = intval($result['estado']);
 
         //Searching id_coach
@@ -3527,7 +3527,7 @@ class MigrationCustom {
      * @param array Array of session data passed by reference (modified in-place)
      * @return bool Always returns true
      */
-    static function fix_access_dates(&$data) {
+    static function fixAccessDates(&$data) {
         // Check the $data array for access_start_date, access_end_date,
         //  coach_access_start_date and coach_access_end_date. If any is not
         //  defined, reuse the period or other dates to fill it
@@ -3635,7 +3635,7 @@ class MigrationCustom {
      * @param int $session_id The session ID
      * @return string   The db-stored value of the 'horario' field for this session
      */
-    static function get_horario_value($session_id) {
+    static function getScheduleValue($session_id) {
          $extra_field_value = new ExtraFieldValue('session');
         //Getting horario info
         $extra_field = new ExtraField('session');
@@ -3663,7 +3663,7 @@ class MigrationCustom {
      * @param array $omigrate Reference of an array with main indexes of data to be filled
      * @return bool Always returns true
      */
-    static function fill_data_list(&$omigrate) {
+    static function fillDataList(&$omigrate) {
         if (is_array($omigrate) && isset($omigrate) && $omigrate['boost_users']) {
             // uidIdPersona field is ID 13 in user_field
             $sql = "SELECT user_id, field_value FROM user_field_values WHERE field_id = 13 ORDER BY user_id";
@@ -3727,7 +3727,7 @@ class MigrationCustom {
      * @param bool  Check in database if there is any posterior operation making this one useless
      * @return array Simplified list of IDs to exclude from the transaction array
      */
-    protected function check_transactions_duplicity($transactions, $check_duplicates_in_db = false) {
+    protected function checkTransactionsDuplicity($transactions, $check_duplicates_in_db = false) {
         // The $transactions array received has rows with the following format
         // $transaction_info('idt','ida','id','orig','idsede','dest','infoextra')
         $cleanable = array();

@@ -9,7 +9,7 @@
 include_once '../../main/inc/global.inc.php';
 
 if (api_is_course_admin() || api_is_teacher_admin()) {
-    //api_not_allowed(true);
+    api_not_allowed(true);
 }
 
 $objExternalPageNGL = ExternalPageNglPlugin::create();

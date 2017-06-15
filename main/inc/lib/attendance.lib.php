@@ -722,9 +722,10 @@ class Attendance
      * @param 	int	   $calendar_id attendance calendar id
      * @param  	array  $users_present present users during current class
      * @param	int	   $attendance_id
+     * @param   bool   $done_attendance Whether to mark the attendance sheet as closed or not
      * @return 	int    affected rows
      */
-    public function attendance_sheet_add($calendar_id, $users_present, $attendance_id)
+    public function attendance_sheet_add($calendar_id, $users_present, $attendance_id, $done_attendance = true)
     {
         $tbl_attendance_sheet = Database::get_course_table(TABLE_ATTENDANCE_SHEET);
         $tbl_attendance_calendar = Database::get_course_table(TABLE_ATTENDANCE_CALENDAR);
@@ -803,9 +804,11 @@ class Attendance
         }
 
         // update done_attendance inside attendance calendar table
-        $sql = "UPDATE $tbl_attendance_calendar SET done_attendance = 1
-                WHERE  c_id = $course_id AND id = '$calendar_id'";
-        Database::query($sql);
+        if ($done_attendance) {
+            $sql = "UPDATE $tbl_attendance_calendar SET done_attendance = 1
+                    WHERE  c_id = $course_id AND id = '$calendar_id'";
+            Database::query($sql);
+        }
 
         // save users' results
         $this->update_users_results($user_ids, $attendance_id);
@@ -823,7 +826,6 @@ class Attendance
                 $calendar_date_value
             );
         }
-
         return $affected_rows;
     }
 
@@ -2152,5 +2154,88 @@ class Attendance
         );
         $pdf = new PDF('A4', null, $params);
         $pdf->html_to_pdf_with_template($tableToString);
+    }
+    /**
+     * Get a specific attendance
+     */
+    public function get_attendance_calendar_data_by_date($attendance_id, $date_time)
+    {
+        $tbl_attendance_calendar = Database::get_course_table(TABLE_ATTENDANCE_CALENDAR);
+        $course_id = $this->get_course_int_id();
+        $attendance_id = intval($attendance_id);
+
+        // check if datetime already exists inside the table
+        $sql = "SELECT * FROM $tbl_attendance_calendar
+		        WHERE   c_id = $course_id AND
+                        date_time = '".Database::escape_string($date_time)."' AND
+                        attendance_id = '$attendance_id'";
+        $result = Database::query($sql);
+        if (Database::num_rows($result)) {
+            return Database::fetch_array($result, 'ASSOC');
+        } else {
+            return false;
+        }
+    }
+     /**
+     * Unstable version! Needs review! Use only for speed boosts!
+     * Add attendances sheet inside table, by group to reduce db stress
+     * @param       array  Array of calendar_id, user_id, status, attendance_id, course_id, date, all assumed pre-filtered
+     * @param       bool   Whether to save absent users
+     * @param       bool   Whether to set done_attendance to 1 in db
+     * @return      int    affected rows
+     */
+    public function attendance_sheet_group_add($list, $save_user_absents = true, $done_attendance = true)
+    {
+        $tbl_attendance_sheet   = Database::get_course_table(TABLE_ATTENDANCE_SHEET);
+        $tbl_attendance_calendar= Database::get_course_table(TABLE_ATTENDANCE_CALENDAR);
+
+        $user_ids = array();
+        $date_now = api_get_utc_datetime();
+        //$calendar_date_value = $calendar_data['date_time'];
+        $lastedit_user_id = api_get_user_id();
+        $lastedit_type = self::DONE_ATTENDANCE_LOG_TYPE;
+        $sql = "INSERT INTO $tbl_attendance_sheet (c_id, user_id, attendance_calendar_id, presence) VALUES ";
+        foreach ($list as $row) {
+            if ($row[0] != null) { //ignore placeholders
+                $sql .= "(".intval($row[4]).','.intval($row[1]).','.intval($row[0]).','.$row[2].'),';
+                $user_ids[] = intval($row[1]);
+            }
+            if ($done_attendance) {
+                // update done_attendance inside attendance calendar table
+                $sql2 = "UPDATE $tbl_attendance_calendar SET done_attendance = 1 WHERE c_id = ".intval($row[4])." AND id = '".intval($row[0])."'";
+                $r2 = Database::query($sql2);
+            }
+            // Save user's results
+            $this->update_users_results(array(intval($row[1])), $row[3]);
+            //save attendance sheet log
+            $this->save_attendance_sheet_log(intval($row[3]), $date_now, $lastedit_type, $lastedit_user_id, $row[5]);
+        }
+        $sql = substr($sql,0,-1);
+        //error_log($sql);
+        $r = Database::query($sql);
+        //$users_absent = array_diff($user_ids, $user_results);
+        $affected_rows = Database::affected_rows($r);
+        return $affected_rows;
+    }
+
+    /**
+     * Disable an attendance sheet from the current course, for a given calendar date ID and a specific user
+     * @param int $calendar_id The internal ID of the date in this calendar
+     * @param int $user_id The user ID
+     * @return bool
+     */
+    public function disableAttendanceSheet($calendar_id, $user_id)
+    {
+        $tbl_attendance_sheet   = Database::get_course_table(TABLE_ATTENDANCE_SHEET);
+        $course_id = $this->get_course_id();
+        $user_id = intval($user_id);
+        $calendar_id = intval($calendar_id);
+
+        $sql = "UPDATE $tbl_attendance_sheet SET presence = ''
+                WHERE c_id = $course_id 
+                AND user_id = $user_id 
+                AND attendance_calendar_id = $calendar_id";
+        Database::query($sql);
+        return true;
     }
 }

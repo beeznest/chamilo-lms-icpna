@@ -277,4 +277,19 @@ class Result
         $sql = 'DELETE FROM '.$tbl_grade_results.' WHERE id = '.$this->id;
         Database::query($sql);
     }
+    /**
+     * Insert these results into the database as a group
+     * @param   array   $results  Grouped results to add to
+     */
+    public function group_add($results) {
+        $tbl_grade_results = Database :: get_main_table(TABLE_MAIN_GRADEBOOK_RESULT);
+        $sql = "INSERT INTO ".$tbl_grade_results
+                ." (user_id, evaluation_id, created_at, score) VALUES ";
+        foreach ($results as $ev) {
+            $sql .= "(".(int)$ev['user_id'].",".(int)$ev['evaluation_id'].",'"
+                 .$ev['created_at']."', ".$ev['score']."),";
+        }
+        $sql = substr($sql,0,-1);
+        Database::query($sql);
+    }
 }

@@ -745,21 +745,20 @@ class MigrationCustom {
 
             if (!empty($course_list)) {
                 $course_data = current($course_list);
-                $course_info = api_get_course_info($course_data['code']);
 
                 if (!empty($course_data)) {
                     $thematic = new Thematic();
-                    $thematic->set_course_int_id($course_info['real_id']);
+                    $thematic->set_course_int_id($course_data['real_id']);
                     $thematic->set_session_id($session_id);
                     $thematic_info = $thematic->get_thematic_by_title($data['thematic']);
 
                     if (empty($thematic_info)) {
                         $thematic->set_thematic_attributes(null, $data['thematic'], null, $session_id);
                         $thematic_id = $thematic->thematic_save();
-                        error_log("Thematic added to course code: {$course_info['code']} - session_id: $session_id");
+                        error_log("Thematic added to course code: {$course_data['code']} - session_id: $session_id");
                     } else {
                         $thematic_id = isset($thematic_info['id']) ? $thematic_info['id'] : null;
-                        error_log("Thematic id #$thematic_id found in course: {$course_info['code']} - session_id: $session_id");
+                        error_log("Thematic id #$thematic_id found in course: {$course_data['code']} - session_id: $session_id");
                     }
 
                     if ($thematic_id) {
@@ -767,7 +766,7 @@ class MigrationCustom {
                         $thematic->thematic_plan_save();
                         error_log("Saving plan attributes: {$data['thematic_plan']}");
                     }
-                    error_log("Adding thematic id : $thematic_id to session: $session_id to course: {$course_info['code']} real_id: {$course_info['real_id']}");
+                    error_log("Adding thematic id : $thematic_id to session: $session_id to course: {$course_data['code']} real_id: {$course_data['real_id']}");
 
                     if ($thematic_id) {
                         error_log("Thematic saved: $thematic_id");
@@ -783,37 +782,6 @@ class MigrationCustom {
                 error_log("No courses in session $session_id ");
             }
         }
-    }
-
-    /**
-     * Add evaluation type
-     * @param array $params
-     */
-    static function addEvaluationType($params) {
-        $table = Database::get_main_table(TABLE_MAIN_GRADEBOOK_EVALUATION_TYPE);
-        if (!empty($params['name']) && !empty($params['external_id'])) {
-            if (isset($params['return_item_if_already_exists'])) {
-                unset($params['return_item_if_already_exists']);
-            }
-            Database::insert($table, $params);
-        }
-    }
-
-    /**
-     * Get evaluation type for given transaction
-     * @param int $external_id
-     * @return mixed False on error or evaluation type (int) if type found
-     */
-    static function getEvaluationType($external_id) {
-        $table = Database::get_main_table(TABLE_MAIN_GRADEBOOK_EVALUATION_TYPE);
-        $external_id = intval($external_id);
-        $sql = "SELECT * FROM $table WHERE external_id = $external_id";
-        $result = Database::query($sql);
-        if (Database::num_rows($result)) {
-            $result = Database::fetch_array($result, 'ASSOC');
-            return $result['id'];
-        }
-        return false;
     }
 
     /**

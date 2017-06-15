@@ -79,6 +79,7 @@ $matches = array(
     ),    
 */
 
+/*
     //Gradebook - create gradebook evaluations types
     array(
         'orig_table' => 'gradebook_evaluation_type',
@@ -101,7 +102,8 @@ $matches = array(
                 'func' => '',
             )            
         )
-    ),    
+    ),
+*/
     //Gradebook - create gradebook evaluations
     array(
         'orig_table' => 'ProgramaAcademico',
@@ -120,12 +122,14 @@ $matches = array(
                 'dest' => 'session_id',
                 'func' => 'getSessionIDByProgramID',
             ),
+            /*
             array(
                 'orig' => 'cc.CodigoTipo',
                 'sql_alter' => '',
                 'dest' => 'gradebook_evaluation_type_id',
                 'func' => 'getEvaluationType',
             ),
+            */
             array(
                 'orig' => 'cc.Descripcion',
                 'sql_alter' => '',

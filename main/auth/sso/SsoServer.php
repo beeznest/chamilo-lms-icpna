@@ -6,7 +6,7 @@
  * using chamilo as a SSO server
  * @package chamilo.auth.sso
  */
-class ssoServer
+class SsoServer
 {
     /**
      * This is used to get the url with the SSO params

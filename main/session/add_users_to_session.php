@@ -373,7 +373,7 @@ if ($ajax_search) {
             AND su.session_id = ".intval($id_session)."
         WHERE u.status<>".DRH."
             AND u.status <> 6
-            AND (su.moved_to = 0 IS su.moved_to IS NULL)
+            AND (su.moved_to = 0 OR su.moved_to IS NULL)
             AND su.moved_status <> ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION."
         $order_clause
     ";

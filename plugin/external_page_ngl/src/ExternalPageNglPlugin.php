@@ -52,22 +52,16 @@ class ExternalPageNglPlugin extends Plugin
      */
     public function performActionsAfterConfigure()
     {
-        $toolTable = Database::get_course_table(TABLE_TOOL_LIST);
-
-        Database::delete(
-            $toolTable,
-            ['link LIKE ?' => '%external_page_ngl_plugin=1%']
-        );
+        $this->deleteAllData();
 
         if ($this->get('tool_enable') !== 'true') {
-            $this->deleteAllData();
-
             return $this;
         }
 
         $toolName = $this->get('button_name');
         $toolImage = $this->get('image_path');
 
+        $toolTable = Database::get_course_table(TABLE_TOOL_LIST);
         $em = Database::getManager();
 
         $sqlResponse = Database::query("

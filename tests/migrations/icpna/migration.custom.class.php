@@ -705,7 +705,7 @@ class MigrationCustom {
                                 $data_list['createAttendance'] = array();
                             }
                         } else {
-                            $attendance->attendance_sheet_add($cal_id, $users_present, $attendance_sheet_id, false,  true);
+                            $attendance->attendance_sheet_add($cal_id, $users_present, $attendance_sheet_id, true);
                         }
                         //error_log("Adding calendar to user: $user_id to calendar: $cal_id");
                     } else {

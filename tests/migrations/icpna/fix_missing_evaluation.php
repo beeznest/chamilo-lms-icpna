@@ -1,4 +1,5 @@
 <?php
+/* For licensing terms, see /license.txt */
 /**
  * Fix missing evaluations by checking all empty evaluations in the
  * gradebook_result table and calling, for each miss, the corresponding

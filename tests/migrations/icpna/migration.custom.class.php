@@ -1,5 +1,5 @@
 <?php
-
+/* For licensing terms, see /license.txt */
 /**
  * This file contains the MigrationCustom class, which defines methods to
  * alter the data from the original database when importing it to the Chamilo

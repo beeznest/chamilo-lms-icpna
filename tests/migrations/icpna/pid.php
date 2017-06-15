@@ -1,5 +1,6 @@
 #!/usr/bin/php5
 <?php
+/* For licensing terms, see /license.txt */
 $pidfile = __DIR__.'/chamilo.transaction.pid';
 if ($argc>1) {
   $command = $argv[1];

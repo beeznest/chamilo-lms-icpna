@@ -1,4 +1,5 @@
 <?php
+/* For licensing terms, see /license.txt */
 /**
  * Migration launcher
  * Call with either "migration" or "sync" as first parameter

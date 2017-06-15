@@ -1,4 +1,5 @@
 <?php
+/* For licensing terms, see /license.txt */
 /**
  * Checks the status of the synchronization and sends e-mails if blocked
  */

@@ -1,4 +1,5 @@
 <?php
+/* For licensing terms, see /license.txt */
 /**
  * Fix missing attendances by checking all empty attendances in the
  * c_attendance_sheet table and calling, for each miss, the corresponding

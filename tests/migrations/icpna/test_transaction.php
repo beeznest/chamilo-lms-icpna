@@ -1,4 +1,5 @@
 <?php
+/* For licensing terms, see /license.txt */
 /**
  * This script will test the recovery of transactions from an external database
  * queried through web services.

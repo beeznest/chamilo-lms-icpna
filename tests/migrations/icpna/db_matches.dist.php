@@ -1,4 +1,5 @@
 <?php
+/* For licensing terms, see /license.txt */
 /**
  * This script defines as closely as possible the matches between
  * original tables and destination (chamilo) tables and fields.

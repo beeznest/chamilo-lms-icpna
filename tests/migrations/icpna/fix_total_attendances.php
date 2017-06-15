@@ -1,4 +1,5 @@
 <?php
+/* For licensing terms, see /license.txt */
 require __DIR__.'/../../../main/inc/global.inc.php';
 require __DIR__.'/../../../main/inc/lib/attendance.lib.php';
 $a = new Attendance();

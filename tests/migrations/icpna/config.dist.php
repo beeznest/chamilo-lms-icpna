@@ -1,5 +1,5 @@
 <?php
-
+/* For licensing terms, see /license.txt */
 /**
  * This is the configuration file allowing you to connect to the origin
  * database. You should either fill this one in or generate your own

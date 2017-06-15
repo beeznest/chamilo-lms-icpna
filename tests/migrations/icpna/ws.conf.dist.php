@@ -1,4 +1,5 @@
 <?php
+/* For licensing terms, see /license.txt */
 /**
  * Redefine the web_service_calls array initially defined in git-included 
  * db_matches.php.

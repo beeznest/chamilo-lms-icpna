@@ -1,5 +1,5 @@
 <?php
-
+/* For licensing terms, see /license.txt */
 require_once __DIR__.'/../../../main/inc/global.inc.php';
 $course_table = Database::get_main_table(TABLE_MAIN_COURSE);
 $tool_table = Database::get_course_table(TABLE_TOOL_LIST);

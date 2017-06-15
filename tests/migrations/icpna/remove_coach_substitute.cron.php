@@ -1,4 +1,5 @@
 <?php
+/* For licensing terms, see /license.txt */
 /**
  * This script should be called by cron.d to remove substitute coach
  * @package chamilo.migration

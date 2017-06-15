@@ -1,4 +1,8 @@
 <?php
+/* For licensing terms, see /license.txt */
+/**
+ * Check if some transaction_id are duplicates (for each branch). If so, delete them
+ */
 die();
 require __DIR__.'/../../../main/inc/global.inc.php';
 $s = 'SELECT id, branch_id as b, transaction_id as t FROM branch_transaction ORDER BY branch_id, transaction_id';

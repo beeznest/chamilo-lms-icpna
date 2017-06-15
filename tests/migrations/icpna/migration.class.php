@@ -1,4 +1,5 @@
 <?php
+/* For licensing terms, see /license.txt */
 /**
  * Scipt defining the Migration class
  * @package chamilo.migration

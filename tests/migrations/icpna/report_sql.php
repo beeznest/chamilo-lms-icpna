@@ -1,4 +1,5 @@
 <?php
+/* For licensing terms, see /license.txt */
 require __DIR__.'/../../../main/inc/global.inc.php';
 $alumnos = array();
 $sql = "SELECT f.field_value, u.user_id from user_field_values f INNER JOIN user u ON u.user_id=f.user_id WHERE f.field_id='13' AND u.status=5";

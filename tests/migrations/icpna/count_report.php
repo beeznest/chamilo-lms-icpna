@@ -1,4 +1,5 @@
 <?php
+/* For licensing terms, see /license.txt */
 require __DIR__.'/../../../main/inc/global.inc.php';
 $eol = "<br />\n";
 if (PHP_SAPI == 'cli') {

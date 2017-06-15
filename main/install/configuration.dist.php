@@ -394,7 +394,8 @@ $_configuration['agenda_legend'] = [
 //$_configuration['tracking_skip_generic_data'] = false;
 // Show question feedback (requires DB change: "ALTER TABLE c_quiz_question ADD COLUMN feedback text;")
 //$_configuration['allow_quiz_question_feedback'] = false;
-
+// Show view accordion lp_category
+//$_configuration['lp_category_accordion'] = false;
 // HTTP headers security
 // This section relates to options to increase the security of your Chamilo
 // portal against attacks specifically focused on HTTP headers vulnerabilities
@@ -448,3 +449,14 @@ $_configuration['agenda_legend'] = [
 // and should be set by all sites.
 //$_configuration['security_referrer_policy'] = 'origin-when-cross-origin';
 // HTTP headers security section ends here
+// Add answered_at field in table survey_invitation
+// Requires DB change:
+// ALTER TABLE c_survey_invitation ADD answered_at DATETIME DEFAULT NULL;
+//$_configuration['survey_answered_at_field'] = false;
+// Allow career diagram, requires a DB change:
+//UPDATE extra_field_values SET created_at = NULL WHERE CAST(created_at AS CHAR(20)) = '0000-00-00 00:00:00';
+//UPDATE extra_field_values SET updated_at = NULL WHERE CAST(updated_at AS CHAR(20)) = '0000-00-00 00:00:00';
+//ALTER TABLE extra_field_values modify column value longtext null;
+//$_configuration['allow_career_diagram'] = false;
+// Code to avoid in session list in user progress page
+//$_configuration['avoid_code_in_user_progress'] = '';

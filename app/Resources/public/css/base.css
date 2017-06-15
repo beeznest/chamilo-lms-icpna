@@ -163,7 +163,6 @@ header {
     color: #666;
 }
 #carousel-announcement img{
-    display: block;
     max-width: 100%;
     height: auto;
 }
@@ -6239,6 +6238,18 @@ ul#toolnavbox-two li a.btn{
 input[type=checkbox]{
     margin: 8px 0 0;
 }
+.lp-accordion .panel-heading .panel-title{
+    width: 100%;
+    display: inline-block;
+}
+.lp-accordion .panel-heading .panel-title a{
+    width: 100%;
+    display: block;
+}
+.lp-accordion .panel-heading .tools-actions{
+    position: relative;
+    top: -30px;
+}
 /* CSS NEW TOP ******************************************************************************/
 /* CSS Responsive */
 @media (min-width: 1025px) and (max-width: 1200px) {
@@ -6779,6 +6790,10 @@ input.form-control[type="color"] {
     margin-top: 20px;
 }
 
+.col-xs-6.course-tool:nth-child(2n+1) {
+    clear: left;
+}
+
 /* Extra small devices (phones, less than 768px) */
 /* No media query since this is the default in Bootstrap */
 
@@ -6799,6 +6814,13 @@ input.form-control[type="color"] {
 
 /* Medium devices (desktops, 992px and up) */
 @media (min-width: 992px) {
+    .col-xs-6.course-tool:nth-child(2n+1) {
+        clear: none;
+    }
+    .col-md-3.course-tool:nth-child(4n+1) {
+        clear: left;
+    }
+
     div.navbar-collapse {
         padding-left: 0;
     }

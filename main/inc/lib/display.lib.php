@@ -739,14 +739,14 @@ class Display
         }
 
         $size_extra = $size.'/';
-
-        // Checking the img/ folder
         $icon = $w_code_path.'img/'.$image;
-
         $theme = 'themes/chamilo/icons/';
 
         if ($loadThemeIcon) {
             $theme = 'themes/'.api_get_visual_theme().'/icons/';
+            if (is_file($alternateCssPath.$theme.$image)) {
+                $icon = $alternateWebCssPath.$theme.$image;
+            }
             // Checking the theme icons folder example: app/Resources/public/css/themes/chamilo/icons/XXX
             if (is_file($alternateCssPath.$theme.$size_extra.$image)) {
                 $icon = $alternateWebCssPath.$theme.$size_extra.$image;
@@ -2276,18 +2276,22 @@ class Display
      * @param string $footer
      * @param string $style primary|success|info|warning|danger
      * @param string $extra
+     * @param string $id
      *
      * @return string
      */
-    public static function panel($content, $title = '', $footer = '', $style = '', $extra = '')
+    public static function panel($content, $title = '', $footer = '', $style = '', $extra = '', $id = '')
     {
         $title = !empty($title) ? '<div class="panel-heading"><h3 class="panel-title">'.$title.'</h3>'.$extra.'</div>' : '';
         $footer = !empty($footer) ? '<div class="panel-footer ">'.$footer.'</div>' : '';
         $styles = ['primary', 'success', 'info', 'warning', 'danger'];
         $style = !in_array($style, $styles) ? 'default' : $style;
 
+        if (!empty($id)) {
+            $id = " id = $id ";
+        }
         return '
-            <div class="panel panel-'.$style.'">
+            <div '.$id.' class="panel panel-'.$style.'">
                 '.$title.'
                 '.self::contentPanel($content).'
                 '.$footer.'

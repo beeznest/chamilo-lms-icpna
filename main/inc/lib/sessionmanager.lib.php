@@ -1752,6 +1752,7 @@ class SessionManager
         $tbl_session = Database::get_main_table(TABLE_MAIN_SESSION);
 
         $entityManager = Database::getManager();
+        /** @var Session $session */
         $session = $entityManager->find('ChamiloCoreBundle:Session', $id_session);
 
         // from function parameter

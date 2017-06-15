@@ -2218,4 +2218,24 @@ class Attendance
         return $affected_rows;
     }
 
+    /**
+     * Disable an attendance sheet from the current course, for a given calendar date ID and a specific user
+     * @param int $calendar_id The internal ID of the date in this calendar
+     * @param int $user_id The user ID
+     * @return bool
+     */
+    public function disableAttendanceSheet($calendar_id, $user_id)
+    {
+        $tbl_attendance_sheet   = Database::get_course_table(TABLE_ATTENDANCE_SHEET);
+        $course_id = $this->get_course_id();
+        $user_id = intval($user_id);
+        $calendar_id = intval($calendar_id);
+
+        $sql = "UPDATE $tbl_attendance_sheet SET presence = ''
+                WHERE c_id = $course_id 
+                AND user_id = $user_id 
+                AND attendance_calendar_id = $calendar_id";
+        Database::query($sql);
+        return true;
+    }
 }

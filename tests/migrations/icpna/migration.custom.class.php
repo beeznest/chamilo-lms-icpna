@@ -804,10 +804,11 @@ class MigrationCustom {
                     if (!empty($data_list['session_course_gradebook'][$course_data['code']][$session_id])) {
                         $gradebook = array('id' => $data_list['session_course_gradebook'][$course_data['code']][$session_id]);
                     } else {
-                        require_once api_get_path(SYS_CODE_PATH).'gradebook/lib/gradebook_functions.inc.php';
-                        $gradebook = array('id' => create_default_course_gradebook($course_data['code'], false, $session_id));
-                        error_log('Gradebook not found. Creating one with ID '.$gradebook['id']);
-                        $data_list['session_course_gradebook'][$course_data['code']][$session_id] = $gradebook['id'];
+                        // This situation should not happen anymore. Default gradebooks are created in all courses and sessions upon creation.
+                        //require_once api_get_path(SYS_CODE_PATH).'gradebook/lib/gradebook_functions.inc.php';
+                        //$gradebook = array('id' => create_default_course_gradebook($course_data['code'], false, $session_id));
+                        error_log('Gradebook not found.');
+                        //$data_list['session_course_gradebook'][$course_data['code']][$session_id] = $gradebook['id'];
                     }
                     if (!empty($gradebook)) {
                         //Check if gradebook exists
@@ -822,7 +823,6 @@ class MigrationCustom {
                         if (empty($evals_found)) {
                             $eval->set_name($data['gradebook_description']);
                             $eval->set_description($data['gradebook_description']);
-                            $eval->set_evaluation_type_id($data['gradebook_evaluation_type_id']);
                             $eval->set_user_id(self::defaultAdminId);
                             $eval->set_course_code($course_data['code']);
                             $eval->set_category_id($gradebook['id']);
@@ -910,7 +910,7 @@ class MigrationCustom {
                                 //$res->set_score($data['nota']);
                                 //$res->add();
                                 $limit = 250;
-                                if (count($data_list['create_eval_results'])>$limit) {
+                                if (count($data_list['create_eval_results']) > $limit) {
                                     $data_list['create_eval_results'][] = $eval_data;
                                     $res->group_add($data_list['create_eval_results']);
                                     $data_list['create_eval_results'] = array();
@@ -1056,7 +1056,29 @@ class MigrationCustom {
          if ($user_info['error'] == false) {
             global $api_failureList;
             unset($user_info['error']);
-            $chamilo_user_info = UserManager::add($user_info);
+            $extra = [];
+            if (!empty($user_info['uidIdPersona'])) {
+                $extra['uidIdPersona'] = $user_info['uidIdPersona'];
+            }
+            $chamilo_user_id = UserManager::create_user(
+                $user_info['firsntame'],
+                $user_info['lastname'],
+                $user_info['status'],
+                $user_info['email'],
+                $user_info['username'],
+                $user_info['password'],
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                $extra,
+                $user_info['encrypt_method']
+            );
+            $chamilo_user_info = api_get_user_info($chamilo_user_id);
 
             if ($chamilo_user_info && $chamilo_user_info['user_id']) {
                 $chamilo_user_info = api_get_user_info($chamilo_user_info['user_id'], false, false, true);
@@ -1135,7 +1157,15 @@ class MigrationCustom {
                 //Edit user
                 $user_info['user_id'] = $user_id;
                 $chamilo_user_info_before = api_get_user_info($user_id, false, false, true);
-                UserManager::update($user_info);
+                UserManager::update_user(
+                    $user_info['id'],
+                    $user_info['firstname'],
+                    $user_info['lastname'],
+                    $user_info['username'],
+                    $user_info['password'],
+                    null,
+                    $user_info['email']
+                );
                 $chamilo_user_info = api_get_user_info($user_id, false, false, true);
                 return array(
                     'entity' => 'user',
@@ -1245,7 +1275,7 @@ class MigrationCustom {
                         );
                     }
                 } else {
-                    SessionManager::suscribe_users_to_session($session_id, array($user_id), SESSION_VISIBLE_READ_ONLY, false, false);
+                    SessionManager::subscribe_users_to_session($session_id, array($user_id), SESSION_VISIBLE_READ_ONLY, false);
                 }
                 $message = 'Move empty to Session';
                 return self::isUserSubscribedToSession($user_id, $session_id, $message, $before);
@@ -1256,6 +1286,7 @@ class MigrationCustom {
                 );
             }
         }
+        return false;
     }
 
     /**
@@ -1354,8 +1385,8 @@ class MigrationCustom {
     /**
      * Editar detalles de curso curso_editar CID
      * const TRANSACTION_TYPE_EDIT_COURSE =  7;
-     * @param array The data identifying the course and other transaction details
-     * @param array The web service information allowing the connection to get more item update data
+     * @param array $data The data identifying the course and other transaction details
+     * @param array $web_service_details The web service information allowing the connection to get more item update data
      * @return array
      */
     static function transaction_7($data, $web_service_details) {
@@ -1381,7 +1412,7 @@ class MigrationCustom {
                 // Now edit extra fields
                 $field_value = new ExtraFieldValue('course');
                 $data_to_update['course_code'] = $data_to_update['code'];
-                $field_value->save_field_values($data_to_update);
+                $field_value->saveFieldValues($data_to_update);
                 // Get course info
                 $course_info_after = api_get_course_info($course_code, true);
 
@@ -1420,8 +1451,46 @@ class MigrationCustom {
             // check dates (only do this at session creation)
             self::fixAccessDates($session_info);
             $session_info['id_coach'] = 0;
-            $session_id = SessionManager::add($session_info);
-            $session_info = api_get_session_info($session_id, true);
+            $extra = [];
+            if (!empty($data['uidIdPrograma'])) {
+                $extra['uidIdPrograma'] = $data['uidIdPrograma'];
+            }
+            if (!empty($data['estado'])) {
+                $extra['estado'] = $data['estado'];
+            }
+            if (!empty($data['sede'])) {
+                $extra['sede'] = $data['sede'];
+            }
+            if (!empty($data['horario'])) {
+                $extra['horario'] = $data['horario'];
+            }
+            if (!empty($data['periodo'])) {
+                $extra['periodo'] = $data['periodo'];
+            }
+            if (!empty($data['aula'])) {
+                $extra['aula'] = $data['aula'];
+            }
+            $session_id = SessionManager::create_session(
+                $session_info['name'],
+                $session_info['access_start_date'],
+                $session_info['access_end_date'],
+                $session_info['display_start_date'],
+                $session_info['display_end_date'],
+                $session_info['coach_access_start_date'],
+                $session_info['coach_access_end_date'],
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                $extra,
+                null,
+                null
+            );
+            //$session_id = SessionManager::add($session_info);
+            $session_info = api_get_session_info($session_id);
             if ($session_id) {
                 $data_list['sessions'][$data['item_id']] = $session_id;
                 return array(
@@ -1455,9 +1524,9 @@ class MigrationCustom {
         global $data_list;
         $session_id = self::getSessionIDByProgramID($uidIdPrograma, $data_list);
         if (!empty($session_id)) {
-            $session_info_before = api_get_session_info($session_id, true);
-            SessionManager::delete_session($session_id, true);
-            $session_info = api_get_session_info($session_id, true);
+            $session_info_before = api_get_session_info($session_id);
+            SessionManager::delete($session_id);
+            $session_info = api_get_session_info($session_id);
             $data_list['sessions'][$data['item_id']] = null;
             return array(
                    'entity' => 'session',
@@ -1496,15 +1565,50 @@ class MigrationCustom {
 
                     $efv = new ExtraFieldValue('user');
                     $fieldValue = $efv->get_values_by_handler_and_field_variable($coachId, 'uidIdPersona');
-                    $uidIdPersona = trim($fieldValue['field_value']);
+                    $uidIdPersona = trim($fieldValue['value']);
 
                     $session_info['id_coach'] = empty($uidIdPersona) ? 0 : intval($coachId);
                 }
 
                 unset($session_info['error']);
-                $session_info_before = api_get_session_info($session_id, true);
-                SessionManager::update($session_info);
-                $session_info = api_get_session_info($session_id, true);
+                $session_info_before = api_get_session_info($session_id);
+                $extra = [];
+                if (!empty($session_info['uidIdPrograma'])) {
+                    $extra['uidIdPrograma'] = $session_info['uidIdPrograma'];
+                }
+                if (!empty($session_info['estado'])) {
+                    $extra['estado'] = $session_info['estado'];
+                }
+                if (!empty($session_info['sede'])) {
+                    $extra['sede'] = $session_info['sede'];
+                }
+                if (!empty($session_info['horario'])) {
+                    $extra['horario'] = $session_info['horario'];
+                }
+                if (!empty($session_info['periodo'])) {
+                    $extra['periodo'] = $session_info['periodo'];
+                }
+                if (!empty($session_info['aula'])) {
+                    $extra['aula'] = $session_info['aula'];
+                }
+                SessionManager::edit_session(
+                    $session_info['id'],
+                    $session_info['name'],
+                    $session_info['access_start_date'],
+                    $session_info['access_end_date'],
+                    $session_info['display_start_date'],
+                    $session_info['display_end_date'],
+                    $session_info['coach_access_start_date'],
+                    $session_info['coach_access_end_date'],
+                    $coachId,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    $extra
+                );
+                $session_info = api_get_session_info($session_id);
                 return array(
                    'entity' => 'session',
                    'before' => $session_info_before,
@@ -1520,162 +1624,6 @@ class MigrationCustom {
                    'message' => "Session does not exists $uidIdPrograma",
                    'status_id' => self::TRANSACTION_STATUS_FAILED
             );
-        }
-    }
-
-    /**
-     * This transaction is used to send teachers attendance information
-     * @param array $data
-     * @param array $webServiceDetails
-     * @return array
-     */
-    static function transaction_534($data, $webServiceDetails) {
-        $tableTrackTeachers = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
-        $tableTrackTeacherAttendance = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
-        $tableUser = Database::get_main_table(TABLE_MAIN_USER);
-        $tableBranchRoom = Database::get_main_table(TABLE_BRANCH_ROOM);
-        $tableBranch = Database::get_main_table(TABLE_BRANCH);
-
-        $whereCondition = array(
-            'where' => array(
-                'id = ?' => array(
-                    $data['item_id']
-                )
-            )
-        );
-        $dataTrackTeachers = Database::select('*', $tableTrackTeachers, $whereCondition);
-        if (!empty($dataTrackTeachers)) {
-            $sql = "SELECT
-            u.username,
-            br.title as room,
-            tck.log_in_course_date,
-            tck.log_out_course_date,
-            tck.id as track_id
-            FROM
-            $tableTrackTeacherAttendance tck
-            INNER JOIN $tableUser u ON u.user_id = tck.user_id
-            INNER JOIN $tableBranchRoom br ON br.id = tck.room_id
-            WHERE tck.id = {$data['item_id']}
-            ";
-
-            $result = Database::query($sql);
-            while ($row = Database::fetch_array($result)) {
-                $dataTrackInOut = $row;
-            }
-
-            if ($data['dest_id'] == 'IN') {
-                $dataTrackInOut['log_in_course_date'] = api_get_local_time($dataTrackInOut['log_in_course_date']);
-                $dateTime = self::explodeDateTime($dataTrackInOut['log_in_course_date']);
-            } else {
-                $dataTrackInOut['log_out_course_date'] = api_get_local_time($dataTrackInOut['log_out_course_date']);
-                $dateTime = self::explodeDateTime($dataTrackInOut['log_out_course_date']);
-            }
-
-            $wsParams = array(
-                'chraula' => $dataTrackInOut['room'],
-                'vchcodigorrhh' => $dataTrackInOut['username'],
-                'chrtipomarcacion' => $data['dest_id'],
-                'chrfechamarcacion' => $dateTime['date'],
-                'chrhoramarcacion' => $dateTime['time'],
-                'intidsede' => $data['branch_id']
-            );
-            $serviceResponse = Migration::soap_call(
-                $webServiceDetails,
-                'insAsistenciaDocente',
-                $wsParams
-            );
-
-            if ($serviceResponse['error'] == false) {
-                return array(
-                    'entity' => 'track_e_teacher_in_out',
-                    'before' => '',
-                    'after'  => '',
-                    'message' => "{$data['dest_id']} sent to ICPNAs WS",
-                    'status_id' => self::TRANSACTION_STATUS_SUCCESSFUL
-                );
-            } else {
-                return $wsParams;
-            }
-        }
-    }
-
-    /**
-     * This transaction is used to send substitute teachers
-     * session information
-     * @param array $data
-     * @param array $webServiceDetails
-     * @return array
-     */
-    static function transaction_537($data, $webServiceDetails) {
-        // Is Disabled because is not completed - refs BT#8566
-        return 537;
-        $tableTrackTeachers = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
-        $tableTrackTeacherAttendance = Database::get_main_table(TABLE_TRACK_E_TEACHER_IN_OUT);
-        $tableUser = Database::get_main_table(TABLE_MAIN_USER);
-        $tableBranchRoom = Database::get_main_table(TABLE_BRANCH_ROOM);
-        $tableBranch = Database::get_main_table(TABLE_BRANCH);
-
-        $whereCondition = array(
-            'where' => array(
-                'id = ?' => array(
-                    $data['id']
-                )
-            )
-        );
-        $dataTrackTeachers = Database::select('*', $tableTrackTeachers, $whereCondition);
-        if (!empty($dataTrackTeachers)) {
-            $sql = "SELECT
-            u.username,
-            br.title as room,
-            tck.log_in_course_date,
-            tck.log_out_course_date,
-            tck.id as track_id
-            FROM
-            $tableTrackTeacherAttendance tck
-            INNER JOIN $tableUser u ON u.user_id = tck.user_id
-            INNER JOIN $tableBranchRoom br ON br.id = tck.room_id
-            WHERE tck.id = {$data['item_id']}
-            ";
-
-            $result = Database::query($sql);
-            while ($row = Database::fetch_array($result)) {
-                $dataTrackInOut = $row;
-            }
-
-            if ($data['dest_id'] == 'IN') {
-                $dataTrackInOut['log_in_course_date'] = api_get_local_time($dataTrackInOut['log_in_course_date']);
-                $dateTime = self::explodeDateTime($dataTrackInOut['log_in_course_date']);
-            } else {
-                $dataTrackInOut['log_out_course_date'] = api_get_local_time($dataTrackInOut['log_out_course_date']);
-                $dateTime = self::explodeDateTime($dataTrackInOut['log_out_course_date']);
-            }
-
-            $wsParams = array(
-                'chraula' => $dataTrackInOut['room'],
-                'vchcodigorrhh' => $dataTrackInOut['username'],
-                'chrtipomarcacion' => $data['dest_id'],
-                'chrfechamarcacion' => $dateTime['date'],
-                'chrhoramarcacion' => $dateTime['time'],
-                'intidsede' => $data['branch_id'],
-                'uidIdPrograma' => $data['dest_id']
-            );
-            $serviceResponse = Migration::soap_call(
-                $webServiceDetails,
-                'insAsistenciaDocente',
-                $wsParams
-            );
-
-            if ($serviceResponse['error'] == false) {
-                return array(
-                    'entity' => 'track_e_teacher_in_out',
-                    'before' => '',
-                    'after'  => '',
-                    'message' => "{$data['dest_id']} sent to ICPNAs WS",
-                    'status_id' => self::TRANSACTION_STATUS_SUCCESSFUL
-                );
-            } else {
-                return $wsParams;
-            }
         }
     }
 
@@ -1748,7 +1696,7 @@ class MigrationCustom {
                 $params = array(
                     'session_id' => $session_id,
                     'field_id' => $extra_field_info['id'],
-                    'field_value' => $destination_id,
+                    'value' => $destination_id,
                 );
                 $extra_field_value->save($params);
 
@@ -2218,7 +2166,7 @@ class MigrationCustom {
 
     //        NOTA
     /**
-     * Añadir nota_agregar IID
+     * Add "nota_agregar" IID
      * const TRANSACTION_TYPE_ADD_NOTA  = 31;
      * @param $original_data
      * @param $web_service_details
@@ -2259,13 +2207,21 @@ class MigrationCustom {
                 if (isset($course_data['code'])) {
                     //Look for gradebook and create it if it does not exist yet
                     $gradebook = new Gradebook();
-                    $gradebook = $gradebook->get_first(array('where' => array('course_code = ? AND session_id = ?' => array($course_data['code'], $session_id))));
-                    error_log("Looking for gradebook in course code:  {$course_data['code']} - session_id: $session_id");
+                    $gradebook = $gradebook->find(
+                        'all',
+                        array(
+                            'where' => array(
+                                'course_code = ? AND session_id = ?' => array($course_data['code'], $session_id)
+                            )
+                        )
+                    );
+                    error_log("Looking for gradebook in course code: {$course_data['code']} - session_id: $session_id");
                     if (count($gradebook)===0) {
-                        require_once api_get_path(SYS_CODE_PATH).'gradebook/lib/gradebook_functions.inc.php';
-                        $gradebook = array('id' => create_default_course_gradebook($course_data['code'], false, $session_id));
-                        error_log('Gradebook not found. Creating one with ID '.$gradebook['id']);
-                        $data_list['session_course_gradebook'][$course_data['code']][$session_id] = $gradebook['id'];
+                        // This should not happen anymore as gradebook are automatically created on course+session creation
+                        //require_once api_get_path(SYS_CODE_PATH).'gradebook/lib/gradebook_functions.inc.php';
+                        //$gradebook = array('id' => create_default_course_gradebook($course_data['code'], false, $session_id));
+                        error_log('Gradebook not found.');
+                        //$data_list['session_course_gradebook'][$course_data['code']][$session_id] = $gradebook['id'];
                     }
                     if (!empty($gradebook)) {
                         //Check if gradebook exists
@@ -2317,7 +2273,7 @@ class MigrationCustom {
                             $message = "Evaluation not found in gradebook: {$gradebook['id']} : in course: {$course_data['code']} - session_id: $session_id";
                         }
                     } else {
-                        $message = "Gradebook does not exists in course: {$course_data['code']} - session_id: $session_id";
+                        $message = "Gradebook does not exists in course: ".$course_data['code']." - session_id: $session_id";
                     }
                 } else {
                     $message = "Something is wrong with the course ";
@@ -2381,13 +2337,21 @@ class MigrationCustom {
                         $gradebook['id'] = $data_list['session_course_gradebook'][$course_data['code']][$session_id];
                     } else {
                         $gradebook = new Gradebook();
-                        $gradebook = $gradebook->get_first(array('where' => array('course_code = ? AND session_id = ?' => array($course_data['code'], $session_id))));
+                        $gradebook = $gradebook->get(
+                            'all',
+                            array(
+                                'where' => array(
+                                    'course_code = ? AND session_id = ?' => array($course_data['code'], $session_id)
+                                )
+                            )
+                        );
                         error_log("Looking for gradebook in course code:  {$course_data['code']} - session_id: $session_id");
                         if (count($gradebook)===0) {
-                            require_once api_get_path(SYS_CODE_PATH).'gradebook/lib/gradebook_functions.inc.php';
-                            $gradebook = array('id' => create_default_course_gradebook($course_data['code'], false, $session_id));
-                            error_log('Gradebook not found. Creating one with ID '.$gradebook['id']);
-                            $data_list['session_course_gradebook'][$course_data['code']][$session_id] = $gradebook['id'];
+                            // This shouldn't happen anymore as gradebooks are created by default
+                            //require_once api_get_path(SYS_CODE_PATH).'gradebook/lib/gradebook_functions.inc.php';
+                            //$gradebook = array('id' => create_default_course_gradebook($course_data['code'], false, $session_id));
+                            error_log('Gradebook not found.');
+                            //$data_list['session_course_gradebook'][$course_data['code']][$session_id] = $gradebook['id'];
                         }
                     }
                     // At this point we tried 3 different ways of obtaining a
@@ -2486,7 +2450,13 @@ class MigrationCustom {
                 $course_data = current($course_list);
                 if (isset($course_data['code'])) {
                     $gradebook = new Gradebook();
-                    $gradebook = $gradebook->get_first(array('where' => array('course_code = ? AND session_id = ?' => array($course_data['code'], $session_id))));
+                    $gradebook = $gradebook->get(
+                        array(
+                            'where' => array(
+                                'course_code = ? AND session_id = ?' => array($course_data['code'], $session_id)
+                            )
+                        )
+                    );
                     error_log("Looking for gradebook in course code:  {$course_data['code']} - session_id: $session_id");
                     if (!empty($gradebook)) {
                         //Check if gradebook exists
@@ -2521,7 +2491,9 @@ class MigrationCustom {
                                 $res->set_evaluation_id($eval_id);
                                 $res->set_user_id($user_id);
                                 $res->set_score($score);
-                                $res->set_id($check_result[0]->get_id());
+                                /** @var Result $checkResultItem */
+                                $checkResultItem = $check_result[0];
+                                $res->set_id($checkResultItem->get_id());
                                 $res->save();
 
                                 $eval_result = Result :: load (null, $user_id, $eval_id);
@@ -2641,8 +2613,7 @@ class MigrationCustom {
                     $attendance = new Attendance();
 
                     $course_info = api_get_course_info($course_data['code']);
-                    $attendance->set_course_id($course_info['code']);
-                    $attendance->set_course_int_id($course_info['real_id']);
+                    $attendance->set_course_id($course_info['real_id']);
                     $attendance->set_session_id($session_id);
                     $attendance_list = array();
                     if (is_array($data_list) && isset($data_list) && $data_list['boost_sessions'] && isset($data_list['sessions_attendances'][$course_info['real_id']][$session_id])) {
@@ -2664,7 +2635,7 @@ class MigrationCustom {
                         $attendance->set_name('Asistencia');
                         $attendance->set_description('');
                         $link_to_gradebook = false;
-                        $attendance_id = $attendance->attendance_add($link_to_gradebook, self::defaultAdminId);
+                        $attendance_id = $attendance->attendance_add($link_to_gradebook);
                         if (is_array($data_list) && isset($data_list) && $data_list['boost_sessions']) {
                             $data_list['sessions_attendances'][$course_info['real_id']][$session_id][] = $attendance_id;
                         }
@@ -2711,11 +2682,11 @@ class MigrationCustom {
 
                     $users_present = array($user_id => $attendance_user_status);
 
-                    $attendance_sheet_info = $attendance->attendance_sheet_get_info($cal_id, $user_id);
+                    $attendance_sheet_info = $attendance->get_users_attendance_sheet($cal_id, $user_id);
 
                     if (empty($attendance_sheet_info)) {
-                        $result = $attendance->attendance_sheet_add($cal_id, $users_present, $attendance_id, false,  true);
-                        $attendance_sheet_after = $attendance->attendance_sheet_get_info($cal_id, $user_id);
+                        $result = $attendance->attendance_sheet_add($cal_id, $users_present, $attendance_id, false);
+                        $attendance_sheet_after = $attendance->get_users_attendance_sheet($cal_id, $user_id);
                     } else {
                         return array(
                             'message' => "Attendance sheet can't be added, because it already exists - attendance_id: $attendance_id - cal_id: $cal_id - user_id: $user_id - course: {$course_info['code']} - session_id: $session_id ",
@@ -2814,8 +2785,7 @@ class MigrationCustom {
                     $attendance = new Attendance();
 
                     $course_info = api_get_course_info($course_data['code']);
-                    $attendance->set_course_id($course_info['code']);
-                    $attendance->set_course_int_id($course_info['real_id']);
+                    $attendance->set_course_id($course_info['real_id']);
                     $attendance->set_session_id($session_id);
 
                     $attendance_list = $attendance->get_attendances_list($course_info['real_id'], $session_id);
@@ -2843,11 +2813,11 @@ class MigrationCustom {
                         );
                     }
 
-                    $attendance_sheet_before = $attendance->attendance_sheet_get_info($cal_id, $user_id);
+                    $attendance_sheet_before = $attendance->get_users_attendance_sheet($cal_id, $user_id);
 
-                    $result = $attendance->attendance_sheet_disable($cal_id, $user_id);
+                    $result = $attendance->disableAttendanceSheet($cal_id, $user_id);
 
-                    $attendance_sheet_after = $attendance->attendance_sheet_get_info($cal_id, $user_id);
+                    $attendance_sheet_after = $attendance->get_users_attendance_sheet($cal_id, $user_id);
 
 
                     if ($result) {
@@ -2940,8 +2910,7 @@ class MigrationCustom {
 
                     $attendance = new Attendance();
                     $course_info = api_get_course_info($course_data['code']);
-                    $attendance->set_course_id($course_info['code']);
-                    $attendance->set_course_int_id($course_info['real_id']);
+                    $attendance->set_course_id($course_info['real_id']);
                     $attendance->set_session_id($session_id);
 
                     $attendance_list = $attendance->get_attendances_list($course_info['real_id'], $session_id);
@@ -2976,11 +2945,11 @@ class MigrationCustom {
                     }
                     $users_present = array($user_id => $attendance_user_status);
 
-                    $attendance_sheet_before = $attendance->attendance_sheet_get_info($cal_id, $user_id);
+                    $attendance_sheet_before = $attendance->get_users_attendance_sheet($cal_id, $user_id);
 
-                    $result = $attendance->attendance_sheet_add($cal_id, $users_present, $attendance_id, false,  true);
+                    $result = $attendance->attendance_sheet_add($cal_id, $users_present, $attendance_id, false);
 
-                    $attendance_sheet_after = $attendance->attendance_sheet_get_info($cal_id, $user_id);
+                    $attendance_sheet_after = $attendance->get_users_attendance_sheet($cal_id, $user_id);
 
                     if ($result) {
                         return array(
@@ -3692,7 +3661,7 @@ class MigrationCustom {
 
         $horario_info = $extra_field_value->get_values_by_handler_and_field_id($session_id, $extra_field_info['id']);
         $extra_field_option = new ExtraFieldOption('session');
-        $horario_info = $extra_field_option->get_field_option_by_field_and_option($extra_field_info['id'], $horario_info['field_value']);
+        $horario_info = $extra_field_option->get_field_option_by_field_and_option($extra_field_info['id'], $horario_info['value']);
 
         $time = "08:00";
         if (isset($horario_info) && isset($horario_info[0])) {
@@ -3784,8 +3753,8 @@ class MigrationCustom {
     /**
      * Check if some transactions are not deprecated because of another one
      * doing the same afterwards
-     * @param array Array of transactions as received by the web service call
-     * @param bool  Check in database if there is any posterior operation making this one useless
+     * @param array $transactions Array of transactions as received by the web service call
+     * @param bool $check_duplicates_in_db Check in database if there is any posterior operation making this one useless
      * @return array Simplified list of IDs to exclude from the transaction array
      */
     protected function checkTransactionsDuplicity($transactions, $check_duplicates_in_db = false) {

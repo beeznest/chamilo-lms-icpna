@@ -34,6 +34,14 @@ class Thematic
         $this->course_int_id = api_get_course_int_id();
     }
 
+    public function set_course_int_id($course_id) {
+        $this->course_int_id = intval($course_id);
+    }
+
+    public function set_session_id($session_id) {
+        $this->session_id = intval($session_id);
+    }
+
     /**
      * Get the total number of thematic inside current course and current session
      * @see SortableTable#get_total_number_of_items()
@@ -1498,4 +1506,29 @@ class Thematic
 
         return $question;
     }
+
+    /**
+     * Get a specific thematic's DB details from a title (inside the current course+session)
+     * @param $title
+     * @return array|bool
+     */
+    public function get_thematic_by_title($title) {
+        $tbl_thematic = Database::get_course_table(TABLE_THEMATIC);
+        $course_id = $this->get_course_int_id();
+        $session_id = $this->get_session_id();
+
+        $title = Database::escape_string($title);
+
+        $sql = "SELECT * FROM $tbl_thematic 
+                WHERE   c_id = $course_id AND 
+                        session_id = $session_id AND 
+                        title = '$title' AND 
+                        active = 1";
+        $result = Database::query($sql);
+        if (Database::num_rows($result)) {
+            return Database::fetch_array($result, 'ASSOC');
+        }
+        return false;
+    }
+
 }

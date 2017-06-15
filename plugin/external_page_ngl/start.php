@@ -8,7 +8,7 @@
  */
 include_once '../../main/inc/global.inc.php';
 
-if (api_is_course_admin() || api_is_teacher_admin()) {
+if (api_is_course_admin()) {
     api_not_allowed(true);
 }
 

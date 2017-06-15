@@ -1,0 +1,1 @@
+This plugin is used to show additional buttons in the course with external information embedded.

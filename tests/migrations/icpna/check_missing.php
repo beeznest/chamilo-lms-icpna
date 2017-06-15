@@ -32,7 +32,7 @@ $data_list = array(
 );
 
 if (count($data_list['users']) < 1) {
-    MigrationCustom::fill_data_list($data_list);
+    MigrationCustom::fillDataList($data_list);
 }
 //error_log('Built in-memory data_list for speed-up '.time());
 /**

@@ -12,7 +12,7 @@
  */
 class MigrationCustom {
 
-    const default_admin_id = 1;
+    const defaultAdminId = 1;
     const TRANSACTION_STATUS_TO_BE_EXECUTED = 1;
     const TRANSACTION_STATUS_SUCCESSFUL = 2;
     const TRANSACTION_STATUS_DEPRECATED = 3; //??
@@ -147,7 +147,7 @@ class MigrationCustom {
      * @param string $date Date
      * @return string A strin in the 'yyyy-mm-dd hh:mm:ss' format
      */
-    static function clean_date_time_from_ws($date) {
+    static function cleanDateTimeFromWS($date) {
         $pre_clean = self::cleanDateTime($date, 0, 19);
         return str_replace('T', ' ', $pre_clean);
     }
@@ -188,7 +188,7 @@ class MigrationCustom {
     /**
      * Removes any weird UTF-8 character from the session name
      * @param mixed $value
-     * @param mixed $omigrate
+     * @param array $omigrate Array of items pre-loaded from the database to boost processing
      * @param array $row_data
      * @return string
      */
@@ -197,12 +197,12 @@ class MigrationCustom {
     }
 
     /**
-     * Gets the real course code from an external uidIdCurso param
+     * Gets the real course (int) ID from an external uidIdCurso param
      * @param string $data
-     * @param array $omigrate
-     * @return mixed
+     * @param array $omigrate Array of items pre-loaded from the database to boost processing
+     * @return mixed Course ID
      */
-    static function getRealCourseCode($data, &$omigrate=null) {
+    static function getRealCourseCode($data, &$omigrate = null) {
         if (is_array($omigrate) && $omigrate['boost_courses']) {
             if (isset($omigrate['courses'][$data])) {
                 return $omigrate['courses'][$data];
@@ -212,19 +212,20 @@ class MigrationCustom {
         $data = strtoupper($data);
         $values = $extra_field->get_item_id_from_field_variable_and_field_value('uidIdCurso', $data);
         if ($values) {
-            return $values['course_code'];
+            return $values['item_id'];
         } else {
             error_log("Course ".print_r($data,1)." not found in DB");
+            return false;
         }
     }
 
     /**
      * Gets the session ID from a given (external) uidIdPrograma
      * @param string $uidIdPrograma
-     * @param array $omigrate
+     * @param array $omigrate Array of items pre-loaded from the database to boost processing
      * @return mixed
      */
-    static function getSessionIDByProgramID($uidIdPrograma, &$omigrate=null) {
+    static function getSessionIDByProgramID($uidIdPrograma, &$omigrate = null) {
         if (is_array($omigrate) && $omigrate['boost_sessions']) {
             if (isset($omigrate['sessions'][$uidIdPrograma])) {
                 return $omigrate['sessions'][$uidIdPrograma];
@@ -234,7 +235,7 @@ class MigrationCustom {
         $uidIdPrograma = strtoupper($uidIdPrograma);
         $values = $extra_field->get_item_id_from_field_variable_and_field_value('uidIdPrograma', $uidIdPrograma);
         if ($values) {
-            return $values['session_id'];
+            return $values['item_id'];
         } else {
             //error_log("session id not found in DB");
         }
@@ -246,7 +247,7 @@ class MigrationCustom {
      * @param array $omigrate
      * @return int  0 if not found
      */
-    static function getUserIDByPersonaID($uidIdPersona, &$omigrate=null) {
+    static function getUserIDByPersonaID($uidIdPersona, &$omigrate = null) {
         if (is_array($omigrate) && $omigrate['boost_users']) {
             if (isset($omigrate['users'][$uidIdPersona])) {
                 return $omigrate['users'][$uidIdPersona];
@@ -257,7 +258,7 @@ class MigrationCustom {
         $uidIdPersona = strtoupper($uidIdPersona);
         $values = $extra_field->get_item_id_from_field_variable_and_field_value('uidIdPersona', $uidIdPersona);
         if ($values) {
-            return $values['user_id'];
+            return $values['item_id'];
         } else {
             return 0;
         }
@@ -266,11 +267,11 @@ class MigrationCustom {
     /**
      * Gets the user id from the uidIdPersona of a teacher
      * @param $uidIdPersona
-     * @param null $omigrate
+     * @param array $omigrate Array of items pre-loaded from the database to boost processing
      * @return int
      */
-    static function getRealTeacherID($uidIdPersona, &$omigrate=null) {
-        $default_teacher_id = self::default_admin_id;
+    static function getRealTeacherID($uidIdPersona, &$omigrate = null) {
+        $default_teacher_id = self::defaultAdminId;
         if (empty($uidIdPersona)) {
             //error_log('No teacher provided');
             return $default_teacher_id;
@@ -285,7 +286,7 @@ class MigrationCustom {
         $values = $extra_field->get_item_id_from_field_variable_and_field_value('uidIdPersona', $uidIdPersona);
 
         if ($values) {
-            return $values['user_id'];
+            return $values['item_id'];
         } else {
             return $default_teacher_id;
         }
@@ -294,9 +295,9 @@ class MigrationCustom {
     /**
      * Manage the user creation, including checking if the user hasn't been
      * created previously
-     * @param array User data
-     * @param object List of migrated things
-     * @return array User info (from Chamilo DB)
+     * @param array $data User data
+     * @param array $omigrate Array of items pre-loaded from the database to boost processing
+     * @return mixed User info (from Chamilo DB) or false on error
      */
     static function createUser($data, &$omigrate=null) {
         //error_log('In createUser, receiving '.print_r($data,1));
@@ -306,8 +307,10 @@ class MigrationCustom {
             return false;
             //exit;
         }
+        $extra = [];
 
         $data['uidIdPersona'] = strtoupper($data['uidIdPersona']);
+        $extra['uidIdPersona'] = $data['uidIdPersona'];
 
         $data['status'] = STUDENT;
         if (isset($data['uidIdEmpleado'])) {
@@ -339,7 +342,7 @@ class MigrationCustom {
                 //error_log("username available  $wanted_user_name");
             } else {
                 //the user already exists?
-                $user_info = UserManager::get_user_info_simple($wanted_user_name);
+                $user_info = api_get_user_info_from_username($wanted_user_name);
                 $user_persona = UserManager::get_extra_user_data_by_field($user_info['user_id'], 'uidIdPersona');
 
                 if (isset($user_persona['uidIdPersona']) && $data['uidIdPersona'] == $user_persona['uidIdPersona']) {
@@ -369,7 +372,7 @@ class MigrationCustom {
                 //error_log("username available {$data['username']} ");
             } else {
                 //the user already exists?
-                $user_info = UserManager::get_user_info_simple($data['username']);
+                $user_info = api_get_user_info_from_username($data['username']);
                 $user_persona = UserManager::get_extra_user_data_by_field($user_info['user_id'], 'uidIdPersona');
 
 
@@ -401,24 +404,31 @@ class MigrationCustom {
 
         global $api_failureList;
         $api_failureList = array();
-        //error_log(print_r($data, 1));
-        $user_info = UserManager::add($data);
-        if (!$user_info) {
+        $userId = UserManager::create_user(
+            $data['firstname'],
+            $data['lastname'],
+            $data['status'],
+            $data['email'],
+            $data['username'],
+            $data['password']
+        );
+        if (!$userId) {
             error_log('User '.$id_persona.' could not be inserted (maybe duplicate?)');
         } else {
             //error_log('User '.$id_persona.' was created as user '.$user_info['user_id']);
         }
         if (is_array($omigrate) && isset($omigrate) && $omigrate['boost_users']) {
-            $omigrate['users'][$id_persona] = $user_info['user_id'];
+            $omigrate['users'][$id_persona] = $userId;
         }
-        UserManager::update_extra_field_value($user_info['user_id'], 'uidIdPersona', $id_persona);
+        UserManager::update_extra_field_value($userId, 'uidIdPersona', $id_persona);
+        $user_info = api_get_user_info($userId);
         return $user_info;
     }
 
     /**
      * Manages the course creation based on the rules in the db_matches.php file
      * @param   array   $data
-     * @param   array   $omigrate
+     * @param array $omigrate Array of items pre-loaded from the database to boost processing
      * @return  array   Return value of CourseManager::createCourse();
      */
     static function createCourse($data, &$omigrate=null) {
@@ -430,18 +440,39 @@ class MigrationCustom {
         $data['language'] = 'english';
         $data['visibility'] = COURSE_VISIBILITY_REGISTERED;
 
+        $courseId = null;
+        // check if this course doesn't exist already
+        if (!empty($data['uidIdCurso'])) {
+            if (is_array($omigrate) && $omigrate['boost_courses']) {
+                if (isset($omigrate['courses'][$data['uidIdCurso']])) {
+                    $courseId = $omigrate['courses'][$data['uidIdCurso']];
+                }
+            } else {
+                $extra_field = new ExtraFieldValue('course');
+                $data = strtoupper($data);
+                $values = $extra_field->get_item_id_from_field_variable_and_field_value('uidIdCurso', $data);
+                $courseId = $values['item_id'];
+            }
+            if (!empty($courseId)) {
+                // A course with this uidIdCurso already exists. Return it instead.
+                $courseInfo = api_get_course_info_by_id($courseId);
+                return $courseInfo;
+            }
+
+        }
+
         //Creates an evaluation
         $data['create_gradebook_evaluation'] = false;
         /*
         $data['gradebook_params'] = array(
             'name'      => 'General evaluation',
-            'user_id'   => self::default_admin_id,
+            'user_id'   => self::defaultAdminId,
             'weight'    => '20',
             'max'       => '20'
         );*/
         $course_data = CourseManager::create_course($data);
         if (is_array($omigrate) && isset($omigrate) && $omigrate['boost_courses']) {
-            $omigrate['courses'][$data['uidIdCurso']] = $course_data['code'];
+            $omigrate['courses'][$data['uidIdCurso']] = $course_data['real_id'];
         }
         return $course_data;
     }
@@ -450,27 +481,78 @@ class MigrationCustom {
      * Manages the session creation, based on data provided by the rules
      * in db_matches.php
      * @param   array   $data
-     * @param   array   $omigrate
+     * @param array $omigrate Array of items pre-loaded from the database to boost processing
      * @return int The created (or existing) session ID
      */
-    static function createSession($data, &$omigrate) {
-        //Hack to add the default gradebook course to the session course
-        $data['create_gradebook_evaluation'] = true;
-        /*$data['gradebook_params'] = array(
-            'name'      => 'General evaluation',
-            'user_id'   => self::default_admin_id,
-            'weight'    => '20',
-            'max'       => '20'
-        );*/
-        self::fix_access_dates($data);
-        // Here the $data variable has $data['course_code'] that will be added
-        //   when creating the session
-        // If session already exists, it will return the existing session id
-        $session_id = SessionManager::add($data, true);
+    static function createSession($data, &$omigrate)
+    {
+        $sessionId = null;
+        // check if this course doesn't exist already
+        if (!empty($data['uidIdPrograma'])) {
+            if (is_array($omigrate) && $omigrate['boost_sessions']) {
+                if (isset($omigrate['sessions'][$data['uidIdPrograma']])) {
+                    $sessionId = $omigrate['sessions'][$data['uidIdPrograma']];
+                }
+            } else {
+                $extra_field = new ExtraFieldValue('session');
+                $data = strtoupper($data);
+                $values = $extra_field->get_item_id_from_field_variable_and_field_value('uidIdPrograma', $data);
+                $sessionId = $values['item_id'];
+            }
+            if (!empty($sessionId)) {
+                // A course with this uidIdCurso already exists. Return it instead.
+                $sessionInfo = api_get_session_info($sessionId);
+                return $sessionInfo;
+            }
+
+        }
+
+        self::fixAccessDates($data);
+        $extra = [];
+        if (!empty($data['uidIdPrograma'])) {
+            $extra['uidIdPrograma'] = $data['uidIdPrograma'];
+        }
+        if (!empty($data['estado'])) {
+            $extra['estado'] = $data['estado'];
+        }
+        if (!empty($data['sede'])) {
+            $extra['sede'] = $data['sede'];
+        }
+        if (!empty($data['horario'])) {
+            $extra['horario'] = $data['horario'];
+        }
+        if (!empty($data['periodo'])) {
+            $extra['periodo'] = $data['periodo'];
+        }
+        if (!empty($data['aula'])) {
+            $extra['aula'] = $data['aula'];
+        }
+        $session_id = SessionManager::create_session(
+            $data['name'],
+            $data['access_start_date'],
+            $data['access_end_date'],
+            $data['display_start_date'],
+            $data['display_end_date'],
+            $data['coach_access_start_date'],
+            $data['coach_access_end_date'],
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            $extra,
+            null,
+            null
+        );
+        if (!empty($data['c_id'])) {
+            SessionManager::add_courses_to_session($session_id, $data['c_id']);
+        }
         if (!$session_id) {
             error_log('Error: Failed to createSession '.$data['name']);
-        } else{
-            $c = SessionManager::set_coach_to_course_session($data['id_coach'], $session_id, $data['course_code']);
+        } else {
+            $c = SessionManager::set_coach_to_course_session($data['id_coach'], $session_id, $data['c_id']);
             if (is_array($omigrate) && isset($omigrate) && $omigrate['boost_sessions']) {
                 $omigrate['sessions'][$data['uidIdPrograma']] = $session_id;
             }
@@ -481,7 +563,7 @@ class MigrationCustom {
     /**
      * Assigns a user to a session based on rules in db_matches.php
      * @param   array   $data
-     * @param   array   $omigrate
+     * @param array $omigrate Array of items pre-loaded from the database to boost processing
      * @return void
      */
     static function addUserToSession($data, &$omigrate=null) {
@@ -532,7 +614,7 @@ class MigrationCustom {
         //error_log('createAttendance');
         $session_id = $data['session_id'];
         $user_id    = $data['user_id'];
-        $time = self::get_horario_value($session_id);
+        $time = self::getScheduleValue($session_id);
         $fecha = $data['fecha']." $time:00";
 
         if (!empty($session_id) && !empty($user_id)) {
@@ -559,8 +641,7 @@ class MigrationCustom {
                         $course_info = api_get_course_info($course['code']);
                     }
 
-                    $attendance->set_course_id($course['code']);
-                    $attendance->set_course_int_id($course_info['real_id']);
+                    $attendance->set_course_id($course_info['real_id']);
                     $attendance->set_session_id($session_id);
 
                     if (is_array($data_list) && isset($data_list) && $data_list['boost_sessions'] && isset($data_list['sessions_attendances'][$course_info['real_id']][$session_id])) {
@@ -578,7 +659,7 @@ class MigrationCustom {
                         //$attendance->set_attendance_weight($_POST['attendance_weight']);
                         $link_to_gradebook = false;
                         //$attendance->category_id = $_POST['category_id'];
-                        $attendance_sheet_id = $attendance->attendance_add($link_to_gradebook, self::default_admin_id);
+                        $attendance_sheet_id = $attendance->attendance_add($link_to_gradebook);
                         if (is_array($data_list) && isset($data_list) && $data_list['boost_sessions']) {
                             $data_list['sessions_attendances'][$course_info['real_id']][$session_id][] = $attendance_sheet_id;
                         }
@@ -774,7 +855,7 @@ class MigrationCustom {
                             $eval->set_name($data['gradebook_description']);
                             $eval->set_description($data['gradebook_description']);
                             $eval->set_evaluation_type_id($data['gradebook_evaluation_type_id']);
-                            $eval->set_user_id(self::default_admin_id);
+                            $eval->set_user_id(self::defaultAdminId);
                             $eval->set_course_code($course_data['code']);
                             $eval->set_category_id($gradebook['id']);
 
@@ -926,7 +1007,7 @@ class MigrationCustom {
                         if (empty($evals_found)) {
                             $eval->set_name($title);
                             //$eval->set_evaluation_type_id($data['gradebook_evaluation_type_id']);
-                            $eval->set_user_id(self::default_admin_id);
+                            $eval->set_user_id(self::defaultAdminId);
                             $eval->set_course_code($course_data['code']);
                             $eval->set_category_id($gradebook['id']);
 
@@ -1369,7 +1450,7 @@ class MigrationCustom {
         if ($session_info['error'] == false) {
             unset($session_info['error']);
             // check dates (only do this at session creation)
-            self::fix_access_dates($session_info);
+            self::fixAccessDates($session_info);
             $session_info['id_coach'] = 0;
             $session_id = SessionManager::add($session_info);
             $session_info = api_get_session_info($session_id, true);
@@ -1439,7 +1520,7 @@ class MigrationCustom {
         if (!empty($session_id)) {
             $session_info = Migration::soap_call($web_service_details, 'programaDetalles', array('intIdSede'=> $data['branch_id'], 'uididprograma' => $data['item_id']));
             if ($session_info['error'] == false) {
-                self::fix_access_dates($session_info);
+                self::fixAccessDates($session_info);
                 $session_info['id'] = $session_id;
 
                 if (isset($session_info['id_coach'])) {
@@ -2586,7 +2667,7 @@ class MigrationCustom {
                     }
                     // attendance are registered with date + time, so get time
                     // from session schedule
-                    $time = self::get_horario_value($session_id);
+                    $time = self::getScheduleValue($session_id);
                     $attendance_date .= " $time:00";
 
                     $attendance = new Attendance();
@@ -2615,7 +2696,7 @@ class MigrationCustom {
                         $attendance->set_name('Asistencia');
                         $attendance->set_description('');
                         $link_to_gradebook = false;
-                        $attendance_id = $attendance->attendance_add($link_to_gradebook, self::default_admin_id);
+                        $attendance_id = $attendance->attendance_add($link_to_gradebook, self::defaultAdminId);
                         if (is_array($data_list) && isset($data_list) && $data_list['boost_sessions']) {
                             $data_list['sessions_attendances'][$course_info['real_id']][$session_id][] = $attendance_id;
                         }
@@ -2759,7 +2840,7 @@ class MigrationCustom {
                         );
                     }
 
-                    $time = self::get_horario_value($session_id);
+                    $time = self::getScheduleValue($session_id);
                     $attendance_date .= " $time";
 
                     $attendance = new Attendance();
@@ -2886,7 +2967,7 @@ class MigrationCustom {
                         );
                     }
 
-                    $time = self::get_horario_value($session_id);
+                    $time = self::getScheduleValue($session_id);
                     $attendance_date .= " $time:00";
 
                     $attendance = new Attendance();
@@ -3008,7 +3089,7 @@ class MigrationCustom {
      * @param bool $check_duplicates_in_db
      * @return int
      */
-    static function process_transactions($params, $web_service_details, $check_duplicates_in_db = false) {
+    static function processTransactions($params, $web_service_details, $check_duplicates_in_db = false) {
         $transactions = Migration::soap_call($web_service_details, 'transacciones', $params);
         $transaction_status_list = self::getTransactionStatusList();
         $counter = 0;
@@ -3021,17 +3102,17 @@ class MigrationCustom {
             // YYYY Uncomment following line to get a detailed list of transactions read
             //error_log("Transactions: \n".print_r($transactions,1));
             $count = 1;
-            $exclude_list = self::check_transactions_duplicity($transactions, $check_duplicates_in_db);
+            $exclude_list = self::checkTransactionsDuplicity($transactions, $check_duplicates_in_db);
             if (!empty($transactions)) {
                 foreach ($transactions as $id => $transaction_info) {
                     $result = array();
                     //Add transactions here
                     if (in_array($id,$exclude_list)) {
                         // Insert as deprecated
-                        $result = self::process_transaction($transaction_info, $transaction_status_list, null, true);
+                        $result = self::processTransaction($transaction_info, $transaction_status_list, null, true);
                     } else {
                         // Do normal insert
-                        $result = self::process_transaction($transaction_info, $transaction_status_list);
+                        $result = self::processTransaction($transaction_info, $transaction_status_list);
                     }
                     $count++;
                     if ($result['error'] == true) {
@@ -3050,7 +3131,7 @@ class MigrationCustom {
      * @param $transaction_info
      * @return array|bool
      */
-    static function validate_transaction($transaction_info) {
+    static function validateTransaction($transaction_info) {
         if (empty($transaction_info) || empty($transaction_info['transaction_id']) || empty($transaction_info['action']) || empty($transaction_info['branch_id']) || empty($transaction_info['item_id'])) {
             return array(
                 'id' => null,
@@ -3070,7 +3151,7 @@ class MigrationCustom {
      * @param bool $deprecated Whether this transaction should be inserted as deprecated or not
      * @return int
      */
-    static function process_transaction($transaction_info, $transaction_status_list = array(), $forced = false, $deprecated = false) {
+    static function processTransaction($transaction_info, $transaction_status_list = array(), $forced = false, $deprecated = false) {
         if ($transaction_info) {
             if (empty($transaction_status_list)) {
                 $transaction_status_list = self::getTransactionStatusList();
@@ -3087,7 +3168,7 @@ class MigrationCustom {
                    'status_id'      => $deprecated ? self::TRANSACTION_STATUS_DEPRECATED : 0,
             );
 
-            $validate = self::validate_transaction($params);
+            $validate = self::validateTransaction($params);
 
             if (isset($validate['error']) && $validate['error']) {
                 return $validate;
@@ -3241,7 +3322,7 @@ class MigrationCustom {
         ["access_end_date"]=>
         string(25) "2009-10-26T00:00:00-05:00"
 
-        ["course_code"]=>
+        ["c_id"]=>
         string(36) "5b7e9b5a-5145-4a42-be48-223a70d9ad52"
         ["id_coach"]=>
         string(36) "26dbb1c1-32b7-4cf8-a81f-43d1cb231abe"
@@ -3255,10 +3336,10 @@ class MigrationCustom {
         }
 
         //Searching course code
-        $course_code = MigrationCustom::getRealCourseCode($result['course_code']);
-        $result['course_code'] = $course_code;
+        $courseId = MigrationCustom::getRealCourseCode($result['course_code']);
+        $result['c_id'] = $courseId;
 
-        $course_info = api_get_course_info($course_code);
+        $course_info = api_get_course_info_by_id($courseId);
 
         //Getting sede
         $extra_field = new ExtraField('session');
@@ -3298,10 +3379,10 @@ class MigrationCustom {
         $result['extra_aula']           = strtoupper($result['uididaula']);
         $result['extra_periodo']        = strtoupper($result['chrperiodo']);
 
-        $result['display_start_date']   = MigrationCustom::clean_date_time_from_ws($result['display_start_date']);
-        $result['display_end_date']     = MigrationCustom::clean_date_time_from_ws($result['display_end_date']);
-        $result['access_start_date']    = MigrationCustom::clean_date_time_from_ws($result['access_start_date']);
-        $result['access_end_date']      = MigrationCustom::clean_date_time_from_ws($result['access_end_date']);
+        $result['display_start_date']   = MigrationCustom::cleanDateTimeFromWS($result['display_start_date']);
+        $result['display_end_date']     = MigrationCustom::cleanDateTimeFromWS($result['display_end_date']);
+        $result['access_start_date']    = MigrationCustom::cleanDateTimeFromWS($result['access_start_date']);
+        $result['access_end_date']      = MigrationCustom::cleanDateTimeFromWS($result['access_end_date']);
         //$result['estado'] = intval($result['estado']);
 
         //Searching id_coach
@@ -3527,7 +3608,7 @@ class MigrationCustom {
      * @param array Array of session data passed by reference (modified in-place)
      * @return bool Always returns true
      */
-    static function fix_access_dates(&$data) {
+    static function fixAccessDates(&$data) {
         // Check the $data array for access_start_date, access_end_date,
         //  coach_access_start_date and coach_access_end_date. If any is not
         //  defined, reuse the period or other dates to fill it
@@ -3635,7 +3716,7 @@ class MigrationCustom {
      * @param int $session_id The session ID
      * @return string   The db-stored value of the 'horario' field for this session
      */
-    static function get_horario_value($session_id) {
+    static function getScheduleValue($session_id) {
          $extra_field_value = new ExtraFieldValue('session');
         //Getting horario info
         $extra_field = new ExtraField('session');
@@ -3660,24 +3741,32 @@ class MigrationCustom {
     /**
      * Prepare an array of items to avoid many queries to the database afterwards, during the treatment
      * of transactions. The data provided depends on the elements contained in the array passed as parameter.
-     * @param array $omigrate Reference of an array with main indexes of data to be filled
+     * @param array $omigrate Array of items pre-loaded from the database to boost processing
      * @return bool Always returns true
      */
-    static function fill_data_list(&$omigrate) {
+    static function fillDataList(&$omigrate) {
         if (is_array($omigrate) && isset($omigrate) && $omigrate['boost_users']) {
             // uidIdPersona field is ID 13 in user_field
-            $sql = "SELECT user_id, field_value FROM user_field_values WHERE field_id = 13 ORDER BY user_id";
+            $sql = "SELECT id FROM extra_field WHERE extra_field_type = 1 AND variable = 'uidIdPersona'";
+            $res = Database::query($sql);
+            $row = Database::fetch_array($res);
+            $fieldId = $row['id'];
+            $sql = "SELECT item_id, value FROM extra_field_values WHERE field_id = $fieldId ORDER BY user_id";
             $res = Database::query($sql);
             while ($row = Database::fetch_array($res)) {
-              $omigrate['users'][$row['field_value']] = $row['user_id'];
+              $omigrate['users'][$row['value']] = $row['item_id'];
             }
         }
         if (is_array($omigrate) && isset($omigrate) && $omigrate['boost_courses']) {
             // uidIdCurso field is ID 5 in course_field
-            $sql = "SELECT course_code, field_value FROM course_field_values WHERE field_id = 5 ORDER BY course_code";
+            $sql = "SELECT id FROM extra_field WHERE extra_field_type = 2 AND variable = 'uidIdCurso'";
+            $res = Database::query($sql);
+            $row = Database::fetch_array($res);
+            $fieldId = $row['id'];
+            $sql = "SELECT item_id, value FROM extra_field_values WHERE field_id = $fieldId ORDER BY item_id";
             $res = Database::query($sql);
             while ($row = Database::fetch_array($res)) {
-              $omigrate['courses'][$row['field_value']] = $row['course_code'];
+              $omigrate['courses'][$row['value']] = $row['item_id'];
             }
             $sql = "SELECT id, code FROM course";
             $res = Database::query($sql);
@@ -3687,15 +3776,19 @@ class MigrationCustom {
         }
         if (is_array($omigrate) && isset($omigrate) && $omigrate['boost_sessions']) {
             // uidIdPrograma field is ID 1 in session_field
-            $sql = "SELECT session_id, field_value FROM session_field_values WHERE field_id = 1 ORDER BY session_id";
+            $sql = "SELECT id FROM extra_field WHERE extra_field_type = 3 AND variable = 'uidIdPrograma'";
+            $res = Database::query($sql);
+            $row = Database::fetch_array($res);
+            $fieldId = $row['id'];
+            $sql = "SELECT item_id, value FROM exta_field_values WHERE field_id = $fieldId ORDER BY item_id";
             $res = Database::query($sql);
             while ($row = Database::fetch_array($res)) {
-              $omigrate['sessions'][$row['field_value']] = $row['session_id'];
+              $omigrate['sessions'][$row['value']] = $row['item_id'];
             }
-            $sql = "SELECT id_session, course_id, course_code FROM session_rel_course";
+            $sql = "SELECT session_id, c_id FROM session_rel_course";
             $res = Database::query($sql);
             while ($row = Database::fetch_array($res)) {
-              $omigrate['session_course'][$row['id_session']] = $row['course_code'];
+              $omigrate['session_course'][$row['session_id']] = $row['c_id'];
             }
         }
         if (is_array($omigrate) && isset($omigrate) && $omigrate['boost_gradebooks']) {
@@ -3727,7 +3820,7 @@ class MigrationCustom {
      * @param bool  Check in database if there is any posterior operation making this one useless
      * @return array Simplified list of IDs to exclude from the transaction array
      */
-    protected function check_transactions_duplicity($transactions, $check_duplicates_in_db = false) {
+    protected function checkTransactionsDuplicity($transactions, $check_duplicates_in_db = false) {
         // The $transactions array received has rows with the following format
         // $transaction_info('idt','ida','id','orig','idsede','dest','infoextra')
         $cleanable = array();

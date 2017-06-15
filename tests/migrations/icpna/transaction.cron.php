@@ -75,7 +75,7 @@ $mig = new $migration->web_service_connection_info['class'];
 error_log('Building in-memory data_list for speed-up '.time());
 $data_list = array('boost_users'=>true, 'boost_courses'=>true, 'boost_sessions'=>true);
 if (count($data_list['users'])<1) {
-    MigrationCustom::fill_data_list($data_list);
+    MigrationCustom::fillDataList($data_list);
 }
 error_log('Built in-memory data_list for speed-up '.time());
 
@@ -109,7 +109,7 @@ foreach ($branches as $id => $branch) {
         //     'cantidad' => 100,
         //     'intIdSede' => $branch_id,
         // );
-        // $result = $mig->process_transactions($params,$migration->web_service_connection_info);
+        // $result = $mig->processTransactions($params,$migration->web_service_connection_info);
     } else {
         //if mode==fix
         error_log('Fixing transactions');

@@ -3,7 +3,7 @@
 
 include_once '../../../main/inc/global.inc.php';
 
-$allow = api_is_teacher() || api_is_course_admin() || api_is_student() || api_is_teacher_admin();
+$allow = api_is_teacher() || api_is_course_admin() || api_is_student();
 
 if (!$allow) {
     api_not_allowed(true);

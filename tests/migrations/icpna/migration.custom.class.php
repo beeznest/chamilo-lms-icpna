@@ -618,8 +618,7 @@ class MigrationCustom
 
         if (!empty($session_id) && !empty($user_id)) {
             //error_log('Called: addUserToSession - Subscribing: session_id: '.$session_id. '  user_id: '.$user_id);
-            SessionManager::suscribe_users_to_session($session_id, array($user_id), SESSION_VISIBLE_READ_ONLY, false,
-                false);
+            SessionManager::subscribe_users_to_session($session_id, array($user_id), SESSION_VISIBLE_READ_ONLY, false);
             //exit;
         } else {
             //error_log('Called: addUserToSession - No idPrograma: '.$data['uidIdPrograma'].' - No uidIdPersona: '.$data['uidIdPersona']);
@@ -1291,7 +1290,7 @@ class MigrationCustom
             $session_id = self::getSessionIDByProgramID($uidIdPrograma, $data_list);
             if (!empty($session_id)) {
                 $before = SessionManager::getUserStatusInSession($user_id, $session_id);
-                //SessionManager::suscribe_users_to_session($session_id, array($user_id), SESSION_VISIBLE_READ_ONLY, false, false);
+                //SessionManager::subscribe_users_to_session($session_id, array($user_id), SESSION_VISIBLE_READ_ONLY, false);
                 SessionManager::unsubscribe_user_from_session($session_id, $user_id);
                 $message = "Move Session to empty";
                 return self::isUserSubscribedToSession($user_id, $session_id, $message, $before);

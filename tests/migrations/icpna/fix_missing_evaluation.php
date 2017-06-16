@@ -11,7 +11,6 @@ require 'db_matches.php';
 // redefine web services config
 require_once 'ws.conf.php';
 require 'migration.class.php';
-require 'migration.mssql.class.php';
 require 'migration.custom.class.php';
 $sql = "SELECT gc.id as cat_id, gc.session_id, ge.id as eval_id ".
        " FROM gradebook_category gc ".

@@ -11,7 +11,6 @@ require 'db_matches.php';
 // redefine web services config
 require_once 'ws.conf.php';
 require 'migration.class.php';
-require 'migration.mssql.class.php';
 require 'migration.custom.class.php';
 $sql = "SELECT count(*) FROM c_attendance_sheet WHERE presence = 4";
 $res = Database::query($sql);
@@ -85,7 +84,7 @@ foreach ($sessions_list as $session_id => $course_id) {
                 break; //get out after first result
             }
             $out3 = "---- Attendance ".$at_id."\n";
-            $a->set_course_int_id($course_id);
+            $a->set_course_id($course_id);
             $cal_list = $a->get_attendance_calendar($at_id);
             $cal_count = count($cal_list);
             foreach ($cal_list as $cal) {

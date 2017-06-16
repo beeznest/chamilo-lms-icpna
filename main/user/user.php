@@ -226,7 +226,7 @@ if (api_is_allowed_to_edit(null, true)) {
                             AND su.user_id = session_course_user.user_id
                             AND session_course_user.session_id = su.session_id
                             AND (su.moved_to = 0 OR su.moved_to IS NULL)
-                            AND su.moved_status != ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION."
+                            AND su.moved_status != ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_CANCELLED."
                             AND session_course_user.session_id = $sessionId
                     ";
 

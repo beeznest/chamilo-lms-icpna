@@ -28,7 +28,7 @@ class SessionManager
     const SESSION_CHANGE_USER_REASON_SCHEDULE = 1;
     const SESSION_CHANGE_USER_REASON_CLASSROOM = 2;
     const SESSION_CHANGE_USER_REASON_LOCATION = 3;
-    const SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION = 4;
+    const SESSION_CHANGE_USER_REASON_ENROLLMENT_CANCELLED = 4;
 
     /**
      * Constructor
@@ -8527,7 +8527,7 @@ class SessionManager
                 'course' => $course->getId(),
                 'rrhh' => SESSION_RELATION_TYPE_RRHH,
                 'session' => $session->getId(),
-                'annulation' => self::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION
+                'annulation' => self::SESSION_CHANGE_USER_REASON_ENROLLMENT_CANCELLED
             ])
             ->getSingleScalarResult();
 
@@ -8576,7 +8576,7 @@ class SessionManager
                     ')
                     ->execute(['new' => $newSessionId, 'old' => $oldSessionId, 'user' => $userId]);
                 break;
-            case self::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION:
+            case self::SESSION_CHANGE_USER_REASON_ENROLLMENT_CANCELLED:
                 UserManager::deactivate_users([$userId]);
                 break;
         }
@@ -8601,7 +8601,7 @@ class SessionManager
             self::SESSION_CHANGE_USER_REASON_SCHEDULE => get_lang('ScheduleChanged'),
             self::SESSION_CHANGE_USER_REASON_CLASSROOM => get_lang('ClassRoomChanged'),
             self::SESSION_CHANGE_USER_REASON_LOCATION => get_lang('LocationChanged'),
-            //self::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION => get_lang('EnrollmentAnnulation')
+            //self::SESSION_CHANGE_USER_REASON_ENROLLMENT_CANCELLED => get_lang('EnrollmentAnnulation')
         ];
     }
 

@@ -40,7 +40,7 @@ $userStatusInSession = SessionManager::getUserStatusInSession($userId, $sessionI
 
 if ($userStatusInSession
     && $userStatusInSession->getMovedTo() != 0
-    || $userStatusInSession->getMovedStatus() == SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION
+    || $userStatusInSession->getMovedStatus() == SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_CANCELLED
 ) {
     api_not_allowed(true);
 }
@@ -103,7 +103,7 @@ $htmlHeadXtra[] = '<script>
     $(document).ready(function() {
         $("#reason_id").change(function() {
             var value = $(this).val();
-            if (value == "'.SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION.'") {
+            if (value == "'.SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_CANCELLED.'") {
                 $("#new_session_id").parent().parent().hide();
             } else {
                 $("#new_session_id").parent().parent().show();

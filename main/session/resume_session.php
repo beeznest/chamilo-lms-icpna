@@ -293,14 +293,14 @@ if (!empty($userList)) {
         );
 
         if ($user['moved_to']
-            || $user['moved_to'] == SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION
+            || $user['moved_to'] == SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_CANCELLED
         ) {
             $information .= SessionManager::getSessionChangeUserReasonsVariationsById($user['moved_status'], 'to');
             $movedDate = $user['moved_at'] && $user['moved_at'] != '0000-00-00 00:00:00'
                 ? api_get_local_time($user['moved_at'])
                 : null;
 
-            if ($user['moved_status'] != SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION) {
+            if ($user['moved_status'] != SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_CANCELLED) {
                 /** @var Session $toSession */
                 $toSession = Database::getManager()->find('ChamiloCoreBundle:Session', $user['moved_to']);
 

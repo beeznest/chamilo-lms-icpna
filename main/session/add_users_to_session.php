@@ -374,7 +374,7 @@ if ($ajax_search) {
         WHERE u.status<>".DRH."
             AND u.status <> 6
             AND (su.moved_to = 0 OR su.moved_to IS NULL)
-            AND su.moved_status <> ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION."
+            AND su.moved_status <> ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_CANCELLED."
         $order_clause
     ";
 
@@ -394,7 +394,7 @@ if ($ajax_search) {
                     AND u.status <> ".DRH."
                     AND u.status <> 6
                     AND (su.moved_to = 0 OR su.moved_to IS NULL)
-                    AND su.moved_status <> ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION."
+                    AND su.moved_status <> ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_CANCELLED."
                 $order_clause
             ";
         }
@@ -561,7 +561,7 @@ if ($ajax_search) {
         WHERE u.status <> ".DRH."
             AND u.status <> 6
             AND (su.moved_to = 0 OR su.moved_to IS NULL)
-            AND su.moved_status != ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION."
+            AND su.moved_status != ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_CANCELLED."
         $order_clause
     ";
 
@@ -581,7 +581,7 @@ if ($ajax_search) {
                     AND u.status <> ".DRH."
                     AND u.status <> 6
                     AND (su.moved_to = 0 OR su.moved_to IS NULL)
-                    AND su.moved_status != ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_ANNULATION."
+                    AND su.moved_status != ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_CANCELLED."
                 $order_clause
             ";
         }

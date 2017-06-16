@@ -5,7 +5,9 @@
  */
 die();
 require __DIR__.'/../../../main/inc/global.inc.php';
-$s = 'SELECT id, branch_id as b, transaction_id as t FROM branch_transaction ORDER BY branch_id, transaction_id';
+$s = 'SELECT id, branch_id as b, transaction_id as t 
+  FROM branch_transaction 
+  ORDER BY branch_id, transaction_id';
 $q = Database::query($s);
 $b = 0;
 $t = 0;

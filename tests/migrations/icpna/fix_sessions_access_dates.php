@@ -4,6 +4,7 @@
  * Finds the sessions without access date and defines (for all sessions without access date older than 30
  * days in the past from now) a new access date based on the period (which can be found in the session
  * name).
+ * To be executed manually on a need-only basis.
  * @package chamilo.migrate 
  */
 require_once __DIR__.'/../../../main/inc/global.inc.php';

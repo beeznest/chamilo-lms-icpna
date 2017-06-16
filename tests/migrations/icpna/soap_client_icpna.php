@@ -1,5 +1,9 @@
 <?php
 /* For licensing terms, see /license.txt */
+/**
+ * This script offers an easy way of testing if the SOAP webservice is in good
+ * working order. Change the URL and any other relevant part to make it run.
+ */
 require_once __DIR__.'/../../../main/inc/global.inc.php';
 $libpath = api_get_path(LIBRARY_PATH);
 //require_once $libpath.'nusoap/nusoap.php';

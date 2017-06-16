@@ -9,7 +9,6 @@
  */
 $matches = [];
 require_once __DIR__.'/../../../main/inc/global.inc.php';
-require_once 'config.php';
 require_once 'migration.class.php';
 require_once 'db_matches.php';
 // redefine web services config
@@ -113,7 +112,6 @@ function execute($branch_id, $trans_id)
         'number_of_transactions' => 1
     );
     $count_total_transactions = $migration->get_transactions_from_webservice($params);
-    //$params = array('branch_id' => $branch_id, 'transaction_id' => $trans_id, 'number_of_transactions' => 1);
     $count_transactions = $migration->execute_transactions($params);
     return $count_transactions;
 }

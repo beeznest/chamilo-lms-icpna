@@ -74,7 +74,7 @@ if (is_array($sessionIds) and !empty($sessionIds)) {
  */
 function requireAction()
 {
-    require_once dirname(__FILE__).'/../../main/inc/global.inc.php';
+    require_once __DIR__.'/../../../main/inc/global.inc.php';
     require_once 'migration.class.php';
     require_once 'migration.custom.class.php';
     $branch_id = 0;
@@ -85,7 +85,7 @@ function requireAction()
     if (!is_file(__DIR__.'/ws.conf.php')) {
         die ('Please define a ws.conf.php file (copy ws.conf.dist.php) before you run the transactions');
     } else {
-        require_once 'ws.conf.php';
+        require_once __DIR__.'ws.conf.php';
     }
 }
 
@@ -106,7 +106,7 @@ function getSessionIdsWithSubstitute()
     $roleCoachSubstitute = getRoleCoachSubstitute();
     $sessionIds = array();
     $sessionCourseUserTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
-    $sql = "SELECT DISTINCT id_session as id FROM $sessionCourseUserTable WHERE status = $roleCoachSubstitute";
+    $sql = "SELECT DISTINCT session_id as id FROM $sessionCourseUserTable WHERE status = $roleCoachSubstitute";
     $res = Database::query($sql);
 
     if (Database::num_rows($res) > 0) {
@@ -133,8 +133,8 @@ function getSessionData($id)
     $roleCoachSubstitute = getRoleCoachSubstitute();
     $sessionCourseUserTable = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
     $sql = "SELECT DISTINCT user.username FROM $sessionCourseUserTable scu
-    INNER JOIN user ON user.user_id = scu.id_user
-    WHERE scu.status = $roleCoachSubstitute AND id_session = $id";
+    INNER JOIN user ON user.id = scu.user_id
+    WHERE scu.status = $roleCoachSubstitute AND session_id = $id";
     $res = Database::query($sql);
 
     if (Database::num_rows($res) > 0) {
@@ -214,7 +214,7 @@ function removeSubstituteCoachFromSession($id) {
     $roleCoachSubstitute = getRoleCoachSubstitute();
     $sessionCourseUser = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
     $affectedRows = Database::delete($sessionCourseUser, array(
-        'status = ? AND id_session = ?' => array($roleCoachSubstitute, $id)
+        'status = ? AND session_id = ?' => array($roleCoachSubstitute, $id)
     ));
     return $affectedRows;
 }

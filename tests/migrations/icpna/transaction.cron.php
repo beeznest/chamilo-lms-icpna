@@ -20,7 +20,7 @@ $mode = 'process';
 $cli_branch = 0;
 if (($argc < 2) or empty($argv[1])) {
     error_log('No mode provided for transaction cron.d process in '.__FILE__.', assuming "process"');
-} elseif (!in_array($argv[1],$modes)) {
+} elseif (!in_array($argv[1], $modes)) {
     error_log('Mode '.$argv[1].' not recognized in '.__FILE__);
     //die();
 } else {
@@ -36,28 +36,27 @@ $pidFile = __DIR__.'/chamilo.transaction.pid';
 $lastExecutionFile = __DIR__.'/chamilo.transaction.last';
 $lastFixExecutionFile = __DIR__.'/chamilo.transaction.fix.last';
 if ($mode == 'fix') {
-  $pidFile = __DIR__.'/chamilo.transaction.fix.pid';
+    $pidFile = __DIR__.'/chamilo.transaction.fix.pid';
 }
 
 $pid = getmypid();
 
 if (is_file($pidFile)) {
-  $pid = file_get_contents($pidFile);
-  error_log($mode.": Transaction run frozen: PID file already exists with PID $pid in $pidFile");
-  die('PID exists - Transaction run frozen');
+    $pid = file_get_contents($pidFile);
+    error_log($mode.": Transaction run frozen: PID file already exists with PID $pid in $pidFile");
+    die('PID exists - Transaction run frozen');
 } else {
-  $res = @file_put_contents($pidFile,$pid);
-  if ($res === false) {
-    error_log($mode.': Failed writing PID file - Transaction run frozen');
-    die('Failed writing PID file - Transaction run frozen');
-  }
-  error_log($mode.': Written PID file with PID '.$pid.'. Now starting transaction run');
+    $res = @file_put_contents($pidFile, $pid);
+    if ($res === false) {
+        error_log($mode.': Failed writing PID file - Transaction run frozen');
+        die('Failed writing PID file - Transaction run frozen');
+    }
+    error_log($mode.': Written PID file with PID '.$pid.'. Now starting transaction run');
 }
 
 // Load config files
 $cron_start = time();
-require_once dirname(__FILE__).'/../../main/inc/global.inc.php';
-require_once 'config.php';
+require_once __DIR__.'/../../../main/inc/global.inc.php';
 require_once 'migration.class.php';
 $branch_id = 0;
 // We need $branch_id defined before calling db_matches.php
@@ -68,14 +67,19 @@ if (!is_file(__DIR__.'/ws.conf.php')) {
     die ('Please define a ws.conf.php file (copy ws.conf.dist.php) before you run the transactions');
 }
 require_once 'ws.conf.php';
-    
-$migration = new Migration();    
-$migration->set_web_service_connection_info($matches);    
+
+$migration = new Migration();
+$migration->set_web_service_connection_info($matches);
 require $migration->web_service_connection_info['filename'];
 $mig = new $migration->web_service_connection_info['class'];
 error_log('Building in-memory data_list for speed-up '.time());
-$data_list = array('boost_users'=>true, 'boost_courses'=>true, 'boost_sessions'=>true);
-if (count($data_list['users'])<1) {
+$data_list = array(
+    'boost_users' => true,
+    'boost_courses' => true,
+    'boost_sessions' => true
+);
+
+if (count($data_list['users']) < 1) {
     MigrationCustom::fillDataList($data_list);
 }
 error_log('Built in-memory data_list for speed-up '.time());
@@ -95,12 +99,14 @@ foreach ($branches as $id => $branch) {
     //if ($branch_id != 2) continue; //put priority on branch 4
     //if a specific branch was given, check only this one
     if (!empty($cli_branch)) {
-        if ($branch_id != $cli_branch) { continue; }
+        if ($branch_id != $cli_branch) {
+            continue;
+        }
         error_log('CLI argument forces to check only branch '.$cli_branch);
     }
     if ($mode == 'process') {
         //Load transactions saved before
-	$params = array('branch_id' => $branch_id, 'number_of_transactions' => '500');
+        $params = array('branch_id' => $branch_id, 'number_of_transactions' => '500');
         $count_total_transactions += $migration->get_transactions_from_webservice($params);
         $count_transactions += $migration->execute_transactions($params);
         // $trans_id = $migration->get_latest_transaction_id_by_branch($branch_id);
@@ -137,7 +143,7 @@ if (is_file($pidFile)) {
             die('Could not delete PID file');
         }
         error_log('PID file deleted for PID '.$pid);
-        error_log(str_repeat('=',40));
+        error_log(str_repeat('=', 40));
     } else {
         error_log('PID file is not of current process. Not deleting.');
         die('PID file is not of current process. Not deleting.'."\n");
@@ -148,12 +154,12 @@ if (is_file($pidFile)) {
 $cron_total = time() - $cron_start;
 error_log($mode.': Total time taken for transaction run: '.$cron_total.'s for '.$count_transactions.' transactions (of '.$count_total_transactions.')');
 if ($mode == 'process') {
-  $time = time();
-  @file_put_contents($lastExecutionFile,'x::'.$time.'::x');
-  error_log('YZYZ - written last with '.$time.'. Shutting down');
+    $time = time();
+    @file_put_contents($lastExecutionFile, 'x::'.$time.'::x');
+    error_log('YZYZ - written last with '.$time.'. Shutting down');
 } else {
-  $time = time();
-  @file_put_contents($lastFixExecutionFile,'x::'.$time.'::x');
-  error_log('YZYZ - written last with '.$time.'. Shutting down');
+    $time = time();
+    @file_put_contents($lastFixExecutionFile, 'x::'.$time.'::x');
+    error_log('YZYZ - written last with '.$time.'. Shutting down');
 }
 exit();

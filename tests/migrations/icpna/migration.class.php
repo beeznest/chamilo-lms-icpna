@@ -83,7 +83,7 @@ class Migration
         $this->odbpass = $dbpass;
         $this->odbname = $dbname;
 
-        // Set the boost level if set in config.php
+        // Set the boost level manually before calling this method
         if (!empty($boost) && is_array($boost)) {
             global $data_list;
             foreach ($boost as $item => $val) {

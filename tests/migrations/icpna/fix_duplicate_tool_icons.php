@@ -10,7 +10,7 @@ $result = Database::query($sql);
 $course_list = Database::store_result($result);
 if (!empty($course_list)) {
     foreach ($course_list as $course) {
-        $sql = "SELECT id, name FROM $tool_table WHERE c_id = {$course['id']} ";
+        $sql = "SELECT iid, name FROM $tool_table WHERE c_id = {$course['id']} ";
         $tool_result = Database::query($sql);
         $all_tools = Database::store_result($tool_result);
         
@@ -19,7 +19,7 @@ if (!empty($course_list)) {
         if (!empty($all_tools)) {
             foreach ($all_tools as $tool) {            
                 if (isset($tools_added[$tool['name']])) {
-                    $sql = "DELETE FROM $tool_table WHERE  c_id = {$course['id']} AND id = {$tool['id']}";
+                    $sql = "DELETE FROM $tool_table WHERE  iid = {$tool['iid']}";
                     Database::query($sql);
                     $deleted = true;
                 } else {

@@ -8,10 +8,12 @@
  */
 require_once __DIR__.'/../../../main/inc/global.inc.php';
 $log = 'sessions_dates_changes.txt';
-$ts = Database::get_main_table(TABLE_MAIN_SESSION_FIELD_OPTIONS);
-$tv = Database::get_main_table(TABLE_MAIN_SESSION_FIELD_VALUES);
+
+$ts = Database::get_main_table(TABLE_EXTRA_FIELD_OPTIONS);
+$tv = Database::get_main_table(TABLE_EXTRA_FIELD_VALUES);
 //$sql = "SELECT * FROM $ts WHERE access_start_date = '0000-00-00 00:00:00' AND access_end_date = '0000-00-00 00:00:00' ORDER BY name";
 //$sql = "SELECT * FROM $ts WHERE access_start_date = '0000-00-00 00:00:00' OR access_end_date = '0000-00-00 00:00:00' ORDER BY name";
+// Field ID 6 is of 'aula'
 $sql = "SELECT id, option_value, option_display_text FROM $ts WHERE field_id = 6";
 echo $sql."\n";
 $res = Database::query($sql);
@@ -28,6 +30,7 @@ if ($res !== false) {
     $row2 = Database::fetch_assoc($res2);
     if (empty($row2['session_id'])) { continue; }
     $session_id = $row2['session_id'];
+    // Field ID 3 = sede
     $sql3 = "SELECT field_value FROM $tv WHERE field_id = 3 AND session_id = $session_id";
     $res3 = Database::query($sql3);
     $row3 = Database::fetch_assoc($res3);

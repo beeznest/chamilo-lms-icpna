@@ -7,7 +7,6 @@
  */
 require __DIR__.'/../../../main/inc/global.inc.php';
 require __DIR__.'/../../../main/inc/lib/attendance.lib.php';
-require 'config.php';
 require 'db_matches.php';
 // redefine web services config
 require_once 'ws.conf.php';

@@ -1277,7 +1277,7 @@ class Migration
             2 => 'executed',
             3 => 'deprecated',
             4 => 'failed',
-            5 => 'abandonned',
+            5 => 'abandoned',
         );
         error_log("Transaction updated #{$params['id']} with status_id = {$params['status_id']} ({$status[$params['status_id']]})");
 

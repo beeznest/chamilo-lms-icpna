@@ -96,8 +96,6 @@ class BranchTransaction
     /**
      * @var BranchSync
      *
-     * @ORM\ManyToOne(targetEntity="Chamilo\CoreBundle\Entity\BranchSync")
-     * @ORM\JoinColumn(name="branch_id", referencedColumnName="id")
      **/
     private $branch;
 

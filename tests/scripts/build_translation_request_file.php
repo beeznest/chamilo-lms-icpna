@@ -1,4 +1,5 @@
-<?php /* For licensing terms, see /license.txt */
+<?php
+/* For licensing terms, see /license.txt */
 /**
  * Generate a file with the undefined terms of one language and another file with the existing English terms.
  * Copy-paste the resulting page in an Excel spreasheet to have it ready to go for translators

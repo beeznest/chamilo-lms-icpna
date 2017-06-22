@@ -18,12 +18,6 @@ use Chamilo\CoreBundle\Entity\Session,
 $cidReset = true;
 require_once __DIR__.'/../inc/global.inc.php';
 
-// setting breadcrumbs
-$interbreadcrumb[] = array(
-    'url' => 'session_list.php',
-    'name' => get_lang('Sessions'),
-);
-
 // setting the section (for the tabs)
 $this_section = SECTION_PLATFORM_ADMIN;
 
@@ -36,7 +30,10 @@ if (empty($sessionId)) {
 SessionManager::protectSession($sessionId);
 
 $tool_name = get_lang('SessionOverview');
-$interbreadcrumb[] = array('url' => 'session_list.php', 'name' => get_lang('SessionList'));
+$interbreadcrumb[] = array(
+    'url' => 'session_list.php',
+    'name' => get_lang('SessionList')
+);
 
 $orig_param = '&origin=resume_session';
 
@@ -247,15 +244,16 @@ $url .= Display::url(
 );
 $url .= Display::url(
     Display::return_icon('export_csv.png', get_lang('ExportUsers'), array(), ICON_SIZE_SMALL),
-    "/main/user/user_export.php?file_type=csv&session=$sessionId&addcsvheader=1"
+    api_get_path(WEB_CODE_PATH)."user/user_export.php?file_type=csv&session=$sessionId&addcsvheader=1"
 );
 
 $userListToShow = Display::page_subheader(get_lang('UserList').$url);
 $userList = SessionManager::get_users_by_session($sessionId);
 
 if (!empty($userList)) {
-    $table = new HTML_Table(array('class' => 'data_table', 'id'=>'session-user-list'));
-
+    $table = new HTML_Table(
+        array('class' => 'data_table', 'id' => 'session-user-list')
+    );
     $table->setHeaderContents(0, 0, get_lang('User'));
     $table->setHeaderContents(0, 1, get_lang('Status'));
     $table->setHeaderContents(0, 2, get_lang('Information'));
@@ -418,12 +416,16 @@ if (!empty($sessionInfo['promotion_id'])) {
     $promotion = $promotion->find($sessionInfo['promotion_id']);
 }
 
-$tpl = new Template(get_lang('Session'));
+$programmedAnnouncement = new ScheduledAnnouncement();
+$programmedAnnouncement = $programmedAnnouncement->allowed();
+
+$tpl = new Template($tool_name);
 $tpl->assign('session_header', $sessionHeader);
 $tpl->assign('title', $sessionTitle);
 $tpl->assign('general_coach', $generalCoach);
 $tpl->assign('session_admin', api_get_user_info($session->getSessionAdminId()));
 $tpl->assign('session', $sessionInfo);
+$tpl->assign('programmed_announcement', $programmedAnnouncement);
 $tpl->assign('session_category', is_null($sessionCategory) ? null : $sessionCategory->getName());
 $tpl->assign('session_dates', SessionManager::parseSessionDates($sessionInfo, true));
 $tpl->assign('session_visibility', SessionManager::getSessionVisibility($sessionInfo));

@@ -398,12 +398,14 @@ switch ($action) {
                 // we want to remind inactive users. The $_GET['since'] parameter
                 // determines which users have to be warned (i.e the users who have been inactive for x days or more
                 $since = isset($_GET['since']) ? intval($_GET['since']) : 6;
-                // getting the users who have to be reminded
-                $to = Tracking:: getInactiveStudentsInCourse(
+
+                // Getting the users who have to be reminded
+                $to = Tracking::getInactiveStudentsInCourse(
                     api_get_course_int_id(),
                     $since,
                     $sessionId
                 );
+
                 // setting the variables for the form elements: the users who need to receive the message
                 foreach ($to as &$user) {
                     $user = 'USER:'.$user;
@@ -484,12 +486,16 @@ switch ($action) {
         }
 
         $defaults['email_ann'] = true;
-
-        $form->addElement('text', 'title', get_lang('EmailTitle'), array("onkeypress" => "return event.keyCode != 13;")); //do not submit on enter
+        $form->addElement(
+            'text',
+            'title',
+            get_lang('EmailTitle'),
+            array("onkeypress" => "return event.keyCode != 13;")
+        );
         $form->addRule('title', get_lang('ThisFieldIsRequired'), 'required');
         $form->addElement('hidden', 'id');
         $htmlTags = "<b>".get_lang('Tags')."</b><br /><br />";
-        $tags = AnnouncementManager::get_tags();
+        $tags = AnnouncementManager::getTags();
 
         foreach ($tags as $tag) {
             $htmlTags .= "<b>".$tag."</b><br />";

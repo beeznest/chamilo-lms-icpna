@@ -361,12 +361,29 @@ $_configuration['tracking_columns'] = [
 */
 // Hide session link of course_block on index/userportal
 //$_configuration['remove_session_url']= false ;
+//
+//
+// AGENDA CONFIGURATION SETTINGS
 // Shows a legend in the agenda tool
 /*
 $_configuration['agenda_legend'] = [
     'red' => 'red caption',
     '#f0f' => 'another caption'
 ];*/
+// Set customs colors to agenda events
+/*
+$_configuration['agenda_colors'] = [
+    'platform' => 'red',
+    'course' => '#458B00',
+    'group' => '#A0522D',
+    'session' => '#00496D',
+    'other_session' => '#999',
+    'personal' => 'steel blue',
+    'student_publication' => '#FF8C00'
+];
+*/
+//
+//
 // Save some tool titles with HTML editor
 // $_configuration['save_titles_as_html'] = false;
 // Show the full toolbar set to all CKEditor
@@ -460,3 +477,14 @@ $_configuration['agenda_legend'] = [
 //$_configuration['allow_career_diagram'] = false;
 // Code to avoid in session list in user progress page
 //$_configuration['avoid_code_in_user_progress'] = '';
+// Allow scheduled emails to session users. See class ProgrammedAnnouncement
+//$_configuration['allow_scheduled_announcements'] = false;
+// Add the list of emails as a bcc when sending an email.
+/*
+$_configuration['send_all_emails_to'] = [
+    'emails' => [
+        'admin1@example.com',
+        'admin2@example.com',
+    ]
+];*/
+

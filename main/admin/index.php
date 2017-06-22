@@ -155,7 +155,6 @@ if (api_is_platform_admin()) {
     $items[] = array('url' => 'course_add.php', 'label' => get_lang('AddCourse'));
 
     if (api_get_setting('course_validation') == 'true') {
-
         $items[] = array('url' => 'course_request_review.php', 'label' => get_lang('ReviewCourseRequests'));
         $items[] = array('url' => 'course_request_accepted.php', 'label' => get_lang('AcceptedCourseRequests'));
         $items[] = array('url' => 'course_request_rejected.php', 'label' => get_lang('RejectedCourseRequests'));
@@ -248,11 +247,14 @@ if (api_is_platform_admin()) {
         $items[] = array('url' => 'event_controller.php?action=listing', 'label' => get_lang('EventMessageManagement'));
     }
 
+    $items[] = array('url' => 'extra_field_list.php', 'label' => get_lang('ExtraFields'));
+
     if (!empty($_configuration['multiple_access_urls'])) {
         if (api_is_global_platform_admin()) {
             $items[] = array('url' => 'access_urls.php', 'label' => get_lang('ConfigureMultipleAccessURLs'));
         }
     }
+
 
     if (api_get_setting('allow_terms_conditions') == 'true') {
         $items[] = array('url' => 'legal_add.php', 'label' => get_lang('TermsAndConditions'));
@@ -434,20 +436,35 @@ if (api_is_platform_admin()) {
             foreach ($menuAdministratorItems as $plugin_name) {
                 $plugin_info = $plugin_obj->getPluginInfo($plugin_name);
 
+                if ($plugin_info['is_admin_plugin'] === false) {
+                    continue;
+                }
+
                 if ($plugin_info['is_admin_plugin']) {
                     $itemUrl = '/admin.php';
                 } elseif ($plugin_info['is_admin_plugin']) {
                     $itemUrl = '/start.php';
                 }
 
-                if (!file_exists(api_get_path(SYS_PLUGIN_PATH).$pluginName.$itemUrl)) {
+                $itemUrl = $pluginName.'/start.php';
+
+                if (file_exists(api_get_path(SYS_PLUGIN_PATH).$itemUrl)) {
+                    $items[] = array(
+                        'url' => api_get_path(WEB_PLUGIN_PATH).$itemUrl,
+                        'label' => $plugin_info['title']
+                    );
+
                     continue;
                 }
 
-                $items[] = array(
-                    'url' => api_get_path(WEB_PLUGIN_PATH).$plugin_name.$itemUrl,
-                    'label' => $plugin_info['title']
-                );
+                $itemUrl = $pluginName.'/admin.php';
+
+                if (file_exists(api_get_path(SYS_PLUGIN_PATH).$itemUrl)) {
+                    $items[] = array(
+                        'url' => api_get_path(WEB_PLUGIN_PATH).$itemUrl,
+                        'label' => $plugin_info['title']
+                    );
+                }
             }
 
             $blocks['plugins']['items'] = $items;

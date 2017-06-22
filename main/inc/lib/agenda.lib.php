@@ -103,14 +103,27 @@ class Agenda
         $this->setIsAllowedToEdit($isAllowToEdit);
         $this->events = [];
 
+        $agendaColors = array_merge(
+            [
+                'platform' => 'red', //red
+                'course' => '#458B00', //green
+                'group' => '#A0522D', //siena
+                'session' => '#00496D', // kind of green
+                'other_session' => '#999', // kind of green
+                'personal' => 'steel blue', //steel blue
+                'student_publication' => '#FF8C00' //DarkOrange
+            ],
+            api_get_configuration_value('agenda_colors') ?: []
+        );
+
         // Event colors
-        $this->event_platform_color = 'red'; //red
-        $this->event_course_color = '#458B00'; //green
-        $this->event_group_color = '#A0522D'; //siena
-        $this->event_session_color = '#00496D'; // kind of green
-        $this->eventOtherSessionColor = '#999';
-        $this->event_personal_color = 'steel blue'; //steel blue
-        $this->eventStudentPublicationColor = '#FF8C00'; //DarkOrange
+        $this->event_platform_color = $agendaColors['platform'];
+        $this->event_course_color = $agendaColors['course'];
+        $this->event_group_color = $agendaColors['group'];
+        $this->event_session_color = $agendaColors['session'];
+        $this->eventOtherSessionColor = $agendaColors['other_session'];
+        $this->event_personal_color = $agendaColors['personal'];
+        $this->eventStudentPublicationColor = $agendaColors['student_publication'];
     }
 
     /**

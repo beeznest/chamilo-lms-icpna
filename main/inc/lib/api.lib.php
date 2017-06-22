@@ -3445,6 +3445,9 @@ function api_not_allowed($print_headers = false, $message = null)
             'error',
             false
         );
+        if (!empty($message)) {
+            $msg = $message;
+        }
     }
 
     $tpl->assign('content', $msg);
@@ -7862,6 +7865,13 @@ function api_mail_html(
     $mail->AltBody = strip_tags(
         str_replace('<br />', "\n", api_html_entity_decode($message))
     );
+
+    $list = api_get_configuration_value('send_all_emails_to');
+    if (!empty($list) && isset($list['emails'])) {
+        foreach ($list['emails'] as $email) {
+            $mail->AddBCC($email);
+        }
+    }
 
     // Send embedded image.
     if ($embedded_image) {

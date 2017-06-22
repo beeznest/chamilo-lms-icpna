@@ -4008,6 +4008,7 @@ $ApprovalForNewAccount = "Validación de una nueva cuenta";
 $ManageUser = "Gestión de usuario";
 $SubscribeUserToCourseAsTeacher = "Inscribir profesores";
 $PasswordEncryptedForSecurity = "Su contraseña está encriptada para su seguridad. Por ello, cuando haya pulsado en el enlace para regenerar su clave se le remitirá un nuevo correo que contendrá su contraseña.";
+$ExtraFields = "Campos extras";
 $OpenIDCouldNotBeFoundPleaseRegister = "Este OpenID no se encuentra en nuestra base de datos. Por favor, regístrese para obtener una cuenta. Si ya tiene una cuenta con nosotros,  edite su perfil en la misma para añadir este OpenID";
 $UsernameMaxXCharacters = "El nombre de usuario puede tener como máximo una longitud de %s caracteres";
 $PictureUploaded = "Su imagen ha sido enviada";
@@ -8032,4 +8033,16 @@ $TempScoreXQuestionsNotCorrectedYet = "Score temporaire: %s pregunta(s) abierta(
 $Annotation = "Anotación";
 $TeacherPicture = "Foto del profesor";
 $FeedbackIfNotCorrect = "Feedback si no es correcta";
+$ScheduledAnnouncements = "Programación de anuncios";
+$SpecificDate = "Envio en fecha concreta";
+$BaseDate = "Envío en base a fecha de inicio/fin de la sesión";
+$AfterOrBefore = "Antes o después";
+$Before = "Antes de";
+$ScheduleAnnouncementDescription = "Este formulario permite programar anuncios/avisos para que sean enviados de manera automática a los alumnos que están realizando un curso en una sesión.
+
+Existe dos tipos de anuncios que se pueden enviar:
+
+Envío en una fecha concreta: En este caso se selecciona un día concreto para hacer el envío.
+
+Envío en base a la fecha de inicio/finalización de la sesión: en este caso se ha de indicar el número de días que han de pasar antes de enviar el anuncio. Y esos días pueden estar asociados a antes o después de la fecha de inicio/finalización. Por ejemplo: 3 días después de fecha de inicio.";
 ?>

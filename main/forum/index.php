@@ -28,7 +28,6 @@ use Chamilo\CourseBundle\Entity\CForumPost;
 require_once __DIR__.'/../inc/global.inc.php';
 $current_course_tool = TOOL_FORUM;
 $htmlHeadXtra[] = '<script>
-
 $(document).ready(function() {
     $(\'.hide-me\').slideUp();
 });
@@ -36,7 +35,6 @@ $(document).ready(function() {
 function hidecontent(content){
     $(content).slideToggle(\'normal\');
 }
-
 </script>';
 
 // The section (tabs).
@@ -72,7 +70,6 @@ if (!empty($gradebook) && $gradebook == 'view') {
 $search_forum = isset($_GET['search']) ? Security::remove_XSS($_GET['search']) : '';
 
 /* ACTIONS */
-
 $actions = isset($_GET['action']) ? $_GET['action'] : '';
 
 if ($actions === 'add') {
@@ -106,23 +103,21 @@ if ($actions === 'add') {
         'name' => get_lang('ForumCategories'),
     );
 }
-Display::display_header('');
+
 // Tool introduction
 $introduction = Display::return_introduction_section(TOOL_FORUM);
-
 $form_count = 0;
-
+$formContent = '';
 if (api_is_allowed_to_edit(false, true)) {
     //if is called from a learning path lp_id
     $lp_id = isset($_REQUEST['lp_id']) ? intval($_REQUEST['lp_id']) : null;
-    handle_forum_and_forumcategories($lp_id);
+    $formContent = handle_forum_and_forumcategories($lp_id);
 }
 
 // Notification
 if ($actions == 'notify' && isset($_GET['content']) && isset($_GET['id'])) {
-    if (
-        api_get_session_id() != 0
-        && api_is_allowed_to_session_edit(false, true) == false
+    if (api_get_session_id() != 0 &&
+        api_is_allowed_to_session_edit(false, true) == false
     ) {
         api_not_allowed();
     }
@@ -131,14 +126,10 @@ if ($actions == 'notify' && isset($_GET['content']) && isset($_GET['id'])) {
 }
 
 get_whats_new();
-
 $whatsnew_post_info = Session::read('whatsnew_post_info');
 
-$tpl = new Template($nameTools, false, false, false, false, true, false);
 /* TRACKING */
-
 Event::event_access_tool(TOOL_FORUM);
-
 /*
     RETRIEVING ALL THE FORUM CATEGORIES AND FORUMS
     note: we do this here just after het handling of the actions to be
@@ -200,7 +191,8 @@ if (api_is_allowed_to_edit(false, true)) {
             null,
             ICON_SIZE_MEDIUM
         ),
-        api_get_self().'?'.api_get_cidreq().'&action=add&content=forumcategory&lp_id='.$lp_id);
+        api_get_self().'?'.api_get_cidreq().'&action=add&content=forumcategory&lp_id='.$lp_id
+    );
 
     if (is_array($forumCategories) && !empty($forumCategories)) {
         $actionLeft .= Display::url(
@@ -237,7 +229,6 @@ if (!empty($forumsInNoCategory)) {
 // Step 3: We display the forum_categories first.
 $listForumCategory = array();
 $forumCategoryInfo = array();
-
 if (is_array($forumCategories)) {
     foreach ($forumCategories as $forumCategory) {
         $forumCategoryInfo['id'] = $forumCategory['cat_id'];
@@ -247,12 +238,12 @@ if (is_array($forumCategories)) {
             $forumCategoryInfo['title'] = $forumCategory['cat_title'];
         }
         $forumCategoryInfo['icon_session'] = api_get_session_image(
-            $forumCategory['session_id'], $_user['status']
+            $forumCategory['session_id'],
+            $_user['status']
         );
 
         // Validation when belongs to a session
         $forumCategoryInfo['description'] = $forumCategory['cat_comment'];
-
         if (empty($sessionId) && !empty($forumCategory['session_name'])) {
             $forumCategory['session_display'] = ' ('.Security::remove_XSS($forumCategory['session_name']).')';
         } else {
@@ -264,10 +255,8 @@ if (is_array($forumCategories)) {
         $forumCategoryInfo['url'] = 'viewforumcategory.php?'.api_get_cidreq().'&forumcategory='.intval($idCategory);
 
         if (!empty($idCategory)) {
-            if (
-                api_is_allowed_to_edit(false, true)
-                && !($forumCategory['session_id'] == 0
-                    && intval($sessionId) != 0)
+            if (api_is_allowed_to_edit(false, true) &&
+                !($forumCategory['session_id'] == 0 && intval($sessionId) != 0)
             ) {
                 $tools .= '<a href="'.api_get_self().'?'.api_get_cidreq()
                     .'&action=edit&content=forumcategory&id='.intval($idCategory)
@@ -289,17 +278,17 @@ if (is_array($forumCategories)) {
                     .'</a>';
                 $tools .= return_visible_invisible_icon(
                     'forumcategory',
-                    strval(intval($idCategory)),
-                    strval(intval($forumCategory['visibility']))
+                    $idCategory,
+                    $forumCategory['visibility']
                 );
                 $tools .= return_lock_unlock_icon(
                     'forumcategory',
-                    strval(intval($idCategory)),
-                    strval(intval($forumCategory['locked']))
+                    $idCategory,
+                    $forumCategory['locked']
                 );
                 $tools .= return_up_down_icon(
                     'forumcategory',
-                    strval(intval($idCategory)),
+                    $idCategory,
                     $forumCategories
                 );
             }
@@ -318,9 +307,8 @@ if (is_array($forumCategories)) {
                 // test if $whatsnew_post_info[$forum['forum_id']] is empty or not.
                 if (isset($forum['forum_id'])) {
                     if (!empty($whatsnew_post_info)) {
-                        if (
-                            isset($whatsnew_post_info[$forum['forum_id']])
-                            && is_array($whatsnew_post_info[$forum['forum_id']])
+                        if (isset($whatsnew_post_info[$forum['forum_id']]) &&
+                            is_array($whatsnew_post_info[$forum['forum_id']])
                         ) {
                             foreach ($whatsnew_post_info[$forum['forum_id']] as $key_thread_id => $new_post_array) {
                                 if (empty($whatsnew_post_info[$forum['forum_id']][$key_thread_id])) {
@@ -376,7 +364,8 @@ if (is_array($forumCategories)) {
                         }
                         // Validation when belongs to a session
                         $forumInfo['icon_session'] = api_get_session_image(
-                            $forum['session_id'], $_user['status']
+                            $forum['session_id'],
+                            $_user['status']
                         );
                         if ($forum['forum_of_group'] != '0') {
                             $my_all_groups_forum_name = isset($all_groups[$forum['forum_of_group']]['name'])
@@ -411,7 +400,8 @@ if (is_array($forumCategories)) {
 
                         if ($forum['moderated'] == 1 && api_is_allowed_to_edit(false, true)) {
                             $waitingCount = getCountPostsWithStatus(
-                                CForumPost::STATUS_WAITING_MODERATION, $forum
+                                CForumPost::STATUS_WAITING_MODERATION,
+                                $forum
                             );
                             if (!empty($waitingCount)) {
                                 $forumInfo['moderation'] = $waitingCount;
@@ -423,9 +413,13 @@ if (is_array($forumCategories)) {
                         // The number of topics and posts.
                         if ($forum['forum_of_group'] !== '0') {
                             if (is_array($mywhatsnew_post_info) && !empty($mywhatsnew_post_info)) {
-                                $forumInfo['alert'] = ' '.Display::return_icon(
-                                        'alert.png', get_lang('Forum'), null, ICON_SIZE_SMALL
-                                    );
+                                $forumInfo['alert'] = ' '.
+                                Display::return_icon(
+                                    'alert.png',
+                                    get_lang('Forum'),
+                                    null,
+                                    ICON_SIZE_SMALL
+                                );
                             }
                         } else {
                             if (is_array($mywhatsnew_post_info) && !empty($mywhatsnew_post_info)) {
@@ -458,7 +452,6 @@ if (is_array($forumCategories)) {
                             }
                         }
                         $forumInfo['last_poster_id'] = $poster_id;
-
                         if (!empty($forum['last_poster_id'])) {
                             $forumInfo['last_poster_date'] = api_convert_and_format_date($forum['last_post_date']);
                             $forumInfo['last_poster_user'] = display_user_link($poster_id, $name, null, $username);
@@ -527,9 +520,11 @@ if (is_array($forumCategories)) {
     }
 }
 
+
+$tpl = new Template($nameTools);
 $tpl->assign('introduction_section', $introduction);
 $tpl->assign('actions', $actions);
 $tpl->assign('data', $listForumCategory);
+$tpl->assign('form_content', $formContent);
 $layout = $tpl->get_template('forum/list.tpl');
 $tpl->display($layout);
-Display:: display_footer();

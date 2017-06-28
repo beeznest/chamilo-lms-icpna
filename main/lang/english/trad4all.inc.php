@@ -7636,7 +7636,7 @@ $AssociateForumToLPItem = "Associate a forum to this learning path item";
 $ForumDissociated = "Forum dissociated";
 $ClickOrDropOneFileHere = "Click or drop one file here";
 $ModuloPercentage = "Modulo:\t\t\t%";
-$LastXDays = "Last % days";
+$LastXDays = "Last %s days";
 $ExportBadges = "Export badges";
 $LanguagesDisableAllExceptDefault = "Disable all languages except the platform default";
 $ThereAreUsersUsingThisLanguagesDisableItManually = "There are users currently using the following language. Please disable manually.";
@@ -8014,4 +8014,5 @@ There are two types of announcements that can be sent:
 Specific date: In this case a specific day is selected to make the announcement. 
 
 Based on the start / end date of the session: in this case the number of days to pass before sending the announcement must be indicated. And those days can be associated to before or after the start / end date. For example: 3 days after the start date.";
+$MandatorySurveyNoAnswered = "You have pending a mandatory survey. To enter the course, you must first complete it.";
 ?>

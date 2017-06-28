@@ -730,6 +730,12 @@ class Display
         $alternateCssPath = api_get_path(SYS_PUBLIC_PATH).'css/';
         $alternateWebCssPath = api_get_path(WEB_PUBLIC_PATH).'css/';
 
+        // Avoid issues with illegal string offset for legacy calls to this
+        // method with an empty string rather than null or an empty array
+        if (empty($additional_attributes)) {
+            $additional_attributes = [];
+        }
+
         $image = trim($image);
 
         if (isset($size)) {
@@ -2274,22 +2280,36 @@ class Display
      * @param string $content
      * @param string $title
      * @param string $footer
-     * @param string $style primary|success|info|warning|danger
+     * @param string $type primary|success|info|warning|danger
      * @param string $extra
      * @param string $id
+     * @param string $customColor
      *
      * @return string
      */
-    public static function panel($content, $title = '', $footer = '', $style = '', $extra = '', $id = '')
-    {
-        $title = !empty($title) ? '<div class="panel-heading"><h3 class="panel-title">'.$title.'</h3>'.$extra.'</div>' : '';
-        $footer = !empty($footer) ? '<div class="panel-footer ">'.$footer.'</div>' : '';
-        $styles = ['primary', 'success', 'info', 'warning', 'danger'];
-        $style = !in_array($style, $styles) ? 'default' : $style;
+    public static function panel(
+        $content,
+        $title = '',
+        $footer = '',
+        $type = 'default',
+        $extra = '',
+        $id = '',
+        $customColor = ''
+    ) {
+        $headerStyle = '';
+        if (!empty($customColor)) {
+            $headerStyle = 'style = "color: white; background-color: '.$customColor.'" ';
+        }
+
+        $title = !empty($title) ? '<div class="panel-heading" '.$headerStyle.' ><h3 class="panel-title">'.$title.'</h3>'.$extra.'</div>' : '';
+        $footer = !empty($footer) ? '<div class="panel-footer">'.$footer.'</div>' : '';
+        $typeList = ['primary', 'success', 'info', 'warning', 'danger'];
+        $style = !in_array($type, $typeList) ? 'default' : $type;
 
         if (!empty($id)) {
             $id = " id = $id ";
         }
+
         return '
             <div '.$id.' class="panel panel-'.$style.'">
                 '.$title.'

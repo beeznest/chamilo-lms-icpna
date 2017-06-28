@@ -7257,10 +7257,10 @@ class SessionManager
                 'coach_username',
                 get_lang('CoachName'),
                 [api_get_user_id() => $userInfo['complete_name']],
-                array(
+                [
                     'id' => 'coach_username',
                     'style' => 'width:370px;',
-                )
+                ]
             );
         } else {
             $sql = "SELECT COUNT(1) FROM $tbl_user WHERE status = 1";
@@ -7307,7 +7307,11 @@ class SessionManager
                     'select',
                     'coach_username',
                     get_lang('CoachName'),
-                    $coachesOptions
+                    $coachesOptions,
+                    [
+                        'id' => 'coach_username',
+                        'style' => 'width:370px;'
+                    ]
                 );
             } else {
                 $form->addElement(
@@ -7318,6 +7322,7 @@ class SessionManager
                     [
                         'url' => api_get_path(WEB_AJAX_PATH).'session.ajax.php?a=search_general_coach',
                         'width' => '100%',
+                        'id' => 'coach_username'
                     ]
                 );
             }

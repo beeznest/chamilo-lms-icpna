@@ -2,6 +2,7 @@
 /* For licensing terms, see /license.txt */
 
 use ChamiloSession as Session;
+use Chamilo\CoreBundle\Component\Utils\ChamiloApi;
 
 /**
  *
@@ -1017,10 +1018,6 @@ if (isset($cidReset) && $cidReset) {
         if (api_get_group_id()) {
             Session::erase('_gid');
         }
-
-        if (api_is_in_gradebook()) {
-            api_remove_in_gradebook();
-        }
     }
 } else {
     // Continue with the previous values
@@ -1529,3 +1526,6 @@ if ((isset($cas_login) && $cas_login && exist_firstpage_parameter()) ||
 
 Redirect::session_request_uri($logging_in, $user_id);
 
+if (!ChamiloApi::isAjaxRequest() && api_get_configuration_value('survey_answered_at_field')) {
+    SurveyManager::protectByMandatory();
+}

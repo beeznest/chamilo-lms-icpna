@@ -1237,7 +1237,7 @@ class MigrationCustom
     static function transaction_4($data)
     {
         $uidIdPersona = $data['item_id'];
-        $uidIdPrograma = $data['orig_id'];
+        $uidIdPrograma = $data['origin'];
         $uidIdProgramaDestination = $data['dest_id'];
         $status = (!empty($data['info']) ? $data['info'] : null);
         global $data_list;
@@ -1727,7 +1727,7 @@ class MigrationCustom
     {
         global $data_list;
         $uidIdPrograma = $data['item_id'];
-        //$orig_id = $data['orig_id'];
+        //$origin = $data['origin'];
         $destination_id = $data['dest_id'];
 
         $common_message = " - item_id:  $uidIdPrograma, dest_id: $destination_id -  looking for extra_field_variable: $extra_field_variable - with data ".print_r($data,
@@ -2305,12 +2305,12 @@ class MigrationCustom
         global $data_list;
         $data = Migration::soap_call($web_service_details, 'notaDetalles', array(
             'uididpersona' => $original_data['item_id'],
-            'uididprograma' => $original_data['orig_id'],
+            'uididprograma' => $original_data['origin'],
             'intIdSede' => $original_data['branch_id']
         ));
 
         if ($data['error'] == false) {
-            $uidIdPrograma = $original_data['orig_id'];
+            $uidIdPrograma = $original_data['origin'];
             $uidIdPersona = $original_data['item_id'];
             $score = $data['name'];
 
@@ -2435,12 +2435,12 @@ class MigrationCustom
         global $data_list;
         $data = Migration::soap_call($web_service_details, 'notaDetalles', array(
             'uididpersona' => $original_data['item_id'],
-            'uididprograma' => $original_data['orig_id'],
+            'uididprograma' => $original_data['origin'],
             'intIdSede' => $original_data['branch_id']
         ));
 
         if ($data['error'] == false) {
-            $uidIdPrograma = $original_data['orig_id'];
+            $uidIdPrograma = $original_data['origin'];
             $uidIdPersona = $original_data['item_id'];
 
             $session_id = self::getSessionIDByProgramID($uidIdPrograma, $data_list);
@@ -2553,12 +2553,12 @@ class MigrationCustom
         global $data_list;
         $data = Migration::soap_call($web_service_details, 'notaDetalles', array(
             'uididpersona' => $original_data['item_id'],
-            'uididprograma' => $original_data['orig_id'],
+            'uididprograma' => $original_data['origin'],
             'intIdSede' => $original_data['branch_id']
         ));
 
         if ($data['error'] == false) {
-            $uidIdPrograma = $original_data['orig_id'];
+            $uidIdPrograma = $original_data['origin'];
             $uidIdPersona = $original_data['item_id'];
             $score = $data['name'];
 
@@ -2695,14 +2695,14 @@ class MigrationCustom
         global $data_list;
         $data = Migration::soap_call($web_service_details, 'asistenciaDetalles', array(
             'uididpersona' => $original_data['item_id'],
-            'uididprograma' => $original_data['orig_id'],
+            'uididprograma' => $original_data['origin'],
             'uididfecha' => $original_data['info'],
             'intIdSede' => $original_data['branch_id']
         ));
 
         if ($data['error'] == false) {
 
-            $uidIdPrograma = $original_data['orig_id'];
+            $uidIdPrograma = $original_data['origin'];
             $uidIdPersona = $original_data['item_id'];
 
             $attendance_date = $data['date_assist'];
@@ -2872,14 +2872,14 @@ class MigrationCustom
         global $data_list;
         $data = Migration::soap_call($web_service_details, 'asistenciaDetalles', array(
             'uididpersona' => $original_data['item_id'],
-            'uididprograma' => $original_data['orig_id'],
+            'uididprograma' => $original_data['origin'],
             'uididfecha' => $original_data['info'],
             'intIdSede' => $original_data['branch_id']
         ));
 
         if ($data['error'] == false) {
 
-            $uidIdPrograma = $original_data['orig_id'];
+            $uidIdPrograma = $original_data['origin'];
             $uidIdPersona = $original_data['item_id'];
 
             $attendance_date = $data['date_assist'];
@@ -3000,13 +3000,13 @@ class MigrationCustom
         global $data_list;
         $data = Migration::soap_call($web_service_details, 'asistenciaDetalles', array(
             'uididpersona' => $original_data['item_id'],
-            'uididprograma' => $original_data['orig_id'],
+            'uididprograma' => $original_data['origin'],
             'uididfecha' => $original_data['info'],
             'intIdSede' => $original_data['branch_id']
         ));
         if ($data['error'] == false) {
 
-            $uidIdPrograma = $original_data['orig_id'];
+            $uidIdPrograma = $original_data['origin'];
             $uidIdPersona = $original_data['item_id'];
 
             $attendance_date = $data['date_assist'];
@@ -3248,7 +3248,7 @@ class MigrationCustom
                 'transaction_id' => isset($transaction_info['idt']) ? $transaction_info['idt'] : null,
                 'action' => isset($transaction_info['ida']) ? $transaction_info['ida'] : null,
                 'item_id' => isset($transaction_info['id']) ? strtoupper($transaction_info['id']) : null,
-                'orig_id' => isset($transaction_info['orig']) ? $transaction_info['orig'] : null,
+                'origin' => isset($transaction_info['orig']) ? $transaction_info['orig'] : null,
                 'branch_id' => isset($transaction_info['idsede']) ? $transaction_info['idsede'] : null,
                 'dest_id' => isset($transaction_info['dest']) ? $transaction_info['dest'] : null,
                 'info' => isset($transaction_info['infoextra']) ? $transaction_info['infoextra'] : null,

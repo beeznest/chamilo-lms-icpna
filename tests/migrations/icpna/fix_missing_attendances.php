@@ -105,7 +105,7 @@ foreach ($sessions_list as $session_id => $course_id) {
                         $uid = Database::result($resu);
                         $params = array(
                             'item_id' => $uid,
-                            'orig_id' => $sid,
+                            'origin' => $sid,
                             'info' => substr($cal['date_time'],0,10),
                             'branch_id' => $sedes[$sede],
                         );

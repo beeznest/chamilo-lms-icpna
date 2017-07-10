@@ -118,7 +118,7 @@ foreach ($sessions_list as $session_id => $course_id) {
                     $uid = Database::result($resu);                   
                     $params = array(
                         'item_id' => $uid,
-                        'orig_id' => $sid,
+                        'origin' => $sid,
                         'branch_id' => $sedes[$sede],
                     );
                     $r8 = MigrationCustom::transaction_31($params,$matches['web_service_calls']);

@@ -188,7 +188,7 @@ function adaptSessionData($sessionData) {
             $branchTransactionRow['branch_id'] = $sessionData['sede'];
             $branchTransactionRow['action'] = 537;
             $branchTransactionRow['item_id'] = $coach;
-            $branchTransactionRow['orig_id'] = null;
+            $branchTransactionRow['origin'] = null;
             $branchTransactionRow['dest_id'] = $sessionData['uidIdPrograma'];
             $branchTransactionRow['info'] = $sessionData['horario'];
             $branchTransactionRow['status_id'] = 1;

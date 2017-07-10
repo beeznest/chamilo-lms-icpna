@@ -540,7 +540,7 @@ class Migration
                 'action' => 1,
                 'transaction_id' => 1000,
                 'item_id' => 'D236776B-D7A5-47FF-8328-55EBE9A59015',
-                'orig_id' => null,
+                'origin' => null,
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -550,7 +550,7 @@ class Migration
                 'transaction_id' => 1001,
                 'action' => 3,
                 'item_id' => 'D236776B-D7A5-47FF-8328-55EBE9A59015',
-                'orig_id' => '0',
+                'origin' => '0',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -560,7 +560,7 @@ class Migration
                 //'action' => 'usuario_eliminar',
                 'action' => 2,
                 'item_id' => 'D236776B-D7A5-47FF-8328-55EBE9A59015',
-                'orig_id' => '0',
+                'origin' => '0',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -570,7 +570,7 @@ class Migration
                 //'action' => 'usuario_matricula',
                 'action' => 4,
                 'item_id' => '95EDA88F-D729-450F-95FF-4A3989244F53', //usuario - Abel
-                'orig_id' => null, //session orig
+                'origin' => null, //session orig
                 'dest_id' => 'C3671999-095E-4018-9826-678BAFF595DF', //session dest
                 'branch_id' => 1,
                 'status_id' => 0
@@ -580,7 +580,7 @@ class Migration
                 //'action' => 'curso_agregar',
                 'action' => 5,
                 'item_id' => 'E2334974-9D55-4BB4-8B57-FCEFBE2510DC',
-                'orig_id' => null,
+                'origin' => null,
                 'dest_id' => null,
                 'branch_id' => 1,
                 'status_id' => 0
@@ -590,7 +590,7 @@ class Migration
                 //'action' => 'curso_eliminar',
                 'action' => 6,
                 'item_id' => 'E2334974-9D55-4BB4-8B57-FCEFBE2510DC',
-                'orig_id' => null,
+                'origin' => null,
                 'dest_id' => null,
                 'branch_id' => 1,
                 'status_id' => 0
@@ -600,7 +600,7 @@ class Migration
                 //'action' => 'curso_editar',
                 'action' => 7,
                 'item_id' => '31B4BD38-5D90-4275-88AF-F01F0274800A', // ONE   (SATURDAYS)
-                'orig_id' => '0',
+                'origin' => '0',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -608,7 +608,7 @@ class Migration
             array(
                 //'action' => 'curso_matricula',
                 'item_id' => 'E2334974-9D55-4BB4-8B57-FCEFBE2510DC', //course
-                'orig_id' => null,
+                'origin' => null,
                 'dest_id' => 'C3671999-095E-4018-9826-678BAFF595DF', //session
                 'branch_id' => 1,
                 'status_id' => 0
@@ -619,7 +619,7 @@ class Migration
                 'transaction_id' => 1007,
                 'action' => 8,
                 'item_id' => 'C3671999-095E-4018-9826-678BAFF595DF',
-                'orig_id' => null,
+                'origin' => null,
                 'dest_id' => null,
                 'branch_id' => 1,
                 'status_id' => 0
@@ -629,7 +629,7 @@ class Migration
                 'transaction_id' => 1008,
                 'action' => 10,
                 'item_id' => 'C3671999-095E-4018-9826-678BAFF595DF',
-                'orig_id' => '0',
+                'origin' => '0',
                 'dest_id' => null,
                 'branch_id' => 1,
                 'status_id' => 0
@@ -639,7 +639,7 @@ class Migration
                 'transaction_id' => 1009,
                 'action' => 9,
                 'item_id' => 'C3671999-095E-4018-9826-678BAFF595DF', //id to delete
-                'orig_id' => null,
+                'origin' => null,
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -649,7 +649,7 @@ class Migration
                 //'action' => 'pa_cambiar_aula',
                 'action' => 11,
                 'item_id' => 'C3671999-095E-4018-9826-678BAFF595DF',
-                'orig_id' => '0',
+                'origin' => '0',
                 'dest_id' => '',
                 'branch_id' => 1,
                 'status_id' => 0
@@ -660,7 +660,7 @@ class Migration
                 'action' => 12,
                 'item_id' => 'B94FEBA2-7EAD-4E14-B3DA-1D02397D1FA1',
                 //session id  - 200910 (A02M) Advanced Oral Communication Skills 2 08:45 10:15 701 00003
-                'orig_id' => '63D661DB-0A2F-47FC-94C0-5AA46BE7DA66',
+                'origin' => '63D661DB-0A2F-47FC-94C0-5AA46BE7DA66',
                 // (01) 07:00 09:00
                 'branch_id' => 1,
                 'dest_id' => 'B4FE6E83-F33F-417B-8B3F-C24CB94264EA',
@@ -671,7 +671,7 @@ class Migration
                 //'action' => 'pa_cambiar_sede',
                 'action' => 'x',
                 'item_id' => 'C3671999-095E-4018-9826-678BAFF595DF',//session id
-                'orig_id' => '0',
+                'origin' => '0',
                 'dest_id' => null,
                 'branch_id' => 1,
                 'status_id' => 0
@@ -679,7 +679,7 @@ class Migration
             array(
                 'action' => 'cambiar_pa_fase',
                 'item_id' => 'C3671999-095E-4018-9826-678BAFF595DF',//session id
-                'orig_id' => '0',
+                'origin' => '0',
                 'dest_id' => null,
                 'branch_id' => 1,
                 'status_id' => 0
@@ -687,7 +687,7 @@ class Migration
             array(
                 'action' => 'cambiar_pa_intensidad',
                 'item_id' => 'C3671999-095E-4018-9826-678BAFF595DF',
-                'orig_id' => '0',
+                'origin' => '0',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -697,7 +697,7 @@ class Migration
                 'transaction_id' => 1010,
                 'action' => 13,
                 'item_id' => 'E395895A-B480-456F-87F2-36B3A1EBB81C',  // horario
-                'orig_id' => '0',
+                'origin' => '0',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -707,7 +707,7 @@ class Migration
                 //'action' => 'horario_editar',
                 'action' => 15,
                 'item_id' => 'E395895A-B480-456F-87F2-36B3A1EBB81C',
-                'orig_id' => '0',
+                'origin' => '0',
                 'dest_id' => null,
                 'branch_id' => 1,
                 'status_id' => 0
@@ -717,7 +717,7 @@ class Migration
                 'action' => 14,
                 'transaction_id' => 1012,
                 'item_id' => 'E395895A-B480-456F-87F2-36B3A1EBB81C',
-                'orig_id' => '0',
+                'origin' => '0',
                 'dest_id' => null,
                 'branch_id' => 1,
                 'status_id' => 0
@@ -726,7 +726,7 @@ class Migration
                 //'action' => 'aula_agregar',
                 'action' => 16,
                 'item_id' => '1',
-                'orig_id' => '0',
+                'origin' => '0',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -735,7 +735,7 @@ class Migration
                 //'action' => 'aula_eliminar',
                 'action' => 17,
                 'item_id' => '1',
-                'orig_id' => '0',
+                'origin' => '0',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -744,7 +744,7 @@ class Migration
                 //'action' => 'aula_editar',
                 'action' => 18,
                 'item_id' => '1',
-                'orig_id' => '0',
+                'origin' => '0',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -754,7 +754,7 @@ class Migration
                 'action' => 19,
                 'transaction_id' => 1013,
                 'item_id' => '7379A7D3-6DC5-42CA-9ED4-97367519F1D9',
-                'orig_id' => '0',
+                'origin' => '0',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -764,7 +764,7 @@ class Migration
                 'action' => 21,
                 'transaction_id' => 1014,
                 'item_id' => '7379A7D3-6DC5-42CA-9ED4-97367519F1D9',
-                'orig_id' => '0',
+                'origin' => '0',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -774,7 +774,7 @@ class Migration
                 'action' => 20,
                 'transaction_id' => 1015,
                 'item_id' => '7379A7D3-6DC5-42CA-9ED4-97367519F1D9',
-                'orig_id' => '0',
+                'origin' => '0',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -784,7 +784,7 @@ class Migration
                 'action' => 22,
                 'transaction_id' => 1016,
                 'item_id' => '0091CD3B-F042-11D7-B338-0050DAB14015',
-                'orig_id' => '0',
+                'origin' => '0',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -794,7 +794,7 @@ class Migration
                 'transaction_id' => 1017,
                 'action' => 24,
                 'item_id' => '0091CD3B-F042-11D7-B338-0050DAB14015',
-                'orig_id' => '0',
+                'origin' => '0',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -804,7 +804,7 @@ class Migration
                 'transaction_id' => 1018,
                 'action' => 23,
                 'item_id' => '0091CD3B-F042-11D7-B338-0050DAB14015',
-                'orig_id' => '0',
+                'origin' => '0',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -814,7 +814,7 @@ class Migration
                 'transaction_id' => 1019,
                 'action' => 25,
                 'item_id' => '0091CD3C-F042-11D7-B338-0050DAB14015',
-                'orig_id' => '0',
+                'origin' => '0',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -824,7 +824,7 @@ class Migration
                 'transaction_id' => 1020,
                 'action' => 27,
                 'item_id' => '0091CD3C-F042-11D7-B338-0050DAB14015',
-                'orig_id' => '0',
+                'origin' => '0',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -834,7 +834,7 @@ class Migration
                 'transaction_id' => 1021,
                 'action' => 26,
                 'item_id' => '0091CD3C-F042-11D7-B338-0050DAB14015',
-                'orig_id' => '0',
+                'origin' => '0',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -846,7 +846,7 @@ class Migration
                 'transaction_id' => 1031,
                 'action' => 31,
                 'item_id' => '2C901CB8-E0A2-412E-A754-3B18AE7F3C02',
-                'orig_id' => 'A33ADE80-F62B-4760-8C16-000B81E1C6AB', ///session_id
+                'origin' => 'A33ADE80-F62B-4760-8C16-000B81E1C6AB', ///session_id
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -856,7 +856,7 @@ class Migration
                 'transaction_id' => 1032,
                 'action' => 32,
                 'item_id' => '2C901CB8-E0A2-412E-A754-3B18AE7F3C02',
-                'orig_id' => 'A33ADE80-F62B-4760-8C16-000B81E1C6AB',
+                'origin' => 'A33ADE80-F62B-4760-8C16-000B81E1C6AB',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -866,7 +866,7 @@ class Migration
                 'transaction_id' => 1033,
                 'action' => 33,
                 'item_id' => '2C901CB8-E0A2-412E-A754-3B18AE7F3C02',
-                'orig_id' => 'A33ADE80-F62B-4760-8C16-000B81E1C6AB',
+                'origin' => 'A33ADE80-F62B-4760-8C16-000B81E1C6AB',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -876,7 +876,7 @@ class Migration
                 'transaction_id' => 1034,
                 'action' => 34,
                 'item_id' => '2C901CB8-E0A2-412E-A754-3B18AE7F3C02',
-                'orig_id' => 'A33ADE80-F62B-4760-8C16-000B81E1C6AB',
+                'origin' => 'A33ADE80-F62B-4760-8C16-000B81E1C6AB',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -886,7 +886,7 @@ class Migration
                 'transaction_id' => 1035,
                 'action' => 35,
                 'item_id' => '2C901CB8-E0A2-412E-A754-3B18AE7F3C02',
-                'orig_id' => 'A33ADE80-F62B-4760-8C16-000B81E1C6AB',
+                'origin' => 'A33ADE80-F62B-4760-8C16-000B81E1C6AB',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0
@@ -896,7 +896,7 @@ class Migration
                 'transaction_id' => 1036,
                 'action' => 36,
                 'item_id' => '2C901CB8-E0A2-412E-A754-3B18AE7F3C02',
-                'orig_id' => 'A33ADE80-F62B-4760-8C16-000B81E1C6AB',
+                'origin' => 'A33ADE80-F62B-4760-8C16-000B81E1C6AB',
                 'branch_id' => 1,
                 'dest_id' => null,
                 'status_id' => 0

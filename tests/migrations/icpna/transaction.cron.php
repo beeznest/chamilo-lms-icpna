@@ -59,9 +59,6 @@ $cron_start = time();
 require_once __DIR__.'/../../../main/inc/global.inc.php';
 require_once 'migration.class.php';
 $branch_id = 0;
-// We need $branch_id defined before calling db_matches.php
-// The only thing we need from db_matches is the definition of the web service
-require_once 'db_matches.php';
 // redefine web services config
 if (!is_file(__DIR__.'/ws.conf.php')) {
     die ('Please define a ws.conf.php file (copy ws.conf.dist.php) before you run the transactions');

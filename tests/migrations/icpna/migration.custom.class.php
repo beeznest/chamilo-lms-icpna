@@ -1099,7 +1099,7 @@ class MigrationCustom
                 $extra['uidIdPersona'] = $user_info['uidIdPersona'];
             }
             $chamilo_user_id = UserManager::create_user(
-                $user_info['firsntame'],
+                $user_info['firstname'],
                 $user_info['lastname'],
                 $user_info['status'],
                 $user_info['email'],
@@ -1111,7 +1111,7 @@ class MigrationCustom
                 null,
                 null,
                 null,
-                null,
+                1,
                 null,
                 $extra,
                 $user_info['encrypt_method']

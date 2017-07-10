@@ -1103,6 +1103,15 @@ class MigrationCustom
             if (!empty($user_info['uidIdPersona'])) {
                 $extra['uidIdPersona'] = $user_info['uidIdPersona'];
             }
+
+            if (empty($user_info['email'])) {
+                return array(
+                    'message' => "User was not created : $uidIdPersonaId \n UserManager::add() params: ".print_r($user_info,
+                            1)." \nResponse: \n ".print_r($api_failureList, 1),
+                    'status_id' => self::TRANSACTION_STATUS_FAILED
+                );
+            }
+
             $chamilo_user_id = UserManager::create_user(
                 $user_info['firstname'],
                 $user_info['lastname'],

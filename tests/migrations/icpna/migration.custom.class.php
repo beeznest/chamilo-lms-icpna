@@ -320,8 +320,13 @@ class MigrationCustom
             error_log('User does not have a uidIdPersona');
             error_log(print_r($data, 1));
             return false;
-            //exit;
         }
+        if (empty($data['email'])) {
+            error_log('User does not have an email');
+            error_log(print_r($data, 1));
+            return false;
+        }
+
         $extra = [];
 
         $data['uidIdPersona'] = strtoupper($data['uidIdPersona']);
@@ -3441,8 +3446,10 @@ class MigrationCustom
         $extra_field_option = new ExtraFieldOption('session');
 
         $extra_field_info = $extra_field->get_handler_field_info_by_field_variable('sede');
-        $extra_field_option_info_sede = $extra_field_option->get_field_option_by_field_and_option($extra_field_info['id'],
-            $result['uididsede']);
+        $extra_field_option_info_sede = $extra_field_option->get_field_option_by_field_and_option(
+            $extra_field_info['id'],
+            $result['uididsede']
+        );
 
         $sede_name = null;
         if (isset($extra_field_option_info_sede[0]) && !empty($extra_field_option_info_sede[0]['option_display_text'])) {

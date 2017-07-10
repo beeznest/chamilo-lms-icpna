@@ -3864,7 +3864,7 @@ class MigrationCustom
             $res = Database::query($sql);
             $row = Database::fetch_array($res);
             $fieldId = $row['id'];
-            $sql = "SELECT item_id, value FROM extra_field_values WHERE field_id = $fieldId ORDER BY user_id";
+            $sql = "SELECT item_id, value FROM extra_field_values WHERE field_id = $fieldId ORDER BY item_id";
             $res = Database::query($sql);
             while ($row = Database::fetch_array($res)) {
                 $omigrate['users'][$row['value']] = $row['item_id'];
@@ -3893,7 +3893,7 @@ class MigrationCustom
             $res = Database::query($sql);
             $row = Database::fetch_array($res);
             $fieldId = $row['id'];
-            $sql = "SELECT item_id, value FROM exta_field_values WHERE field_id = $fieldId ORDER BY item_id";
+            $sql = "SELECT item_id, value FROM extra_field_values WHERE field_id = $fieldId ORDER BY item_id";
             $res = Database::query($sql);
             while ($row = Database::fetch_array($res)) {
                 $omigrate['sessions'][$row['value']] = $row['item_id'];

@@ -1239,7 +1239,7 @@ class MigrationCustom
         $uidIdPersona = $data['item_id'];
         $uidIdPrograma = $data['origin'];
         $uidIdProgramaDestination = $data['dest_id'];
-        $status = (!empty($data['info']) ? $data['info'] : null);
+        $status = (!empty($data['external_info']) ? $data['external_info'] : null);
         global $data_list;
         $user_id = self::getUserIDByPersonaID($uidIdPersona, $data_list);
 
@@ -2696,7 +2696,7 @@ class MigrationCustom
         $data = Migration::soap_call($web_service_details, 'asistenciaDetalles', array(
             'uididpersona' => $original_data['item_id'],
             'uididprograma' => $original_data['origin'],
-            'uididfecha' => $original_data['info'],
+            'uididfecha' => $original_data['external_info'],
             'intIdSede' => $original_data['branch_id']
         ));
 
@@ -2873,7 +2873,7 @@ class MigrationCustom
         $data = Migration::soap_call($web_service_details, 'asistenciaDetalles', array(
             'uididpersona' => $original_data['item_id'],
             'uididprograma' => $original_data['origin'],
-            'uididfecha' => $original_data['info'],
+            'uididfecha' => $original_data['external_info'],
             'intIdSede' => $original_data['branch_id']
         ));
 
@@ -3001,7 +3001,7 @@ class MigrationCustom
         $data = Migration::soap_call($web_service_details, 'asistenciaDetalles', array(
             'uididpersona' => $original_data['item_id'],
             'uididprograma' => $original_data['origin'],
-            'uididfecha' => $original_data['info'],
+            'uididfecha' => $original_data['external_info'],
             'intIdSede' => $original_data['branch_id']
         ));
         if ($data['error'] == false) {
@@ -3251,7 +3251,7 @@ class MigrationCustom
                 'origin' => isset($transaction_info['orig']) ? $transaction_info['orig'] : null,
                 'branch_id' => isset($transaction_info['idsede']) ? $transaction_info['idsede'] : null,
                 'dest_id' => isset($transaction_info['dest']) ? $transaction_info['dest'] : null,
-                'info' => isset($transaction_info['infoextra']) ? $transaction_info['infoextra'] : null,
+                'external_info' => isset($transaction_info['infoextra']) ? $transaction_info['infoextra'] : null,
                 'status_id' => $deprecated ? self::TRANSACTION_STATUS_DEPRECATED : 0,
             );
 

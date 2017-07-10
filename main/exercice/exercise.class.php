@@ -1847,7 +1847,11 @@ class Exercise
     function get_last_exercise_order()
     {
         $table = Database::get_course_table(TABLE_QUIZ_ORDER);
-        $sql = "SELECT exercise_order FROM $table ORDER BY exercise_order DESC LIMIT 1";
+        $sql = "
+            SELECT exercise_order FROM $table
+            WHERE c_id = ".api_get_course_int_id()."
+            ORDER BY exercise_order DESC LIMIT 1
+        ";
         $result = Database::query($sql);
         if (Database::num_rows($result)) {
             $row = Database::fetch_array($result);
@@ -1861,7 +1865,7 @@ class Exercise
     function get_exercise_order()
     {
         $table = Database::get_course_table(TABLE_QUIZ_ORDER);
-        $sql = "SELECT exercise_order FROM $table WHERE exercise_id = {$this->id}";
+        $sql = "SELECT exercise_order FROM $table WHERE exercise_id = {$this->id} AND c_id = ".api_get_course_int_id();
         $result = Database::query($sql);
         if (Database::num_rows($result)) {
             $row = Database::fetch_array($result);

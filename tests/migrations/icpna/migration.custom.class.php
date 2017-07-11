@@ -269,7 +269,7 @@ class MigrationCustom
         //error_log('getUserIDByPersonaID');
         $extra_field = new ExtraFieldValue('user');
         $uidIdPersona = strtoupper($uidIdPersona);
-        $values = $extra_field->get_item_id_from_field_variable_and_field_value('uidIdPersona', $uidIdPersona);
+        $values = $extra_field->get_item_id_from_field_variable_and_field_value('uididpersona', $uidIdPersona);
         if ($values) {
             return $values['item_id'];
         } else {
@@ -297,7 +297,7 @@ class MigrationCustom
         }
 
         $extra_field = new ExtraFieldValue('user');
-        $values = $extra_field->get_item_id_from_field_variable_and_field_value('uidIdPersona', $uidIdPersona);
+        $values = $extra_field->get_item_id_from_field_variable_and_field_value('uididpersona', $uidIdPersona);
 
         if ($values) {
             return $values['item_id'];
@@ -316,7 +316,7 @@ class MigrationCustom
     static function createUser($data, &$omigrate = null)
     {
         //error_log('In createUser, receiving '.print_r($data,1));
-        if (empty($data['uidIdPersona'])) {
+        if (empty($data['uididpersona'])) {
             error_log('User does not have a uidIdPersona');
             error_log(print_r($data, 1));
             return false;
@@ -329,8 +329,8 @@ class MigrationCustom
 
         $extra = [];
 
-        $data['uidIdPersona'] = strtoupper($data['uidIdPersona']);
-        $extra['uidIdPersona'] = $data['uidIdPersona'];
+        $data['uididpersona'] = strtoupper($data['uididpersona']);
+        $extra['uididpersona'] = $data['uididpersona'];
 
         $data['status'] = STUDENT;
         if (isset($data['uidIdEmpleado'])) {
@@ -342,13 +342,13 @@ class MigrationCustom
             $data['lastname'] = (string)trim($data['lastname']);
 
             if (empty($data['firstname']) && empty($data['lastname'])) {
-                $wanted_user_name = UserManager::purify_username($data['uidIdPersona']);
+                $wanted_user_name = UserManager::purify_username($data['uididpersona']);
                 //$wanted_user_name = UserManager::create_unique_username(null, null);
             } else {
                 $wanted_user_name = UserManager::create_username($data['firstname'], $data['lastname']);
             }
 
-            $extra_data = UserManager::get_extra_user_data_by_value('uidIdPersona', $data['uidIdPersona']);
+            $extra_data = UserManager::get_extra_user_data_by_value('uididpersona', $data['uididpersona']);
 
             if ($extra_data) {
                 $user_info = api_get_user_info($extra_data[0]);
@@ -363,13 +363,13 @@ class MigrationCustom
             } else {
                 //the user already exists?
                 $user_info = api_get_user_info_from_username($wanted_user_name);
-                $user_persona = UserManager::get_extra_user_data_by_field($user_info['user_id'], 'uidIdPersona');
+                $user_persona = UserManager::get_extra_user_data_by_field($user_info['user_id'], 'uididpersona');
 
-                if (isset($user_persona['uidIdPersona']) && $data['uidIdPersona'] == $user_persona['uidIdPersona']) {
+                if (isset($user_persona['uididpersona']) && $data['uididpersona'] == $user_persona['uididpersona']) {
                     error_log("Skip user already added: {$user_info['username']}");
                     return $user_info;
                 } else {
-                    error_log("Homonym - wanted_username: $wanted_user_name - uidIdPersona: {$user_persona['uidIdPersona']} - username: {$user_info['username']}");
+                    error_log("Homonym - wanted_username: $wanted_user_name - uididpersona: {$user_persona['uididpersona']} - username: {$user_info['username']}");
                     //print_r($data);
                     //The user has the same firstname and lastname but it has another uiIdPersona could by an homonym
                     $data['username'] = UserManager::create_unique_username($data['firstname'], $data['lastname']);
@@ -393,15 +393,15 @@ class MigrationCustom
             } else {
                 //the user already exists?
                 $user_info = api_get_user_info_from_username($data['username']);
-                $user_persona = UserManager::get_extra_user_data_by_field($user_info['user_id'], 'uidIdPersona');
+                $user_persona = UserManager::get_extra_user_data_by_field($user_info['user_id'], 'uididpersona');
 
 
-                if (isset($user_persona['uidIdPersona']) && (string)$data['uidIdPersona'] == (string)$user_persona['uidIdPersona']) {
+                if (isset($user_persona['uididpersona']) && (string)$data['uididpersona'] == (string)$user_persona['uididpersona']) {
                     //error_log("2 Skip user already added: {$user_info['username']}");
                     return $user_info;
                 } else {
                     //print_r($user_persona);
-                    //error_log("2 homonym - wanted_username: {$data['username']} - uidIdPersona: {$user_persona['uidIdPersona']} - username: {$user_info['username']}");
+                    //error_log("2 homonym - wanted_username: {$data['username']} - uididpersona: {$user_persona['uididpersona']} - username: {$user_info['username']}");
                     //print_r($data);
                     //The user has the same firstname and lastname but it has another uiIdPersona could by an homonym
                     $data['username'] = UserManager::create_unique_username($data['firstname'], $data['lastname']);
@@ -416,8 +416,8 @@ class MigrationCustom
             return false;
             //exit;
         }
-        $id_persona = $data['uidIdPersona'];
-        unset($data['uidIdPersona']);
+        $id_persona = $data['uididpersona'];
+        unset($data['uididpersona']);
         unset($data['uidIdAlumno']);
         unset($data['uidIdEmpleado']);
         $data['encrypt_method'] = 'sha1';
@@ -440,7 +440,7 @@ class MigrationCustom
         if (is_array($omigrate) && isset($omigrate) && $omigrate['boost_users']) {
             $omigrate['users'][$id_persona] = $userId;
         }
-        UserManager::update_extra_field_value($userId, 'uidIdPersona', $id_persona);
+        UserManager::update_extra_field_value($userId, 'uididpersona', $id_persona);
         $user_info = api_get_user_info($userId);
         return $user_info;
     }
@@ -607,15 +607,15 @@ class MigrationCustom
         }
 
         if (is_array($omigrate) && $omigrate['boost_users']) {
-            if (isset($omigrate['users'][$data['uidIdPersona']])) {
-                $user_id = $omigrate['users'][$data['uidIdPersona']];
+            if (isset($omigrate['users'][$data['uididpersona']])) {
+                $user_id = $omigrate['users'][$data['uididpersona']];
             }
         }
         if (empty($user_id)) {
             $extra_field_value = new ExtraFieldValue('user');
-            $result = $extra_field_value->get_item_id_from_field_variable_and_field_value('uidIdPersona',
-                $data['uidIdPersona']);
-            //error_log('data[uidIdPersona] '.$data['uidIdPersona'].' returned $result[user_id]: '.$result['user_id']);
+            $result = $extra_field_value->get_item_id_from_field_variable_and_field_value('uididpersona',
+                $data['uididpersona']);
+            //error_log('data[uididpersona] '.$data['uididpersona'].' returned $result[user_id]: '.$result['user_id']);
             if ($result && $result['user_id']) {
                 $user_id = $result['user_id'];
             }
@@ -626,7 +626,7 @@ class MigrationCustom
             SessionManager::subscribe_users_to_session($session_id, array($user_id), SESSION_VISIBLE_READ_ONLY, false);
             //exit;
         } else {
-            //error_log('Called: addUserToSession - No idPrograma: '.$data['uidIdPrograma'].' - No uidIdPersona: '.$data['uidIdPersona']);
+            //error_log('Called: addUserToSession - No idPrograma: '.$data['uidIdPrograma'].' - No uididpersona: '.$data['uididpersona']);
         }
     }
 
@@ -1094,14 +1094,21 @@ class MigrationCustom
         global $data_list;
         $uidIdPersonaId = $data['item_id'];
         //Add user call the webservice
-        $user_info = Migration::soap_call($web_service_details, 'usuarioDetalles',
-            array('intIdSede' => $data['branch_id'], 'uididpersona' => $uidIdPersonaId));
+        $user_info = Migration::soap_call(
+            $web_service_details,
+            'usuarioDetalles',
+            array(
+                'intIdSede' => $data['branch_id'],
+                'uididpersona' => $uidIdPersonaId
+            )
+        );
+
         if ($user_info['error'] == false) {
             global $api_failureList;
             unset($user_info['error']);
             $extra = [];
-            if (!empty($user_info['uidIdPersona'])) {
-                $extra['uidIdPersona'] = $user_info['uidIdPersona'];
+            if (!empty($user_info['uididpersona'])) {
+                $extra['uididpersona'] = $user_info['uididpersona'];
             }
 
             // ICPNA users are accepted without e-mail
@@ -1184,7 +1191,7 @@ class MigrationCustom
             }
         } else {
             return array(
-                'message' => "User was not found with uidIdPersona: $uidIdPersonaId",
+                'message' => "User was not found with uididpersona: $uidIdPersonaId",
                 'status_id' => self::TRANSACTION_STATUS_FAILED
             );
         }
@@ -1232,7 +1239,7 @@ class MigrationCustom
             }
         } else {
             return array(
-                'message' => "User was not found with uidIdPersona: $uidIdPersonaId",
+                'message' => "User was not found with uididpersona: $uidIdPersonaId",
                 'status_id' => self::TRANSACTION_STATUS_FAILED
             );
         }
@@ -1636,7 +1643,7 @@ class MigrationCustom
                     $coachId = $session_info['id_coach'];
 
                     $efv = new ExtraFieldValue('user');
-                    $fieldValue = $efv->get_values_by_handler_and_field_variable($coachId, 'uidIdPersona');
+                    $fieldValue = $efv->get_values_by_handler_and_field_variable($coachId, 'uididpersona');
                     $uidIdPersona = trim($fieldValue['value']);
 
                     $session_info['id_coach'] = empty($uidIdPersona) ? 0 : intval($coachId);
@@ -3403,7 +3410,7 @@ class MigrationCustom
         $result['status'] = $result['rol'] == 'profesor' ? COURSEMANAGER : STUDENT;
         $result['phone'] = (string)$result['phone'];
         $result['active'] = (int)$result['active'];
-        $result['extra_uidIdPersona'] = strtoupper($params['uididpersona']);
+        $result['extra_uididpersona'] = strtoupper($params['uididpersona']);
         unset($result['rol']);
         return $result;
     }
@@ -3873,7 +3880,7 @@ class MigrationCustom
     {
         if (is_array($omigrate) && isset($omigrate) && $omigrate['boost_users']) {
             // uidIdPersona field is ID 13 in user_field
-            $sql = "SELECT id FROM extra_field WHERE extra_field_type = 1 AND variable = 'uidIdPersona'";
+            $sql = "SELECT id FROM extra_field WHERE extra_field_type = 1 AND variable = 'uididpersona'";
             $res = Database::query($sql);
             $row = Database::fetch_array($res);
             $fieldId = $row['id'];
@@ -3885,7 +3892,7 @@ class MigrationCustom
         }
         if (is_array($omigrate) && isset($omigrate) && $omigrate['boost_courses']) {
             // uidIdCurso field is ID 5 in course_field
-            $sql = "SELECT id FROM extra_field WHERE extra_field_type = 2 AND variable = 'uidIdCurso'";
+            $sql = "SELECT id FROM extra_field WHERE extra_field_type = 2 AND variable = 'uididcurso'";
             $res = Database::query($sql);
             $row = Database::fetch_array($res);
             $fieldId = $row['id'];
@@ -3902,7 +3909,7 @@ class MigrationCustom
         }
         if (is_array($omigrate) && isset($omigrate) && $omigrate['boost_sessions']) {
             // uidIdPrograma field is ID 1 in session_field
-            $sql = "SELECT id FROM extra_field WHERE extra_field_type = 3 AND variable = 'uidIdPrograma'";
+            $sql = "SELECT id FROM extra_field WHERE extra_field_type = 3 AND variable = 'uididprograma'";
             $res = Database::query($sql);
             $row = Database::fetch_array($res);
             $fieldId = $row['id'];

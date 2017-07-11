@@ -1107,8 +1107,8 @@ class MigrationCustom
             global $api_failureList;
             unset($user_info['error']);
             $extra = [];
-            if (!empty($user_info['uididpersona'])) {
-                $extra['uididpersona'] = $user_info['uididpersona'];
+            if (!empty($user_info['extra_uididpersona'])) {
+                $extra['extra_uididpersona'] = $user_info['extra_uididpersona'];
             }
 
             // ICPNA users are accepted without e-mail

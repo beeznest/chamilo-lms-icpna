@@ -1527,6 +1527,7 @@ class MigrationCustom
             // check dates (only do this at session creation)
             self::fixAccessDates($session_info);
             $session_info['id_coach'] = 0;
+            $cid = $session_info['c_id'];
             $extra = [];
             if (!empty($session_info['extra_uidIdPrograma'])) {
                 $extra['extra_uididprograma'] = $session_info['extra_uidIdPrograma'];
@@ -1568,6 +1569,9 @@ class MigrationCustom
             //$session_id = SessionManager::add($session_info);
             $session_info = api_get_session_info($session_id);
             if ($session_id) {
+                if (!empty($cid)) {
+                    SessionManager::add_courses_to_session($session_id, $cid);
+                }
                 $data_list['sessions'][$data['item_id']] = $session_id;
                 return array(
                     'entity' => 'session',

@@ -1901,7 +1901,7 @@ class MigrationCustom
                 $params = array(
                     'field_id' => $extra_field_info['id'],
                     'option_value' => $original_data['item_id'],
-                    'option_display_text' => $data['name'],
+                    'display_text' => $data['name'],
                     'option_order' => null
                 );
 
@@ -1996,7 +1996,7 @@ class MigrationCustom
                         'id' => $option['id'],
                         'field_id' => $extra_field_info['id'],
                         'option_value' => $original_data['item_id'],
-                        'option_display_text' => $data['name'],
+                        'display_text' => $data['name'],
                         'option_order' => null
                     );
                     $extra_field_option->update($extra_field_option_info);
@@ -3864,7 +3864,7 @@ class MigrationCustom
 
         $time = "08:00";
         if (isset($horario_info) && isset($horario_info[0])) {
-            $horario = $horario_info[0]['option_display_text'];
+            $horario = $horario_info[0]['display_text'];
             $horario_array = explode(' ', $horario);
             //Schedule format is "(01) 07:00 09:00" in this case. Adapt to your case
             if (isset($horario_array[1])) {

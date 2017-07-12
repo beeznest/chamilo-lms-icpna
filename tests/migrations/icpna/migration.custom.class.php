@@ -530,23 +530,23 @@ class MigrationCustom
 
         self::fixAccessDates($data);
         $extra = [];
-        if (!empty($data['uidIdPrograma'])) {
-            $extra['uidIdPrograma'] = $data['uidIdPrograma'];
+        if (!empty($session_info['extra_uidIdPrograma'])) {
+            $extra['extra_uididprograma'] = $session_info['extra_uidIdPrograma'];
         }
-        if (!empty($data['estado'])) {
-            $extra['estado'] = $data['estado'];
+        if (!empty($session_info['estado'])) {
+            $extra['extra_estado'] = $session_info['estado'];
         }
-        if (!empty($data['sede'])) {
-            $extra['sede'] = $data['sede'];
+        if (!empty($session_info['extra_sede'])) {
+            $extra['extra_sede'] = $session_info['extra_sede'];
         }
-        if (!empty($data['horario'])) {
-            $extra['horario'] = $data['horario'];
+        if (!empty($session_info['extra_horario'])) {
+            $extra['extra_horario'] = $session_info['extra_horario'];
         }
-        if (!empty($data['periodo'])) {
-            $extra['periodo'] = $data['periodo'];
+        if (!empty($session_info['extra_periodo'])) {
+            $extra['extra_periodo'] = $session_info['extra_periodo'];
         }
-        if (!empty($data['aula'])) {
-            $extra['aula'] = $data['aula'];
+        if (!empty($session_info['extra_aula'])) {
+            $extra['extra_aula'] = $session_info['extra_aula'];
         }
         $session_id = SessionManager::create_session(
             $data['name'],

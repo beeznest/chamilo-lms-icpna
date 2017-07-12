@@ -1570,6 +1570,9 @@ class MigrationCustom
             $session_info = api_get_session_info($session_id);
             if ($session_id) {
                 if (!empty($cid)) {
+                    if (!is_array($cid)) {
+                        $cid = [$cid];
+                    }
                     SessionManager::add_courses_to_session($session_id, $cid);
                 }
                 $data_list['sessions'][$data['item_id']] = $session_id;

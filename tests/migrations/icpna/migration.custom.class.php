@@ -1326,6 +1326,12 @@ class MigrationCustom
             if (!empty($session_id)) {
                 $before = self::getUserStatusInSession($session_id, $user_id);
                 if (isset($status) && $status == 1) {
+                    SessionManager::subscribe_users_to_session(
+                        $session_id,
+                        array($user_id),
+                        SESSION_VISIBLE_READ_ONLY,
+                        false
+                    );
                     $course_list = SessionManager::get_course_list_by_session_id($session_id);
                     if (!empty($course_list)) {
                         $course_data = current($course_list);
@@ -1337,8 +1343,12 @@ class MigrationCustom
                         );
                     }
                 } else {
-                    SessionManager::subscribe_users_to_session($session_id, array($user_id), SESSION_VISIBLE_READ_ONLY,
-                        false);
+                    SessionManager::subscribe_users_to_session(
+                        $session_id,
+                        array($user_id),
+                        SESSION_VISIBLE_READ_ONLY,
+                        false
+                    );
                 }
                 $message = 'Move empty to Session';
                 return self::isUserSubscribedToSession($user_id, $session_id, $message, $before);

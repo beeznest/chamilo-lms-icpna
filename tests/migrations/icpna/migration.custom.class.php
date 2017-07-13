@@ -1329,7 +1329,7 @@ class MigrationCustom
                     $course_list = SessionManager::get_course_list_by_session_id($session_id);
                     if (!empty($course_list)) {
                         $course_data = current($course_list);
-                        SessionManager::set_coach_to_course_session($user_id, $session_id, $course_data['code']);
+                        SessionManager::set_coach_to_course_session($user_id, $session_id, $course_data['id']);
                     } else {
                         return array(
                             'message' => 'Could not subscribe to course: no course in session '.$uidIdProgramaDestination,

@@ -1277,8 +1277,8 @@ class MigrationCustom
 
             if (!empty($session_id) && !empty($destination_session_id)) {
 
-                $before1 = SessionManager::getUserStatusInSession($user_id, $session_id);
-                $before2 = SessionManager::getUserStatusInSession($user_id, $destination_session_id);
+                $before1 = self::getUserStatusInSession($session_id, $user_id);
+                $before2 = self::getUserStatusInSession($destination_session_id, $user_id);
 
                 //$reason_id = SESSION_CHANGE_USER_REASON_SCHEDULE;
                 //change schedule - see cases CONST in sessionmanager
@@ -1307,7 +1307,7 @@ class MigrationCustom
         if (!empty($uidIdPrograma) && empty($uidIdProgramaDestination)) {
             $session_id = self::getSessionIDByProgramID($uidIdPrograma, $data_list);
             if (!empty($session_id)) {
-                $before = SessionManager::getUserStatusInSession($user_id, $session_id);
+                $before = self::getUserStatusInSession($session_id, $user_id);
                 //SessionManager::subscribe_users_to_session($session_id, array($user_id), SESSION_VISIBLE_READ_ONLY, false);
                 SessionManager::unsubscribe_user_from_session($session_id, $user_id);
                 $message = "Move Session to empty";
@@ -1324,7 +1324,7 @@ class MigrationCustom
         if (empty($uidIdPrograma) && !empty($uidIdProgramaDestination)) {
             $session_id = self::getSessionIDByProgramID($uidIdProgramaDestination, $data_list);
             if (!empty($session_id)) {
-                $before = SessionManager::getUserStatusInSession($user_id, $session_id);
+                $before = self::getUserStatusInSession($session_id, $user_id);
                 if (isset($status) && $status == 1) {
                     $course_list = SessionManager::get_course_list_by_session_id($session_id);
                     if (!empty($course_list)) {
@@ -1362,7 +1362,7 @@ class MigrationCustom
      */
     static function isUserSubscribedToSession($user_id, $session_id, $message = null, $before = array())
     {
-        $user_session_status = SessionManager::getUserStatusInSession($user_id, $session_id);
+        $user_session_status = self::getUserStatusInSession($session_id, $user_id);
         //error_log('YYYY - User status in session '.$session_id.' is '.print_r($user_session_status,1));
         if (!empty($user_session_status)) {
             return array(
@@ -4020,7 +4020,11 @@ class MigrationCustom
                             $or .= ' OR action = '.self::TRANSACTION_TYPE_DEL_USER.' ';
                             break;
                     }
-                    $sql = 'SELECT id FROM branch_transaction WHERE branch_id = '.$t['idsede'].' AND item_id = '.$t['id'].' AND  (action = '.$t['ida'].' '.$or.' ) AND transaction_id > '.$t['idt'];
+                    $sql = 'SELECT id FROM branch_transaction 
+                      WHERE branch_id = '.$t['idsede'].' 
+                        AND item_id = '.$t['id'].' 
+                        AND  (action = '.$t['ida'].' '.$or.' ) 
+                        AND transaction_id > '.$t['idt'];
                     $res = Database::query($sql);
                     if ($res === false or Database::num_rows($res) <= 0) {
                         //nothing found, proceed with transaction (do not exclude)
@@ -4032,4 +4036,23 @@ class MigrationCustom
         }
         return $exclude;
     }
+
+    /**
+     * @param $session_id
+     * @param $user_id
+     * @return array
+     */
+    static function getUserStatusInSession($session_id, $user_id) {
+        $tbl_session_rel_user = Database::get_main_table(TABLE_MAIN_SESSION_USER);
+        $session_id = intval($session_id);
+        $user_id = intval($user_id);
+        $sql = "SELECT * FROM $tbl_session_rel_user WHERE user_id = $user_id AND session_id = $session_id";
+        $result = Database::query($sql);
+        if (Database::num_rows($result)) {
+            $result = Database::store_result($result, 'ASSOC');
+            return $result[0];
+        }
+        return array();
+    }
+
 }

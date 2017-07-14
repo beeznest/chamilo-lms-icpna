@@ -8029,7 +8029,7 @@ $SendEmailToTeacherWhenStudentEndQuiz = "Enviar un correo al profesor cuando el 
 $SendEmailToTeacherWhenStudentEndQuizOnlyIfOpenQuestion = "Enviar un correo al profesor cuando el estudiante termina un ejercicio, solo si ha respondido a una pregunta abierta";
 $SendEmailToTeacherWhenStudentEndQuizOnlyIfOralQuestion = "Enviar un correo al profesor cuando el estudiante termina un ejercicio, solo si ha respondido a una pregunta oral";
 $StudentStartExercise = "Un ejercicio/examen ha sido iniciado por un estudiante";
-$TempScoreXQuestionsNotCorrectedYet = "Score temporaire: %s pregunta(s) abierta(s) no corregida(s) todavía.";
+$TempScoreXQuestionsNotCorrectedYet = "Nota temporal: %s pregunta(s) abierta(s) no corregida(s) todavía.";
 $Annotation = "Anotación";
 $TeacherPicture = "Foto del profesor";
 $FeedbackIfNotCorrect = "Feedback si no es correcta";
@@ -8046,4 +8046,17 @@ Envío en una fecha concreta: En este caso se selecciona un día concreto para h
 
 Envío en base a la fecha de inicio/finalización de la sesión: en este caso se ha de indicar el número de días que han de pasar antes de enviar el anuncio. Y esos días pueden estar asociados a antes o después de la fecha de inicio/finalización. Por ejemplo: 3 días después de fecha de inicio.";
 $MandatorySurveyNoAnswered = "Usted tiene pendiente una encuesta obligatoria. Para ingresar al curso, primero deberá completarla";
+$ShowPreviousButton = "Mostrar el botón 'anterior'";
+$AllTickets = "Todos los tickets";
+$IsMandatory = "Obligatorio/a?";
+$StudentXHasBeenAssignedNewWorkInCourseY = "Nueva tarea asignada a %s en el curso %s";
+$AsHRMYouReceiveThisMailToAlertThatXHasNewWorkInCourseY = "Como su responsable RH, está recibiendo este correo para avisarle que una nueva tarea acaba de ser asignada a %s en el curso %s.";
+$DearXComma = "Estimado/a %s,";
+$UserLinkingRequests = "Solicitudes de vinculación a estudiantes";
+$NewHomeworkEmailAlertToHrmEnable = "Enviar un correo a los estudiantes y sus responsables de recursos humanos a la creación de una tarea";
+$UserLinkingRequestAccepted = "Solicitud de vinculación a estudiante aceptada";
+$UserLinkingTo = "Vinculado al estudiante";
+$RequestLinkingToUser = "Solicitar vinculación a estudiante";
+$LinkingRequestsAdded = "Solicitud de vinculación añadida";
+$HrmList = "Lista de responsables de recursos humanos";
 ?>

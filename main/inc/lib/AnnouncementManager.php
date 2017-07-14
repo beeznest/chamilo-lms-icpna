@@ -38,6 +38,7 @@ class AnnouncementManager
         if (!empty(api_get_session_id())) {
             $tags[] = '((coaches))';
             $tags[] = '((general_coach))';
+            $tags[] = '((general_coach_email))';
         }
 
         return $tags;
@@ -63,7 +64,8 @@ class AnnouncementManager
             $courseInfo['code']
         );
 
-        $generalCoach = '';
+        $generalCoachName = '';
+        $generalCoachEmail = '';
         $coaches = '';
         if (!empty($sessionId)) {
             $sessionInfo = api_get_session_info($sessionId);
@@ -74,7 +76,8 @@ class AnnouncementManager
             );
 
             $generalCoach = api_get_user_info($sessionInfo['id_coach']);
-            $generalCoach = $generalCoach['complete_name'];
+            $generalCoachName = $generalCoach['complete_name'];
+            $generalCoachEmail = $generalCoach['email'];
         }
 
         $data = [];
@@ -96,7 +99,8 @@ class AnnouncementManager
 
         if (!empty(api_get_session_id())) {
             $data['coaches'] = $coaches;
-            $data['general_coach'] = $generalCoach;
+            $data['general_coach'] = $generalCoachName;
+            $data['general_coach_email'] = $generalCoachEmail;
         }
 
         $content = str_replace(self::getTags(), $data, $content);
@@ -396,17 +400,12 @@ class AnnouncementManager
             api_get_session_id()
         );
 
-        $lastEdit = $itemProperty->getLasteditDate();
-
         $html .= "<tr><td>$content</td></tr>";
-        $html .= "<tr><td class=\"announcements_datum\">".get_lang('LastUpdateDate')." : ".
-            Display::dateToStringAgoAndLongDate(
-                !empty($lastEdit) ? $lastEdit->format('Y-m-d h:i:s') : ''
-            )."</td></tr>";
-
-        if ($itemProperty->getGroup() !== null) {
-            $sent_to_icon = Display::return_icon('group.gif', get_lang('AnnounceSentToUserSelection'));
-        }
+        $html .= "<tr>";
+        $html .= "<td class=\"announcements_datum\">".get_lang('LastUpdateDate')." : ";
+        $lastEdit = $itemProperty->getLasteditDate();
+        $html .= Display::dateToStringAgoAndLongDate($lastEdit);
+        $html .= "</td></tr>";
 
         if (api_is_allowed_to_edit(false, true)) {
             $sent_to = self::sent_to('announcement', $id);
@@ -768,7 +767,7 @@ class AnnouncementManager
             }
         }
 
-        // we remove everything from item_property for this
+        // We remove everything from item_property for this
         $sql = "DELETE FROM $tbl_item_property
                 WHERE c_id = $course_id AND ref='$id' AND tool='announcement'";
         Database::query($sql);
@@ -1176,12 +1175,12 @@ class AnnouncementManager
      */
     public static function get_attachment($announcementId)
     {
-        $tbl_announcement_attachment = Database::get_course_table(TABLE_ANNOUNCEMENT_ATTACHMENT);
+        $table = Database::get_course_table(TABLE_ANNOUNCEMENT_ATTACHMENT);
         $announcementId = intval($announcementId);
         $course_id = api_get_course_int_id();
         $row = array();
         $sql = 'SELECT id, path, filename, comment 
-                FROM ' . $tbl_announcement_attachment.'
+                FROM '.$table.'
 				WHERE c_id = ' . $course_id.' AND announcement_id = '.$announcementId;
         $result = Database::query($sql);
         if (Database::num_rows($result) != 0) {
@@ -1384,10 +1383,19 @@ class AnnouncementManager
         $course_id = $courseId ?: api_get_course_int_id();
         $_course = api_get_course_info();
 
-        $group_memberships = GroupManager::get_group_ids($course_id, api_get_user_id());
+        $group_memberships = GroupManager::get_group_ids(
+            $course_id,
+            api_get_user_id()
+        );
         $allowUserEditSetting = api_get_course_setting('allow_user_edit_announcement');
 
-        $select = ' DISTINCT announcement.*, ip.visibility, ip.to_group_id, ip.insert_user_id, ip.insert_date';
+        $select = ' DISTINCT 
+                        announcement.*, 
+                        ip.visibility, 
+                        ip.to_group_id, 
+                        ip.insert_user_id, 
+                        ip.insert_date, 
+                        ip.lastedit_date';
         if ($getCount) {
             $select = ' COUNT(DISTINCT announcement.iid) count';
         }
@@ -1608,12 +1616,35 @@ class AnnouncementManager
         $displayed = [];
         $results = [];
         $actionUrl = api_get_path(WEB_CODE_PATH).'announcements/announcements.php?'.api_get_cidreq();
+        $emailIcon = Display::return_icon(
+            'email.gif',
+            get_lang('AnnounceSentByEmail')
+        );
+        $attachmentIcon = Display::return_icon(
+            'attachment.gif',
+            get_lang('Attachment')
+        );
+
+        $editIcon = Display::return_icon(
+            'edit.png',
+            get_lang('Edit'),
+            '',
+            ICON_SIZE_SMALL
+        );
+
+        $deleteIcon = Display::return_icon(
+            'delete.png',
+            get_lang('Delete'),
+            '',
+            ICON_SIZE_SMALL
+        );
+
         while ($myrow = Database::fetch_array($result, 'ASSOC')) {
             if (!in_array($myrow['id'], $displayed)) {
                 $sent_to_icon = '';
                 // the email icon
                 if ($myrow['email_sent'] == '1') {
-                    $sent_to_icon = ' '.Display::return_icon('email.gif', get_lang('AnnounceSentByEmail'));
+                    $sent_to_icon = ' '.$emailIcon;
                 }
                 $groupReference = ($myrow['to_group_id'] > 0) ? ' <span class="label label-info">'.get_lang('Group').'</span> ' : '';
                 $title = $myrow['title'].$groupReference.$sent_to_icon;
@@ -1625,26 +1656,31 @@ class AnnouncementManager
 
                 $attachment_icon = '';
                 if (count($attachment_list) > 0) {
-                    $attachment_icon = ' '.Display::return_icon('attachment.gif', get_lang('Attachment'));
+                    $attachment_icon = ' '.$attachmentIcon;
                 }
 
                 /* TITLE */
                 $user_info = api_get_user_info($myrow['insert_user_id']);
                 $username = sprintf(get_lang("LoginX"), $user_info['username']);
-                $username_span = Display::tag('span', api_get_person_name($user_info['firstName'], $user_info['lastName']), array('title'=>$username));
-                $title = Display::url($title.$attachment_icon, $actionUrl.'&action=view&id='.$myrow['id']);
-                //$html .= Display::tag('td', $username_span, array('class' => 'announcements-list-line-by-user'));
-                //$html .= Display::tag('td', api_convert_and_format_date($myrow['insert_date'], DATE_TIME_FORMAT_LONG), array('class' => 'announcements-list-line-datetime'));
 
-                $modify_icons = '';
+                $username_span = Display::tag(
+                    'span',
+                    $user_info['complete_name'],
+                    array('title' => $username)
+                );
+
+                $title = Display::url(
+                    $title.$attachment_icon,
+                    $actionUrl.'&action=view&id='.$myrow['id']
+                );
+
                 // we can edit if : we are the teacher OR the element belongs to
                 // the session we are coaching OR the option to allow users to edit is on
                 if (api_is_allowed_to_edit(false, true) ||
                     (api_is_session_general_coach() && api_is_element_in_the_session(TOOL_ANNOUNCEMENT, $myrow['id']))
                     || (api_get_course_setting('allow_user_edit_announcement') && !api_is_anonymous())
                 ) {
-                    $modify_icons = "<a href=\"".$actionUrl."&action=modify&id=".$myrow['id']."\">".
-                        Display::return_icon('edit.png', get_lang('Edit'), '', ICON_SIZE_SMALL)."</a>";
+                    $modify_icons = "<a href=\"".$actionUrl."&action=modify&id=".$myrow['id']."\">".$editIcon."</a>";
                     if ($myrow['visibility'] == 1) {
                         $image_visibility = "visible";
                         $alt_visibility = get_lang('Hide');
@@ -1670,8 +1706,7 @@ class AnnouncementManager
                     }
                     if (api_is_allowed_to_edit(false, true)) {
                         $modify_icons .= "<a href=\"".$actionUrl."&action=delete&id=".$myrow['id']."&sec_token=".$stok."\" onclick=\"javascript:if(!confirm('".addslashes(api_htmlentities(get_lang('ConfirmYourChoice'), ENT_QUOTES, api_get_system_encoding()))."')) return false;\">".
-                            Display::return_icon('delete.png', get_lang('Delete'), '', ICON_SIZE_SMALL).
-                            "</a>";
+                            $deleteIcon."</a>";
                     }
                     $iterator++;
                 } else {
@@ -1682,10 +1717,17 @@ class AnnouncementManager
                 }
 
                 $announcement = [
-                    'id' => $myrow["id"],
+                    'id' => $myrow['id'],
                     'title' => $title,
                     'username' => $username_span,
-                    'insert_date' => api_convert_and_format_date($myrow['insert_date'], DATE_TIME_FORMAT_LONG),
+                    'insert_date' => api_convert_and_format_date(
+                        $myrow['insert_date'],
+                        DATE_TIME_FORMAT_LONG
+                    ),
+                    'lastedit_date' => api_convert_and_format_date(
+                        $myrow['lastedit_date'],
+                        DATE_TIME_FORMAT_LONG
+                    ),
                     'actions' => $modify_icons
                 ];
 
@@ -1721,8 +1763,7 @@ class AnnouncementManager
 
         if (api_is_allowed_to_edit(false, true)) {
             // check teacher status
-            if (empty($_GET['origin']) or $_GET['origin'] !== 'learnpath') {
-
+            if (empty($_GET['origin']) || $_GET['origin'] !== 'learnpath') {
                 if (api_get_group_id() == 0) {
                     $group_condition = '';
                 } else {
@@ -1750,7 +1791,7 @@ class AnnouncementManager
             }
         } else {
             // students only get to see the visible announcements
-            if (empty($_GET['origin']) or $_GET['origin'] !== 'learnpath') {
+            if (empty($_GET['origin']) || $_GET['origin'] !== 'learnpath') {
                 $group_memberships = GroupManager::get_group_ids($_course['real_id'], $userId);
 
                 if ((api_get_course_setting('allow_user_edit_announcement') && !api_is_anonymous())) {
@@ -1830,7 +1871,6 @@ class AnnouncementManager
                                 ORDER BY display_order DESC
                                 LIMIT 0, $maximum";
                     } else {
-
                         if (api_get_course_setting('allow_user_edit_announcement')) {
                             $cond_user_id = " AND (
                                 ip.lastedit_user_id = '".api_get_user_id()."' OR ip.to_group_id='0' OR ip.to_group_id IS NULL

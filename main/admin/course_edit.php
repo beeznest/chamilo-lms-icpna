@@ -69,7 +69,7 @@ if (api_is_multiple_url_enabled()) {
             ON (u.user_id=url_rel_user.user_id)
             WHERE
                 url_rel_user.access_url_id = $urlId AND
-                status = 1" . $order_clause;
+                status = 1".$order_clause;
 } else {
     $sql = "SELECT user_id, lastname, firstname
             FROM $table_user WHERE status='1'".$order_clause;
@@ -143,7 +143,48 @@ $form->addText(
 
 $form->applyFilter('visual_code', 'strtoupper');
 $form->applyFilter('visual_code', 'html_filter');
-$form->addElement('advmultiselect', 'course_teachers', get_lang('CourseTeachers'), $allTeachers);
+
+$countCategories = $courseCategoriesRepo->countAllInAccessUrl($urlId);
+if ($countCategories >= 100) {
+    // Category code
+    $url = api_get_path(WEB_AJAX_PATH).'course.ajax.php?a=search_category';
+
+    $categorySelect = $form->addElement(
+        'select_ajax',
+        'category_code',
+        get_lang('CourseFaculty'),
+        null,
+        ['url' => $url]
+    );
+
+    if (!empty($courseInfo['categoryCode'])) {
+        $data = \CourseCategory::getCategory($courseInfo['categoryCode']);
+        $categorySelect->addOption($data['name'], $data['code']);
+    }
+} else {
+    $courseInfo['category_code'] = $courseInfo['categoryCode'];
+    $categories = $courseCategoriesRepo->findAllInAccessUrl($urlId);
+    $categoriesOptions = [null => get_lang('None')];
+
+    /** @var CourseCategory $category */
+    foreach ($categories as $category) {
+        $categoriesOptions[$category->getCode()] = (string) $category;
+    }
+
+    $form->addSelect(
+        'category_code',
+        get_lang('CourseFaculty'),
+        $categoriesOptions
+    );
+}
+
+
+$form->addElement(
+    'advmultiselect',
+    'course_teachers',
+    get_lang('CourseTeachers'),
+    $allTeachers
+);
 $courseInfo['course_teachers'] = $course_teachers;
 if (array_key_exists('add_teachers_to_sessions_courses', $courseInfo)) {
     $form->addElement(
@@ -158,7 +199,10 @@ $coursesInSession = SessionManager::get_session_by_course($courseInfo['real_id']
 if (!empty($coursesInSession)) {
     foreach ($coursesInSession as $session) {
         $sessionId = $session['id'];
-        $coaches = SessionManager::getCoachesByCourseSession($sessionId, $courseInfo['real_id']);
+        $coaches = SessionManager::getCoachesByCourseSession(
+            $sessionId,
+            $courseInfo['real_id']
+        );
         $teachers = $allTeachers;
 
         $sessionTeachers = array();
@@ -189,41 +233,6 @@ if (!empty($coursesInSession)) {
         );
         $courseInfo[$groupName] = $sessionTeachers;
     }
-}
-
-$countCategories = $courseCategoriesRepo->countAllInAccessUrl($urlId);
-
-if ($countCategories >= 100) {
-    // Category code
-    $url = api_get_path(WEB_AJAX_PATH).'course.ajax.php?a=search_category';
-
-    $categorySelect = $form->addElement(
-        'select_ajax',
-        'category_code',
-        get_lang('CourseFaculty'),
-        null,
-        ['url' => $url]
-    );
-
-    if (!empty($courseInfo['categoryCode'])) {
-        $data = \CourseCategory::getCategory($courseInfo['categoryCode']);
-        $categorySelect->addOption($data['name'], $data['code']);
-    }
-} else {
-    $courseInfo['category_code'] = $courseInfo['categoryCode'];
-    $categories = $courseCategoriesRepo->findAllInAccessUrl($urlId);
-    $categoriesOptions = [null => get_lang('None')];
-
-    /** @var CourseCategory $category */
-    foreach ($categories as $category) {
-        $categoriesOptions[$category->getCode()] = $category->__toString();
-    }
-
-    $form->addSelect(
-        'category_code',
-        get_lang('CourseFaculty'),
-        $categoriesOptions
-    );
 }
 
 $form->addText('department_name', get_lang('CourseDepartment'), false, array('size' => '60'));

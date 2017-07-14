@@ -435,8 +435,11 @@ class SessionManager
      * @return mixed Integer for number of rows, or array of results
      * @assert (array(),true) !== false
      */
-    public static function get_sessions_admin($options = array(), $get_count = false, $columns = [])
-    {
+    public static function get_sessions_admin(
+        $options = array(),
+        $get_count = false,
+        $columns = []
+    ) {
         $tbl_session = Database::get_main_table(TABLE_MAIN_SESSION);
         $sessionCategoryTable = Database::get_main_table(TABLE_MAIN_SESSION_CATEGORY);
 
@@ -541,6 +544,7 @@ class SessionManager
         }
         $query .= $order;
         $query .= $limit;
+
         $result = Database::query($query);
 
         $categories = self::get_all_session_category();
@@ -550,7 +554,6 @@ class SessionManager
                 $orderedCategories[$category['id']] = $category['name'];
             }
         }
-
         $formatted_sessions = array();
         if (Database::num_rows($result)) {
             $sessions = Database::store_result($result, 'ASSOC');
@@ -665,8 +668,13 @@ class SessionManager
      * @param array options order and limit keys
      * @return array table with user name, lp name, progress
      */
-    public static function get_session_lp_progress($sessionId = 0, $courseId = 0, $date_from, $date_to, $options)
-    {
+    public static function get_session_lp_progress(
+        $sessionId = 0,
+        $courseId = 0,
+        $date_from,
+        $date_to,
+        $options
+    ) {
         //escaping vars
         $sessionId = $sessionId == 'T' ? 'T' : intval($sessionId);
         $courseId = intval($courseId);
@@ -749,7 +757,8 @@ class SessionManager
                     AND v.user_id = %d
             $sessionCond";
 
-            $sql_query = sprintf($sql,
+            $sql_query = sprintf(
+                $sql,
                 intval($courseId),
                 intval($user['user_id']),
                 $sessionId
@@ -791,19 +800,22 @@ class SessionManager
      * @todo fix the query
      * @return array table with user name, lp name, progress
      */
-    public static function get_survey_overview($sessionId = 0, $courseId = 0, $surveyId = 0, $date_from, $date_to, $options)
-    {
+    public static function get_survey_overview(
+        $sessionId = 0,
+        $courseId = 0,
+        $surveyId = 0,
+        $date_from,
+        $date_to,
+        $options
+    ) {
         //escaping vars
         $sessionId = intval($sessionId);
         $courseId = intval($courseId);
         $surveyId = intval($surveyId);
-        $date_from = Database::escape_string($date_from);
-        $date_to = Database::escape_string($date_to);
 
         //tables
         $session_course_user = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
         $user = Database::get_main_table(TABLE_MAIN_USER);
-        $tbl_course_lp_view = Database::get_course_table(TABLE_LP_VIEW);
         $c_survey = Database::get_course_table(TABLE_SURVEY);
         $c_survey_answer = Database::get_course_table(TABLE_SURVEY_ANSWER);
         $c_survey_question = Database::get_course_table(TABLE_SURVEY_QUESTION);
@@ -901,8 +913,13 @@ class SessionManager
      *
      * @return array table with user name, lp name, progress
      */
-    public static function get_session_progress($sessionId, $courseId, $date_from, $date_to, $options)
-    {
+    public static function get_session_progress(
+        $sessionId,
+        $courseId,
+        $date_from,
+        $date_to,
+        $options
+    ) {
         $sessionId = intval($sessionId);
 
         $getAllSessions = false;
@@ -983,7 +1000,13 @@ class SessionManager
         /**
          *  Exercises
          */
-        $exercises = ExerciseLib::get_all_exercises($course, $sessionId, false, '', $getAllSessions);
+        $exercises = ExerciseLib::get_all_exercises(
+            $course,
+            $sessionId,
+            false,
+            '',
+            $getAllSessions
+        );
         $exercises_total = count($exercises);
 
         /**
@@ -1222,19 +1245,6 @@ class SessionManager
         }
 
         return $table;
-    }
-
-    /**
-     * @return int
-     */
-    public static function get_number_of_tracking_access_overview()
-    {
-        $table = Database::get_main_table(TABLE_STATISTIC_TRACK_E_COURSE_ACCESS);
-        $sql = "SELECT COUNT(course_access_id) count FROM $table";
-        $result = Database::query($sql);
-        $row = Database::fetch_assoc($result);
-
-        return $row['count'];
     }
 
     /**
@@ -1578,10 +1588,10 @@ class SessionManager
     /**
      * Delete session
      * @author Carlos Vargas  from existing code
-     * @param	array	$id_checked an array to delete sessions
-     * @param   boolean  $from_ws optional, true if the function is called
+     * @param array $id_checked an array to delete sessions
+     * @param boolean $from_ws optional, true if the function is called
      * by a webservice, false otherwise.
-     * @return	void	Nothing, or false on error
+     * @return bool
      * */
     public static function delete($id_checked, $from_ws = false)
     {
@@ -1719,7 +1729,8 @@ class SessionManager
     }
 
     /**
-     * Subscribes students to the given session and optionally (default) unsubscribes previous users
+     * Subscribes students to the given session and optionally (default)
+     * unsubscribes previous users
      *
      * @author Carlos Vargas from existing code
      * @author Julio Montoya. Cleaning code.
@@ -2362,7 +2373,6 @@ class SessionManager
         if ($removeExistingCoursesWithUsers === true && !empty($existingCourses)) {
             foreach ($existingCourses as $existingCourse) {
                 if (!in_array($existingCourse['c_id'], $courseList)) {
-
                     $sql = "DELETE FROM $tbl_session_rel_course
                             WHERE
                                 c_id = ".$existingCourse['c_id']." AND
@@ -2628,14 +2638,18 @@ class SessionManager
 
     /**
      * Creates a new extra field for a given session
-     * @param	string	$variable Field's internal variable name
-     * @param	int		$fieldType Field's type
-     * @param	string	$displayText Field's language var name
-     * @param   string  $default    Field's default value
+     * @param string $variable Field's internal variable name
+     * @param int $fieldType Field's type
+     * @param string $displayText Field's language var name
+     * @param string $default Field's default value
      * @return int     new extra field id
      */
-    public static function create_session_extra_field($variable, $fieldType, $displayText, $default = '')
-    {
+    public static function create_session_extra_field(
+        $variable,
+        $fieldType,
+        $displayText,
+        $default = ''
+    ) {
         $extraField = new ExtraFieldModel('session');
         $params = [
             'variable' => $variable,
@@ -2649,10 +2663,10 @@ class SessionManager
 
     /**
      * Update an extra field value for a given session
-     * @param	integer	Course ID
-     * @param	string	Field variable name
-     * @param	string	Field value
-     * @return	boolean	true if field updated, false otherwise
+     * @param integer    Course ID
+     * @param string    Field variable name
+     * @param string    Field value
+     * @return boolean    true if field updated, false otherwise
      */
     public static function update_session_extra_field_value($sessionId, $variable, $value = '')
     {
@@ -2715,13 +2729,13 @@ class SessionManager
     /**
      * Create a session category
      * @author Jhon Hinojosa <jhon.hinojosa@dokeos.com>, from existing code
-     * @param	string 		name
-     * @param 	integer		year_start
-     * @param 	integer		month_start
-     * @param 	integer		day_start
-     * @param 	integer		year_end
-     * @param 	integer		month_end
-     * @param 	integer		day_end
+     * @param string        name
+     * @param integer        year_start
+     * @param integer        month_start
+     * @param integer        day_start
+     * @param integer        year_end
+     * @param integer        month_end
+     * @param integer        day_end
      * @return int session ID
      * */
     public static function create_category_session(
@@ -2790,14 +2804,14 @@ class SessionManager
     /**
      * Edit a sessions category
      * @author Jhon Hinojosa <jhon.hinojosa@dokeos.com>,from existing code
-     * @param	integer		id
-     * @param	string 		name
-     * @param 	integer		year_start
-     * @param 	integer		month_start
-     * @param 	integer		day_start
-     * @param 	integer		year_end
-     * @param 	integer		month_end
-     * @param 	integer		day_end
+     * @param integer        id
+     * @param string        name
+     * @param integer        year_start
+     * @param integer        month_start
+     * @param integer        day_start
+     * @param integer        year_end
+     * @param integer        month_end
+     * @param integer        day_end
      * @return bool
      * The parameter id is a primary key
      * */
@@ -3495,7 +3509,6 @@ class SessionManager
         if ($getSql) {
             return $sql;
         }
-
         $result = Database::query($sql);
 
         if ($getCount) {
@@ -3517,6 +3530,10 @@ class SessionManager
             );
 
             while ($row = Database::fetch_array($result)) {
+                if ($getOnlySessionId) {
+                    $sessions[$row['id']] = $row;
+                    continue;
+                }
                 $imageFilename = \ExtraField::FIELD_TYPE_FILE_IMAGE.'_'.$row['id'].'.png';
 
                 $row['image'] = is_file($sysUploadPath.$imageFilename) ? $webUploadPath.$imageFilename : $imgPath;
@@ -3814,9 +3831,10 @@ class SessionManager
      * @param  int $id session id
      * @param    int $status filter by status coach = 2
      * @param bool $getCount Optional. Allow get the number of rows from the result
+     * @param int $urlId
      * @return array|int A list with an user list. If $getCount is true then return a the count of registers
      */
-    public static function get_users_by_session($id, $status = null, $getCount = false)
+    public static function get_users_by_session($id, $status = null, $getCount = false, $urlId = 0)
     {
         if (empty($id)) {
             return array();
@@ -3844,10 +3862,11 @@ class SessionManager
                 ON (au.user_id = u.user_id)
                 ";
 
-        $urlId = api_get_current_access_url_id();
-        if (isset($status) && $status != '') {
+        $urlId = empty($urlId) ? api_get_current_access_url_id() : (int) $urlId;
+
+        if ($status != '') {
             $status = intval($status);
-            $sql .= " WHERE su.relation_type = $status AND (au.access_url_id = $urlId OR su.access_url_id is null )";
+            $sql .= " WHERE su.relation_type = $status AND (au.access_url_id = $urlId OR au.access_url_id is null)";
         } else {
             $sql .= " WHERE (au.access_url_id = $urlId OR au.access_url_id is null )";
         }
@@ -7778,8 +7797,8 @@ class SessionManager
     /**
      * Gets the admin session list callback of the session/session_list.php
      * page with all user/details in the right fomat
-     * @param array
-     * @result array Array of rows results
+     * @param array $options
+     * @return array Array of rows results
      * @asset ('a') === false
      */
     public static function get_sessions_admin_complete($options = array())
@@ -7856,7 +7875,7 @@ class SessionManager
         $select = "
                 SELECT * FROM (
                     SELECT DISTINCT
-                         IF (
+                        IF (
                             (s.access_start_date <= '$today' AND '$today' < s.access_end_date) OR
                             (s.access_start_date = '0000-00-00 00:00:00' AND s.access_end_date = '0000-00-00 00:00:00' ) OR
                             (s.access_start_date IS NULL AND s.access_end_date IS NULL) OR
@@ -7905,9 +7924,11 @@ class SessionManager
             $where .= ' AND '.$options['where'];
         }
 
+        $limit = '';
         if (!empty($options['limit'])) {
-            $where .= " LIMIT ".$options['limit'];
+            $limit = " LIMIT ".$options['limit'];
         }
+
         $query = "$select FROM $tbl_session s
                     LEFT JOIN $tbl_session_field_values fv
                     ON (fv.item_id = s.id)
@@ -7922,24 +7943,34 @@ class SessionManager
                     LEFT JOIN $tbl_session_category sc
                     ON (s.session_category_id = sc.id)
                     INNER JOIN $tbl_user u
-                    ON (s.id_coach = u.user_id) ".
-            $where;
+                    ON (s.id_coach = u.user_id) 
+                    $where
+                    $limit
+        ";
 
         if (api_is_multiple_url_enabled()) {
             $table_access_url_rel_session = Database::get_main_table(TABLE_MAIN_ACCESS_URL_REL_SESSION);
             $access_url_id = api_get_current_access_url_id();
             if ($access_url_id != -1) {
-                $where .= " AND ar.access_url_id = $access_url_id ";
                 $query = "$select
                     FROM $tbl_session s
-                    LEFT JOIN $tbl_session_field_values fv ON (fv.session_id = s.id)
-                    LEFT JOIN $tbl_session_field_options fvo ON (fv.field_id = fvo.field_id)
-                    LEFT JOIN $tbl_session_rel_course src ON (src.id_session = s.id)
-                    LEFT JOIN $tbl_course c ON (src.c_id = c.id)
-                    LEFT JOIN $tbl_session_category sc ON (s.session_category_id = sc.id)
-                    INNER JOIN $tbl_user u ON (s.id_coach = u.user_id)
-                    INNER JOIN $table_access_url_rel_session ar ON (ar.session_id = s.id)
-                    $where";
+                    LEFT JOIN $tbl_session_field_values fv 
+                    ON (fv.item_id = s.id)
+                    LEFT JOIN $tbl_session_field_options fvo 
+                    ON (fv.field_id = fvo.field_id)
+                    LEFT JOIN $tbl_session_rel_course src 
+                    ON (src.session_id = s.id)
+                    LEFT JOIN $tbl_course c 
+                    ON (src.c_id = c.id)
+                    LEFT JOIN $tbl_session_category sc 
+                    ON (s.session_category_id = sc.id)
+                    INNER JOIN $tbl_user u 
+                    ON (s.id_coach = u.user_id)
+                    INNER JOIN $table_access_url_rel_session ar 
+                    ON (ar.session_id = s.id AND ar.access_url_id = $access_url_id)
+                    $where
+                    $limit
+                ";
             }
         }
 
@@ -7950,8 +7981,22 @@ class SessionManager
         }
 
         $result = Database::query($query);
-        $formatted_sessions = array();
 
+        $acceptIcon = Display::return_icon(
+            'accept.png',
+            get_lang('Active'),
+            array(),
+            ICON_SIZE_SMALL
+        );
+
+        $errorIcon = Display::return_icon(
+            'error.png',
+            get_lang('Inactive'),
+            array(),
+            ICON_SIZE_SMALL
+        );
+
+        $formatted_sessions = array();
         if (Database::num_rows($result)) {
             $sessions = Database::store_result($result, 'ASSOC');
             foreach ($sessions as $session) {
@@ -7959,9 +8004,9 @@ class SessionManager
                 $session['name'] = Display::url($session['name'], "resume_session.php?id_session=".$session['id']);
                 $session['coach_name'] = Display::url($session['coach_name'], "user_information.php?user_id=".$session['user_id']);
                 if ($session['session_active'] == 1) {
-                    $session['session_active'] = Display::return_icon('accept.png', get_lang('Active'), array(), ICON_SIZE_SMALL);
+                    $session['session_active'] = $acceptIcon;
                 } else {
-                    $session['session_active'] = Display::return_icon('error.png', get_lang('Inactive'), array(), ICON_SIZE_SMALL);
+                    $session['session_active'] = $errorIcon;
                 }
 
                 $session = self::convert_dates_to_local($session);
@@ -8006,7 +8051,10 @@ class SessionManager
 
                 // Magic filter
                 if (isset($formatted_sessions[$session_id])) {
-                    $formatted_sessions[$session_id] = self::compareArraysToMerge($formatted_sessions[$session_id], $session);
+                    $formatted_sessions[$session_id] = self::compareArraysToMerge(
+                        $formatted_sessions[$session_id],
+                        $session
+                    );
                 } else {
                     $formatted_sessions[$session_id] = $session;
                 }
@@ -8504,12 +8552,14 @@ class SessionManager
     }
 
     /**
-     * @param \Chamilo\CoreBundle\Entity\Course $course
-     * @param \Chamilo\CoreBundle\Entity\Session $session
+     * @param Course $course
+     * @param Session $session
      * @return int
      */
-    public static function getCountUsersInCourseSession(Course $course, Session $session)
-    {
+    public static function getCountUsersInCourseSession(
+        Course $course,
+        Session $session
+    ) {
         return Database::getManager()
             ->createQuery("
                 SELECT COUNT(scu)

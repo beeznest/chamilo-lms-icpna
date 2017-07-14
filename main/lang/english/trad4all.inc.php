@@ -7262,7 +7262,7 @@ $NewStatus = "New status";
 $Reason = "Reason";
 $RequestStatus = "Request new status";
 $StatusRequestMessage = "You have been logged-in with default permissions. You can request more permissions by submitting the following request.";
-$ReasonIsMandatory = "You reason field is mandatory. Please fill it in before submitting.";
+$ReasonIsMandatory = "The 'reason' field is mandatory. Please fill it in before submitting.";
 $RequestSubmitted = "Your request has been submitted.";
 $RequestFailed = "We are not able to fulfill your request at this time. Please contact your administrator.";
 $InternalLogin = "Internal login";
@@ -8003,8 +8003,8 @@ $Annotation = "Annotation";
 $TeacherPicture = "Teacher picture";
 $FeedbackIfNotCorrect = "Feedback if not correct";
 $ScheduledAnnouncements = "Scheduled announcements";
-$SpecificDate = "Specific date";
-$BaseDate = "Base date";
+$SpecificDate = "Specific dispatch date";
+$BaseDate = "Dispatch based on the session's start/end dates";
 $AfterOrBefore = "After or before";
 $Before = "Before";
 $ScheduleAnnouncementDescription = "This form allows scheduling announcements to be sent automatically to the students who are taking a course in a session. 
@@ -8014,5 +8014,18 @@ There are two types of announcements that can be sent:
 Specific date: In this case a specific day is selected to make the announcement. 
 
 Based on the start / end date of the session: in this case the number of days to pass before sending the announcement must be indicated. And those days can be associated to before or after the start / end date. For example: 3 days after the start date.";
-$MandatorySurveyNoAnswered = "You have pending a mandatory survey. To enter the course, you must first complete it.";
+$MandatorySurveyNoAnswered = "A mandatory survey is waiting your answer. To enter the course, you must first complete the survey.";
+$ShowPreviousButton = "Show previous button";
+$AllTickets = "All tickets";
+$IsMandatory = "Mandatory?";
+$StudentXHasBeenAssignedNewWorkInCourseY = "%s got a new assignment in course %s";
+$AsHRMYouReceiveThisMailToAlertThatXHasNewWorkInCourseY = "As his/her human resources manager, you are receiving this e-mail to let you know that %s just got a new assignment in course %s";
+$DearXComma = "Dear %s,";
+$UserLinkingRequests = "User linking requests";
+$NewHomeworkEmailAlertToHrmEnable = "Send e-mail to students and their HRM on assignments creation";
+$UserLinkingRequestAccepted = "User linking request accepted";
+$UserLinkingTo = "Linked to student";
+$RequestLinkingToUser = "Request linking to student";
+$LinkingRequestsAdded = "Linking request added";
+$HrmList = "Human Resource Managers list";
 ?>

@@ -60,7 +60,12 @@ if (!in_array(
 // Search features
 
 //@todo move this in the display_class or somewhere else
-
+/**
+ * @param string $col
+ * @param string $oper
+ * @param string $val
+ * @return string
+ */
 function getWhereClause($col, $oper, $val)
 {
     $ops = array(
@@ -118,8 +123,9 @@ if (($search || $forceSearch) && ($search !== 'false')) {
     $whereConditionInForm = getWhereClause($searchField, $searchOperator, $searchString);
 
     if (!empty($whereConditionInForm)) {
-        $whereCondition .= ' AND '.$whereConditionInForm;
+        $whereCondition .= ' AND ('.$whereConditionInForm.') ';
     }
+
     $filters = isset($_REQUEST['filters']) && !is_array($_REQUEST['filters']) ? json_decode($_REQUEST['filters']) : false;
 
     if (!empty($filters)) {
@@ -142,21 +148,21 @@ if (($search || $forceSearch) && ($search !== 'false')) {
 
                 $extraCondition = '';
                 if (!empty($condition_array)) {
-                    $extraCondition = ' AND ( ';
+                    $extraCondition = $filters->groupOp.' ( ';
                     $extraCondition .= implode($filters->groupOp, $condition_array);
                     $extraCondition .= ' ) ';
                 }
 
+
                 $whereCondition .= $extraCondition;
 
                 // Question field
-
                 $resultQuestion = $extraField->getExtraFieldRules($filters, 'question_');
                 $questionFields = $resultQuestion['extra_fields'];
                 $condition_array = $resultQuestion['condition_array'];
 
                 if (!empty($condition_array)) {
-                    $extraQuestionCondition = ' AND ( ';
+                    $extraQuestionCondition = $filters->groupOp.' ( ';
                     $extraQuestionCondition .= implode($filters->groupOp, $condition_array);
                     $extraQuestionCondition .= ' ) ';
                     // Remove conditions already added
@@ -688,6 +694,7 @@ switch ($action) {
         );
         if ($result) {
             foreach ($result as &$item) {
+                $item['sent'] = $item['sent'] == 1 ? get_lang('Yes') : get_lang('No');
                 $item['date'] = api_get_local_time($item['date']);
             }
         }
@@ -889,7 +896,7 @@ switch ($action) {
         }
 
         break;
-	case 'get_user_skill_ranking':
+    case 'get_user_skill_ranking':
         $columns = array('photo', 'firstname', 'lastname', 'skills_acquired', 'currently_learning', 'rank');
         $result = $skill->get_user_list_skill_ranking($start, $limit, $sidx, $sord, $whereCondition);
         $result = msort($result, 'skills_acquired', 'asc');

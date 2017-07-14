@@ -1512,7 +1512,7 @@ function get_forums(
     $forum_list = array();
     $includeGroupsForumSelect = '';
     if (!$includeGroupsForum) {
-        $includeGroupsForumSelect = " AND forum_of_group = 0 ";
+        $includeGroupsForumSelect = " AND (forum_of_group = 0 OR forum_of_group IS NULL) ";
     }
 
     if ($id == '') {
@@ -5586,12 +5586,13 @@ function getForumCreatedByUser($user_id, $courseId, $sessionId)
                 true,
                 $sessionId
             );
-
-            $forumList[] = array(
-                $forumInfo['forum_title'],
-                api_get_local_time($forum['insert_date']),
-                api_get_local_time($forum['lastedit_date']),
-            );
+            if (!empty($forumInfo)) {
+                $forumList[] = array(
+                    $forumInfo['forum_title'],
+                    api_get_local_time($forum['insert_date']),
+                    api_get_local_time($forum['lastedit_date']),
+                );
+            }
         }
     }
 

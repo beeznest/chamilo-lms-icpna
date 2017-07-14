@@ -1943,7 +1943,7 @@ abstract class Question
             $class = 'success';
         }
 
-        if ($this->type == FREE_ANSWER || $this->type == ORAL_EXPRESSION) {
+        if (in_array($this->type, [FREE_ANSWER, ORAL_EXPRESSION, ANNOTATION])) {
             $score['revised'] = isset($score['revised']) ? $score['revised'] : false;
             if ($score['revised'] == true) {
                 $score_label = get_lang('Revised');
@@ -1953,6 +1953,15 @@ abstract class Question
                 $class = 'warning';
                 $weight = float_format($score['weight'], 1);
                 $score['result'] = " ? / ".$weight;
+                $model = ExerciseLib::getCourseScoreModel();
+                if (!empty($model)) {
+                    $score['result'] = " ? ";
+                }
+
+                $hide = api_get_configuration_value('hide_free_question_score');
+                if ($hide === true) {
+                    $score['result'] = '-';
+                }
             }
         }
 
@@ -2227,8 +2236,10 @@ abstract class Question
     public function isQuestionWaitingReview($score)
     {
         $isReview = false;
-        if (!empty($score['comments']) || $score['score'] > 0) {
-            $isReview = true;
+        if (!empty($score)) {
+            if (!empty($score['comments']) || $score['score'] > 0) {
+                $isReview = true;
+            }
         }
 
         return $isReview;
@@ -2258,7 +2269,7 @@ abstract class Question
      */
     public function returnFormatFeedback()
     {
-        return '<br /><br />'.Display::return_message($this->feedback, 'normal', false);
+        return Display::return_message($this->feedback, 'normal', false);
     }
 
     /**

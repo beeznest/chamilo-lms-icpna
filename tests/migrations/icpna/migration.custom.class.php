@@ -1106,10 +1106,6 @@ class MigrationCustom
         if ($user_info['error'] == false) {
             global $api_failureList;
             unset($user_info['error']);
-            $extra = [];
-            if (!empty($user_info['extra_uididpersona'])) {
-                $extra['extra_uididpersona'] = $user_info['extra_uididpersona'];
-            }
 
             // ICPNA users are accepted without e-mail
             if (empty($user_info['email'])) {
@@ -1131,9 +1127,18 @@ class MigrationCustom
                 null,
                 1,
                 null,
-                $extra,
+                null,
                 $user_info['encrypt_method']
             );
+            if (!empty($user_info['extra_uididpersona'])) {
+                $extraFieldValue = new ExtraFieldValue('user');
+                $params = [
+                    'item_id' => $chamilo_user_id,
+                    'variable' => 'uididpersona',
+                    'value' => $user_info['extra_uididpersona']
+                ];
+                $extraFieldValue->save($params);
+            }
             $chamilo_user_info = api_get_user_info($chamilo_user_id);
 
             if ($chamilo_user_info && $chamilo_user_info['user_id']) {

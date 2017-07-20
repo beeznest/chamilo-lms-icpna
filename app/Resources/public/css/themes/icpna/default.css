@@ -1,0 +1,198 @@
+/*!
+ * Chamilo LMS stylesheet - Default v.2.0
+ * Homepage: https://chamilo.org
+ * Author: Alex Aragón <alex.aragon@beeznest.com>
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * Based on Bootstrap v3
+*/
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Open Sans Light'), local('OpenSans-Light'), url(fonts/OpenSans-Light.woff2) format('woff2'), url(fonts/OpenSans-Light.woff) format('woff');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans'), local('OpenSans'), url(fonts/OpenSans.woff2) format('woff2'), url(fonts/OpenSans.woff) format('woff');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Open Sans Semibold'), local('OpenSans-Semibold'), url(fonts/OpenSans-Semibold.woff2) format('woff2'), url(fonts/OpenSans-Semibold.woff) format('woff');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Open Sans Bold'), local('OpenSans-Bold'), url(fonts/OpenSans-Bold.woff2) format('woff2'), url(fonts/OpenSans-Bold.woff) format('woff');
+}
+body {
+  margin: 0;
+  font-family: 'Open Sans', sans-serif;
+}
+ 
+a {
+  color: #00339F;
+  text-decoration: none;
+}
+a:hover,
+a:focus {
+  color: #2E75A3;
+  text-decoration: none;
+}
+a:focus {
+  outline: none;
+}
+
+.navbar{
+  border-radius: 0;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+}
+.navbar-collapse{
+  overflow: hidden !important;
+}
+.navbar-default {
+  background: #00339F;
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+  border: none;
+  border-top: 1px solid #DA291C;
+}
+.navbar-default .navbar-nav > li > a:focus,
+.navbar-default .navbar-nav > li > a:hover {
+  color: #FFFFFF;
+  background-color:#00297F;
+}
+.navbar-default .navbar-nav > .active > a,
+.navbar-default .navbar-nav > .active > a:hover,
+.navbar-default .navbar-nav > .active > a:focus{
+  color: #fff;
+  background-color:#00297F;
+}
+.navbar-default .navbar-nav > li > a{
+  color: #B0C9FF;
+  text-transform: uppercase;
+  border-left:  1px solid #012676;
+  border-right: 1px solid #0041CC;
+}
+.navbar-default .navbar-nav > .open > a,
+.navbar-default .navbar-nav > .open > a:hover,
+.navbar-default .navbar-nav > .open > a:focus{
+  background: #00297F;
+  color: #ffffff;
+}
+.navbar-nav > li > .dropdown-menu{
+  min-width: 100%;
+  margin-top: 2px;
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+}
+.navbar-default .navbar-nav > .open > .dropdown-menu{
+  padding: 3px 4px;
+}
+.navbar-default .navbar-nav > .open > .dropdown-menu > li > a{
+  padding: 6px 9px;
+}
+.nav > li > a:hover, .nav > li > a:focus{
+   background-color: transparent;
+}
+.navbar-form .form-control{
+  height: 25px;
+  padding: 6px;
+}
+.navbar-default .navbar-brand {
+  color:white;
+}
+.navbar-default .navbar-collapse, .navbar-default .navbar-form{
+  border-color: #2C5B8E;
+}
+.avatar-user .img-circle{
+    border: none;
+}
+.navbar-default .navbar-toggle{
+  border-color: #00677C;
+}
+.navbar-default .navbar-toggle .icon-bar{
+  background-color: #ffffff;
+}
+.navbar-default .navbar-toggle:focus, .navbar-default .navbar-toggle:hover{
+  background-color: #2C5B8E;
+}
+.badge-warning{
+  background-color: #FD6600;
+}
+.breadcrumb{
+  padding: 8px 15px;
+  margin-bottom: 21px;
+  list-style: outside none none;
+  background-color: #ECF0F1;
+}
+.breadcrumb > .active{
+  color: #95a5a6;
+}
+.panel-default{
+  border-color: #ECF0F1;
+}
+.panel-default .panel-heading{
+  color: #2c3e50;
+  background-color:#ECF0F1;
+  border-color: #ECF0F1;
+}
+.btn-primary{
+   color: #FFF;
+   background-color: #00339F;
+   border-color: #00339F;
+}
+.btn-primary:hover{
+   background-color: #00297F;
+   border-color: #00297F;
+}
+/* Jquery UI */
+.ui-accordion .ui-accordion-icons{
+  padding-left: 0.2em;
+}
+/* End Jquery UI */
+.bgfooter{
+  background-color:#00339F;
+  border-top: 3px solid #DA291C;
+  color: #FFFFFF;
+}
+.bgfooter a{
+  color: #ffffff;
+}
+.page-header{
+  margin: 10px 0 10px;
+}
+.hot-course-title{
+    text-transform: uppercase;
+    color: #00339F;
+    font-weight: bold;
+    border-bottom: 1px solid #DDD;
+    padding-bottom: 12px;
+}
+.hot-course-head{
+    padding: 10px 0;
+    margin-bottom: 25px;
+}
+#homepage-announcements .page-header{
+    text-transform: uppercase;
+    color: #00339F;
+    font-weight: bold;
+    border-bottom: 1px solid #DDD;
+}
+#carousel-announcement .carousel-caption{
+    display: none;
+}
+#carousel-announcement .carousel-indicators li{
+    background-color: #004A97;
+}
+#carousel-announcement .carousel-indicators .active{
+    background: #DB4138;
+}
+.grid-courses .items .category{
+    background-color: #004A97;
+}

@@ -1141,14 +1141,26 @@ class MigrationCustom
             }
             $chamilo_user_info = api_get_user_info($chamilo_user_id);
 
-            if ($chamilo_user_info && $chamilo_user_info['user_id']) {
-                $chamilo_user_info = api_get_user_info($chamilo_user_info['user_id'], false, false, true);
-                $data_list['users'][$uidIdPersonaId] = $chamilo_user_info['user_id'];
+            if ($chamilo_user_info && $chamilo_user_info['id']) {
+                $chamilo_user_info = api_get_user_info($chamilo_user_info['id'], false, false, true);
+
+                // We extra-update the user to set a password that works with the salt
+                $sql = "UPDATE user 
+                    SET password = SHA1(CONCAT('".$chamilo_user_info['username']."', '{', salt, '}')), 
+                        auth_source = 'platform'
+                    WHERE id = ".$chamilo_user_info['id']." AND salt IS NOT NULL AND salt != ''";
+                $res = Database::query($sql);
+                $msg = '';
+                if ($res === false) {
+                    $msg = ' - Issue updating password: '.$sql;
+                }
+
+                $data_list['users'][$uidIdPersonaId] = $chamilo_user_info['id'];
                 return array(
                     'entity' => 'user',
                     'before' => null,
                     'after' => $chamilo_user_info,
-                    'message' => "User was created - user_id: {$chamilo_user_info['user_id']} - firstname: {$chamilo_user_info['firstname']} - lastname:{$chamilo_user_info['lastname']}",
+                    'message' => "User was created - user_id: {$chamilo_user_info['id']} - firstname: {$chamilo_user_info['firstname']} - lastname:{$chamilo_user_info['lastname']}".$msg,
                     'status_id' => self::TRANSACTION_STATUS_SUCCESSFUL
                 );
             } else {
@@ -1232,11 +1244,22 @@ class MigrationCustom
                     $user_info['email']
                 );
                 $chamilo_user_info = api_get_user_info($user_id, false, false, true);
+                // We extra-update the user to set a password that works with the salt
+                $sql = "UPDATE user 
+                    SET password = SHA1(CONCAT('".$chamilo_user_info['username']."', '{', salt, '}')), 
+                        auth_source = 'platform'
+                    WHERE id = ".$chamilo_user_info['id']." AND salt IS NOT NULL AND salt != ''";
+                $res = Database::query($sql);
+                $msg = '';
+                if ($res === false) {
+                    $msg = ' - Issue updating password: '.$sql;
+                }
+
                 return array(
                     'entity' => 'user',
                     'before' => $chamilo_user_info_before,
                     'after' => $chamilo_user_info,
-                    'message' => "User id $user_id was updated with data: ".print_r($user_info, 1),
+                    'message' => "User id $user_id was updated with data: ".print_r($user_info, 1).$msg,
                     'status_id' => self::TRANSACTION_STATUS_SUCCESSFUL
                 );
             } else {

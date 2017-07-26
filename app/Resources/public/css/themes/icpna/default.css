@@ -196,3 +196,25 @@ a:focus {
 .grid-courses .items .category{
     background-color: #004A97;
 }
+.big_icon a{
+    display: inline-block;
+    padding: 10px;
+    border: 3px solid #CCCCCC;
+    border-radius: 50%;
+    /*box-shadow: 0 4px 8px #C8C8C8;*/
+}
+.big_icon a:hover{
+    box-shadow: 0 4px 18px #C8C8C8;
+}
+.big_icon img{
+    padding: 10px;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+}
+.big_icon img:hover{
+    box-shadow: none;
+}
+.course-tool .content h4{
+    margin: 0;
+}

@@ -23,7 +23,7 @@ $toolName = get_lang('TeacherTimeReport');
 // Access restrictions.
 api_protect_admin_script();
 
-$form = new FormValidator('teacher_time_report');
+$form = new FormValidator('teacher_time_report', 'get');
 $startDate = new DateTime(api_get_local_time());
 $startDate->modify('first day of this month');
 $limitDate = new DateTime(api_get_local_time());
@@ -368,6 +368,27 @@ $form->setDefaults([
     'until' => $selectedUntil
 ]);
 
+$leftActions = Display::url(
+    Display::return_icon('session.png', get_lang('Sessions'), [], ICON_SIZE_MEDIUM),
+    api_get_path(WEB_CODE_PATH).'admin/teachers_time_by_session_report.php'
+);
+$exportUrlParams = [
+    'from' => $selectedFrom,
+    'until' => $selectedUntil,
+    'course' => $selectedCourse,
+    'session' => $selectedSession,
+    'teacher' => $selectedTeacher,
+    '_qf__teacher_time_report' => ''
+];
+$rightActions = Display::url(
+    Display::return_icon('pdf.png', get_lang('ExportToPDF'), [], ICON_SIZE_MEDIUM),
+    api_get_self().'?export=pdf&'.http_build_query($exportUrlParams)
+);
+$rightActions .= Display::url(
+    Display::return_icon('export_excel.png', get_lang('ExportExcel'), [], ICON_SIZE_MEDIUM),
+    api_get_self().'?export=xls&'.http_build_query($exportUrlParams)
+);
+
 $tpl = new Template($toolName);
 $tpl->assign('report_title', $reportTitle);
 $tpl->assign('report_sub_title', $reportSubTitle);
@@ -385,5 +406,7 @@ $tpl->assign('rows', $timeReport->data);
 $templateName = $tpl->get_template('admin/teacher_time_report.tpl');
 
 $contentTemplate = $tpl->fetch($templateName);
+$tpl->assign('header', get_lang('TeacherTimeReport'));
+$tpl->assign('actions', Display::toolbarAction('teacher_time_report_actions', [$leftActions, $rightActions]));
 $tpl->assign('content', $contentTemplate);
 $tpl->display_one_col_template();

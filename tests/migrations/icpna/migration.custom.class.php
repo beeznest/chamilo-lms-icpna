@@ -1146,7 +1146,7 @@ class MigrationCustom
 
                 // We extra-update the user to set a password that works with the salt
                 $sql = "UPDATE user 
-                    SET password = SHA1(CONCAT('".$chamilo_user_info['username']."', '{', salt, '}')), 
+                    SET password = SHA1(CONCAT('".$user_info['password']."', '{', salt, '}')), 
                         auth_source = 'platform'
                     WHERE id = ".$chamilo_user_info['id']." AND salt IS NOT NULL AND salt != ''";
                 $res = Database::query($sql);
@@ -1246,7 +1246,7 @@ class MigrationCustom
                 $chamilo_user_info = api_get_user_info($user_id, false, false, true);
                 // We extra-update the user to set a password that works with the salt
                 $sql = "UPDATE user 
-                    SET password = SHA1(CONCAT('".$chamilo_user_info['username']."', '{', salt, '}')), 
+                    SET password = SHA1(CONCAT('".$user_info['password']."', '{', salt, '}')), 
                         auth_source = 'platform'
                     WHERE id = ".$chamilo_user_info['id']." AND salt IS NOT NULL AND salt != ''";
                 $res = Database::query($sql);

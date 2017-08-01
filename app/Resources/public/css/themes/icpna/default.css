@@ -188,7 +188,13 @@ a:focus {
     border-bottom: 1px solid #DDD;
 }
 #carousel-announcement .carousel-caption{
-    display: none;
+    display: block;
+    text-transform: uppercase;
+    color: #00339F;
+    font-weight: bold;
+    border-bottom: 1px solid #DDD;
+    margin-bottom: 12px;
+    font-size: 16px;
 }
 #carousel-announcement .carousel-indicators li{
     background-color: #004A97;

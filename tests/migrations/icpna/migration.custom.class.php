@@ -1697,23 +1697,26 @@ class MigrationCustom
                 unset($session_info['error']);
                 $session_info_before = api_get_session_info($session_id);
                 $extra = [];
+                /*
+                // We don't need uidIdPrograma when updating a session
                 if (!empty($session_info['uidIdPrograma'])) {
                     $extra['uidIdPrograma'] = $session_info['uidIdPrograma'];
                 }
+                */
                 if (!empty($session_info['estado'])) {
-                    $extra['estado'] = $session_info['estado'];
+                    $extra['extra_estado'] = $session_info['estado'];
                 }
-                if (!empty($session_info['sede'])) {
-                    $extra['sede'] = $session_info['sede'];
+                if (!empty($session_info['extra_sede'])) {
+                    $extra['extra_sede'] = $session_info['extra_sede'];
                 }
-                if (!empty($session_info['horario'])) {
-                    $extra['horario'] = $session_info['horario'];
+                if (!empty($session_info['extra_horario'])) {
+                    $extra['extra_horario'] = $session_info['extra_horario'];
                 }
-                if (!empty($session_info['periodo'])) {
-                    $extra['periodo'] = $session_info['periodo'];
+                if (!empty($session_info['extra_periodo'])) {
+                    $extra['extra_periodo'] = $session_info['extra_periodo'];
                 }
-                if (!empty($session_info['aula'])) {
-                    $extra['aula'] = $session_info['aula'];
+                if (!empty($session_info['extra_aula'])) {
+                    $extra['extra_aula'] = $session_info['extra_aula'];
                 }
                 SessionManager::edit_session(
                     $session_info['id'],

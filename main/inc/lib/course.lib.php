@@ -2792,7 +2792,7 @@ class CourseManager
 
             // get course list not auto-register. Use Distinct to avoid multiple
             // entries when a course is assigned to a HRD (DRH) as watcher
-            $sql = "SELECT DISTINCT(course.code), course.id as real_id
+            $sql = "SELECT DISTINCT(course.code), course.id as real_id, course.category_code AS category
                     FROM $tbl_course course
                     INNER JOIN $tbl_course_user cru 
                     ON (course.id = cru.c_id)
@@ -2820,7 +2820,7 @@ class CourseManager
         }
 
         if ($include_sessions === true) {
-            $sql = "SELECT DISTINCT(c.code), c.id as real_id
+            $sql = "SELECT DISTINCT(c.code), c.id as real_id, course.category_code AS category
                     FROM " . Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER)." s,
                     $tbl_course c
                     WHERE user_id = $user_id AND s.c_id = c.id";
@@ -3609,6 +3609,7 @@ class CourseManager
                 $params['visibility'] = $course_info['visibility'];
                 $params['status'] = $course_info['status'];
                 $params['category'] = $course_info['categoryName'];
+                $params['category_code'] = $course_info['categoryCode'];
                 $params['icon'] = Display::return_icon(
                     'drawing-pin.png',
                     null,
@@ -3846,6 +3847,7 @@ class CourseManager
             $params['title'] = $course_info['title'];
             $params['title_cut'] = $params['title'];
             $params['category'] = $course_info['categoryName'];
+            $params['category_code'] = $course_info['categoryCode'];
             $params['teachers'] = $teachers;
 
             if ($course_info['visibility'] != COURSE_VISIBILITY_CLOSED) {
@@ -4291,18 +4293,15 @@ class CourseManager
                 'session_category_id' => $session_category_id
             );
 
-            if (api_get_setting('allow_skills_tool') === 'true') {
-                $entityManager = Database::getManager();
-                $objUser = $entityManager->find('ChamiloUserBundle:User', $user_id);
-                $objCourse = $entityManager->find('ChamiloCoreBundle:Course', $course['real_id']);
-                $objSession = $entityManager->find('ChamiloCoreBundle:Session', $session_id);
+            if (Skill::isAllow($user_id, false)) {
+                $em = Database::getManager();
+                $objUser = $em->find('ChamiloUserBundle:User', $user_id);
+                $objCourse = $em->find('ChamiloCoreBundle:Course', $course['real_id']);
+                $objSession = $em->find('ChamiloCoreBundle:Session', $session_id);
 
-                $skill = $entityManager
-                    ->getRepository('ChamiloCoreBundle:Skill')
-                    ->getLastByUser($objUser, $objCourse, $objSession);
+                $skill = $em->getRepository('ChamiloCoreBundle:Skill')->getLastByUser($objUser, $objCourse, $objSession);
 
                 $output['skill'] = null;
-
                 if ($skill) {
                     $output['skill']['name'] = $skill->getName();
                     $output['skill']['icon'] = $skill->getIcon();

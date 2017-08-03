@@ -3,10 +3,9 @@
 
 use Chamilo\CoreBundle\Entity\ExtraField as EntityExtraField;
 use Chamilo\UserBundle\Entity\User;
-use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
+use Chamilo\CoreBundle\Entity\SkillRelUser;
+use Chamilo\CoreBundle\Entity\SkillRelUserComment;
 use Symfony\Component\Security\Core\Encoder\EncoderFactory;
-use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
-use Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder;
 use ChamiloSession as Session;
 
 /**
@@ -723,9 +722,34 @@ class UserManager
         Database::query($sql);
 
         // Skills
-        $table = Database::get_main_table(TABLE_MAIN_SKILL_REL_USER);
-        $sql = "DELETE FROM $table WHERE user_id = $user_id";
-        Database::query($sql);
+        $em = Database::getManager();
+
+        $criteria = ['user' => $user_id];
+        $skills = $em->getRepository('ChamiloCoreBundle:SkillRelUser')->findBy($criteria);
+        if ($skills) {
+            /** @var SkillRelUser $skill */
+            foreach ($skills as $skill) {
+                $comments = $skill->getComments();
+                if ($comments) {
+                    /** @var SkillRelUserComment $comment */
+                    foreach ($comments as $comment) {
+                        $em->remove($comment);
+                    }
+                }
+                $em->remove($skill);
+            }
+            $em->flush();
+        }
+
+        // ExtraFieldSavedSearch
+        $criteria = ['user' => $user_id];
+        $searchList = $em->getRepository('ChamiloCoreBundle:ExtraFieldSavedSearch')->findBy($criteria);
+        if ($searchList) {
+            foreach ($searchList as $search) {
+                $em->remove($search);
+            }
+            $em->flush();
+        }
 
         $connection = Database::getManager()->getConnection();
         $tableExists = $connection->getSchemaManager()->tablesExist(['plugin_bbb_room']);
@@ -4567,8 +4591,7 @@ class UserManager
         $relationType,
         $deleteUsersBeforeInsert = false,
         $deleteOtherAssignedUsers = true
-    )
-    {
+    ) {
         $userRelUserTable = Database::get_main_table(TABLE_MAIN_USER_REL_USER);
         $userRelAccessUrlTable = Database::get_main_table(TABLE_MAIN_ACCESS_URL_REL_USER);
 
@@ -4579,26 +4602,30 @@ class UserManager
         if ($deleteOtherAssignedUsers) {
             if (api_get_multiple_access_url()) {
                 // Deleting assigned users to hrm_id
-                $sql = "SELECT s.user_id FROM $userRelUserTable s 
-                    INNER JOIN $userRelAccessUrlTable a ON (a.user_id = s.user_id) 
-                    WHERE 
-                        friend_user_id = $userId AND 
-                        relation_type = $relationType AND 
-                        access_url_id = ".api_get_current_access_url_id();
+                $sql = "SELECT s.user_id 
+                        FROM $userRelUserTable s 
+                        INNER JOIN $userRelAccessUrlTable a
+                        ON (a.user_id = s.user_id) 
+                        WHERE 
+                            friend_user_id = $userId AND 
+                            relation_type = $relationType AND 
+                            access_url_id = ".api_get_current_access_url_id();
             } else {
-                $sql = "SELECT user_id FROM $userRelUserTable 
-                    WHERE friend_user_id = $userId 
-                    AND relation_type = $relationType";
+                $sql = "SELECT user_id 
+                        FROM $userRelUserTable 
+                        WHERE 
+                            friend_user_id = $userId AND 
+                            relation_type = $relationType";
             }
             $result = Database::query($sql);
 
             if (Database::num_rows($result) > 0) {
                 while ($row = Database::fetch_array($result)) {
                     $sql = "DELETE FROM $userRelUserTable 
-                        WHERE 
-                          user_id = {$row['user_id']} AND 
-                          friend_user_id = $userId AND 
-                          relation_type = $relationType";
+                            WHERE
+                                user_id = {$row['user_id']} AND 
+                                friend_user_id = $userId AND 
+                                relation_type = $relationType";
                     Database::query($sql);
                 }
             }
@@ -4616,7 +4643,6 @@ class UserManager
         if (is_array($subscribedUsersId)) {
             foreach ($subscribedUsersId as $subscribedUserId) {
                 $subscribedUserId = intval($subscribedUserId);
-
                 $sql = "INSERT IGNORE INTO $userRelUserTable (user_id, friend_user_id, relation_type)
                         VALUES ($subscribedUserId, $userId, $relationType)";
 
@@ -4753,9 +4779,14 @@ class UserManager
             $cat = Category::load($category_id);
             $displayscore = ScoreDisplay::instance();
             if (isset($cat) && $displayscore->is_custom()) {
-                $grade = $displayscore->display_score(array($score, $cat[0]->get_weight()), SCORE_DIV_PERCENT_WITH_CUSTOM);
+                $grade = $displayscore->display_score(
+                    array($score, $cat[0]->get_weight()),
+                    SCORE_DIV_PERCENT_WITH_CUSTOM
+                );
             } else {
-                $grade = $displayscore->display_score(array($score, $cat[0]->get_weight()));
+                $grade = $displayscore->display_score(
+                    array($score, $cat[0]->get_weight())
+                );
             }
             $row['grade'] = $grade;
 
@@ -4856,13 +4887,17 @@ class UserManager
 
     /**
      *
-     * @param int   student id
-     * @param int   years
-     * @param bool  show warning_message
-     * @param bool  return_timestamp
+     * @param int $student_id
+     * @param int $years
+     * @param bool $warning_message  show warning_message
+     * @param bool $return_timestamp return_timestamp
      */
-    public static function delete_inactive_student($student_id, $years = 2, $warning_message = false, $return_timestamp = false)
-    {
+    public static function delete_inactive_student(
+        $student_id,
+        $years = 2,
+        $warning_message = false,
+        $return_timestamp = false
+    ) {
         $tbl_track_login = Database::get_main_table(TABLE_STATISTIC_TRACK_E_LOGIN);
         $sql = 'SELECT login_date FROM '.$tbl_track_login.'
                 WHERE login_user_id = '.intval($student_id).'
@@ -4990,10 +5025,24 @@ class UserManager
      * @param array $bossList
      * @return int Affected rows
      */
-    public static function subscribeUserToBossList($studentId, $bossList)
+    /**
+     * Subscribe boss to students
+     *
+     * @param int $studentId
+     * @param array $bossList
+     * @param bool $sendNotification
+     * @return int Affected rows
+     */
+    public static function subscribeUserToBossList($studentId, $bossList, $sendNotification = false)
     {
         if ($bossList) {
             $studentId = (int) $studentId;
+            $studentInfo = api_get_user_info($studentId);
+
+            if (empty($studentInfo)) {
+                return false;
+            }
+
             $userRelUserTable = Database::get_main_table(TABLE_MAIN_USER_REL_USER);
             $sql = "DELETE FROM $userRelUserTable 
                     WHERE user_id = $studentId AND relation_type = ".USER_RELATION_TYPE_BOSS;
@@ -5003,8 +5052,20 @@ class UserManager
                 $bossId = (int) $bossId;
                 $sql = "INSERT IGNORE INTO $userRelUserTable (user_id, friend_user_id, relation_type)
                         VALUES ($studentId, $bossId, ".USER_RELATION_TYPE_BOSS.")";
+                $insertId = Database::query($sql);
 
-                Database::query($sql);
+                if ($insertId && $sendNotification) {
+                    $name = $studentInfo['complete_name'];
+                    $url = api_get_path(WEB_CODE_PATH).'mySpace/myStudents.php?student='.$studentId;
+                    $url = Display::url($url, $url);
+                    $subject = sprintf(get_lang('UserXHasBeenAssignedToBoss'), $name);
+                    $message = sprintf(get_lang('UserXHasBeenAssignedToBossWithUrlX'), $name, $url);
+                    MessageManager::send_message_simple(
+                        $bossId,
+                        $subject,
+                        $message
+                    );
+                }
             }
         }
     }
@@ -5054,6 +5115,32 @@ class UserManager
     }
 
     /**
+     * Get the teacher (users with COURSEMANGER status) list
+     * @return array The list
+     */
+    public static function getTeachersList()
+    {
+        $userTable = Database::get_main_table(TABLE_MAIN_USER);
+        $resultData = Database::select(
+            'user_id, lastname, firstname, username',
+            $userTable,
+            array(
+            'where' => array(
+                'status = ?' => COURSEMANAGER
+            )
+        ));
+
+        foreach ($resultData as &$teacherData) {
+            $teacherData['completeName'] = api_get_person_name(
+                $teacherData['firstname'],
+                $teacherData['lastname']
+            );
+        }
+
+        return $resultData;
+    }
+
+    /**
      * @return array
      */
     public static function getOfficialCodeGrouped()
@@ -5063,9 +5150,7 @@ class UserManager
                 FROM $user
                 GROUP BY official_code";
         $result = Database::query($sql);
-
         $values = Database::store_result($result, 'ASSOC');
-
         $result = array();
         foreach ($values as $value) {
             $result[$value['official_code']] = $value['official_code'];
@@ -5449,5 +5534,54 @@ SQL;
         }
 
         return [];
+    }
+
+    /**
+     * Check if user is teacher of a student based in their courses
+     * @param $teacherId
+     * @param $studentId
+     * @return array
+     */
+    public static function getCommonCoursesBetweenTeacherAndStudent($teacherId, $studentId)
+    {
+        $courses = CourseManager::getCoursesFollowedByUser($teacherId, COURSEMANAGER);
+        if (empty($courses)) {
+            return false;
+        }
+
+        $coursesFromUser = CourseManager::get_courses_list_by_user_id($studentId);
+        if (empty($coursesFromUser)) {
+            return false;
+        }
+
+        $coursesCodeList = array_column($courses, 'code');
+        $coursesCodeFromUserList = array_column($coursesFromUser, 'code');
+        $commonCourses = array_intersect($coursesCodeList, $coursesCodeFromUserList);
+        $commonCourses = array_filter($commonCourses);
+
+        if (!empty($commonCourses)) {
+            return $commonCourses;
+        }
+
+        return [];
+    }
+
+    /**
+     * @param $teacherId
+     * @param $studentId
+     * @return bool
+     */
+    public static function isTeacherOfStudent($teacherId, $studentId)
+    {
+        $courses = self::getCommonCoursesBetweenTeacherAndStudent(
+            $teacherId,
+            $studentId
+        );
+
+        if (!empty($courses)) {
+            return true;
+        }
+
+        return false;
     }
 }

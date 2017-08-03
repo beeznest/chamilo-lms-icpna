@@ -6,7 +6,7 @@
  * @author Angel Fernando Quiroz Campos <angel.quiroz@beeznest.com
  * @package chamilo.plugin.externalPageNGL
  */
-include_once '../../main/inc/global.inc.php';
+require_once '../../main/inc/global.inc.php';
 
 if (api_is_course_admin()) {
     api_not_allowed(true);
@@ -24,7 +24,7 @@ $coursePath = api_get_course_path();
 if (empty($coursePath)) {
     $backToURL = api_get_path(WEB_PATH);
 } else {
-    $backToURL = api_get_path(WEB_COURSE_PATH) . $coursePath . '/?id_session=' . $sessionId;
+    $backToURL = api_get_path(WEB_COURSE_PATH).$coursePath.'/?id_session='.$sessionId;
 }
 
 $toolName = $objExternalPageNGL->get_lang('external_page');

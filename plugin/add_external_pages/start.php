@@ -1,7 +1,7 @@
 <?php
 /* For licensing terms, see /license.txt */
 
-include_once '../../main/inc/global.inc.php';
+require_once '../../main/inc/global.inc.php';
 
 $isAllowed = api_is_teacher() || api_is_course_admin() || api_is_course_admin() || api_is_student();
 
@@ -39,7 +39,6 @@ if (!empty($_GET['id']) || $_GET['id'] === '0') {
                 true
             );
             $programUid = $programValue['value'];
-
             $branchValue = $extraFieldValue->get_values_by_handler_and_field_variable($sessionId, 'sede', true);
             $branchUid = $branchValue['value'];
         }

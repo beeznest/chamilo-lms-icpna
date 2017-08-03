@@ -1697,12 +1697,10 @@ class MigrationCustom
                 unset($session_info['error']);
                 $session_info_before = api_get_session_info($session_id);
                 $extra = [];
-                /*
                 // We don't need uidIdPrograma when updating a session
-                if (!empty($session_info['uidIdPrograma'])) {
-                    $extra['uidIdPrograma'] = $session_info['uidIdPrograma'];
+                if (!empty($session_info['extra_uidIdPrograma'])) {
+                    $extra['extra_uidIdPrograma'] = $session_info['extra_uidIdPrograma'];
                 }
-                */
                 if (!empty($session_info['estado'])) {
                     $extra['extra_estado'] = $session_info['estado'];
                 }

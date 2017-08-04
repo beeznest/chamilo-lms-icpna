@@ -4129,6 +4129,7 @@ function addDir($formValues, $user_id, $courseInfo, $groupId, $session_id)
 
     $dirName = '/'.$created_dir;
     $today = new DateTime(api_get_utc_datetime(), new DateTimeZone('UTC'));
+    $title = isset($formValues['work_title']) ? $formValues['work_title'] : $formValues['new_dir'];
 
     $workTable = new CStudentPublication();
     $title = isset($formValues['work_title']) ? $formValues['work_title'] : $formValues['new_dir'];

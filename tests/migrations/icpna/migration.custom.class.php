@@ -1146,7 +1146,7 @@ class MigrationCustom
 
                 // We extra-update the user to set a password that works with the salt
                 $sql = "UPDATE user 
-                    SET password = SHA1(CONCAT('".$chamilo_user_info['username']."', '{', salt, '}')), 
+                    SET password = SHA1(CONCAT('".$user_info['password']."', '{', salt, '}')), 
                         auth_source = 'platform'
                     WHERE id = ".$chamilo_user_info['id']." AND salt IS NOT NULL AND salt != ''";
                 $res = Database::query($sql);
@@ -1246,7 +1246,7 @@ class MigrationCustom
                 $chamilo_user_info = api_get_user_info($user_id, false, false, true);
                 // We extra-update the user to set a password that works with the salt
                 $sql = "UPDATE user 
-                    SET password = SHA1(CONCAT('".$chamilo_user_info['username']."', '{', salt, '}')), 
+                    SET password = SHA1(CONCAT('".$user_info['password']."', '{', salt, '}')), 
                         auth_source = 'platform'
                     WHERE id = ".$chamilo_user_info['id']." AND salt IS NOT NULL AND salt != ''";
                 $res = Database::query($sql);
@@ -1697,23 +1697,23 @@ class MigrationCustom
                 unset($session_info['error']);
                 $session_info_before = api_get_session_info($session_id);
                 $extra = [];
-                if (!empty($session_info['uidIdPrograma'])) {
-                    $extra['uidIdPrograma'] = $session_info['uidIdPrograma'];
+                if (!empty($session_info['extra_uidIdPrograma'])) {
+                    $extra['extra_uididprograma'] = $session_info['extra_uidIdPrograma'];
                 }
                 if (!empty($session_info['estado'])) {
-                    $extra['estado'] = $session_info['estado'];
+                    $extra['extra_estado'] = $session_info['estado'];
                 }
-                if (!empty($session_info['sede'])) {
-                    $extra['sede'] = $session_info['sede'];
+                if (!empty($session_info['extra_sede'])) {
+                    $extra['extra_sede'] = $session_info['extra_sede'];
                 }
-                if (!empty($session_info['horario'])) {
-                    $extra['horario'] = $session_info['horario'];
+                if (!empty($session_info['extra_horario'])) {
+                    $extra['extra_horario'] = $session_info['extra_horario'];
                 }
-                if (!empty($session_info['periodo'])) {
-                    $extra['periodo'] = $session_info['periodo'];
+                if (!empty($session_info['extra_periodo'])) {
+                    $extra['extra_periodo'] = $session_info['extra_periodo'];
                 }
-                if (!empty($session_info['aula'])) {
-                    $extra['aula'] = $session_info['aula'];
+                if (!empty($session_info['extra_aula'])) {
+                    $extra['extra_aula'] = $session_info['extra_aula'];
                 }
                 SessionManager::edit_session(
                     $session_info['id'],

@@ -36,7 +36,7 @@ $objTpl->assign('path', $loginProcess);
 $objTpl->assign('redirect_path', $loginProcess);
 $objTpl->assign('back_to', $backToURL);
 
-$content = $objTpl->fetch('external_page_ngl/views/showpage.tpl');
+$content = $objTpl->fetch('external_page_ngl/views/external_page_ngl_showpage.tpl');
 
 $objTpl->assign('header', $buttonName);
 $objTpl->assign('content', $content);

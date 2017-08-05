@@ -52,7 +52,8 @@ if (!empty($_GET['id']) || $_GET['id'] === '0') {
     $toolName = $objAddExternalPage->get_lang('external_page');
     $objTpl = new Template($toolName);
     $objTpl->assign('path', $getNewPath);
-    $content = $objTpl->fetch('add_external_pages/views/showpage.tpl');
+    $content = $objTpl->fetch('add_external_pages/views/add_external_pages_showpage.tpl');
+
     $objTpl->assign('header', $names[$id]);
     $objTpl->assign('content', $content);
     $objTpl->display_one_col_template();

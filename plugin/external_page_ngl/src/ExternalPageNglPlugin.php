@@ -188,7 +188,12 @@ class ExternalPageNglPlugin extends Plugin
         $data = $extraField->get_handler_field_info_by_field_variable('eworkbooklogin');
 
         if ($data == false) {
-            UserManager::create_extra_field('eworkbooklogin', ExtraField::FIELD_TYPE_TEXT, 'E-Workbook Login', '');
+            UserManager::create_extra_field(
+                'eworkbooklogin',
+                ExtraField::FIELD_TYPE_TEXT,
+                'E-Workbook Login',
+                ''
+            );
         }
     }
 

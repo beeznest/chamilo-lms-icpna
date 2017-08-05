@@ -90,7 +90,12 @@ class AddExternalPagesPlugin extends Plugin
         ");
         while ($row = Database::fetch_assoc($sqlResponse)) {
             foreach ($toolTmp as $tool) {
-                $this->createLinkToCourseTool($tool['name'], $row['c_id'], $tool['image'], $tool['link']);
+                $this->createLinkToCourseTool(
+                    $tool['name'],
+                    $row['c_id'],
+                    $tool['image'],
+                    $tool['link']
+                );
             }
         }
 

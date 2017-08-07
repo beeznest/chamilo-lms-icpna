@@ -1362,11 +1362,24 @@ class CourseRestorer
             $new_id = Database::insert($link_cat_table, $params);
 
             if ($new_id) {
+                $courseInfo = api_get_course_info_by_id($this->destination_course_id);
                 $sql = "UPDATE $link_cat_table 
                         SET id = iid 
                         WHERE iid = $new_id";
                 Database::query($sql);
-                api_set_default_visibility($new_id, TOOL_LINK_CATEGORY);
+                api_item_property_update(
+                    $courseInfo,
+                    TOOL_LINK_CATEGORY,
+                    $new_id,
+                    'LinkCategoryAdded',
+                    api_get_user_id()
+                );
+                api_set_default_visibility(
+                    $new_id,
+                    TOOL_LINK_CATEGORY,
+                    0,
+                    $courseInfo
+                );
             }
 
             $this->course->resources[RESOURCE_LINKCATEGORY][$id]->destination_id = $new_id;

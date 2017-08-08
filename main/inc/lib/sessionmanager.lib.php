@@ -8677,8 +8677,8 @@ class SessionManager
                 WHERE scu.course = :course
                     AND su.relationType != :rrhh
                     AND scu.session = :session
-                    AND (su.movedTo = 0 or su.movedTo IS NULL)
-                    AND su.movedStatus != :annulation
+                    AND (su.movedTo = 0 OR su.movedTo IS NULL)
+                    AND (su.movedStatus != :annulation OR su.movedStatus is NULL) 
             ")
             ->setParameters([
                 'course' => $course->getId(),

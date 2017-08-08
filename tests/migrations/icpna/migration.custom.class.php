@@ -3361,11 +3361,20 @@ class MigrationCustom
                         'message' => "Third party transaction id  #{$params['transaction_id']} was already added to Chamilo with id #{$transaction_info['id']}. Trying to execute because transaction has status: {$transaction_status_list[$transaction_info['status_id']]['title']}"
                     );
                 } else {
+                    // The transaction already exists and was already successfull.
+                    // Don't report it in full to avoid filling logs with trash.
+                    return array(
+                        'id' => null,
+                        'error' => true,
+                        'message' => "TPT #{$params['transaction_id']} already {$transaction_status_list[$transaction_info['status_id']]['title']}"
+                    );
+                    /*
                     return array(
                         'id' => null,
                         'error' => true,
                         'message' => "Third party transaction id #{$params['transaction_id']} was already added to Chamilo with id #{$transaction_info['id']}. Transaction can't be executed twice. Transacion status_id = {$transaction_status_list[$transaction_info['status_id']]['title']}"
                     );
+                    */
                 }
             }
             return array(

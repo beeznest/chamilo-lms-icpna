@@ -398,7 +398,8 @@ if ($ajax_search) {
                     u.status <> 6 AND 
                     (su.moved_to = 0 OR su.moved_to IS NULL) AND 
                     (
-                        su.moved_status IS NULL OR su.moved_status <> ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_CANCELLED."
+                        su.moved_status IS NULL OR 
+                        su.moved_status <> ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_CANCELLED."
                     )
                 $order_clause
             ";

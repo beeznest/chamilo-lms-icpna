@@ -1718,8 +1718,11 @@ class CourseManager
                 INNER JOIN $tblSessionUser as su
                     ON su.session_id = session_course_user.session_id
                     AND user.user_id = su.user_id
-                    AND (su.moved_to = 0 OR su.moved_to IS NULL)
-                    AND su.moved_status <> ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_CANCELLED."
+                    AND (su.moved_to = 0 OR su.moved_to IS NULL) AND 
+                    (
+                        su.moved_status IS NULL OR 
+                        su.moved_status <> ".SessionManager::SESSION_CHANGE_USER_REASON_ENROLLMENT_CANCELLED."
+                    )
             ";
 
             $where[] = ' session_course_user.c_id IS NOT NULL ';

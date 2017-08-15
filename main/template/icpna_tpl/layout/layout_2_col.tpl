@@ -77,8 +77,36 @@
                 {% if _u.logged  == 1 %}
                     {{ user_image_block }}
                 {% endif %}
-               
-                {{ course_block }}
+
+                {% if course_block %}
+                <!-- block course -->
+                <div class="panel-group" id="course" role="tablist" aria-multiselectable="true">
+                    <div class="panel panel-default" id="course_block">
+                        <div class="panel-heading" role="tab">
+                            <h4 class="panel-title">
+                                <a role="button" data-toggle="collapse" data-parent="#course" href="#courseCollapse" aria-expanded="true" aria-controls="courseCollapse">
+                                    {{ 'Courses' | get_lang }}
+                                </a>
+                            </h4>
+                        </div>
+                        <div style="" aria-expanded="true" id="courseCollapse" class="panel-collapse collapse in" role="tabpanel">
+                            <div class="panel-body">
+                                <ul class="list-group">
+                                    {% for item in course_block %}
+                                    <li class="list-group-item {{ item.class }}">
+                                        <span class="item-icon">
+                                            {{ item.icon }}
+                                        </span>
+                                        <a href="{{ item.link }}">{{ item.title }}</a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end block course -->
+                {% endif %}
 
                 {% if plugin_menu_bottom %}
                     <div class="sidebar-menu-bottom">

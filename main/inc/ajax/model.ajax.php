@@ -120,12 +120,16 @@ if (!empty($searchString)) {
 
 if (($search || $forceSearch) && ($search !== 'false')) {
     $whereCondition = ' 1 = 1 ';
-    $whereConditionInForm = getWhereClause($searchField, $searchOperator, $searchString);
+    $whereConditionInForm = getWhereClause(
+        $searchField,
+        $searchOperator,
+        $searchString
+    );
 
     if (!empty($whereConditionInForm)) {
-        $whereCondition .= ' AND ('.$whereConditionInForm.') ';
+        $whereCondition .= ' AND ( ';
+        $whereCondition .= '  ('.$whereConditionInForm.') ';
     }
-
     $filters = isset($_REQUEST['filters']) && !is_array($_REQUEST['filters']) ? json_decode($_REQUEST['filters']) : false;
 
     if (!empty($filters)) {
@@ -152,12 +156,13 @@ if (($search || $forceSearch) && ($search !== 'false')) {
                     $extraCondition .= implode($filters->groupOp, $condition_array);
                     $extraCondition .= ' ) ';
                 }
-
-
                 $whereCondition .= $extraCondition;
 
                 // Question field
-                $resultQuestion = $extraField->getExtraFieldRules($filters, 'question_');
+                $resultQuestion = $extraField->getExtraFieldRules(
+                    $filters,
+                    'question_'
+                );
                 $questionFields = $resultQuestion['extra_fields'];
                 $condition_array = $resultQuestion['condition_array'];
 
@@ -166,7 +171,11 @@ if (($search || $forceSearch) && ($search !== 'false')) {
                     $extraQuestionCondition .= implode($filters->groupOp, $condition_array);
                     $extraQuestionCondition .= ' ) ';
                     // Remove conditions already added
-                    $extraQuestionCondition = str_replace($extraCondition, '', $extraQuestionCondition);
+                    $extraQuestionCondition = str_replace(
+                        $extraCondition,
+                        '',
+                        $extraQuestionCondition
+                    );
                 }
 
                 $whereCondition .= $extraQuestionCondition;
@@ -175,7 +184,11 @@ if (($search || $forceSearch) && ($search !== 'false')) {
             $whereCondition .= ' AND ( ';
             $counter = 0;
             foreach ($filters->rules as $key => $rule) {
-                $whereCondition .= getWhereClause($rule->field, $rule->op, $rule->data);
+                $whereCondition .= getWhereClause(
+                    $rule->field,
+                    $rule->op,
+                    $rule->data
+                );
 
                 if ($counter < count($filters->rules) - 1) {
                     $whereCondition .= $filters->groupOp;
@@ -184,6 +197,10 @@ if (($search || $forceSearch) && ($search !== 'false')) {
             }
             $whereCondition .= ' ) ';
         }
+    }
+
+    if (!empty($whereConditionInForm)) {
+        $whereCondition .= ' ) ';
     }
 }
 
@@ -205,7 +222,12 @@ switch ($action) {
         $course_id = isset($_REQUEST['course_id']) ? $_REQUEST['course_id'] : null;
         $group_id = isset($_REQUEST['gidReq']) ? $_REQUEST['gidReq'] : null;
         $sessionId = isset($_REQUEST['session_id']) ? $_REQUEST['session_id'] : null;
-        $count = Tracking::get_group_reporting($course_id, $sessionId, $group_id, 'count');
+        $count = Tracking::get_group_reporting(
+            $course_id,
+            $sessionId,
+            $group_id,
+            'count'
+        );
         break;
     case 'get_user_course_report':
     case 'get_user_course_report_resumed':
@@ -326,8 +348,13 @@ switch ($action) {
 
                 $courseCodeList = array();
                 foreach ($sessionList as $session) {
-                    $courses = SessionManager::get_course_list_by_session_id($session['id']);
-                    $courseCodeList = array_merge($courseCodeList, array_column($courses, 'code'));
+                    $courses = SessionManager::get_course_list_by_session_id(
+                        $session['id']
+                    );
+                    $courseCodeList = array_merge(
+                        $courseCodeList,
+                        array_column($courses, 'code')
+                    );
                 }
             }
             $searchByGroups = true;
@@ -488,7 +515,10 @@ switch ($action) {
             $whereCondition = " AND $whereCondition";
         }
 
-        $count = ExerciseLib::get_count_exam_results($exercise_id, $whereCondition);
+        $count = ExerciseLib::get_count_exam_results(
+            $exercise_id,
+            $whereCondition
+        );
         break;
     case 'get_hotpotatoes_exercise_results':
         $hotpot_path = $_REQUEST['path'];
@@ -592,7 +622,11 @@ switch ($action) {
     case 'get_exercise_grade':
         //@TODO replace this for a more efficient function (not retrieving the whole data)
         $course = api_get_course_info_by_id($_GET['course_id']);
-        $users = CourseManager::get_student_list_from_course_code($course['code'], true, $_GET['session_id']);
+        $users = CourseManager::get_student_list_from_course_code(
+            $course['code'],
+            true,
+            $_GET['session_id']
+        );
 
         $count = count($users);
         break;
@@ -644,7 +678,10 @@ switch ($action) {
 
         $course_id = api_get_course_int_id();
         if ($type == 'registered') {
-            $count = $obj->getUserGroupByCourseWithDataCount($course_id, $groupFilter);
+            $count = $obj->getUserGroupByCourseWithDataCount(
+                $course_id,
+                $groupFilter
+            );
         } else {
             $count = $obj->get_count($groupFilter);
         }
@@ -897,15 +934,30 @@ switch ($action) {
 
         break;
     case 'get_user_skill_ranking':
-        $columns = array('photo', 'firstname', 'lastname', 'skills_acquired', 'currently_learning', 'rank');
-        $result = $skill->get_user_list_skill_ranking($start, $limit, $sidx, $sord, $whereCondition);
+        $columns = array(
+            'photo',
+            'firstname',
+            'lastname',
+            'skills_acquired',
+            'currently_learning',
+            'rank'
+        );
+        $result = $skill->get_user_list_skill_ranking(
+            $start,
+            $limit,
+            $sidx,
+            $sord,
+            $whereCondition
+        );
         $result = msort($result, 'skills_acquired', 'asc');
 
         $skills_in_course = array();
         if (!empty($result)) {
             foreach ($result as &$item) {
                 $user_info = api_get_user_info($item['user_id']);
-                $personal_course_list = UserManager::get_personal_session_course_list($item['user_id']);
+                $personal_course_list = UserManager::get_personal_session_course_list(
+                    $item['user_id']
+                );
                 $count_skill_by_course = array();
                 foreach ($personal_course_list as $course_item) {
                     if (!isset($skills_in_course[$course_item['code']])) {
@@ -953,7 +1005,13 @@ switch ($action) {
             'amount',
             'actions'
         );
-        $result = getWorkListTeacher($start, $limit, $sidx, $sord, $whereCondition);
+        $result = getWorkListTeacher(
+            $start,
+            $limit,
+            $sidx,
+            $sord,
+            $whereCondition
+        );
         break;
     case 'get_work_student':
         $columns = array(
@@ -964,7 +1022,13 @@ switch ($action) {
             'last_upload',
             'others'
         );
-        $result = getWorkListStudent($start, $limit, $sidx, $sord, $whereCondition);
+        $result = getWorkListStudent(
+            $start,
+            $limit,
+            $sidx,
+            $sord,
+            $whereCondition
+        );
         break;
     case 'get_work_user_list_all':
         if (isset($_GET['type']) && $_GET['type'] === 'simple') {
@@ -989,7 +1053,14 @@ switch ($action) {
                 'actions'
             );
         }
-        $result = get_work_user_list($start, $limit, $sidx, $sord, $work_id, $whereCondition);
+        $result = get_work_user_list(
+            $start,
+            $limit,
+            $sidx,
+            $sord,
+            $work_id,
+            $whereCondition
+        );
 
         break;
     case 'get_work_user_list_others':
@@ -1001,7 +1072,14 @@ switch ($action) {
             $columns = array('type', 'firstname', 'lastname', 'title', 'sent_date', 'actions');
         }
         $whereCondition .= " AND u.user_id <> ".api_get_user_id();
-        $result = get_work_user_list($start, $limit, $sidx, $sord, $work_id, $whereCondition);
+        $result = get_work_user_list(
+            $start,
+            $limit,
+            $sidx,
+            $sord,
+            $work_id,
+            $whereCondition
+        );
         break;
     case 'get_work_user_list':
         if (isset($_GET['type']) && $_GET['type'] == 'simple') {
@@ -1016,7 +1094,14 @@ switch ($action) {
 
         if (empty($documents)) {
             $whereCondition .= " AND u.user_id = ".api_get_user_id();
-            $result = get_work_user_list($start, $limit, $sidx, $sord, $work_id, $whereCondition);
+            $result = get_work_user_list(
+                $start,
+                $limit,
+                $sidx,
+                $sord,
+                $work_id,
+                $whereCondition
+            );
         } else {
             $result = get_work_user_list_from_documents(
                 $start,
@@ -1169,7 +1254,11 @@ switch ($action) {
                     );
                 }
 
-                $count_users_in_session = SessionManager::get_users_by_session($session['id'], 0, true);
+                $count_users_in_session = SessionManager::get_users_by_session(
+                    $session['id'],
+                    0,
+                    true
+                );
                 $session_date = array();
                 if (!empty($session['access_start_date'])) {
                     $session_date[] = get_lang('From').' '.api_format_date($session['access_start_date'], DATE_FORMAT_SHORT);
@@ -1321,12 +1410,14 @@ switch ($action) {
             'firstname',
             'lastname',
         );
-        $lessons = LearnpathList::get_course_lessons($course['code'], $sessionId);
+        $lessons = LearnpathList::get_course_lessons(
+            $course['code'],
+            $sessionId
+        );
         foreach ($lessons as $lesson_id => $lesson) {
             $columns[] = $lesson_id;
         }
         $columns[] = 'total';
-
         $result = SessionManager::get_session_lp_progress(
             $sessionId,
             $courseId,
@@ -1525,20 +1616,33 @@ switch ($action) {
             if ($item['parent_id'] != 0) {
                 continue;
             }
-            $skills = $obj->get_skills_by_gradebook($item['id']);
+            $skills = $obj->getSkillsByGradebook($item['id']);
 
             //Fixes bug when gradebook doesn't have names
             if (empty($item['name'])) {
                 $item['name'] = $item['course_code'];
             }
 
-            $item['name'] = Display::url($item['name'], api_get_path(WEB_CODE_PATH).'gradebook/index.php?id_session=0&cidReq='.$item['course_code']);
+            $item['name'] = Display::url(
+                $item['name'],
+                api_get_path(WEB_CODE_PATH).'gradebook/index.php?id_session=0&cidReq='.$item['course_code']
+            );
 
             if (!empty($item['certif_min_score']) && !empty($item['document_id'])) {
-                $item['certificates'] = Display::return_icon('accept.png', get_lang('WithCertificate'), array(), ICON_SIZE_SMALL);
+                $item['certificates'] = Display::return_icon(
+                    'accept.png',
+                    get_lang('WithCertificate'),
+                    array(),
+                    ICON_SIZE_SMALL
+                );
                  $item['has_certificates'] = '1';
             } else {
-                $item['certificates'] = Display::return_icon('warning.png', get_lang('NoCertificate'), array(), ICON_SIZE_SMALL);
+                $item['certificates'] = Display::return_icon(
+                    'warning.png',
+                    get_lang('NoCertificate'),
+                    array(),
+                    ICON_SIZE_SMALL
+                );
                 $item['has_certificates'] = '0';
             }
 
@@ -1566,8 +1670,14 @@ switch ($action) {
         foreach ($result as $item) {
             $language_info = api_get_language_info($item['language_id']);
             $item['language_id'] = $language_info['english_name'];
-            $item['actions'] = Display::url(Display::return_icon('edit.png', get_lang('Edit')), api_get_path(WEB_CODE_PATH).'admin/event_type.php?action=edit&event_type_name='.$item['event_type_name']);
-            $item['actions'] .= Display::url(Display::return_icon('delete.png', get_lang('Delete')), api_get_path(WEB_CODE_PATH).'admin/event_controller.php?action=delete&id='.$item['id']);
+            $item['actions'] = Display::url(
+                Display::return_icon('edit.png', get_lang('Edit')),
+                api_get_path(WEB_CODE_PATH).'admin/event_type.php?action=edit&event_type_name='.$item['event_type_name']
+            );
+            $item['actions'] .= Display::url(
+                Display::return_icon('delete.png', get_lang('Delete')),
+                api_get_path(WEB_CODE_PATH).'admin/event_controller.php?action=delete&id='.$item['id']
+            );
             $new_result[] = $item;
         }
         $result = $new_result;
@@ -1647,10 +1757,19 @@ switch ($action) {
         $result = $obj->getAllGrid($sidx, $sord, $start, $limit);
         $new_result = array();
         if (!empty($result)) {
-            $checkIcon = Display::return_icon('check-circle.png', get_lang('Yes'));
-            $timesIcon = Display::return_icon('closed-circle.png', get_lang('No'));
+            $checkIcon = Display::return_icon(
+                'check-circle.png',
+                get_lang('Yes')
+            );
+            $timesIcon = Display::return_icon(
+                'closed-circle.png',
+                get_lang('No')
+            );
             foreach ($result as $item) {
-                $item['display_text'] = ExtraField::translateDisplayName($item['variable'], $item['displayText']);
+                $item['display_text'] = ExtraField::translateDisplayName(
+                    $item['variable'],
+                    $item['displayText']
+                );
                 $item['field_type'] = $obj->get_field_type_by_id($item['fieldType']);
                 $item['changeable'] = $item['changeable'] ? $checkIcon : $timesIcon;
                 $item['visible_to_self'] = $item['visibleToSelf'] ? $checkIcon : $timesIcon;
@@ -1714,12 +1833,24 @@ switch ($action) {
         }
 
         $course = api_get_course_info_by_id($_GET['course_id']);
-        $listUserSess = CourseManager::get_student_list_from_course_code($course['code'], true, $_GET['session_id']);
+        $listUserSess = CourseManager::get_student_list_from_course_code(
+            $course['code'],
+            true,
+            $_GET['session_id']
+        );
 
         $usersId = array_keys($listUserSess);
-
-        $users = UserManager::get_user_list_by_ids($usersId, null, "lastname, firstname", "$start , $limit");
-        $exeResults = $objExercise->getExerciseAndResult($_GET['course_id'], $_GET['session_id'], $quizIds);
+        $users = UserManager::get_user_list_by_ids(
+            $usersId,
+            null,
+            "lastname, firstname",
+            "$start , $limit"
+        );
+        $exeResults = $objExercise->getExerciseAndResult(
+            $_GET['course_id'],
+            $_GET['session_id'],
+            $quizIds
+        );
 
         $arrGrade = array();
         foreach ($exeResults as $exeResult) {
@@ -1902,12 +2033,11 @@ if (in_array($action, $allowed_actions)) {
         }
         exit;
     }
-
     $i = 0;
-
     if (!empty($result)) {
         foreach ($result as $row) {
-            // if results tab give not id, set id to $i otherwise id="null" for all <tr> of the jqgrid - ref #4235
+            // if results tab give not id, set id to $i otherwise id="null"
+            // for all <tr> of the jqgrid - ref #4235
             if (!isset($row['id']) || isset($row['id']) && $row['id'] == '') {
                 $response->rows[$i]['id'] = $i;
             } else {

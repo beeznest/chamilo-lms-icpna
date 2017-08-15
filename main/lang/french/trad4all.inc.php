@@ -5253,7 +5253,7 @@ $PleaseSelectInstallationProcessLanguage = "Veuillez sélectionner la langue de 
 $AsciiSvgComment = "Activer le plugin AsciiSVG de l'éditeur en ligne pour permettre la génération de graphiques selon des fonctions mathématiques.";
 $HereAreTheValuesYouEntered = "Voici les valeurs que vous avez introduites";
 $PrintThisPageToRememberPassAndOthers = "Imprimez cette page pour conserver votre mot de passe et autres paramètres";
-$TheInstallScriptWillEraseAllTables = "Le script d'installation va supprimer toutes les tables des bases de données sélectionnées. Nous recommandons avec insistance pour que vous fassiez une copie de sauvegarde complète de celles-ci avant de confirmer cette dernière étape de l'installation.";
+$TheInstallScriptWillEraseAllTables = "Le script d'installation va supprimer toutes les tables de la base de données sélectionnée. Nous recommandons avec insistance que vous fassiez une copie de sauvegarde complète de celles-ci avant de confirmer cette dernière étape de l'installation.";
 $Published = "Publié";
 $ReadWarningBelow = "lire l'avertissement ci-dessous";
 $SecurityAdvice = "Conseil de sécurité";
@@ -6376,7 +6376,7 @@ $ShowGroupsToUsersComment = "Montrer les classes aux utilisateurs. La fonctionna
 $ExerciseWillBeActivatedFromXToY = "L'exercice sera disponible du %s au %s";
 $ExerciseAvailableFromX = "Exercice disponible à partir du %s";
 $ExerciseAvailableUntilX = "Exercice disponible jusqu'au %s";
-$HomepageViewActivityBig = "Vue activité élargie (style iPad)";
+$HomepageViewActivityBig = "Vue grandes icônes";
 $CheckFilePermissions = "Vérifier les permissions sur les fichiers";
 $AddedToALP = "Ajouté à un parcours";
 $NotAvailable = "Non disponible";
@@ -7970,4 +7970,17 @@ $UserLinkingTo = "Lié à l'apprenant";
 $RequestLinkingToUser = "Solliciter lien à apprenant";
 $LinkingRequestsAdded = "Demande de liaison enregistrée";
 $HrmList = "Liste des directeurs de ressources humaines";
+$AssignHrmToUser = "Assigner Directeur des Ressources Humaines";
+$AddHrmToUser = "Ajouter Directeur des Ressources Humaines";
+$HrmAssignedUsersCourseList = "Liste des cours des utilisateurs assignés au directeur des ressources humaines";
+$GoToSurvey = "Aller à l'enquête";
+$NotificationCertificateSubject = "Avis d'obtention de certificat";
+$NotificationCertificateTemplate = "Cher/Chère ((user_first_name)), vous avez terminé ((course_title)). Votre note finale est de ((score)). Merci de laisser passer quelques jours avant l'apparition de le visualiser sur notre système. Nous espérons que vous en ayez pleinement profité et que nous vous reverrons bientôt dans l'un de vos prochains cours. Si nous pouvons vous être utile d'une quelconque manière, n'hésitez pas à nous contacter.
+Cordialement, ((author_first_name)) ((author_last_name)), ((portal_name))";
+$SendCertificateNotifications = "Envoyer les avis de certificat à tous les utilisateurs";
+$MailSubjectForwardShort = "Tr";
+$ForwardedMessage = "Message transféré";
+$ForwardMessage = "Transférer message";
+$MyCoursePageCategoryIntroduction = "Vous trouverez ci-dessous la liste des catégories de cours.
+Cliquez sur l'une pour voir la liste des cours qu'elle contient.";
 ?>

@@ -5262,7 +5262,7 @@ $PleaseSelectInstallationProcessLanguage = "Please select the language you'd lik
 $AsciiSvgComment = "Enable the AsciiSVG plugin in the WYSIWYG editor to draw charts from mathematical functions.";
 $HereAreTheValuesYouEntered = "Here are the values you entered";
 $PrintThisPageToRememberPassAndOthers = "Print this page to remember your password and other settings";
-$TheInstallScriptWillEraseAllTables = "The install script will erase all tables of the selected databases. We heavily recommend you do a full backup of them before confirming this last install step.";
+$TheInstallScriptWillEraseAllTables = "The install script will erase all tables of the selected database. We heavily recommend you do a full backup of them before confirming this last install step.";
 $Published = "Published";
 $ReadWarningBelow = "read warning below";
 $SecurityAdvice = "Security advice";
@@ -6388,7 +6388,7 @@ $ShowGroupsToUsersComment = "Show the classes to users. Classes are a feature th
 $ExerciseWillBeActivatedFromXToY = "Exercise will be activated from %s to %s";
 $ExerciseAvailableFromX = "Exercise available from %s";
 $ExerciseAvailableUntilX = "Exercise available until %s";
-$HomepageViewActivityBig = "Big activity view (Ipad style)";
+$HomepageViewActivityBig = "Big icons view";
 $CheckFilePermissions = "Check file permissions";
 $AddedToALP = "Added to a LP";
 $NotAvailable = "Not available";
@@ -8044,4 +8044,6 @@ $SendCertificateNotifications = "Send certificate notification to all users";
 $MailSubjectForwardShort = "Fwd";
 $ForwardedMessage = "Forwarded message";
 $ForwardMessage = "Forward message";
+$MyCoursePageCategoryIntroduction = "You will find below the list of course categories.
+Click on one of them to see the list of courses it has.";
 ?>

@@ -1351,13 +1351,13 @@ function item_property_update_on_folder($_course, $path, $user_id)
             $folder_id = DocumentManager::get_document_id($_course, $newpath);
             if ($folder_id) {
                 $sql = "UPDATE $table SET
-				        lastedit_date='$time',
+				        lastedit_date = '$time',
 				        lastedit_type = 'DocumentInFolderUpdated', 
 				        lastedit_user_id='$user_id'
 						WHERE 
 						    c_id = $course_id AND 
 						    tool='".TOOL_DOCUMENT."' AND 
-						    ref='$folder_id'";
+						    ref = '$folder_id'";
                 Database::query($sql);
             }
         }

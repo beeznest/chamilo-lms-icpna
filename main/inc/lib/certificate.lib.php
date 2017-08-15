@@ -19,7 +19,7 @@ class Certificate extends Model
     /**
      * Certification data
      */
-    public $certificate_data = array();
+    public $certificate_data = [];
 
     /**
      * Student's certification path
@@ -40,11 +40,15 @@ class Certificate extends Model
      * Constructor
      * @param int $certificate_id ID of the certificate.
      * @param int $userId
+     * @param bool $sendNotification send message to student
      *
      * If no ID given, take user_id and try to generate one
      */
-    public function __construct($certificate_id = 0, $userId = 0)
-    {
+    public function __construct(
+        $certificate_id = 0,
+        $userId = 0,
+        $sendNotification = false
+    ) {
         $this->table = Database::get_main_table(TABLE_MAIN_GRADEBOOK_CERTIFICATE);
         $this->user_id = !empty($userId) ? $userId : api_get_user_id();
 
@@ -62,12 +66,12 @@ class Certificate extends Model
 
             // To force certification generation
             if ($this->force_certificate_generation) {
-                $this->generate();
+                $this->generate([], $sendNotification);
             }
 
             if (isset($this->certificate_data) && $this->certificate_data) {
                 if (empty($this->certificate_data['path_certificate'])) {
-                    $this->generate();
+                    $this->generate([], $sendNotification);
                 }
             }
         }
@@ -147,9 +151,10 @@ class Certificate extends Model
      *  Generates an HTML Certificate and fills the path_certificate field in the DB
      *
      * @param array $params
+     * @param bool $sendNotification
      * @return bool|int
      */
-    public function generate($params = array())
+    public function generate($params = [], $sendNotification = false)
     {
         // The user directory should be set
         if (empty($this->certification_user_path) &&
@@ -167,12 +172,12 @@ class Certificate extends Model
         if (isset($my_category[0]) &&
             $my_category[0]->is_certificate_available($this->user_id)
         ) {
-            $courseId = api_get_course_int_id();
-            $courseInfo = api_get_course_info();
-            $sessionId = api_get_session_id();
+            $courseInfo = api_get_course_info($my_category[0]->get_course_code());
+            $courseId = $courseInfo['real_id'];
+            $sessionId = $my_category[0]->get_session_id();
 
             $skill = new Skill();
-            $skill->add_skill_to_user(
+            $skill->addSkillToUser(
                 $this->user_id,
                 $this->certificate_data['cat_id'],
                 $courseId,
@@ -228,16 +233,16 @@ class Certificate extends Model
                             $result = @file_put_contents($myPathCertificate, $newContent);
                             if ($result) {
                                 // Updating the path
-                                self::update_user_info_about_certificate(
+                                self::updateUserCertificateInfo(
                                     $this->certificate_data['cat_id'],
                                     $this->user_id,
                                     $path_certificate
                                 );
                                 $this->certificate_data['path_certificate'] = $path_certificate;
 
-                                if ($this->html_file_is_generated()) {
+                                if ($this->isHtmlFileGenerated()) {
                                     if (!empty($file_info)) {
-                                        $text = $this->parse_certificate_variables(
+                                        $text = $this->parseCertificateVariables(
                                             $new_content_html['variables']
                                         );
                                         $this->generateQRImage(
@@ -245,19 +250,20 @@ class Certificate extends Model
                                             $qr_code_filename
                                         );
 
-                                        $subject = get_lang('NotificationCertificateSubject');
-                                        $message = nl2br(get_lang('NotificationCertificateTemplate'));
-                                        $score = $this->certificate_data['score_certificate'];
-
-                                        Certificate::sendNotification(
-                                            $subject,
-                                            $message,
-                                            api_get_user_info($this->user_id),
-                                            $courseInfo,
-                                            [
-                                                'score_certificate' => $score
-                                            ]
-                                        );
+                                        if ($sendNotification) {
+                                            $subject = get_lang('NotificationCertificateSubject');
+                                            $message = nl2br(get_lang('NotificationCertificateTemplate'));
+                                            $score = $this->certificate_data['score_certificate'];
+                                            Certificate::sendNotification(
+                                                $subject,
+                                                $message,
+                                                api_get_user_info($this->user_id),
+                                                $courseInfo,
+                                                [
+                                                    'score_certificate' => $score
+                                                ]
+                                            );
+                                        }
                                     }
                                 }
                             }
@@ -355,7 +361,7 @@ class Certificate extends Model
     * @param string $path_certificate the path name of the certificate
     * @return void
     */
-    public function update_user_info_about_certificate(
+    public function updateUserCertificateInfo(
         $cat_id,
         $user_id,
         $path_certificate
@@ -372,12 +378,11 @@ class Certificate extends Model
     }
 
     /**
-     *
      * Check if the file was generated
      *
      * @return boolean
      */
-    public function html_file_is_generated()
+    public function isHtmlFileGenerated()
     {
         if (empty($this->certification_user_path)) {
             return false;
@@ -414,7 +419,7 @@ class Certificate extends Model
      * second is an array of contents
      * @return string The translated string
      */
-    public function parse_certificate_variables($array)
+    public function parseCertificateVariables($array)
     {
         $headers = $array[0];
         $content = $array[1];

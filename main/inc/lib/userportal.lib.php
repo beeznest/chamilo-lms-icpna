@@ -10,7 +10,8 @@ class IndexManager
     const VIEW_BY_SESSION = 1;
 
     // An instance of the template engine
-    //No need to initialize because IndexManager is not static, and the constructor immediately instantiates a Template
+    // No need to initialize because IndexManager is not static,
+    // and the constructor immediately instantiates a Template
     public $tpl;
     public $name = '';
     public $home = '';
@@ -314,7 +315,6 @@ class IndexManager
     public function return_notice()
     {
         $user_selected_language = api_get_interface_language();
-
         $html = '';
         // Notice
         $home_notice = @(string) file_get_contents($this->home.'home_notice_'.$user_selected_language.'.html');
@@ -1142,8 +1142,11 @@ class IndexManager
      * @param string $categoryCodeFilter
      * @return string
      */
-    public function returnCoursesAndSessions($user_id, $showSessions = true, $categoryCodeFilter = '')
-    {
+    public function returnCoursesAndSessions(
+        $user_id,
+        $showSessions = true,
+        $categoryCodeFilter = ''
+    ) {
         $gameModeIsActive = api_get_setting('gamification_mode');
         $listCourse = '';
         $specialCourseList = '';
@@ -1172,6 +1175,9 @@ class IndexManager
         $studentInfoProgress = (!empty($studentInfo['progress']) && $studentInfo['progress'] === true);
         $studentInfoScore = (!empty($studentInfo['score']) && $studentInfo['score'] === true);
         $studentInfoCertificate = (!empty($studentInfo['certificate']) && $studentInfo['certificate'] === true);
+        $courseCompleteList = [];
+        $coursesInCategoryCount = 0;
+        $coursesNotInCategoryCount = 0;
 
         // If we're not in the history view...
         if (!isset($_GET['history'])) {
@@ -1187,8 +1193,8 @@ class IndexManager
                 $this->load_directories_preview
             );
 
-            //Course option (show student progress)
-            //This code will add new variables (Progress, Score, Certificate)
+            // Course option (show student progress)
+            // This code will add new variables (Progress, Score, Certificate)
             if ($studentInfoProgress || $studentInfoScore || $studentInfoCertificate) {
                 if (!empty($specialCourses)) {
                     foreach ($specialCourses as $key => $specialCourseInfo) {
@@ -1236,7 +1242,7 @@ class IndexManager
                     }
                 }
 
-                if (isset($courses['in_category']) && isset($courses['not_category'])) {
+                if (isset($courses['in_category'])) {
                     foreach ($courses['in_category'] as $key1 => $value) {
                         if (isset($courses['in_category'][$key1]['courses'])) {
                             foreach ($courses['in_category'][$key1]['courses'] as $key2 => $courseInCatInfo) {
@@ -1267,18 +1273,29 @@ class IndexManager
                                         null
                                     );
                                     $courses['in_category'][$key1]['student_info']['certificate'] = null;
+                                    $isCertificateAvailable = $category[0]->is_certificate_available($user_id);
                                     if (isset($category[0])) {
                                         if ($viewGrid == 'true') {
-                                            if ($category[0]->is_certificate_available($user_id)) {
-                                                $courses['in_category'][$key1]['student_info']['certificate'] = get_lang('Yes');
+                                            if ($isCertificateAvailable) {
+                                                $courses['in_category'][$key1]['student_info']['certificate'] = get_lang(
+                                                    'Yes'
+                                                );
                                             } else {
-                                                $courses['in_category'][$key1]['student_info']['certificate'] = get_lang('No');
+                                                $courses['in_category'][$key1]['student_info']['certificate'] = get_lang(
+                                                    'No'
+                                                );
                                             }
                                         } else {
-                                            if ($category[0]->is_certificate_available($user_id)) {
-                                                $courses['in_category'][$key1]['student_info']['certificate'] = Display::label(get_lang('Yes'), 'success');
+                                            if ($isCertificateAvailable) {
+                                                $courses['in_category'][$key1]['student_info']['certificate'] = Display::label(
+                                                    get_lang('Yes'),
+                                                    'success'
+                                                );
                                             } else {
-                                                $courses['in_category'][$key1]['student_info']['certificate'] = Display::label(get_lang('No'), 'danger');
+                                                $courses['in_category'][$key1]['student_info']['certificate'] = Display::label(
+                                                    get_lang('No'),
+                                                    'danger'
+                                                );
                                             }
                                         }
                                     }
@@ -1286,7 +1303,9 @@ class IndexManager
                             }
                         }
                     }
+                }
 
+                if (isset($courses['not_category'])) {
                     foreach ($courses['not_category'] as $key => $courseNotInCatInfo) {
                         if ($studentInfoProgress) {
                             $progress = Tracking::get_avg_student_progress(
@@ -1317,17 +1336,15 @@ class IndexManager
                             $courses['not_category'][$key]['student_info']['certificate'] = null;
 
                             if (isset($category[0])) {
+                                $certificateAvailable = $category[0]->is_certificate_available($user_id);
                                 if ($viewGrid == 'true') {
-                                    if ($category[0]->is_certificate_available($user_id)) {
+                                    if ($certificateAvailable) {
                                         $courses['not_category'][$key]['student_info']['certificate'] = get_lang('Yes');
                                     } else {
                                         $courses['not_category'][$key]['student_info']['certificate'] = get_lang('No');
                                     }
                                 } else {
-                                    if ($category[0]->is_certificate_available(
-                                        $user_id
-                                    )
-                                    ) {
+                                    if ($certificateAvailable) {
                                         $courses['not_category'][$key]['student_info']['certificate'] = Display::label(
                                             get_lang('Yes'),
                                             'success'
@@ -1343,7 +1360,6 @@ class IndexManager
                         }
                     }
                 }
-
             }
 
             if ($viewGridCourses) {
@@ -1353,20 +1369,37 @@ class IndexManager
 
             if ($specialCourses) {
                 if ($categoryCodeFilter) {
-                    $specialCourses = self::filterByCategory($specialCourses, $categoryCodeFilter);
+                    $specialCourses = self::filterByCategory(
+                        $specialCourses,
+                        $categoryCodeFilter
+                    );
                 }
-
                 $this->tpl->assign('courses', $specialCourses);
-
                 $specialCourseList = $this->tpl->fetch(
                     $this->tpl->get_template($coursesWithoutCategoryTemplate)
                 );
             }
 
             if ($courses['in_category'] || $courses['not_category']) {
+                foreach ($courses['in_category'] as $courseData) {
+                    if (!empty($courseData['courses'])) {
+                        $coursesInCategoryCount += count($courseData['courses']);
+                        $courseCompleteList = array_merge($courseCompleteList, $courseData['courses']);
+                    }
+                }
+
+                $coursesNotInCategoryCount += count($courses['not_category']);
+                $courseCompleteList = array_merge($courseCompleteList, $courses['not_category']);
+
                 if ($categoryCodeFilter) {
-                    $courses['in_category'] = self::filterByCategory($courses['in_category'], $categoryCodeFilter);
-                    $courses['not_category'] = self::filterByCategory($courses['not_category'], $categoryCodeFilter);
+                    $courses['in_category'] = self::filterByCategory(
+                        $courses['in_category'],
+                        $categoryCodeFilter
+                    );
+                    $courses['not_category'] = self::filterByCategory(
+                        $courses['not_category'],
+                        $categoryCodeFilter
+                    );
                 }
 
                 $this->tpl->assign('courses', $courses['not_category']);
@@ -1380,7 +1413,7 @@ class IndexManager
                 );
             }
 
-            $courseCount = count($specialCourses) + count($courses['in_category']) + count($courses['not_category']);
+            $courseCount = count($specialCourses) + $coursesInCategoryCount + $coursesNotInCategoryCount;
         }
 
         $sessions_with_category = '';
@@ -1788,6 +1821,8 @@ class IndexManager
         }
 
         return [
+            'courses' => $courseCompleteList,
+            'sessions' => $session_categories,
             'html' => trim($specialCourseList.$sessions_with_category.$sessions_with_no_category.$listCourse),
             'session_count' => $sessionCount,
             'course_count' => $courseCount
@@ -2003,6 +2038,8 @@ class IndexManager
 
         return [
             'html' => $html,
+            'sessions' => $session_categories,
+            'courses' => $listCoursesInfo,
             'session_count' => $sessionCount,
             'course_count' => $courseCount
         ];
@@ -2239,17 +2276,15 @@ class IndexManager
     }
 
     /**
-     * @param $userId
+     * @param int $userId
      * @return array
      */
-    public static function returnCourseCategoryListFromUser($userId)
+    public function returnCourseCategoryListFromUser($userId)
     {
         $sessionCount = 0;
-
         $courseList = CourseManager::get_courses_list_by_user_id($userId);
         $categoryCodes = CourseManager::getCourseCategoriesFromCourseList($courseList);
         $categories = [];
-
         foreach ($categoryCodes as $categoryCode) {
             $categories[] = CourseCategory::getCategory($categoryCode);
         }
@@ -2274,7 +2309,9 @@ class IndexManager
     private static function filterByCategory($courseList, $categoryCode)
     {
         return array_filter($courseList, function ($courseInfo) use ($categoryCode) {
-            if ($courseInfo['category_code'] === $categoryCode) {
+            if (isset($courseInfo['category_code']) &&
+                $courseInfo['category_code'] === $categoryCode
+            ) {
                 return true;
             }
 

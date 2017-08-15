@@ -13,6 +13,7 @@ class CatForm extends FormValidator
     const TYPE_EDIT = 2;
     const TYPE_MOVE = 3;
     const TYPE_SELECT_COURSE = 4;
+    /** @var Category  */
     private $category_object;
 
     /**
@@ -133,7 +134,7 @@ class CatForm extends FormValidator
      */
     protected function build_editing_form()
     {
-        $skills = $this->category_object->get_skills_for_select();
+        $skills = $this->category_object->getSkillsForSelect();
 
         $course_code = api_get_course_id();
         $session_id = api_get_session_id();
@@ -177,7 +178,7 @@ class CatForm extends FormValidator
                 'skills' => $skills,
                 'weight' => $this->category_object->get_weight(),
                 'visible' => $this->category_object->is_visible(),
-                'certif_min_score' => $this->category_object->get_certificate_min_score(),
+                'certif_min_score' => $this->category_object->getCertificateMinScore(),
                 'generate_certificates' => $this->category_object->getGenerateCertificates(),
                 'is_requirement' => $this->category_object->getIsRequirement(),
             )

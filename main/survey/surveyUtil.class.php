@@ -1,6 +1,9 @@
 <?php
 /* For licensing terms, see /license.txt */
 
+use Chamilo\CourseBundle\Component\CourseCopy\CourseBuilder,
+    Chamilo\CourseBundle\Component\CourseCopy\CourseRestorer;
+
 /**
  * This class offers a series of general utility functions for survey querying and display
  * @package chamilo.survey
@@ -2923,6 +2926,80 @@ class SurveyUtil
             $surveys[] = $array;
         }
         return $surveys;
+    }
+
+    /**
+     * @param int $courseId
+     * @param int $sessionId
+     * @return array
+     */
+    public static function getCourseSurveys($courseId, $sessionId = 0)
+    {
+        $conditionSession = api_get_session_condition($sessionId, true, false, 's.sessionId');
+        $em = Database::getManager();
+        $surveys = $em
+            ->createQuery("
+                SELECT s FROM ChamiloCourseBundle:CSurvey s
+                LEFT JOIN ChamiloCourseBundle:CSurveyQuestion sq WITH (s.surveyId = sq.surveyId AND sq.cId = :course)
+                LEFT JOIN ChamiloUserBundle:User u WITH s.author = u.userId
+                WHERE s.cId = :course $conditionSession
+                GROUP BY s.surveyId
+                ORDER BY s.title ASC
+            ")
+            ->setParameter('course', $courseId)
+            ->getResult();
+
+        return $surveys;
+    }
+
+    /**
+     * @param string $code
+     * @param int $courseId
+     * @param int $sessionId
+     * @return mixed
+     */
+    public static function existsSurveyCodeInCourse($code, $courseId, $sessionId = 0)
+    {
+        $params = ['code' => "$code%", 'course' => $courseId];
+        $dql = "SELECT COUNT(s) FROM ChamiloCourseBundle:CSurvey s WHERE s.code LIKE :code AND s.cId = :course";
+
+        if ($sessionId) {
+            $dql .= " AND s.sessionId = :session";
+            $params['session'] = $sessionId;
+        }
+
+        return Database::getManager()
+            ->createQuery($dql)
+            ->setParameters($params)
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * @param int $surveyId
+     * @param string $origCourseCode
+     * @param int $origSessionId
+     * @param string $newCourseCode
+     * @param int $newSessionId
+     * @return mixed
+     */
+    public static function copy($surveyId, $origCourseCode, $origSessionId, $newCourseCode, $newSessionId)
+    {
+        $courseInfo = api_get_course_info($origCourseCode);
+        /** @var CourseBuilder $cb */
+        $cb = new CourseBuilder('', $courseInfo);
+        $cb->set_tools_to_build(['surveys']);
+        $cb->set_tools_specific_id_list([
+            'surveys' => [$surveyId]
+        ]);
+        $course = $cb->build($origSessionId, $origCourseCode);
+
+        /** @var CourseRestorer $course_restorer */
+        $course_restorer = new CourseRestorer($course);
+        $course_restorer->set_add_text_in_items(true);
+
+        $restoredIds = $course_restorer->restore($newCourseCode, $newSessionId, false, false);
+
+        return current($restoredIds['surveys']);
     }
 
     /**

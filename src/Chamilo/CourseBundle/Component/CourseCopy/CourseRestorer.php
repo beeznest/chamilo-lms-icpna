@@ -180,9 +180,11 @@ class CourseRestorer
         // Encoding conversion of the course, if it is needed.
         $this->course->to_system_encoding();
 
+        $return = [];
+
         foreach ($this->tools_to_restore as $tool) {
             $function_build = 'restore_'.$tool;
-            $this->$function_build(
+            $return[$tool][] = $this->$function_build(
                 $session_id,
                 $respect_base_content,
                 $destination_course_code
@@ -243,6 +245,8 @@ class CourseRestorer
                 }
             }
         }
+
+        return $return;
     }
 
     /**
@@ -2225,6 +2229,7 @@ class CourseRestorer
      */
     public function restore_surveys($sessionId = 0)
     {
+        $return = [];
         $sessionId = intval($sessionId);
         if ($this->course->has_resources(RESOURCE_SURVEY)) {
             $table_sur = Database::get_course_table(TABLE_SURVEY);
@@ -2312,6 +2317,7 @@ class CourseRestorer
                             $params['code'] = $survey_code;
                             $new_id = Database::insert($table_sur, $params);
                             if ($new_id) {
+                                $return[] = $new_id;
                                 $sql = "UPDATE $table_sur SET survey_id = iid WHERE iid = $new_id";
                                 Database::query($sql);
 
@@ -2348,6 +2354,7 @@ class CourseRestorer
                             $new_id = Database::insert($table_sur, $params);
 
                             if ($new_id) {
+                                $return[] = $new_id;
                                 $sql = "UPDATE $table_sur SET survey_id = iid WHERE iid = $new_id";
                                 Database::query($sql);
 
@@ -2374,6 +2381,7 @@ class CourseRestorer
                     $new_id = Database::insert($table_sur, $params);
 
                     if ($new_id) {
+                        $return[] = $new_id;
                         $sql = "UPDATE $table_sur SET survey_id = iid WHERE iid = $new_id";
                         Database::query($sql);
 
@@ -2394,6 +2402,8 @@ class CourseRestorer
                 }
             }
         }
+
+        return $return;
     }
 
     /**

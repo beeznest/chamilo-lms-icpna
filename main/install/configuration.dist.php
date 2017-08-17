@@ -460,6 +460,13 @@ INSERT INTO extra_field (extra_field_type, field_type, variable, display_text, v
 VALUES (12, 13, 'is_mandatory', 'IsMandatory', 1, 1, NOW());
 */
 //$_configuration['allow_mandatory_survey'] = false;
+// Allow required survey questions. Applies to yesno/multiplechoice question type. Requires DB change:
+/*
+ALTER TABLE c_survey_question ADD is_required TINYINT(1) DEFAULT 0 NOT NULL;
+*/
+//$_configuration['allow_required_survey_questions'] = false;
+// Hide Survey Reporting button
+//$_configuration['hide_survey_reporting_button'] = false;
 // ------
 
 // Allow career diagram, requires a DB change:
@@ -591,6 +598,12 @@ $_configuration['score_grade_model'] = [
 /*$_configuration['gradebook_dependency_mandatory_courses'] = [
     'courses' => [1, 2]
 ];*/
+// Gradebook id list needed to build the gradebook sidebar see BT#13099
+/*
+$_configuration['gradebook_badge_sidebar'] = [
+    'gradebooks' => [1, 2, 3]
+];*/
+
 // Show language selector in main menu an update the language in the user's
 // profile.
 //$_configuration['show_language_selector_in_menu'] = false;

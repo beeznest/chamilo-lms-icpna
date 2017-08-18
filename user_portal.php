@@ -314,6 +314,7 @@ if (!empty($courseAndSessions['courses']) && $allow) {
     $result = [];
     $result20 = 0;
     $result80 = 0;
+    $countCoursesPassedNoDependency = 0;
     /** @var Category $category */
     foreach ($mainCategoryList as $category) {
         $userFinished = Category::userFinishedCourse(
@@ -328,6 +329,7 @@ if (!empty($courseAndSessions['courses']) && $allow) {
                     $result20 += 10;
                 }
             } else {
+                $countCoursesPassedNoDependency++;
                 if ($result80 < 80) {
                     $result80 += 10;
                 }
@@ -347,11 +349,31 @@ if (!empty($courseAndSessions['courses']) && $allow) {
         $badgeList[$id]['name'] = $category->get_name();
         $badgeList[$id]['finished'] = false;
         if (!empty($category)) {
-            $userFinished = Category::userFinishedCourse(
-                $userId,
-                $category,
-                true
-            );
+            $minToValidate = $category->getMinimumToValidate();
+            $dependencies = $category->getCourseListDependency();
+            $countDependenciesPassed = 0;
+            foreach ($dependencies as $courseId) {
+                $courseInfo = api_get_course_info_by_id($courseId);
+                $courseCode = $courseInfo['code'];
+                $categories = Category::load(null, null, $courseCode);
+                $subCategory = !empty($categories[0]) ? $categories[0] : null;
+                if (!empty($subCategory)) {
+                    $score = Category::userFinishedCourse(
+                        $userId,
+                        $subCategory,
+                        true
+                    );
+                    if ($score) {
+                        $countDependenciesPassed++;
+                    }
+                }
+            }
+
+            $userFinished =
+                $countDependenciesPassed == count($dependencies) &&
+                $countCoursesPassedNoDependency >= $minToValidate
+            ;
+
             if ($userFinished) {
                 $badgeList[$id]['finished'] = true;
             }

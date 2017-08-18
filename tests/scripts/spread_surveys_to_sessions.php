@@ -1,81 +1,244 @@
 <?php
 /* For licensing terms, see /license.txt */
 
-die();
+//die();
 
 if (PHP_SAPI !== 'cli') {
     die('This script can only be executed from the command line');
 }
 
 use Chamilo\CoreBundle\Entity\Session,
-    Chamilo\CoreBundle\Entity\SessionRelCourse,
+    Chamilo\CoreBundle\Entity\Course,
     Chamilo\CourseBundle\Entity\CSurvey;
 
 require_once __DIR__.'/../../main/inc/global.inc.php';
 
+// Set the origin course code
+$courseCode = 'B01';
+//Set course codes (not in sessions) to replicate the survey
+$destinationCourseCodes = [
+];
+//Set the uididprograma value to filter sessions
+$uididprogramaFilter = [
+];
+// Set the sede value to filter sessions
+$sedeFilter = [
+];
+$surveyDayNumberToStart = 13;
+$surveyDayNumberToEnd = 15;
+
 $em = Database::getManager();
-$monthStart = new DateTime('first day of this month 00:00:00', new DateTimeZone('UTC'));
-$monthEnd = new DateTime('last day of this month 23:59:59', new DateTimeZone('UTC'));
 
-// Todas las sesiones que empiezan este mes
-$sessions = $em
-    ->createQuery("
-        SELECT s FROM ChamiloCoreBundle:Session s
-        WHERE s.accessStartDate >= :month_start AND s.accessStartDate <= :month_end
-    ")
-    ->setParameters(['month_start' => $monthStart, 'month_end' => $monthEnd])
-    ->getResult();
+/** @var Course $course */
+$course = $em->getRepository('ChamiloCoreBundle:Course')->findOneBy(['code' => $courseCode]);
 
-/** @var Session $session */
-foreach ($sessions as $session) {
-    /** @var SessionRelCourse $sessionCourse */
-    $sessionCourse = $session->getCourses()->first();
+ChamiloSession::write('_real_cid', $course->getId());
 
-    if (!$sessionCourse) {
-        continue;
+echo "Replicate surveys from {$course->getCode()}".PHP_EOL;
+echo PHP_EOL;
+
+if ($destinationCourseCodes) {
+    replicateInCourses($course, $destinationCourseCodes);
+
+    exit; //only replicate in basis courses
+}
+
+replicateInSessions($course, $surveyDayNumberToStart, $surveyDayNumberToEnd, $uididprogramaFilter, $sedeFilter);
+
+echo "Exiting".PHP_EOL;
+
+/**
+ * @param \Chamilo\CoreBundle\Entity\Course $originCourse
+ * @param array $destinationCourseCodes
+ */
+function replicateInCourses(Course $originCourse, array $destinationCourseCodes) {
+    $courseSurveys = SurveyUtil::getCourseSurveys($originCourse->getId());
+
+    $em = Database::getManager();
+    $courseRepo = $em->getRepository('ChamiloCoreBundle:Course');
+
+    foreach ($destinationCourseCodes as $courseCode) {
+        echo "Attempt to replicate surveys in course $courseCode.".PHP_EOL;
+        /** @var Course $courseToReplicate */
+        $courseToReplicate = $courseRepo->findOneBy(['code' => $courseCode]);
+
+        if (!$courseToReplicate) {
+            echo "\tCourse does not exists.".PHP_EOL;
+            continue;
+        }
+
+        /** @var CSurvey $survey */
+        foreach ($courseSurveys as $survey) {
+            echo "\tReplicate survey {$survey->getCode()}".PHP_EOL;
+
+            if (SurveyUtil::existsSurveyCodeInCourse($survey->getCode(), $courseToReplicate->getId())) {
+                echo "\t\tSurvey {$survey->getCode()} already exists in course.".PHP_EOL;
+                continue;
+            }
+
+            $newSurveyIds = SurveyUtil::copy($survey->getSurveyId(), $originCourse->getCode(), 0, $courseCode, 0);
+            /** @var CSurvey $replicatedSurvey */
+            $replicatedSurvey = $em->find('ChamiloCourseBundle:CSurvey', current($newSurveyIds));
+            echo "\t\tNew survey created with code {$replicatedSurvey->getCode()}".PHP_EOL;
+        }
+    }
+}
+
+/**
+ * @param \Chamilo\CoreBundle\Entity\Course $originCourse
+ * @param int $dayNumberToStart number of day to start survey
+ * @param int $dayNumberToEnd number of day to end survey
+ * @param array $uididprogramaFilter Optional. uididprograma extra field to filter
+ * @param array $sedeFilter Optional. sede extra field to filter
+ */
+function replicateInSessions(
+    Course $originCourse,
+    $dayNumberToStart,
+    $dayNumberToEnd,
+    array $uididprogramaFilter = [],
+    array $sedeFilter = []
+)
+{
+    $em = Database::getManager();
+    $monthStart = new DateTime('first day of this month 00:00:00', new DateTimeZone('UTC'));
+    $monthEnd = new DateTime('last day of this month 23:59:59', new DateTimeZone('UTC'));
+
+    $courseSurveys = SurveyUtil::getCourseSurveys($originCourse->getId());
+
+    //Get sessions from de origin course for this month
+    $sessions = $em
+        ->createQuery("
+            SELECT s FROM ChamiloCoreBundle:Session s
+            INNER JOIN ChamiloCoreBundle:SessionRelCourse sc WITH s = sc.session
+            WHERE s.accessStartDate >= :month_start AND s.accessStartDate <= :month_end
+              AND sc.course = :course
+        ")
+        ->setParameters(['month_start' => $monthStart, 'month_end' => $monthEnd, 'course' => $originCourse])
+        ->getResult();
+
+    if ($uididprogramaFilter) {
+        $sessions = filterSessionsByUididprograma($sessions, $uididprogramaFilter);
     }
 
-    $course = $sessionCourse->getCourse();
-    $surveys = SurveyUtil::getCourseSurveys($course->getId());
+    if ($sedeFilter) {
+        $sessions = filterSessionsBySede($sessions, $sedeFilter);
+    }
+
+    /** @var Session $session */
+    foreach ($sessions as $session) {
+        ChamiloSession::write('id_session', $session->getId());
+
+        echo "Attempt to replicate surveys in session {$session->getId()}".PHP_EOL;
+
+        $users = getSessionUsersForInvitation($session, $originCourse);
+
+        /** @var CSurvey $survey */
+        foreach ($courseSurveys as $survey) {
+            echo "\tReplicate survey {$survey->getCode()}".PHP_EOL;
+
+            if (SurveyUtil::existsSurveyCodeInCourse($survey->getCode(), $originCourse->getId(), $session->getId())) {
+                echo "\t\tSurvey code {$survey->getCode()} already exists in session {$session->getId()}".PHP_EOL;
+                continue;
+            }
+
+            $newSurveyIds = SurveyUtil::copy(
+                $survey->getSurveyId(),
+                $originCourse->getCode(),
+                0,
+                $originCourse->getCode(),
+                $session->getId()
+            );
+
+            /** @var CSurvey $newSurvey */
+            $newSurvey = $em->find('ChamiloCourseBundle:CSurvey', current($newSurveyIds));
+            echo "\t\tNew survey created with code {$newSurvey->getCode()} in session {$session->getId()}".PHP_EOL;
+
+            //Calculate new survey date
+            $newSurveyAvailFrom = clone $session->getAccessStartDate();
+            $newSurveyAvailFrom->modify('+'.($dayNumberToStart - 1).'days');
+            $newSurveyAvailTill = clone $session->getAccessStartDate();
+            $newSurveyAvailTill->modify('+'.($dayNumberToEnd - 1).'days');
+
+            $newSurvey
+                ->setAvailFrom($newSurveyAvailFrom)
+                ->setAvailTill($newSurveyAvailTill);
+            $em->persist($newSurvey);
+            $em->flush();
+
+            $_GET['survey_id'] = $newSurvey->getSurveyId();
+            $_GET['course'] = $originCourse->getCode();
+
+            SurveyUtil::saveInvitations($users, '', '', 0, false, 0);
+            SurveyUtil::update_count_invited($newSurvey->getCode());
+
+            echo "\t\tUsers in session course were invited".PHP_EOL;
+        }
+    }
+}
+
+/**
+ * @param \Chamilo\CoreBundle\Entity\Session $session
+ * @param \Chamilo\CoreBundle\Entity\Course $course
+ * @return array
+ */
+function getSessionUsersForInvitation(Session $session, Course $course)
+{
     $users = [];
-
-    // Hack for get course code and session id
-    ChamiloSession::write('_real_cid', $course->getId());
-    ChamiloSession::write('id_session', $session->getId());
-
     $sessionCourseUsers = $session->getUserCourseSubscriptionsByStatus($course, Session::STUDENT);
 
     foreach ($sessionCourseUsers as $sessionCourseUser) {
         $users[] = "USER:{$sessionCourseUser->getUser()->getId()}";
     }
 
-    /** @var CSurvey $survey */
-    foreach ($surveys as $survey) {
-        if (SurveyUtil::existsSurveyCodeInCourse($survey->getCode(), $course->getId(), $session->getId())) {
-            echo 'Survey code '.$survey->getCode().' already exists in session '.$session->getId().'.'.PHP_EOL;
-            continue;
-        }
+    return $users;
+}
 
-        echo "Creating survey with code '{$survey->getCode()}' in session {$session->getId()}".PHP_EOL;
+/**
+ * @param array $sessions
+ * @param array $uididprogramas
+ * @return array
+ */
+function filterSessionsByUididprograma(array $sessions, array $uididprogramas)
+{
+    $em = Database::getManager();
 
-        $newSurveyIds = SurveyUtil::copy(
-            $survey->getSurveyId(),
-            $course->getCode(),
-            0,
-            $course->getCode(),
-            $session->getId()
-        );
-        /** @var CSurvey $newSurvey */
-        $newSurvey = $em->find('ChamiloCourseBundle:CSurvey', current($newSurveyIds));
-        echo "---- New survey created with code {$newSurvey->getCode()} in session {$session->getId()}".PHP_EOL;
+    return array_filter($sessions, function (Session $session) use ($em, $uididprogramas) {
+        $sessionIsFound = $em
+            ->createQuery("
+                SELECT COUNT(efv) FROM ChamiloCoreBundle:ExtraFieldValues efv
+                INNER JOIN ChamiloCoreBundle:ExtraField ef WITH efv.field = ef
+                WHERE ef.variable = :variable
+                  AND efv.value IN ('".implode("', '", $uididprogramas)."')
+                  AND efv.itemId = :session
+            ")
+            ->setParameters(['variable' => 'uididprograma', 'session' => $session->getId()])
+            ->getSingleScalarResult();
 
-        // Hack for get course code and session id
-        $_GET['survey_id'] = $newSurvey->getSurveyId();
-        $_GET['course'] = $course->getCode();
+        return $sessionIsFound > 0;
+    });
+}
 
-        SurveyUtil::saveInvitations($users, '', '', 0, false, 0);
-        SurveyUtil::update_count_invited($newSurvey->getCode());
-        echo "---- Users in session course were invited".PHP_EOL;
-        echo PHP_EOL;
-    }
+/**
+ * @param array $sessions
+ * @param array $sedes
+ * @return array
+ */
+function filterSessionsBySede(array $sessions, array $sedes)
+{
+    $em = Database::getManager();
+
+    return array_filter($sessions, function (Session $session) use ($em, $sedes) {
+        $sessionIsFound = $em
+            ->createQuery("
+                SELECT COUNT(efv) FROM ChamiloCoreBundle:ExtraFieldValues efv
+                INNER JOIN ChamiloCoreBundle:ExtraField ef WITH efv.field = ef
+                WHERE ef.variable = :variable
+                  AND efv.value IN ('".implode("', '", $sedes)."')
+                  AND efv.itemId = :session
+            ")
+            ->setParameters(['variable' => 'sede', 'session' => $session->getId()])
+            ->getSingleScalarResult();
+
+        return $sessionIsFound > 0;
+    });
 }

@@ -3089,7 +3089,7 @@ class SurveyUtil
         $course_id = $_course['real_id'];
         $user_id = intval($user_id);
         $sessionId = api_get_session_id();
-        $mandatoryAllowed = api_get_configuration_value('allow_mandatory_survey');
+        $mandatoryAllowed = api_get_configuration_value('allow_mandatory_survey') && api_is_allowed_to_edi();
 
         // Database table definitions
         $table_survey_question = Database::get_course_table(TABLE_SURVEY_QUESTION);

@@ -3110,7 +3110,7 @@ class SurveyUtil
         echo '<thead>';
         echo '<tr>';
         echo '	<th>'.get_lang('SurveyName').'</th>';
-        echo '	<th class="text-center">'.get_lang('Anonymous').'</th>';
+        //echo '	<th class="text-center">'.get_lang('Anonymous').'</th>';
         if ($mandatoryAllowed) {
             echo '<th class="text-center">'.get_lang('IsMandatory').'</th>';
         }
@@ -3177,9 +3177,9 @@ class SurveyUtil
                     : $icon.PHP_EOL.$row['title'];
                 echo '</td>';
             }
-            echo '<td class="text-center">';
-            echo ($row['anonymous'] == 1) ? get_lang('Yes') : get_lang('No');
-            echo '</td>';
+            //echo '<td class="text-center">';
+            //echo ($row['anonymous'] == 1) ? get_lang('Yes') : get_lang('No');
+            //echo '</td>';
             if ($mandatoryAllowed) {
                 $efvMandatory = $efv->get_values_by_handler_and_field_variable(
                     $row['survey_id'],

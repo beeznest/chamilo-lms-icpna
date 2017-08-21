@@ -155,13 +155,21 @@
                                         {{ 'Progress' | get_lang  }} : {{ grade_book_progress }} %
                                         <br />
                                         {% for badge in grade_book_badge_list %}
-                                            {{ badge.name }} -
-                                            {% if badge.finished %}
-                                                Yes
-                                            {% else %}
-                                                No
-                                            {% endif %}
-                                            <br />
+                                            <div class="badge_sidebar">
+                                            {% for skill in badge.skills %}
+                                                {% if badge.finished %}
+                                                    <img class="badge_sidebar_image " src = "{{ skill.web_icon_path }}" />
+                                                {% else %}
+                                                    <img class="badge_sidebar_image badge_sidebar_image_transparency" src = "{{ skill.web_icon_path }}" />
+                                                {% endif %}
+                                                <div class="badge_sidebar_title">
+                                                {{ skill.name }}
+                                                </div>
+                                            {% endfor %}
+                                            </div>
+                                            {#<div class="badge_sidebar_title">#}
+                                            {#{{ badge.name }}#}
+                                            {#</div>#}
                                         {% endfor %}
                                     </li>
                                 </ul>

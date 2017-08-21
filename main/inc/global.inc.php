@@ -488,12 +488,29 @@ if (!empty($valid_languages)) {
     // Overwrite all lang configs and use the menu language
     if ($allow) {
         if (isset($_SESSION['user_language_choice'])) {
-            $language_interface = $_SESSION['user_language_choice'];
             $userEntity = api_get_user_entity(api_get_user_id());
-            if ($userEntity && isset($_GET['language'])) {
-                $userEntity->setLanguage($language_interface);
-                Database::getManager()->merge($userEntity);
-                Database::getManager()->flush();
+            if ($userEntity) {
+                if (isset($_GET['language'])) {
+                    $language_interface = $_SESSION['user_language_choice'];
+                    $userEntity->setLanguage($language_interface);
+                    Database::getManager()->merge($userEntity);
+                    Database::getManager()->flush();
+
+                    // Update cache
+                    api_get_user_info(
+                        api_get_user_id(),
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        true
+                    );
+                    if (isset($_SESSION['_user'])) {
+                        $_SESSION['_user']['language'] = $language_interface;
+                    }
+                }
+                $language_interface = $_SESSION['user_language_choice'] = $userEntity->getLanguage();
             }
         } else {
             $userInfo = api_get_user_info();
@@ -625,3 +642,4 @@ if (empty($default_quota)) {
 define('DEFAULT_DOCUMENT_QUOTA', $default_quota);
 // Forcing PclZip library to use a custom temporary folder.
 define('PCLZIP_TEMPORARY_DIR', api_get_path(SYS_ARCHIVE_PATH));
+

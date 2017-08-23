@@ -1,7 +1,7 @@
 <?php
 /* For licensing terms, see /license.txt */
 
-die();
+//die();
 
 if (PHP_SAPI !== 'cli') {
     die('This script can only be executed from the command line');
@@ -15,7 +15,6 @@ use Chamilo\CoreBundle\Entity\Session,
 require_once __DIR__.'/../../main/inc/global.inc.php';
 
 $sessionIds = [
-    2, 4, 5, 6
 ];
 
 $em = Database::getManager();
@@ -35,7 +34,7 @@ foreach ($sessionIds as $sessionId) {
         ChamiloSession::write('_real_cid', $course->getId());
 
         $users = getSessionUsersForInvitation($session, $course);
-        $courseSurveys = SurveyUtil::getCourseSurveys($course->getId());
+        $courseSurveys = SurveyUtil::getCourseSurveys($course->getId(), $session->getId());
 
         /** @var CSurvey $survey */
         foreach ($courseSurveys as $survey) {

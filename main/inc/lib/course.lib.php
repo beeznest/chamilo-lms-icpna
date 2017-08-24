@@ -2739,6 +2739,7 @@ class CourseManager
      * whether he gets all the courses or just his. Note: This does *not* include all sessions
      * @param bool $loadSpecialCourses
      * @param array $skipCourseList List of course ids to skip
+     * @param bool $useUserLanguageFilterIfAvailable
      * @return array List of codes and db name
      * @author isaac flores paz
      */
@@ -2747,7 +2748,8 @@ class CourseManager
         $include_sessions = false,
         $adminGetsAllCourses = false,
         $loadSpecialCourses = true,
-        $skipCourseList = []
+        $skipCourseList = [],
+        $useUserLanguageFilterIfAvailable = true
     ) {
         $user_id = intval($user_id);
         $urlId = api_get_current_access_url_id();
@@ -2761,7 +2763,7 @@ class CourseManager
 
         $languageCondition = '';
         $onlyInUserLanguage = api_get_configuration_value('my_courses_show_courses_in_user_language_only');
-        if ($onlyInUserLanguage) {
+        if ($useUserLanguageFilterIfAvailable && $onlyInUserLanguage) {
             $userInfo = api_get_user_info(api_get_user_id());
             if (!empty($userInfo['language'])) {
                 $languageCondition = " AND course.course_language = '".$userInfo['language']."' ";
@@ -3590,10 +3592,14 @@ class CourseManager
      * in the sense that any user clicking them is registered as a student
      * @param int       $user_id User id
      * @param bool      $load_dirs Whether to show the document quick-loader or not
+     * @param bool $useUserLanguageFilterIfAvailable
      * @return string
      */
-    public static function returnSpecialCourses($user_id, $load_dirs = false)
-    {
+    public static function returnSpecialCourses(
+        $user_id,
+        $load_dirs = false,
+        $useUserLanguageFilterIfAvailable = true
+    ) {
         $user_id = intval($user_id);
         $table = Database::get_main_table(TABLE_MAIN_COURSE);
         $specialCourseList = self::get_special_course_list();
@@ -3605,7 +3611,7 @@ class CourseManager
         // Filter by language
         $languageCondition = '';
         $onlyInUserLanguage = api_get_configuration_value('my_courses_show_courses_in_user_language_only');
-        if ($onlyInUserLanguage) {
+        if ($useUserLanguageFilterIfAvailable && $onlyInUserLanguage) {
             $userInfo = api_get_user_info(api_get_user_id());
             if (!empty($userInfo['language'])) {
                 $languageCondition = " AND course_language = '".$userInfo['language']."' ";
@@ -3639,6 +3645,7 @@ class CourseManager
                 $params = [];
                 //Param (course_code) needed to get the student info in page "My courses"
                 $params['course_code'] = $course['code'];
+                $params['code'] = $course['code'];
                 // Get notifications.
                 $course_info['id_session'] = null;
                 $courseUserInfo = self::getUserCourseInfo($user_id, $courseId);
@@ -3718,10 +3725,15 @@ class CourseManager
      * @param int $user_id
      * @param bool  $load_dirs Whether to show the document quick-loader or not
      * @param integer $user_id
+     * @param bool $useUserLanguageFilterIfAvailable
+     *
      * @return array
      */
-    public static function returnCourses($user_id, $load_dirs = false)
-    {
+    public static function returnCourses(
+        $user_id,
+        $load_dirs = false,
+        $useUserLanguageFilterIfAvailable = true
+    ) {
         $user_id = intval($user_id);
         if (empty($user_id)) {
             $user_id = api_get_user_id();
@@ -3742,7 +3754,8 @@ class CourseManager
             $courseInCategory = self::returnCoursesCategories(
                 $row['id'],
                 $load_dirs,
-                $user_id
+                $user_id,
+                $useUserLanguageFilterIfAvailable
             );
 
             $params = [
@@ -3757,7 +3770,8 @@ class CourseManager
         $coursesNotCategory = self::returnCoursesCategories(
             0,
             $load_dirs,
-            $user_id
+            $user_id,
+            $useUserLanguageFilterIfAvailable
         );
 
         if ($coursesNotCategory) {
@@ -3773,12 +3787,14 @@ class CourseManager
      * @param int      $user_category_id User category id
      * @param bool $load_dirs Whether to show the document quick-loader or not
      * @param int $user_id
+     * @param bool $useUserLanguageFilterIfAvailable
      * @return string
      */
     public static function returnCoursesCategories(
         $user_category_id,
         $load_dirs = false,
-        $user_id = 0
+        $user_id = 0,
+        $useUserLanguageFilterIfAvailable = true
     ) {
         $user_id = $user_id ?: api_get_user_id();
         $user_category_id = (int) $user_category_id;
@@ -3803,7 +3819,7 @@ class CourseManager
 
         $languageCondition = '';
         $onlyInUserLanguage = api_get_configuration_value('my_courses_show_courses_in_user_language_only');
-        if ($onlyInUserLanguage) {
+        if ($useUserLanguageFilterIfAvailable && $onlyInUserLanguage) {
             $userInfo = api_get_user_info(api_get_user_id());
             if (!empty($userInfo['language'])) {
                 $languageCondition = " AND course.course_language = '".$userInfo['language']."' ";

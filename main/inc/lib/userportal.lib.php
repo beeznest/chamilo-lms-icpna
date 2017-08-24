@@ -1140,12 +1140,14 @@ class IndexManager
      * @param int $user_id
      * @param bool $showSessions
      * @param string $categoryCodeFilter
+     * @param bool $useUserLanguageFilterIfAvailable
      * @return string
      */
     public function returnCoursesAndSessions(
         $user_id,
         $showSessions = true,
-        $categoryCodeFilter = ''
+        $categoryCodeFilter = '',
+        $useUserLanguageFilterIfAvailable = true
     ) {
         $gameModeIsActive = api_get_setting('gamification_mode');
         $listCourse = '';
@@ -1185,13 +1187,15 @@ class IndexManager
             // Display special courses.
             $specialCourses = CourseManager::returnSpecialCourses(
                 $user_id,
-                $this->load_directories_preview
+                $this->load_directories_preview,
+                $useUserLanguageFilterIfAvailable
             );
 
             // Display courses.
             $courses = CourseManager::returnCourses(
                 $user_id,
-                $this->load_directories_preview
+                $this->load_directories_preview,
+                $useUserLanguageFilterIfAvailable
             );
 
             // Course option (show student progress)
@@ -1375,6 +1379,7 @@ class IndexManager
                 $specialCourseList = $this->tpl->fetch(
                     $this->tpl->get_template($coursesWithoutCategoryTemplate)
                 );
+                $courseCompleteList = array_merge($courseCompleteList, $specialCourses);
             }
             if ($courses['in_category'] || $courses['not_category']) {
                 foreach ($courses['in_category'] as $courseData) {

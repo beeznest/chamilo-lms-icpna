@@ -7,7 +7,7 @@
  * Init
  */
 require_once __DIR__.'/../../../main/inc/global.inc.php';
-$alert_mail = 'Webmaster <info@example.com>';
+$alert_mail = 'Grupo de alerta Sincro Acad <sinc_acad@icpna.edu.pe>';
 $last_file = __DIR__.'/chamilo.transaction.last';
 $last_fix_file = __DIR__.'/chamilo.transaction.fix.last';
 $pid_file = __DIR__.'/chamilo.transaction.pid';

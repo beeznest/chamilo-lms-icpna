@@ -50,13 +50,12 @@ if (!$failing) {
 } else {
     // if it failed, then we need to:
     echo "Sending mail to admins\n";
-    // 1. send an e-mail alert
+    // 1. prepare an e-mail alert that will be sent last
     $t = 'Transactions were locked on '.$_configuration['root_web'];
     $b = 'Please make sure you check '.$_configuration['root_web'].' to see if everything is OK'."\r\n\r\n".'This was detected on '.date('Y-m-d H:i:s',$now)."\r\n";
     $t = 'Sincronización bloqueada en '.$_configuration['root_web'];
     $b = 'Por favor, asegúrese de verificar los logs en '.__DIR__.'/php_errors.log para identificar el problema.'."\r\n\r\nPor mientras, la sincronización ha sido re-lanzada automáticamente. Si no toma efecto, borre los archivos siguientes manualmente:\r\n$pid_file\r\n$pid_fix_file\r\n\r\nEste problema fue detectado después de 10 minutos de inactividad por ".__FILE__." en el momento siguiente: ".date('Y-m-d H:i:s',$now)."\r\n";
 
-    @api_send_mail($alert_mail,$t,$b);
     // 2. remove the lock files
     if (file_exists($pid_file)) {
         $pid = @file_get_contents($pid_file);
@@ -70,4 +69,6 @@ if (!$failing) {
             @unlink($pid_fix_file);
         }
     }
+    // Actually send the e-mail
+    @api_send_mail($alert_mail,$t,$b);
 }

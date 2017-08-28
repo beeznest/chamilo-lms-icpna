@@ -7,7 +7,8 @@
  * Init
  */
 require_once __DIR__.'/../../../main/inc/global.inc.php';
-$alert_mail = 'Grupo de alerta Sincro Acad <sinc_acad@icpna.edu.pe>';
+$alert_mail_name = 'Grupo de alerta Sincro Acad';
+$alert_mail_mail = 'sinc_acad@icpna.edu.pe';
 $last_file = __DIR__.'/chamilo.transaction.last';
 $last_fix_file = __DIR__.'/chamilo.transaction.fix.last';
 $pid_file = __DIR__.'/chamilo.transaction.pid';
@@ -94,7 +95,7 @@ if (!$failing) {
     }
     // Actually send the e-mail
     logOnDebug($debug, 'Trying to send mail alert');
-    @api_send_mail($alert_mail,$t,$b);
+    @api_mail_html($alert_mail_name, $alert_mail_mail, $t, $b);
     logOnDebug($debug, 'Mail should have been sent');
 }
 

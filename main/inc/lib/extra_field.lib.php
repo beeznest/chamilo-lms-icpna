@@ -90,6 +90,10 @@ class ExtraField extends Model
     {
         parent::__construct();
 
+        if (api_get_configuration_value('extra_field_required')) {
+            $this->columns[] = 'required';
+        }
+
         $this->type = $type;
         $this->table = Database::get_main_table(TABLE_EXTRA_FIELD);
         $this->table_field_options = Database::get_main_table(TABLE_EXTRA_FIELD_OPTIONS);
@@ -2390,6 +2394,10 @@ class ExtraField extends Model
                         );
                         break;
                 }
+
+                if (isset($field_details['required']) && $field_details['required'] == 1) {
+                    $form->addRule('extra_' . $field_details['variable'], get_lang('ThisFieldIsRequired'), 'required');
+                }
             }
         }
 
@@ -2585,6 +2593,12 @@ class ExtraField extends Model
             get_lang('FieldPossibleValues'),
             array('id' => 'field_options', 'class' => 'span6')
         );
+        $form->addElement(
+            'text',
+            'field_options',
+            get_lang('FieldPossibleValues'),
+            array('id' => 'field_options', 'class' => 'span6')
+        );
 
         $fieldWithOptions = array(
             self::FIELD_TYPE_RADIO,
@@ -2622,6 +2636,13 @@ class ExtraField extends Model
             array('id' => 'default_value')
         );
 
+        if (api_get_configuration_value('extra_field_required')) {
+            $group = array();
+            $group[] = $form->createElement('radio', 'required', null, get_lang('Yes'), 1);
+            $group[] = $form->createElement('radio', 'required', null, get_lang('No'), 0);
+            $form->addGroup($group, '', get_lang('Required'), null, false);
+        }
+
         $group = array();
         $group[] = $form->createElement('radio', 'visible_to_self', null, get_lang('Yes'), 1);
         $group[] = $form->createElement('radio', 'visible_to_self', null, get_lang('No'), 0);
@@ -2656,6 +2677,7 @@ class ExtraField extends Model
             $defaults['field_options'] = $option->get_field_options_by_field_to_string($id);
             $form->addButtonUpdate(get_lang('Modify'));
         } else {
+            $defaults['required'] = 0;
             $defaults['visible_to_self'] = 0;
             $defaults['visible_to_others'] = 0;
             $defaults['changeable'] = 0;

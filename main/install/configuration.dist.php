@@ -615,3 +615,8 @@ $_configuration['gradebook_badge_sidebar'] = [
 // When using the my-courses list filter by category, set this option to true
 // to only show courses in the user's configured language
 // $_configuration['my_courses_show_courses_in_user_language_only'] = false;
+
+// This is for make an extra_field required or not
+// You need to execute this sql query to allow the db to store this value :
+// ALTER TABLE extra_field ADD required INT NULL;
+// $_configuration['extra_field_required'] = false;

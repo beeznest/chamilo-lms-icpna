@@ -740,7 +740,7 @@ if ($actions) {
     );
 }
 
-SocialManager::setSocialUserBlock($tpl, api_get_user_id(), 'messages');
+$socialUserBlock = SocialManager::setSocialUserBlock($tpl, api_get_user_id(), 'messages', 0, true, true);
 
 if (api_get_setting('allow_social_tool') === 'true') {
     SocialManager::setSocialUserBlock($tpl, api_get_user_id(), 'home');
@@ -752,11 +752,19 @@ if (api_get_setting('allow_social_tool') === 'true') {
         $show_delete_account_button
     );
 
-    $tpl->assign('social_menu_block', $menu);
-    $tpl->assign('social_right_content', $form->returnForm());
-    $social_layout = $tpl->get_template('social/edit_profile.tpl');
+    // Enabled custom page for profile
+    if (CustomPages::enabled()) {
+        CustomPages::display(
+            CustomPages::PROFILE,
+            array('form' => $form, 'menu' => $menu, 'social' => $socialUserBlock)
+        );
+    } else {
+        $tpl->assign('social_menu_block', $menu);
+        $tpl->assign('social_right_content', $form->returnForm());
+        $social_layout = $tpl->get_template('social/edit_profile.tpl');
 
-    $tpl->display($social_layout);
+        $tpl->display($social_layout);
+    }
 } else {
     $bigImage = UserManager::getUserPicture(api_get_user_id(), USER_IMAGE_SIZE_BIG);
     $normalImage = UserManager::getUserPicture(api_get_user_id(), USER_IMAGE_SIZE_ORIGINAL);

@@ -1796,6 +1796,8 @@ class SocialManager extends UserManager
      * group_add, home, messages, messages_inbox, messages_compose,
      * messages_outbox, invitations, shared_profile, friends, groups, search
      * @param int $groupId Optional. Group ID
+     * @param $show_full_profile
+     * @param $returnHtml
      * @return string The HTML code with the social block
      */
     public static function setSocialUserBlock(
@@ -1803,7 +1805,8 @@ class SocialManager extends UserManager
         $userId,
         $groupBlock = '',
         $groupId = 0,
-        $show_full_profile = true
+        $show_full_profile = true,
+        $returnHtml = false
     ) {
         if (api_get_setting('allow_social_tool') != 'true') {
             return '';
@@ -1860,6 +1863,11 @@ class SocialManager extends UserManager
 
         if (in_array($groupBlock, ['groups', 'group_edit', 'member_list'])) {
             $templateName = $template->get_template('social/group_block.tpl');
+        }
+
+        // Custom return HTML
+        if ($returnHtml) {
+            return $template->fetch($templateName);
         }
 
         $template->assign('social_avatar_block', $template->fetch($templateName));

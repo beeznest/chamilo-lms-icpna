@@ -16,6 +16,7 @@ class CustomPages
     const REGISTRATION_FEEDBACK = 'registration-feedback';
     const REGISTRATION = 'registration';
     const LOST_PASSWORD = 'lostpassword';
+    const PROFILE = 'profile';
 
     /**
      * Returns true if custom pages are enabled. False otherwise.

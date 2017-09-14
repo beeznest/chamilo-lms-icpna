@@ -59,29 +59,30 @@ $em = Database::getManager();
 foreach ($originCourseCodes as $courseCode) {
     /** @var Course $course */
     $course = $em->getRepository('ChamiloCoreBundle:Course')->findOneBy(['code' => $courseCode]);
+    if (empty($course)) {
+        echo "Course of code $courseCode not found in DB".PHP_EOL;
+        continue;
+    }
 
     ChamiloSession::write('_real_cid', $course->getId());
 
     echo "Replicate surveys from {$course->getCode()} to ".count($destinationCourseCodes)." courses".PHP_EOL;
     echo PHP_EOL;
 
-    if ($destinationCourseCodes) {
+    if (count($destinationCourseCodes) > 0) {
         echo count($destinationCourseCodes)." destination base courses selected".PHP_EOL;
         replicateInCourses($course, $destinationCourseCodes);
-
-        // This acts only if
-        exit; //only replicate in basis courses
+    } else {
+        replicateInSessions(
+            $course,
+            $surveyDayNumberToStart,
+            $surveyDayNumberToEnd,
+            $uididprogramaFilter,
+            $sedeFilter,
+            $surveyFixedDayToStart,
+            $surveyFixedDayToEnd
+        );
     }
-
-    replicateInSessions(
-        $course,
-        $surveyDayNumberToStart,
-        $surveyDayNumberToEnd,
-        $uididprogramaFilter,
-        $sedeFilter,
-        $surveyFixedDayToStart,
-        $surveyFixedDayToEnd
-    );
 }
 
 echo "Exiting".PHP_EOL;
@@ -151,7 +152,10 @@ function replicateInSessions(
     echo "Replicating surveys from course ".$originCourse->getCode()." to all its sessions".PHP_EOL;
 
     $monthStart = new DateTime('first day of this month 00:00:00', new DateTimeZone('UTC'));
+    // Account for some sessions starting a few days before the start of this month
+    $monthStart->modify('- 5 days');
     $monthEnd = new DateTime('last day of this month 23:59:59', new DateTimeZone('UTC'));
+    $monthEnd->modify('+ 5 days');
 
     $courseSurveys = SurveyUtil::getCourseSurveys($originCourse->getId());
 
@@ -160,7 +164,7 @@ function replicateInSessions(
         ->createQuery("
             SELECT s FROM ChamiloCoreBundle:Session s
             INNER JOIN ChamiloCoreBundle:SessionRelCourse sc WITH s = sc.session
-            WHERE s.accessStartDate >= :month_start AND s.accessStartDate <= :month_end
+            WHERE s.accessStartDate >= :month_start AND s.accessEndDate <= :month_end
               AND sc.course = :course
         ")
         ->setParameters(['month_start' => $monthStart, 'month_end' => $monthEnd, 'course' => $originCourse])

@@ -6,7 +6,6 @@
  * In order for the script to set the right permissions, it has to be launched
  * either as www-data or root
  */
-exit();
 if (PHP_SAPI != 'cli') {
     exit('This script can only be executed from the command line');
 }

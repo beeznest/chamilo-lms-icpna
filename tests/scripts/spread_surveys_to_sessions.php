@@ -1,5 +1,10 @@
 <?php
 /* For licensing terms, see /license.txt */
+/**
+ * This script allows you to replicate a survey from a base course to other
+ * base courses or from base courses to session courses
+ * @ref BT#13203
+ */
 
 //die();
 
@@ -14,45 +19,70 @@ use Chamilo\CoreBundle\Entity\Session,
 require_once __DIR__.'/../../main/inc/global.inc.php';
 
 // Set the origin course code
-$courseCode = 'B01';
+$originCourseCodes = [
+    'B01',
+];
 //Set course codes (not in sessions) to replicate the survey
 $destinationCourseCodes = [
+    'B02',
 ];
-//Set the uididprograma value to filter sessions
+//Set the uididprograma value (a session extra field) to filter sessions
 $uididprogramaFilter = [
 ];
-// Set the sede value to filter sessions
+// Set the branch value to filter sessions
+// (eg: select * from extra_field_options where field_id = 28)
 $sedeFilter = [
+    //'8F67B2B3-667E-4EBC-8605-766D2FF71B55', // Cent
+    //'7379A7D3-6DC5-42CA-9ED4-97367519F1D9', // Mira
+    //'30DE73B6-8203-4F81-96C8-3B27977BB924', // Smig
+    //'8BA65461-60B5-4716-BEB3-22BC7B71BC09', // Moli
+    //'257AD17D-91F7-4BC8-81D4-71EBD35A4E50', // Nort
+    //'AC2CD7F4-A61D-45B3-9954-5A91FA2D8B95', // CPas
+    //'3575A639-E933-4462-A173-6DFBFE45501B', // Abcy
+    //'7BF57202-B174-4113-BAA3-C9A9C3753FD4', // Hraz
+    //'6944EC08-1CA5-40D2-9576-850DE912DBEF', // Icaa
+    //'9FB2971E-1424-4AC6-980F-AEF856EF249F', // Anda
+    //'FE3AABDB-531D-4601-A3D4-E4F697335806', // Surc
+    //'CE894D3F-E9E1-476C-9314-764DC0BCD003', // Chin
+    //'EF7BF999-E359-40C1-A712-BCA0450888F4', // Iqui
+    //'1CE8E5F9-56D2-4C35-B3C1-ED0D91C3D4B1', // Chim
+    //'1BCE2204-76C3-4CC6-A0E3-8B7164FC76A4', // Puca
 ];
 $surveyDayNumberToStart = 13;
 $surveyDayNumberToEnd = 15;
 
 $em = Database::getManager();
 
-/** @var Course $course */
-$course = $em->getRepository('ChamiloCoreBundle:Course')->findOneBy(['code' => $courseCode]);
+foreach ($originCourseCodes as $courseCode) {
+    /** @var Course $course */
+    $course = $em->getRepository('ChamiloCoreBundle:Course')->findOneBy(['code' => $courseCode]);
 
-ChamiloSession::write('_real_cid', $course->getId());
+    ChamiloSession::write('_real_cid', $course->getId());
 
-echo "Replicate surveys from {$course->getCode()}".PHP_EOL;
-echo PHP_EOL;
+    echo "Replicate surveys from {$course->getCode()} to ".count($destinationCourseCodes)." courses".PHP_EOL;
+    echo PHP_EOL;
 
-if ($destinationCourseCodes) {
-    replicateInCourses($course, $destinationCourseCodes);
+    if ($destinationCourseCodes) {
+        echo count($destinationCourseCodes)." destination base courses selected".PHP_EOL;
+        replicateInCourses($course, $destinationCourseCodes);
 
-    exit; //only replicate in basis courses
+        // This acts only if
+        exit; //only replicate in basis courses
+    }
+
+    replicateInSessions($course, $surveyDayNumberToStart, $surveyDayNumberToEnd, $uididprogramaFilter, $sedeFilter);
 }
-
-replicateInSessions($course, $surveyDayNumberToStart, $surveyDayNumberToEnd, $uididprogramaFilter, $sedeFilter);
 
 echo "Exiting".PHP_EOL;
 
 /**
+ * Replicate all surveys from given origin course to all destination courses
  * @param \Chamilo\CoreBundle\Entity\Course $originCourse
  * @param array $destinationCourseCodes
  */
 function replicateInCourses(Course $originCourse, array $destinationCourseCodes) {
     $courseSurveys = SurveyUtil::getCourseSurveys($originCourse->getId());
+    echo "Replicating surveys from course ".$originCourse->getCode().PHP_EOL;
 
     $em = Database::getManager();
     $courseRepo = $em->getRepository('ChamiloCoreBundle:Course');
@@ -100,6 +130,8 @@ function replicateInSessions(
 )
 {
     $em = Database::getManager();
+    echo "Replicating surveys from course ".$originCourse->getCode()." to all its sessions".PHP_EOL;
+
     $monthStart = new DateTime('first day of this month 00:00:00', new DateTimeZone('UTC'));
     $monthEnd = new DateTime('last day of this month 23:59:59', new DateTimeZone('UTC'));
 

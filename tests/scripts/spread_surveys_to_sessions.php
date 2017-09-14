@@ -50,6 +50,9 @@ $sedeFilter = [
 ];
 $surveyDayNumberToStart = 13;
 $surveyDayNumberToEnd = 15;
+// If fixed dates are defined, they will superseed the relative number of days above
+$surveyFixedDayToStart = ''; // e.g. '2017-09-16 05:00:00'; (include timezone shift)
+$surveyFixedDayToEnd = ''; // e.g. '2017-09-24 05:00:00'; (include timezone shift)
 
 $em = Database::getManager();
 
@@ -70,7 +73,15 @@ foreach ($originCourseCodes as $courseCode) {
         exit; //only replicate in basis courses
     }
 
-    replicateInSessions($course, $surveyDayNumberToStart, $surveyDayNumberToEnd, $uididprogramaFilter, $sedeFilter);
+    replicateInSessions(
+        $course,
+        $surveyDayNumberToStart,
+        $surveyDayNumberToEnd,
+        $uididprogramaFilter,
+        $sedeFilter,
+        $surveyFixedDayToStart,
+        $surveyFixedDayToEnd
+    );
 }
 
 echo "Exiting".PHP_EOL;
@@ -131,7 +142,9 @@ function replicateInSessions(
     $dayNumberToStart,
     $dayNumberToEnd,
     array $uididprogramaFilter = [],
-    array $sedeFilter = []
+    array $sedeFilter = [],
+    $fixedDayToStart,
+    $fixedDayToEnd
 )
 {
     $em = Database::getManager();
@@ -191,10 +204,15 @@ function replicateInSessions(
             echo "\t\tNew survey created with code {$newSurvey->getCode()} in session {$session->getId()}".PHP_EOL;
 
             //Calculate new survey date
-            $newSurveyAvailFrom = clone $session->getAccessStartDate();
-            $newSurveyAvailFrom->modify('+'.($dayNumberToStart - 1).'days');
-            $newSurveyAvailTill = clone $session->getAccessStartDate();
-            $newSurveyAvailTill->modify('+'.($dayNumberToEnd - 1).'days');
+            if (!empty($fixedDayToStart) && !empty($fixedDayToEnd)) {
+                $newSurveyAvailFrom = new DateTime($fixedDayToStart);
+                $newSurveyAvailTill = new DateTime($fixedDayToEnd);
+            } else {
+                $newSurveyAvailFrom = clone $session->getAccessStartDate();
+                $newSurveyAvailFrom->modify('+'.($dayNumberToStart - 1).'days');
+                $newSurveyAvailTill = clone $session->getAccessStartDate();
+                $newSurveyAvailTill->modify('+'.($dayNumberToEnd - 1).'days');
+            }
 
             $newSurvey
                 ->setAvailFrom($newSurveyAvailFrom)

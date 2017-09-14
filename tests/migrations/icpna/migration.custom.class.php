@@ -1358,6 +1358,7 @@ class MigrationCustom
                     if (!empty($course_list)) {
                         $course_data = current($course_list);
                         SessionManager::set_coach_to_course_session($user_id, $session_id, $course_data['id']);
+                        return self::isCoachInSessionCourse($user_id, $session_id, $course_data['id']);
                     } else {
                         return array(
                             'message' => 'Could not subscribe to course: no course in session '.$uidIdProgramaDestination,
@@ -1407,6 +1408,38 @@ class MigrationCustom
         } else {
             return array(
                 'message' => "User $user_id was NOT added to Session $session_id  - $message",
+                'status_id' => self::TRANSACTION_STATUS_FAILED
+            );
+        }
+    }
+    /**
+     * Check if a coach user is subscribed to a session course
+     * @param int $user_id
+     * @param int $session_id
+     * @param int $course_id
+     * @param string $message
+     * @param array $before
+     * @return array
+     */
+    static function isCoachInSessionCourse($user_id, $session_id, $course_id, $message = null, $before = array())
+    {
+        $tbl_session_course_user = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
+        $session_id = intval($session_id);
+        $course_id = intval($course_id);
+        $user_id = intval($user_id);
+        $sql = "SELECT * FROM $tbl_session_course_user WHERE user_id = $user_id AND session_id = $session_id AND course_id = $course_id AND status = 2";
+        $result = Database::query($sql);
+        if (Database::num_rows($result) > 0) {
+            return array(
+                'entity' => 'session_rel_course_rel_user',
+                'before' => $before,
+                'after' => 2,
+                'message' => "User $user_id added to session $session_id course $course_id - user relation_type in session: 2 - $message ",
+                'status_id' => self::TRANSACTION_STATUS_SUCCESSFUL
+            );
+        } else {
+            return array(
+                'message' => "User $user_id was NOT added to session $session_id course $course_id - $message",
                 'status_id' => self::TRANSACTION_STATUS_FAILED
             );
         }

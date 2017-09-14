@@ -18,61 +18,9 @@ if (isset($content['form']->_elementIndex['status'])) {
     $content['form']->removeElement('status');
     $content['form']->removeElement('status');
 }
+
 $rootWeb = api_get_path('WEB_PATH');
 
-// Deprecated since 2015-03-26
-/**
- * Code to change the way QuickForm render html
- */
-/*
-$renderer = & $content['form']->defaultRenderer();
-$form_template = <<<EOT
-
-<form {attributes}>
-{content}
-  <div class="clear">
-    &nbsp;
-  </div>
-  <p><a href="#" class="btn btn-primary" onclick="$('#registration-form').submit()"><span>S'inscrire</span></a></p>
-</form>
-
-EOT;
-$renderer->setFormTemplate($form_template);
-
-$element_template = <<<EOT
-  <div class="field decalle">
-    <label>
-      <!-- BEGIN required --><span class="form_required">*</span> <!-- END required -->{label}
-    </label>
-    <div class="formw">
-      <!-- BEGIN error --><span class="form_error">{error}</span><br /><!-- END error --> {element}
-    </div>
-  </div>
-
-EOT;
-$element_template_wimage = <<<EOT
-  <div class="field decalle display">
-    <label>
-      <!-- BEGIN required --><span class="form_required">*</span> <!-- END required -->{label}
-    </label>
-    <div class="formw">
-      <!-- BEGIN error --><span class="form_error">{error}</span><br /><!-- END error --> {element}
-      <img src="/custompages/images/perso.jpg" alt="" />
-    </div>
-  </div>
-
-EOT;
-$renderer->setElementTemplate($element_template_wimage,'pass1');
-$renderer->setElementTemplate($element_template);
-
-$header_template = <<<EOT
-  <div class="row">
-    <div class="form_header">{header}</div>
-  </div>
-
-EOT;
-
- */
 Display::display_header(get_lang('Registration'));
 ?>
 
@@ -96,6 +44,31 @@ Display::display_header(get_lang('Registration'));
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function () {
+        $('#extra_birthday').change(function () {
+            if (childChecker()) {
+
+            }
+        });
+    });
+
+    function childChecker() {
+
+        var extraBirthdayFieldValue = $('#extra_birthday').val();
+
+        if (extraBirthdayFieldValue == null) {
+            return false;
+        }
+
+        var birthday = new Date(extraBirthdayFieldValue);
+        var birthdayYear = birthday.getFullYear();
+        var now = new Date();
+        var nowYear = now.getFullYear();
+
+        return birthdayYear + 18 < nowYear;
+    }
+</script>
 <?php
 
 Display::display_footer();

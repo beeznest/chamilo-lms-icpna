@@ -2593,12 +2593,6 @@ class ExtraField extends Model
             get_lang('FieldPossibleValues'),
             array('id' => 'field_options', 'class' => 'span6')
         );
-        $form->addElement(
-            'text',
-            'field_options',
-            get_lang('FieldPossibleValues'),
-            array('id' => 'field_options', 'class' => 'span6')
-        );
 
         $fieldWithOptions = array(
             self::FIELD_TYPE_RADIO,

@@ -99,6 +99,11 @@ function replicateInCourses(Course $originCourse, array $destinationCourseCodes)
 
         /** @var CSurvey $survey */
         foreach ($courseSurveys as $survey) {
+            // Surveys are only considered if their code ends with 'survey'
+            if (substr($survey->getCode(), -6, 6) != 'survey') {
+                continue;
+            }
+
             echo "\tReplicate survey {$survey->getCode()}".PHP_EOL;
 
             if (SurveyUtil::existsSurveyCodeInCourse($survey->getCode(), $courseToReplicate->getId())) {

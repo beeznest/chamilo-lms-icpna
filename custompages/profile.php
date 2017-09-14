@@ -10,6 +10,26 @@
 
 require_once api_get_path(SYS_PATH).'main/inc/global.inc.php';
 require_once __DIR__.'/language.php';
+
+$form = isset($content['form']) ? $content['form'] : null;
+
+$elements = $form->getElements();
+
+foreach ($elements as $element) {
+    if (isset($element->_attributes['name']) && $element->_attributes['name'] == 'firstname') {
+        $form->insertElementBefore($form->removeElement('extra_document_type', false), 'firstname');
+    }
+
+    if (isset($element->_attributes['name']) && $element->_attributes['name'] == 'lastname') {
+        $form->insertElementBefore($form->removeElement('extra_middle_name', false), 'lastname');
+    }
+
+    if (isset($element->_attributes['name']) && $element->_attributes['name'] == 'lastname') {
+        $form->insertElementBefore($form->removeElement('extra_middle_name', false), 'lastname');
+        $form->insertElementBefore($form->removeElement('extra_mother_name', false), 'lastname');
+    }
+}
+
 /**
  * Removes some unwanted elementend of the form object
  */

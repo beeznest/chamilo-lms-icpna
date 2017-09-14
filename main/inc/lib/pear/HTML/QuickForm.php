@@ -635,7 +635,7 @@ class HTML_QuickForm extends HTML_Common
                 $this->_elements[$i + 1] =& $this->_elements[$i];
                 if ($this->_elementIndex[$currentName] == $i) {
                     $this->_elementIndex[$currentName] = $i + 1;
-                } else {
+                } else if ($this->_duplicateIndex) {
                     $dupIdx = array_search($i, $this->_duplicateIndex[$currentName]);
                     $this->_duplicateIndex[$currentName][$dupIdx] = $i + 1;
                 }

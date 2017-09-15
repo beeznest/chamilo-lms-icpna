@@ -494,7 +494,7 @@ class ExtraField extends Model
 
         $itemId = (int) $itemId;
         $form->addHidden('item_id', $itemId);
-        $extraData = false;
+        $extraData = [];
         if (!empty($itemId)) {
             $extraData = self::get_handler_extra_data($itemId);
 

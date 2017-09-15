@@ -41,12 +41,13 @@ class HTML_QuickForm_html extends HTML_QuickForm_static
     * Class constructor
     *
     * @param string $text   raw HTML to add
+    * @param string $elementName   raw HTML to add
     * @access public
     * @return void
     */
-    public function __construct($text = null)
+    public function __construct($text = null, $elementName = null)
     {
-        parent::__construct(null, null, $text);
+        parent::__construct($elementName, null, $text);
         $this->_type = 'html';
     }
 

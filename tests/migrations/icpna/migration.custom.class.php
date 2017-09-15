@@ -1427,7 +1427,11 @@ class MigrationCustom
         $session_id = intval($session_id);
         $course_id = intval($course_id);
         $user_id = intval($user_id);
-        $sql = "SELECT * FROM $tbl_session_course_user WHERE user_id = $user_id AND session_id = $session_id AND course_id = $course_id AND status = 2";
+        $sql = "SELECT * FROM $tbl_session_course_user
+            WHERE user_id = $user_id 
+            AND session_id = $session_id 
+            AND c_id = $course_id 
+            AND status = 2";
         $result = Database::query($sql);
         if (Database::num_rows($result) > 0) {
             return array(

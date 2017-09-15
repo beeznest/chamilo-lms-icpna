@@ -111,7 +111,7 @@ Display::display_header(get_lang('Registration'));
         }
 
         $('#extra_birthday').change(function () {
-            console.log(childChecker());
+
             if (childChecker()) {
                 $('#guardian_div').show();
             } else {

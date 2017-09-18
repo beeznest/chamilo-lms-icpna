@@ -41,7 +41,7 @@ if (isset($form->_elementIndex['extra_guardian_email'])) {
 }
 
 $form->addElement('html', '<div id="guardian_div">');
-$form->addHtml('<div class="alert alert-warning">If you are under age it is necessary to register the data of your guardian, also you need to be agree with our <a data-toggle="modal" data-target="#terms-conditions"><b>TERMS AND CONDITIONS</b></a></div>');
+$form->addHtml('<div class="alert alert-warning">If you are under age it is necessary to register the data of your guardian, also you need to be agree with our <button type="button" class="btn btn-link" data-toggle="modal" data-target="#terms-conditions"><b>TERMS AND CONDITIONS</b></button></div>');
 $form->addText('extra_guardian_name', 'Guardian Name');
 $form->addText('extra_guardian_email', 'Guardian Email');
 $form->addElement('html', '</div>', 'guardian_section');
@@ -110,7 +110,28 @@ Display::display_header(get_lang('Registration'));
             </div>
             <div class="modal-body">
                 <p class="text-center">DECLARACION DE PROTECCION DE DATOS PERSONALES MAYOR DE 14 Y MENOR A 18 A&Ntilde;OS</p>
-                <p class="text-justify" style="text-align: justify;">En aplicaci&oacute;n a lo dispuesto por la Ley 29733 Ley de Protecci&oacute;n de Datos Personales, y el D.S. 003-2013-JUS, y en especial en el art&iacute;culo 28 del D.S.003-2013-JUS, el suscrito menor de edad, titular de mis datos personales, mediante el llenado y/o firma del presente formulario, autorizo de forma expresa e inequ&iacute;voca y por tiempo indefinido que mis datos personales, sean tratados, almacenados, sistematizados y utilizados por el INSTITUTO CULTURAL PERUANO NORTEAMERICANO para fines estad&iacute;sticos, administrativos y de gesti&oacute;n comercial, incluyendo invitaciones a cursos, talleres, charlas y otros eventos que el ICPNA organice, auspicie o participe, siendo que los datos, ser&aacute;n conservados en un banco de datos cuyo titular es el ICPNA, autorizando incluso el flujo transfronterizo con fines acad&eacute;micos y/o destinado a la administraci&oacute;n de ex&aacute;menes internacionales. Asimismo, declaro que estoy informado que ante alguna solicitud de datos personales sensibles, es mi facultad responder o no sobre los mismos e igualmente declaro conocer los efectos y/o consecuencias de proporcionar mis datos personales o de negarme a brindarlos. Igualmente declaro conocer que para ejercer mis derechos como acceso, rectificaci&oacute;n, cancelaci&oacute;n y oposici&oacute;n y otros derechos, sobre mis datos puedo dirigirme a las oficinas, ubicadas en Av. Angamos Oeste 120, Miraflores . Se&ntilde;alo tambi&eacute;n, que al ser yo menor de edad, el ICPNA no me est&aacute; solicitando datos relativos a la actividad profesional o laboral de mis padres, ni su informaci&oacute;n econ&oacute;mica, datos sociol&oacute;gicos o de cualquier otro sobre los dem&aacute;s miembros de mi familia. Asimismo, declaro que estoy informando al ICPNA de la identidad y direcci&oacute;n de mis padres, a fin de que ellos puedan autorizar el tratamiento de mis datos personales, en aquellos casos en que mi propia autorizaci&oacute;n no fuera suficiente y que est&eacute;n referidas al acceso a actividades, vinculadas con bienes o servicios que est&eacute;n restringidos para mayores de edad</p>
+                <p class="text-justify">En aplicaci&oacute;n a lo dispuesto por la Ley
+                    29733 Ley de Protecci&oacute;n de Datos Personales, y el D.S. 003-2013-JUS, y en especial en el art&iacute;culo
+                    28 del D.S.003-2013-JUS, el suscrito menor de edad, titular de mis datos personales, mediante el
+                    llenado y/o firma del presente formulario, autorizo de forma expresa e inequ&iacute;voca y por
+                    tiempo indefinido que mis datos personales, sean tratados, almacenados, sistematizados y utilizados
+                    por el INSTITUTO CULTURAL PERUANO NORTEAMERICANO para fines estad&iacute;sticos, administrativos y
+                    de gesti&oacute;n comercial, incluyendo invitaciones a cursos, talleres, charlas y otros eventos que
+                    el ICPNA organice, auspicie o participe, siendo que los datos, ser&aacute;n conservados en un banco
+                    de datos cuyo titular es el ICPNA, autorizando incluso el flujo transfronterizo con fines acad&eacute;micos
+                    y/o destinado a la administraci&oacute;n de ex&aacute;menes internacionales. Asimismo, declaro que
+                    estoy informado que ante alguna solicitud de datos personales sensibles, es mi facultad responder o
+                    no sobre los mismos e igualmente declaro conocer los efectos y/o consecuencias de proporcionar mis
+                    datos personales o de negarme a brindarlos. Igualmente declaro conocer que para ejercer mis derechos
+                    como acceso, rectificaci&oacute;n, cancelaci&oacute;n y oposici&oacute;n y otros derechos, sobre mis
+                    datos puedo dirigirme a las oficinas, ubicadas en Av. Angamos Oeste 120, Miraflores . Se&ntilde;alo
+                    tambi&eacute;n, que al ser yo menor de edad, el ICPNA no me est&aacute; solicitando datos relativos
+                    a la actividad profesional o laboral de mis padres, ni su informaci&oacute;n econ&oacute;mica, datos
+                    sociol&oacute;gicos o de cualquier otro sobre los dem&aacute;s miembros de mi familia. Asimismo,
+                    declaro que estoy informando al ICPNA de la identidad y direcci&oacute;n de mis padres, a fin de que
+                    ellos puedan autorizar el tratamiento de mis datos personales, en aquellos casos en que mi propia
+                    autorizaci&oacute;n no fuera suficiente y que est&eacute;n referidas al acceso a actividades,
+                    vinculadas con bienes o servicios que est&eacute;n restringidos para mayores de edad</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -124,7 +145,9 @@ Display::display_header(get_lang('Registration'));
         var FrmProfile = {
             $slctDocument: $('#slct_extra_document_type'),
             $txtDocument: $('#txt_extra_document_type'),
-            studentDocument: function () {
+            $txtBirthday: $('#extra_birthday'),
+            $divGuardian: $('#guardian_div'),
+            onStudentDocument: function () {
                 this.$txtDocument.val('');
 
                 switch (this.$slctDocument.prop('selectedIndex')) {
@@ -144,45 +167,42 @@ Display::display_header(get_lang('Registration'));
                             .attr('maxlength', '9');
                         break;
                 }
+            },
+            checkAge: function(minimunAge) {
+                var extraBirthdayFieldValue = this.$txtBirthday.val();
+
+                if (extraBirthdayFieldValue == null) {
+                    return false;
+                }
+
+                var now = new moment(),
+                    birthYear = new moment(extraBirthdayFieldValue),
+                    age = now.diff(birthYear, 'years');
+
+                return age >= minimunAge;
+            },
+            onStudentBirthday: function () {
+                if (this.checkAge(18)) {
+                    this.$divGuardian.hide();
+
+                    return;
+                }
+
+                this.$divGuardian.show();
             }
         }
 
         $(document).ready(function () {
-            if (childChecker()) {
-                $('#guardian_div').show();
-            } else {
-                $('#guardian_div').hide();
-            }
-
-            $('#extra_birthday').change(function () {
-                if (childChecker()) {
-                    $('#guardian_div').fadeIn();
-                } else {
-                    $('#guardian_div').fadeOut();
-                }
+            FrmProfile.onStudentBirthday();
+            FrmProfile.$txtBirthday.change(function () {
+                FrmProfile.onStudentBirthday()
             });
 
-            FrmProfile.studentDocument();
-
+            FrmProfile.onStudentDocument();
             FrmProfile.$slctDocument.on('change', function () {
-                FrmProfile.studentDocument();
+                FrmProfile.onStudentDocument();
             });
         });
-
-        function childChecker() {
-            var extraBirthdayFieldValue = $('#extra_birthday').val();
-
-            if (extraBirthdayFieldValue == null) {
-                return false;
-            }
-
-            var birthday = new Date(extraBirthdayFieldValue);
-            var birthdayYear = birthday.getFullYear();
-            var now = new Date();
-            var nowYear = now.getFullYear();
-
-            return birthdayYear + 18 > nowYear;
-        }
     })();
 </script>
 <?php

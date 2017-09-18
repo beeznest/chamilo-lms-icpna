@@ -193,6 +193,7 @@ if (is_profile_editable() && api_get_setting('openid_authentication') == 'true')
 
 //    PHONE
 $form->addElement('text', 'phone', get_lang('Phone'), array('size' => 20));
+$form->addRule('phone', get_lang('ThisFieldIsRequired'), 'required');
 if (api_get_setting('profile', 'phone') !== 'true') {
     $form->freeze('phone');
 }

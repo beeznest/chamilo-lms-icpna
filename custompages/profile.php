@@ -41,6 +41,7 @@ if (isset($form->_elementIndex['extra_guardian_email'])) {
 }
 
 $form->addElement('html', '<div id="guardian_div">');
+$form->addHtml('<div class="alert alert-warning">If you are under age it is necessary to register the data of your guardian</div>');
 $form->addText('extra_guardian_name', 'Guardian Name');
 $form->addText('extra_guardian_email', 'Guardian Email');
 $form->addElement('html', '</div>', 'guardian_section');
@@ -113,9 +114,9 @@ Display::display_header(get_lang('Registration'));
         $('#extra_birthday').change(function () {
             console.log(childChecker());
             if (childChecker()) {
-                $('#guardian_div').show();
+                $('#guardian_div').fadeIn(1000);
             } else {
-                $('#guardian_div').hide();
+                $('#guardian_div').fadeOut(1000);
             }
         });
     });

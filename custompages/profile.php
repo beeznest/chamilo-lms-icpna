@@ -102,39 +102,38 @@ Display::display_header(get_lang('Registration'));
     </div>
 </div>
 <script>
-    $(document).ready(function () {
-
-        if (childChecker()) {
-            $('#guardian_div').show();
-        } else {
-            $('#guardian_div').hide();
-        }
-
-        $('#extra_birthday').change(function () {
-            console.log(childChecker());
+    (function () {
+        $(document).ready(function () {
             if (childChecker()) {
-                $('#guardian_div').fadeIn(1000);
+                $('#guardian_div').show();
             } else {
-                $('#guardian_div').fadeOut(1000);
+                $('#guardian_div').hide();
             }
+
+            $('#extra_birthday').change(function () {
+                if (childChecker()) {
+                    $('#guardian_div').fadeIn();
+                } else {
+                    $('#guardian_div').fadeOut();
+                }
+            });
         });
-    });
 
-    function childChecker() {
+        function childChecker() {
+            var extraBirthdayFieldValue = $('#extra_birthday').val();
 
-        var extraBirthdayFieldValue = $('#extra_birthday').val();
+            if (extraBirthdayFieldValue == null) {
+                return false;
+            }
 
-        if (extraBirthdayFieldValue == null) {
-            return false;
+            var birthday = new Date(extraBirthdayFieldValue);
+            var birthdayYear = birthday.getFullYear();
+            var now = new Date();
+            var nowYear = now.getFullYear();
+
+            return birthdayYear + 18 > nowYear;
         }
-
-        var birthday = new Date(extraBirthdayFieldValue);
-        var birthdayYear = birthday.getFullYear();
-        var now = new Date();
-        var nowYear = now.getFullYear();
-
-        return birthdayYear + 18 > nowYear;
-    }
+    })();
 </script>
 <?php
 

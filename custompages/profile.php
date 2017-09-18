@@ -83,15 +83,14 @@ Display::display_header(get_lang('Registration'));
 ?>
 
 <div class="row">
-    <div class="col-md-3">
-        <div class="social-network-menu">
-            <?php
-                echo $content['social'];
-                echo $content['menu']
-            ?>
+    <div class="col-md-2">
+        <div id="image-message-container">
+            <a class="expand-image" href="<?php echo $content['big_image'] ?>">
+                <img src="<?php echo $content['normal_image'] ?>" class="img-thumbnail img-responsive">
+            </a>
         </div>
     </div>
-    <div class="col-md-9">
+    <div class="col-md-10">
         <?php if (isset($content['error']) && !empty($content['error'])) {
             echo '<div id="registration-form-error" class="alert alert-danger">'.$content['error'].'</div>';
         }?>

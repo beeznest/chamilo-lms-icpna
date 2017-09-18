@@ -770,12 +770,23 @@ if (api_get_setting('allow_social_tool') === 'true') {
     $bigImage = UserManager::getUserPicture(api_get_user_id(), USER_IMAGE_SIZE_BIG);
     $normalImage = UserManager::getUserPicture(api_get_user_id(), USER_IMAGE_SIZE_ORIGINAL);
 
-    $imageToShow = '<div id="image-message-container">';
-    $imageToShow .= '<a class="expand-image" href="'.$bigImage.'" /><img src="'.$normalImage.'"></a>';
-    $imageToShow .= '</div>';
+    if (CustomPages::enabled()) {
+        CustomPages::display(
+            CustomPages::PROFILE,
+            [
+                'form' => $form,
+                'big_image' => $bigImage,
+                'normal_image' => $normalImage
+            ]
+        );
+    } else {
+        $imageToShow = '<div id="image-message-container">';
+        $imageToShow .= '<a class="expand-image" href="'.$bigImage.'" /><img src="'.$normalImage.'"></a>';
+        $imageToShow .= '</div>';
 
-    $content = $imageToShow.$form->returnForm();
+        $content = $imageToShow.$form->returnForm();
 
-    $tpl->assign('content', $content);
-    $tpl->display_one_col_template();
+        $tpl->assign('content', $content);
+        $tpl->display_one_col_template();
+    }
 }

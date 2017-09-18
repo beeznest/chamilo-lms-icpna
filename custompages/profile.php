@@ -103,6 +103,32 @@ Display::display_header(get_lang('Registration'));
 </div>
 <script>
     (function () {
+        var FrmProfile = {
+            $slctDocument: $('#slct_extra_document_type'),
+            $txtDocument: $('#txt_extra_document_type'),
+            studentDocument: function () {
+                this.$txtDocument.val('');
+
+                switch (this.$slctDocument.prop('selectedIndex')) {
+                    case 1:
+                        this.$txtDocument
+                            .attr('pattern', '\\d{8}')
+                            .attr('maxlength', '8');
+                        break;
+                    case 2:
+                        this.$txtDocument
+                            .attr('pattern', '')
+                            .attr('maxlength', '');
+                        break;
+                    case 3:
+                        this.$txtDocument
+                            .attr('pattern', '\\d{9}')
+                            .attr('maxlength', '9');
+                        break;
+                }
+            }
+        }
+
         $(document).ready(function () {
             if (childChecker()) {
                 $('#guardian_div').show();
@@ -116,6 +142,12 @@ Display::display_header(get_lang('Registration'));
                 } else {
                     $('#guardian_div').fadeOut();
                 }
+            });
+
+            FrmProfile.studentDocument();
+
+            FrmProfile.$slctDocument.on('change', function () {
+                FrmProfile.studentDocument();
             });
         });
 

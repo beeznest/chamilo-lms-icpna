@@ -227,3 +227,86 @@ a:focus {
 .course-tool .content h4{
     margin: 0;
 }
+.form-box.well{
+    background-color: #f3f7f8;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    padding-left: 10%;
+    padding-top: 5%;
+}
+.form-box.well label{
+    color: #34495E;
+    font-weight: normal;
+    font-size: 12px;
+}
+.form-box.well .form-control{
+    background-color: #FFF;
+    border: 1px solid #34495e;
+    border-radius: 5px;
+}
+.form-box.well .form-group .bootstrap-select.btn-group .dropdown-toggle.btn-default{
+    background-color: #FFF;
+    border: none;
+    border-radius: 5px;
+}
+#password1.form-control{
+    margin-bottom: 10px;
+}
+.form-box.well .progress {
+    border: 1px solid #fff;
+    background: #fff;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
+    margin-bottom: 5px;
+}
+.form-box.well .password-verdict{
+    font-size: 12px;
+}
+.form-box.well .help-block{
+    font-size: 12px;
+    font-style: italic;
+}
+.form-box.well .form-group .input-group .input-group-addon{
+    background-color: #eee;
+    border-color: #34495e; 
+}
+.form-box.well .form-group .input-group-btn .btn-default{
+    background-color: #eee;
+    border-color: #34495e;
+}
+.form-box.well #profile_apply_change{
+    display: block;
+    width: 100%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+#password_progress{
+    display: none;
+}
+.box.box-primary {
+    border-top-color: #3c8dbc;
+}
+.box {
+    position: relative;
+    border-radius: 3px;
+    background: #ffffff;
+    border-top: 3px solid #d2d6de;
+    margin-bottom: 20px;
+    width: 100%;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+}
+.box-header.with-border {
+    border-bottom: 1px solid #f4f4f4;
+}
+.box-header {
+    color: #444;
+    display: block;
+    padding: 10px;
+    position: relative;
+}
+.box-header .box-title {
+    display: inline-block;
+    font-size: 18px;
+    margin: 0;
+    line-height: 1;
+}

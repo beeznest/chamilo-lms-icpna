@@ -83,6 +83,24 @@ Display::display_header(get_lang('Registration'));
 ?>
 
 <div class="row">
+    <div class="col-md-10">
+        <?php if (isset($content['error']) && !empty($content['error'])) {
+            echo '<div id="registration-form-error" class="alert alert-danger">'.$content['error'].'</div>';
+        }?>
+        
+            <div class="box box-primary">
+                <div class="box-body">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><?php echo get_lang('ModifProfile'); ?></h3>
+                    </div>
+                    <div id="registration-form-box" class="form-box well">
+                    <?php
+                        $content['form']->display();
+                    ?>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="col-md-2">
         <div id="image-message-container">
             <a class="expand-image" href="<?php echo $content['big_image'] ?>">
@@ -90,16 +108,7 @@ Display::display_header(get_lang('Registration'));
             </a>
         </div>
     </div>
-    <div class="col-md-10">
-        <?php if (isset($content['error']) && !empty($content['error'])) {
-            echo '<div id="registration-form-error" class="alert alert-danger">'.$content['error'].'</div>';
-        }?>
-        <div id="registration-form-box" class="form-box">
-            <?php
-            $content['form']->display();
-            ?>
-        </div>
-    </div>
+    
 </div>
 <script>
     (function () {

@@ -59,7 +59,7 @@ $form->addElement('html', '
 <div class="form-group">
     <div class="col-md-2"></div>
     <div class="col-md-8">
-        <div class="alert alert-warning">Before Saving you need to be agreed with our
+        <div class="terms alert alert-warning">Before Saving you need to be agreed with our
             <button type="button" class="btn btn-link" data-toggle="modal" data-target="#terms-conditions">
                 <b>TERMS AND CONDITIONS</b>
             </button>
@@ -104,28 +104,36 @@ $rootWeb = api_get_path('WEB_PATH');
 
 Display::display_header(get_lang('Registration'));
 ?>
-    <div class="row">
-        <div class="col-md-2">
-            <div id="image-message-container">
-                <a class="expand-image" href="<?php echo $content['big_image'] ?>">
-                    <img src="<?php echo $content['normal_image'] ?>" class="img-thumbnail img-responsive">
-                </a>
+
+<div class="row">
+    <div class="col-md-10">
+        <?php if (isset($content['error']) && !empty($content['error'])) {
+            echo '<div id="registration-form-error" class="alert alert-danger">'.$content['error'].'</div>';
+        }?>
+        
+            <div class="box box-primary">
+                <div class="box-body">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><?php echo get_lang('ModifProfile'); ?></h3>
+                    </div>
+                    <div id="registration-form-box" class="form-box well">
+                    <?php
+                        $content['form']->display();
+                    ?>
+                </div>
             </div>
         </div>
-        <div class="col-md-10">
-            <?php
-            if (isset($content['error']) && !empty($content['error'])) {
-                echo '<div id="registration-form-error" class="alert alert-danger">'.$content['error'].'</div>';
-            }
-            ?>
-            <div id="registration-form-box" class="form-box">
-                <?php
-                $content['form']->display();
-                ?>
-            </div>
+	
+    </div>
+    <div class="col-md-2">
+        <div id="image-message-container">
+            <a class="expand-image" href="<?php echo $content['big_image'] ?>">
+                <img src="<?php echo $content['normal_image'] ?>" class="img-thumbnail img-responsive">
+            </a>
         </div>
     </div>
-    <div id="terms-conditions" class="modal fade" role="dialog">
+</div>
+<div id="terms-conditions" class="modal fade" role="dialog">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -141,7 +149,7 @@ Display::display_header(get_lang('Registration'));
                 </div>
             </div>
         </div>
-    </div>
+ </div>
     <script>
         (function () {
             var FrmProfile = {
@@ -190,7 +198,7 @@ Display::display_header(get_lang('Registration'));
 
                     if (age >= 18) {
                         this.$divGuardian.hide();
-                        this.$modalTitle.html('DECLARACION DE PROTECCION DE DATOS PERSONALES MAYOR DE 18 AÑOS DE EDAD');
+                        this.$modalTitle.html('<h3>DECLARACION DE PROTECCION DE DATOS PERSONALES MAYOR DE 18 AÑOS DE EDAD</h3>');
                         this.$modalText.html(
                             'En aplicación a lo dispuesto por la Ley 29733 Ley de Protección de ' +
                             'Datos Personales, y el D.S. 003-2013-JUS,el suscrito titular de los datos personales, ' +
@@ -216,7 +224,7 @@ Display::display_header(get_lang('Registration'));
 
                     if (age >= 14 && age < 18) {
                         this.$modalTitle.html(
-                            'DECLARACION DE PROTECCION DE DATOS PERSONALES MAYOR DE 14 Y MENOR A 18 AÑOS'
+                            '<h3>DECLARACION DE PROTECCION DE DATOS PERSONALES MAYOR DE 14 Y MENOR A 18 AÑOS</h3>'
                         );
                         this.$modalText.html(
                             'En aplicación a lo dispuesto por la Ley 29733 Ley de Protección de Datos Personales, ' +
@@ -247,7 +255,7 @@ Display::display_header(get_lang('Registration'));
                         return;
                     }
 
-                    this.$modalTitle.html('DECLARACION DE PROTECCION DE DATOS PERSONALES MENOR DE 14 AÑOS DE EDAD');
+                    this.$modalTitle.html('<h3>DECLARACION DE PROTECCION DE DATOS PERSONALES MENOR DE 14 AÑOS DE EDAD</h3>');
                     this.$modalText.html(
                         'En aplicación a lo dispuesto por la Ley 29733 Ley de Protección de Datos Personales, y el ' +
                         'D.S. 003-2013-JUS, el suscrito, padre o tutor del titular de los datos personales, mediante ' +

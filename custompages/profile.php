@@ -96,7 +96,7 @@ foreach ($elements as $element) {
     }
 
     if (isset($element->_attributes['name']) && $element->_attributes['name'] == 'guardian_section') {
-        $form->insertElementBefore($form->removeElement('extra_guardian_document', false), 'guardian_section');
+        //$form->insertElementBefore($form->removeElement('extra_guardian_document', false), 'guardian_section');
     }
 }
 
@@ -151,6 +151,15 @@ Display::display_header(get_lang('Registration'));
                 $divGuardian: $('#guardian_div'),
                 $modalTitle: $('#title-modal'),
                 $modalText: $('#text-modal'),
+                $slctOcupation: $('#extra_ocupation'),
+                $slctOcupationLocationFirst: $('#first_extrastudy_job_center_ubication'),
+                $slctOcupationLocationSecond: $('#second_extrastudy_job_center_ubication'),
+                $slctOcupationLocationThird: $('#thrid_extrastudy_job_center_ubication'),
+                $txtOcupationName1: $('#extra_study_center_name_o1'),
+                $txtOcupationName2: $('#extra_study_center_name_o2'),
+                $txtOcupationName3: $('#extra_study_center_name_o3'),
+                $txtOcupationName4: $('#extra_study_center_name_o4'),
+                $slctUniCarrers: $('#extra_university_careers'),
                 onStudentDocument: function () {
                     this.$txtDocument.val('');
 
@@ -272,6 +281,48 @@ Display::display_header(get_lang('Registration'));
                     );
 
                     this.$divGuardian.show();
+                },
+                onOcupation: function () {
+                    this.$txtOcupationName1.parents('.form-group').hide();
+                    this.$txtOcupationName2.parents('.form-group').hide();
+                    this.$txtOcupationName3.parents('.form-group').hide();
+                    this.$txtOcupationName4.parents('.form-group').hide();
+                    this.$slctUniCarrers.parents('.form-group').hide();
+
+                    switch (this.$slctOcupation.prop('selectedIndex')) {
+                        case 1:
+                            this.$txtOcupationName1.parents('.form-group').show();
+                            break;
+                        case 2:
+                            this.$txtOcupationName2.parents('.form-group').show();
+                            break;
+                        case 3:
+                            this.$txtOcupationName3.parents('.form-group').show();
+                            this.$slctUniCarrers.parents('.form-group').show();
+                            break;
+                        case 4:
+                            this.$txtOcupationName4.parents('.form-group').show();
+                            break;
+                    }
+                },
+                onOcupationLocation: function () {
+                    var firstValue = this.$slctOcupationLocationFirst.find('option:selected').data('value') || '',
+                        secondValue = this.$slctOcupationLocationSecond.find('option:selected').data('value') || '',
+                        thirdValue = this.$slctOcupationLocationThird.find('option:selected').data('value') || '';
+
+                    var ubigeo = firstValue + '' + secondValue + thirdValue;
+
+                    this.$txtOcupationName1.find('option').show();
+                    this.$txtOcupationName1.find('option:not([data-value="' + ubigeo + '"])').hide();
+                    this.$txtOcupationName1.selectpicker('refresh');
+
+                    this.$txtOcupationName2.find('option').show();
+                    this.$txtOcupationName2.find('option:not([data-value="' + ubigeo + '"])').hide();
+                    this.$txtOcupationName2.selectpicker('refresh');
+
+                    this.$txtOcupationName3.find('option').show();
+                    this.$txtOcupationName3.find('option:not([data-value="' + ubigeo + '"])').hide();
+                    this.$txtOcupationName3.selectpicker('refresh');
                 }
             };
 
@@ -284,6 +335,21 @@ Display::display_header(get_lang('Registration'));
                 FrmProfile.onStudentDocument();
                 FrmProfile.$slctDocument.on('change', function () {
                     FrmProfile.onStudentDocument();
+                });
+
+                FrmProfile.onOcupation();
+                FrmProfile.$slctOcupation.on('change', function () {
+                    FrmProfile.onOcupation();
+                });
+
+                FrmProfile.$slctOcupationLocationFirst.on('change', function () {
+                    FrmProfile.onOcupationLocation();
+                });
+                FrmProfile.$slctOcupationLocationSecond.on('change', function () {
+                    FrmProfile.onOcupationLocation();
+                });
+                FrmProfile.$slctOcupationLocationThird.on('change', function () {
+                    FrmProfile.onOcupationLocation();
                 });
             });
         })();

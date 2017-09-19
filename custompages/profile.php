@@ -59,9 +59,9 @@ $form->addElement('html', '
 <div class="form-group">
     <div class="col-md-2"></div>
     <div class="col-md-8">
-        <div class="terms alert alert-warning">Before Saving you need to be agreed with our
+        <div class="terms alert alert-warning">Antes de guardar los datos, debes estar de acuerdo con nuestros
             <button type="button" class="btn btn-link" data-toggle="modal" data-target="#terms-conditions">
-                <b>TERMS AND CONDITIONS</b>
+                <b>términos y condiciones</b>
             </button>
         </div>
     </div>
@@ -80,7 +80,7 @@ $elements = $form->getElements();
 foreach ($elements as $element) {
 
     if (isset($element->_attributes['name']) && $element->_attributes['name'] == 'firstname') {
-        $form->insertElementBefore($form->removeElement('extra_document_type', false), 'firstname');
+        $form->insertElementBefore($form->removeElement('extra_id_document', false), 'firstname');
     }
 
     if (isset($element->_attributes['name']) && $element->_attributes['name'] == 'lastname') {
@@ -92,11 +92,11 @@ foreach ($elements as $element) {
     }
 
     if (isset($element->_attributes['name']) && $element->_attributes['name'] == 'username') {
-        $form->insertElementBefore($form->removeElement('extra_mother_name', false), 'username');
+        $form->insertElementBefore($form->removeElement('extra_mothers_name', false), 'username');
     }
 
     if (isset($element->_attributes['name']) && $element->_attributes['name'] == 'guardian_section') {
-        //$form->insertElementBefore($form->removeElement('extra_guardian_document', false), 'guardian_section');
+        $form->insertElementBefore($form->removeElement('extra_guardian_id_document', false), 'guardian_section');
     }
 }
 
@@ -153,21 +153,21 @@ Display::display_header(get_lang('Registration'));
     <script>
         (function () {
             var FrmProfile = {
-                $slctDocument: $('#slct_extra_document_type'),
-                $txtDocument: $('#txt_extra_document_type'),
-                $txtBirthday: $('#extra_birthday'),
+                $slctDocument: $('#slct_extra_id_document'),
+                $txtDocument: $('#txt_extra_id_document'),
+                $txtBirthdate: $('#extra_birthdate'),
                 $divGuardian: $('#guardian_div'),
                 $modalTitle: $('#title-modal'),
                 $modalText: $('#text-modal'),
-                $slctOcupation: $('#extra_ocupation'),
-                $slctOcupationLocationFirst: $('#first_extrastudy_job_center_ubication'),
-                $slctOcupationLocationSecond: $('#second_extrastudy_job_center_ubication'),
-                $slctOcupationLocationThird: $('#thrid_extrastudy_job_center_ubication'),
-                $txtOcupationName1: $('#extra_study_center_name_o1'),
-                $txtOcupationName2: $('#extra_study_center_name_o2'),
-                $txtOcupationName3: $('#extra_study_center_name_o3'),
-                $txtOcupationName4: $('#extra_study_center_name_o4'),
-                $slctUniCarrers: $('#extra_university_careers'),
+                $slctOccupation: $('#extra_occupation'),
+                $slctOccupationLocationFirst: $('#first_extraoccupation_ubigeo'),
+                $slctOccupationLocationSecond: $('#second_extraoccupation_ubigeo'),
+                $slctOccupationLocationThird: $('#thrid_extraoccupation_ubigeo'),
+                $slctOccupationName1: $('#extra_occupation_center_name_1'),
+                $slctOccupationName2: $('#extra_occupation_center_name_2'),
+                $slctOccupationName3: $('#extra_occupation_center_name_3'),
+                $txtOccupationName4: $('#extra_occupation_center_name_4'),
+                $slctUniCarrers: $('#extra_university_career'),
                 onStudentDocument: function () {
                     this.$txtDocument.val('');
 
@@ -190,7 +190,7 @@ Display::display_header(get_lang('Registration'));
                     }
                 },
                 checkAge: function () {
-                    var extraBirthdayFieldValue = this.$txtBirthday.val();
+                    var extraBirthdayFieldValue = this.$txtBirthdate.val();
 
                     if (extraBirthdayFieldValue == null) {
                         return false;
@@ -290,53 +290,53 @@ Display::display_header(get_lang('Registration'));
 
                     this.$divGuardian.show();
                 },
-                onOcupation: function () {
-                    this.$txtOcupationName1.parents('.form-group').hide();
-                    this.$txtOcupationName2.parents('.form-group').hide();
-                    this.$txtOcupationName3.parents('.form-group').hide();
-                    this.$txtOcupationName4.parents('.form-group').hide();
+                onOccupation: function () {
+                    this.$slctOccupationName1.parents('.form-group').hide();
+                    this.$slctOccupationName2.parents('.form-group').hide();
+                    this.$slctOccupationName3.parents('.form-group').hide();
+                    this.$txtOccupationName4.parents('.form-group').hide();
                     this.$slctUniCarrers.parents('.form-group').hide();
 
-                    switch (this.$slctOcupation.prop('selectedIndex')) {
+                    switch (this.$slctOccupation.prop('selectedIndex')) {
                         case 1:
-                            this.$txtOcupationName1.parents('.form-group').show();
+                            this.$slctOccupationName1.parents('.form-group').show();
                             break;
                         case 2:
-                            this.$txtOcupationName2.parents('.form-group').show();
+                            this.$slctOccupationName2.parents('.form-group').show();
                             break;
                         case 3:
-                            this.$txtOcupationName3.parents('.form-group').show();
+                            this.$slctOccupationName3.parents('.form-group').show();
                             this.$slctUniCarrers.parents('.form-group').show();
                             break;
                         case 4:
-                            this.$txtOcupationName4.parents('.form-group').show();
+                            this.$txtOccupationName4.parents('.form-group').show();
                             break;
                     }
                 },
-                onOcupationLocation: function () {
-                    var firstValue = this.$slctOcupationLocationFirst.find('option:selected').data('value') || '',
-                        secondValue = this.$slctOcupationLocationSecond.find('option:selected').data('value') || '',
-                        thirdValue = this.$slctOcupationLocationThird.find('option:selected').data('value') || '';
+                onOccupationLocation: function () {
+                    var firstValue = this.$slctOccupationLocationFirst.find('option:selected').data('value') || '',
+                        secondValue = this.$slctOccupationLocationSecond.find('option:selected').data('value') || '',
+                        thirdValue = this.$slctOccupationLocationThird.find('option:selected').data('value') || '';
 
                     var ubigeo = firstValue + '' + secondValue + thirdValue;
 
-                    this.$txtOcupationName1.find('option').show();
-                    this.$txtOcupationName1.find('option:not([data-value="' + ubigeo + '"])').hide();
-                    this.$txtOcupationName1.selectpicker('refresh');
+                    this.$slctOccupationName1.find('option').show();
+                    this.$slctOccupationName1.find('option:not([data-value="' + ubigeo + '"])').hide();
+                    this.$slctOccupationName1.selectpicker('refresh');
 
-                    this.$txtOcupationName2.find('option').show();
-                    this.$txtOcupationName2.find('option:not([data-value="' + ubigeo + '"])').hide();
-                    this.$txtOcupationName2.selectpicker('refresh');
+                    this.$slctOccupationName2.find('option').show();
+                    this.$slctOccupationName2.find('option:not([data-value="' + ubigeo + '"])').hide();
+                    this.$slctOccupationName2.selectpicker('refresh');
 
-                    this.$txtOcupationName3.find('option').show();
-                    this.$txtOcupationName3.find('option:not([data-value="' + ubigeo + '"])').hide();
-                    this.$txtOcupationName3.selectpicker('refresh');
+                    this.$slctOccupationName3.find('option').show();
+                    this.$slctOccupationName3.find('option:not([data-value="' + ubigeo + '"])').hide();
+                    this.$slctOccupationName3.selectpicker('refresh');
                 }
             };
 
             $(document).ready(function () {
                 FrmProfile.onStudentBirthday();
-                FrmProfile.$txtBirthday.change(function () {
+                FrmProfile.$txtBirthdate.change(function () {
                     FrmProfile.onStudentBirthday()
                 });
 
@@ -345,19 +345,19 @@ Display::display_header(get_lang('Registration'));
                     FrmProfile.onStudentDocument();
                 });
 
-                FrmProfile.onOcupation();
-                FrmProfile.$slctOcupation.on('change', function () {
-                    FrmProfile.onOcupation();
+                FrmProfile.onOccupation();
+                FrmProfile.$slctOccupation.on('change', function () {
+                    FrmProfile.onOccupation();
                 });
 
-                FrmProfile.$slctOcupationLocationFirst.on('change', function () {
-                    FrmProfile.onOcupationLocation();
+                FrmProfile.$slctOccupationLocationFirst.on('change', function () {
+                    FrmProfile.onOccupationLocation();
                 });
-                FrmProfile.$slctOcupationLocationSecond.on('change', function () {
-                    FrmProfile.onOcupationLocation();
+                FrmProfile.$slctOccupationLocationSecond.on('change', function () {
+                    FrmProfile.onOccupationLocation();
                 });
-                FrmProfile.$slctOcupationLocationThird.on('change', function () {
-                    FrmProfile.onOcupationLocation();
+                FrmProfile.$slctOccupationLocationThird.on('change', function () {
+                    FrmProfile.onOccupationLocation();
                 });
             });
         })();

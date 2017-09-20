@@ -170,8 +170,6 @@ Display::display_header(get_lang('Registration'));
                     $txtOccupationName4: $('#extra_occupation_center_name_4'),
                     $slctUniCarrers: $('#extra_university_career'),
                     onStudentDocument: function () {
-                        this.$txtDocument.val('');
-
                         switch (this.$slctDocument.prop('selectedIndex')) {
                             case 1:
                                 this.$txtDocument
@@ -180,7 +178,7 @@ Display::display_header(get_lang('Registration'));
                                 break;
                             case 2:
                                 this.$txtDocument
-                                    .attr('pattern', '')
+                                    .attr('pattern', '[\\dA-Za-z]')
                                     .attr('maxlength', '');
                                 break;
                             case 3:
@@ -381,6 +379,7 @@ Display::display_header(get_lang('Registration'));
 
                 FrmProfile.onStudentDocument();
                 FrmProfile.$slctDocument.on('change', function () {
+                    FrmProfile.$txtDocument.val('');
                     FrmProfile.onStudentDocument();
                 });
 

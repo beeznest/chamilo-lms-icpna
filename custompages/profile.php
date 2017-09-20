@@ -322,7 +322,7 @@ Display::display_header(get_lang('Registration'));
                         var ubigeo = firstValue + '' + secondValue + thirdValue,
                             self = this;
 
-                        function foo($el, options) {
+                        function addOptions($el, options) {
                             $el
                                 .empty()
                                 .append(
@@ -351,7 +351,7 @@ Display::display_header(get_lang('Registration'));
                             field_variable: 'occupation_center_name_1',
                             filter_by: ubigeo
                         }, function (options) {
-                            foo(self.$slctOccupationName1, options);
+                            addOptions(self.$slctOccupationName1, options);
                         });
 
                         $.getJSON(_p.web_ajax + 'extra_field.ajax.php', {
@@ -360,7 +360,7 @@ Display::display_header(get_lang('Registration'));
                             field_variable: 'occupation_center_name_2',
                             filter_by: ubigeo
                         }, function (options) {
-                            foo(self.$slctOccupationName2, options);
+                            addOptions(self.$slctOccupationName2, options);
                         });
 
                         $.getJSON(_p.web_ajax + 'extra_field.ajax.php', {
@@ -369,7 +369,7 @@ Display::display_header(get_lang('Registration'));
                             field_variable: 'occupation_center_name_3',
                             filter_by: ubigeo
                         }, function (options) {
-                            foo(self.$slctOccupationName3, options);
+                            addOptions(self.$slctOccupationName3, options);
                         });
                     }
                 };

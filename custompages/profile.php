@@ -316,18 +316,20 @@ Display::display_header(get_lang('Registration'));
                         this.$txtOccupationName4.parents('.form-group').hide();
                         this.$slctUniCarrers.parents('.form-group').hide();
 
+                        var modifiedIndex = this.$slctOccupation.prop('childElementCount') > 4 ? 0 : 1;
+
                         switch (this.$slctOccupation.prop('selectedIndex')) {
-                            case 1:
+                            case 1 - modifiedIndex:
                                 this.$slctOccupationName1.parents('.form-group').show();
                                 break;
-                            case 2:
+                            case 2 - modifiedIndex:
                                 this.$slctOccupationName2.parents('.form-group').show();
                                 break;
-                            case 3:
+                            case 3 - modifiedIndex:
                                 this.$slctOccupationName3.parents('.form-group').show();
                                 this.$slctUniCarrers.parents('.form-group').show();
                                 break;
-                            case 4:
+                            case 4 - modifiedIndex:
                                 this.$txtOccupationName4.parents('.form-group').show();
                                 break;
                         }

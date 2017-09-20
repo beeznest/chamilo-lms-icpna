@@ -1340,18 +1340,18 @@ class ExtraField extends Model
         $id = $fieldDetails['id'];
         $slctFirstId = "first_extra$variable";
         $slctSecondId = "second_extra$variable";
-        $slctThirdId = "thrid_extra$variable";
+        $slctThirdId = "third_extra$variable";
         $langSelect = get_lang('Select');
 
         $js = "
             (function () {
                 var slctFirst = $('#$slctFirstId'),
                     slctSecond = $('#$slctSecondId'),
-                    slctThrid = $('#$slctThirdId');
+                    slctThird = $('#$slctThirdId');
                     
                 slctFirst.on('change', function () {
                     slctSecond.empty().selectpicker('refresh');
-                    slctThrid.empty().selectpicker('refresh');
+                    slctThird.empty().selectpicker('refresh');
     
                     var level = $(this).val();
     
@@ -1383,7 +1383,7 @@ class ExtraField extends Model
                         });
                 });
                 slctSecond.on('change', function () {
-                    slctThrid.empty().selectpicker('refresh');
+                    slctThird.empty().selectpicker('refresh');
     
                     var level = $(this).val();
                     
@@ -1398,7 +1398,7 @@ class ExtraField extends Model
                         'option_value_id': level
                     })
                         .done(function (data) {
-                            slctThrid.append(
+                            slctThird.append(
                                 $('<option>', {value: '', text: '$langSelect'})
                             );
 
@@ -1406,12 +1406,12 @@ class ExtraField extends Model
                                 var valueParts = value.split('#'),
                                     dataValue = valueParts.length > 1 ? valueParts.shift() : '';
 
-                                slctThrid.append(
+                                slctThird.append(
                                     $('<option>', {value: index, text: valueParts.join(''), 'data-value': dataValue})
                                 );
                             });
     
-                            slctThrid.selectpicker('refresh');
+                            slctThird.selectpicker('refresh');
                         });
                 });
             })();

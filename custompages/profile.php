@@ -181,6 +181,13 @@ Display::display_header(get_lang('Registration'));
                     $txtNationality: $('#extra_nationality'),
                     $txtBirthdate: $('#extra_birthdate'),
                     $txtMobilePhone: $('#profile_extra_mobile_phone_number'),
+                    onMobileNumberLoad: function () {
+                        this.$txtMobilePhone.val(
+                            this.$txtMobilePhone.val()
+                                .replace(/[^\d]+/g, '')
+                                .replace(/(\d{2})(\d{9})/, '($1)$2')
+                        );
+                    },
                     onStudentDocument: function () {
                         switch (this.$slctDocument.prop('selectedIndex')) {
                             case 1:
@@ -332,22 +339,24 @@ Display::display_header(get_lang('Registration'));
                         this.$txtOccupationName4.removeAttr('required');
                         this.$slctUniCarrers.removeAttr('required');
 
+                        var modifiedIndex = this.$slctOccupation.prop('childElementCount') > 4 ? 0 : 1;
+
                         switch (this.$slctOccupation.prop('selectedIndex')) {
-                            case 1:
+                            case 1 - modifiedIndex:
                                 this.$slctOccupationName1.parents('.form-group').show();
                                 this.$slctOccupationName1.attr('required', true);
                                 break;
-                            case 2:
+                            case 2 - modifiedIndex:
                                 this.$slctOccupationName2.parents('.form-group').show();
                                 this.$slctOccupationName2.attr('required', true);
                                 break;
-                            case 3:
+                            case 3 - modifiedIndex:
                                 this.$slctOccupationName3.parents('.form-group').show();
                                 this.$slctOccupationName3.attr('required', true);
                                 this.$slctUniCarrers.parents('.form-group').show();
                                 this.$slctUniCarrers.attr('required', true);
                                 break;
-                            case 4:
+                            case 4 - modifiedIndex:
                                 this.$txtOccupationName4.parents('.form-group').show();
                                 this.$txtOccupationName4.attr('required', true);
                                 break;
@@ -418,6 +427,8 @@ Display::display_header(get_lang('Registration'));
                         this.$slctLocation.attr('required', true);
                     }
                 };
+
+                FrmProfile.onMobileNumberLoad();
 
                 FrmProfile.onStudentBirthday();
                 FrmProfile.$txtBirthdate.change(function () {

@@ -169,6 +169,14 @@ Display::display_header(get_lang('Registration'));
                     $slctOccupationName3: $('#extra_occupation_center_name_3'),
                     $txtOccupationName4: $('#extra_occupation_center_name_4'),
                     $slctUniCarrers: $('#extra_university_career'),
+                    $mobileNumber: $('#profile_extra_mobile_phone_number'),
+                    onMobileNumberLoad: function () {
+                        this.$mobileNumber.val(
+                            this.$mobileNumber.val()
+                                .replace(/[^\d]+/g, '')
+                                .replace(/(\d{2})(\d{9})/, '($1)$2')
+                        );
+                    },
                     onStudentDocument: function () {
                         switch (this.$slctDocument.prop('selectedIndex')) {
                             case 1:
@@ -383,6 +391,8 @@ Display::display_header(get_lang('Registration'));
                         });
                     }
                 };
+
+                FrmProfile.onMobileNumberLoad();
 
                 FrmProfile.onStudentBirthday();
                 FrmProfile.$txtBirthdate.change(function () {

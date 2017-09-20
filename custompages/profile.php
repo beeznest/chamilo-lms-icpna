@@ -202,7 +202,7 @@ Display::display_header(get_lang('Registration'));
                             case 2:
                                 this.$txtDocument
                                     .attr({
-                                        pattern: '[\\dA-Za-z]',
+                                        pattern: '[a-zA-Z0-9]+',
                                         maxlength: '',
                                         title: '<?php echo get_lang('OnlyLettersAndNumbers') ?>',
                                         required: true

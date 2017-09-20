@@ -156,7 +156,6 @@ Display::display_header(get_lang('Registration'));
                 var FrmProfile = {
                     $slctDocument: $('#slct_extra_id_document'),
                     $txtDocument: $('#txt_extra_id_document'),
-                    $txtBirthdate: $('#extra_birthdate'),
                     $divGuardian: $('#guardian_div'),
                     $modalTitle: $('#title-modal'),
                     $modalText: $('#text-modal'),
@@ -241,7 +240,9 @@ Display::display_header(get_lang('Registration'));
 
                         if (age >= 18) {
                             this.$divGuardian.hide();
-                            this.$modalTitle.html('<h3>DECLARACION DE PROTECCION DE DATOS PERSONALES MAYOR DE 18 AÑOS DE EDAD</h3>');
+                            this.$modalTitle.html(
+                                '<h3>DECLARACION DE PROTECCION DE DATOS PERSONALES MAYOR DE 18 AÑOS DE EDAD</h3>'
+                            );
                             this.$modalText.html(
                                 'En aplicación a lo dispuesto por la Ley 29733 Ley de Protección de ' +
                                 'Datos Personales, y el D.S. 003-2013-JUS,el suscrito titular de los datos personales, ' +
@@ -300,7 +301,9 @@ Display::display_header(get_lang('Registration'));
                         }
 
                         this.$txtGuardianName.attr('required', true);
-                        this.$modalTitle.html('<h3>DECLARACION DE PROTECCION DE DATOS PERSONALES MENOR DE 14 AÑOS DE EDAD</h3>');
+                        this.$modalTitle.html(
+                            '<h3>DECLARACION DE PROTECCION DE DATOS PERSONALES MENOR DE 14 AÑOS DE EDAD</h3>'
+                        );
                         this.$modalText.html(
                             'En aplicación a lo dispuesto por la Ley 29733 Ley de Protección de Datos Personales, y el ' +
                             'D.S. 003-2013-JUS, el suscrito, padre o tutor del titular de los datos personales, mediante ' +

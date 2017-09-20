@@ -163,12 +163,24 @@ Display::display_header(get_lang('Registration'));
                     $slctOccupation: $('#extra_occupation'),
                     $slctOccupationLocationFirst: $('#first_extraoccupation_ubigeo'),
                     $slctOccupationLocationSecond: $('#second_extraoccupation_ubigeo'),
-                    $slctOccupationLocationThird: $('#thrid_extraoccupation_ubigeo'),
+                    $slctOccupationLocationThird: $('#third_extraoccupation_ubigeo'),
                     $slctOccupationName1: $('#extra_occupation_center_name_1'),
                     $slctOccupationName2: $('#extra_occupation_center_name_2'),
                     $slctOccupationName3: $('#extra_occupation_center_name_3'),
                     $txtOccupationName4: $('#extra_occupation_center_name_4'),
                     $slctUniCarrers: $('#extra_university_career'),
+                    $txtGuardianName: $('#profile_extra_guardian_name'),
+                    $txtGuardianEmail: $('#profile_extra_guardian_email'),
+                    $txtGuardianDocument: $('#txt_extra_guardian_id_document'),
+                    $slctLocationFirst: $('#first_extraaddress_ubigeo'),
+                    $slctLocationSecond: $('#second_extraaddress_ubigeo'),
+                    $slctLocationThird: $('#third_extraaddress_ubigeo'),
+                    $slctLocation: $('#extra_address'),
+                    $txtEmail: $('#profile_email'),
+                    $slctSex: $('#extra_sex'),
+                    $txtNationality: $('#extra_nationality'),
+                    $txtBirthdate: $('#extra_birthdate'),
+                    $txtMobilePhone: $('#profile_extra_mobile_phone_number'),
                     onStudentDocument: function () {
                         switch (this.$slctDocument.prop('selectedIndex')) {
                             case 1:
@@ -214,6 +226,10 @@ Display::display_header(get_lang('Registration'));
                         return age;
                     },
                     onStudentBirthday: function () {
+                        this.$txtGuardianName.removeAttr('required');
+                        this.$txtGuardianEmail.removeAttr('required');
+                        this.$txtGuardianDocument.removeAttr('required');
+
                         var age = this.checkAge();
 
                         if (age >= 18) {
@@ -243,6 +259,7 @@ Display::display_header(get_lang('Registration'));
                         }
 
                         if (age >= 14 && age < 18) {
+                            this.$txtGuardianName.attr('required', true);
                             this.$modalTitle.html(
                                 '<h3>DECLARACION DE PROTECCION DE DATOS PERSONALES MAYOR DE 14 Y MENOR A 18 AÑOS</h3>'
                             );
@@ -275,6 +292,7 @@ Display::display_header(get_lang('Registration'));
                             return;
                         }
 
+                        this.$txtGuardianName.attr('required', true);
                         this.$modalTitle.html('<h3>DECLARACION DE PROTECCION DE DATOS PERSONALES MENOR DE 14 AÑOS DE EDAD</h3>');
                         this.$modalText.html(
                             'En aplicación a lo dispuesto por la Ley 29733 Ley de Protección de Datos Personales, y el ' +
@@ -308,19 +326,30 @@ Display::display_header(get_lang('Registration'));
                         this.$txtOccupationName4.parents('.form-group').hide();
                         this.$slctUniCarrers.parents('.form-group').hide();
 
+                        this.$slctOccupationName1.removeAttr('required');
+                        this.$slctOccupationName2.removeAttr('required');
+                        this.$slctOccupationName3.removeAttr('required');
+                        this.$txtOccupationName4.removeAttr('required');
+                        this.$slctUniCarrers.removeAttr('required');
+
                         switch (this.$slctOccupation.prop('selectedIndex')) {
                             case 1:
                                 this.$slctOccupationName1.parents('.form-group').show();
+                                this.$slctOccupationName1.attr('required', true);
                                 break;
                             case 2:
                                 this.$slctOccupationName2.parents('.form-group').show();
+                                this.$slctOccupationName2.attr('required', true);
                                 break;
                             case 3:
                                 this.$slctOccupationName3.parents('.form-group').show();
+                                this.$slctOccupationName3.attr('required', true);
                                 this.$slctUniCarrers.parents('.form-group').show();
+                                this.$slctUniCarrers.attr('required', true);
                                 break;
                             case 4:
                                 this.$txtOccupationName4.parents('.form-group').show();
+                                this.$txtOccupationName4.attr('required', true);
                                 break;
                         }
                     },
@@ -381,6 +410,12 @@ Display::display_header(get_lang('Registration'));
                         }, function (options) {
                             addOptions(self.$slctOccupationName3, options);
                         });
+                    },
+                    onLocation: function () {
+                        this.$slctLocationFirst.attr('required', true);
+                        this.$slctLocationSecond.attr('required', true);
+                        this.$slctLocationThird.attr('required', true);
+                        this.$slctLocation.attr('required', true);
                     }
                 };
 
@@ -409,6 +444,17 @@ Display::display_header(get_lang('Registration'));
                 FrmProfile.$slctOccupationLocationThird.on('change', function () {
                     FrmProfile.onOccupationLocation();
                 });
+
+                FrmProfile.$txtEmail.attr('required', true);
+                FrmProfile.$slctSex.attr('required', true);
+                FrmProfile.$txtNationality.attr('required', true);
+                FrmProfile.$txtBirthdate.attr('required', true);
+                FrmProfile.$txtMobilePhone.attr('required', true);
+                FrmProfile.$slctOccupationLocationFirst.attr('required', true);
+                FrmProfile.$slctOccupationLocationSecond.attr('required', true);
+                FrmProfile.$slctOccupationLocationThird.attr('required', true);
+
+                FrmProfile.onLocation();
             });
         })();
     </script>

@@ -173,18 +173,30 @@ Display::display_header(get_lang('Registration'));
                         switch (this.$slctDocument.prop('selectedIndex')) {
                             case 1:
                                 this.$txtDocument
-                                    .attr('pattern', '\\d{8}')
-                                    .attr('maxlength', '8');
+                                    .attr({
+                                        pattern: '\\d{8}',
+                                        maxlength: '8',
+                                        title: '<?php echo get_lang('OnlyNumbers') ?>',
+                                        required: true
+                                    });
                                 break;
                             case 2:
                                 this.$txtDocument
-                                    .attr('pattern', '[\\dA-Za-z]')
-                                    .attr('maxlength', '');
+                                    .attr({
+                                        pattern: '[\\dA-Za-z]',
+                                        maxlength: '',
+                                        title: '<?php echo get_lang('OnlyLettersAndNumbers') ?>',
+                                        required: true
+                                    });
                                 break;
                             case 3:
                                 this.$txtDocument
-                                    .attr('pattern', '\\d{9}')
-                                    .attr('maxlength', '9');
+                                    .attr({
+                                        pattern: '\\d{9}',
+                                        maxlength: '9',
+                                        title: '<?php echo get_lang('OnlyNumbers') ?>',
+                                        required: true
+                                    });
                                 break;
                         }
                     },

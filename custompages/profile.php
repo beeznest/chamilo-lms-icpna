@@ -318,19 +318,58 @@ Display::display_header(get_lang('Registration'));
                         secondValue = this.$slctOccupationLocationSecond.find('option:selected').data('value') || '',
                         thirdValue = this.$slctOccupationLocationThird.find('option:selected').data('value') || '';
 
-                    var ubigeo = firstValue + '' + secondValue + thirdValue;
+                    var ubigeo = firstValue + '' + secondValue + thirdValue,
+                        self = this;
 
-                    this.$slctOccupationName1.find('option').show();
-                    this.$slctOccupationName1.find('option:not([data-value="' + ubigeo + '"])').hide();
-                    this.$slctOccupationName1.selectpicker('refresh');
+                    function foo($el, options) {
+                        $el
+                            .empty()
+                            .append(
+                                $('<option>', {value: '', text: '<?php echo get_lang('SelectAnOption') ?>'})
+                            );
 
-                    this.$slctOccupationName2.find('option').show();
-                    this.$slctOccupationName2.find('option:not([data-value="' + ubigeo + '"])').hide();
-                    this.$slctOccupationName2.selectpicker('refresh');
+                        $.each(options, function (index, option) {
+                            var valueParts = option.display_text.split('#'),
+                                dataValue = valueParts.length > 1 ? valueParts.shift() : '';
 
-                    this.$slctOccupationName3.find('option').show();
-                    this.$slctOccupationName3.find('option:not([data-value="' + ubigeo + '"])').hide();
-                    this.$slctOccupationName3.selectpicker('refresh');
+                            $el.append(
+                                $('<option>', {
+                                    value: option.option_value,
+                                    text: valueParts.join(''),
+                                    'data-value': dataValue
+                                })
+                            );
+                        });
+
+                        $el.selectpicker('refresh');
+                    }
+
+                    $.getJSON(_p.web_ajax + 'extra_field.ajax.php', {
+                        a: 'filter_select_options',
+                        type: 'user',
+                        field_variable: 'occupation_center_name_1',
+                        filter_by: ubigeo
+                    }, function (options) {
+                        foo(self.$slctOccupationName1, options);
+                    });
+
+                    $.getJSON(_p.web_ajax + 'extra_field.ajax.php', {
+                        a: 'filter_select_options',
+                        type: 'user',
+                        field_variable: 'occupation_center_name_2',
+                        filter_by: ubigeo
+                    }, function (options) {
+                        foo(self.$slctOccupationName2, options);
+                    });
+
+                    $.getJSON(_p.web_ajax + 'extra_field.ajax.php', {
+                        a: 'filter_select_options',
+                        type: 'user',
+                        field_variable: 'occupation_center_name_3',
+                        filter_by: ubigeo
+                    }, function (options) {
+                        foo(self.$slctOccupationName3, options);
+                    });
                 }
             };
 

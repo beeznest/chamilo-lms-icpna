@@ -6,10 +6,10 @@ use Chamilo\CoreBundle\Entity\Tag;
 require_once __DIR__.'/../global.inc.php';
 
 $action = isset($_GET['a']) ? $_GET['a'] : '';
+$type = isset($_REQUEST['type']) ? $_REQUEST['type'] : null;
 
 switch ($action) {
     case 'get_second_select_options':
-        $type = isset($_REQUEST['type']) ? $_REQUEST['type'] : null;
         $field_id = isset($_REQUEST['field_id']) ? $_REQUEST['field_id'] : null;
         $option_value_id = isset($_REQUEST['option_value_id']) ? $_REQUEST['option_value_id'] : null;
 
@@ -24,7 +24,6 @@ switch ($action) {
     case 'search_tags':
         header('Content-Type: application/json');
 
-        $type = isset($_REQUEST['type']) ? $_REQUEST['type'] : null;
         $fieldId = isset($_REQUEST['field_id']) ? $_REQUEST['field_id'] : null;
         $tag = isset($_REQUEST['q']) ? $_REQUEST['q'] : null;
         $result = [];
@@ -58,6 +57,19 @@ switch ($action) {
         break;
     default:
         exit;
+        break;
+    case 'filter_select_options':
+        $filter = isset($_REQUEST['filter_by']) ? $_REQUEST['filter_by'] : null;
+        $fieldVariable = isset($_REQUEST['field_variable']) ? $_REQUEST['field_variable'] : null;
+
+        if (!$filter || !$fieldVariable || !$type) {
+            break;
+        }
+
+        $efvOption = new ExtraFieldOption('user');
+        $options = $efvOption->filterSelectFieldOptions($filter, $fieldVariable);
+
+        echo json_encode($options);
         break;
 }
 exit;

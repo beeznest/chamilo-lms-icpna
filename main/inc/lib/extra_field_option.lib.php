@@ -2,6 +2,7 @@
 /* For licensing terms, see /license.txt */
 
 use Chamilo\CoreBundle\Entity\ExtraFieldOptions;
+use Chamilo\CoreBundle\Entity\ExtraField as ExtraFieldEntity;
 
 /**
  * Class ExtraFieldOption
@@ -559,6 +560,42 @@ class ExtraFieldOption extends Model
                 continue;
             }
             $options[] = $option;
+        }
+
+        return $options;
+    }
+
+    public function filterSelectFieldOptions($filterBy, $fieldVariable){
+        $em = Database::getManager();
+        /** @var ExtraFieldEntity $field */
+        $field = $em->getRepository('ChamiloCoreBundle:ExtraField')
+            ->findOneBy([
+                'extraFieldType' => $this->getExtraField()->extraFieldType,
+                'variable' => $fieldVariable
+            ]);
+        $result = $em
+            ->createQuery('
+                SELECT fo FROM ChamiloCoreBundle:ExtraFieldOptions fo
+                WHERE fo.field = :field AND fo.displayText LIKE :filter
+                ORDER BY fo.displayText ASC
+            ')
+            ->setParameters([
+                'field' => $field,
+                'filter' => "$filterBy%"
+            ])
+            ->getResult();
+
+        $options = [];
+
+        /** @var ExtraFieldOptions $option */
+        foreach ($result as $option) {
+            $options[] = [
+                'id' => $option->getId(),
+                'field_id' => $option->getField()->getId(),
+                'option_value' => $option->getValue(),
+                'display_text' => $option->getDisplayText(),
+                'option_order' => $option->getOptionOrder()
+            ];
         }
 
         return $options;

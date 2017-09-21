@@ -123,6 +123,7 @@ function get_lang($variable, $reserved = null, $language = null, $forceSpecificL
     // This is a cache for already translated language variables. By using it, we avoid repetitive translations, gaining speed.
     static $cache;
 
+    // Force the function to translate the current variable and added it to cache
     if ($language && $forceSpecificLanguageLoad) {
         include api_get_path(SYS_LANG_PATH).$language.'/trad4all.inc.php';
         $cache[$language][$variable] = isset(${$variable})

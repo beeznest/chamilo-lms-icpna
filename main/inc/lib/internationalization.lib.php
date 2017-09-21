@@ -62,6 +62,7 @@ define('PERSON_NAME_DATA_EXPORT', PERSON_NAME_EASTERN_ORDER);
  * @param string $variable This is the identificator (name) of the translated string to be retrieved.
  * @param string $reserved This parameter has been reserved for future use.
  * @param string $language (optional)    Language indentificator. If it is omited, the current interface language is assumed.
+ * @param string $forceSpecificLanguageLoad (optional) hack to force to load an especific language for especific variables
  *
  * @return string                        Returns the requested string in the correspondent language.
  *
@@ -78,7 +79,7 @@ define('PERSON_NAME_DATA_EXPORT', PERSON_NAME_EASTERN_ORDER);
  * 3. Translations are created many contributors through using a special tool: Chamilo Translation Application.
  * @link http://translate.chamilo.org/
  */
-function get_lang($variable, $reserved = null, $language = null)
+function get_lang($variable, $reserved = null, $language = null, $forceSpecificLanguageLoad = null)
 {
     // For serving some old hacks:
     // By manipulating this global variable the translation may
@@ -121,6 +122,13 @@ function get_lang($variable, $reserved = null, $language = null)
 
     // This is a cache for already translated language variables. By using it, we avoid repetitive translations, gaining speed.
     static $cache;
+
+    if ($language && $forceSpecificLanguageLoad) {
+        include api_get_path(SYS_LANG_PATH).$language.'/trad4all.inc.php';
+        $cache[$language][$variable] = isset(${$variable})
+            ? ${$variable}
+            : ($show_special_markup ? SPECIAL_OPENING_TAG.$variable.SPECIAL_CLOSING_TAG : $variable);
+    }
 
     // Looking up into the cache for existing translation.
     if (isset($cache[$language][$variable])) {

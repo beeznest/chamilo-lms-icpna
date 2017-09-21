@@ -488,10 +488,11 @@ Display::display_header(get_lang('Registration', null, 'spanish', true));
                 onOccupation();
                 onOccupationLocation();
 
-                $slctDocument.on('change', function () {
+                $slctDocument.attr('required', true).on('change', function () {
                     $txtDocument.val('');
                     onStudentDocument();
                 });
+                $txtDocument.attr('required', true);
                 $txtEmail.attr('required', true);
                 $slctSex.attr('required', true);
                 $txtBirthdate.attr('required', true).change(function () {

@@ -93,6 +93,19 @@ if (is_profile_editable()) {
     $form->freeze();
 }
 
+//Sort order of the form elements to match the custom profile page
+$currentLanguage = api_get_interface_language();
+
+if ($currentLanguage == 'spanish') {
+    $form->insertElementBefore($form->removeElement('firstname', false), 'lastname');
+}
+
+$form->insertElementBefore($form->removeElement('extra_id_document', false), 'firstname');
+$form->insertElementBefore($form->removeElement('extra_middle_name', false), 'lastname');
+$form->insertElementBefore($form->removeElement('extra_middle_name', false), 'lastname');
+$form->insertElementBefore($form->removeElement('extra_mothers_name', false), 'username');
+$form->insertElementBefore($form->removeElement('extra_guardian_id_document', false), 'guardian_section');
+
 // Translate chamilo default profile elements
 $thisElement = $form->getElement('firstname');
 $thisElement->_label = get_lang('FirstName', null, 'spanish', true);
@@ -110,37 +123,16 @@ $thisElement = $form->getElement('picture');
 $thisElement->_label = get_lang('UpdateImage', null, 'spanish', true);
 $thisElement = $form->getElement('language');
 $thisElement->_label = get_lang('Language', null, 'spanish', true);
+$thisElement = $form->getElement('extra_address');
+$thisElement->_label = get_lang('AddressField', null, 'spanish', true);
+$thisElement = $form->getElement('extra_sex');
+$thisElement->_label = get_lang('UserSex', null, 'spanish', true);
 //$thisElement = $form->getElement('password0');
 //$thisElement->_label = get_lang('Pass', null, 'spanish', true);
 //$thisElement = $form->getElement('password1');
 //$thisElement->_label = get_lang('NewPass', null, 'spanish', true);
 //$thisElement = $form->getElement('password2');
 //$thisElement->_label = get_lang('PassTwo', null, 'spanish', true);
-
-$elements = $form->getElements();
-
-foreach ($elements as $element) {
-
-    if (isset($element->_attributes['name']) && $element->_attributes['name'] == 'firstname') {
-        $form->insertElementBefore($form->removeElement('extra_id_document', false), 'firstname');
-    }
-
-    if (isset($element->_attributes['name']) && $element->_attributes['name'] == 'lastname') {
-        $form->insertElementBefore($form->removeElement('extra_middle_name', false), 'lastname');
-    }
-
-    if (isset($element->_attributes['name']) && $element->_attributes['name'] == 'lastname') {
-        $form->insertElementBefore($form->removeElement('extra_middle_name', false), 'lastname');
-    }
-
-    if (isset($element->_attributes['name']) && $element->_attributes['name'] == 'username') {
-        $form->insertElementBefore($form->removeElement('extra_mothers_name', false), 'username');
-    }
-
-    if (isset($element->_attributes['name']) && $element->_attributes['name'] == 'guardian_section') {
-        $form->insertElementBefore($form->removeElement('extra_guardian_id_document', false), 'guardian_section');
-    }
-}
 
 $rootWeb = api_get_path('WEB_PATH');
 

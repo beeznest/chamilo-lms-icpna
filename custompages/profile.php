@@ -110,12 +110,12 @@ $thisElement = $form->getElement('picture');
 $thisElement->_label = get_lang('UpdateImage', null, 'spanish', true);
 $thisElement = $form->getElement('language');
 $thisElement->_label = get_lang('Language', null, 'spanish', true);
-$thisElement = $form->getElement('password0');
-$thisElement->_label = get_lang('Pass', null, 'spanish', true);
-$thisElement = $form->getElement('password1');
-$thisElement->_label = get_lang('NewPass', null, 'spanish', true);
-$thisElement = $form->getElement('password2');
-$thisElement->_label = get_lang('PassTwo', null, 'spanish', true);
+//$thisElement = $form->getElement('password0');
+//$thisElement->_label = get_lang('Pass', null, 'spanish', true);
+//$thisElement = $form->getElement('password1');
+//$thisElement->_label = get_lang('NewPass', null, 'spanish', true);
+//$thisElement = $form->getElement('password2');
+//$thisElement->_label = get_lang('PassTwo', null, 'spanish', true);
 
 $elements = $form->getElements();
 

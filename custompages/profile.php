@@ -11,7 +11,25 @@
 require_once api_get_path(SYS_PATH).'main/inc/global.inc.php';
 require_once __DIR__.'/language.php';
 
+/** @var \FormValidator $form */
 $form = isset($content['form']) ? $content['form'] : null;
+
+/** @var \HTML_QuickForm_select $slctOccupationName1 */
+$slctOccupationName1 = $form->getElement('extra_occupation_center_name_1');
+$occupationName1 = $slctOccupationName1->getValue() ?: [];
+$slctOccupationName1->clearOptions();
+/** @var \HTML_QuickForm_select $slctOccupationName2 */
+$slctOccupationName2 = $form->getElement('extra_occupation_center_name_2');
+$occupationName2 = $slctOccupationName2->getValue() ?: [];
+$slctOccupationName2->clearOptions();
+/** @var \HTML_QuickForm_select $slctOccupationName3 */
+$slctOccupationName3 = $form->getElement('extra_occupation_center_name_3');
+$occupationName3 = $slctOccupationName3->getValue() ?: [];
+$slctOccupationName3->clearOptions();
+/** @var \HTML_QuickForm_select $slctUniversityCarrer */
+$slctUniversityCarrer = $form->getElement('extra_university_career');
+$universityCarrer = $slctUniversityCarrer->getValue() ?: [];
+$slctUniversityCarrer->clearOptions();
 
 /**
  * Removes some unwanted elementend of the form object
@@ -368,7 +386,8 @@ Display::display_header(get_lang('Registration'));
                 function onOccupationLocation () {
                     var firstValue = $slctOccupationLocationFirst.find('option:selected').data('value') || '',
                         secondValue = $slctOccupationLocationSecond.find('option:selected').data('value') || '',
-                        thirdValue = $slctOccupationLocationThird.find('option:selected').data('value') || '';
+                        thirdValue = $slctOccupationLocationThird.find('option:selected').data('value') || '',
+                        modifiedIndex = $slctOccupation.prop('childElementCount') > 4 ? 0 : 1;
 
                     var ubigeo = firstValue + '' + secondValue + thirdValue;
 
@@ -395,38 +414,63 @@ Display::display_header(get_lang('Registration'));
                         $el.selectpicker('refresh');
                     }
 
-                    $.getJSON(_p.web_ajax + 'extra_field.ajax.php', {
-                        a: 'filter_select_options',
-                        type: 'user',
-                        field_variable: 'occupation_center_name_1',
-                        filter_by: ubigeo
-                    }, function (options) {
-                        addOptions($slctOccupationName1, options);
-                    });
-
-                    $.getJSON(_p.web_ajax + 'extra_field.ajax.php', {
-                        a: 'filter_select_options',
-                        type: 'user',
-                        field_variable: 'occupation_center_name_2',
-                        filter_by: ubigeo
-                    }, function (options) {
-                        addOptions($slctOccupationName2, options);
-                    });
-
-                    $.getJSON(_p.web_ajax + 'extra_field.ajax.php', {
-                        a: 'filter_select_options',
-                        type: 'user',
-                        field_variable: 'occupation_center_name_3',
-                        filter_by: ubigeo
-                    }, function (options) {
-                        addOptions($slctOccupationName3, options);
-                    });
+                    switch ($slctOccupation.prop('selectedIndex')) {
+                        case 1 - modifiedIndex:
+                            $.getJSON(_p.web_ajax + 'extra_field.ajax.php', {
+                                a: 'filter_select_options',
+                                type: 'user',
+                                field_variable: 'occupation_center_name_1',
+                                filter_by: ubigeo
+                            }, function (options) {
+                                addOptions($slctOccupationName1, options);
+                                $slctOccupationName1
+                                    .selectpicker('val', ['<?php echo implode("', '", $occupationName1) ?>']);
+                            });
+                            break;
+                        case 2 - modifiedIndex:
+                            $.getJSON(_p.web_ajax + 'extra_field.ajax.php', {
+                                a: 'filter_select_options',
+                                type: 'user',
+                                field_variable: 'occupation_center_name_2',
+                                filter_by: ubigeo
+                            }, function (options) {
+                                addOptions($slctOccupationName2, options);
+                                $slctOccupationName2
+                                    .selectpicker('val', ['<?php echo implode("', '", $occupationName2) ?>']);
+                            });
+                            break;
+                        case 3 - modifiedIndex:
+                            $.getJSON(_p.web_ajax + 'extra_field.ajax.php', {
+                                a: 'filter_select_options',
+                                type: 'user',
+                                field_variable: 'occupation_center_name_3',
+                                filter_by: firstValue + '' + secondValue
+                            }, function (options) {
+                                addOptions($slctOccupationName3, options);
+                                $slctOccupationName3
+                                    .selectpicker('val', ['<?php echo implode("', '", $occupationName3) ?>']);
+                            });
+                            $.getJSON(_p.web_ajax + 'extra_field.ajax.php', {
+                                a: 'filter_select_options',
+                                type: 'user',
+                                field_variable: 'university_career',
+                                filter_by: ''
+                            }, function (options) {
+                                addOptions($slctUniCarrers, options);
+                                $slctUniCarrers
+                                    .selectpicker('val', ['<?php echo implode("', '", $universityCarrer) ?>']);
+                            });
+                            break;
+                        case 4 - modifiedIndex:
+                            break;
+                    }
                 }
 
                 onStudentDocument();
                 onStudentBirthday();
                 onMobileNumberLoad();
                 onOccupation();
+                onOccupationLocation();
 
                 $slctDocument.on('change', function () {
                     $txtDocument.val('');
@@ -445,6 +489,7 @@ Display::display_header(get_lang('Registration'));
                 $txtMobilePhone.attr('required', true);
                 $slctOccupation.on('change', function () {
                     onOccupation();
+                    onOccupationLocation();
                 });
                 $slctOccupationLocationFirst.attr('required', true).on('change', function () {
                     onOccupationLocation();

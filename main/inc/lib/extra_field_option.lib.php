@@ -565,7 +565,12 @@ class ExtraFieldOption extends Model
         return $options;
     }
 
-    public function filterSelectFieldOptions($filterBy, $fieldVariable){
+    /**
+     * @param string $fieldVariable
+     * @param null $filterBy
+     * @return array
+     */
+    public function filterSelectFieldOptions($fieldVariable, $filterBy = null){
         $em = Database::getManager();
         /** @var ExtraFieldEntity $field */
         $field = $em->getRepository('ChamiloCoreBundle:ExtraField')
@@ -573,16 +578,23 @@ class ExtraFieldOption extends Model
                 'extraFieldType' => $this->getExtraField()->extraFieldType,
                 'variable' => $fieldVariable
             ]);
+
+        $applyFilter = !is_null($filterBy);
+        $dqlFilter = '';
+        $params = ['field' => $field];
+
+        if ($applyFilter) {
+            $dqlFilter = 'AND fo.displayText LIKE :filter';
+            $params['filter'] = "$filterBy%";
+        }
+
         $result = $em
-            ->createQuery('
+            ->createQuery("
                 SELECT fo FROM ChamiloCoreBundle:ExtraFieldOptions fo
-                WHERE fo.field = :field AND fo.displayText LIKE :filter
+                WHERE fo.field = :field $dqlFilter
                 ORDER BY fo.displayText ASC
-            ')
-            ->setParameters([
-                'field' => $field,
-                'filter' => "$filterBy%"
-            ])
+            ")
+            ->setParameters($params)
             ->getResult();
 
         $options = [];

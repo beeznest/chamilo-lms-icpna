@@ -62,12 +62,12 @@ switch ($action) {
         $filter = isset($_REQUEST['filter_by']) ? $_REQUEST['filter_by'] : null;
         $fieldVariable = isset($_REQUEST['field_variable']) ? $_REQUEST['field_variable'] : null;
 
-        if (!$filter || !$fieldVariable || !$type) {
+        if (!$fieldVariable || !$type) {
             break;
         }
 
         $efvOption = new ExtraFieldOption('user');
-        $options = $efvOption->filterSelectFieldOptions($filter, $fieldVariable);
+        $options = $efvOption->filterSelectFieldOptions($fieldVariable, $filter);
 
         echo json_encode($options);
         break;

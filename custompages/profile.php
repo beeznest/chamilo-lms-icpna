@@ -136,7 +136,7 @@ $thisElement->_label = get_lang('UserSex', null, 'spanish', true);
 
 $rootWeb = api_get_path('WEB_PATH');
 
-Display::display_header(get_lang('Registration'));
+Display::display_header(get_lang('Registration', null, 'spanish', true));
 ?>
 
 <div class="row">
@@ -148,7 +148,7 @@ Display::display_header(get_lang('Registration'));
             <div class="box box-primary">
                 <div class="box-body">
                     <div class="box-header with-border">
-                        <h3 class="box-title"><?php echo get_lang('ModifProfile'); ?></h3>
+                        <h3 class="box-title"><?php echo get_lang('ModifProfile', null, 'spanish', true); ?></h3>
                     </div>
                     <div id="registration-form-box" class="form-box well">
                     <?php

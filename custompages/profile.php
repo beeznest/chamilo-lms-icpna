@@ -96,7 +96,7 @@ if (is_profile_editable()) {
 //Sort order of the form elements to match the custom profile page
 $currentLanguage = api_get_interface_language();
 
-if ($currentLanguage == 'spanish') {
+if ($currentLanguage !== 'english') {
     $form->insertElementBefore($form->removeElement('firstname', false), 'lastname');
 }
 

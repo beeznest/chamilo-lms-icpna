@@ -52,8 +52,8 @@ $form->addElement('html', '
     <div class="col-md-2"></div>
 </div>
 ');
-$form->addText('extra_guardian_name', 'Guardian Name');
-$form->addText('extra_guardian_email', 'Guardian Email');
+$form->addText('extra_guardian_name', 'Nombre del apoderado');
+$form->addText('extra_guardian_email', 'Email del apoderado');
 $form->addElement('html', '</div>', 'guardian_section');
 $form->addElement('html', '
 <div class="form-group">
@@ -74,6 +74,30 @@ if (is_profile_editable()) {
 } else {
     $form->freeze();
 }
+
+// Translate chamilo default profile elements
+$thisElement = $form->getElement('firstname');
+$thisElement->_label = get_lang('FirstName', null, 'spanish', true);
+$thisElement = $form->getElement('lastname');
+$thisElement->_label = get_lang('LastName', null, 'spanish', true);
+$thisElement = $form->getElement('username');
+$thisElement->_label = get_lang('UserName', null, 'spanish', true);
+$thisElement = $form->getElement('official_code');
+$thisElement->_label = get_lang('OfficialCode', null, 'spanish', true);
+$thisElement = $form->getElement('email');
+$thisElement->_label = get_lang('Email', null, 'spanish', true);
+$thisElement = $form->getElement('phone');
+$thisElement->_label = get_lang('Phone', null, 'spanish', true);
+$thisElement = $form->getElement('picture');
+$thisElement->_label = get_lang('UpdateImage', null, 'spanish', true);
+$thisElement = $form->getElement('language');
+$thisElement->_label = get_lang('Language', null, 'spanish', true);
+$thisElement = $form->getElement('password0');
+$thisElement->_label = get_lang('Pass', null, 'spanish', true);
+$thisElement = $form->getElement('password1');
+$thisElement->_label = get_lang('NewPass', null, 'spanish', true);
+$thisElement = $form->getElement('password2');
+$thisElement->_label = get_lang('PassTwo', null, 'spanish', true);
 
 $elements = $form->getElements();
 

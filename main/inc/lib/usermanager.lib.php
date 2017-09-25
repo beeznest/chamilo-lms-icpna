@@ -756,9 +756,11 @@ class UserManager
                 self::update_extra_field_value($userId, 'mail_notify_invitation', '1');
                 self::update_extra_field_value($userId, 'mail_notify_message', '1');
                 self::update_extra_field_value($userId, 'mail_notify_group_message', '1');
-            }*/
+            }
 
             self::update_extra_field_value($userId, 'already_logged_in', 'false');
+
+            */
 
             if (!empty($email) && $send_mail) {
                 $recipient_name = api_get_person_name(

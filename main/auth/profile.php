@@ -750,10 +750,13 @@ if ($actions) {
     );
 }
 
-$socialUserBlock = SocialManager::setSocialUserBlock($tpl, api_get_user_id(), 'messages', 0, true, true);
+$customPagesEnabled = CustomPages::enabled();
+$customPageExists = CustomPages::exists(CustomPages::PROFILE);
 
 if (api_get_setting('allow_social_tool') === 'true') {
     SocialManager::setSocialUserBlock($tpl, api_get_user_id(), 'home');
+    $socialUserBlock = SocialManager::setSocialUserBlock($tpl, api_get_user_id(), 'messages', 0, true, true);
+
     $menu = SocialManager::show_social_menu(
         'home',
         null,
@@ -763,39 +766,42 @@ if (api_get_setting('allow_social_tool') === 'true') {
     );
 
     // Enabled custom page for profile
-    if (CustomPages::enabled()) {
+    if ($customPagesEnabled && $customPageExists) {
         CustomPages::display(
             CustomPages::PROFILE,
             array('form' => $form, 'menu' => $menu, 'social' => $socialUserBlock)
         );
-    } else {
-        $tpl->assign('social_menu_block', $menu);
-        $tpl->assign('social_right_content', $form->returnForm());
-        $social_layout = $tpl->get_template('social/edit_profile.tpl');
-
-        $tpl->display($social_layout);
+        exit;
     }
-} else {
-    $bigImage = UserManager::getUserPicture(api_get_user_id(), USER_IMAGE_SIZE_BIG);
-    $normalImage = UserManager::getUserPicture(api_get_user_id(), USER_IMAGE_SIZE_ORIGINAL);
 
-    if (CustomPages::enabled()) {
-        CustomPages::display(
-            CustomPages::PROFILE,
-            [
-                'form' => $form,
-                'big_image' => $bigImage,
-                'normal_image' => $normalImage
-            ]
-        );
-    } else {
-        $imageToShow = '<div id="image-message-container">';
-        $imageToShow .= '<a class="expand-image" href="'.$bigImage.'" /><img src="'.$normalImage.'"></a>';
-        $imageToShow .= '</div>';
+    $tpl->assign('social_menu_block', $menu);
+    $tpl->assign('social_right_content', $form->returnForm());
+    $social_layout = $tpl->get_template('social/edit_profile.tpl');
 
-        $content = $imageToShow.$form->returnForm();
-
-        $tpl->assign('content', $content);
-        $tpl->display_one_col_template();
-    }
+    $tpl->display($social_layout);
+    exit;
 }
+
+$bigImage = UserManager::getUserPicture(api_get_user_id(), USER_IMAGE_SIZE_BIG);
+$normalImage = UserManager::getUserPicture(api_get_user_id(), USER_IMAGE_SIZE_ORIGINAL);
+
+if ($customPagesEnabled && $customPageExists) {
+    CustomPages::display(
+        CustomPages::PROFILE,
+        [
+            'form' => $form,
+            'big_image' => $bigImage,
+            'normal_image' => $normalImage
+        ]
+    );
+    exit;
+}
+
+$imageToShow = '<div id="image-message-container">';
+$imageToShow .= '<a class="expand-image" href="'.$bigImage.'" /><img src="'.$normalImage.'"></a>';
+$imageToShow .= '</div>';
+
+$content = $imageToShow.$form->returnForm();
+
+$tpl->assign('content', $content);
+$tpl->display_one_col_template();

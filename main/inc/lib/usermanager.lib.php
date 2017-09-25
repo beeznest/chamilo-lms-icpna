@@ -606,7 +606,7 @@ class UserManager
         $original_password = $password;
 
         $access_url_id = 1;
-        if (api_get_multiple_access_url()) {
+        /*if (api_get_multiple_access_url()) {
             $access_url_id = api_get_current_access_url_id();
         }
 
@@ -636,7 +636,7 @@ class UserManager
 
                 return false;
             }
-        }
+        }*/
 
         if (empty($password)) {
             if ($authSource === PLATFORM_AUTH_SOURCE) {
@@ -761,118 +761,6 @@ class UserManager
             self::update_extra_field_value($userId, 'already_logged_in', 'false');
 
             */
-
-            if (!empty($email) && $send_mail) {
-                $recipient_name = api_get_person_name(
-                    $firstName,
-                    $lastName,
-                    null,
-                    PERSON_NAME_EMAIL_ADDRESS
-                );
-                $tplSubject = new Template(
-                    null,
-                    false,
-                    false,
-                    false,
-                    false,
-                    false
-                );
-                $layoutSubject = $tplSubject->get_template(
-                    'mail/subject_registration_platform.tpl'
-                );
-                $emailSubject = $tplSubject->fetch($layoutSubject);
-                $sender_name = api_get_person_name(
-                    api_get_setting('administratorName'),
-                    api_get_setting('administratorSurname'),
-                    null,
-                    PERSON_NAME_EMAIL_ADDRESS
-                );
-                $email_admin = api_get_setting('emailAdministrator');
-
-                $url = api_get_path(WEB_PATH);
-                if (api_is_multiple_url_enabled()) {
-                    $access_url_id = api_get_current_access_url_id();
-                    if ($access_url_id != -1) {
-                        $urlInfo = api_get_access_url($access_url_id);
-                        if ($urlInfo) {
-                            $url = $urlInfo['url'];
-                        }
-                    }
-                }
-
-                $tplContent = new Template(null, false, false, false, false, false);
-                // variables for the default template
-                $tplContent->assign('complete_name', stripslashes(api_get_person_name($firstName, $lastName)));
-                $tplContent->assign('login_name', $loginName);
-                $tplContent->assign('original_password', stripslashes($original_password));
-                $tplContent->assign('mailWebPath', $url);
-                $tplContent->assign('new_user', $user);
-
-                $layoutContent = $tplContent->get_template('mail/content_registration_platform.tpl');
-                $emailBody = $tplContent->fetch($layoutContent);
-                /* MANAGE EVENT WITH MAIL */
-                if (EventsMail::check_if_using_class('user_registration')) {
-                    $values["about_user"] = $return;
-                    $values["password"] = $original_password;
-                    $values["send_to"] = array($return);
-                    $values["prior_lang"] = null;
-                    EventsDispatcher::events('user_registration', $values);
-                } else {
-                    $phoneNumber = isset($extra['mobile_phone_number']) ? $extra['mobile_phone_number'] : null;
-
-                    $additionalParameters = array(
-                        'smsType' => SmsPlugin::WELCOME_LOGIN_PASSWORD,
-                        'userId' => $return,
-                        'mobilePhoneNumber' => $phoneNumber,
-                        'password' => $original_password
-                    );
-
-                    api_mail_html(
-                        $recipient_name,
-                        $email,
-                        $emailSubject,
-                        $emailBody,
-                        $sender_name,
-                        $email_admin,
-                        null,
-                        null,
-                        null,
-                        $additionalParameters
-                    );
-                }
-
-                if ($sendEmailToAllAdmins) {
-                    $adminList = self::get_all_administrators();
-
-                    $tplContent = new Template(null, false, false, false, false, false);
-                    // variables for the default template
-                    $tplContent->assign('complete_name', stripslashes(api_get_person_name($firstName, $lastName)));
-                    $tplContent->assign('user_added', $user);
-
-                    $renderer = FormValidator::getDefaultRenderer();
-
-                    // Form template
-                    $elementTemplate = ' {label}: {element} <br />';
-                    $renderer->setElementTemplate($elementTemplate);
-                    /** @var FormValidator $form */
-                    $form->freeze(null, $elementTemplate);
-                    $form->removeElement('submit');
-                    $formData = $form->returnForm();
-                    $url = api_get_path(WEB_CODE_PATH).'admin/user_information.php?user_id='.$user->getId();
-                    $tplContent->assign('link', Display::url($url, $url));
-                    $tplContent->assign('form', $formData);
-
-                    $layoutContent = $tplContent->get_template('mail/content_registration_platform_to_admin.tpl');
-                    $emailBody = $tplContent->fetch($layoutContent);
-                    $subject = get_lang('UserAdded');
-
-                    foreach ($adminList as $adminId => $data) {
-                        MessageManager::send_message_simple($adminId, $subject, $emailBody);
-                    }
-
-                }
-                /* ENDS MANAGE EVENT WITH MAIL */
-            }
 
             if (!empty($hook)) {
                 $hook->setEventData(array(

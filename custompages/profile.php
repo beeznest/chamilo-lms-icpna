@@ -14,6 +14,28 @@ require_once __DIR__.'/language.php';
 /** @var \FormValidator $form */
 $form = isset($content['form']) ? $content['form'] : null;
 
+Display::display_header(get_lang('EditProfile', null, 'spanish', true));
+
+if (!$form->elementExists('extra_id_document') ||
+    !$form->elementExists('extra_middle_name') ||
+    !$form->elementExists('extra_mothers_name') ||
+    !$form->elementExists('extra_sex') ||
+    !$form->elementExists('extra_birthdate') ||
+    !$form->elementExists('extra_nationality') ||
+    !$form->elementExists('extra_address_ubigeo') ||
+    !$form->elementExists('extra_occupation_center_name_1') ||
+    !$form->elementExists('extra_occupation_center_name_2') ||
+    !$form->elementExists('extra_occupation_center_name_3') ||
+    !$form->elementExists('extra_occupation_center_name_4') ||
+    !$form->elementExists('extra_university_career') ||
+    !$form->elementExists('extra_guardian_id_document') ||
+    !$form->elementExists('extra_guardian_name') ||
+    !$form->elementExists('extra_guardian_email')) {
+    $form->display();
+    Display::display_footer();
+    exit;
+}
+
 /** @var \HTML_QuickForm_select $slctOccupationName1 */
 $slctOccupationName1 = $form->getElement('extra_occupation_center_name_1');
 $occupationName1 = $slctOccupationName1->getValue() ?: [];
@@ -35,28 +57,13 @@ $slctUniversityCarrer->clearOptions();
  * Removes some unwanted elementend of the form object
  */
 
-if (isset($form->_elementIndex['status'])) {
-    $form->removeElement('status');
-    $form->removeElement('status');
-}
-if (isset($form->_elementIndex['extra_skype'])) {
-    $form->removeElement('extra_skype');
-}
-if (isset($form->_elementIndex['extra_linkedin_url'])) {
-    $form->removeElement('extra_linkedin_url');
-}
-
-if (isset($form->_elementIndex['apply_change'])) {
-    $form->removeElement('apply_change');
-}
-
-if (isset($form->_elementIndex['extra_guardian_name'])) {
-    $form->removeElement('extra_guardian_name');
-}
-
-if (isset($form->_elementIndex['extra_guardian_email'])) {
-    $form->removeElement('extra_guardian_email');
-}
+$form->removeElement('status');
+$form->removeElement('status');
+$form->removeElement('extra_skype');
+$form->removeElement('extra_linkedin_url');
+$form->removeElement('apply_change');
+$form->removeElement('extra_guardian_name');
+$form->removeElement('extra_guardian_email');
 
 $form->addElement('html', '<div id="guardian_div">');
 $form->addElement('html', '
@@ -134,9 +141,6 @@ $thisElement->_label = get_lang('UserSex', null, 'spanish', true);
 //$thisElement = $form->getElement('password2');
 //$thisElement->_label = get_lang('PassTwo', null, 'spanish', true);
 
-$rootWeb = api_get_path('WEB_PATH');
-
-Display::display_header(get_lang('Registration', null, 'spanish', true));
 ?>
 
 <div class="row">

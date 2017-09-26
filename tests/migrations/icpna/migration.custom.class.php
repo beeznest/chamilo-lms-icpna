@@ -4264,6 +4264,8 @@ class MigrationCustom
                 );
             }
 
+            $cleanedBirthdayDateTime = self::cleanDateTimeFromWS($objectData->sdtFechaNacimiento);
+
             Database::query("UPDATE $t_user SET phone = {$objectData->vchTelefonoPersona} WHERE user_id = $userId");
 
             Database::query("UPDATE $t_ufv SET value = 'false' WHERE field_id = '{$extraData['already_logged_in']}' AND item_id = $userId");
@@ -4276,7 +4278,7 @@ class MigrationCustom
             Database::query("UPDATE $t_ufv SET value = '{$objectData->vchSegundoNombre}' WHERE field_id = '{$extraData['middle_name']}' AND item_id = $userId");
             Database::query("UPDATE $t_ufv SET value = '{$objectData->vchMaterno}' WHERE field_id = '{$extraData['mothers_name']}' AND item_id = $userId");
             Database::query("UPDATE $t_ufv SET value = '{$objectData->chrSexo}' WHERE field_id = '{$extraData['sex']}' AND item_id = $userId");
-            Database::query("UPDATE $t_ufv SET value = '{$objectData->sdtFechaNacimiento}' WHERE field_id = '{$extraData['birthdate']}' AND item_id = $userId");
+            Database::query("UPDATE $t_ufv SET value = '{$cleanedBirthdayDateTime}' WHERE field_id = '{$extraData['birthdate']}' AND item_id = $userId");
             Database::query("UPDATE $t_ufv SET value = '{$objectData->uididpaisorigen}' WHERE field_id = '{$extraData['nationality']}' AND item_id = $userId");
             Database::query("UPDATE $t_ufv SET value = '{$objectData->uidIdDepartamento}' WHERE field_id = '{$extraData['address_department']}' AND item_id = $userId");
             Database::query("UPDATE $t_ufv SET value = '{$objectData->uidIdProvincia}' WHERE field_id = '{$extraData['address_province']}' AND item_id = $userId");

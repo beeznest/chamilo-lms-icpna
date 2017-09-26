@@ -679,7 +679,7 @@ $form->insertElementBefore(
                 function onDepartmentSelected(selectedValue, $el) {
                     $el.empty().selectpicker('refresh');
 
-                    $.getJSON(url, {a: 'get_provincia', uidid: selectedValue}, function (response) {
+                    return $.getJSON(url, {a: 'get_provincia', uidid: selectedValue}, function (response) {
                         $('<option>', {value: '', text: '<?php echo get_lang('SelectAnOption') ?>'}).appendTo($el);
 
                         $.each(response, function (i, option) {
@@ -693,7 +693,7 @@ $form->insertElementBefore(
                 function onProvinceSelected(selectedValue, $el) {
                     $el.empty().selectpicker('refresh');
 
-                    $.getJSON(url, {a: 'get_distrito', uidid: selectedValue}, function (response) {
+                    return $.getJSON(url, {a: 'get_distrito', uidid: selectedValue}, function (response) {
                         $('<option>', {value: '', text: '<?php echo get_lang('SelectAnOption') ?>'}).appendTo($el);
 
                         $.each(response, function (i, option) {
@@ -761,17 +761,7 @@ $form->insertElementBefore(
                             xhrOccupationResponse,
                             xhrStudyCenterResponse
                         ) {
-                            var selectedDocumentTypeIndex = 0,
-                                selectedGuardianDocumentTypeIndex = 0;
-
                             $.each(docTypeResponse[0], function (i, option) {
-                                selectedDocumentTypeIndex = option.value == defaultValues.extra_id_document_type
-                                    ? i + 1
-                                    : selectedDocumentTypeIndex;
-                                selectedGuardianDocumentTypeIndex = option.value == defaultValues.extra_guardian_id_document_type
-                                    ? i + 1
-                                    : selectedGuardianDocumentTypeIndex;
-
                                 $('<option>', option).appendTo($slctDocument);
                                 $('<option>', option).appendTo($slctGuardianDocument);
                             });
@@ -793,19 +783,59 @@ $form->insertElementBefore(
                                 $('<option>', option).appendTo($slctOccupationName1);
                             });
 
-                            $slctDocument.prop('selectedIndex', selectedDocumentTypeIndex).selectpicker('refresh');
-                            $slctGuardianDocument.prop('selectedIndex', selectedGuardianDocumentTypeIndex).selectpicker('refresh');
-                            $slctNationality.selectpicker('refresh');
-                            $slctAddressDepartment.selectpicker('refresh');
-                            $slctOccupation.selectpicker('refresh');
-                            $slctOccupationDepartment.selectpicker('refresh');
-                            $slctOccupationName1.selectpicker('refresh');
+                            $slctDocument
+                                .val(defaultValues.extra_id_document_type)
+                                .selectpicker('refresh');
+                            $slctGuardianDocument
+                                .val(defaultValues.extra_guardian_id_document_type)
+                                .selectpicker('refresh');
+                            $slctNationality
+                                .val(defaultValues.extra_nationality)
+                                .selectpicker('refresh');
+                            $slctAddressDepartment
+                                .val(defaultValues.extra_address_department)
+                                .selectpicker('refresh');
+                            console.log(defaultValues.extra_occupation);
+                            $slctOccupation
+                                .val(defaultValues.extra_occupation)
+                                .selectpicker('refresh');
+                            $slctOccupationDepartment
+                                .val(defaultValues.extra_occupation_department)
+                                .selectpicker('refresh');
+                            $slctOccupationName1
+                                .selectpicker('refresh');
 
-                            onDocumentIdTypeSelected(selectedDocumentTypeIndex, $txtDocument);
-                            onDocumentIdTypeSelected(selectedGuardianDocumentTypeIndex, $txtGuardianDocument);
+                            onDocumentIdTypeSelected($slctDocument.prop('selectedIndex'), $txtDocument);
+                            onDocumentIdTypeSelected($slctGuardianDocument.prop('selectedIndex'), $txtGuardianDocument);
                             onStudentBirthday();
                             onMobileNumberLoad();
+                            onDepartmentSelected(defaultValues.extra_address_department, $slctAddressProvince)
+                                .done(function () {
+                                    $slctAddressProvince
+                                        .val(defaultValues.extra_address_province)
+                                        .selectpicker('refresh');
+
+                                    onProvinceSelected(defaultValues.extra_address_province, $slctAddressDistrict)
+                                        .done(function () {
+                                            $slctAddressDistrict
+                                                .val(defaultValues.extra_address_district)
+                                                .selectpicker('refresh');
+                                        });
+                                });
                             onOccupationSelected($slctOccupation.prop('selectedIndex'));
+                            onDepartmentSelected(defaultValues.extra_occupation_department, $slctOccupationProvince)
+                                .done(function () {
+                                    $slctOccupationProvince
+                                        .val(defaultValues.extra_occupation_province)
+                                        .selectpicker('refresh');
+
+                                    onProvinceSelected(defaultValues.extra_occupation_province, $slctOccupationDistrict)
+                                        .done(function () {
+                                            $slctOccupationDistrict
+                                                .val(defaultValues.extra_occupation_district)
+                                                .selectpicker('refresh');
+                                        })
+                                });
                         });
                 })();
 

@@ -4287,6 +4287,11 @@ class MigrationCustom
             Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->vchcelularPersona)."' WHERE field_id = '{$extraData['mobile_phone_number']}' AND item_id = $userId");
             Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->uidIdOcupacion)."' WHERE field_id = '{$extraData['occupation']}' AND item_id = $userId");
 
+            Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->strNombrePadre)."' WHERE field_id = '{$extraData['guardian_name']}' AND item_id = $userId");
+            Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->vchEmailApoderado)."' WHERE field_id = '{$extraData['guardian_email']}' AND item_id = $userId");
+            Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->uidIdDocumentoIdentidadPadre)."' WHERE field_id = '{$extraData['guardian_id_document_type']}' AND item_id = $userId");
+            Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->vchDocumentoNumeroPadre)."' WHERE field_id = '{$extraData['guardian_id_document_number']}' AND item_id = $userId");
+
             if (!empty($hook)) {
                 $hook->setEventData(array(
                     'return' => $userId,

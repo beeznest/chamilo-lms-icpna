@@ -16,102 +16,35 @@ $form = isset($content['form']) ? $content['form'] : null;
 
 Display::display_header(get_lang('EditProfile', null, 'spanish', true));
 
-if (!$form->elementExists('extra_id_document') ||
+if (!$form->elementExists('extra_id_document_type') ||
+    !$form->elementExists('extra_id_document_number') ||
     !$form->elementExists('extra_middle_name') ||
     !$form->elementExists('extra_mothers_name') ||
     !$form->elementExists('extra_sex') ||
     !$form->elementExists('extra_birthdate') ||
     !$form->elementExists('extra_nationality') ||
-    !$form->elementExists('extra_address_ubigeo') ||
+    !$form->elementExists('extra_address_department') ||
+    !$form->elementExists('extra_address_province') ||
+    !$form->elementExists('extra_address_district') ||
+    !$form->elementExists('extra_address') ||
+    !$form->elementExists('extra_mobile_phone_number') ||
+    !$form->elementExists('extra_occupation') ||
+    !$form->elementExists('extra_occupation_department') ||
+    !$form->elementExists('extra_occupation_province') ||
+    !$form->elementExists('extra_occupation_district') ||
     !$form->elementExists('extra_occupation_center_name_1') ||
     !$form->elementExists('extra_occupation_center_name_2') ||
     !$form->elementExists('extra_occupation_center_name_3') ||
     !$form->elementExists('extra_occupation_center_name_4') ||
     !$form->elementExists('extra_university_career') ||
-    !$form->elementExists('extra_guardian_id_document') ||
+    !$form->elementExists('extra_guardian_id_document_type') ||
+    !$form->elementExists('extra_guardian_id_document_number') ||
     !$form->elementExists('extra_guardian_name') ||
     !$form->elementExists('extra_guardian_email')) {
     $form->display();
     Display::display_footer();
     exit;
 }
-
-/** @var \HTML_QuickForm_select $slctOccupationName1 */
-$slctOccupationName1 = $form->getElement('extra_occupation_center_name_1');
-$occupationName1 = $slctOccupationName1->getValue() ?: [];
-$slctOccupationName1->clearOptions();
-/** @var \HTML_QuickForm_select $slctOccupationName2 */
-$slctOccupationName2 = $form->getElement('extra_occupation_center_name_2');
-$occupationName2 = $slctOccupationName2->getValue() ?: [];
-$slctOccupationName2->clearOptions();
-/** @var \HTML_QuickForm_select $slctOccupationName3 */
-$slctOccupationName3 = $form->getElement('extra_occupation_center_name_3');
-$occupationName3 = $slctOccupationName3->getValue() ?: [];
-$slctOccupationName3->clearOptions();
-/** @var \HTML_QuickForm_select $slctUniversityCarrer */
-$slctUniversityCarrer = $form->getElement('extra_university_career');
-$universityCarrer = $slctUniversityCarrer->getValue() ?: [];
-$slctUniversityCarrer->clearOptions();
-
-/**
- * Removes some unwanted elementend of the form object
- */
-
-$form->removeElement('status');
-$form->removeElement('status');
-$form->removeElement('extra_skype');
-$form->removeElement('extra_linkedin_url');
-$form->removeElement('apply_change');
-$form->removeElement('extra_guardian_name');
-$form->removeElement('extra_guardian_email');
-
-$form->addElement('html', '<div id="guardian_div">');
-$form->addElement('html', '
-<div class="form-group">
-    <div class="col-md-2"></div>
-    <div class="col-md-8">
-        <div class="alert alert-warning">
-            If you are under age it is necessary to register the data of your guardian
-        </div>
-    </div>
-    <div class="col-md-2"></div>
-</div>
-');
-$form->addText('extra_guardian_name', 'Nombre del apoderado');
-$form->addText('extra_guardian_email', 'Email del apoderado');
-$form->addElement('html', '</div>', 'guardian_section');
-$form->addElement('html', '
-<div class="form-group">
-    <div class="col-md-2"></div>
-    <div class="col-md-8">
-        <div class="terms alert alert-warning">Antes de guardar los datos, debes estar de acuerdo con nuestros
-            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#terms-conditions">
-                <b>términos y condiciones</b>
-            </button>
-        </div>
-    </div>
-    <div class="col-md-2"></div>
-</div>
-');
-
-if (is_profile_editable()) {
-    $form->addButtonUpdate(get_lang('SaveSettings'), 'apply_change');
-} else {
-    $form->freeze();
-}
-
-//Sort order of the form elements to match the custom profile page
-$currentLanguage = api_get_interface_language();
-
-if ($currentLanguage !== 'english') {
-    $form->insertElementBefore($form->removeElement('firstname', false), 'lastname');
-}
-
-$form->insertElementBefore($form->removeElement('extra_id_document', false), 'firstname');
-$form->insertElementBefore($form->removeElement('extra_middle_name', false), 'lastname');
-$form->insertElementBefore($form->removeElement('extra_middle_name', false), 'lastname');
-$form->insertElementBefore($form->removeElement('extra_mothers_name', false), 'username');
-$form->insertElementBefore($form->removeElement('extra_guardian_id_document', false), 'guardian_section');
 
 // Translate chamilo default profile elements
 $thisElement = $form->getElement('firstname');
@@ -141,6 +74,266 @@ $thisElement->_label = get_lang('UserSex', null, 'spanish', true);
 //$thisElement = $form->getElement('password2');
 //$thisElement->_label = get_lang('PassTwo', null, 'spanish', true);
 
+/**
+ * Removes some unwanted elementend of the form object
+ */
+if ($form->elementExists('status')) {
+    $form->removeElement('status');
+}
+if ($form->elementExists('extra_skype')) {
+    $form->removeElement('extra_skype');
+}
+if ($form->elementExists('extra_linkedin_url')) {
+    $form->removeElement('extra_linkedin_url');
+}
+if ($form->elementExists('apply_change')) {
+    $form->removeElement('apply_change');
+}
+
+$form->removeElement('extra_id_document_type');
+$form->addSelect(
+    'extra_id_document_type',
+    'Documento de identidad',
+    ['' => get_lang('SelectAnOption')],
+    ['id' => 'slct_extra_id_document_type']
+);
+
+/** @var \HTML_QuickForm_select $slctSex */
+$slctSex = $form->getElement('extra_sex');
+$slctSex->clearOptions();
+$slctSex->addOption('Masculino', 'M');
+$slctSex->addOption('Femenino', 'F');
+
+$form->removeElement('extra_nationality');
+$form->addSelect(
+    'extra_nationality',
+    'Nacionalidad',
+    ['' => get_lang('SelectAnOption')],
+    ['id' => 'extra_nationality']
+);
+
+$form->removeElement('extra_address_department');
+$form->addSelect(
+    'extra_address_department',
+    'Dirección (departamento)',
+    ['' => get_lang('SelectAnOption')],
+    ['id' => 'extra_address_department']
+);
+
+$form->removeElement('extra_address_province');
+$form->addSelect(
+    'extra_address_province',
+    'Dirección (provincia)',
+    ['' => get_lang('SelectAnOption')],
+    ['id' => 'extra_address_province']
+);
+
+$form->removeElement('extra_address_district');
+$form->addSelect(
+    'extra_address_district',
+    'Dirección (distrito)',
+    ['' => get_lang('SelectAnOption')],
+    ['id' => 'extra_address_district']
+);
+
+$form->removeElement('extra_occupation');
+$form->addSelect(
+    'extra_occupation',
+    'Ocupación',
+    ['' => get_lang('SelectAnOption')],
+    ['id' => 'extra_occupation']
+);
+
+$form->removeElement('extra_occupation_department');
+$form->addSelect(
+    'extra_occupation_department',
+    'Dirección del centro de estudios/laboral (departamento / provincia / distrito)',
+    ['' => get_lang('SelectAnOption')],
+    ['id' => 'extra_occupation_department']
+);
+
+$form->removeElement('extra_occupation_province');
+$form->addSelect(
+    'extra_occupation_province',
+    '',
+    ['' => get_lang('SelectAnOption')],
+    ['id' => 'extra_occupation_province']
+);
+
+$form->removeElement('extra_occupation_district');
+$form->addSelect(
+    'extra_occupation_district',
+    '',
+    ['' => get_lang('SelectAnOption')],
+    ['id' => 'extra_occupation_district']
+);
+
+$form->removeElement('extra_occupation_center_name_1');
+$form->addSelect(
+    'extra_occupation_center_name_1',
+    'Centro de estudios (escolar)',
+    ['' => get_lang('SelectAnOption')],
+    ['id' => 'extra_occupation_center_name_1']
+);
+
+$form->removeElement('extra_occupation_center_name_2');
+$form->addSelect(
+    'extra_occupation_center_name_2',
+    'Centro de estudios (técnico)',
+    ['' => get_lang('SelectAnOption')],
+    ['id' => 'extra_occupation_center_name_2']
+);
+
+$form->removeElement('extra_occupation_center_name_3');
+$form->addSelect(
+    'extra_occupation_center_name_3',
+    'Universidad',
+    ['' => get_lang('SelectAnOption')],
+    ['id' => 'extra_occupation_center_name_3']
+);
+
+$form->removeElement('extra_university_career');
+$form->addSelect(
+    'extra_university_career',
+    'Carrera universitaria',
+    ['' => get_lang('SelectAnOption')],
+    ['id' => 'extra_university_career']
+);
+
+$form->removeElement('extra_guardian_id_document_type');
+$form->addSelect(
+    'extra_guardian_id_document_type',
+    'Documento de identidad del apoderado',
+    ['' => get_lang('SelectAnOption')],
+    ['id' => 'extra_extra_guardian_id_document_type']
+);
+
+$occupationName1 = $occupationName2 = $occupationName3 = $universityCarrer = [];
+
+$form->removeElement('extra_guardian_name');
+$form->removeElement('extra_guardian_email');
+
+$form->addElement('html', '<div id="guardian_div">');
+$form->addElement('html', '
+<div class="form-group">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <div class="alert alert-warning">
+            If you are under age it is necessary to register the data of your guardian
+        </div>
+    </div>
+    <div class="col-md-2"></div>
+</div>
+', 'guardian_section');
+$form->addText('extra_guardian_name', 'Nombre del apoderado');
+$form->addText('extra_guardian_email', 'Email del apoderado');
+$form->addElement('html', '</div>');
+$form->addElement('html', '
+<div class="form-group">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <div class="terms alert alert-warning">Antes de guardar los datos, debes estar de acuerdo con nuestros
+            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#terms-conditions">
+                <b>términos y condiciones</b>
+            </button>
+        </div>
+    </div>
+    <div class="col-md-2"></div>
+</div>
+', 'terms');
+
+if (is_profile_editable()) {
+    $form->addButtonUpdate(get_lang('SaveSettings'), 'apply_change');
+} else {
+    $form->freeze();
+}
+
+//Sort order of the form elements to match the custom profile page
+$currentLanguage = api_get_interface_language();
+
+if ($currentLanguage !== 'english') {
+    $form->insertElementBefore(
+        $form->removeElement('firstname', false),
+        'lastname'
+    );
+}
+
+$form->insertElementBefore(
+    $form->removeElement('extra_id_document_number', false),
+    'firstname'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_id_document_type', false),
+    'extra_id_document_number'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_middle_name', false),
+    'lastname'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_mothers_name', false),
+    'username'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_guardian_id_document_number', false),
+    'terms'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_guardian_id_document_type', false),
+    'extra_guardian_id_document_number'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_guardian_id_document_type', false),
+    'extra_guardian_id_document_number'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_guardian_email', false),
+    'extra_guardian_id_document_type'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_university_career', false),
+    'guardian_section'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_occupation_center_name_4', false),
+    'extra_university_career'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_occupation_center_name_3', false),
+    'extra_occupation_center_name_4'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_occupation_center_name_2', false),
+    'extra_occupation_center_name_3'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_occupation_center_name_1', false),
+    'extra_occupation_center_name_2'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_occupation_district', false),
+    'extra_occupation_center_name_1'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_occupation_province', false),
+    'extra_occupation_district'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_occupation_department', false),
+    'extra_occupation_province'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_occupation', false),
+    'extra_occupation_department'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_mobile_phone_number', false),
+    'extra_occupation'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_address', false),
+    'extra_mobile_phone_number'
+);
 ?>
 
 <div class="row">
@@ -191,15 +384,15 @@ $thisElement->_label = get_lang('UserSex', null, 'spanish', true);
     <script>
         (function () {
             $(document).ready(function () {
-                var $slctDocument = $('#slct_extra_id_document'),
-                    $txtDocument = $('#txt_extra_id_document'),
+                var $slctDocument = $('#slct_extra_id_document_type'),
+                    $txtDocument = $('#txt_extra_id_document_number'),
                     $divGuardian = $('#guardian_div'),
                     $modalTitle = $('#title-modal'),
                     $modalText = $('#text-modal'),
                     $slctOccupation = $('#extra_occupation'),
-                    $slctOccupationLocationFirst = $('#first_extraoccupation_ubigeo'),
-                    $slctOccupationLocationSecond = $('#second_extraoccupation_ubigeo'),
-                    $slctOccupationLocationThird = $('#third_extraoccupation_ubigeo'),
+                    $slctOccupationDepartment = $('#extra_occupation_department'),
+                    $slctOccupationProvince = $('#extra_occupation_province'),
+                    $slctOccupationDistrict = $('#extra_occupation_district'),
                     $slctOccupationName1 = $('#extra_occupation_center_name_1'),
                     $slctOccupationName2 = $('#extra_occupation_center_name_2'),
                     $slctOccupationName3 = $('#extra_occupation_center_name_3'),
@@ -208,15 +401,17 @@ $thisElement->_label = get_lang('UserSex', null, 'spanish', true);
                     $txtGuardianName = $('#profile_extra_guardian_name'),
                     $txtGuardianEmail = $('#profile_extra_guardian_email'),
                     $txtGuardianDocument = $('#txt_extra_guardian_id_document'),
-                    $slctLocationFirst = $('#first_extraaddress_ubigeo'),
-                    $slctLocationSecond = $('#second_extraaddress_ubigeo'),
-                    $slctLocationThird = $('#third_extraaddress_ubigeo'),
+                    $slctAddressDepartment = $('#extra_address_department'),
+                    $slctAddressProvince = $('#extra_address_province'),
+                    $slctAddressDistrict = $('#extra_address_district'),
                     $slctLocation = $('#extra_address'),
                     $txtEmail = $('#profile_email'),
                     $slctSex = $('#extra_sex'),
-                    $txtNationality = $('#extra_nationality'),
+                    $slctNationality = $('#extra_nationality'),
                     $txtBirthdate = $('#extra_birthdate'),
-                    $txtMobilePhone = $('#profile_extra_mobile_phone_number');
+                    $txtMobilePhone = $('#profile_extra_mobile_phone_number'),
+                    $slctGuardianDocument = $('#extra_extra_guardian_id_document_type'),
+                    url = _p.web_plugin + 'icpna_update_user/ajax.php';
 
                 function onMobileNumberLoad () {
                     $txtMobilePhone.val(
@@ -404,9 +599,9 @@ $thisElement->_label = get_lang('UserSex', null, 'spanish', true);
                 }
 
                 function onOccupationLocation () {
-                    var firstValue = $slctOccupationLocationFirst.find('option:selected').data('value') || '',
-                        secondValue = $slctOccupationLocationSecond.find('option:selected').data('value') || '',
-                        thirdValue = $slctOccupationLocationThird.find('option:selected').data('value') || '',
+                    var firstValue = $slctOccupationDepartment.find('option:selected').data('value') || '',
+                        secondValue = $slctOccupationProvince.find('option:selected').data('value') || '',
+                        thirdValue = $slctOccupationDistrict.find('option:selected').data('value') || '',
                         modifiedIndex = $slctOccupation.prop('childElementCount') > 4 ? 0 : 1;
 
                     var ubigeo = firstValue + '' + secondValue + thirdValue;
@@ -486,11 +681,65 @@ $thisElement->_label = get_lang('UserSex', null, 'spanish', true);
                     }
                 }
 
-                onStudentDocument();
-                onStudentBirthday();
-                onMobileNumberLoad();
-                onOccupation();
-                onOccupationLocation();
+                (function () {
+                    var xhrDocumentIdType = $.getJSON(url, {a: 'get_tipodocumento'}),
+                        xhrNationality = $.getJSON(url, {a: 'get_nacionalidad'}),
+                        xhrDepartment = $.getJSON(url, {a: 'get_departamento'}),
+                        xhrOccupation = $.getJSON(url, {a: 'get_ocupacion'}),
+                        xhrStudyCenter = $.getJSON(url, {a: 'get_centroestudios'});
+
+                    $
+                        .when
+                        .apply($, [
+                            xhrDocumentIdType,
+                            xhrNationality,
+                            xhrDepartment,
+                            xhrOccupation,
+                            xhrStudyCenter
+                        ])
+                        .then(function (
+                            docTypeResponse,
+                            nationalityResponse,
+                            departmentResponse,
+                            xhrOccupationResponse,
+                            xhrStudyCenterResponse
+                        ) {
+                            $.each(docTypeResponse[0], function (i, option) {
+                                $('<option>', option).appendTo($slctDocument);
+                                $('<option>', option).appendTo($slctGuardianDocument);
+                            });
+
+                            $.each(nationalityResponse[0], function (i, option) {
+                                $('<option>', option).appendTo($slctNationality);
+                            });
+
+                            $.each(departmentResponse[0], function (i, option) {
+                                $('<option>', option).appendTo($slctAddressDepartment);
+                                $('<option>', option).appendTo($slctOccupationDepartment);
+                            });
+
+                            $.each(xhrOccupationResponse[0], function (i, option) {
+                                $('<option>', option).appendTo($slctOccupation);
+                            });
+
+                            $.each(xhrStudyCenterResponse[0], function (i, option) {
+                                $('<option>', option).appendTo($slctOccupation);
+                            });
+
+                            $slctDocument.selectpicker('refresh');
+                            $slctGuardianDocument.selectpicker('refresh');
+                            $slctNationality.selectpicker('refresh');
+                            $slctAddressDepartment.selectpicker('refresh');
+                            $slctOccupation.selectpicker('refresh');
+                            $slctOccupationDepartment.selectpicker('refresh');
+                        });
+                })();
+
+                //onStudentDocument();
+                //onStudentBirthday();
+                //onMobileNumberLoad();
+                //onOccupation();
+                //onOccupationLocation();
 
                 $slctDocument.attr('required', true).on('change', function () {
                     $txtDocument.val('');
@@ -502,23 +751,31 @@ $thisElement->_label = get_lang('UserSex', null, 'spanish', true);
                 $txtBirthdate.attr('required', true).change(function () {
                     onStudentBirthday()
                 });
-                $txtNationality.attr('required', true);
-                $slctLocationFirst.attr('required', true);
-                $slctLocationSecond.attr('required', true);
-                $slctLocationThird.attr('required', true);
+                $slctNationality.attr('required', true);
+                $slctAddressDepartment.attr('required', true).on('change', function () {
+                    var value = $(this).val();
+
+                    $.getJSON(url, {a: 'get_provincia', uidid: value}, function (response) {
+                        $.each(response, function (option) {
+                            $('<option>', option).appendTo($slctAddressProvince);
+                        });
+                    });
+                });
+                $slctAddressProvince.attr('required', true);
+                $slctAddressDistrict.attr('required', true);
                 $slctLocation.attr('required', true);
                 $txtMobilePhone.attr('required', true);
                 $slctOccupation.on('change', function () {
                     onOccupation();
                     onOccupationLocation();
                 });
-                $slctOccupationLocationFirst.attr('required', true).on('change', function () {
+                $slctOccupationDepartment.attr('required', true).on('change', function () {
                     onOccupationLocation();
                 });
-                $slctOccupationLocationSecond.attr('required', true).on('change', function () {
+                $slctOccupationProvince.attr('required', true).on('change', function () {
                     onOccupationLocation();
                 });
-                $slctOccupationLocationThird.attr('required', true).on('change', function () {
+                $slctOccupationDistrict.attr('required', true).on('change', function () {
                     onOccupationLocation();
                 });
             });

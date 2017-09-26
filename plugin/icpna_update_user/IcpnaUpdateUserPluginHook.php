@@ -25,9 +25,20 @@ class IcpnaUpdateUserPluginHook extends HookObserver implements HookUpdateUserOb
     public function hookUpdateUser(HookUpdateUserEventInterface $hook)
     {
         $data = $hook->getEventData();
-        error_log(print_r($data['type'], true));
 
         if ($data['type'] !== HOOK_EVENT_TYPE_POST) {
+            return $data;
+        }
+
+        $webServiceUri = 'http://www25.icpna.edu.pe:86/wsdatospersonales/webservice.asmx';
+
+        try {
+            $client = new SoapClient(null, [
+                'location' => $webServiceUri,
+                'uri' => $webServiceUri
+            ]);
+            $client->__soapCall('actualizadatospersonales', []);
+        } catch (Exception $e) {
             return $data;
         }
 

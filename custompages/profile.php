@@ -14,6 +14,8 @@ require_once __DIR__.'/language.php';
 /** @var \FormValidator $form */
 $form = isset($content['form']) ? $content['form'] : null;
 
+$defaultValues = $form->exportValues();
+
 Display::display_header(get_lang('EditProfile', null, 'spanish', true));
 
 if (!$form->elementExists('extra_id_document_type') ||
@@ -327,8 +329,6 @@ $form->addSelect(
     ['id' => 'extra_guardian_id_document_type']
 );
 
-$occupationName1 = $occupationName2 = $occupationName3 = $universityCarrer = [];
-
 $form->removeElement('extra_guardian_name');
 $form->addText('extra_guardian_name', 'Nombre del apoderado', false);
 
@@ -533,7 +533,7 @@ $form->insertElementBefore(
                     );
                 }
 
-                function onDocumentIdType (selectedIndex, $el) {
+                function onDocumentIdTypeSelected (selectedIndex, $el) {
                     switch (selectedIndex) {
                         case 1:
                             $el.attr({
@@ -676,33 +676,35 @@ $form->insertElementBefore(
                     $divGuardian.show();
                 }
 
-                function onDepartment(selectedValue, $el)
-                {
-                    $el.empty();
+                function onDepartmentSelected(selectedValue, $el) {
+                    $el.empty().selectpicker('refresh');
 
                     $.getJSON(url, {a: 'get_provincia', uidid: selectedValue}, function (response) {
                         $('<option>', {value: '', text: '<?php echo get_lang('SelectAnOption') ?>'}).appendTo($el);
 
-                        $.each(response, function (option) {
+                        $.each(response, function (i, option) {
                             $('<option>', option).appendTo($el);
                         });
+
+                        $el.selectpicker('refresh');
                     });
                 }
 
-                function onProvince(selectedValue, $el)
-                {
-                    $el.empty();
+                function onProvinceSelected(selectedValue, $el) {
+                    $el.empty().selectpicker('refresh');
 
                     $.getJSON(url, {a: 'get_distrito', uidid: selectedValue}, function (response) {
                         $('<option>', {value: '', text: '<?php echo get_lang('SelectAnOption') ?>'}).appendTo($el);
 
-                        $.each(response, function (option) {
+                        $.each(response, function (i, option) {
                             $('<option>', option).appendTo($el);
                         });
+
+                        $el.selectpicker('refresh');
                     });
                 }
 
-                function onOccupation () {
+                function onOccupationSelected (selectedIndex) {
                     $slctOccupationName1.parents('.form-group').hide();
                     $slctOccupationName2.parents('.form-group').hide();
                     $slctOccupationName3.parents('.form-group').hide();
@@ -715,109 +717,28 @@ $form->insertElementBefore(
                     $txtOccupationName4.removeAttr('required');
                     $slctUniCarrers.removeAttr('required');
 
-                    var modifiedIndex = $slctOccupation.prop('childElementCount') > 4 ? 0 : 1;
-
-                    switch ($slctOccupation.prop('selectedIndex')) {
-                        case 1 - modifiedIndex:
+                    switch (selectedIndex) {
+                        case 1:
                             $slctOccupationName1.attr('required', true).parents('.form-group').show();
                             break;
-                        case 2 - modifiedIndex:
+                        case 2:
                             $slctOccupationName2.attr('required', true).parents('.form-group').show();
                             break;
-                        case 3 - modifiedIndex:
+                        case 3:
                             $slctOccupationName3.attr('required', true).parents('.form-group').show();
                             $slctUniCarrers.attr('required', true).parents('.form-group').show();
                             break;
-                        case 4 - modifiedIndex:
+                        case 4:
+                            //no break
+                        case 5:
                             $txtOccupationName4.attr('required', true).parents('.form-group').show();
                             break;
                     }
                 }
 
-                function onOccupationLocation () {
-                    var firstValue = $slctOccupationDepartment.find('option:selected').data('value') || '',
-                        secondValue = $slctOccupationProvince.find('option:selected').data('value') || '',
-                        thirdValue = $slctOccupationDistrict.find('option:selected').data('value') || '',
-                        modifiedIndex = $slctOccupation.prop('childElementCount') > 4 ? 0 : 1;
-
-                    var ubigeo = firstValue + '' + secondValue + thirdValue;
-
-                    function addOptions($el, options) {
-                        $el
-                            .empty()
-                            .append(
-                                $('<option>', {value: '', text: '<?php echo get_lang('SelectAnOption') ?>'})
-                            );
-
-                        $.each(options, function (index, option) {
-                            var valueParts = option.display_text.split('#'),
-                                dataValue = valueParts.length > 1 ? valueParts.shift() : '';
-
-                            $el.append(
-                                $('<option>', {
-                                    value: option.option_value,
-                                    text: valueParts.join(''),
-                                    'data-value': dataValue
-                                })
-                            );
-                        });
-
-                        $el.selectpicker('refresh');
-                    }
-
-                    switch ($slctOccupation.prop('selectedIndex')) {
-                        case 1 - modifiedIndex:
-                            $.getJSON(_p.web_ajax + 'extra_field.ajax.php', {
-                                a: 'filter_select_options',
-                                type: 'user',
-                                field_variable: 'occupation_center_name_1',
-                                filter_by: ubigeo
-                            }, function (options) {
-                                addOptions($slctOccupationName1, options);
-                                $slctOccupationName1
-                                    .selectpicker('val', ['<?php echo implode("', '", $occupationName1) ?>']);
-                            });
-                            break;
-                        case 2 - modifiedIndex:
-                            $.getJSON(_p.web_ajax + 'extra_field.ajax.php', {
-                                a: 'filter_select_options',
-                                type: 'user',
-                                field_variable: 'occupation_center_name_2',
-                                filter_by: ubigeo
-                            }, function (options) {
-                                addOptions($slctOccupationName2, options);
-                                $slctOccupationName2
-                                    .selectpicker('val', ['<?php echo implode("', '", $occupationName2) ?>']);
-                            });
-                            break;
-                        case 3 - modifiedIndex:
-                            $.getJSON(_p.web_ajax + 'extra_field.ajax.php', {
-                                a: 'filter_select_options',
-                                type: 'user',
-                                field_variable: 'occupation_center_name_3',
-                                filter_by: firstValue + '' + secondValue
-                            }, function (options) {
-                                addOptions($slctOccupationName3, options);
-                                $slctOccupationName3
-                                    .selectpicker('val', ['<?php echo implode("', '", $occupationName3) ?>']);
-                            });
-                            $.getJSON(_p.web_ajax + 'extra_field.ajax.php', {
-                                a: 'filter_select_options',
-                                type: 'user',
-                                field_variable: 'university_career',
-                                filter_by: ''
-                            }, function (options) {
-                                addOptions($slctUniCarrers, options);
-                                $slctUniCarrers
-                                    .selectpicker('val', ['<?php echo implode("', '", $universityCarrer) ?>']);
-                            });
-                            break;
-                        case 4 - modifiedIndex:
-                            break;
-                    }
-                }
-
                 (function () {
+                    var defaultValues = <?php echo json_encode($defaultValues); ?>;
+
                     var xhrDocumentIdType = $.getJSON(url, {a: 'get_tipodocumento'}),
                         xhrNationality = $.getJSON(url, {a: 'get_nacionalidad'}),
                         xhrDepartment = $.getJSON(url, {a: 'get_departamento'}),
@@ -840,7 +761,17 @@ $form->insertElementBefore(
                             xhrOccupationResponse,
                             xhrStudyCenterResponse
                         ) {
+                            var selectedDocumentTypeIndex = 0,
+                                selectedGuardianDocumentTypeIndex = 0;
+
                             $.each(docTypeResponse[0], function (i, option) {
+                                selectedDocumentTypeIndex = option.value == defaultValues.extra_id_document_type
+                                    ? i + 1
+                                    : selectedDocumentTypeIndex;
+                                selectedGuardianDocumentTypeIndex = option.value == defaultValues.extra_guardian_id_document_type
+                                    ? i + 1
+                                    : selectedGuardianDocumentTypeIndex;
+
                                 $('<option>', option).appendTo($slctDocument);
                                 $('<option>', option).appendTo($slctGuardianDocument);
                             });
@@ -862,24 +793,25 @@ $form->insertElementBefore(
                                 $('<option>', option).appendTo($slctOccupationName1);
                             });
 
-                            $slctDocument.selectpicker('refresh');
-                            $slctGuardianDocument.selectpicker('refresh');
+                            $slctDocument.prop('selectedIndex', selectedDocumentTypeIndex).selectpicker('refresh');
+                            $slctGuardianDocument.prop('selectedIndex', selectedGuardianDocumentTypeIndex).selectpicker('refresh');
                             $slctNationality.selectpicker('refresh');
                             $slctAddressDepartment.selectpicker('refresh');
                             $slctOccupation.selectpicker('refresh');
                             $slctOccupationDepartment.selectpicker('refresh');
                             $slctOccupationName1.selectpicker('refresh');
+
+                            onDocumentIdTypeSelected(selectedDocumentTypeIndex, $txtDocument);
+                            onDocumentIdTypeSelected(selectedGuardianDocumentTypeIndex, $txtGuardianDocument);
+                            onStudentBirthday();
+                            onMobileNumberLoad();
+                            onOccupationSelected($slctOccupation.prop('selectedIndex'));
                         });
                 })();
 
-                onStudentBirthday();
-                onMobileNumberLoad();
-                //onOccupation();
-                //onOccupationLocation();
-
                 $slctDocument.attr('required', true).on('change', function () {
                     $txtDocument.val('');
-                    onDocumentIdType(this.selectedIndex, $txtDocument);
+                    onDocumentIdTypeSelected(this.selectedIndex, $txtDocument);
                 });
                 $txtDocument.attr('required', true);
                 $txtFirstname.attr('required', true);
@@ -891,28 +823,29 @@ $form->insertElementBefore(
                 });
                 $slctNationality.attr('required', true);
                 $slctAddressDepartment.attr('required', true).on('change', function () {
-                    onDepartment(this.value, $slctAddressProvince);
+                    onDepartmentSelected(this.value, $slctAddressProvince);
+                    $slctAddressDistrict.empty().selectpicker('refresh');
                 });
-                $slctAddressProvince.attr('required', true);
+                $slctAddressProvince.attr('required', true).on('change', function () {
+                    onProvinceSelected(this.value, $slctAddressDistrict);
+                });
                 $slctAddressDistrict.attr('required', true);
                 $slctLocation.attr('required', true);
                 $txtMobilePhone.attr('required', true);
-                $slctOccupation.on('change', function () {
-                    onOccupation();
-                    onOccupationLocation();
+                $slctOccupation.attr('required', true).on('change', function () {
+                    onOccupationSelected(this.selectedIndex);
                 });
                 $slctOccupationDepartment.attr('required', true).on('change', function () {
-                    onDepartment(this.value, $slctAddressProvince);
+                    onDepartmentSelected(this.value, $slctOccupationProvince);
+                    $slctOccupationDistrict.empty().selectpicker('refresh');
                 });
                 $slctOccupationProvince.attr('required', true).on('change', function () {
-                    onOccupationLocation();
+                    onProvinceSelected(this.value, $slctOccupationDistrict);
                 });
-                $slctOccupationDistrict.attr('required', true).on('change', function () {
-                    onOccupationLocation();
-                });
+                $slctOccupationDistrict.attr('required', true);
                 $slctGuardianDocument.on('change', function () {
-                    $txtDocument.val('');
-                    onDocumentIdType(this.selectedIndex, $txtGuardianDocument);
+                    $txtGuardianDocument.val('');
+                    onDocumentIdTypeSelected(this.selectedIndex, $txtGuardianDocument);
                 });
             });
         })();

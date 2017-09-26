@@ -81,10 +81,8 @@ $formRenderer->setElementTemplate(
         <div class="form-group {error_class}">
             <label {label-for} class="col-sm-2 control-label {extra_label_class}" >{label}</label>
             <div class="col-sm-4">
-                <p>
-                    {element}
-                    <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
-                </p>
+                {element}
+                <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
             </div>
     ',
     'extra_id_document_type'
@@ -92,10 +90,8 @@ $formRenderer->setElementTemplate(
 $formRenderer->setElementTemplate(
     '
             <div class="col-sm-4">
-                <p>
-                    {element}
-                    <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
-                </p>
+                {element}
+                <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
             </div>
         </div>        
     ',
@@ -217,12 +213,13 @@ $form->addSelect(
     'extra_id_document_type',
     'Documento de identidad',
     ['' => get_lang('SelectAnOption')],
-    ['id' => 'slct_extra_id_document_type']
+    ['id' => 'extra_id_document_type']
 );
 
 /** @var \HTML_QuickForm_select $slctSex */
 $slctSex = $form->getElement('extra_sex');
 $slctSex->clearOptions();
+$slctSex->addOption(get_lang('SelectAnOption'), '');
 $slctSex->addOption('Masculino', 'M');
 $slctSex->addOption('Femenino', 'F');
 
@@ -327,7 +324,7 @@ $form->addSelect(
     'extra_guardian_id_document_type',
     'Documento de identidad del apoderado',
     ['' => get_lang('SelectAnOption')],
-    ['id' => 'extra_extra_guardian_id_document_type']
+    ['id' => 'extra_guardian_id_document_type']
 );
 
 $occupationName1 = $occupationName2 = $occupationName3 = $universityCarrer = [];
@@ -497,8 +494,10 @@ $form->insertElementBefore(
     <script>
         (function () {
             $(document).ready(function () {
-                var $slctDocument = $('#slct_extra_id_document_type'),
-                    $txtDocument = $('#txt_extra_id_document_number'),
+                var $slctDocument = $('#extra_id_document_type'),
+                    $txtDocument = $('#extra_id_document_number'),
+                    $txtFirstname = $('#profile_firstname'),
+                    $txtLastname = $('#profile_lastname'),
                     $divGuardian = $('#guardian_div'),
                     $modalTitle = $('#title-modal'),
                     $modalText = $('#text-modal'),
@@ -513,7 +512,8 @@ $form->insertElementBefore(
                     $slctUniCarrers = $('#extra_university_career'),
                     $txtGuardianName = $('#profile_extra_guardian_name'),
                     $txtGuardianEmail = $('#profile_extra_guardian_email'),
-                    $txtGuardianDocument = $('#txt_extra_guardian_id_document'),
+                    $slctGuardianDocument = $('#extra_guardian_id_document_type'),
+                    $txtGuardianDocument = $('#extra_guardian_id_document_number'),
                     $slctAddressDepartment = $('#extra_address_department'),
                     $slctAddressProvince = $('#extra_address_province'),
                     $slctAddressDistrict = $('#extra_address_district'),
@@ -523,7 +523,6 @@ $form->insertElementBefore(
                     $slctNationality = $('#extra_nationality'),
                     $txtBirthdate = $('#extra_birthdate'),
                     $txtMobilePhone = $('#profile_extra_mobile_phone_number'),
-                    $slctGuardianDocument = $('#extra_extra_guardian_id_document_type'),
                     url = _p.web_plugin + 'icpna_update_user/ajax.php';
 
                 function onMobileNumberLoad () {
@@ -534,34 +533,28 @@ $form->insertElementBefore(
                     );
                 }
 
-                function onStudentDocument () {
-                    switch ($slctDocument.prop('selectedIndex')) {
+                function onDocumentIdType (selectedIndex, $el) {
+                    switch (selectedIndex) {
                         case 1:
-                            $txtDocument
-                                .attr({
-                                    pattern: '\\d{8}',
-                                    maxlength: '8',
-                                    title: '<?php echo get_lang('OnlyNumbers') ?>',
-                                    required: true
-                                });
+                            $el.attr({
+                                pattern: '\\d{8}',
+                                maxlength: '8',
+                                title: '<?php echo get_lang('OnlyNumbers') ?>'
+                            });
                             break;
                         case 2:
-                            $txtDocument
-                                .attr({
-                                    pattern: '[a-zA-Z0-9]+',
-                                    maxlength: '',
-                                    title: '<?php echo get_lang('OnlyLettersAndNumbers') ?>',
-                                    required: true
-                                });
+                            $el.attr({
+                                pattern: '[a-zA-Z0-9]+',
+                                maxlength: '',
+                                title: '<?php echo get_lang('OnlyLettersAndNumbers') ?>'
+                            });
                             break;
                         case 3:
-                            $txtDocument
-                                .attr({
-                                    pattern: '\\d{9}',
-                                    maxlength: '9',
-                                    title: '<?php echo get_lang('OnlyNumbers') ?>',
-                                    required: true
-                                });
+                            $el.attr({
+                                pattern: '\\d{9}',
+                                maxlength: '9',
+                                title: '<?php echo get_lang('OnlyNumbers') ?>'
+                            });
                             break;
                     }
                 }
@@ -583,6 +576,7 @@ $form->insertElementBefore(
                 function onStudentBirthday () {
                     $txtGuardianName.removeAttr('required');
                     $txtGuardianEmail.removeAttr('required');
+                    $slctGuardianDocument.removeAttr('required');
                     $txtGuardianDocument.removeAttr('required');
 
                     var age = checkAge();
@@ -615,8 +609,12 @@ $form->insertElementBefore(
                         return;
                     }
 
+                    $txtGuardianName.attr('required', true);
+                    $txtGuardianEmail.attr('required', true);
+                    $slctGuardianDocument.attr('required', true);
+                    $txtGuardianDocument.attr('required', true);
+
                     if (age >= 14 && age < 18) {
-                        $txtGuardianName.attr('required', true);
                         $modalTitle.html(
                             '<h3>DECLARACION DE PROTECCION DE DATOS PERSONALES MAYOR DE 14 Y MENOR A 18 AÑOS</h3>'
                         );
@@ -649,7 +647,6 @@ $form->insertElementBefore(
                         return;
                     }
 
-                    $txtGuardianName.attr('required', true);
                     $modalTitle.html(
                         '<h3>DECLARACION DE PROTECCION DE DATOS PERSONALES MENOR DE 14 AÑOS DE EDAD</h3>'
                     );
@@ -677,6 +674,32 @@ $form->insertElementBefore(
                     );
 
                     $divGuardian.show();
+                }
+
+                function onDepartment(selectedValue, $el)
+                {
+                    $el.empty();
+
+                    $.getJSON(url, {a: 'get_provincia', uidid: selectedValue}, function (response) {
+                        $('<option>', {value: '', text: '<?php echo get_lang('SelectAnOption') ?>'}).appendTo($el);
+
+                        $.each(response, function (option) {
+                            $('<option>', option).appendTo($el);
+                        });
+                    });
+                }
+
+                function onProvince(selectedValue, $el)
+                {
+                    $el.empty();
+
+                    $.getJSON(url, {a: 'get_distrito', uidid: selectedValue}, function (response) {
+                        $('<option>', {value: '', text: '<?php echo get_lang('SelectAnOption') ?>'}).appendTo($el);
+
+                        $.each(response, function (option) {
+                            $('<option>', option).appendTo($el);
+                        });
+                    });
                 }
 
                 function onOccupation () {
@@ -849,17 +872,18 @@ $form->insertElementBefore(
                         });
                 })();
 
-                //onStudentDocument();
-                //onStudentBirthday();
-                //onMobileNumberLoad();
+                onStudentBirthday();
+                onMobileNumberLoad();
                 //onOccupation();
                 //onOccupationLocation();
 
                 $slctDocument.attr('required', true).on('change', function () {
                     $txtDocument.val('');
-                    onStudentDocument();
+                    onDocumentIdType(this.selectedIndex, $txtDocument);
                 });
                 $txtDocument.attr('required', true);
+                $txtFirstname.attr('required', true);
+                $txtLastname.attr('required', true);
                 $txtEmail.attr('required', true);
                 $slctSex.attr('required', true);
                 $txtBirthdate.attr('required', true).change(function () {
@@ -867,13 +891,7 @@ $form->insertElementBefore(
                 });
                 $slctNationality.attr('required', true);
                 $slctAddressDepartment.attr('required', true).on('change', function () {
-                    var value = $(this).val();
-
-                    $.getJSON(url, {a: 'get_provincia', uidid: value}, function (response) {
-                        $.each(response, function (option) {
-                            $('<option>', option).appendTo($slctAddressProvince);
-                        });
-                    });
+                    onDepartment(this.value, $slctAddressProvince);
                 });
                 $slctAddressProvince.attr('required', true);
                 $slctAddressDistrict.attr('required', true);
@@ -884,13 +902,17 @@ $form->insertElementBefore(
                     onOccupationLocation();
                 });
                 $slctOccupationDepartment.attr('required', true).on('change', function () {
-                    onOccupationLocation();
+                    onDepartment(this.value, $slctAddressProvince);
                 });
                 $slctOccupationProvince.attr('required', true).on('change', function () {
                     onOccupationLocation();
                 });
                 $slctOccupationDistrict.attr('required', true).on('change', function () {
                     onOccupationLocation();
+                });
+                $slctGuardianDocument.on('change', function () {
+                    $txtDocument.val('');
+                    onDocumentIdType(this.selectedIndex, $txtGuardianDocument);
                 });
             });
         })();

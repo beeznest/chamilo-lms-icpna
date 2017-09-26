@@ -4174,9 +4174,6 @@ class MigrationCustom
 
         $original_password = $password;
 
-        // database table definition
-        $table_user = Database::get_main_table(TABLE_MAIN_USER);
-
         $language = api_get_setting('platformLanguage');
 
         if (!empty($currentUserId)) {
@@ -4186,8 +4183,19 @@ class MigrationCustom
         }
 
         $now = new DateTime();
+        $now = $now->format('Y-m-d H:i:s');
 
         $t_user = Database::get_main_table(TABLE_MAIN_USER);
+
+        $username = Database::escape_string($loginName);
+        $sql = "SELECT id FROM $t_user WHERE username = '$username'";
+        $res = Database::query($sql);
+        $count = Database::num_rows($res);
+        if ($count > 0) {
+            //user already exists, return
+            error_log('El usuario ya existe en la plataforma');
+            return false;
+        }
 
         $userId = Database::insert($t_user, [
             'username' => $loginName,
@@ -4205,15 +4213,16 @@ class MigrationCustom
             'picture_uri' => '',
             'creator_id' => $creator_id,
             'language' => $language,
-            'registration_date' => $now->format('Y-m-d H:i:s'),
+            'registration_date' => $now,
             'hr_dept_id' => 0,
             'active' => 1,
             'enabled' => 1
         ]);
 
         if (!empty($userId)) {
+
             $return = $userId;
-            $sql = "UPDATE $table_user SET user_id = $return WHERE id = $return";
+            $sql = "UPDATE $t_user SET user_id = $return WHERE id = $return";
             Database::query($sql);
 
             if (api_get_multiple_access_url()) {
@@ -4249,32 +4258,32 @@ class MigrationCustom
                         'field_id' => $id,
                         'value' => '',
                         'item_id' => $userId,
-                        'created_at' => $now->format('Y-m-d H:i:s'),
-                        'updated_at' => $now->format('Y-m-d H:i:s')
+                        'created_at' => $now,
+                        'updated_at' => $now
                     ]
                 );
             }
 
-            Database::update($t_user, ['phone' => $objectData->vchTelefonoPersona], ['user_id = ?' => $userId]);
+            Database::query("UPDATE $t_user SET phone = {$objectData->vchTelefonoPersona} WHERE user_id = $userId");
 
-            Database::update($t_ufv, ['value' => false], ['field_id = ? AND item_id = ?' => [$extraData['already_logged_in'], $userId]]);
-            Database::update($t_ufv, ['value' => 1], ['field_id = ? AND item_id = ?' => [$extraData['mail_notify_group_message'], $userId]]);
-            Database::update($t_ufv, ['value' => 1], ['field_id = ? AND item_id = ?' => [$extraData['mail_notify_invitation'], $userId]]);
-            Database::update($t_ufv, ['value' => 1], ['field_id = ? AND item_id = ?' => [$extraData['mail_notify_message'], $userId]]);
+            Database::query("UPDATE $t_ufv SET value = 'false' WHERE field_id = '{$extraData['already_logged_in']}' AND item_id = $userId");
+            Database::query("UPDATE $t_ufv SET value = 1 WHERE field_id = '{$extraData['mail_notify_group_message']}' AND item_id = $userId");
+            Database::query("UPDATE $t_ufv SET value = 1 WHERE field_id = '{$extraData['mail_notify_invitation']}' AND item_id = $userId");
+            Database::query("UPDATE $t_ufv SET value = 1 WHERE field_id = '{$extraData['mail_notify_message']}' AND item_id = $userId");
 
-            Database::update($t_ufv, ['value' => $objectData->uidIdDocumentoIdentidad], ['field_id = ? AND item_id = ?' => [$extraData['id_document_type'], $userId]]);
-            Database::update($t_ufv, ['value' => $objectData->vchDocumentoNumero], ['field_id = ? AND item_id = ?' => [$extraData['id_document_number'], $userId]]);
-            Database::update($t_ufv, ['value' => $objectData->vchSegundoNombre], ['field_id = ? AND item_id = ?' => [$extraData['middle_name'], $userId]]);
-            Database::update($t_ufv, ['value' => $objectData->vchMaterno], ['field_id = ? AND item_id = ?' => [$extraData['mothers_name'], $userId]]);
-            Database::update($t_ufv, ['value' => $objectData->chrSexo], ['field_id = ? AND item_id = ?' => [$extraData['sex'], $userId]]);
-            Database::update($t_ufv, ['value' => $objectData->sdtFechaNacimiento], ['field_id = ? AND item_id = ?' => [$extraData['birthdate'], $userId]]);
-            Database::update($t_ufv, ['value' => $objectData->uididpaisorigen], ['field_id = ? AND item_id = ?' => [$extraData['nationality'],  $userId]]);
-            Database::update($t_ufv, ['value' => $objectData->uidIdDepartamento], ['field_id = ? AND item_id = ?' => [$extraData['address_department'],  $userId]]);
-            Database::update($t_ufv, ['value' => $objectData->uidIdProvincia], ['field_id = ? AND item_id = ?' => [$extraData['address_province'],  $userId]]);
-            Database::update($t_ufv, ['value' => $objectData->uidIdDistrito], ['field_id = ? AND item_id = ?' => [$extraData['address_district'],  $userId]]);
-            Database::update($t_ufv, ['value' => $objectData->vchDireccionPersona], ['field_id = ? AND item_id = ?' => [$extraData['address'], $userId]]);
-            Database::update($t_ufv, ['value' => $objectData->vchcelularPersona], ['field_id = ? AND item_id = ?' => [$extraData['mobile_phone_number'], $userId]]);
-            Database::update($t_ufv, ['value' => $objectData->uidIdOcupacion], ['field_id = ? AND item_id = ?' => [$extraData['occupation'],  $userId]]);
+            Database::query("UPDATE $t_ufv SET value = '{$objectData->uidIdDocumentoIdentidad}' WHERE field_id = '{$extraData['id_document_type']}' AND item_id = $userId");
+            Database::query("UPDATE $t_ufv SET value = '{$objectData->vchDocumentoNumero}' WHERE field_id = '{$extraData['id_document_number']}' AND item_id = $userId");
+            Database::query("UPDATE $t_ufv SET value = '{$objectData->vchSegundoNombre}' WHERE field_id = '{$extraData['middle_name']}' AND item_id = $userId");
+            Database::query("UPDATE $t_ufv SET value = '{$objectData->vchMaterno}' WHERE field_id = '{$extraData['mothers_name']}' AND item_id = $userId");
+            Database::query("UPDATE $t_ufv SET value = '{$objectData->chrSexo}' WHERE field_id = '{$extraData['sex']}' AND item_id = $userId");
+            Database::query("UPDATE $t_ufv SET value = '{$objectData->sdtFechaNacimiento}' WHERE field_id = '{$extraData['birthdate']}' AND item_id = $userId");
+            Database::query("UPDATE $t_ufv SET value = '{$objectData->uididpaisorigen}' WHERE field_id = '{$extraData['nationality']}' AND item_id = $userId");
+            Database::query("UPDATE $t_ufv SET value = '{$objectData->uidIdDepartamento}' WHERE field_id = '{$extraData['address_department']}' AND item_id = $userId");
+            Database::query("UPDATE $t_ufv SET value = '{$objectData->uidIdProvincia}' WHERE field_id = '{$extraData['address_province']}' AND item_id = $userId");
+            Database::query("UPDATE $t_ufv SET value = '{$objectData->uidIdDistrito}' WHERE field_id = '{$extraData['address_district']}' AND item_id = $userId");
+            Database::query("UPDATE $t_ufv SET value = '{$objectData->vchDireccionPersona}' WHERE field_id = '{$extraData['address']}' AND item_id = $userId");
+            Database::query("UPDATE $t_ufv SET value = '{$objectData->vchcelularPersona}' WHERE field_id = '{$extraData['mobile_phone_number']}' AND item_id = $userId");
+            Database::query("UPDATE $t_ufv SET value = '{$objectData->uidIdOcupacion}' WHERE field_id = '{$extraData['occupation']}' AND item_id = $userId");
 
             if (!empty($hook)) {
                 $hook->setEventData(array(

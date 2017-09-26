@@ -1112,23 +1112,15 @@ class MigrationCustom
                 $user_info['email'] = 'NO TIENE';
             }
 
-            $chamilo_user_id = UserManager::create_user(
+            $chamilo_user_id = self::create_user_custom_ws(
                 $user_info['firstname'],
                 $user_info['lastname'],
                 $user_info['status'],
                 $user_info['email'],
                 $user_info['username'],
                 $user_info['password'],
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                1,
-                null,
-                null,
-                $user_info['encrypt_method']
+                $uidIdPersonaId
+
             );
             if (!empty($user_info['extra_uididpersona'])) {
                 $extraFieldValue = new ExtraFieldValue('user');
@@ -4131,6 +4123,229 @@ class MigrationCustom
             return $result[0];
         }
         return array();
+    }
+
+    /**
+     * Creates a new user for the platform from a custom WS
+     * @author Hugues Peeters <peeters@ipm.ucl.ac.be>,
+     * @author Roan Embrechts <roan_embrechts@yahoo.com>
+     * @param  string $firstName
+     * @param  string $lastName
+     * @param  int    $status (1 for course tutor, 5 for student, 6 for anonymous)
+     * @param  string $email
+     * @param  string $loginName
+     * @param  string $password
+     * @param  string $official_code Any official code (optional)
+     * @param  string $language User language    (optional)
+     * @param  string $phone Phone number    (optional)
+     * @param  string $picture_uri Picture URI        (optional)
+     * @param  string $authSource Authentication source    (optional, defaults to 'platform', dependind on constant)
+     * @param  string $expirationDate Account expiration date (optional, defaults to null)
+     * @param  int    $active Whether the account is enabled or disabled by default
+     * @param  int    $hr_dept_id The department of HR in which the user is registered (optional, defaults to 0)
+     * @param  array  $extra    Extra fields
+     * @param  string $encrypt_method Encrypt method used if password is given encrypted. Set to an empty string by default
+     * @param  bool $send_mail
+     * @param  bool $isAdmin
+     * @param  string $address
+     * @param  bool $sendEmailToAllAdmins
+     * @param FormValidator $form
+     *
+     * @return mixed   new user id - if the new user creation succeeds, false otherwise
+     * @desc The function tries to retrieve user id from the session.
+     * If it exists, the current user id is the creator id. If a problem arises,
+     * @assert ('Sam','Gamegie',5,'sam@example.com','jo','jo') > 1
+     * @assert ('Pippin','Took',null,null,'jo','jo') === false
+     */
+    static function create_user_custom_ws(
+        $firstName,
+        $lastName,
+        $status,
+        $email,
+        $loginName,
+        $password,
+        $uididpersona
+    ) {
+        $currentUserId = api_get_user_id();
+        $hook = HookCreateUser::create();
+        if (!empty($hook)) {
+            $hook->notifyCreateUser(HOOK_EVENT_TYPE_PRE);
+        }
+
+        $original_password = $password;
+
+        // database table definition
+        $table_user = Database::get_main_table(TABLE_MAIN_USER);
+
+        $language = api_get_setting('platformLanguage');
+
+        if (!empty($currentUserId)) {
+            $creator_id = $currentUserId;
+        } else {
+            $creator_id = 0;
+        }
+
+        $now = new DateTime();
+
+        $t_user = Database::get_main_table(TABLE_MAIN_USER);
+
+        $userId = Database::insert($t_user, [
+            'username' => $loginName,
+            'username_canonical' => mb_convert_case($loginName, MB_CASE_LOWER),
+            'email' => $email,
+            'email_canonical' => mb_convert_case($email, MB_CASE_LOWER),
+            'lastname' => $lastName,
+            'firstname' => $firstName,
+            'password' => $password,
+            'auth_source' => PLATFORM_AUTH_SOURCE,
+            'status' => $status,
+            'official_code' => '',
+            'phone' => '',
+            'address' => '',
+            'picture_uri' => '',
+            'creator_id' => $creator_id,
+            'language' => $language,
+            'registration_date' => $now->format('Y-m-d H:i:s'),
+            'hr_dept_id' => 0,
+            'active' => 1,
+            'enabled' => 1
+        ]);
+
+        if (!empty($userId)) {
+            $return = $userId;
+            $sql = "UPDATE $table_user SET user_id = $return WHERE id = $return";
+            Database::query($sql);
+
+            if (api_get_multiple_access_url()) {
+                UrlManager::add_user_to_url($userId, api_get_current_access_url_id());
+            } else {
+                //we are adding by default the access_url_user table with access_url_id = 1
+                UrlManager::add_user_to_url($userId, 1);
+            }
+
+            $client = new SoapClient('http://www25.icpna.edu.pe:86/wsdatospersonales/webservice.asmx?wsdl');
+            $data = $client->obtienedatospersonales(
+                [
+                    'uididpersona' => $uididpersona
+                ]
+            )->obtienedatospersonalesResult->any;
+
+            $xml = strstr($data, '<diffgr:diffgram');
+
+            $objectData = new SimpleXMLElement($xml);
+            $objectData = $objectData->NewDataSet->Table;
+
+            $extraData = self::get_extra_user_data_custom_ws();
+            $extraFieldsToInsert = self::get_extra_fields_user_custom_ws();
+            ksort($extraFieldsToInsert);
+
+            unset($extraFieldsToInsert['tags']);
+
+            $t_ufv = Database::get_main_table(TABLE_EXTRA_FIELD_VALUES);
+
+            foreach ($extraFieldsToInsert as $id => $name) {
+                Database::insert($t_ufv,
+                    [
+                        'field_id' => $id,
+                        'value' => '',
+                        'item_id' => $userId,
+                        'created_at' => $now->format('Y-m-d H:i:s'),
+                        'updated_at' => $now->format('Y-m-d H:i:s')
+                    ]
+                );
+            }
+
+            Database::update($t_user, ['phone' => $objectData->vchTelefonoPersona], ['user_id = ?' => $userId]);
+
+            Database::update($t_ufv, ['value' => false], ['field_id = ? AND item_id = ?' => [$extraData['already_logged_in'], $userId]]);
+            Database::update($t_ufv, ['value' => 1], ['field_id = ? AND item_id = ?' => [$extraData['mail_notify_group_message'], $userId]]);
+            Database::update($t_ufv, ['value' => 1], ['field_id = ? AND item_id = ?' => [$extraData['mail_notify_invitation'], $userId]]);
+            Database::update($t_ufv, ['value' => 1], ['field_id = ? AND item_id = ?' => [$extraData['mail_notify_message'], $userId]]);
+
+            Database::update($t_ufv, ['value' => $objectData->uidIdDocumentoIdentidad], ['field_id = ? AND item_id = ?' => [$extraData['id_document_type'], $userId]]);
+            Database::update($t_ufv, ['value' => $objectData->vchDocumentoNumero], ['field_id = ? AND item_id = ?' => [$extraData['id_document_number'], $userId]]);
+            Database::update($t_ufv, ['value' => $objectData->vchSegundoNombre], ['field_id = ? AND item_id = ?' => [$extraData['middle_name'], $userId]]);
+            Database::update($t_ufv, ['value' => $objectData->vchMaterno], ['field_id = ? AND item_id = ?' => [$extraData['mothers_name'], $userId]]);
+            Database::update($t_ufv, ['value' => $objectData->chrSexo], ['field_id = ? AND item_id = ?' => [$extraData['sex'], $userId]]);
+            Database::update($t_ufv, ['value' => $objectData->sdtFechaNacimiento], ['field_id = ? AND item_id = ?' => [$extraData['birthdate'], $userId]]);
+            Database::update($t_ufv, ['value' => $objectData->uididpaisorigen], ['field_id = ? AND item_id = ?' => [$extraData['nationality'],  $userId]]);
+            Database::update($t_ufv, ['value' => $objectData->uidIdDepartamento], ['field_id = ? AND item_id = ?' => [$extraData['address_department'],  $userId]]);
+            Database::update($t_ufv, ['value' => $objectData->uidIdProvincia], ['field_id = ? AND item_id = ?' => [$extraData['address_province'],  $userId]]);
+            Database::update($t_ufv, ['value' => $objectData->uidIdDistrito], ['field_id = ? AND item_id = ?' => [$extraData['address_district'],  $userId]]);
+            Database::update($t_ufv, ['value' => $objectData->vchDireccionPersona], ['field_id = ? AND item_id = ?' => [$extraData['address'], $userId]]);
+            Database::update($t_ufv, ['value' => $objectData->vchcelularPersona], ['field_id = ? AND item_id = ?' => [$extraData['mobile_phone_number'], $userId]]);
+            Database::update($t_ufv, ['value' => $objectData->uidIdOcupacion], ['field_id = ? AND item_id = ?' => [$extraData['occupation'],  $userId]]);
+
+            if (!empty($hook)) {
+                $hook->setEventData(array(
+                    'return' => $userId,
+                    'originalPassword' => $original_password
+                ));
+                $hook->notifyCreateUser(HOOK_EVENT_TYPE_POST);
+            }
+            Event::addEvent(LOG_USER_CREATE, LOG_USER_ID, $userId);
+        } else {
+            Display::addFlash(Display::return_message(get_lang('ErrorContactPlatformAdmin')));
+
+            return false;
+        }
+
+        return $return;
+    }
+
+
+    /**
+     * Gets extra fields user fields data
+     * @return    array    Array of fields => value for the given user
+     */
+    static function get_extra_fields_user_custom_ws()
+    {
+
+        $extra_data = array();
+        $t_uf = Database::get_main_table(TABLE_EXTRA_FIELD);
+        $sql = "SELECT f.id as id, f.variable as fvar, f.field_type as type
+                FROM $t_uf f
+                WHERE
+                    extra_field_type = 1
+                ";
+
+        $sql .= " ORDER BY f.id";
+
+        $res = Database::query($sql);
+        if (Database::num_rows($res) > 0) {
+            while ($row = Database::fetch_array($res)) {
+                $extra_data[$row['id']] = $row['fvar'];
+            }
+        }
+
+        return $extra_data;
+    }
+
+    /**
+     * Gets extra user fields data
+     * @return    array    Array of fields => value for the given user
+     */
+    static function get_extra_user_data_custom_ws()
+    {
+
+        $extra_data = array();
+        $t_uf = Database::get_main_table(TABLE_EXTRA_FIELD);
+        $sql = "SELECT f.id as id, f.variable as fvar, f.field_type as type
+                FROM $t_uf f
+                WHERE
+                    extra_field_type = 1
+                ";
+
+        $sql .= " ORDER BY f.id";
+
+        $res = Database::query($sql);
+        if (Database::num_rows($res) > 0) {
+            while ($row = Database::fetch_array($res)) {
+                $extra_data[$row['fvar']] = $row['id'];
+            }
+        }
+
+        return $extra_data;
     }
 
 }

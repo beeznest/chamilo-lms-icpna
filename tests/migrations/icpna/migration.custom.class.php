@@ -4216,7 +4216,8 @@ class MigrationCustom
             'registration_date' => $now,
             'hr_dept_id' => 0,
             'active' => 1,
-            'enabled' => 1
+            'enabled' => 1,
+            'salt' => sha1(uniqid(null, true))
         ]);
 
         if (!empty($userId)) {

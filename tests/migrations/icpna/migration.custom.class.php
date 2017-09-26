@@ -4135,22 +4135,7 @@ class MigrationCustom
      * @param  string $email
      * @param  string $loginName
      * @param  string $password
-     * @param  string $official_code Any official code (optional)
-     * @param  string $language User language    (optional)
-     * @param  string $phone Phone number    (optional)
-     * @param  string $picture_uri Picture URI        (optional)
-     * @param  string $authSource Authentication source    (optional, defaults to 'platform', dependind on constant)
-     * @param  string $expirationDate Account expiration date (optional, defaults to null)
-     * @param  int    $active Whether the account is enabled or disabled by default
-     * @param  int    $hr_dept_id The department of HR in which the user is registered (optional, defaults to 0)
-     * @param  array  $extra    Extra fields
-     * @param  string $encrypt_method Encrypt method used if password is given encrypted. Set to an empty string by default
-     * @param  bool $send_mail
-     * @param  bool $isAdmin
-     * @param  string $address
-     * @param  bool $sendEmailToAllAdmins
-     * @param FormValidator $form
-     *
+     * @param  string $uididpersona
      * @return mixed   new user id - if the new user creation succeeds, false otherwise
      * @desc The function tries to retrieve user id from the session.
      * If it exists, the current user id is the creator id. If a problem arises,
@@ -4288,10 +4273,21 @@ class MigrationCustom
             Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->vchcelularPersona)."' WHERE field_id = '{$extraData['mobile_phone_number']}' AND item_id = $userId");
             Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->uidIdOcupacion)."' WHERE field_id = '{$extraData['occupation']}' AND item_id = $userId");
 
-            Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->strNombrePadre)."' WHERE field_id = '{$extraData['guardian_name']}' AND item_id = $userId");
-            Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->vchEmailApoderado)."' WHERE field_id = '{$extraData['guardian_email']}' AND item_id = $userId");
-            Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->uidIdDocumentoIdentidadPadre)."' WHERE field_id = '{$extraData['guardian_id_document_type']}' AND item_id = $userId");
-            Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->vchDocumentoNumeroPadre)."' WHERE field_id = '{$extraData['guardian_id_document_number']}' AND item_id = $userId");
+            if (!empty($objectData->strNombrePadre) && is_string($objectData->strNombrePadre)) {
+                Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->strNombrePadre)."' WHERE field_id = '{$extraData['guardian_name']}' AND item_id = $userId");
+            }
+
+            if (!empty($objectData->vchEmailApoderado) && is_string($objectData->vchEmailApoderado)) {
+                Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->vchEmailApoderado)."' WHERE field_id = '{$extraData['guardian_email']}' AND item_id = $userId");
+            }
+
+            if (!empty($objectData->uidIdDocumentoIdentidadPadre) && is_string($objectData->uidIdDocumentoIdentidadPadre)) {
+                Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->uidIdDocumentoIdentidadPadre)."' WHERE field_id = '{$extraData['guardian_id_document_type']}' AND item_id = $userId");
+            }
+
+            if (!empty($objectData->vchDocumentoNumeroPadre) && is_string($objectData->vchDocumentoNumeroPadre)) {
+                Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->vchDocumentoNumeroPadre)."' WHERE field_id = '{$extraData['guardian_id_document_number']}' AND item_id = $userId");
+            }
 
             if (!empty($hook)) {
                 $hook->setEventData(array(

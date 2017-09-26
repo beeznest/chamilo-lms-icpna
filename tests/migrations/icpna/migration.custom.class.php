@@ -4266,7 +4266,7 @@ class MigrationCustom
 
             $cleanedBirthdayDateTime = self::cleanDateTimeFromWS($objectData->sdtFechaNacimiento);
 
-            Database::query("UPDATE $t_user SET phone = {$objectData->vchTelefonoPersona} WHERE user_id = $userId");
+            Database::query("UPDATE $t_user SET phone = '{$objectData->vchTelefonoPersona}' WHERE user_id = $userId");
 
             Database::query("UPDATE $t_ufv SET value = 'false' WHERE field_id = '{$extraData['already_logged_in']}' AND item_id = $userId");
             Database::query("UPDATE $t_ufv SET value = 1 WHERE field_id = '{$extraData['mail_notify_group_message']}' AND item_id = $userId");

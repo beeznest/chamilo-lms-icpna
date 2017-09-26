@@ -47,32 +47,16 @@ if (!$form->elementExists('extra_id_document_type') ||
 }
 
 // Translate chamilo default profile elements
-$thisElement = $form->getElement('firstname');
-$thisElement->_label = get_lang('FirstName', null, 'spanish', true);
-$thisElement = $form->getElement('lastname');
-$thisElement->_label = get_lang('LastName', null, 'spanish', true);
-$thisElement = $form->getElement('username');
-$thisElement->_label = get_lang('UserName', null, 'spanish', true);
-$thisElement = $form->getElement('official_code');
-$thisElement->_label = get_lang('OfficialCode', null, 'spanish', true);
-$thisElement = $form->getElement('email');
-$thisElement->_label = get_lang('Email', null, 'spanish', true);
-$thisElement = $form->getElement('phone');
-$thisElement->_label = get_lang('Phone', null, 'spanish', true);
-$thisElement = $form->getElement('picture');
-$thisElement->_label = get_lang('UpdateImage', null, 'spanish', true);
-$thisElement = $form->getElement('language');
-$thisElement->_label = get_lang('Language', null, 'spanish', true);
-$thisElement = $form->getElement('extra_address');
-$thisElement->_label = get_lang('AddressField', null, 'spanish', true);
-$thisElement = $form->getElement('extra_sex');
-$thisElement->_label = get_lang('UserSex', null, 'spanish', true);
-//$thisElement = $form->getElement('password0');
-//$thisElement->_label = get_lang('Pass', null, 'spanish', true);
-//$thisElement = $form->getElement('password1');
-//$thisElement->_label = get_lang('NewPass', null, 'spanish', true);
-//$thisElement = $form->getElement('password2');
-//$thisElement->_label = get_lang('PassTwo', null, 'spanish', true);
+$form->getElement('firstname')->_label = get_lang('FirstName', null, 'spanish', true);
+$form->getElement('lastname')->_label = get_lang('LastName', null, 'spanish', true);
+$form->getElement('username')->_label = get_lang('UserName', null, 'spanish', true);
+$form->getElement('official_code')->_label = get_lang('OfficialCode', null, 'spanish', true);
+$form->getElement('email')->_label = get_lang('Email', null, 'spanish', true);
+$form->getElement('phone')->_label = get_lang('Phone', null, 'spanish', true);
+$form->getElement('picture')->_label = get_lang('UpdateImage', null, 'spanish', true);
+$form->getElement('language')->_label = get_lang('Language', null, 'spanish', true);
+$form->getElement('extra_address')->_label = get_lang('AddressField', null, 'spanish', true);
+$form->getElement('extra_sex')->_label = get_lang('UserSex', null, 'spanish', true);
 
 /**
  * Removes some unwanted elementend of the form object
@@ -89,6 +73,144 @@ if ($form->elementExists('extra_linkedin_url')) {
 if ($form->elementExists('apply_change')) {
     $form->removeElement('apply_change');
 }
+
+$formRenderer = $form->defaultRenderer();
+
+$formRenderer->setElementTemplate(
+    '
+        <div class="form-group {error_class}">
+            <label {label-for} class="col-sm-2 control-label {extra_label_class}" >{label}</label>
+            <div class="col-sm-4">
+                <p>
+                    {element}
+                    <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
+                </p>
+            </div>
+    ',
+    'extra_id_document_type'
+);
+$formRenderer->setElementTemplate(
+    '
+            <div class="col-sm-4">
+                <p>
+                    {element}
+                    <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
+                </p>
+            </div>
+        </div>        
+    ',
+    'extra_id_document_number'
+);
+
+$formRenderer->setElementTemplate(
+    '
+        <div class="form-group {error_class}">
+            <label {label-for} class="col-sm-2 control-label {extra_label_class}" >{label}</label>
+            <div class="col-sm-8">
+                <p>
+                    {element}
+                    <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
+                </p>
+    ',
+    'extra_address_department'
+);
+$formRenderer->setElementTemplate(
+    '
+                <p>
+                    {element}
+                    <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
+                </p>
+    ',
+    'extra_address_province'
+);
+$formRenderer->setElementTemplate(
+    '
+                <p>
+                    {element}
+                    <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
+                </p>
+            </div>
+        </div>
+    ',
+    'extra_address_district'
+);
+
+$formRenderer->setElementTemplate(
+    '
+        <div class="form-group {error_class}">
+            <label {label-for} class="col-sm-2 control-label {extra_label_class}" >{label}</label>
+            <div class="col-sm-8">
+                <p>
+                    {element}
+                    <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
+                </p>
+    ',
+    'extra_occupation_department'
+);
+$formRenderer->setElementTemplate(
+    '
+                <p>
+                    {element}
+                    <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
+                </p>
+    ',
+    'extra_occupation_province'
+);
+$formRenderer->setElementTemplate(
+    '
+                <p>
+                    {element}
+                    <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
+                </p>
+            </div>
+        </div>
+    ',
+    'extra_occupation_district'
+);
+
+$formRenderer->setElementTemplate(
+    '
+        <div id="guardian_div">
+            <div class="form-group">
+                <div class="col-sm-8 col-sm-offset-2">
+                    <div class="alert alert-warning">
+                    If you are under age it is necessary to register the data of your guardian
+                    </div>
+                </div>
+            </div>
+            <div class="form-group {error_class}">
+                <label {label-for} class="col-sm-2 control-label {extra_label_class}" >{label}</label>
+                <div class="col-sm-8">
+                    {element}
+                    <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
+                </div>
+            </div>
+    ',
+    'extra_guardian_name'
+);
+
+$formRenderer->setElementTemplate(
+    '
+            <div class="form-group {error_class}">
+                <label {label-for} class="col-sm-2 control-label {extra_label_class}" >{label}</label>
+                <div class="col-sm-4">
+                    {element}
+                    <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
+                </div>
+    ',
+    'extra_guardian_id_document_type'
+);
+$formRenderer->setElementTemplate(
+    '
+                <div class="col-sm-4">
+                    {element}
+                    <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
+                </div>
+            </div>
+        </div><!-- #guardian_div -->
+    ',
+    'extra_guardian_id_document_number'
+);
 
 $form->removeElement('extra_id_document_type');
 $form->addSelect(
@@ -115,7 +237,7 @@ $form->addSelect(
 $form->removeElement('extra_address_department');
 $form->addSelect(
     'extra_address_department',
-    'Dirección (departamento)',
+    'Dirección (departamento / provincia / distrito)',
     ['' => get_lang('SelectAnOption')],
     ['id' => 'extra_address_department']
 );
@@ -211,23 +333,10 @@ $form->addSelect(
 $occupationName1 = $occupationName2 = $occupationName3 = $universityCarrer = [];
 
 $form->removeElement('extra_guardian_name');
-$form->removeElement('extra_guardian_email');
+$form->addText('extra_guardian_name', 'Nombre del apoderado', false);
 
-$form->addElement('html', '<div id="guardian_div">');
-$form->addElement('html', '
-<div class="form-group">
-    <div class="col-md-2"></div>
-    <div class="col-md-8">
-        <div class="alert alert-warning">
-            If you are under age it is necessary to register the data of your guardian
-        </div>
-    </div>
-    <div class="col-md-2"></div>
-</div>
-', 'guardian_section');
-$form->addText('extra_guardian_name', 'Nombre del apoderado');
-$form->addText('extra_guardian_email', 'Email del apoderado');
-$form->addElement('html', '</div>');
+$form->removeElement('extra_guardian_email');
+$form->addText('extra_guardian_email', 'Email del apoderado', false);
 $form->addElement('html', '
 <div class="form-group">
     <div class="col-md-2"></div>
@@ -292,7 +401,7 @@ $form->insertElementBefore(
 );
 $form->insertElementBefore(
     $form->removeElement('extra_university_career', false),
-    'guardian_section'
+    'extra_guardian_name'
 );
 $form->insertElementBefore(
     $form->removeElement('extra_occupation_center_name_4', false),
@@ -331,8 +440,12 @@ $form->insertElementBefore(
     'extra_occupation'
 );
 $form->insertElementBefore(
-    $form->removeElement('extra_address', false),
+    $form->removeElement('phone', false),
     'extra_mobile_phone_number'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_address', false),
+    'phone'
 );
 ?>
 
@@ -341,7 +454,7 @@ $form->insertElementBefore(
         <?php if (isset($content['error']) && !empty($content['error'])) {
             echo '<div id="registration-form-error" class="alert alert-danger">'.$content['error'].'</div>';
         }?>
-        
+
             <div class="box box-primary">
                 <div class="box-body">
                     <div class="box-header with-border">
@@ -354,7 +467,7 @@ $form->insertElementBefore(
                 </div>
             </div>
         </div>
-	
+
     </div>
     <div class="col-md-2">
         <div id="image-message-container">
@@ -723,7 +836,7 @@ $form->insertElementBefore(
                             });
 
                             $.each(xhrStudyCenterResponse[0], function (i, option) {
-                                $('<option>', option).appendTo($slctOccupation);
+                                $('<option>', option).appendTo($slctOccupationName1);
                             });
 
                             $slctDocument.selectpicker('refresh');
@@ -732,6 +845,7 @@ $form->insertElementBefore(
                             $slctAddressDepartment.selectpicker('refresh');
                             $slctOccupation.selectpicker('refresh');
                             $slctOccupationDepartment.selectpicker('refresh');
+                            $slctOccupationName1.selectpicker('refresh');
                         });
                 })();
 

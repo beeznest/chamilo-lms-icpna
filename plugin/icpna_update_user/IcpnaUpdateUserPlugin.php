@@ -237,13 +237,13 @@ class IcpnaUpdateUserPlugin extends Plugin
         $return = [];
         $tableResult = $this->getTableResult(
             'centroestudios',
-            ['chrTipoOcupacion' => $type, 'uididdistrito' => $district]
+            ['chrTipoOcupacion' => 'UN', 'uididdistritocentroestudios' => 'B25EBB48-4044-47E7-A9D6-05C1FE7DD4C6']
         );
 
         foreach ($tableResult as $item) {
             $return[] = [
-                'value' => (string) $item->uididcentroestudios,
-                'text' => (string) $item->vchdescripcioncentroestudios
+                'value' => (string) $item->uidIdCentroEstudios,
+                'text' => (string) $item->vchDescripcionCentroEstudios
             ];
         }
 

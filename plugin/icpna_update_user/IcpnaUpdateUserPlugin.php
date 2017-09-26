@@ -178,8 +178,8 @@ class IcpnaUpdateUserPlugin extends Plugin
 
         foreach ($tableResult as $item) {
             $return[] = [
-                'value' => (string) $item->uidIdProvincia,
-                'text' => (string) $item->vchNombreProvincia
+                'value' => (string) $item->uidIdprovincia,
+                'text' => (string) $item->vchNombreprovincia
             ];
         }
 

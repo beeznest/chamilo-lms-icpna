@@ -218,7 +218,32 @@ class IcpnaUpdateUserPlugin extends Plugin
         foreach ($tableResult as $item) {
             $return[] = [
                 'value' => (string) $item->uididocupacion,
-                'text' => (string) $item->vchDescripcionOcupacion
+                'text' => (string) $item->vchDescripcionOcupacion,
+                'data-type' => (string) $item->chrTipoOcupacion
+            ];
+        }
+
+        return $return;
+    }
+
+    /**
+     * Call to centroestudios function
+     * @param string $type
+     * @param string $district
+     * @return array
+     */
+    public function getCentroestudios($type, $district)
+    {
+        $return = [];
+        $tableResult = $this->getTableResult(
+            'centroestudios',
+            ['chrTipoOcupacion' => $type, 'uididdistrito' => $district]
+        );
+
+        foreach ($tableResult as $item) {
+            $return[] = [
+                'value' => (string) $item->uididcentroestudios,
+                'text' => (string) $item->vchdescripcioncentroestudios
             ];
         }
 
@@ -229,15 +254,15 @@ class IcpnaUpdateUserPlugin extends Plugin
      * Call to centroestudios function
      * @return array
      */
-    public function getCentroestudios()
+    public function getCarrerauniversitaria()
     {
         $return = [];
-        $tableResult = $this->getTableResult('centroestudios');
+        $tableResult = $this->getTableResult('carrerauniversitaria');
 
         foreach ($tableResult as $item) {
             $return[] = [
-                'value' => (string) $item->uididcentroestudios,
-                'text' => (string) $item->vchdescripcioncentroestudios
+                'value' => (string) $item->uididcarrerauniversitaria,
+                'text' => (string) $item->vchcarrerauniversitaria
             ];
         }
 

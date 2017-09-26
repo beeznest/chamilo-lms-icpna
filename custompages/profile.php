@@ -75,6 +75,15 @@ if ($form->elementExists('extra_linkedin_url')) {
 if ($form->elementExists('apply_change')) {
     $form->removeElement('apply_change');
 }
+if ($form->elementExists('official_code')) {
+    $form->removeElement('official_code');
+}
+if ($form->elementExists('username')) {
+    $form->removeElement('username');
+}
+if ($form->elementExists('language')) {
+    $form->removeElement('language');
+}
 
 $formRenderer = $form->defaultRenderer();
 
@@ -378,7 +387,7 @@ $form->insertElementBefore(
 );
 $form->insertElementBefore(
     $form->removeElement('extra_mothers_name', false),
-    'username'
+    'email'
 );
 $form->insertElementBefore(
     $form->removeElement('extra_guardian_id_document_number', false),
@@ -717,23 +726,40 @@ $form->insertElementBefore(
                     $txtOccupationName4.removeAttr('required');
                     $slctUniCarrers.removeAttr('required');
 
-                    switch (selectedIndex) {
-                        case 1:
-                            $slctOccupationName1.attr('required', true).parents('.form-group').show();
-                            break;
-                        case 2:
-                            $slctOccupationName2.attr('required', true).parents('.form-group').show();
-                            break;
-                        case 3:
-                            $slctOccupationName3.attr('required', true).parents('.form-group').show();
-                            $slctUniCarrers.attr('required', true).parents('.form-group').show();
-                            break;
-                        case 4:
-                            //no break
-                        case 5:
-                            $txtOccupationName4.attr('required', true).parents('.form-group').show();
-                            break;
-                    }
+                    var type = $slctOccupation.find('option:selected').data('type') || '';
+
+                    return $.getJSON(url, {
+                        a: 'get_centroestudios',
+                        type: type,
+                        district: $slctOccupationDistrict.val()
+                    }, function (response) {
+                        switch (selectedIndex) {
+                            case 1:
+                                addOptions(response, $slctOccupationName1);
+                                $slctOccupationName1.attr('required', true).parents('.form-group').show();
+                                break;
+                            case 2:
+                                addOptions(response, $slctOccupationName2);
+                                $slctOccupationName2.attr('required', true).parents('.form-group').show();
+                                break;
+                            case 3:
+                                addOptions(response, $slctOccupationName3);
+                                $slctOccupationName3.attr('required', true).parents('.form-group').show();
+                                $slctUniCarrers.attr('required', true).parents('.form-group').show();
+                                break;
+                            case 4:
+                                //no break
+                            case 5:
+                                $txtOccupationName4.attr('required', true).parents('.form-group').show();
+                                break;
+                        }
+                    });
+                }
+
+                function addOptions(options, $el) {
+                    $.each(options, function (i, option) {
+                        $('<option>', option).appendTo($el);
+                    });
                 }
 
                 (function () {
@@ -743,7 +769,7 @@ $form->insertElementBefore(
                         xhrNationality = $.getJSON(url, {a: 'get_nacionalidad'}),
                         xhrDepartment = $.getJSON(url, {a: 'get_departamento'}),
                         xhrOccupation = $.getJSON(url, {a: 'get_ocupacion'}),
-                        xhrStudyCenter = $.getJSON(url, {a: 'get_centroestudios'});
+                        xhrUniCareers = $.getJSON(url, {a: 'get_carrerauniversitaria'});
 
                     $
                         .when
@@ -752,36 +778,22 @@ $form->insertElementBefore(
                             xhrNationality,
                             xhrDepartment,
                             xhrOccupation,
-                            xhrStudyCenter
+                            xhrUniCareers
                         ])
                         .then(function (
                             docTypeResponse,
                             nationalityResponse,
                             departmentResponse,
                             xhrOccupationResponse,
-                            xhrStudyCenterResponse
+                            xhrUniCareersResponse
                         ) {
-                            $.each(docTypeResponse[0], function (i, option) {
-                                $('<option>', option).appendTo($slctDocument);
-                                $('<option>', option).appendTo($slctGuardianDocument);
-                            });
-
-                            $.each(nationalityResponse[0], function (i, option) {
-                                $('<option>', option).appendTo($slctNationality);
-                            });
-
-                            $.each(departmentResponse[0], function (i, option) {
-                                $('<option>', option).appendTo($slctAddressDepartment);
-                                $('<option>', option).appendTo($slctOccupationDepartment);
-                            });
-
-                            $.each(xhrOccupationResponse[0], function (i, option) {
-                                $('<option>', option).appendTo($slctOccupation);
-                            });
-
-                            $.each(xhrStudyCenterResponse[0], function (i, option) {
-                                $('<option>', option).appendTo($slctOccupationName1);
-                            });
+                            addOptions(docTypeResponse[0], $slctDocument);
+                            addOptions(docTypeResponse[0], $slctGuardianDocument);
+                            addOptions(nationalityResponse[0], $slctNationality);
+                            addOptions(departmentResponse[0], $slctAddressDepartment);
+                            addOptions(departmentResponse[0], $slctOccupationDepartment);
+                            addOptions(xhrOccupationResponse[0], $slctOccupation);
+                            addOptions(xhrUniCareersResponse[0], $slctUniCarrers);
 
                             $slctDocument
                                 .val(defaultValues.extra_id_document_type)
@@ -795,14 +807,14 @@ $form->insertElementBefore(
                             $slctAddressDepartment
                                 .val(defaultValues.extra_address_department)
                                 .selectpicker('refresh');
-                            console.log(defaultValues.extra_occupation);
                             $slctOccupation
                                 .val(defaultValues.extra_occupation)
                                 .selectpicker('refresh');
                             $slctOccupationDepartment
                                 .val(defaultValues.extra_occupation_department)
                                 .selectpicker('refresh');
-                            $slctOccupationName1
+                            $slctUniCarrers
+                                .val(defaultValues.extra_university_career)
                                 .selectpicker('refresh');
 
                             onDocumentIdTypeSelected($slctDocument.prop('selectedIndex'), $txtDocument);
@@ -822,7 +834,18 @@ $form->insertElementBefore(
                                                 .selectpicker('refresh');
                                         });
                                 });
-                            onOccupationSelected($slctOccupation.prop('selectedIndex'));
+                            onOccupationSelected($slctOccupation.prop('selectedIndex'))
+                                .done(function () {
+                                    $slctOccupationName1
+                                        .val(defaultValues.extra_occupation_center_name_1)
+                                        .selectpicker('refresh');
+                                    $slctOccupationName2
+                                        .val(defaultValues.extra_occupation_center_name_2)
+                                        .selectpicker('refresh');
+                                    $slctOccupationName3
+                                        .val(defaultValues.extra_occupation_center_name_3)
+                                        .selectpicker('refresh');
+                                });
                             onDepartmentSelected(defaultValues.extra_occupation_department, $slctOccupationProvince)
                                 .done(function () {
                                     $slctOccupationProvince

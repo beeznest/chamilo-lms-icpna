@@ -14,6 +14,7 @@ require_once __DIR__.'/language.php';
 /** @var \FormValidator $form */
 $form = isset($content['form']) ? $content['form'] : null;
 
+$formErrros = $form->_errors;
 $defaultValues = $form->exportValues();
 
 Display::display_header(get_lang('EditProfile', null, 'spanish', true));
@@ -459,10 +460,12 @@ $form->insertElementBefore(
 
 <div class="row">
     <div class="col-md-10">
-        <?php if (isset($content['error']) && !empty($content['error'])) {
-            echo '<div id="registration-form-error" class="alert alert-danger">'.$content['error'].'</div>';
-        }?>
-
+        <?php foreach ($formErrros as $name => $error) { ?>
+            <div id="registration-form-error" class="alert alert-danger">
+                <strong><?php echo $form->getElement($name)->getLabel() ?></strong>
+                <?php echo $error ?>
+            </div>
+        <?php } ?>
             <div class="box box-primary">
                 <div class="box-body">
                     <div class="box-header with-border">

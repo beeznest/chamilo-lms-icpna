@@ -146,12 +146,13 @@ $form->addElement(
 );
 if (api_get_setting('profile', 'login') !== 'true' || api_get_setting('login_is_email') == 'true') {
     $form->freeze('username');
+} else {
+    $form->applyFilter('username', 'stripslashes');
+    $form->applyFilter('username', 'trim');
+    $form->addRule('username', get_lang('ThisFieldIsRequired'), 'required');
+    $form->addRule('username', get_lang('UsernameWrong'), 'username');
+    $form->addRule('username', get_lang('UserTaken'), 'username_available', $user_data['username']);
 }
-$form->applyFilter('username', 'stripslashes');
-$form->applyFilter('username', 'trim');
-$form->addRule('username', get_lang('ThisFieldIsRequired'), 'required');
-$form->addRule('username', get_lang('UsernameWrong'), 'username');
-$form->addRule('username', get_lang('UserTaken'), 'username_available', $user_data['username']);
 
 //    OFFICIAL CODE
 if (defined('CONFVAL_ASK_FOR_OFFICIAL_CODE') && CONFVAL_ASK_FOR_OFFICIAL_CODE === true) {

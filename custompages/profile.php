@@ -48,15 +48,17 @@ if (!$form->elementExists('extra_id_document_type') ||
     exit;
 }
 
+$efv = new ExtraFieldValue('user');
+$uididpersona = $efv->get_values_by_handler_and_field_variable(api_get_user_id(), 'uididpersona');
+
+$form->addHidden('extra_uididpersona', $uididpersona['value']);
+
 // Translate chamilo default profile elements
 $form->getElement('firstname')->_label = get_lang('FirstName', null, 'spanish', true);
 $form->getElement('lastname')->_label = get_lang('LastName', null, 'spanish', true);
-$form->getElement('username')->_label = get_lang('UserName', null, 'spanish', true);
-$form->getElement('official_code')->_label = get_lang('OfficialCode', null, 'spanish', true);
 $form->getElement('email')->_label = get_lang('Email', null, 'spanish', true);
 $form->getElement('phone')->_label = get_lang('Phone', null, 'spanish', true);
 $form->getElement('picture')->_label = get_lang('UpdateImage', null, 'spanish', true);
-$form->getElement('language')->_label = get_lang('Language', null, 'spanish', true);
 $form->getElement('extra_address')->_label = get_lang('AddressField', null, 'spanish', true);
 $form->getElement('extra_sex')->_label = get_lang('UserSex', null, 'spanish', true);
 

@@ -4151,6 +4151,11 @@ class MigrationCustom
         $password,
         $uididpersona
     ) {
+
+        if (empty($uididpersona)) {
+            return false;
+        }
+
         $currentUserId = api_get_user_id();
         $hook = HookCreateUser::create();
         if (!empty($hook)) {

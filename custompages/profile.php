@@ -531,6 +531,7 @@ $form->insertElementBefore(
                     $slctSex = $('#extra_sex'),
                     $slctNationality = $('#extra_nationality'),
                     $txtBirthdate = $('#extra_birthdate'),
+                    $txtPhone = $('#profile_phone'),
                     $txtMobilePhone = $('#profile_extra_mobile_phone_number'),
                     url = _p.web_plugin + 'icpna_update_user/ajax.php';
 
@@ -553,16 +554,16 @@ $form->insertElementBefore(
                             break;
                         case 2:
                             $el.attr({
-                                pattern: '[a-zA-Z0-9]+',
-                                maxlength: '',
-                                title: '<?php echo get_lang('OnlyLettersAndNumbers') ?>'
+                                pattern: '\\d{9}',
+                                maxlength: '9',
+                                title: '<?php echo get_lang('OnlyNumbers') ?>'
                             });
                             break;
                         case 3:
                             $el.attr({
-                                pattern: '\\d{9}',
-                                maxlength: '9',
-                                title: '<?php echo get_lang('OnlyNumbers') ?>'
+                                pattern: '[a-zA-Z0-9]+',
+                                maxlength: '',
+                                title: '<?php echo get_lang('OnlyLettersAndNumbers') ?>'
                             });
                             break;
                     }
@@ -853,7 +854,10 @@ $form->insertElementBefore(
                 });
                 $slctAddressDistrict.attr('required', true);
                 $slctLocation.attr('required', true);
-                $txtMobilePhone.attr('required', true);
+                $txtMobilePhone.attr({
+                    'required': true,
+                    'pattern': '(\\(\\d{2}\\))?(\\d{9})'
+                });
                 $slctOccupation.attr('required', true).on('change', function () {
                     onOccupationSelected(this.selectedIndex);
 

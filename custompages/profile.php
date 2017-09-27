@@ -184,7 +184,7 @@ $formRenderer->setElementTemplate(
             <div class="form-group">
                 <div class="col-sm-8 col-sm-offset-2">
                     <div class="alert alert-warning">
-                    If you are under age it is necessary to register the data of your guardian
+                    Si eres menor de edad, es necesario registrar los datos de tu padre, madre o apoderado
                     </div>
                 </div>
             </div>
@@ -226,14 +226,14 @@ $form->removeElement('extra_id_document_type');
 $form->addSelect(
     'extra_id_document_type',
     'Documento de identidad',
-    ['' => get_lang('SelectAnOption')],
+    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
     ['id' => 'extra_id_document_type']
 );
 
 /** @var \HTML_QuickForm_select $slctSex */
 $slctSex = $form->getElement('extra_sex');
 $slctSex->clearOptions();
-$slctSex->addOption(get_lang('SelectAnOption'), '');
+$slctSex->addOption(get_lang('SelectAnOption', null, 'spanish', true), '');
 $slctSex->addOption('Masculino', 'M');
 $slctSex->addOption('Femenino', 'F');
 
@@ -241,7 +241,7 @@ $form->removeElement('extra_nationality');
 $form->addSelect(
     'extra_nationality',
     'Nacionalidad',
-    ['' => get_lang('SelectAnOption')],
+    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
     ['id' => 'extra_nationality']
 );
 
@@ -249,7 +249,7 @@ $form->removeElement('extra_address_department');
 $form->addSelect(
     'extra_address_department',
     'Dirección (departamento / provincia / distrito)',
-    ['' => get_lang('SelectAnOption')],
+    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
     ['id' => 'extra_address_department']
 );
 
@@ -257,7 +257,7 @@ $form->removeElement('extra_address_province');
 $form->addSelect(
     'extra_address_province',
     'Dirección (provincia)',
-    ['' => get_lang('SelectAnOption')],
+    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
     ['id' => 'extra_address_province']
 );
 
@@ -265,7 +265,7 @@ $form->removeElement('extra_address_district');
 $form->addSelect(
     'extra_address_district',
     'Dirección (distrito)',
-    ['' => get_lang('SelectAnOption')],
+    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
     ['id' => 'extra_address_district']
 );
 
@@ -273,7 +273,7 @@ $form->removeElement('extra_occupation');
 $form->addSelect(
     'extra_occupation',
     'Ocupación',
-    ['' => get_lang('SelectAnOption')],
+    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
     ['id' => 'extra_occupation']
 );
 
@@ -281,7 +281,7 @@ $form->removeElement('extra_occupation_department');
 $form->addSelect(
     'extra_occupation_department',
     'Dirección del centro de estudios/laboral (departamento / provincia / distrito)',
-    ['' => get_lang('SelectAnOption')],
+    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
     ['id' => 'extra_occupation_department']
 );
 
@@ -289,7 +289,7 @@ $form->removeElement('extra_occupation_province');
 $form->addSelect(
     'extra_occupation_province',
     '',
-    ['' => get_lang('SelectAnOption')],
+    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
     ['id' => 'extra_occupation_province']
 );
 
@@ -297,7 +297,7 @@ $form->removeElement('extra_occupation_district');
 $form->addSelect(
     'extra_occupation_district',
     '',
-    ['' => get_lang('SelectAnOption')],
+    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
     ['id' => 'extra_occupation_district']
 );
 
@@ -305,7 +305,7 @@ $form->removeElement('extra_occupation_center_name_1');
 $form->addSelect(
     'extra_occupation_center_name_1',
     'Centro de estudios (escolar)',
-    ['' => get_lang('SelectAnOption')],
+    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
     ['id' => 'extra_occupation_center_name_1']
 );
 
@@ -313,7 +313,7 @@ $form->removeElement('extra_occupation_center_name_2');
 $form->addSelect(
     'extra_occupation_center_name_2',
     'Centro de estudios (técnico)',
-    ['' => get_lang('SelectAnOption')],
+    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
     ['id' => 'extra_occupation_center_name_2']
 );
 
@@ -321,7 +321,7 @@ $form->removeElement('extra_occupation_center_name_3');
 $form->addSelect(
     'extra_occupation_center_name_3',
     'Universidad',
-    ['' => get_lang('SelectAnOption')],
+    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
     ['id' => 'extra_occupation_center_name_3']
 );
 
@@ -329,7 +329,7 @@ $form->removeElement('extra_university_career');
 $form->addSelect(
     'extra_university_career',
     'Carrera universitaria',
-    ['' => get_lang('SelectAnOption')],
+    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
     ['id' => 'extra_university_career']
 );
 
@@ -337,7 +337,7 @@ $form->removeElement('extra_guardian_id_document_type');
 $form->addSelect(
     'extra_guardian_id_document_type',
     'Documento de identidad del apoderado',
-    ['' => get_lang('SelectAnOption')],
+    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
     ['id' => 'extra_guardian_id_document_type']
 );
 
@@ -361,7 +361,7 @@ $form->addElement('html', '
 ', 'terms');
 
 if (is_profile_editable()) {
-    $form->addButtonUpdate(get_lang('SaveSettings'), 'apply_change');
+    $form->addButtonUpdate(get_lang('SaveSettings', null, 'spanish', true), 'apply_change');
 } else {
     $form->freeze();
 }
@@ -554,21 +554,21 @@ $form->insertElementBefore(
                             $el.attr({
                                 pattern: '\\d{8}',
                                 maxlength: '8',
-                                title: '<?php echo get_lang('OnlyNumbers') ?>'
+                                title: '<?php echo get_lang('OnlyNumbers', null, 'spanish', true) ?>'
                             });
                             break;
                         case 2:
                             $el.attr({
                                 pattern: '\\d{9}',
                                 maxlength: '9',
-                                title: '<?php echo get_lang('OnlyNumbers') ?>'
+                                title: '<?php echo get_lang('OnlyNumbers', null, 'spanish', true) ?>'
                             });
                             break;
                         case 3:
                             $el.attr({
                                 pattern: '[a-zA-Z0-9]+',
                                 maxlength: '',
-                                title: '<?php echo get_lang('OnlyLettersAndNumbers') ?>'
+                                title: '<?php echo get_lang('OnlyLettersAndNumbers', null, 'spanish', true) ?>'
                             });
                             break;
                     }
@@ -749,7 +749,7 @@ $form->insertElementBefore(
                 function addOptions(options, $el) {
                     $el.empty();
 
-                    $('<option>', {value: '', text: '<?php echo get_lang('SelectAnOption') ?>'}).appendTo($el);
+                    $('<option>', {value: '', text: '<?php echo get_lang('SelectAnOption', null, 'spanish', true) ?>'}).appendTo($el);
 
                     $.each(options, function (i, option) {
                         $('<option>', option).appendTo($el);

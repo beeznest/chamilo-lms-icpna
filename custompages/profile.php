@@ -507,6 +507,26 @@ $form->insertElementBefore(
  </div>
     <script>
         (function () {
+            $.fn.required = function (isRequired) {
+                var label = this
+                    .parents('.form-group')
+                    .find('label');
+
+                if (isRequired) {
+                    this.attr('required', true);
+                    label
+                        .not(':has(span.form_required)')
+                        .prepend('<span class="form_required">* </span>');
+
+                    return this;
+                }
+
+                this.removeAttr('required');
+                label.find('span.form_required').remove();
+
+                return this;
+            };
+
             $(document).ready(function () {
                 var $slctDocument = $('#extra_id_document_type'),
                     $txtDocument = $('#extra_id_document_number'),
@@ -589,10 +609,10 @@ $form->insertElementBefore(
                 }
 
                 function onStudentBirthday () {
-                    $txtGuardianName.removeAttr('required');
-                    $txtGuardianEmail.removeAttr('required');
-                    $slctGuardianDocument.removeAttr('required');
-                    $txtGuardianDocument.removeAttr('required');
+                    $txtGuardianName.required(false);
+                    $txtGuardianEmail.required(false);
+                    $slctGuardianDocument.required(false);
+                    $txtGuardianDocument.required(false);
 
                     var age = checkAge();
 
@@ -624,10 +644,10 @@ $form->insertElementBefore(
                         return;
                     }
 
-                    $txtGuardianName.attr('required', true);
-                    $txtGuardianEmail.attr('required', true);
-                    $slctGuardianDocument.attr('required', true);
-                    $txtGuardianDocument.attr('required', true);
+                    $txtGuardianName.required(true);
+                    $txtGuardianEmail.required(true);
+                    $slctGuardianDocument.required(true);
+                    $txtGuardianDocument.required(true);
 
                     if (age >= 14 && age < 18) {
                         $modalTitle.html(
@@ -710,11 +730,11 @@ $form->insertElementBefore(
                     $txtOccupationName4.parents('.form-group').hide();
                     $slctUniCarrers.parents('.form-group').hide();
 
-                    $slctOccupationName1.removeAttr('required').empty();
-                    $slctOccupationName2.removeAttr('required').empty();
-                    $slctOccupationName3.removeAttr('required').empty();
-                    $txtOccupationName4.removeAttr('required');
-                    $slctUniCarrers.removeAttr('required');
+                    $slctOccupationName1.required(false).empty();
+                    $slctOccupationName2.required(false).empty();
+                    $slctOccupationName3.required(false).empty();
+                    $txtOccupationName4.required(false);
+                    $slctUniCarrers.required(false);
 
                     var type = $slctOccupation.find('option:selected').data('type') || '';
 
@@ -726,21 +746,21 @@ $form->insertElementBefore(
                         switch (selectedIndex) {
                             case 1:
                                 addOptions(response, $slctOccupationName1);
-                                $slctOccupationName1.attr('required', true).parents('.form-group').show();
+                                $slctOccupationName1.required(true).parents('.form-group').show();
                                 break;
                             case 2:
                                 addOptions(response, $slctOccupationName2);
-                                $slctOccupationName2.attr('required', true).parents('.form-group').show();
+                                $slctOccupationName2.required(true).parents('.form-group').show();
                                 break;
                             case 3:
                                 addOptions(response, $slctOccupationName3);
-                                $slctOccupationName3.attr('required', true).parents('.form-group').show();
-                                $slctUniCarrers.attr('required', true).parents('.form-group').show();
+                                $slctOccupationName3.required(true).parents('.form-group').show();
+                                $slctUniCarrers.required(true).parents('.form-group').show();
                                 break;
                             case 4:
                                 //no break
                             case 5:
-                                $txtOccupationName4.attr('required', true).parents('.form-group').show();
+                                $txtOccupationName4.required(true).parents('.form-group').show();
                                 break;
                         }
                     });
@@ -834,43 +854,44 @@ $form->insertElementBefore(
                                                 .selectpicker('val', defaultValues.extra_occupation_district);
                                         })
                                 });
+
+                            $('span.form_required + small').text('<?php echo get_lang('ThisFieldIsRequired', null, 'spanish', true) ?>');
                         });
                 })();
 
-                $slctDocument.attr('required', true).on('change', function () {
+                $slctDocument.required(true).on('change', function () {
                     $txtDocument.val('');
                     onDocumentIdTypeSelected(this.selectedIndex, $txtDocument);
                 });
-                $txtDocument.attr('required', true);
-                $txtFirstname.attr('required', true);
-                $txtLastname.attr('required', true);
-                $txtEmail.attr('required', true);
-                $slctSex.attr('required', true);
-                $txtBirthdate.attr('required', true).change(function () {
+                $txtDocument.required(true);
+                $txtFirstname.required(true);
+                $txtLastname.required(true);
+                $txtEmail.required(true);
+                $slctSex.required(true);
+                $txtBirthdate.required(true).change(function () {
                     onStudentBirthday()
                 });
-                $slctNationality.attr('required', true);
-                $slctAddressDepartment.attr('required', true).on('change', function () {
+                $slctNationality.required(true);
+                $slctAddressDepartment.required(true).on('change', function () {
                     onDepartmentSelected(this.value, $slctAddressProvince);
                     $slctAddressDistrict.empty().selectpicker('refresh');
                 });
-                $slctAddressProvince.attr('required', true).on('change', function () {
+                $slctAddressProvince.required(true).on('change', function () {
                     onProvinceSelected(this.value, $slctAddressDistrict);
                 });
-                $slctAddressDistrict.attr('required', true);
-                $slctLocation.attr('required', true);
-                $txtMobilePhone.attr({
-                    'required': true,
+                $slctAddressDistrict.required(true);
+                $slctLocation.required(true);
+                $txtMobilePhone.required(true).attr({
                     'pattern': '(\\(\\d{2}\\))?(\\d{9})'
                 });
-                $slctOccupation.attr('required', true).on('change', function () {
+                $slctOccupation.required(true).on('change', function () {
                     onOccupationSelected(this.selectedIndex);
 
                     $slctOccupationName1.empty().selectpicker('refresh');
                     $slctOccupationName2.empty().selectpicker('refresh');
                     $slctOccupationName3.empty().selectpicker('refresh');
                 });
-                $slctOccupationDepartment.attr('required', true).on('change', function () {
+                $slctOccupationDepartment.required(true).on('change', function () {
                     $slctOccupationDistrict.empty().selectpicker('refresh');
                     $slctOccupationName1.empty().selectpicker('refresh');
                     $slctOccupationName2.empty().selectpicker('refresh');
@@ -878,14 +899,14 @@ $form->insertElementBefore(
 
                     onDepartmentSelected(this.value, $slctOccupationProvince);
                 });
-                $slctOccupationProvince.attr('required', true).on('change', function () {
+                $slctOccupationProvince.required(true).on('change', function () {
                     $slctOccupationName1.empty().selectpicker('refresh');
                     $slctOccupationName2.empty().selectpicker('refresh');
                     $slctOccupationName3.empty().selectpicker('refresh');
 
                     onProvinceSelected(this.value, $slctOccupationDistrict);
                 });
-                $slctOccupationDistrict.attr('required', true).on('change', function () {
+                $slctOccupationDistrict.required(true).on('change', function () {
                     onOccupationSelected($slctOccupation.prop('selectedIndex'));
                 });
                 $slctGuardianDocument.on('change', function () {

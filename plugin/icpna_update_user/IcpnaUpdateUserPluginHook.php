@@ -36,9 +36,8 @@ class IcpnaUpdateUserPluginHook extends HookObserver implements HookUpdateUserOb
             return [];
         }
 
-        $userId = api_get_user_id();
-        $user = api_get_user_entity($userId);
-        $extraData = UserManager::get_extra_user_data($user->getId());
+        $userInfo = api_get_user_info();
+        $extraData = UserManager::get_extra_user_data($userInfo['id']);
 
         if (!isset($extraData['uididpersona'])) {
             return false;
@@ -61,9 +60,9 @@ class IcpnaUpdateUserPluginHook extends HookObserver implements HookUpdateUserOb
                     'p_uididpersona' => strtoupper($extraData['uididpersona']),
                     'p_uididdocumentoidentidad' => strtoupper($extraData['id_document_type']),
                     'p_vchDocumentoNumero' => $extraData['id_document_number'],
-                    'p_vchPrimerNombre' => $user->getFirstname(),
+                    'p_vchPrimerNombre' => $userInfo['firstname'],
                     'p_vchSegundoNombre' => $extraData['middle_name'],
-                    'p_vchPaterno' => $user->getLastname(),
+                    'p_vchPaterno' => $userInfo['lastname'],
                     'p_vchMaterno' => $extraData['mothers_name'],
                     'p_chrSexo' => $extraData['sex'],
                     'p_sdtFechaNacimiento' => $extraData['birthdate'],
@@ -72,8 +71,8 @@ class IcpnaUpdateUserPluginHook extends HookObserver implements HookUpdateUserOb
                     'p_uidIdProvincia' => strtoupper($extraData['address_province']),
                     'p_uidIdDistrito' => strtoupper($extraData['address_district']),
                     'p_vchDireccionPersona' => $extraData['address'],
-                    'p_vchEmailPersona' => $user->getEmail(),
-                    'p_vchTelefonoPersona' => $user->getPhone(),
+                    'p_vchEmailPersona' => $userInfo['email'],
+                    'p_vchTelefonoPersona' => $userInfo['phone'],
                     'p_vchcelularPersona' => $extraData['mobile_phone_number'],
                     'p_uidIdOcupacion' => strtoupper($extraData['occupation']),
                     'p_uididdepartamentocentroestudios' => strtoupper($extraData['occupation_department']),
@@ -100,6 +99,10 @@ class IcpnaUpdateUserPluginHook extends HookObserver implements HookUpdateUserOb
 
             return true;
         } catch (Exception $e) {
+            Display::addFlash(
+                Display::return_message($e->getMessage(), 'error')
+            );
+
             return false;
         }
 

@@ -4207,7 +4207,10 @@ class MigrationCustom
             'hr_dept_id' => 0,
             'active' => 1,
             'enabled' => 1,
-            'salt' => sha1(uniqid(null, true))
+            'salt' => sha1(uniqid(null, true)),
+            'roles' => 'a:0:{}',
+            'created_at' => $now,
+            'updated_at' => $now
         ]);
 
         if (!empty($userId)) {

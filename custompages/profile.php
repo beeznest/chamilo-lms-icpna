@@ -19,31 +19,30 @@ $defaultValues = $form->exportValues();
 
 Display::display_header(get_lang('EditProfile', null, 'spanish', true));
 
-if (!$form->elementExists('extra_id_document_type') ||
-    !$form->elementExists('extra_id_document_number') ||
-    !$form->elementExists('extra_middle_name') ||
-    !$form->elementExists('extra_mothers_name') ||
-    !$form->elementExists('extra_sex') ||
-    !$form->elementExists('extra_birthdate') ||
-    !$form->elementExists('extra_nationality') ||
-    !$form->elementExists('extra_address_department') ||
-    !$form->elementExists('extra_address_province') ||
-    !$form->elementExists('extra_address_district') ||
-    !$form->elementExists('extra_address') ||
-    !$form->elementExists('extra_mobile_phone_number') ||
-    !$form->elementExists('extra_occupation') ||
-    !$form->elementExists('extra_occupation_department') ||
-    !$form->elementExists('extra_occupation_province') ||
-    !$form->elementExists('extra_occupation_district') ||
-    !$form->elementExists('extra_occupation_center_name_1') ||
-    !$form->elementExists('extra_occupation_center_name_2') ||
-    !$form->elementExists('extra_occupation_center_name_3') ||
-    !$form->elementExists('extra_occupation_center_name_4') ||
-    !$form->elementExists('extra_university_career') ||
-    !$form->elementExists('extra_guardian_id_document_type') ||
-    !$form->elementExists('extra_guardian_id_document_number') ||
-    !$form->elementExists('extra_guardian_name') ||
-    !$form->elementExists('extra_guardian_email')) {
+if (!$form->elementExists('extra_id_document_type') || !$form->elementExists('extra_id_document_number')
+    || !$form->elementExists('extra_middle_name')
+    || !$form->elementExists('extra_mothers_name')
+    || !$form->elementExists('extra_sex')
+    || !$form->elementExists('extra_birthdate')
+    || !$form->elementExists('extra_nationality')
+    || !$form->elementExists('extra_address_department')
+    || !$form->elementExists('extra_address_province')
+    || !$form->elementExists('extra_address_district')
+    || !$form->elementExists('extra_address')
+    || !$form->elementExists('extra_mobile_phone_number')
+    || !$form->elementExists('extra_occupation')
+    || !$form->elementExists('extra_occupation_department')
+    || !$form->elementExists('extra_occupation_province')
+    || !$form->elementExists('extra_occupation_district')
+    || !$form->elementExists('extra_occupation_center_name_1')
+    || !$form->elementExists('extra_occupation_center_name_2')
+    || !$form->elementExists('extra_occupation_center_name_3')
+    || !$form->elementExists('extra_occupation_center_name_4')
+    || !$form->elementExists('extra_university_career')
+    || !$form->elementExists('extra_guardian_id_document_type')
+    || !$form->elementExists('extra_guardian_id_document_number')
+    || !$form->elementExists('extra_guardian_name')
+    || !$form->elementExists('extra_guardian_email')) {
     $form->display();
     Display::display_footer();
     exit;
@@ -458,37 +457,37 @@ $form->insertElementBefore(
 );
 ?>
 
-<div class="row">
-    <div class="col-md-10">
-        <?php foreach ($formErrros as $name => $error) { ?>
-            <div id="registration-form-error" class="alert alert-danger">
-                <strong><?php echo $form->getElement($name)->getLabel() ?></strong>
-                <?php echo $error ?>
-            </div>
-        <?php } ?>
+    <div class="row">
+        <div class="col-md-10">
+            <?php foreach ($formErrros as $name => $error) { ?>
+                <div id="registration-form-error" class="alert alert-danger">
+                    <strong><?php echo $form->getElement($name)->getLabel() ?></strong>
+                    <?php echo $error ?>
+                </div>
+            <?php } ?>
             <div class="box box-primary">
                 <div class="box-body">
                     <div class="box-header with-border">
                         <h3 class="box-title"><?php echo get_lang('ModifProfile', null, 'spanish', true); ?></h3>
                     </div>
                     <div id="registration-form-box" class="form-box well">
-                    <?php
+                        <?php
                         $content['form']->display();
-                    ?>
+                        ?>
+                    </div>
                 </div>
             </div>
-        </div>
 
-    </div>
-    <div class="col-md-2">
-        <div id="image-message-container">
-            <a class="expand-image" href="<?php echo $content['big_image'] ?>">
-                <img src="<?php echo $content['normal_image'] ?>" class="img-thumbnail img-responsive">
-            </a>
+        </div>
+        <div class="col-md-2">
+            <div id="image-message-container">
+                <a class="expand-image" href="<?php echo $content['big_image'] ?>">
+                    <img src="<?php echo $content['normal_image'] ?>" class="img-thumbnail img-responsive">
+                </a>
+            </div>
         </div>
     </div>
-</div>
-<div id="terms-conditions" class="modal fade" role="dialog">
+    <div id="terms-conditions" class="modal fade" role="dialog">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -504,7 +503,7 @@ $form->insertElementBefore(
                 </div>
             </div>
         </div>
- </div>
+    </div>
     <script>
         (function () {
             $.fn.required = function (isRequired) {
@@ -560,7 +559,7 @@ $form->insertElementBefore(
                     $txtMobilePhone = $('#profile_extra_mobile_phone_number'),
                     url = _p.web_plugin + 'icpna_update_user/ajax.php';
 
-                function onMobileNumberLoad () {
+                function onMobileNumberLoad() {
                     $txtMobilePhone.val(
                         $txtMobilePhone.val()
                             .replace(/[^\d]+/g, '')
@@ -568,7 +567,7 @@ $form->insertElementBefore(
                     );
                 }
 
-                function onDocumentIdTypeSelected (selectedIndex, $el) {
+                function onDocumentIdTypeSelected(selectedIndex, $el) {
                     switch (selectedIndex) {
                         case 1:
                             $el.attr({
@@ -594,7 +593,7 @@ $form->insertElementBefore(
                     }
                 }
 
-                function checkAge () {
+                function checkAge() {
                     var extraBirthdayFieldValue = $txtBirthdate.val();
 
                     if (extraBirthdayFieldValue == null) {
@@ -608,7 +607,7 @@ $form->insertElementBefore(
                     return age;
                 }
 
-                function onStudentBirthday () {
+                function onStudentBirthday() {
                     $txtGuardianName.required(false);
                     $txtGuardianEmail.required(false);
                     $slctGuardianDocument.required(false);
@@ -723,7 +722,7 @@ $form->insertElementBefore(
                     });
                 }
 
-                function onOccupationSelected (selectedIndex) {
+                function onOccupationSelected(selectedIndex) {
                     $slctOccupationName1.parents('.form-group').hide();
                     $slctOccupationName2.parents('.form-group').hide();
                     $slctOccupationName3.parents('.form-group').hide();
@@ -758,7 +757,7 @@ $form->insertElementBefore(
                                 $slctUniCarrers.required(true).parents('.form-group').show();
                                 break;
                             case 4:
-                                //no break
+                            //no break
                             case 5:
                                 $txtOccupationName4.required(true).parents('.form-group').show();
                                 break;
@@ -769,7 +768,10 @@ $form->insertElementBefore(
                 function addOptions(options, $el) {
                     $el.empty();
 
-                    $('<option>', {value: '', text: '<?php echo get_lang('SelectAnOption', null, 'spanish', true) ?>'}).appendTo($el);
+                    $('<option>', {
+                        value: '',
+                        text: '<?php echo get_lang('SelectAnOption', null, 'spanish', true) ?>'
+                    }).appendTo($el);
 
                     $.each(options, function (i, option) {
                         $('<option>', option).appendTo($el);
@@ -855,7 +857,8 @@ $form->insertElementBefore(
                                         })
                                 });
 
-                            $('span.form_required + small').text('<?php echo get_lang('ThisFieldIsRequired', null, 'spanish', true) ?>');
+                            $('span.form_required + small')
+                                .text('<?php echo get_lang('ThisFieldIsRequired', null, 'spanish', true) ?>');
                         });
                 })();
 

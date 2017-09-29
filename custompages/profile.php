@@ -836,15 +836,6 @@ $form->insertElementBefore(
                                                 .selectpicker('val', defaultValues.extra_address_district);
                                         });
                                 });
-                            onOccupationSelected($slctOccupation.prop('selectedIndex'))
-                                .done(function () {
-                                    $slctOccupationName1
-                                        .selectpicker('val', defaultValues.extra_occupation_center_name_1);
-                                    $slctOccupationName2
-                                        .selectpicker('val', defaultValues.extra_occupation_center_name_2);
-                                    $slctOccupationName3
-                                        .selectpicker('val', defaultValues.extra_occupation_center_name_3);
-                                });
                             onDepartmentSelected(defaultValues.extra_occupation_department, $slctOccupationProvince)
                                 .done(function () {
                                     $slctOccupationProvince
@@ -854,6 +845,16 @@ $form->insertElementBefore(
                                         .done(function () {
                                             $slctOccupationDistrict
                                                 .selectpicker('val', defaultValues.extra_occupation_district);
+
+                                            onOccupationSelected($slctOccupation.prop('selectedIndex'))
+                                                .done(function () {
+                                                    $slctOccupationName1
+                                                        .selectpicker('val', defaultValues.extra_occupation_center_name_1);
+                                                    $slctOccupationName2
+                                                        .selectpicker('val', defaultValues.extra_occupation_center_name_2);
+                                                    $slctOccupationName3
+                                                        .selectpicker('val', defaultValues.extra_occupation_center_name_3);
+                                                });
                                         })
                                 });
 

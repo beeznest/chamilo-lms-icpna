@@ -885,7 +885,8 @@ $form->insertElementBefore(
                 $slctAddressDistrict.required(true);
                 $slctLocation.required(true);
                 $txtMobilePhone.required(true).attr({
-                    'pattern': '(\\(\\d{2}\\))?(\\d{9})'
+                    'pattern': '(\\(\\d{2}\\))(\\d{9})',
+                    'title': $txtMobilePhone.attr('placeholder')
                 });
                 $slctOccupation.required(true).on('change', function () {
                     onOccupationSelected(this.selectedIndex);

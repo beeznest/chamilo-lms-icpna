@@ -4331,7 +4331,7 @@ function languageToCountryIsoCode($languageIsoCode)
             $country = 'ae';
             break;
         case 'en':
-            $country = 'gb';
+            $country = 'us';
             break;
         case 'he':
             $country = 'il';
@@ -4354,6 +4354,9 @@ function languageToCountryIsoCode($languageIsoCode)
         case 'zh-TW':
         case 'zh':
             $country = 'cn';
+            break;
+        case 'es':
+            $country = 'pe';
             break;
         default:
             $country = $languageIsoCode;

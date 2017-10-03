@@ -338,17 +338,19 @@ $form->removeElement('extra_guardian_email');
 $form->addText('extra_guardian_email', 'Email del apoderado', false);
 $form->addElement('html', '
 <div class="form-group">
-    <div class="col-md-2"></div>
-    <div class="col-md-8">
+    <div class="col-md-8 col-md-offset-2">
         <div class="terms alert alert-warning">
-            Antes de guardar los datos, debes estar de acuerdo con nuestros
+            Para continuar debe aceptar nuestros
             <button type="button" class="btn btn-link btn-xs" data-toggle="modal" data-target="#terms-conditions">
-                <span class="fa fa-external-link" aria-hidden="true"></span>
                 <b>términos y condiciones</b>
             </button>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" required id="chk_terms"> '.get_lang('IAcceptTermsAndConditions', null, 'spanish', true).'
+                </label>
+            </div>
         </div>
     </div>
-    <div class="col-md-2"></div>
 </div>
 ', 'terms');
 
@@ -520,8 +522,7 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
                     <p id="text-modal" class="text-justify"></p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" id="btn-close-modal"><?php echo get_lang('Close', null, 'spanish', true) ?></button>
-                    <button type="button" class="btn btn-primary" id="btn-accept-modal"><?php echo get_lang('IAcceptTermsAndConditions', null, 'spanish', true) ?></button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo get_lang('Close', null, 'spanish', true) ?></button>
                 </div>
             </div>
         </div>
@@ -580,20 +581,17 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
                     $txtPhone = $('#profile_phone'),
                     $txtMobilePhone = $('#profile_extra_mobile_phone_number'),
                     url = _p.web_plugin + 'icpna_update_user/ajax.php',
-                    $formSubmit = $('form#profile :submit');
+                    $form = $('form#profile');
 
-                $formSubmit.prop('disabled', true);
+                $form.get(0).onsubmit = null;
+                $form.on('submit', function (e) {
+                    if (!$('#chk_terms').prop('checked')) {
+                        e.preventDefault();
 
-                $('#btn-close-modal').on('click', function () {
-                    $formSubmit.prop('disabled', true);
+                        return;
+                    }
 
-                    $('#terms-conditions').modal('hide');
-                });
-
-                $('#btn-accept-modal').on('click', function () {
-                    $formSubmit.prop('disabled', false);
-
-                    $('#terms-conditions').modal('hide');
+                    addProgress('profile');
                 });
 
                 function onMobileNumberLoad() {

@@ -102,7 +102,7 @@ class DatePicker extends HTML_QuickForm_text
                         buttonText: '" . get_lang('SelectDate')."',
                         changeMonth: true,
                         changeYear: true,
-                        yearRange: 'c-60y:c+5y'
+                        yearRange: 'c-50:c'
                     })
                     .on('change', function (e) {
                         txtDateAltText.text(txtDateAlt.val());

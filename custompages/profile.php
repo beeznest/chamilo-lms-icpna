@@ -340,8 +340,10 @@ $form->addElement('html', '
 <div class="form-group">
     <div class="col-md-2"></div>
     <div class="col-md-8">
-        <div class="terms alert alert-warning">Antes de guardar los datos, debes estar de acuerdo con nuestros
-            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#terms-conditions">
+        <div class="terms alert alert-warning">
+            Antes de guardar los datos, debes estar de acuerdo con nuestros
+            <button type="button" class="btn btn-link btn-xs" data-toggle="modal" data-target="#terms-conditions">
+                <span class="fa fa-external-link" aria-hidden="true"></span>
                 <b>términos y condiciones</b>
             </button>
         </div>
@@ -501,14 +503,15 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">TERMS AND CONDITIONS</h4>
+                    <h4 class="modal-title"><?php echo get_lang('YouHaveToAcceptTermsAndConditions', null, 'spanish', true) ?></h4>
                 </div>
                 <div class="modal-body">
                     <p id="title-modal" class="text-center"></p>
                     <p id="text-modal" class="text-justify"></p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" id="btn-close-modal"><?php echo get_lang('Close', null, 'spanish', true) ?></button>
+                    <button type="button" class="btn btn-primary" id="btn-accept-modal"><?php echo get_lang('IAcceptTermsAndConditions', null, 'spanish', true) ?></button>
                 </div>
             </div>
         </div>
@@ -566,7 +569,22 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
                     $txtBirthdate = $('#extra_birthdate'),
                     $txtPhone = $('#profile_phone'),
                     $txtMobilePhone = $('#profile_extra_mobile_phone_number'),
-                    url = _p.web_plugin + 'icpna_update_user/ajax.php';
+                    url = _p.web_plugin + 'icpna_update_user/ajax.php',
+                    $formSubmit = $('form#profile :submit');
+
+                $formSubmit.prop('disabled', true);
+
+                $('#btn-close-modal').on('click', function () {
+                    $formSubmit.prop('disabled', true);
+
+                    $('#terms-conditions').modal('hide');
+                });
+
+                $('#btn-accept-modal').on('click', function () {
+                    $formSubmit.prop('disabled', false);
+
+                    $('#terms-conditions').modal('hide');
+                });
 
                 function onMobileNumberLoad() {
                     $txtMobilePhone.val(

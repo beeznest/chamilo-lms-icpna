@@ -55,7 +55,7 @@ $form->addHidden('extra_uididpersona', $uididpersona['value']);
 
 // Translate chamilo default profile elements
 $form->getElement('firstname')->_label = get_lang('FirstName', null, 'spanish', true);
-$form->getElement('lastname')->_label = get_lang('LastName', null, 'spanish', true);
+$form->getElement('lastname')->_label = get_lang('LastName', null, 'es-icpna', true);
 $form->getElement('email')->_label = get_lang('Email', null, 'spanish', true);
 $form->getElement('phone')->_label = get_lang('Phone', null, 'spanish', true);
 $form->getElement('picture')->_label = get_lang('UpdateImage', null, 'spanish', true);

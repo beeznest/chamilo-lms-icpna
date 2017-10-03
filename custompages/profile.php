@@ -687,6 +687,8 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
                             'actividades, vinculadas con bienes o servicios que estén restringidos para mayores de edad'
                         );
 
+                        $divGuardian.show();
+
                         return;
                     }
 
@@ -882,7 +884,7 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
                 $txtEmail.required(true);
                 $slctSex.required(true);
                 $txtBirthdate.required(true).change(function () {
-                    onStudentBirthday()
+                    onStudentBirthday();
                 });
                 $slctNationality.required(true);
                 $slctAddressDepartment.required(true).on('change', function () {

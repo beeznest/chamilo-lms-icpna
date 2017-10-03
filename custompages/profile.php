@@ -456,11 +456,21 @@ $form->getElement('extra_middle_name')->setAttribute('maxlength', 30);
 $form->getElement('lastname')->_label = get_lang('LastName', null, 'es-icpna', true);
 $form->getElement('lastname')->setAttribute('maxlength', 30);
 $form->getElement('extra_mothers_name')->setAttribute('maxlength', 30);
-$form->getElement('email')->_label = get_lang('Email', null, 'spanish', true);
+$form->getElement('email')->_label = [
+    get_lang('Email', null, 'spanish', true),
+    get_lang('OnlyImagesAllowed', null, 'spanish', true)
+];
 $form->getElement('email')->setAttribute('maxlength', 50);
 $form->getElement('picture')->_label = get_lang('UpdateImage', null, 'spanish', true);
-$form->getElement('phone')->_label = get_lang('Phone', null, 'spanish', true);
+$form->getElement('phone')->_label = [
+    get_lang('Phone', null, 'spanish', true),
+    'Ejemplo: (51)017110000'
+];
 $form->getElement('phone')->setAttribute('maxlength', 13);
+$form->getElement('extra_mobile_phone_number')->_label = [
+    'Número de celular ('.get_lang('CountryDialCode', null, 'spanish', true).')',
+    'Ejemplo: (51)987654321'
+];
 $form->getElement('extra_mobile_phone_number')->setAttribute('maxlength', 13);
 $form->getElement('extra_address')->_label = get_lang('AddressField', null, 'spanish', true);
 $form->getElement('extra_sex')->_label = get_lang('UserSex', null, 'spanish', true);

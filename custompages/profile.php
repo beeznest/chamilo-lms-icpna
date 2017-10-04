@@ -454,10 +454,18 @@ $form->insertElementBefore(
 // Translate chamilo default profile elements
 $form->getElement('firstname')->_label = get_lang('FirstName', null, 'spanish', true);
 $form->getElement('firstname')->setAttribute('maxlength', 30);
+$form->getElement('firstname')->setAttribute('pattern', '[a-zA-ZñÑ]+');
+$form->getElement('firstname')->setAttribute('title', get_lang('OnlyLetters', null, 'spanish', true));
 $form->getElement('extra_middle_name')->setAttribute('maxlength', 30);
+$form->getElement('extra_middle_name')->setAttribute('pattern', '[a-zA-ZñÑ]+');
+$form->getElement('extra_middle_name')->setAttribute('title', get_lang('OnlyLetters', null, 'spanish', true));
 $form->getElement('lastname')->_label = get_lang('LastName', null, 'es-icpna', true);
 $form->getElement('lastname')->setAttribute('maxlength', 30);
+$form->getElement('lastname')->setAttribute('pattern', '[a-zA-ZñÑ]+');
+$form->getElement('lastname')->setAttribute('title', get_lang('OnlyLetters', null, 'spanish', true));
 $form->getElement('extra_mothers_name')->setAttribute('maxlength', 30);
+$form->getElement('extra_mothers_name')->setAttribute('pattern', '[a-zA-ZñÑ]+');
+$form->getElement('extra_mothers_name')->setAttribute('title', get_lang('OnlyLetters', null, 'spanish', true));
 $form->getElement('email')->_label = get_lang('Email', null, 'spanish', true);
 $form->getElement('email')->setAttribute('maxlength', 50);
 $form->getElement('email')->setAttribute('type', 'email');
@@ -467,15 +475,18 @@ $form->getElement('picture')->_label = [
 ];
 $form->getElement('phone')->_label = [
     get_lang('Phone', null, 'spanish', true),
-    'Ejemplo: (51)017110000'
+    'Ejemplo: 017110000'
 ];
-$form->getElement('phone')->setAttribute('maxlength', 13);
+$form->getElement('phone')->setAttribute('maxlength', 12);
+$form->getElement('phone')->setAttribute('pattern', '\\d{1,12}');
 $form->getElement('extra_mobile_phone_number')->_label = [
     'Número de celular ('.get_lang('CountryDialCode', null, 'spanish', true).')',
-    'Ejemplo: (51)987654321'
+    'Ejemplo: 987654321'
 ];
-$form->getElement('extra_mobile_phone_number')->setAttribute('maxlength', 13);
+$form->getElement('extra_mobile_phone_number')->setAttribute('maxlength', 12);
+$form->getElement('extra_mobile_phone_number')->setAttribute('placeholder', '978654321');
 $form->getElement('extra_address')->_label = get_lang('AddressField', null, 'spanish', true);
+$form->getElement('extra_address')->setAttribute('maxlength', 100);
 $form->getElement('extra_sex')->_label = get_lang('UserSex', null, 'spanish', true);
 $form->getElement('extra_guardian_name')->setAttribute('maxlength', 60);
 $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
@@ -602,14 +613,6 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
                     addProgress('profile');
                 });
 
-                function onMobileNumberLoad() {
-                    $txtMobilePhone.val(
-                        $txtMobilePhone.val()
-                            .replace(/[^\d]+/g, '')
-                            .replace(/(\d{2})(\d{9})/, '($1)$2')
-                    );
-                }
-
                 function onDocumentIdTypeSelected(selectedIndex, $el) {
                     switch (selectedIndex) {
                         case 1:
@@ -621,15 +624,15 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
                             break;
                         case 2:
                             $el.attr({
-                                pattern: '\\d{9}',
-                                maxlength: '9',
+                                pattern: '\\d{1,12}',
+                                maxlength: '12',
                                 title: '<?php echo get_lang('OnlyNumbers', null, 'spanish', true) ?>'
                             });
                             break;
                         case 3:
                             $el.attr({
-                                pattern: '[a-zA-Z0-9]+',
-                                maxlength: '',
+                                pattern: '[a-zA-Z0-9]{1,12}',
+                                maxlength: '12',
                                 title: '<?php echo get_lang('OnlyLettersAndNumbers', null, 'spanish', true) ?>'
                             });
                             break;
@@ -869,7 +872,6 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
                             onDocumentIdTypeSelected($slctDocument.prop('selectedIndex'), $txtDocument);
                             onDocumentIdTypeSelected($slctGuardianDocument.prop('selectedIndex'), $txtGuardianDocument);
                             onStudentBirthday();
-                            onMobileNumberLoad();
                             onDepartmentSelected(defaultValues.extra_address_department, $slctAddressProvince)
                                 .done(function () {
                                     $slctAddressProvince
@@ -931,7 +933,7 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
                 $slctAddressDistrict.required(true);
                 $slctLocation.required(true);
                 $txtMobilePhone.required(true).attr({
-                    'pattern': '(\\(\\d{2}\\))(\\d{9})',
+                    'pattern': '\\d{1,12}',
                     'title': $txtMobilePhone.attr('placeholder')
                 });
                 $slctOccupation.required(true).on('change', function () {

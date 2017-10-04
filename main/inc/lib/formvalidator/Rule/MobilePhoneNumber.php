@@ -20,7 +20,7 @@ class HTML_QuickForm_Rule_Mobile_Phone_Number extends HTML_QuickForm_Rule
      */
     function validate($mobilePhoneNumber, $options = null)
     {
-        $rule = "/^\d{11}$/";
+        $rule = "/^\d{1,12}$/";
         return preg_match($rule, $mobilePhoneNumber);
     }
 }

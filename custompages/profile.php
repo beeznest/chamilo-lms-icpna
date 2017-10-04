@@ -458,12 +458,13 @@ $form->getElement('extra_middle_name')->setAttribute('maxlength', 30);
 $form->getElement('lastname')->_label = get_lang('LastName', null, 'es-icpna', true);
 $form->getElement('lastname')->setAttribute('maxlength', 30);
 $form->getElement('extra_mothers_name')->setAttribute('maxlength', 30);
-$form->getElement('email')->_label = [
-    get_lang('Email', null, 'spanish', true),
+$form->getElement('email')->_label = get_lang('Email', null, 'spanish', true);
+$form->getElement('email')->setAttribute('maxlength', 50);
+$form->getElement('email')->setAttribute('type', 'email');
+$form->getElement('picture')->_label = [
+    get_lang('UpdateImage', null, 'spanish', true),
     get_lang('OnlyImagesAllowed', null, 'spanish', true)
 ];
-$form->getElement('email')->setAttribute('maxlength', 50);
-$form->getElement('picture')->_label = get_lang('UpdateImage', null, 'spanish', true);
 $form->getElement('phone')->_label = [
     get_lang('Phone', null, 'spanish', true),
     'Ejemplo: (51)017110000'
@@ -484,8 +485,15 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
         <div class="col-md-10">
             <?php foreach ($formErrros as $name => $error) { ?>
                 <div id="registration-form-error" class="alert alert-danger">
-                    <strong><?php echo $form->getElement($name)->getLabel() ?></strong>
-                    <?php echo $error ?>
+                    <strong><?php
+                        $label = $form->getElement($name)->getLabel();
+
+                        if (is_array($label)) {
+                            echo implode('<br>', $label);
+                        } else {
+                            echo $label.'<br>'.$error;
+                        }
+                        ?></strong>
                 </div>
             <?php } ?>
             <div class="box box-primary">
@@ -515,7 +523,7 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title"><?php echo get_lang('YouHaveToAcceptTermsAndConditions', null, 'spanish', true) ?></h4>
+                    <h4 class="modal-title">Política de Privacidad de Datos</h4>
                 </div>
                 <div class="modal-body">
                     <p id="title-modal" class="text-center"></p>

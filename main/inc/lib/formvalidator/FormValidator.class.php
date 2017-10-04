@@ -1810,5 +1810,6 @@ function mobile_phone_number_filter($mobilePhoneNumber)
 {
     $mobilePhoneNumber = str_replace(array('+', '(', ')'), '', $mobilePhoneNumber);
 
-    return ltrim($mobilePhoneNumber, '0');
+    //return ltrim($mobilePhoneNumber, '0');
+    return $mobilePhoneNumber;
 }

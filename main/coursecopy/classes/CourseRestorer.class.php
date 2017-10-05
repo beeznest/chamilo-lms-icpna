@@ -1160,7 +1160,7 @@ class CourseRestorer
                         'end_time' => $quiz->end_time,
                         'feedback_type' => (int) $quiz->feedback_type,
                         'random_answers' => (int) $quiz->random_answers,
-                        'random_by_category' => $quiz->random_by_category,
+                        'random_by_category' => 0, //$quiz->random_by_category,
                         'review_answers' => $quiz->review_answers,
                         'propagate_neg' => $quiz->propagate_neg,
                         'text_when_finished' => $quiz->text_when_finished,

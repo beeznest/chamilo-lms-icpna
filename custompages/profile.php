@@ -238,7 +238,7 @@ $form->addSelect(
 $form->removeElement('extra_address_department');
 $form->addSelect(
     'extra_address_department',
-    'Dirección (departamento / provincia / distrito)',
+    'Dirección (Departamento / Provincia / Distrito)',
     ['' => get_lang('SelectAnOption', null, 'spanish', true)],
     ['id' => 'extra_address_department']
 );
@@ -246,7 +246,7 @@ $form->addSelect(
 $form->removeElement('extra_address_province');
 $form->addSelect(
     'extra_address_province',
-    'Dirección (provincia)',
+    'Dirección (Provincia)',
     ['' => get_lang('SelectAnOption', null, 'spanish', true)],
     ['id' => 'extra_address_province']
 );
@@ -254,7 +254,7 @@ $form->addSelect(
 $form->removeElement('extra_address_district');
 $form->addSelect(
     'extra_address_district',
-    'Dirección (distrito)',
+    'Dirección (Distrito)',
     ['' => get_lang('SelectAnOption', null, 'spanish', true)],
     ['id' => 'extra_address_district']
 );
@@ -270,7 +270,7 @@ $form->addSelect(
 $form->removeElement('extra_occupation_department');
 $form->addSelect(
     'extra_occupation_department',
-    'Dirección del centro de estudios/laboral (departamento / provincia / distrito)',
+    'Dirección del centro de estudios/laboral (Departamento / Provincia / Distrito)',
     ['' => get_lang('SelectAnOption', null, 'spanish', true)],
     ['id' => 'extra_occupation_department']
 );
@@ -627,9 +627,9 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
                             break;
                         case 2:
                             $el.attr({
-                                pattern: '\\d{1,12}',
+                                pattern: '[a-zA-Z0-9]{1,12}',
                                 maxlength: '12',
-                                title: '<?php echo get_lang('OnlyNumbers', null, 'spanish', true) ?>'
+                                title: '<?php echo get_lang('OnlyLettersAndNumbers', null, 'spanish', true) ?>'
                             });
                             break;
                         case 3:

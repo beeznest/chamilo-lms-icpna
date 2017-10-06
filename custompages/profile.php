@@ -831,6 +831,29 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
                     $el.selectpicker('refresh');
                 }
 
+                function validateDocumentNumbers() {
+                    if (!$txtGuardianDocument.get(0).setCustomValidity) {
+                        return;
+                    }
+
+                    var studentDocumentType = $slctDocument.prop('selectedIndex'),
+                        studentDocumentNumber = $txtDocument.val().trim(),
+                        guardianDocumentType = $slctGuardianDocument.prop('selectedIndex'),
+                        guardianDocumentNumber = $txtGuardianDocument.val().trim();
+
+                    if (studentDocumentNumber == guardianDocumentNumber
+                        && studentDocumentType == guardianDocumentType) {
+                        $txtGuardianDocument.get(0).setCustomValidity(
+                            "El número de documento no puede ser igual al del estudiante: " +
+                            $slctDocument.prop('selectedOptions')[0].text + ' - ' + studentDocumentNumber
+                        );
+
+                        return;
+                    }
+
+                    $txtGuardianDocument.get(0).setCustomValidity('');
+                }
+
                 (function () {
                     var defaultValues = <?php echo json_encode($defaultValues); ?>;
 
@@ -910,6 +933,8 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
 
                             $('span.form_required + small')
                                 .text('<?php echo get_lang('ThisFieldIsRequired', null, 'spanish', true) ?>');
+
+                            validateDocumentNumbers();
                         });
                 })();
 
@@ -967,6 +992,9 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
                 $slctGuardianDocument.on('change', function () {
                     $txtGuardianDocument.val('');
                     onDocumentIdTypeSelected(this.selectedIndex, $txtGuardianDocument);
+                });
+                $txtGuardianDocument.on('change', function () {
+                    validateDocumentNumbers();
                 });
             });
         })();

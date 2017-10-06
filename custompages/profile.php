@@ -346,7 +346,8 @@ $form->addElement('html', '
             </button>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" required id="chk_terms"> '.get_lang('IAcceptTermsAndConditions', null, 'spanish', true).'
+                    <input type="checkbox" required id="chk_terms">
+                    '.get_lang('IAcceptTermsAndConditions', null, 'spanish', true).'
                 </label>
             </div>
         </div>
@@ -541,7 +542,9 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
                     <p id="text-modal" class="text-justify"></p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo get_lang('Close', null, 'spanish', true) ?></button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <?php echo get_lang('Close', null, 'spanish', true) ?>
+                    </button>
                 </div>
             </div>
         </div>

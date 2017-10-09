@@ -474,6 +474,7 @@ $form->getElement('picture')->_label = [
     get_lang('UpdateImage', null, 'spanish', true),
     get_lang('OnlyImagesAllowed', null, 'spanish', true)
 ];
+$form->getElement('picture')->setAttribute('title', get_lang('OnlyImagesAllowed', null, 'spanish', true));
 $form->getElement('phone')->_label = [
     get_lang('Phone', null, 'spanish', true),
     'Ejemplo: 017110000'

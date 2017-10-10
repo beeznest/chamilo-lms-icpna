@@ -17,7 +17,7 @@ $form = isset($content['form']) ? $content['form'] : null;
 $formErrros = $form->_errors;
 $defaultValues = $form->exportValues();
 
-Display::display_header(get_lang('EditProfile', null, 'spanish', true));
+Display::display_header(get_lang('EditInformation', null, 'es-icpna', true));
 
 if (!$form->elementExists('extra_id_document_type') || !$form->elementExists('extra_id_document_number')
     || !$form->elementExists('extra_middle_name')
@@ -332,7 +332,7 @@ $form->addSelect(
 );
 
 $form->removeElement('extra_guardian_name');
-$form->addText('extra_guardian_name', 'Nombre del apoderado', false);
+$form->addText('extra_guardian_name', 'Nombre y apellido del apoderado', false);
 
 $form->removeElement('extra_guardian_email');
 $form->addText('extra_guardian_email', 'Email del apoderado', false);
@@ -453,7 +453,7 @@ $form->insertElementBefore(
 );
 
 // Translate chamilo default profile elements
-$form->getElement('firstname')->_label = get_lang('FirstName', null, 'spanish', true);
+$form->getElement('firstname')->_label = get_lang('FirstName', null, 'es-icpna', true);
 $form->getElement('firstname')->setAttribute('maxlength', 30);
 $form->getElement('firstname')->setAttribute('pattern', '[a-zA-ZñÑ\s\-]+');
 $form->getElement('firstname')->setAttribute('title', get_lang('OnlyLetters', null, 'spanish', true));
@@ -513,7 +513,7 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
             <div class="box box-primary">
                 <div class="box-body">
                     <div class="box-header with-border">
-                        <h3 class="box-title"><?php echo get_lang('ModifProfile', null, 'spanish', true); ?></h3>
+                        <h3 class="box-title"><?php echo get_lang('EditInformation', null, 'es-icpna', true); ?></h3>
                     </div>
                     <div id="registration-form-box" class="form-box well">
                         <?php

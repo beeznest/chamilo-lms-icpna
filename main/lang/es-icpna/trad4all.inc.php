@@ -206,3 +206,5 @@ $LPExerciseResultsBySession="Resultados de los ejercicios de las lecciones por p
 // userInfo.inc.php
 $ThisStudentIsSubscribeThroughASession="Este estudiante está inscrito en este curso mediante un programa académico. No puede editar su información";
 $LastName="Apellido paterno";
+$FirstName="Primer nombre";
+$EditInformation="Actualizar datos personales";

@@ -6,3 +6,4 @@ $langMyAgenda = "Agenda";
 $CampusHomepage = "Home";
 $SocialNetwork = "Social";
 $ShowStudentViewTitle="Learner View";
+$EditInformation="Update personal information";

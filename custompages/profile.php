@@ -659,10 +659,10 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
                 }
 
                 function onStudentBirthday() {
-                    $txtGuardianName.required(false);
-                    $txtGuardianEmail.required(false);
-                    $slctGuardianDocument.required(false);
-                    $txtGuardianDocument.required(false);
+                    $txtGuardianName.val('').required(false);
+                    $txtGuardianEmail.val('').required(false);
+                    $slctGuardianDocument.val('').required(false);
+                    $txtGuardianDocument.val('').required(false);
 
                     var age = checkAge();
 
@@ -972,6 +972,7 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
                     $slctOccupationName1.empty().selectpicker('refresh');
                     $slctOccupationName2.empty().selectpicker('refresh');
                     $slctOccupationName3.empty().selectpicker('refresh');
+                    $txtOccupationName4.val('');
                 });
                 $slctOccupationDepartment.required(true).on('change', function () {
                     $slctOccupationDistrict.empty().selectpicker('refresh');

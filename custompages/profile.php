@@ -15,7 +15,6 @@ require_once __DIR__.'/language.php';
 $form = isset($content['form']) ? $content['form'] : null;
 
 $formErrros = $form->_errors;
-$defaultValues = $form->exportValues();
 
 Display::display_header(get_lang('EditInformation', null, 'es-icpna', true));
 
@@ -48,10 +47,14 @@ if (!$form->elementExists('extra_id_document_type') || !$form->elementExists('ex
     exit;
 }
 
+$plugin = IcpnaUpdateUserPlugin::create();
 $efv = new ExtraFieldValue('user');
 $uididpersona = $efv->get_values_by_handler_and_field_variable(api_get_user_id(), 'uididpersona');
-
 $form->addHidden('extra_uididpersona', $uididpersona['value']);
+$form->setDefaults(
+    $plugin->getUserInfo($uididpersona['value'])
+);
+$defaultValues = $form->exportValues();
 
 /**
  * Removes some unwanted elementend of the form object

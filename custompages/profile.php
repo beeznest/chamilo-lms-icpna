@@ -947,7 +947,26 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
                     $txtDocument.val('');
                     onDocumentIdTypeSelected(this.selectedIndex, $txtDocument);
                 });
-                $txtDocument.required(true);
+                $txtDocument.required(true).on('change', function () {
+                    var self = this;
+
+                    $.getJSON(url, {
+                        a: 'validate_id_document',
+                        uididpersona: '<?php echo $uididpersona['value'] ?>',
+                        uididtipo: $slctDocument.val(),
+                        number: self.value
+                    }, function (response) {
+                        if (!self.setCustomValidity) {
+                            return;
+                        }
+
+                        if (response.repeated) {
+                            self.setCustomValidity('El número de documento ya se encuentra registrado');
+                        } else {
+                            self.setCustomValidity('');
+                        }
+                    });
+                });
                 $txtFirstname.required(true);
                 $txtLastname.required(true);
                 $txtEmail.required(true);

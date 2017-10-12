@@ -53,6 +53,19 @@ switch ($action) {
     case 'get_carrerauniversitaria':
         $return = $plugin->getCarrerauniversitaria();
         break;
+    case 'validate_id_document':
+        $uididPersona = isset($_REQUEST['uididpersona']) ? $_REQUEST['uididpersona'] : null;
+        $uididType = isset($_REQUEST['uididtipo']) ? $_REQUEST['uididtipo'] : null;
+        $docNumber = isset($_REQUEST['number']) ? $_REQUEST['number'] : null;
+
+        if (!isset($uididPersona, $uididType, $docNumber)) {
+            break;
+        }
+
+        $return = [
+            'repeated' => $plugin->validateIdDocument($uididPersona, $uididType, $docNumber)
+        ];
+        break;
     default:
         $return = [];
 }

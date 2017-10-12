@@ -323,4 +323,35 @@ class IcpnaUpdateUserPlugin extends Plugin
 
         return $return;
     }
+
+    /**
+     * Call to validaDocumentoIdentidad function
+     * @param string $uididPersona
+     * @param string $uididType
+     * @param string $docNumber
+     * @return bool
+     */
+    public function validateIdDocument($uididPersona, $uididType, $docNumber)
+    {
+        $wsUrl = $this->get(self::SETTING_WEB_SERVICE);
+
+        if (empty($wsUrl)) {
+            return true;
+        }
+
+        try {
+            $client = new SoapClient($wsUrl);
+            $result = $client
+                ->validaDocumentoIdentidad([
+                    'uididpersona' => $uididPersona,
+                    'uididdocumentoidentidad' => $uididType,
+                    'vchnumerodocumento' => $docNumber
+                ])
+                ->validaDocumentoIdentidadResult;
+
+            return (bool) $result;
+        } catch (Exception $e) {
+            return true;
+        }
+    }
 }

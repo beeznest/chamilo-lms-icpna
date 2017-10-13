@@ -480,14 +480,14 @@ $form->getElement('picture')->_label = [
 $form->getElement('picture')->setAttribute('title', get_lang('OnlyImagesAllowed', null, 'spanish', true));
 $form->getElement('phone')->_label = [
     get_lang('Phone', null, 'spanish', true),
-    'De 9 a 15 dígitos. Por ejemplo: 017110000'
+    'De 6 a 12 dígitos. Por ejemplo: 017110000'
 ];
-$form->getElement('phone')->setAttribute('maxlength', 15);
-$form->getElement('phone')->setAttribute('pattern', '\\d{9,15}');
-$form->getElement('phone')->setAttribute('title', 'De 9 a 15 dígitos. Por ejemplo: 017110000');
+$form->getElement('phone')->setAttribute('maxlength', 12);
+$form->getElement('phone')->setAttribute('pattern', '\\d{6,12}');
+$form->getElement('phone')->setAttribute('title', 'De 6 a 12 dígitos. Por ejemplo: 017110000');
 $form->getElement('extra_mobile_phone_number')->_label = [
     'Celular',
-    'Ejemplo: 987654321'
+    'De 9 a 15 dígitos. Ejemplo: 987654321'
 ];
 $form->getElement('extra_mobile_phone_number')->setAttribute('maxlength', 15);
 $form->getElement('extra_mobile_phone_number')->setAttribute('placeholder', 'De 9 a 15 dígitos. Por ejemplo: 978654321');
@@ -609,6 +609,7 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                     $txtBirthdate = $('#extra_birthdate'),
                     $txtPhone = $('#profile_phone'),
                     $txtMobilePhone = $('#profile_extra_mobile_phone_number'),
+                    $txtPicture = $('#picture'),
                     url = _p.web_plugin + 'icpna_update_user/ajax.php',
                     $form = $('form#profile');
 
@@ -981,7 +982,7 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                 $slctSex.required(true);
                 $txtBirthdate.required(true).change(function () {
                     onStudentBirthday();
-                });
+                }).datepicker('option', 'maxDate', '+0d -4y');
                 $slctNationality.required(true);
                 $slctAddressDepartment.required(true).on('change', function () {
                     onDepartmentSelected(this.value, $slctAddressProvince);
@@ -1028,6 +1029,22 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                 });
                 $txtGuardianDocument.on('change', function () {
                     validateDocumentNumbers();
+                });
+                $txtPicture.parent().next().append(function () {
+                    var $btn = $('<button>')
+                        .attr({
+                            type: 'button',
+                            class: 'btn btn-default btn-sm'
+                        })
+                        .html('<span class="fa fa-times" aria-hidden="true"></span>' +
+                            '<span class="sr-only">Limpiar</span>')
+                        .on('click', function () {
+                            $txtPicture.val('');
+                            $('#picture_preview_image').cropper('clear').cropper('reset');
+                            $('#picture-form-group').hide();
+                        });
+
+                    return $btn;
                 });
             });
         })();

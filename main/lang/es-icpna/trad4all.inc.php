@@ -208,3 +208,4 @@ $ThisStudentIsSubscribeThroughASession="Este estudiante está inscrito en este c
 $LastName="Apellido paterno";
 $FirstName="Primer nombre";
 $EditInformation="Actualizar datos personales";
+$OnlyNumbers = "Solamente números";

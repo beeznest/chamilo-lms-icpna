@@ -630,7 +630,7 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                             $el.attr({
                                 pattern: '\\d{8}',
                                 maxlength: '8',
-                                title: '<?php echo get_lang('OnlyNumbers', null, 'spanish', true) ?>. 8 dígitos'
+                                title: '<?php echo get_lang('OnlyNumbers', null, 'es-icpna', true) ?>. 8 dígitos'
                             });
                             break;
                         case 2:

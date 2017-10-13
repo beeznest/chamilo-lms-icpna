@@ -335,7 +335,7 @@ $form->addSelect(
 );
 
 $form->removeElement('extra_guardian_name');
-$form->addText('extra_guardian_name', 'Nombre y apellido del apoderado', false);
+$form->addText('extra_guardian_name', 'Nombres y apellidos del apoderado', false);
 
 $form->removeElement('extra_guardian_email');
 $form->addText('extra_guardian_email', 'Email del apoderado', false);
@@ -486,7 +486,7 @@ $form->getElement('phone')->setAttribute('maxlength', 15);
 $form->getElement('phone')->setAttribute('pattern', '\\d{9,15}');
 $form->getElement('phone')->setAttribute('title', 'De 9 a 15 dígitos. Por ejemplo: 017110000');
 $form->getElement('extra_mobile_phone_number')->_label = [
-    'Número de celular ('.get_lang('CountryDialCode', null, 'spanish', true).')',
+    'Celular',
     'Ejemplo: 987654321'
 ];
 $form->getElement('extra_mobile_phone_number')->setAttribute('maxlength', 15);
@@ -971,6 +971,7 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                             self.setCustomValidity('El número de documento ya se encuentra registrado');
                         } else {
                             self.setCustomValidity('');
+                            validateDocumentNumbers();
                         }
                     });
                 });

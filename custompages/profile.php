@@ -480,22 +480,24 @@ $form->getElement('picture')->_label = [
 $form->getElement('picture')->setAttribute('title', get_lang('OnlyImagesAllowed', null, 'spanish', true));
 $form->getElement('phone')->_label = [
     get_lang('Phone', null, 'spanish', true),
-    'Ejemplo: 017110000'
+    'De 9 a 15 dígitos. Por ejemplo: 017110000'
 ];
-$form->getElement('phone')->setAttribute('maxlength', 12);
-$form->getElement('phone')->setAttribute('pattern', '\\d{1,12}');
+$form->getElement('phone')->setAttribute('maxlength', 15);
+$form->getElement('phone')->setAttribute('pattern', '\\d{9,15}');
+$form->getElement('phone')->setAttribute('title', 'De 9 a 15 dígitos. Por ejemplo: 017110000');
 $form->getElement('extra_mobile_phone_number')->_label = [
     'Número de celular ('.get_lang('CountryDialCode', null, 'spanish', true).')',
     'Ejemplo: 987654321'
 ];
-$form->getElement('extra_mobile_phone_number')->setAttribute('maxlength', 12);
-$form->getElement('extra_mobile_phone_number')->setAttribute('placeholder', '978654321');
+$form->getElement('extra_mobile_phone_number')->setAttribute('maxlength', 15);
+$form->getElement('extra_mobile_phone_number')->setAttribute('placeholder', 'De 9 a 15 dígitos. Por ejemplo: 978654321');
 $form->getElement('extra_address')->_label = get_lang('AddressField', null, 'spanish', true);
 $form->getElement('extra_address')->setAttribute('maxlength', 100);
 $form->getElement('extra_sex')->_label = get_lang('UserSex', null, 'spanish', true);
 $form->getElement('extra_guardian_name')->setAttribute('maxlength', 60);
 $form->getElement('extra_guardian_name')->setAttribute('pattern', '[a-zA-ZñÑ\s\-]+');
 $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
+$form->getElement('extra_guardian_email')->setAttribute('type', 'email');
 ?>
 
     <div class="row">
@@ -627,21 +629,21 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
                             $el.attr({
                                 pattern: '\\d{8}',
                                 maxlength: '8',
-                                title: '<?php echo get_lang('OnlyNumbers', null, 'spanish', true) ?>'
+                                title: '<?php echo get_lang('OnlyNumbers', null, 'spanish', true) ?>. 8 dígitos'
                             });
                             break;
                         case 2:
                             $el.attr({
-                                pattern: '[a-zA-Z0-9]{1,12}',
+                                pattern: '[a-zA-Z0-9]{12}',
                                 maxlength: '12',
-                                title: '<?php echo get_lang('OnlyLettersAndNumbers', null, 'spanish', true) ?>'
+                                title: '<?php echo get_lang('OnlyLettersAndNumbers', null, 'spanish', true) ?>. 12 caracteres'
                             });
                             break;
                         case 3:
                             $el.attr({
-                                pattern: '[a-zA-Z0-9]{1,12}',
+                                pattern: '[a-zA-Z0-9]{9,12}',
                                 maxlength: '12',
-                                title: '<?php echo get_lang('OnlyLettersAndNumbers', null, 'spanish', true) ?>'
+                                title: '<?php echo get_lang('OnlyLettersAndNumbers', null, 'spanish', true) ?>. De 9 a 12 caracteres'
                             });
                             break;
                     }
@@ -662,14 +664,19 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
                 }
 
                 function onStudentBirthday() {
-                    $txtGuardianName.val('').required(false);
-                    $txtGuardianEmail.val('').required(false);
-                    $slctGuardianDocument.val('').required(false);
-                    $txtGuardianDocument.val('').required(false);
+                    $txtGuardianName.required(false);
+                    $txtGuardianEmail.required(false);
+                    $slctGuardianDocument.required(false);
+                    $txtGuardianDocument.required(false);
 
                     var age = checkAge();
 
                     if (age >= 18) {
+                        $txtGuardianName.val('');
+                        $txtGuardianEmail.val('');
+                        $slctGuardianDocument.selectpicker('val', '');
+                        $txtGuardianDocument.val('');
+
                         $divGuardian.hide();
                         $modalTitle.html(
                             '<h3>DECLARACION DE PROTECCION DE DATOS PERSONALES MAYOR DE 18 AÑOS DE EDAD</h3>'
@@ -985,7 +992,7 @@ $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
                 $slctAddressDistrict.required(true);
                 $slctLocation.required(true);
                 $txtMobilePhone.required(true).attr({
-                    'pattern': '\\d{1,12}',
+                    'pattern': '\\d{9,15}',
                     'title': $txtMobilePhone.attr('placeholder')
                 });
                 $slctOccupation.required(true).on('change', function () {

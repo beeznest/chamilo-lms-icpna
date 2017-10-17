@@ -4396,7 +4396,7 @@ class Tracking
     {
         foreach ($courseList as $courseInfo) {
             if (strpos($courseInfo['code'], $needle) === false) {
-                ontinue;
+                continue;
             }
 
             return true;

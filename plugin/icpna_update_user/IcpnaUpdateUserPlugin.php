@@ -354,4 +354,32 @@ class IcpnaUpdateUserPlugin extends Plugin
             return true;
         }
     }
+
+    /**
+     * Call to validaDatosCompletos function
+     * Web service returns 0 if the profile is completed, otherwiswe return 1
+     * @param string $uididpersona
+     * @return bool Return true if progile is completed, otherwise return false
+     */
+    public function profileIsCompleted($uididpersona)
+    {
+        $wsUrl = $this->get(self::SETTING_WEB_SERVICE);
+
+        if (empty($wsUrl)) {
+            return true;
+        }
+
+        try {
+            $client = new SoapClient($wsUrl);
+            $result = $client
+                ->validaDatosCompletos([
+                    'uididpersona' => $uididpersona,
+                ])
+                ->validaDatosCompletosResult;
+
+            return !$result;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
 }

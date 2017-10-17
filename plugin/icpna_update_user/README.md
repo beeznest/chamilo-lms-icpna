@@ -18,6 +18,12 @@ Installation procedure
 
 6. Check that changes to the basic user fields are allowed in the "User" section of the platform settings.
 
+7. Search `page_after_login` in *Configuration Settings* page, then set the following parameters and save configuration:
+- *Learner page after login* to `plugin/icpna_update_user/redirect.php`
+- *Teacher page after login* to `plugin/icpna_update_user/redirect.php`
+- *Human resources manager page after login* to `plugin/icpna_update_user/redirect.php`
+- *Session admin page after login* to `plugin/icpna_update_user/redirect.php`
+
 Once all this is configured, your users' profile should be attached to an external application and any update should be sent directly there.
 
 This has been developed through BeezNest's task system, reference BT#13382

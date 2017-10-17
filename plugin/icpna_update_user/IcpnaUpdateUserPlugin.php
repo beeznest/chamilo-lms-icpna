@@ -1,6 +1,8 @@
 <?php
 /* For licensing terms, see /license.txt */
 
+use Chamilo\CoreBundle\Component\Utils\ChamiloApi;
+
 class IcpnaUpdateUserPlugin extends Plugin
 {
     const SETTING_ENABLE = 'enable_hook';
@@ -381,5 +383,42 @@ class IcpnaUpdateUserPlugin extends Plugin
         } catch (Exception $e) {
             return false;
         }
+    }
+
+    /**
+     * Redirect to redirect.php file to validate profile
+     */
+    public function redirect()
+    {
+        if (ChamiloApi::isAjaxRequest()) {
+            return;
+        }
+
+        $userId = api_get_user_id();
+
+        if (!$userId) {
+            return;
+        }
+
+        $filter = [
+            '/main/auth/profile.php',
+            '/plugin/icpna_update_user/redirect.php'
+        ];
+
+        if (in_array($_SERVER['PHP_SELF'], $filter)) {
+            return;
+        }
+
+        $efv = new ExtraFieldValue('user');
+        $uididpersona = $efv->get_values_by_handler_and_field_variable($userId, 'uididpersona');
+
+        $profileIsCompleted = $this->profileIsCompleted($uididpersona['value']);
+
+        if ($profileIsCompleted) {
+            return;
+        }
+
+        header('Location: '.api_get_path(WEB_CODE_PATH).'auth/profile.php');
+        exit;
     }
 }

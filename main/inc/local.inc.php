@@ -1509,6 +1509,8 @@ if ((isset($cas_login) && $cas_login && exist_firstpage_parameter()) ||
 
 Redirect::session_request_uri($logging_in, $user_id);
 
+IcpnaUpdateUserPlugin::create()->redirect();
+
 if (!ChamiloApi::isAjaxRequest() && api_get_configuration_value('allow_mandatory_survey')) {
     SurveyManager::protectByMandatory();
 }

@@ -400,6 +400,10 @@ class IcpnaUpdateUserPlugin extends Plugin
             return;
         }
 
+        if (!api_is_student()) {
+            return;
+        }
+
         $filter = [
             '/main/auth/profile.php',
             '/plugin/icpna_update_user/redirect.php'

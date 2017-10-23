@@ -173,9 +173,10 @@ $formRenderer->setElementTemplate(
 
 $formRenderer->setElementTemplate(
     '
-        <div id="guardian_div">
-            <div class="form-group">
-                <div class="col-sm-8 col-sm-offset-2">
+        <fieldset id="guardian_div">
+            <legend>Actualizar datos personales - Padre de familia</legend>
+            <div class="row">
+                <div class="col-sm-12">
                     <div class="alert alert-warning">
                     Si eres menor de edad, es necesario registrar los datos de tu padre, madre o apoderado
                     </div>
@@ -210,7 +211,7 @@ $formRenderer->setElementTemplate(
                     <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
                 </div>
             </div>
-        </div><!-- #guardian_div -->
+        </fieldset><!-- #guardian_div -->
     ',
     'extra_guardian_id_document_number'
 );
@@ -670,7 +671,24 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                     $slctGuardianDocument.required(false);
                     $txtGuardianDocument.required(false);
 
-                    var age = checkAge();
+                    var age = checkAge(),
+                        occupationOptions = $slctOccupation.find('option').hide();
+
+                    if (age >= 4 && age <= 17) {
+                        occupationOptions
+                            .filter(function (i) {
+                                return i <= 1;
+                            })
+                            .show();
+                    } else if (age > 17) {
+                        occupationOptions
+                            .filter(function (i) {
+                                return i > 1;
+                            })
+                            .show();
+                    }
+
+                    $slctOccupation.selectpicker('refresh');
 
                     if (age >= 18) {
                         $txtGuardianName.val('');
@@ -689,17 +707,17 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                             'inequívoca y por tiempo indefinido que mis datos personales, sean tratados, ' +
                             'almacenados, sistematizados y utilizados por el INSTITUTO CULTURAL PERUANO ' +
                             'NORTEAMERICANO para fines estadísticos, administrativos y de gestión comercial, ' +
-                            'incluyendo invitaciones a cursos, talleres, charlas y otros eventos que el ICPNA ' +
-                            'organice, auspicie o participe, siendo que los datos, serán conservados en un banco de ' +
-                            'datos cuyo titular es el ICPNA, autorizando incluso el flujo transfronterizo con fines ' +
-                            'académicos y/o destinado a la administración de exámenes internacionales. Asimismo, ' +
-                            'declaro que estoy informado que ante alguna solicitud de datos personales sensibles, es ' +
-                            'mi facultad responder o no sobre los mismos e igualmente declaro conocer los efectos ' +
-                            'y/o consecuencias de proporcionar mis datos personales o de negarme a brindarlos. ' +
-                            'Igualmente declaro conocer que para ejercer mis derechos como acceso, rectificación, ' +
-                            'cancelación y oposición y otros derechos, sobre mis datos puedo dirigirme a las ' +
-                            'oficinas, ubicadas en Av. Angamos Oeste 120, Miraflores. Declaro conocer los alcances ' +
-                            'de la Ley 29733 y su reglamento, para ejercer mis derechos conforme a Ley.'
+                            'incluyendo pero sin estar limitado a: invitaciones a cursos, talleres, charlas y otros ' +
+                            'eventos que el ICPNA organice, auspicie o participe, siendo que los datos, serán ' +
+                            'conservados en un banco de datos cuyo titular es el ICPNA, autorizando incluso su ' +
+                            'tratamiento internacional si fuera el caso. Asimismo, declaro que estoy informado que ' +
+                            'ante alguna solicitud de datos personales sensibles, es mi facultad responder o no ' +
+                            'sobre los mismos e igualmente declaro conocer los efectos y/o consecuencias de ' +
+                            'proporcionar mis datos personales o de negarme a brindarlos. Igualmente declaro conocer ' +
+                            'que para ejercer mis derechos como acceso, rectificación, cancelación y oposición y ' +
+                            'otros derechos, sobre mis datos puedo dirigirme a las oficinas, ubicadas en Av. Angamos ' +
+                            'Oeste 120, Miraflores. Declaro conocer los alcances de la Ley 29733 y su reglamento, ' +
+                            'para ejercer mis derechos conforme a Ley.'
                         );
 
                         return;
@@ -716,28 +734,28 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                         );
                         $modalText.html(
                             'En aplicación a lo dispuesto por la Ley 29733 Ley de Protección de Datos Personales, ' +
-                            'y el D.S.003-2013-JUS, y en especial en el artículo 28 del D.S.003-2013-JUS, el ' +
+                            'y el D.S. 003-2013-JUS, y en especial en el artículo 28 del D.S.003-2013-JUS, el ' +
                             'suscrito menor de edad, titular de mis datos personales, mediante el llenado y/o firma ' +
                             'del presente formulario, autorizo de forma expresa e inequívoca y por tiempo indefinido ' +
                             'que mis datos personales, sean tratados, almacenados, sistematizados y utilizados por ' +
                             'el INSTITUTO CULTURAL PERUANO NORTEAMERICANO para fines estadísticos, administrativos y ' +
-                            'de gestión comercial, incluyendo invitaciones a cursos, talleres, charlas y otros ' +
-                            'eventos que el ICPNA organice, auspicie o participe, siendo que los datos, serán ' +
-                            'conservados en un banco de datos cuyo titular es el ICPNA, autorizando incluso el flujo ' +
-                            'transfronterizo con fines académicos y/o destinado a la administración de exámenes ' +
-                            'internacionales. Asimismo, declaro que estoy informado que ante alguna solicitud de ' +
-                            'datos personales sensibles, es mi facultad responder o no sobre los mismos e igualmente ' +
-                            'declaro conocer los efectos y/o consecuencias de proporcionar mis datos personales o de ' +
-                            'negarme a brindarlos. Igualmente declaro conocer que para ejercer mis derechos como ' +
-                            'acceso, rectificación, cancelación y oposición y otros derechos, sobre mis datos puedo ' +
-                            'dirigirme a las oficinas, ubicadas en Av. Angamos Oeste 120, Miraflores. Señalo ' +
-                            'también, que al ser yo menor de edad, el ICPNA no me está solicitando datos relativos a ' +
-                            'la actividad profesional o laboral de mis padres, ni su información económica, datos ' +
-                            'sociológicos o de cualquier otro sobre los demás miembros de mi familia. Asimismo, ' +
-                            'declaro que estoy informando al ICPNA de la identidad y dirección de mis padres, a fin ' +
-                            'de que ellos puedan autorizar el tratamiento de mis datos personales, en aquellos casos ' +
-                            'en que mi propia autorización no fuera suficiente y que estén referidas al acceso a ' +
-                            'actividades, vinculadas con bienes o servicios que estén restringidos para mayores de edad'
+                            'de gestión comercial, incluyendo pero sin estar limitado a: invitaciones a cursos, ' +
+                            'talleres, charlas y otros eventos que el ICPNA organice, auspicie o participe, siendo ' +
+                            'que los datos, serán conservados en un banco de datos cuyo titular es el ICPNA, ' +
+                            'autorizando incluso su tratamiento internacional si fuera el caso. Asimismo, declaro ' +
+                            'que estoy informado que ante alguna solicitud de datos personales sensibles, es mi ' +
+                            'facultad responder o no sobre los mismos e igualmente declaro conocer los efectos y/o ' +
+                            'consecuencias de proporcionar mis datos personales o de negarme a brindarlos. ' +
+                            'Igualmente declaro conocer que para ejercer mis derechos como acceso, rectificación, ' +
+                            'cancelación y oposición y otros derechos, sobre mis datos puedo dirigirme a las ' +
+                            'oficinas, ubicadas en Av. Angamos Oeste 120, Miraflores. Señalo también, que al ser yo ' +
+                            'menor de edad, el ICPNA no me está solicitando datos relativos a la actividad ' +
+                            'profesional o laboral de mis padres, ni su información económica, datos sociológicos o ' +
+                            'de cualquier otro sobre los demás miembros de mi familia. Asimismo, declaro que estoy ' +
+                            'informando al ICPNA de la identidad y dirección de mis padres, a fin de que ellos ' +
+                            'puedan autorizar el tratamiento de mis datos personales, en aquellos casos en que mi ' +
+                            'propia autorización no fuera suficiente y que estén referidas al acceso a actividades, ' +
+                            'vinculadas con bienes o servicios que estén restringidos para mayores de edad.'
                         );
 
                         $divGuardian.show();
@@ -750,25 +768,24 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                     );
                     $modalText.html(
                         'En aplicación a lo dispuesto por la Ley 29733 Ley de Protección de Datos Personales, y el ' +
-                        'D.S. 003-2013-JUS, el suscrito, padre o tutor del titular de los datos personales, mediante ' +
-                        'el llenado y/o firma del presente formulario, autorizo de forma expresa e inequívoca y por ' +
-                        'tiempo indefinido que los datos personales de mi hijo o menor sujeto a mi tutela sean ' +
-                        'tratados, almacenados, sistematizados y utilizados por el INSTITUTO CULTURAL PERUANO ' +
-                        'NORTEAMERICANO para fines estadísticos, administrativos y de gestión comercial, incluyendo ' +
-                        'invitaciones a cursos, talleres, charlas y otros eventos que el ICPNA organice, auspicie o ' +
-                        'participe, siendo que los datos, serán conservados en un banco de datos cuyo titular es el ' +
-                        'ICPNA, autorizando incluso el flujo transfronterizo con fines académicos y/o destinado a la ' +
-                        'administración de exámenes internacionales. Asimismo, declaro que estoy informado que ante ' +
-                        'alguna solicitud de datos personales sensibles, es mi facultad responder o no sobre los ' +
-                        'mismos e igualmente declaro conocer los efectos y/o consecuencias de proporcionar mis datos ' +
-                        'personales o de negarme a brindarlos. Igualmente declaro conocer que para ejercer mis ' +
-                        'derechos como acceso, rectificación, cancelación y oposición y otros derechos, sobre mis ' +
-                        'datos puedo dirigirme a las oficinas, ubicadas en Av. Angamos Oeste 120, Miraflores. ' +
-                        'Declaro conocer los alcances de la Ley 29733 y su reglamento, para ejercer mis derechos ' +
-                        'conforme a Ley y declaro además, que parte integrante de esta declaración y autorización ' +
-                        'explícita en todos los términos expuestos, incluyen también el tratamiento de datos ' +
-                        'personales del menor de edad sujeto a mi patria potestad, y cuyos datos se encuentran en el ' +
-                        'banco de datos del ICPNA.'
+                        'D.S. 003-2013-JUS,el suscrito titular de los datos personales, mediante el llenado y/o ' +
+                        'firma del presente formulario, autorizo de forma expresa e inequívoca y por tiempo ' +
+                        'indefinido que mis datos personales, sean tratados, almacenados, sistematizados y ' +
+                        'utilizados por el INSTITUTO CULTURAL PERUANO NORTEAMERICANO para fines estadísticos, ' +
+                        'administrativos y de gestión comercial, incluyendo pero sin estar limitado a: invitaciones ' +
+                        'a cursos, talleres, charlas y otros eventos que el ICPNA organice, auspicie o participe, ' +
+                        'siendo que los datos, serán conservados en un banco de datos cuyo titular es el ICPNA, ' +
+                        'autorizando incluso su tratamiento internacional si fuera el caso. Asimismo, declaro que ' +
+                        'estoy informado que ante alguna solicitud de datos personales sensibles, es mi facultad ' +
+                        'responder o no sobre los mismos e igualmente declaro conocer los efectos y/o consecuencias ' +
+                        'de proporcionar mis datos personales o de negarme a brindarlos. Igualmente declaro conocer ' +
+                        'que para ejercer mis derechos como acceso, rectificación, cancelación y oposición y otros ' +
+                        'derechos, sobre mis datos puedo dirigirme a las oficinas, ubicadas en Av. Angamos Oeste ' +
+                        '120, Miraflores. Declaro conocer los alcances de la Ley 29733 y su reglamento, para ejercer ' +
+                        'mis derechos conforme a Ley y declaro además, que parte integrante de esta declaración y ' +
+                        'autorización explícita en todos los términos expuestos, incluyen también el tratamiento de ' +
+                        'datos personales del menor de edad sujeto a mi patria potestad, y cuyos datos se encuentran ' +
+                        'en el banco de datos del ICPNA.'
                     );
 
                     $divGuardian.show();

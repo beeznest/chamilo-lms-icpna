@@ -173,9 +173,10 @@ $formRenderer->setElementTemplate(
 
 $formRenderer->setElementTemplate(
     '
-        <div id="guardian_div">
-            <div class="form-group">
-                <div class="col-sm-8 col-sm-offset-2">
+        <fieldset id="guardian_div">
+            <legend>Actualizar datos personales - Padre de familia</legend>
+            <div class="row">
+                <div class="col-sm-12">
                     <div class="alert alert-warning">
                     Si eres menor de edad, es necesario registrar los datos de tu padre, madre o apoderado
                     </div>
@@ -210,7 +211,7 @@ $formRenderer->setElementTemplate(
                     <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
                 </div>
             </div>
-        </div><!-- #guardian_div -->
+        </fieldset><!-- #guardian_div -->
     ',
     'extra_guardian_id_document_number'
 );

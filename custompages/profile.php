@@ -671,7 +671,24 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                     $slctGuardianDocument.required(false);
                     $txtGuardianDocument.required(false);
 
-                    var age = checkAge();
+                    var age = checkAge(),
+                        occupationOptions = $slctOccupation.find('option').hide();
+
+                    if (age >= 4 && age <= 17) {
+                        occupationOptions
+                            .filter(function (i) {
+                                return i <= 1;
+                            })
+                            .show();
+                    } else if (age > 17) {
+                        occupationOptions
+                            .filter(function (i) {
+                                return i > 1;
+                            })
+                            .show();
+                    }
+
+                    $slctOccupation.selectpicker('refresh');
 
                     if (age >= 18) {
                         $txtGuardianName.val('');

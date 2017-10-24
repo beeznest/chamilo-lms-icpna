@@ -209,3 +209,4 @@ $LastName="Apellido paterno";
 $FirstName="Primer nombre";
 $EditInformation="Actualizar datos personales";
 $OnlyNumbers = "Solamente números";
+$EditStudentInformation="Actualizar datos personales - Alumno";

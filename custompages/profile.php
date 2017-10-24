@@ -16,7 +16,9 @@ $form = isset($content['form']) ? $content['form'] : null;
 
 $formErrros = $form->_errors;
 
-Display::display_header(get_lang('EditInformation', null, 'es-icpna', true));
+$title = get_lang('EditStudentInformation', null, 'es-icpna', true);
+
+Display::display_header($title);
 
 if (!$form->elementExists('extra_id_document_type') || !$form->elementExists('extra_id_document_number')
     || !$form->elementExists('extra_middle_name')
@@ -519,7 +521,7 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
             <div class="box box-primary">
                 <div class="box-body">
                     <div class="box-header with-border">
-                        <h3 class="box-title"><?php echo get_lang('EditInformation', null, 'es-icpna', true); ?></h3>
+                        <h3 class="box-title"><?php echo $title; ?></h3>
                     </div>
                     <div id="registration-form-box" class="form-box well">
                         <?php

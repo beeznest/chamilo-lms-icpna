@@ -693,10 +693,10 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                     $slctOccupation.selectpicker('refresh');
 
                     if (age >= 18) {
-                        $txtGuardianName.val('');
-                        $txtGuardianEmail.val('');
-                        $slctGuardianDocument.selectpicker('val', '');
-                        $txtGuardianDocument.val('');
+                        //$txtGuardianName.val('');
+                        //$txtGuardianEmail.val('');
+                        //$slctGuardianDocument.selectpicker('val', '');
+                        //$txtGuardianDocument.val('');
 
                         $divGuardian.hide();
                         $modalTitle.html(

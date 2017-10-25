@@ -282,6 +282,8 @@ class IcpnaUpdateUserPlugin extends Plugin
 
         $uidIdOcupacion = (string) $tableResult->uidIdOcupacion;
         $uidIdCentroEstudios = (string) $tableResult->uidIdCentroEstudios;
+        $birthdate = (string) $tableResult->sdtFechaNacimiento;
+        $birthdate = explode('T', $birthdate);
 
         $return = [
             'extra_id_document_type' => (string) $tableResult->uidIdDocumentoIdentidad,
@@ -291,7 +293,7 @@ class IcpnaUpdateUserPlugin extends Plugin
             'lastname' => (string) $tableResult->vchPaterno,
             'extra_mothers_name' => (string) $tableResult->vchMaterno,
             'extra_sex' => (string) $tableResult->chrSexo,
-            'extra_birthdate' => (string) $tableResult->sdtFechaNacimiento,
+            'extra_birthdate' => $birthdate[0],
             'extra_nationality' => (string) $tableResult->uididpaisorigen,
             'extra_address_department' => (string) $tableResult->uidIdDepartamento,
             'extra_address_province' => (string) $tableResult->uidIdProvincia,

@@ -676,7 +676,7 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                     var age = checkAge(),
                         occupationOptions = $slctOccupation.find('option').hide();
 
-                    if (age >= 4 && age <= 17) {
+                    if (/*age >= 4 &&*/ !age || age <= 17) {
                         occupationOptions
                             .filter(function (i) {
                                 return i <= 1;
@@ -1047,8 +1047,17 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                     $txtOccupationName4.parents('.form-group').hide();
                     $slctUniCarrers.parents('.form-group').hide();
 
+                    var age = checkAge(),
+                        txtField = this;
+
+                    if (!age || age < 4) {
+                        alert('La edad mínima es de 4 años');
+                        txtField.value = '';
+                        $('#extra_birthdate_alt_text').text('');
+                    }
+
                     onStudentBirthday();
-                }).datepicker('option', 'maxDate', '+0d -4y');
+                });//.datepicker('option', 'maxDate', '+0d -4y');
                 $slctNationality.required(true);
                 $slctAddressDepartment.required(true).on('change', function () {
                     onDepartmentSelected(this.value, $slctAddressProvince);

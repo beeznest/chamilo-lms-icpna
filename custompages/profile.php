@@ -1000,6 +1000,13 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                 $txtEmail.required(true);
                 $slctSex.required(true);
                 $txtBirthdate.required(true).change(function () {
+                    $slctOccupation.selectpicker('val', '');
+                    $slctOccupationName1.parents('.form-group').hide();
+                    $slctOccupationName2.parents('.form-group').hide();
+                    $slctOccupationName3.parents('.form-group').hide();
+                    $txtOccupationName4.parents('.form-group').hide();
+                    $slctUniCarrers.parents('.form-group').hide();
+
                     onStudentBirthday();
                 }).datepicker('option', 'maxDate', '+0d -4y');
                 $slctNationality.required(true);

@@ -66,7 +66,7 @@
                                 <li class="user-body">
                                     <a href="{{ profile_url }}">
                                         <span class="fa fa-pencil-square-o" aria-hidden="true"></span>
-                                        {{ 'EditInformation'|get_lang }}
+                                        {{ 'EditStudentInformation'|get_lang }}
                                     </a>
                                 </li>
                                 <li class="user-body">

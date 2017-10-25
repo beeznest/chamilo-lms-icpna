@@ -886,6 +886,44 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                     $txtGuardianDocument.get(0).setCustomValidity('');
                 }
 
+                function validateEmail(el) {
+                    $.getJSON(url, {
+                        a: 'validate_email',
+                        email: el.value
+                    }, function (response) {
+                        if (!el.setCustomValidity) {
+                            el.value = '';
+
+                            return;
+                        }
+
+                        if (!response.valid) {
+                            el.setCustomValidity('Correo electrónico no permitido');
+                        } else {
+                            el.setCustomValidity('');
+                        }
+                    });
+                }
+
+                function validatePhone(el) {
+                    $.getJSON(url, {
+                        a: 'validate_phone',
+                        phone: el.value
+                    }, function (response) {
+                        if (!el.setCustomValidity) {
+                            el.value = '';
+
+                            return;
+                        }
+
+                        if (!response.valid) {
+                            el.setCustomValidity('Número teléfonico no permitido');
+                        } else {
+                            el.setCustomValidity('');
+                        }
+                    });
+                }
+
                 (function () {
                     var defaultValues = <?php echo json_encode($defaultValues); ?>;
 
@@ -997,7 +1035,9 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                 });
                 $txtFirstname.required(true);
                 $txtLastname.required(true);
-                $txtEmail.required(true);
+                $txtEmail.required(true).on('change', function () {
+                    validateEmail(this);
+                });
                 $slctSex.required(true);
                 $txtBirthdate.required(true).change(function () {
                     $slctOccupation.selectpicker('val', '');
@@ -1022,6 +1062,11 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                 $txtMobilePhone.required(true).attr({
                     'pattern': '\\d{9,15}',
                     'title': $txtMobilePhone.attr('placeholder')
+                }).on('change', function () {
+                    validatePhone(this);
+                });
+                $txtPhone.on('change', function () {
+                    validatePhone(this);
                 });
                 $slctOccupation.required(true).on('change', function () {
                     onOccupationSelected(this.selectedIndex);
@@ -1055,6 +1100,9 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                 });
                 $txtGuardianDocument.on('change', function () {
                     validateDocumentNumbers();
+                });
+                $txtGuardianEmail.on('change', function () {
+                    validateEmail(this);
                 });
                 $txtPicture.parent().next().append(function () {
                     var $btn = $('<button>')

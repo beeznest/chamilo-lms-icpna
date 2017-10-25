@@ -66,6 +66,34 @@ switch ($action) {
             'repeated' => $plugin->validateIdDocument($uididPersona, $uididType, $docNumber)
         ];
         break;
+    case 'validate_email':
+        $email = isset($_REQUEST['email']) ? $_REQUEST['email'] : null;
+
+        if (!isset($email)) {
+            break;
+        }
+
+        $content = file_get_contents(__DIR__.'/black_list/email.json');
+        $blackList = json_decode($content, true);
+
+        $return = [
+            'valid' => !in_array($email, $blackList)
+        ];
+        break;
+    case 'validate_phone':
+        $phone = isset($_REQUEST['phone']) ? $_REQUEST['phone'] : null;
+
+        if (!isset($phone)) {
+            break;
+        }
+
+        $content = file_get_contents(__DIR__.'/black_list/phone.json');
+        $blackList = json_decode($content, true);
+
+        $return = [
+            'valid' => !in_array($phone, $blackList)
+        ];
+        break;
     default:
         $return = [];
 }

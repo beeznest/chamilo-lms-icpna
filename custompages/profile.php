@@ -850,20 +850,46 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                         switch (selectedIndex) {
                             case 1:
                                 addOptions(response, $slctOccupationName1);
+
+                                if (defaultValues.extra_occupation_center_name_1) {
+                                    $slctOccupationName1
+                                        .selectpicker('val', defaultValues.extra_occupation_center_name_1);
+                                }
+
                                 $slctOccupationName1.required(true).parents('.form-group').show();
                                 break;
                             case 2:
                                 addOptions(response, $slctOccupationName2);
+
+                                if (defaultValues.extra_occupation_center_name_2) {
+                                    $slctOccupationName2
+                                        .selectpicker('val', defaultValues.extra_occupation_center_name_2);
+                                }
+
                                 $slctOccupationName2.required(true).parents('.form-group').show();
                                 break;
                             case 3:
                                 addOptions(response, $slctOccupationName3);
+
+                                if (defaultValues.extra_occupation_center_name_3) {
+                                    $slctOccupationName3
+                                        .selectpicker('val', defaultValues.extra_occupation_center_name_3);
+                                }
+
+                                if (defaultValues.extra_university_career) {
+                                    $slctUniCarrers.selectpicker('val', defaultValues.extra_university_career);
+                                }
+
                                 $slctOccupationName3.required(true).parents('.form-group').show();
                                 $slctUniCarrers.required(true).parents('.form-group').show();
                                 break;
                             case 4:
                             //no break
                             case 5:
+                                if (defaultValues.extra_occupation_center_name_4) {
+                                    $txtOccupationName4.val(defaultValues.extra_occupation_center_name_4);
+                                }
+
                                 $txtOccupationName4.required(true).parents('.form-group').show();
                                 break;
                         }

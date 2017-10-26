@@ -946,8 +946,10 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                     });
                 }
 
+                var defaultValues = {};
+
                 (function () {
-                    var defaultValues = <?php echo json_encode($defaultValues); ?>;
+                    defaultValues = <?php echo json_encode($defaultValues); ?>;
 
                     var xhrDocumentIdType = $.getJSON(url, {a: 'get_tipodocumento'}),
                         xhrNationality = $.getJSON(url, {a: 'get_nacionalidad'}),
@@ -1062,6 +1064,13 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                 });
                 $slctSex.required(true);
                 $txtBirthdate.required(true).change(function () {
+                    if (defaultValues.extra_birthdate == this.value) {
+                        $slctOccupation.selectpicker('val', defaultValues.extra_occupation).setError(false, null);
+                        onOccupationSelected($slctOccupation.prop('selectedIndex'));
+
+                        return;
+                    }
+
                     $slctOccupation
                         .selectpicker('val', '')
                         .setError(true, 'Por favor es necesario actualizar su ocupación');

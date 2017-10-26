@@ -649,6 +649,8 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                     addProgress('profile');
                 });
 
+                var currentAge = 0;
+
                 function onDocumentIdTypeSelected(selectedIndex, $el) {
                     switch (selectedIndex) {
                         case 1:
@@ -697,6 +699,8 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
 
                     var age = checkAge(),
                         occupationOptions = $slctOccupation.find('option').hide();
+
+                    currentAge = age;
 
                     if (/*age >= 4 &&*/ !age || age <= 17) {
                         occupationOptions
@@ -1090,13 +1094,30 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                 });
                 $slctSex.required(true);
                 $txtBirthdate.required(true).change(function () {
-                    if (defaultValues.extra_birthdate == this.value) {
-                        $slctOccupation.selectpicker('val', defaultValues.extra_occupation).setError(false, null);
-                        onOccupationSelected($slctOccupation.prop('selectedIndex'));
+                    var age = checkAge(),
+                        txtField = this;
+
+                    //if (defaultValues.extra_birthdate == this.value) {
+                    //    $slctOccupation.selectpicker('val', defaultValues.extra_occupation).setError(false, null);
+                    //    onOccupationSelected($slctOccupation.prop('selectedIndex'));
+                    //
+                    //    return;
+                    //}
+
+                    if (!age || age < 4) {
+                        txtField.value = '';
+                        $('#extra_birthdate_alt_text').text('');
+
+                        $txtBirthdate.setError(true, 'La edad mínima es de 4 años');
 
                         return;
                     }
 
+                    if (currentAge == age) {
+                        return;
+                    }
+
+                    $txtBirthdate.setError(false, null);
                     $slctOccupation
                         .selectpicker('val', '')
                         .setError(true, 'Por favor es necesario actualizar su ocupación');
@@ -1105,18 +1126,6 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                     $slctOccupationName3.parents('.form-group').hide();
                     $txtOccupationName4.parents('.form-group').hide();
                     $slctUniCarrers.parents('.form-group').hide();
-
-                    var age = checkAge(),
-                        txtField = this;
-
-                    if (!age || age < 4) {
-                        txtField.value = '';
-                        $('#extra_birthdate_alt_text').text('');
-
-                        $txtBirthdate.setError(true, 'La edad mínima es de 4 años');
-                    } else {
-                        $txtBirthdate.setError(false, null);
-                    }
 
                     onStudentBirthday();
                 });//.datepicker('option', 'maxDate', '+0d -4y');

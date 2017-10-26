@@ -581,6 +581,28 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                 return this;
             };
 
+            $.fn.setError = function (hasError, helpMessage) {
+                var formGroup = this.parents('.form-group');
+
+                formGroup.find('span.help-inline.help-block').remove();
+
+                if (hasError) {
+                    formGroup.addClass('error has-error');
+
+                    if (helpMessage) {
+                        formGroup.find('.col-sm-8').append(
+                            '<span class="help-inline help-block">' + helpMessage + '</span>'
+                        );
+                    }
+
+                    return this;
+                }
+
+                formGroup.removeClass('error has-error');
+
+                return this;
+            }
+
             $(document).ready(function () {
                 var $slctDocument = $('#extra_id_document_type'),
                     $txtDocument = $('#extra_id_document_number'),
@@ -1040,7 +1062,9 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                 });
                 $slctSex.required(true);
                 $txtBirthdate.required(true).change(function () {
-                    $slctOccupation.selectpicker('val', '');
+                    $slctOccupation
+                        .selectpicker('val', '')
+                        .setError(true, 'Por favor es necesario actualizar su ocupación');
                     $slctOccupationName1.parents('.form-group').hide();
                     $slctOccupationName2.parents('.form-group').hide();
                     $slctOccupationName3.parents('.form-group').hide();
@@ -1054,13 +1078,9 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                         txtField.value = '';
                         $('#extra_birthdate_alt_text').text('');
 
-                        $('<span>').addClass('help-inline help-block').text('La edad mínima es de 4 años')
-                            .insertAfter($txtBirthdate.parents('.input-group'));
-
-                        $txtBirthdate.parents('.form-group').addClass('has-error');
+                        $txtBirthdate.setError(true, 'La edad mínima es de 4 años');
                     } else {
-                        $txtBirthdate.parents('.form-group').removeClass('has-error');
-                        $txtBirthdate.parents('.input-group').next('span.help-inline.help-block').remove();
+                        $txtBirthdate.setError(false, null);
                     }
 
                     onStudentBirthday();
@@ -1091,6 +1111,8 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                     $slctOccupationName2.empty().selectpicker('refresh');
                     $slctOccupationName3.empty().selectpicker('refresh');
                     $txtOccupationName4.val('');
+
+                    $slctOccupation.setError(false, null);
                 });
                 $slctOccupationDepartment.required(true).on('change', function () {
                     $slctOccupationDistrict.empty().selectpicker('refresh');

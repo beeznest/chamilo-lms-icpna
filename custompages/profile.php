@@ -1051,9 +1051,16 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                         txtField = this;
 
                     if (!age || age < 4) {
-                        alert('La edad mínima es de 4 años');
                         txtField.value = '';
                         $('#extra_birthdate_alt_text').text('');
+
+                        $('<span>').addClass('help-inline help-block').text('La edad mínima es de 4 años')
+                            .insertAfter($txtBirthdate.parents('.input-group'));
+
+                        $txtBirthdate.parents('.form-group').addClass('has-error');
+                    } else {
+                        $txtBirthdate.parents('.form-group').removeClass('has-error');
+                        $txtBirthdate.parents('.input-group').next('span.help-inline.help-block').remove();
                     }
 
                     onStudentBirthday();

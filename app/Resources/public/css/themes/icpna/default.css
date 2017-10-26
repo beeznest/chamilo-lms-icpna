@@ -235,17 +235,19 @@ a:focus {
     padding-left: 10%;
     padding-top: 5%;
 }
-.form-box.well label{
+.form-box.well .form-group:not(.has-error) label{
     color: #34495E;
     font-weight: normal;
     font-size: 12px;
 }
-.form-box.well .form-control{
-    background-color: #FFF;
+.form-box.well .form-group:not(.has-error) .form-control{
     border: 1px solid #34495e;
     border-radius: 5px;
 }
-.form-box.well .form-group .bootstrap-select.btn-group .dropdown-toggle.btn-default{
+.form-box.well .form-group #extra_birthdate_alt_text.form-control {
+    border-radius: 0;
+}
+.form-box.well .form-group:not(.has-error) .bootstrap-select.btn-group .dropdown-toggle.btn-default{
     background-color: #FFF;
     border: none;
     border-radius: 5px;
@@ -266,13 +268,17 @@ a:focus {
     font-size: 12px;
     font-style: italic;
 }
-.form-box.well .form-group .input-group .input-group-addon{
+.form-box.well .form-group:not(.has-error) .input-group .input-group-addon{
     background-color: #eee;
     border-color: #34495e; 
 }
-.form-box.well .form-group .input-group-btn .btn-default{
+.form-box.well .form-group:not(.has-error) .input-group-btn .btn-default{
     background-color: #eee;
     border-color: #34495e;
+}
+.form-box.well .form-group.has-error .input-group-btn .btn-default {
+    background-color: #f2dede;
+    border-color: #a94442;
 }
 .form-box.well #profile_apply_change{
     display: block;

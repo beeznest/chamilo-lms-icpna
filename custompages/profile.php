@@ -496,7 +496,6 @@ $form->getElement('extra_mobile_phone_number')->setAttribute('maxlength', 15);
 $form->getElement('extra_mobile_phone_number')->setAttribute('placeholder', 'De 9 a 15 dígitos. Por ejemplo: 978654321');
 $form->getElement('extra_address')->_label = get_lang('AddressField', null, 'spanish', true);
 $form->getElement('extra_address')->setAttribute('maxlength', 100);
-$form->getElement('extra_address')->setAttribute('pattern', '[a-zA-Zá-úñÑ0-9]+[a-zA-Zá-úñÑ\s\-0-9]*');
 $form->getElement('extra_sex')->_label = get_lang('UserSex', null, 'spanish', true);
 $form->getElement('extra_guardian_name')->setAttribute('maxlength', 60);
 $form->getElement('extra_guardian_name')->setAttribute('pattern', '[a-zA-Zá-úñÑ]+[a-zA-Zá-úñÑ\s\-]*');
@@ -602,6 +601,24 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                 formGroup.removeClass('error has-error');
 
                 return this;
+            };
+
+            function validateTexts(el) {
+                var value = el.value.trim();
+
+                if (value.length === 0) {
+                    if (value.setCustomValidity) {
+                        value.setCustomValidity('Por favor rellene este campo.');
+                    }
+
+                    return false;
+                }
+
+                if (value.setCustomValidity) {
+                    value.setCustomValidity('');
+                }
+
+                return true;
             }
 
             $(document).ready(function () {
@@ -645,6 +662,27 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                         e.preventDefault();
 
                         return;
+                    }
+
+                    var texts = [
+                        $slctLocation
+                    ];
+
+                    if ($slctOccupation.get(0).selectedIndex === 4) {
+                        texts.push($txtOccupationName4);
+                    }
+
+                    for (var i = 0; i < texts.length; i++) {
+                        var $el = texts[i],
+                            isValid = validateTexts($el.get(0));
+
+                        if (!isValid) {
+                            $el.setError(true, 'Por favor, rellena este campo.');
+
+                            e.preventDefault();
+
+                            return;
+                        }
                     }
 
                     switch ($slctOccupation.get(0).selectedIndex) {

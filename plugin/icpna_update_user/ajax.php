@@ -67,7 +67,7 @@ switch ($action) {
         ];
         break;
     case 'validate_email':
-        $email = isset($_REQUEST['email']) ? $_REQUEST['email'] : null;
+        $email = isset($_REQUEST['email']) ? strtolower($_REQUEST['email']) : null;
 
         if (!isset($email)) {
             break;

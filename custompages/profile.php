@@ -647,6 +647,39 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                         return;
                     }
 
+                    switch ($slctOccupation.get(0).selectedIndex) {
+                        case 0:
+                            $slctOccupationName1.selectpicker('val', '');
+                            $slctOccupationName2.selectpicker('val', '');
+                            $slctOccupationName3.selectpicker('val', '');
+                            $txtOccupationName4.val('');
+                            $slctUniCarrers.selectpicker('val', '');
+                            break;
+                        case 1:
+                            $slctOccupationName2.selectpicker('val', '');
+                            $slctOccupationName3.selectpicker('val', '');
+                            $txtOccupationName4.val('');
+                            $slctUniCarrers.selectpicker('val', '');
+                            break;
+                        case 2:
+                            $slctOccupationName1.selectpicker('val', '');
+                            $slctOccupationName3.selectpicker('val', '');
+                            $txtOccupationName4.val('');
+                            $slctUniCarrers.selectpicker('val', '');
+                            break;
+                        case 3:
+                            $slctOccupationName1.selectpicker('val', '');
+                            $slctOccupationName2.selectpicker('val', '');
+                            $txtOccupationName4.val('');
+                            break;
+                        case 4:
+                            $slctOccupationName1.selectpicker('val', '');
+                            $slctOccupationName2.selectpicker('val', '');
+                            $slctOccupationName3.selectpicker('val', '');
+                            $slctUniCarrers.selectpicker('val', '');
+                            break;
+                    }
+
                     addProgress('profile');
                 });
 

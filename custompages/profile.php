@@ -461,17 +461,17 @@ $form->insertElementBefore(
 // Translate chamilo default profile elements
 $form->getElement('firstname')->_label = get_lang('FirstName', null, 'es-icpna', true);
 $form->getElement('firstname')->setAttribute('maxlength', 30);
-$form->getElement('firstname')->setAttribute('pattern', '[a-zA-ZñÑ\s\-]+');
+$form->getElement('firstname')->setAttribute('pattern', '[a-zA-Zá-úñÑ]+[a-zA-Zá-úñÑ\s\-]*');
 $form->getElement('firstname')->setAttribute('title', get_lang('OnlyLetters', null, 'spanish', true));
 $form->getElement('extra_middle_name')->setAttribute('maxlength', 30);
-$form->getElement('extra_middle_name')->setAttribute('pattern', '[a-zA-ZñÑ\s\-]+');
+$form->getElement('extra_middle_name')->setAttribute('pattern', '[a-zA-Zá-úñÑ]+[a-zA-Zá-úñÑ\s\-]*');
 $form->getElement('extra_middle_name')->setAttribute('title', get_lang('OnlyLetters', null, 'spanish', true));
 $form->getElement('lastname')->_label = get_lang('LastName', null, 'es-icpna', true);
 $form->getElement('lastname')->setAttribute('maxlength', 30);
-$form->getElement('lastname')->setAttribute('pattern', '[a-zA-ZñÑ\s\-]+');
+$form->getElement('lastname')->setAttribute('pattern', '[a-zA-Zá-úñÑ]+[a-zA-Zá-úñÑ\s\-]*');
 $form->getElement('lastname')->setAttribute('title', get_lang('OnlyLetters', null, 'spanish', true));
 $form->getElement('extra_mothers_name')->setAttribute('maxlength', 30);
-$form->getElement('extra_mothers_name')->setAttribute('pattern', '[a-zA-ZñÑ\s\-]+');
+$form->getElement('extra_mothers_name')->setAttribute('pattern', '[a-zA-Zá-úñÑ]+[a-zA-Zá-úñÑ\s\-]*');
 $form->getElement('extra_mothers_name')->setAttribute('title', get_lang('OnlyLetters', null, 'spanish', true));
 $form->getElement('email')->_label = get_lang('Email', null, 'spanish', true);
 $form->getElement('email')->setAttribute('maxlength', 50);
@@ -496,9 +496,10 @@ $form->getElement('extra_mobile_phone_number')->setAttribute('maxlength', 15);
 $form->getElement('extra_mobile_phone_number')->setAttribute('placeholder', 'De 9 a 15 dígitos. Por ejemplo: 978654321');
 $form->getElement('extra_address')->_label = get_lang('AddressField', null, 'spanish', true);
 $form->getElement('extra_address')->setAttribute('maxlength', 100);
+$form->getElement('extra_address')->setAttribute('pattern', '[a-zA-Zá-úñÑ0-9]+[a-zA-Zá-úñÑ\s\-0-9]*');
 $form->getElement('extra_sex')->_label = get_lang('UserSex', null, 'spanish', true);
 $form->getElement('extra_guardian_name')->setAttribute('maxlength', 60);
-$form->getElement('extra_guardian_name')->setAttribute('pattern', '[a-zA-ZñÑ\s\-]+');
+$form->getElement('extra_guardian_name')->setAttribute('pattern', '[a-zA-Zá-úñÑ]+[a-zA-Zá-úñÑ\s\-]*');
 $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
 $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
 ?>
@@ -644,6 +645,39 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                         e.preventDefault();
 
                         return;
+                    }
+
+                    switch ($slctOccupation.get(0).selectedIndex) {
+                        case 0:
+                            $slctOccupationName1.selectpicker('val', '');
+                            $slctOccupationName2.selectpicker('val', '');
+                            $slctOccupationName3.selectpicker('val', '');
+                            $txtOccupationName4.val('');
+                            $slctUniCarrers.selectpicker('val', '');
+                            break;
+                        case 1:
+                            $slctOccupationName2.selectpicker('val', '');
+                            $slctOccupationName3.selectpicker('val', '');
+                            $txtOccupationName4.val('');
+                            $slctUniCarrers.selectpicker('val', '');
+                            break;
+                        case 2:
+                            $slctOccupationName1.selectpicker('val', '');
+                            $slctOccupationName3.selectpicker('val', '');
+                            $txtOccupationName4.val('');
+                            $slctUniCarrers.selectpicker('val', '');
+                            break;
+                        case 3:
+                            $slctOccupationName1.selectpicker('val', '');
+                            $slctOccupationName2.selectpicker('val', '');
+                            $txtOccupationName4.val('');
+                            break;
+                        case 4:
+                            $slctOccupationName1.selectpicker('val', '');
+                            $slctOccupationName2.selectpicker('val', '');
+                            $slctOccupationName3.selectpicker('val', '');
+                            $slctUniCarrers.selectpicker('val', '');
+                            break;
                     }
 
                     addProgress('profile');

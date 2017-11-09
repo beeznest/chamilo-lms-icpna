@@ -280,8 +280,8 @@ class Testcategory {
 	public static function getListOfCategoriesNameForTest($in_testid) {
 		$tabcatName = array();
 		$tabcatID = self::getListOfCategoriesIDForTest($in_testid);
-		for ($i=0; $i < count($tabcatID); $i++) {
-			$cat = new Testcategory($tabcatID[$i]);
+		foreach ($tabcatID as $catId) {
+			$cat = new Testcategory($catId);
 			$tabcatName[$cat->id] = $cat->name;
 		}
 		return $tabcatName;

@@ -15,6 +15,10 @@ if (PHP_SAPI !== 'cli') {
 
 require_once __DIR__.'/../../main/inc/global.inc.php';
 
+if (!api_is_platform_admin()) {
+    die;
+}
+
 $courseCode = api_get_course_id();
 $sessionId = api_get_session_id();
 

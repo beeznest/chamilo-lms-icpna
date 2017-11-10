@@ -4040,6 +4040,662 @@ class Exercise
     }
 
     /**
+     * This function was originally found in the exercise_show.php
+     * @param   int     exe id
+     * @param   int     question id
+     * @param   int     the choice the user selected
+     * @param   array   the hotspot coordinates $hotspot[$question_id] = coordinates
+     * @param   string  function is called from 'exercise_show' or 'exercise_result'
+     * @param   bool    save results in the DB or just show the reponse
+     * @param   bool    gets information from DB or from the current selection
+     * @param   bool    show results or not
+     * @todo    reduce parameters of this function
+     * @return  string  html code
+     */
+    public function manageAnswerWithoutHTML(
+        $exeId,
+        $questionId,
+        $choice,
+        $from = 'exercise_show',
+        $exerciseResultCoordinates = array(),
+        $saved_results = true,
+        $from_database = false,
+        $show_result = true,
+        $propagate_neg = 0,
+        $hotspot_delineation_result = array()
+    )
+    {
+        global $feedback_type, $debug;
+        global $learnpath_id, $learnpath_item_id; //needed in order to use in the exercise_attempt() for the time
+        require_once api_get_path(LIBRARY_PATH).'geometry.lib.php';
+
+        $extra_data = array();
+        $final_overlap = 0;
+        $final_missing = 0;
+        $final_excess = 0;
+        $overlap_color = 0;
+        $missing_color = 0;
+        $excess_color = 0;
+        $threadhold1 = 0;
+        $threadhold2 = 0;
+        $threadhold3 = 0;
+
+        $arrques = null;
+        $arrans = null;
+
+        $questionId = intval($questionId);
+        $exeId = intval($exeId);
+        $TBL_TRACK_ATTEMPT = Database::get_statistic_table(TABLE_STATISTIC_TRACK_E_ATTEMPT);
+        $table_ans = Database::get_course_table(TABLE_QUIZ_ANSWER);
+
+        // Creates a temporary Question object
+        $course_id = api_get_course_int_id();
+        $objQuestionTmp = Question::read($questionId, $course_id);
+        if ($objQuestionTmp === false) {
+            return false;
+        }
+
+        $questionName = $objQuestionTmp->selectTitle();
+        $questionWeighting = $objQuestionTmp->selectWeighting();
+        $answerType = $objQuestionTmp->selectType();
+        $quesId = $objQuestionTmp->selectId();
+        $extra = $objQuestionTmp->extra;
+
+        $next = 1; //not for now
+        //Extra information of the question
+        if (!empty($extra)) {
+            $extra = explode(':', $extra);
+            //Fixes problems with negatives values using intval
+            $true_score = intval($extra[0]);
+            $false_score = intval($extra[1]);
+            $doubt_score = intval($extra[2]);
+        }
+
+        $totalWeighting = 0;
+        $totalScore = 0;
+
+        // Destruction of the Question object
+        unset($objQuestionTmp);
+
+        // Construction of the Answer object
+        $objAnswerTmp = new Answer($questionId);
+        $nbrAnswers = $objAnswerTmp->selectNbrAnswers();
+
+        if ($answerType == FREE_ANSWER || $answerType == ORAL_EXPRESSION) {
+            $nbrAnswers = 1;
+        }
+
+        $nano = null;
+        $wamiRecorder = null;
+
+        if ($answerType == ORAL_EXPRESSION) {
+            require_once api_get_path(LIBRARY_PATH).'nanogong.lib.php';
+            require_once api_get_path(LIBRARY_PATH) . 'WamiRecorder.php';
+            $exe_info = get_exercise_results_by_attempt($exeId);
+            $exe_info = $exe_info[$exeId];
+
+            $params = array();
+            $params['course_id'] = api_get_course_int_id();
+            $params['session_id'] = api_get_session_id();
+            $params['user_id'] = isset($exe_info['exe_user_id']) ? $exe_info['exe_user_id'] : api_get_user_id();
+            $params['exercise_id'] = isset($exe_info['exe_exo_id']) ? $exe_info['exe_exo_id'] : $this->id;
+            $params['question_id'] = $questionId;
+            $params['exe_id'] = isset($exe_info['exe_id']) ? $exe_info['exe_id'] : $exeId;
+
+            $nano = new Nanogong($params);
+            $wamiRecorder = new WamiRecorder(
+                api_get_course_int_id(),
+                api_get_session_id(),
+                isset($exe_info['exe_user_id']) ? $exe_info['exe_user_id'] : api_get_user_id(),
+                isset($exe_info['exe_exo_id']) ? $exe_info['exe_exo_id'] : $this->id,
+                $questionId,
+                isset($exe_info['exe_id']) ? $exe_info['exe_id'] : $exeId
+            );
+
+            //probably this attempt came in an exercise all question by page
+            if ($feedback_type == 0) {
+                $nano->replace_with_real_exe($exeId);
+            }
+        }
+
+        $user_answer = '';
+
+        // Get answer list for matching
+        $sql_answer = 'SELECT id, answer FROM '.$table_ans.' WHERE c_id = '.$course_id.' AND question_id = "'.$questionId.'" ';
+        $res_answer = Database::query($sql_answer);
+
+        $answer_matching = array();
+        while ($real_answer = Database::fetch_array($res_answer)) {
+            $answer_matching[$real_answer['id']] = $real_answer['answer'];
+        }
+
+        $real_answers = array();
+        $quiz_question_options = Question::readQuestionOption($questionId, $course_id);
+
+        $organs_at_risk_hit = 0;
+
+        $questionScore = 0;
+
+        $answer_correct_array = array();
+
+        for ($answerId = 1; $answerId <= $nbrAnswers; $answerId++) {
+            $answer = $objAnswerTmp->selectAnswer($answerId);
+            $answerComment = $objAnswerTmp->selectComment($answerId);
+            $answerCorrect = $objAnswerTmp->isCorrect($answerId);
+            $answerWeighting = (float)$objAnswerTmp->selectWeighting($answerId);
+
+            $numAnswer = $objAnswerTmp->selectAutoId($answerId);
+
+            $answer_correct_array[$answerId] = (bool)$answerCorrect;
+
+            //Delineation
+            $delineation_cord = $objAnswerTmp->selectHotspotCoordinates(1);
+            $answer_delineation_destination = $objAnswerTmp->selectDestination(1);
+
+            switch ($answerType) {
+                // for unique answer
+                case UNIQUE_ANSWER :
+                case UNIQUE_ANSWER_IMAGE :
+                case UNIQUE_ANSWER_NO_OPTION :
+                    if ($from_database) {
+                        $queryans = "SELECT answer FROM ".$TBL_TRACK_ATTEMPT." WHERE exe_id = '".$exeId."' and question_id= '".$questionId."'";
+                        $resultans = Database::query($queryans);
+                        $choice = Database::result($resultans, 0, "answer");
+
+                        $studentChoice = ($choice == $numAnswer) ? 1 : 0;
+                        if ($studentChoice) {
+                            $questionScore += $answerWeighting;
+                            $totalScore += $answerWeighting;
+                        }
+                    }
+                    break;
+                // for multiple answers
+                case MULTIPLE_ANSWER_TRUE_FALSE :
+                    if ($from_database) {
+                        $choice = array();
+                        $queryans = "SELECT answer FROM ".$TBL_TRACK_ATTEMPT." where exe_id = ".$exeId." and question_id = ".$questionId;
+                        $resultans = Database::query($queryans);
+                        while ($row = Database::fetch_array($resultans)) {
+                            $ind = $row['answer'];
+                            $result = explode(':', $ind);
+                            $my_answer_id = $result[0];
+                            $option = $result[1];
+                            $choice[$my_answer_id] = $option;
+                        }
+                        $studentChoice = $choice[$numAnswer];
+                    }
+
+                    if (!empty($studentChoice)) {
+                        if ($studentChoice == $answerCorrect) {
+                            $questionScore += $true_score;
+                        } else {
+                            if ($quiz_question_options[$studentChoice]['name'] != "Don't know") {
+                                $questionScore += $false_score;
+                            } else {
+                                $questionScore += $doubt_score;
+                            }
+                        }
+                    } else {
+                        //if no result then the user just hit don't know
+                        $studentChoice = 3;
+                        $questionScore += $doubt_score;
+                    }
+                    $totalScore = $questionScore;
+                    break;
+                case MULTIPLE_ANSWER : //2
+                    if ($from_database) {
+                        $choice = array();
+                        $queryans = "SELECT answer FROM ".$TBL_TRACK_ATTEMPT." WHERE exe_id = '".$exeId."' AND question_id= '".$questionId."'";
+                        $resultans = Database::query($queryans);
+                        while ($row = Database::fetch_array($resultans)) {
+                            $ind = $row['answer'];
+                            $choice[$ind] = 1;
+                        }
+
+                        $studentChoice = isset($choice[$numAnswer]) ? $choice[$numAnswer] : null;
+                        $real_answers[$answerId] = (bool)$studentChoice;
+
+                        if ($studentChoice) {
+                            $questionScore += $answerWeighting;
+                        }
+                    }
+                    $totalScore += $answerWeighting;
+                    break;
+                case GLOBAL_MULTIPLE_ANSWER :
+                    if ($from_database) {
+                        $choice = array();
+                        $queryans = "SELECT answer FROM $TBL_TRACK_ATTEMPT WHERE exe_id = '".$exeId."' AND question_id= '".$questionId."'";
+                        $resultans = Database::query($queryans);
+                        while ($row = Database::fetch_array($resultans)) {
+                            $ind = $row['answer'];
+                            $choice[$ind] = 1;
+                        }
+                        $studentChoice = $choice[$numAnswer];
+                        $real_answers[$answerId] = (bool)$studentChoice;
+                        if ($studentChoice) {
+                            $questionScore += $answerWeighting;
+                        }
+                    }
+                    $totalScore += $answerWeighting;
+                    break;
+                case MULTIPLE_ANSWER_COMBINATION_TRUE_FALSE:
+                    if ($from_database) {
+                        $queryans = "SELECT answer FROM ".$TBL_TRACK_ATTEMPT." where exe_id = ".$exeId." AND question_id= ".$questionId;
+                        $resultans = Database::query($queryans);
+                        while ($row = Database::fetch_array($resultans)) {
+                            $ind = $row['answer'];
+                            $result = explode(':', $ind);
+                            $my_answer_id = $result[0];
+                            $option = $result[1];
+                            $choice[$my_answer_id] = $option;
+                        }
+                        $numAnswer = $objAnswerTmp->selectAutoId($answerId);
+                        $studentChoice = $choice[$numAnswer];
+
+                        if ($answerCorrect == $studentChoice) {
+                            //$answerCorrect = 1;
+                            $real_answers[$answerId] = true;
+                        } else {
+                            //$answerCorrect = 0;
+                            $real_answers[$answerId] = false;
+                        }
+                    }
+                    break;
+                case MULTIPLE_ANSWER_COMBINATION:
+                    if ($from_database) {
+                        $queryans = "SELECT answer FROM ".$TBL_TRACK_ATTEMPT." where exe_id = '".$exeId."' and question_id= '".$questionId."'";
+                        $resultans = Database::query($queryans);
+                        while ($row = Database::fetch_array($resultans)) {
+                            $ind = $row['answer'];
+                            $choice[$ind] = 1;
+                        }
+                        $numAnswer = $objAnswerTmp->selectAutoId($answerId);
+                        $studentChoice = $choice[$numAnswer];
+
+                        if ($answerCorrect == 1) {
+                            if ($studentChoice) {
+                                $real_answers[$answerId] = true;
+                            } else {
+                                $real_answers[$answerId] = false;
+                            }
+                        } else {
+                            if ($studentChoice) {
+                                $real_answers[$answerId] = false;
+                            } else {
+                                $real_answers[$answerId] = true;
+                            }
+                        }
+                    }
+                    break;
+                // for fill in the blanks
+                case FILL_IN_BLANKS :
+                    // the question is encoded like this
+                    // [A] B [C] D [E] F::10,10,10@1
+                    // number 1 before the "@" means that is a switchable fill in blank question
+                    // [A] B [C] D [E] F::10,10,10@ or  [A] B [C] D [E] F::10,10,10
+                    // means that is a normal fill blank question
+                    // first we explode the "::"
+                    $pre_array = explode('::', $answer);
+                    // is switchable fill blank or not
+                    $last = count($pre_array) - 1;
+                    $is_set_switchable = explode('@', $pre_array[$last]);
+                    $switchable_answer_set = false;
+                    if (isset($is_set_switchable[1]) && $is_set_switchable[1] == 1) {
+                        $switchable_answer_set = true;
+                    }
+                    $answer = '';
+                    for ($k = 0; $k < $last; $k++) {
+                        $answer .= $pre_array[$k];
+                    }
+                    // splits weightings that are joined with a comma
+                    $answerWeighting = explode(',', $is_set_switchable[0]);
+
+                    // we save the answer because it will be modified
+                    //$temp = $answer;
+                    $temp = $answer;
+
+                    $answer = '';
+                    $j = 0;
+                    //initialise answer tags
+                    $user_tags = $correct_tags = $real_text = array();
+                    // the loop will stop at the end of the text
+                    while (1) {
+                        // quits the loop if there are no more blanks (detect '[')
+                        if (($pos = api_strpos($temp, '[')) === false) {
+                            // adds the end of the text
+                            $answer = $temp;
+                            /* // Deprecated code
+                              // TeX parsing - replacement of texcode tags
+                              $texstring = api_parse_tex($texstring);
+                              $answer = str_replace("{texcode}", $texstring, $answer);
+                             */
+                            $real_text[] = $answer;
+                            break; //no more "blanks", quit the loop
+                        }
+                        // adds the piece of text that is before the blank
+                        //and ends with '[' into a general storage array
+                        $real_text[] = api_substr($temp, 0, $pos + 1);
+                        $answer .= api_substr($temp, 0, $pos + 1);
+                        //take the string remaining (after the last "[" we found)
+                        $temp = api_substr($temp, $pos + 1);
+                        // quit the loop if there are no more blanks, and update $pos to the position of next ']'
+                        if (($pos = api_strpos($temp, ']')) === false) {
+                            // adds the end of the text
+                            $answer .= $temp;
+                            break;
+                        }
+                        if ($from_database) {
+                            $queryfill = "SELECT answer FROM ".$TBL_TRACK_ATTEMPT." WHERE exe_id = '".$exeId."' AND question_id= '".Database::escape_string(
+                                    $questionId
+                                )."'";
+                            $resfill = Database::query($queryfill);
+                            $str = Database::result($resfill, 0, 'answer');
+
+                            api_preg_match_all('#\[([^[]*)\]#', $str, $arr);
+                            $str = str_replace('\r\n', '', $str);
+                            $choice = $arr[1];
+
+                            $tmp = api_strrpos($choice[$j], ' / ');
+                            $choice[$j] = api_substr($choice[$j], 0, $tmp);
+                            $choice[$j] = trim($choice[$j]);
+
+                            //Needed to let characters ' and " to work as part of an answer
+                            $choice[$j] = stripslashes($choice[$j]);
+                        }
+
+                        //No idea why we api_strtolower user reponses
+                        //$user_tags[] = api_strtolower($choice[$j]);
+                        $user_tags[] = $choice[$j];
+                        //put the contents of the [] answer tag into correct_tags[]
+                        //$correct_tags[] = api_strtolower(api_substr($temp, 0, $pos));
+                        $correct_tags[] = api_substr($temp, 0, $pos);
+                        $j++;
+                        $temp = api_substr($temp, $pos + 1);
+                    }
+                    $answer = '';
+                    $real_correct_tags = $correct_tags;
+                    $chosen_list = array();
+
+                    for ($i = 0; $i < count($real_correct_tags); $i++) {
+                        if ($i == 0) {
+                            $answer .= $real_text[0];
+                        }
+                        if (!$switchable_answer_set) {
+                            //needed to parse ' and " characters
+                            $user_tags[$i] = stripslashes($user_tags[$i]);
+                            if ($correct_tags[$i] == $user_tags[$i]) {
+                                // gives the related weighting to the student
+                                $questionScore += $answerWeighting[$i];
+                                // increments total score
+                                $totalScore += $answerWeighting[$i];
+                                // adds the word in green at the end of the string
+                                $answer .= $correct_tags[$i];
+                            } // else if the word entered by the student IS NOT the same as the one defined by the professor
+                            elseif (!empty($user_tags[$i])) {
+                                // adds the word in red at the end of the string, and strikes it
+                                $answer .= '<font color="red"><s>'.$user_tags[$i].'</s></font>';
+                            } else {
+                                // adds a tabulation if no word has been typed by the student
+                                $answer .= '&nbsp;&nbsp;&nbsp;';
+                            }
+                        } else {
+                            // switchable fill in the blanks
+                            if (in_array($user_tags[$i], $correct_tags)) {
+                                $chosen_list[] = $user_tags[$i];
+                                $correct_tags = array_diff($correct_tags, $chosen_list);
+
+                                // gives the related weighting to the student
+                                $questionScore += $answerWeighting[$i];
+                                // increments total score
+                                $totalScore += $answerWeighting[$i];
+                                // adds the word in green at the end of the string
+                                $answer .= $user_tags[$i];
+                            } elseif (!empty($user_tags[$i])) {
+                                // else if the word entered by the student IS NOT the same as the one defined by the professor
+                                // adds the word in red at the end of the string, and strikes it
+                                $answer .= '<font color="red"><s>'.$user_tags[$i].'</s></font>';
+                            } else {
+                                // adds a tabulation if no word has been typed by the student
+                                $answer .= '&nbsp;&nbsp;&nbsp;';
+                            }
+                        }
+                        // adds the correct word, followed by ] to close the blank
+                        $answer .= ' / <font color="green"><b>'.$real_correct_tags[$i].'</b></font>]';
+                        if (isset($real_text[$i + 1])) {
+                            $answer .= $real_text[$i + 1];
+                        }
+                    }
+                    break;
+                // for free answer
+                case FREE_ANSWER :
+                    if ($from_database) {
+                        $query = "SELECT answer, marks FROM ".$TBL_TRACK_ATTEMPT." WHERE exe_id = '".$exeId."' AND question_id= '".$questionId."'";
+                        $resq = Database::query($query);
+                        $choice = Database::result($resq, 0, 'answer');
+                        $choice = str_replace('\r\n', '', $choice);
+                        $choice = stripslashes($choice);
+                        $questionScore = Database::result($resq, 0, "marks");
+                        if ($questionScore == -1) {
+                            $totalScore += 0;
+                        } else {
+                            $totalScore += $questionScore;
+                        }
+                        if ($questionScore == '') {
+                            $questionScore = 0;
+                        }
+                        $arrques = $questionName;
+                        $arrans = $choice;
+                    }
+                    break;
+                case ORAL_EXPRESSION :
+                    if ($from_database) {
+                        $query = "SELECT answer, marks FROM ".$TBL_TRACK_ATTEMPT." WHERE exe_id = '".$exeId."' AND question_id= '".$questionId."'";
+                        $resq = Database::query($query);
+                        $choice = Database::result($resq, 0, 'answer');
+                        $choice = str_replace('\r\n', '', $choice);
+                        $choice = stripslashes($choice);
+                        $questionScore = Database::result($resq, 0, "marks");
+                        if ($questionScore == -1) {
+                            $totalScore += 0;
+                        } else {
+                            $totalScore += $questionScore;
+                        }
+                        $arrques = $questionName;
+                        $arrans = $choice;
+                    }
+                    break;
+                // for matching
+                case DRAGGABLE:
+                case MATCHING_DRAG:
+                case MATCHING:
+                    if ($from_database) {
+                        $sql_answer = 'SELECT id, answer FROM '.$table_ans.' WHERE c_id = '.$course_id.' AND question_id="'.$questionId.'" AND correct=0';
+                        $res_answer = Database::query($sql_answer);
+                        // getting the real answer
+                        $real_list = array();
+                        while ($real_answer = Database::fetch_array($res_answer)) {
+                            $real_list[$real_answer['id']] = $real_answer['answer'];
+                        }
+                        $sql_select_answer = 'SELECT id, answer, correct, id_auto FROM '.$table_ans.'
+                                              WHERE c_id = '.$course_id.' AND question_id="'.$questionId.'" AND correct <> 0 ORDER BY id_auto';
+                        $res_answers = Database::query($sql_select_answer);
+
+                        $questionScore = 0;
+
+                        while ($a_answers = Database::fetch_array($res_answers)) {
+                            $i_answer_id = $a_answers['id']; //3
+                            $s_answer_label = $a_answers['answer']; // your daddy - your mother
+                            $i_answer_correct_answer = $a_answers['correct']; //1 - 2
+                            $i_answer_id_auto = $a_answers['id_auto']; // 3 - 4
+
+                            $sql_user_answer = "SELECT answer FROM $TBL_TRACK_ATTEMPT
+                                                WHERE exe_id = '$exeId' AND question_id = '$questionId' AND position='$i_answer_id_auto'";
+
+                            $res_user_answer = Database::query($sql_user_answer);
+
+                            if (Database::num_rows($res_user_answer) > 0) {
+                                $s_user_answer = Database::result($res_user_answer, 0, 0); //  rich - good looking
+                            } else {
+                                $s_user_answer = 0;
+                            }
+                            $i_answerWeighting = $objAnswerTmp->selectWeighting($i_answer_id);
+
+                            $user_answer = '';
+                            if (!empty($s_user_answer)) {
+                                if ($s_user_answer == $i_answer_correct_answer) {
+                                    $questionScore += $i_answerWeighting;
+                                    $totalScore += $i_answerWeighting;
+                                    if ($answerType == DRAGGABLE) {
+                                        $user_answer = Display::label(get_lang('Correct'), 'success');
+                                    } else {
+                                        $user_answer = '<span>'.$real_list[$i_answer_correct_answer].'</span>';
+                                    }
+                                } else {
+                                    if ($answerType == DRAGGABLE) {
+                                        $user_answer = Display::label(get_lang('NotCorrect'), 'important');
+                                    } else {
+                                        $user_answer = '<span style="color: #FF0000; text-decoration: line-through;">'.$real_list[$s_user_answer].'</span>';
+                                    }
+                                }
+                            } else {
+                                if ($answerType == DRAGGABLE) {
+                                    $user_answer = Display::label(get_lang('Incorrect'), 'important');
+                                }
+                            }
+                        }
+                        break(2); //break the switch and the "for" condition
+                    }
+                // for hotspot with no order
+                case HOT_SPOT :
+                    if ($from_database) {
+                        $TBL_TRACK_HOTSPOT = Database::get_statistic_table(
+                            TABLE_STATISTIC_TRACK_E_HOTSPOT
+                        );
+                        $query = "SELECT hotspot_correct FROM " . $TBL_TRACK_HOTSPOT . "
+                                  WHERE
+                                        hotspot_exe_id = '" . $exeId . "' and
+                                        hotspot_question_id= '" . $questionId . "' AND
+                                        hotspot_answer_id='" . Database::escape_string(
+                                $answerId
+                            ) . "'";
+                        $resq = Database::query($query);
+                        $studentChoice = Database::result(
+                            $resq,
+                            0,
+                            "hotspot_correct"
+                        );
+
+                        if ($studentChoice) {
+                            $questionScore += $answerWeighting;
+                            $totalScore += $answerWeighting;
+                        }
+                    }
+                    break;
+                // @todo never added to chamilo
+                //for hotspot with fixed order
+                case HOT_SPOT_ORDER :
+                    $studentChoice = $choice['order'][$answerId];
+                    if ($studentChoice == $answerId) {
+                        $questionScore += $answerWeighting;
+                        $totalScore += $answerWeighting;
+                        $studentChoice = true;
+                    } else {
+                        $studentChoice = false;
+                    }
+                    break;
+                // for hotspot with delineation
+                case HOT_SPOT_DELINEATION :
+                    if ($from_database) {
+                        // getting the user answer
+                        $TBL_TRACK_HOTSPOT = Database::get_statistic_table(TABLE_STATISTIC_TRACK_E_HOTSPOT);
+                        $query = "SELECT hotspot_correct, hotspot_coordinate from ".$TBL_TRACK_HOTSPOT." where hotspot_exe_id = '".$exeId."' and hotspot_question_id= '".$questionId."' AND hotspot_answer_id='1'"; //by default we take 1 because it's a delineation
+                        $resq = Database::query($query);
+                        $row = Database::fetch_array($resq, 'ASSOC');
+
+                        $choice = $row['hotspot_correct'];
+                        $user_answer = $row['hotspot_coordinate'];
+
+                        // THIS is very important otherwise the poly_compile will throw an error!!
+                        // round-up the coordinates
+                        $coords = explode('/', $user_answer);
+                        $user_array = '';
+                        foreach ($coords as $coord) {
+                            list($x, $y) = explode(';', $coord);
+                            $user_array .= round($x).';'.round($y).'/';
+                        }
+                        $user_array = substr($user_array, 0, -1);
+                    }
+                    $_SESSION['hotspot_coord'][1] = $delineation_cord;
+                    $_SESSION['hotspot_dest'][1] = $answer_delineation_destination;
+                    break;
+            } // end switch Answertype
+
+            global $origin;
+        } // end for that loops over all answers of the current question
+
+        $final_answer = true;
+        foreach ($real_answers as $my_answer) {
+            if (!$my_answer) {
+                $final_answer = false;
+            }
+        }
+
+        //we add the total score after dealing with the answers
+        if ($answerType == MULTIPLE_ANSWER_COMBINATION || $answerType == MULTIPLE_ANSWER_COMBINATION_TRUE_FALSE) {
+            if ($final_answer) {
+                //getting only the first score where we save the weight of all the question
+                $answerWeighting = $objAnswerTmp->selectWeighting(1);
+                $questionScore += $answerWeighting;
+                $totalScore += $answerWeighting;
+            }
+        }
+
+        //Fixes multiple answer question in order to be exact
+        if ($answerType == MULTIPLE_ANSWER || $answerType == GLOBAL_MULTIPLE_ANSWER) {
+            //var_dump($answer_correct_array, $real_answers);
+            $diff = @array_diff($answer_correct_array, $real_answers);
+            //This makes the result non exact
+            if (!empty($diff)) {
+                //$questionScore = 0;
+            }
+        }
+
+        $extra_data = array(
+            'final_overlap' => $final_overlap,
+            'final_missing' => $final_missing,
+            'final_excess' => $final_excess,
+            'overlap_color' => $overlap_color,
+            'missing_color' => $missing_color,
+            'excess_color' => $excess_color,
+            'threadhold1' => $threadhold1,
+            'threadhold2' => $threadhold2,
+            'threadhold3' => $threadhold3,
+        );
+
+        unset($objAnswerTmp);
+
+        $totalWeighting += $questionWeighting;
+        // Store results directly in the database
+        // For all in one page exercises, the results will be
+        // stored by exercise_results.php (using the session)
+
+        if ($propagate_neg == 0 && $questionScore < 0) {
+            $questionScore = 0;
+        }
+
+        $return_array = array(
+            'score' => $questionScore,
+            'weight' => $questionWeighting,
+            'extra' => $extra_data,
+            'open_question' => $arrques,
+            'open_answer' => $arrans,
+            'answer_type' => $answerType
+        );
+
+        return $return_array;
+    }
+
+    /**
      * Sends a notification when a user ends an examn
      *
      */

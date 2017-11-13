@@ -32,6 +32,7 @@ $data[] = [
     '',
     '',
     '',
+    '',
     'Etapa preliminar',
     '',
     //'',
@@ -64,6 +65,10 @@ $studentSubscriptions = CourseManager::get_student_list_from_course_code($course
 foreach ($studentSubscriptions as $subscriptionId => $subscription) {
     $student = api_get_user_info($subscription['user_id'], false, false, true);
 
+    if (empty($student['username'])) {
+        continue;
+    }
+
     $userData = [];
     $userData[] = $student['lastname'];
     $userData[] = $student['firstname'];
@@ -73,31 +78,48 @@ foreach ($studentSubscriptions as $subscriptionId => $subscription) {
     $userData[] = $student['extra_fields']['extra_grado'];
     $userData[] = $student['extra_fields']['extra_lugar'];
 
-
-    $realExercisePRE = getExercise(
+    $realExercisesPRE = getExercise(
         substr($student['extra_fields']['extra_grado'], 0, 1).substr($student['extra_fields']['extra_nivel'], 0, 1),
         'PRE',
         $courseInfo['real_id']
     );
 
-    $realExerciseFIN = getExercise(
+    $realExercisesFIN = getExercise(
         substr($student['extra_fields']['extra_grado'], 0, 1).substr($student['extra_fields']['extra_nivel'], 0, 1),
         'FIN',
         $courseInfo['real_id']
     );
 
-    $resultsPRE = getCategoryResults(
-        $courseInfo['real_id'],
-        $courseInfo['id'],
-        $realExercisePRE['id'],
-        $student['user_id']
-    );
-    $resultsFIN = getCategoryResults(
-        $courseInfo['real_id'],
-        $courseInfo['id'],
-        $realExerciseFIN['id'],
-        $student['user_id']
-    );
+    $resultsPRE = [];
+    $resultsFIN = [];
+
+    foreach ($realExercisesPRE as $realExercise) {
+        $results = getCategoryResults(
+            $courseInfo['real_id'],
+            $courseInfo['id'],
+            $realExercise['id'],
+            $student['user_id']
+        );
+
+        if ($results) {
+            $resultsPRE = $results;
+            break;
+        }
+    }
+
+    foreach ($realExercisesFIN as $realExercise) {
+        $results = getCategoryResults(
+            $courseInfo['real_id'],
+            $courseInfo['id'],
+            $realExercise['id'],
+            $student['user_id']
+        );
+
+        if ($results) {
+            $resultsFIN = $results;
+            break;
+        }
+    }
 
     if (!$resultsPRE && !$resultsFIN) {
         continue;
@@ -146,16 +168,18 @@ function getExercise($requiredGrade, $stage, $courseId, $sessionId = 0)
         $exerciseList[$row['id']] = $row;
     }
 
+    $exercises = [];
+
     foreach ($exerciseList as $exerciseInfo) {
         $exerciseGrade = substr($exerciseInfo['title'], 0, 2);
         $exerciseStage = substr($exerciseInfo['title'], -3);
 
-        if ($exerciseGrade === $requiredGrade && $exerciseStage === $stage) {
-            return $exerciseInfo;
+        if (/*$exerciseGrade === $requiredGrade && */$exerciseStage === $stage) {
+            $exercises[] = $exerciseInfo;
         }
     }
 
-    return [];
+    return $exercises;
 }
 
 function getBestAttemtpByUserWithLP($studentId, $execiseId, $courseCode, $sessionId = 0)
@@ -540,8 +564,10 @@ function showScore($score, $weight, $show_percentage = true, $use_platform_setti
 </head>
 <body>
 <table>
+    <?php $i = -2 ?>
     <?php foreach ($data as $row) { ?>
         <tr>
+            <td><?php echo ++$i ?></td>
             <?php foreach ($row as $cell) { ?>
                 <td><?php echo $cell ?></td>
             <?php } ?>

@@ -44,6 +44,7 @@ $data[] = [
 $data[] = [
     'Apellidos',
     'Nombres',
+    'DNI',
     'Colegio',
     'Nivel',
     'Grado',
@@ -66,6 +67,7 @@ foreach ($studentSubscriptions as $subscriptionId => $subscription) {
     $userData = [];
     $userData[] = $student['lastname'];
     $userData[] = $student['firstname'];
+    $userData[] = $student['username'];
     $userData[] = $student['extra_fields']['extra_colegio'];
     $userData[] = $student['extra_fields']['extra_nivel'];
     $userData[] = $student['extra_fields']['extra_grado'];

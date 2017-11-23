@@ -676,3 +676,15 @@ $_configuration['gradebook_badge_sidebar'] = [
 //$_configuration['not_empty_session_student_list_for_multiple_subscription'] = false;
 // Disable the option to set course coach in session when editing course
 //$_configuration['disabled_edit_session_coaches_course_editing_course'] = false;
+// Show sender's email when receiving email notifications.
+//$_configuration['show_user_email_in_notification'] = false;
+// Set skill levels name, then later it will be parsed using get_lang BT#13586
+/*$_configuration['skill_levels_names'] = [
+    'levels' => [
+        1 => 'Skills',
+        2 => 'Capability',
+        3 => 'Dimension',
+    ]
+];*/
+// Hide the session list in Reporting tool. Useful when a course has too many sessions.
+//$_configuration['hide_reporting_session_list'] = false;

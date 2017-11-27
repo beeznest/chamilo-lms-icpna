@@ -4226,76 +4226,30 @@ class MigrationCustom
                 UrlManager::add_user_to_url($userId, 1);
             }
 
-            $client = new SoapClient('http://www25.icpna.edu.pe:86/wsdatospersonales/webservice.asmx?wsdl');
-            $data = $client->obtienedatospersonales(
-                [
-                    'uididpersona' => $uididpersona
-                ]
-            )->obtienedatospersonalesResult->any;
+            //$extraData = self::get_extra_user_data_custom_ws();
+            //$extraFieldsToInsert = self::get_extra_fields_user_custom_ws();
+            //ksort($extraFieldsToInsert);
 
-            $xml = strstr($data, '<diffgr:diffgram');
+            //unset($extraFieldsToInsert['tags']);
 
-            $objectData = new SimpleXMLElement($xml);
-            $objectData = $objectData->NewDataSet->Table;
+            //$t_ufv = Database::get_main_table(TABLE_EXTRA_FIELD_VALUES);
+            //
+            //foreach ($extraFieldsToInsert as $id => $name) {
+            //    Database::insert($t_ufv,
+            //        [
+            //            'field_id' => $id,
+            //            'value' => '',
+            //            'item_id' => $userId,
+            //            'created_at' => $now,
+            //            'updated_at' => $now
+            //        ]
+            //    );
+            //}
 
-            $extraData = self::get_extra_user_data_custom_ws();
-            $extraFieldsToInsert = self::get_extra_fields_user_custom_ws();
-            ksort($extraFieldsToInsert);
-
-            unset($extraFieldsToInsert['tags']);
-
-            $t_ufv = Database::get_main_table(TABLE_EXTRA_FIELD_VALUES);
-
-            foreach ($extraFieldsToInsert as $id => $name) {
-                Database::insert($t_ufv,
-                    [
-                        'field_id' => $id,
-                        'value' => '',
-                        'item_id' => $userId,
-                        'created_at' => $now,
-                        'updated_at' => $now
-                    ]
-                );
-            }
-
-            $cleanedBirthdayDateTime = self::cleanDateTimeFromWS($objectData->sdtFechaNacimiento);
-
-            Database::query("UPDATE $t_user SET phone = '".Database::escape_string($objectData->vchTelefonoPersona)."' WHERE user_id = $userId");
-
-            Database::query("UPDATE $t_ufv SET value = 'false' WHERE field_id = '".Database::escape_string($extraData['already_logged_in'])."' AND item_id = $userId");
-            Database::query("UPDATE $t_ufv SET value = 1 WHERE field_id = '".Database::escape_string($extraData['mail_notify_group_message'])."' AND item_id = $userId");
-            Database::query("UPDATE $t_ufv SET value = 1 WHERE field_id = '".Database::escape_string($extraData['mail_notify_invitation'])."' AND item_id = $userId");
-            Database::query("UPDATE $t_ufv SET value = 1 WHERE field_id = '".Database::escape_string($extraData['mail_notify_message'])."' AND item_id = $userId");
-
-            Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->uidIdDocumentoIdentidad)."' WHERE field_id = '{$extraData['id_document_type']}' AND item_id = $userId");
-            Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->vchDocumentoNumero)."' WHERE field_id = '{$extraData['id_document_number']}' AND item_id = $userId");
-            Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->vchSegundoNombre)."' WHERE field_id = '{$extraData['middle_name']}' AND item_id = $userId");
-            Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->vchMaterno)."' WHERE field_id = '{$extraData['mothers_name']}' AND item_id = $userId");
-            Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->chrSexo)."' WHERE field_id = '{$extraData['sex']}' AND item_id = $userId");
-            Database::query("UPDATE $t_ufv SET value = '{$cleanedBirthdayDateTime}' WHERE field_id = '{$extraData['birthdate']}' AND item_id = $userId");
-            Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->uididpaisorigen)."' WHERE field_id = '{$extraData['nationality']}' AND item_id = $userId");
-            Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->uidIdDepartamento)."' WHERE field_id = '{$extraData['address_department']}' AND item_id = $userId");
-            Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->uidIdProvincia)."' WHERE field_id = '{$extraData['address_province']}' AND item_id = $userId");
-            Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->uidIdDistrito)."' WHERE field_id = '{$extraData['address_district']}' AND item_id = $userId");
-            Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->vchDireccionPersona)."' WHERE field_id = '{$extraData['address']}' AND item_id = $userId");
-            Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->vchcelularPersona)."' WHERE field_id = '{$extraData['mobile_phone_number']}' AND item_id = $userId");
-            Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->uidIdOcupacion)."' WHERE field_id = '{$extraData['occupation']}' AND item_id = $userId");
-
-            if (!empty($objectData->strNombrePadre) && is_string($objectData->strNombrePadre)) {
-                Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->strNombrePadre)."' WHERE field_id = '{$extraData['guardian_name']}' AND item_id = $userId");
-            }
-
-            if (!empty($objectData->vchEmailApoderado) && is_string($objectData->vchEmailApoderado)) {
-                Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->vchEmailApoderado)."' WHERE field_id = '{$extraData['guardian_email']}' AND item_id = $userId");
-            }
-
-            if (!empty($objectData->uidIdDocumentoIdentidadPadre) && is_string($objectData->uidIdDocumentoIdentidadPadre)) {
-                Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->uidIdDocumentoIdentidadPadre)."' WHERE field_id = '{$extraData['guardian_id_document_type']}' AND item_id = $userId");
-            }
-
-            if (!empty($objectData->vchDocumentoNumeroPadre) && is_string($objectData->vchDocumentoNumeroPadre)) {
-                Database::query("UPDATE $t_ufv SET value = '".Database::escape_string($objectData->vchDocumentoNumeroPadre)."' WHERE field_id = '{$extraData['guardian_id_document_number']}' AND item_id = $userId");
-            }
+            //Database::query("UPDATE $t_ufv SET value = 'false' WHERE field_id = '".Database::escape_string($extraData['already_logged_in'])."' AND item_id = $userId");
+            //Database::query("UPDATE $t_ufv SET value = 1 WHERE field_id = '".Database::escape_string($extraData['mail_notify_group_message'])."' AND item_id = $userId");
+            //Database::query("UPDATE $t_ufv SET value = 1 WHERE field_id = '".Database::escape_string($extraData['mail_notify_invitation'])."' AND item_id = $userId");
+            //Database::query("UPDATE $t_ufv SET value = 1 WHERE field_id = '".Database::escape_string($extraData['mail_notify_message'])."' AND item_id = $userId");
 
             if (!empty($hook)) {
                 $hook->setEventData(array(

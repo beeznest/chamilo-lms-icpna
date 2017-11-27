@@ -362,8 +362,9 @@ class IcpnaUpdateUserPlugin extends Plugin
     /**
      * Call to validaDatosCompletos function
      * Web service returns 0 if the profile is completed, otherwiswe return 1
+     * When webservice doesn't works then this function return true
      * @param string $uididpersona
-     * @return bool Return true if progile is completed, otherwise return false
+     * @return bool Return true if profile is completed or when webservice fail
      */
     public function profileIsCompleted($uididpersona)
     {
@@ -383,7 +384,8 @@ class IcpnaUpdateUserPlugin extends Plugin
 
             return !$result;
         } catch (Exception $e) {
-            return false;
+            //When webservice doesn't works then return true to avoid blocking access to users
+            return true;
         }
     }
 
@@ -392,6 +394,10 @@ class IcpnaUpdateUserPlugin extends Plugin
      */
     public function redirect()
     {
+        if ($this->get(self::SETTING_ENABLE) !== 'true') {
+            return;
+        }
+
         if (ChamiloApi::isAjaxRequest()) {
             return;
         }

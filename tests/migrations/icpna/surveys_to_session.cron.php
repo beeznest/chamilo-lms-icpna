@@ -78,7 +78,8 @@ while ($row = Database::fetch_assoc($result)) {
         continue;
     }
 
-    echo "Session found. ("
+    echo "Session found ("
+        ."id: {$session->getId()} "
         ."branch: {$row['branch']} period: {$row['period']} "
         ."frequency: {$row['frequency']} intensity: {$row['intensity']})".PHP_EOL;
 
@@ -93,6 +94,7 @@ while ($row = Database::fetch_assoc($result)) {
     replicateInSessions(
         $masterCourse,
         $session,
+        $sessionCourse,
         $efSurvey['value'],
         new DateTime($row['start_date'], new DateTimeZone('UTC')),
         new DateTime($row['end_date'], new DateTimeZone('UTC'))
@@ -104,13 +106,18 @@ echo 'Finish'.PHP_EOL;
 /**
  * @param \Chamilo\CoreBundle\Entity\Course $originCourse
  * @param \Chamilo\CoreBundle\Entity\Session $session
+ * @param \Chamilo\CoreBundle\Entity\Course $sessionCourse
  * @param string $surveyCode
  * @param \DateTime $fixedDayToStart
  * @param \DateTime $fixedDayToEnd
+ * @throws \Doctrine\ORM\ORMException
+ * @throws \Doctrine\ORM\OptimisticLockException
+ * @throws \Doctrine\ORM\TransactionRequiredException
  */
 function replicateInSessions(
     Course $originCourse,
     Session $session,
+    Course $sessionCourse,
     $surveyCode,
     DateTime $fixedDayToStart,
     DateTime $fixedDayToEnd
@@ -121,17 +128,17 @@ function replicateInSessions(
 
     echo "Replicating survey in session {$session->getId()}".PHP_EOL;
 
-    $users = getSessionUsersForInvitation($session, $originCourse);
+    $users = getSessionUsersForInvitation($session, $sessionCourse);
 
     /** @var CSurvey $survey */
     foreach ($courseSurveys as $survey) {
-        if ($survey->getCode() !== $surveyCode) {
+        if (strpos($survey->getCode(), $surveyCode) === false) {
             continue;
         }
 
         echo "\tReplicating survey {$survey->getCode()}:".PHP_EOL;
 
-        if (SurveyUtil::existsSurveyCodeInCourse($survey->getCode(), $originCourse->getId(), $session->getId())) {
+        if (SurveyUtil::existsSurveyCodeInCourse($surveyCode, $sessionCourse->getId(), $session->getId())) {
             echo "\t\tSurvey code {$survey->getCode()} already exists in session {$session->getId()}".PHP_EOL;
             continue;
         }
@@ -140,22 +147,26 @@ function replicateInSessions(
             $survey->getSurveyId(),
             $originCourse->getCode(),
             0,
-            $originCourse->getCode(),
+            $sessionCourse->getCode(),
             $session->getId()
         );
+        $newSurveyId = current($newSurveyIds);
 
         /** @var CSurvey $newSurvey */
-        $newSurvey = $em->find('ChamiloCourseBundle:CSurvey', current($newSurveyIds));
+        $newSurvey = $em->find('ChamiloCourseBundle:CSurvey', $newSurveyId);
         echo "\t\tNew survey created with code {$newSurvey->getCode()} in session {$session->getId()}".PHP_EOL;
 
         $newSurvey
             ->setAvailFrom($fixedDayToStart)
-            ->setAvailTill($fixedDayToEnd);
+            ->setAvailTill($fixedDayToEnd)
+            ->setCreationDate(
+                api_get_utc_datetime(null, false, true)
+            );
         $em->persist($newSurvey);
         $em->flush();
 
         $_GET['survey_id'] = $newSurvey->getSurveyId();
-        $_GET['course'] = $originCourse->getCode();
+        $_GET['course'] = $sessionCourse->getCode();
 
         SurveyUtil::saveInvitations($users, '', '', 0, false, 0);
         SurveyUtil::update_count_invited($newSurvey->getCode());

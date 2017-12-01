@@ -38,9 +38,14 @@ if (!$masterCourse) {
     exit;
 }
 
-ChamiloSession::write('_real_cid', $masterCourse->getId());
-
 while ($row = Database::fetch_assoc($result)) {
+    echo "Searching sessions about:".PHP_EOL
+        ."\tbranch: {$row['branch']}".PHP_EOL
+        ."\tperiod: {$row['period']}".PHP_EOL
+        ."\tfrequency: {$row['frequency']}".PHP_EOL
+        ."\tintensity: {$row['intensity']})".PHP_EOL
+        .PHP_EOL;
+
     $dql = "
         SELECT s FROM ChamiloCoreBundle:Session s
         INNER JOIN ChamiloCoreBundle:ExtraFieldValues branchV WITH s.id = branchV.itemId
@@ -73,19 +78,13 @@ while ($row = Database::fetch_assoc($result)) {
 
     /** @var Session $session */
     foreach ($sessions as $session) {
-        if (!$session) {
-            continue;
-        }
-
-        echo "Session found ("
-            ."id: {$session->getId()} "
-            ."branch: {$row['branch']} period: {$row['period']} "
-            ."frequency: {$row['frequency']} intensity: {$row['intensity']})".PHP_EOL;
-
-        ChamiloSession::write('id_session', $session->getId());
+        echo "Session found: ({$session->getId()}) {$session->getName()}".PHP_EOL;
 
         /** @var Course $sessionCourse */
         $sessionCourse = $session->getCourses()->first()->getCourse();
+
+        ChamiloSession::write('id_session', $session->getId());
+        ChamiloSession::write('_real_cid', $sessionCourse->getId());
 
         $efv = new ExtraFieldValue('course');
         $efSurvey = $efv->get_values_by_handler_and_field_variable($sessionCourse->getId(), 'survey');
@@ -169,7 +168,7 @@ function replicateInSessions(
         $_GET['course'] = $sessionCourse->getCode();
 
         SurveyUtil::saveInvitations($users, '', '', 0, false, 0);
-        SurveyUtil::update_count_invited($newSurvey->getCode());
+        SurveyUtil::update_count_invited($newSurvey->getCode(), $sessionCourse->getId(), $session->getId());
 
         echo "\t\tUsers in session course were invited".PHP_EOL;
     }

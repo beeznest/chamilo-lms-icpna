@@ -61,7 +61,7 @@ while ($row = Database::fetch_assoc($result)) {
                     AND intensityF.variable = 'intensidad' AND intensityV.value = :intensity
             ) > 0
     ";
-    $results = $em
+    $sessions = $em
         ->createQuery($dql)
         ->setParameters([
             'branch' => $row['branch'],
@@ -72,33 +72,33 @@ while ($row = Database::fetch_assoc($result)) {
         ->getResult();
 
     /** @var Session $session */
-    $session = current($results);
+    foreach ($sessions as $session) {
+        if (!$session) {
+            continue;
+        }
 
-    if (!$session) {
-        continue;
+        echo "Session found ("
+            ."id: {$session->getId()} "
+            ."branch: {$row['branch']} period: {$row['period']} "
+            ."frequency: {$row['frequency']} intensity: {$row['intensity']})".PHP_EOL;
+
+        ChamiloSession::write('id_session', $session->getId());
+
+        /** @var Course $sessionCourse */
+        $sessionCourse = $session->getCourses()->first()->getCourse();
+
+        $efv = new ExtraFieldValue('course');
+        $efSurvey = $efv->get_values_by_handler_and_field_variable($sessionCourse->getId(), 'survey');
+
+        replicateInSessions(
+            $masterCourse,
+            $session,
+            $sessionCourse,
+            $efSurvey['value'],
+            new DateTime($row['start_date'], new DateTimeZone('UTC')),
+            new DateTime($row['end_date'], new DateTimeZone('UTC'))
+        );
     }
-
-    echo "Session found ("
-        ."id: {$session->getId()} "
-        ."branch: {$row['branch']} period: {$row['period']} "
-        ."frequency: {$row['frequency']} intensity: {$row['intensity']})".PHP_EOL;
-
-    ChamiloSession::write('id_session', $session->getId());
-
-    /** @var Course $sessionCourse */
-    $sessionCourse = $session->getCourses()->first()->getCourse();
-
-    $efv = new ExtraFieldValue('course');
-    $efSurvey = $efv->get_values_by_handler_and_field_variable($sessionCourse->getId(), 'survey');
-
-    replicateInSessions(
-        $masterCourse,
-        $session,
-        $sessionCourse,
-        $efSurvey['value'],
-        new DateTime($row['start_date'], new DateTimeZone('UTC')),
-        new DateTime($row['end_date'], new DateTimeZone('UTC'))
-    );
 }
 
 echo 'Finish'.PHP_EOL;

@@ -84,7 +84,11 @@ class IcpnaUpdateUserPluginHook extends HookObserver implements HookUpdateUserOb
                     'p_strNombrePadre' => $extraData['guardian_name'],
                     'p_vchEmailApoderado' => $extraData['guardian_email'],
                     'p_uidIdDocumentoIdentidadPadre' => strtoupper($extraData['guardian_id_document_type']),
-                    'p_vchDocumentoNumeroPadre' => $extraData['guardian_id_document_number']
+                    'p_vchDocumentoNumeroPadre' => $extraData['guardian_id_document_number'],
+                    'p_vchNombreUrbanizacion' => $extraData['urbanization'],
+                    'p_uidIdTipoVia' => $extraData['type_of_road'],
+                    'p_chrNroPuerta' => $extraData['door_number'],
+                    'p_chrNroInterior' => $extraData['indoor_number'],
                 ])
                 ->actualizadatospersonalesResult
                 ->any;

@@ -94,6 +94,9 @@ switch ($action) {
             'valid' => !in_array($phone, $blackList)
         ];
         break;
+    case 'get_tipo_via':
+        $return = $plugin->getTipoVia();
+        break;
     default:
         $return = [];
 }

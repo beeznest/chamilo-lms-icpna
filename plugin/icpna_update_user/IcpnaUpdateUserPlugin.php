@@ -298,7 +298,11 @@ class IcpnaUpdateUserPlugin extends Plugin
             'extra_address_department' => (string) $tableResult->uidIdDepartamento,
             'extra_address_province' => (string) $tableResult->uidIdProvincia,
             'extra_address_district' => (string) $tableResult->uidIdDistrito,
+            'extra_urbanization' => (string) $tableResult->vchNombreUrbanizacion,
+            'extra_type_of_road' => (string) $tableResult->uidIdTipoVia,
             'extra_address' => (string) $tableResult->vchDireccionPersona,
+            'extra_door_number' => (string) $tableResult->chrNroPuerta,
+            'extra_indoor_number' => (string) $tableResult->chrNroInterior,
             'email' => (string) $tableResult->vchEmailPersona,
             'phone' => (string) $tableResult->vchTelefonoPersona,
             'extra_mobile_phone_number' => (string) $tableResult->vchcelularPersona,
@@ -432,5 +436,24 @@ class IcpnaUpdateUserPlugin extends Plugin
 
         header('Location: '.api_get_path(WEB_CODE_PATH).'auth/profile.php');
         exit;
+    }
+
+    /**
+     * Call to tipovia function
+     * @return array
+     */
+    public function getTipoVia()
+    {
+        $return = [];
+        $tableResult = $this->getTableResult('tipovia');
+
+        foreach ($tableResult as $item) {
+            $return[] = [
+                'value' => (string) $item->uidIdTipoVia,
+                'text' => (string) $item->vchNombreTipoVia,
+            ];
+        }
+
+        return $return;
     }
 }

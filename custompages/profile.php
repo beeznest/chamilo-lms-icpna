@@ -29,7 +29,11 @@ if (!$form->elementExists('extra_id_document_type') || !$form->elementExists('ex
     || !$form->elementExists('extra_address_department')
     || !$form->elementExists('extra_address_province')
     || !$form->elementExists('extra_address_district')
+    || !$form->elementExists('extra_urbanization')
+    || !$form->elementExists('extra_type_of_road')
     || !$form->elementExists('extra_address')
+    || !$form->elementExists('extra_door_number')
+    || !$form->elementExists('extra_indoor_number')
     || !$form->elementExists('extra_mobile_phone_number')
     || !$form->elementExists('extra_occupation')
     || !$form->elementExists('extra_occupation_department')
@@ -81,6 +85,7 @@ if ($form->elementExists('username')) {
 }
 if ($form->elementExists('language')) {
     $form->removeElement('language');
+    $form->addHidden('language', $defaultValues['language']);
 }
 
 $formRenderer = $form->defaultRenderer();
@@ -263,6 +268,14 @@ $form->addSelect(
     'Dirección (Distrito)',
     ['' => get_lang('SelectAnOption', null, 'spanish', true)],
     ['id' => 'extra_address_district']
+);
+
+$form->removeElement('extra_type_of_road');
+$form->addSelect(
+    'extra_type_of_road',
+    'Tipo de vía',
+    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
+    ['id' => 'extra_type_of_road']
 );
 
 $form->removeElement('extra_occupation');
@@ -454,8 +467,24 @@ $form->insertElementBefore(
     'extra_mobile_phone_number'
 );
 $form->insertElementBefore(
-    $form->removeElement('extra_address', false),
+    $form->removeElement('extra_indoor_number', false),
     'phone'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_door_number', false),
+    'extra_indoor_number'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_address', false),
+    'extra_door_number'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_type_of_road', false),
+    'extra_address'
+);
+$form->insertElementBefore(
+    $form->removeElement('extra_urbanization', false),
+    'extra_type_of_road'
 );
 
 // Translate chamilo default profile elements
@@ -494,8 +523,11 @@ $form->getElement('extra_mobile_phone_number')->_label = [
 ];
 $form->getElement('extra_mobile_phone_number')->setAttribute('maxlength', 15);
 $form->getElement('extra_mobile_phone_number')->setAttribute('placeholder', 'De 9 a 15 dígitos. Por ejemplo: 978654321');
-$form->getElement('extra_address')->_label = get_lang('AddressField', null, 'spanish', true);
+$form->getElement('extra_urbanization')->setAttribute('maxlength', 150);
+$form->getElement('extra_address')->_label = 'Nombre de vía';
 $form->getElement('extra_address')->setAttribute('maxlength', 100);
+$form->getElement('extra_door_number')->setAttribute('maxlength', 10);
+$form->getElement('extra_indoor_number')->setAttribute('maxlength', 10);
 $form->getElement('extra_sex')->_label = get_lang('UserSex', null, 'spanish', true);
 $form->getElement('extra_guardian_name')->setAttribute('maxlength', 60);
 $form->getElement('extra_guardian_name')->setAttribute('pattern', '[a-zA-Zá-úñÑ]+[a-zA-Zá-úñÑ\s\-]*');
@@ -645,7 +677,11 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                     $slctAddressDepartment = $('#extra_address_department'),
                     $slctAddressProvince = $('#extra_address_province'),
                     $slctAddressDistrict = $('#extra_address_district'),
-                    $slctLocation = $('#extra_address'),
+                    $txtAddressUrbanization = $('#extra_urbanization'),
+                    $slctAddressTypeRoad = $('#extra_type_of_road'),
+                    $txtAddress = $('#extra_address'),
+                    $txtAddressDoorNumber = $('#extra_door_number'),
+                    $txtAddressIndoorNumber = $('#extra_indoor_number'),
                     $txtEmail = $('#profile_email'),
                     $slctSex = $('#extra_sex'),
                     $slctNationality = $('#extra_nationality'),
@@ -665,7 +701,7 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                     }
 
                     var texts = [
-                        $slctLocation
+                        $txtAddress
                     ];
 
                     if ($slctOccupation.get(0).selectedIndex === 4) {
@@ -1056,6 +1092,7 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                     var xhrDocumentIdType = $.getJSON(url, {a: 'get_tipodocumento'}),
                         xhrNationality = $.getJSON(url, {a: 'get_nacionalidad'}),
                         xhrDepartment = $.getJSON(url, {a: 'get_departamento'}),
+                        xhrAddressTypeRoad = $.getJSON(url, {a: 'get_tipo_via'}),
                         xhrOccupation = $.getJSON(url, {a: 'get_ocupacion'}),
                         xhrUniCareers = $.getJSON(url, {a: 'get_carrerauniversitaria'});
 
@@ -1065,6 +1102,7 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                             xhrDocumentIdType,
                             xhrNationality,
                             xhrDepartment,
+                            xhrAddressTypeRoad,
                             xhrOccupation,
                             xhrUniCareers
                         ])
@@ -1072,6 +1110,7 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                             docTypeResponse,
                             nationalityResponse,
                             departmentResponse,
+                            xhrAddressTypeRoad,
                             xhrOccupationResponse,
                             xhrUniCareersResponse
                         ) {
@@ -1079,6 +1118,7 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                             addOptions(docTypeResponse[0], $slctGuardianDocument);
                             addOptions(nationalityResponse[0], $slctNationality);
                             addOptions(departmentResponse[0], $slctAddressDepartment);
+                            addOptions(xhrAddressTypeRoad[0], $slctAddressTypeRoad);
                             addOptions(departmentResponse[0], $slctOccupationDepartment);
                             addOptions(xhrOccupationResponse[0], $slctOccupation);
                             addOptions(xhrUniCareersResponse[0], $slctUniCarrers);
@@ -1087,6 +1127,7 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                             $slctGuardianDocument.selectpicker('val', defaultValues.extra_guardian_id_document_type);
                             $slctNationality.selectpicker('val', defaultValues.extra_nationality);
                             $slctAddressDepartment.selectpicker('val', defaultValues.extra_address_department);
+                            $slctAddressTypeRoad.selectpicker('val', defaultValues.extra_type_of_road);
                             $slctOccupation.selectpicker('val', defaultValues.extra_occupation);
                             $slctOccupationDepartment.selectpicker('val', defaultValues.extra_occupation_department);
                             $slctUniCarrers.selectpicker('val', defaultValues.extra_university_career);
@@ -1210,7 +1251,8 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                     onProvinceSelected(this.value, $slctAddressDistrict);
                 });
                 $slctAddressDistrict.required(true);
-                $slctLocation.required(true);
+                $slctAddressTypeRoad.required(true);
+                $txtAddress.required(true);
                 $txtMobilePhone.required(true).attr({
                     'pattern': '\\d{9,15}',
                     'title': $txtMobilePhone.attr('placeholder')

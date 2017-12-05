@@ -329,6 +329,9 @@ class IcpnaUpdateUserPlugin extends Plugin
             'extra_guardian_id_document_number' => (string) $tableResult->vchDocumentoNumeroPadre
         ];
 
+        $return['extra_door_number'] = trim($return['extra_door_number']);
+        $return['extra_indoor_number'] = trim($return['extra_indoor_number']);
+
         return $return;
     }
 

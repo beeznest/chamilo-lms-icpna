@@ -524,10 +524,16 @@ $form->getElement('extra_mobile_phone_number')->_label = [
 $form->getElement('extra_mobile_phone_number')->setAttribute('maxlength', 15);
 $form->getElement('extra_mobile_phone_number')->setAttribute('placeholder', 'De 9 a 15 dígitos. Por ejemplo: 978654321');
 $form->getElement('extra_urbanization')->setAttribute('maxlength', 150);
+$form->getElement('extra_urbanization')->setAttribute('pattern', '[a-zA-Zá-úñÑ0-9]+[a-zA-Zá-úñÑ0-9\s\-]*');
+$form->getElement('extra_urbanization')->setAttribute('title', get_lang('OnlyLettersAndNumbersAndSpaces', null, 'spanish', true));
 $form->getElement('extra_address')->_label = 'Nombre de vía';
 $form->getElement('extra_address')->setAttribute('maxlength', 100);
 $form->getElement('extra_door_number')->setAttribute('maxlength', 10);
+$form->getElement('extra_door_number')->setAttribute('pattern', '[a-zA-Zá-úñÑ0-9]+[a-zA-Zá-úñÑ\s\-0-9]*');
+$form->getElement('extra_door_number')->setAttribute('title', get_lang('OnlyLettersAndNumbersAndSpaces', null, 'spanish', true));
 $form->getElement('extra_indoor_number')->setAttribute('maxlength', 10);
+$form->getElement('extra_indoor_number')->setAttribute('pattern', '[a-zA-Zá-úñÑ0-9]+[a-zA-Zá-úñÑ\s\-0-9]*');
+$form->getElement('extra_indoor_number')->setAttribute('title', get_lang('OnlyLettersAndNumbersAndSpaces', null, 'spanish', true));
 $form->getElement('extra_sex')->_label = get_lang('UserSex', null, 'spanish', true);
 $form->getElement('extra_guardian_name')->setAttribute('maxlength', 60);
 $form->getElement('extra_guardian_name')->setAttribute('pattern', '[a-zA-Zá-úñÑ]+[a-zA-Zá-úñÑ\s\-]*');

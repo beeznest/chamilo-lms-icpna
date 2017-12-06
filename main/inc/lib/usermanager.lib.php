@@ -2783,6 +2783,10 @@ class UserManager
                 }
             }
 
+            if ($row['movedStatus'] != 0) {
+                continue;
+            }
+
             $categories[$row['session_category_id']]['session_category'] = array(
                 'id' => $row['session_category_id'],
                 'name' => $row['session_category_name'],

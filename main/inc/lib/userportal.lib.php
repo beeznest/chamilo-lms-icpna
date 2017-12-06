@@ -1602,13 +1602,15 @@ class IndexManager
                                 $params['courses'] = $html_courses_session;
 
                                 if ($showSimpleSessionInfo) {
+                                    $movedStatus = SessionManager::getSessionChangeUserReason($session['moved_status']);
+
                                     $params['subtitle'] = self::getSimpleSessionDetails(
                                         $session_box['coach'],
                                         $session_box['dates'],
                                         isset($session_box['duration']) ? $session_box['duration'] : null
                                     );
 
-                                    $sessionParams[0]['subtitle'] .= $movedStatus ? " ($movedStatus)" : '';
+                                    $params['subtitle'] .= $movedStatus ? " ($movedStatus)" : '';
                                 }
 
                                 if ($gameModeIsActive) {
@@ -1710,11 +1712,15 @@ class IndexManager
                                     $sessionParams[0]['coach_name'] = !empty($session_box['coach']) ? $session_box['coach'] : null;
 
                                     if ($showSimpleSessionInfo) {
+                                        $movedStatus = SessionManager::getSessionChangeUserReason($session['moved_status']);
+
                                         $sessionParams[0]['subtitle'] = self::getSimpleSessionDetails(
                                             $session_box['coach'],
                                             $session_box['dates'],
                                             isset($session_box['duration']) ? $session_box['duration'] : null
                                         );
+
+                                        $sessionParams[0]['subtitle'] .= $movedStatus ? " ($movedStatus)" : '';
                                     }
 
                                     $this->tpl->assign('session', $sessionParams);

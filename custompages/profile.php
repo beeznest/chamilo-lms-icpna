@@ -1258,6 +1258,7 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                 });
                 $slctAddressDistrict.required(true);
                 $slctAddressTypeRoad.required(true);
+                $txtAddressDoorNumber.required(true);
                 $txtAddress.required(true);
                 $txtMobilePhone.required(true).attr({
                     'pattern': '\\d{9,15}',

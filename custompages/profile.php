@@ -526,7 +526,7 @@ $form->getElement('extra_mobile_phone_number')->setAttribute('placeholder', 'De 
 $form->getElement('extra_urbanization')->setAttribute('maxlength', 150);
 $form->getElement('extra_urbanization')->setAttribute('pattern', '[a-zA-Zá-úÁ-ÚñÑ0-9\.\:]+[a-zA-Zá-úÁ-ÚñÑ0-9\s\-\.\:]*');
 $form->getElement('extra_urbanization')->setAttribute('title', get_lang('OnlyLettersAndNumbersAndSpaces', null, 'spanish', true));
-$form->getElement('extra_address')->_label = 'Nombre de vía';
+$form->getElement('extra_address')->_label = 'Nombre de vía (dirección)';
 $form->getElement('extra_address')->setAttribute('maxlength', 100);
 $form->getElement('extra_door_number')->setAttribute('maxlength', 10);
 $form->getElement('extra_door_number')->setAttribute('pattern', '[a-zA-Zá-úÁ-ÚñÑ0-9]+[a-zA-Zá-úÁ-ÚñÑ\s\-0-9]*');

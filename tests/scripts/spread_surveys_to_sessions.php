@@ -6,7 +6,7 @@
  * @ref BT#13203
  */
 
-//die();
+die();
 
 if (PHP_SAPI !== 'cli') {
     die('This script can only be executed from the command line');
@@ -20,11 +20,9 @@ require_once __DIR__.'/../../main/inc/global.inc.php';
 
 // Set the origin course code
 $originCourseCodes = [
-    'B01',
 ];
 //Set course codes (not in sessions) to replicate the survey
 $destinationCourseCodes = [
-    'B02',
 ];
 //Set the uididprograma value (a session extra field) to filter sessions
 $uididprogramaFilter = [
@@ -48,6 +46,7 @@ $sedeFilter = [
     //'1CE8E5F9-56D2-4C35-B3C1-ED0D91C3D4B1', // Chim
     //'1BCE2204-76C3-4CC6-A0E3-8B7164FC76A4', // Puca
 ];
+$period = ''; //e.g. '201712';
 $surveyDayNumberToStart = 13;
 $surveyDayNumberToEnd = 15;
 // If fixed dates are defined, they will superseed the relative number of days above
@@ -55,6 +54,8 @@ $surveyFixedDayToStart = ''; // e.g. '2017-09-16 05:00:00'; (include timezone sh
 $surveyFixedDayToEnd = ''; // e.g. '2017-09-24 05:00:00'; (include timezone shift)
 
 $em = Database::getManager();
+
+$countSessions = 0;
 
 foreach ($originCourseCodes as $courseCode) {
     /** @var Course $course */
@@ -66,10 +67,8 @@ foreach ($originCourseCodes as $courseCode) {
 
     ChamiloSession::write('_real_cid', $course->getId());
 
-    echo "Replicate surveys from {$course->getCode()} to ".count($destinationCourseCodes)." courses".PHP_EOL;
-    echo PHP_EOL;
-
     if (count($destinationCourseCodes) > 0) {
+        echo "Replicate surveys from {$course->getCode()} to ".count($destinationCourseCodes)." courses".PHP_EOL;
         echo count($destinationCourseCodes)." destination base courses selected".PHP_EOL;
         replicateInCourses($course, $destinationCourseCodes);
     } else {
@@ -91,6 +90,9 @@ echo "Exiting".PHP_EOL;
  * Replicate all surveys from given origin course to all destination courses
  * @param \Chamilo\CoreBundle\Entity\Course $originCourse
  * @param array $destinationCourseCodes
+ * @throws \Doctrine\ORM\ORMException
+ * @throws \Doctrine\ORM\OptimisticLockException
+ * @throws \Doctrine\ORM\TransactionRequiredException
  */
 function replicateInCourses(Course $originCourse, array $destinationCourseCodes) {
     $courseSurveys = SurveyUtil::getCourseSurveys($originCourse->getId());
@@ -137,6 +139,11 @@ function replicateInCourses(Course $originCourse, array $destinationCourseCodes)
  * @param int $dayNumberToEnd number of day to end survey
  * @param array $uididprogramaFilter Optional. uididprograma extra field to filter
  * @param array $sedeFilter Optional. sede extra field to filter
+ * @param $fixedDayToStart
+ * @param $fixedDayToEnd
+ * @throws \Doctrine\ORM\ORMException
+ * @throws \Doctrine\ORM\OptimisticLockException
+ * @throws \Doctrine\ORM\TransactionRequiredException
  */
 function replicateInSessions(
     Course $originCourse,
@@ -151,12 +158,6 @@ function replicateInSessions(
     $em = Database::getManager();
     echo "Replicating surveys from course ".$originCourse->getCode()." to all its sessions".PHP_EOL;
 
-    $monthStart = new DateTime('first day of this month 00:00:00', new DateTimeZone('UTC'));
-    // Account for some sessions starting a few days before the start of this month
-    $monthStart->modify('- 5 days');
-    $monthEnd = new DateTime('last day of this month 23:59:59', new DateTimeZone('UTC'));
-    $monthEnd->modify('+ 5 days');
-
     $courseSurveys = SurveyUtil::getCourseSurveys($originCourse->getId());
 
     //Get sessions from de origin course for this month
@@ -164,10 +165,10 @@ function replicateInSessions(
         ->createQuery("
             SELECT s FROM ChamiloCoreBundle:Session s
             INNER JOIN ChamiloCoreBundle:SessionRelCourse sc WITH s = sc.session
-            WHERE s.accessStartDate >= :month_start AND s.accessEndDate <= :month_end
+            WHERE s.name LIKE :period
               AND sc.course = :course
         ")
-        ->setParameters(['month_start' => $monthStart, 'month_end' => $monthEnd, 'course' => $originCourse])
+        ->setParameters(['course' => $originCourse, 'period' => "% - {$GLOBALS['period']} - %"])
         ->getResult();
 
     if ($uididprogramaFilter) {
@@ -180,6 +181,7 @@ function replicateInSessions(
 
     /** @var Session $session */
     foreach ($sessions as $session) {
+        echo 'Session No. '.(++$GLOBALS['countSessions']);
         ChamiloSession::write('id_session', $session->getId());
 
         echo "Attempt to replicate surveys in session {$session->getId()}".PHP_EOL;

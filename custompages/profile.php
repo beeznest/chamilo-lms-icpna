@@ -524,7 +524,7 @@ $form->getElement('extra_mobile_phone_number')->_label = [
 $form->getElement('extra_mobile_phone_number')->setAttribute('maxlength', 15);
 $form->getElement('extra_mobile_phone_number')->setAttribute('placeholder', 'De 9 a 15 dígitos. Por ejemplo: 978654321');
 $form->getElement('extra_urbanization')->setAttribute('maxlength', 150);
-$form->getElement('extra_urbanization')->setAttribute('pattern', '[a-zA-Zá-úÁ-ÚñÑ0-9]+[a-zA-Zá-úÁ-ÚñÑ0-9\s\-]*');
+$form->getElement('extra_urbanization')->setAttribute('pattern', '[a-zA-Zá-úÁ-ÚñÑ0-9\.\:]+[a-zA-Zá-úÁ-ÚñÑ0-9\s\-\.\:]*');
 $form->getElement('extra_urbanization')->setAttribute('title', get_lang('OnlyLettersAndNumbersAndSpaces', null, 'spanish', true));
 $form->getElement('extra_address')->_label = 'Nombre de vía';
 $form->getElement('extra_address')->setAttribute('maxlength', 100);

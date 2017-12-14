@@ -753,7 +753,10 @@ class ExtraFieldValue extends Model
      * @param string $field_value Data we are looking for in the given field
      * @param bool $transform Whether to transform the result to a human readable strings
      * @param bool $last Whether to return the last element or simply the first one we get
+     * @param bool $all
+     * @param bool $logQuery
      * @return mixed Give the ID if found, or false on failure or not found
+     * @throws \Doctrine\DBAL\DBALException
      * @assert (-1,-1) === false
      */
     public function get_item_id_from_field_variable_and_field_value(
@@ -761,7 +764,8 @@ class ExtraFieldValue extends Model
         $field_value,
         $transform = false,
         $last = false,
-        $all = false
+        $all = false,
+        $logQuery = false
     ) {
         $field_value = Database::escape_string($field_value);
         $field_variable = Database::escape_string($field_variable);
@@ -782,6 +786,10 @@ class ExtraFieldValue extends Model
             // This is useful in special cases where there might
             // (erroneously) be more than one row for an item
             $sql .= ' DESC';
+        }
+
+        if ($logQuery) {
+            error_log('get_item_id_from_field_variable_and_field_value -> '.$sql);
         }
 
         $result = Database::query($sql);

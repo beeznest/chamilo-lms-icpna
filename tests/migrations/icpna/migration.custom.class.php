@@ -269,7 +269,14 @@ class MigrationCustom
         //error_log('getUserIDByPersonaID');
         $extra_field = new ExtraFieldValue('user');
         $uidIdPersona = strtoupper($uidIdPersona);
-        $values = $extra_field->get_item_id_from_field_variable_and_field_value('uididpersona', $uidIdPersona);
+        $values = $extra_field->get_item_id_from_field_variable_and_field_value(
+            'uididpersona',
+            $uidIdPersona,
+            false,
+            false,
+            false,
+            true
+        );
         if ($values) {
             return $values['item_id'];
         } else {
@@ -1282,6 +1289,7 @@ class MigrationCustom
         $user_id = self::getUserIDByPersonaID($uidIdPersona, $data_list);
 
         if (empty($user_id)) {
+            error_log('YYYY - data_list: '.print_r($data_list, true));
             error_log('YYYY - User '.$uidIdPersona.' could not be found');
             return array(
                 'message' => "User does not exists in DB: $uidIdPersona",

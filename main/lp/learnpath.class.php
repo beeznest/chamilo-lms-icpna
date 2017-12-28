@@ -11436,7 +11436,7 @@ EOD;
         }
 
         if ($protocolFixApplied == false) {
-            if (strpos($src, api_get_path(WEB_CODE_PATH)) === false) {
+            if (strpos(api_get_path(WEB_PATH), $host) === false) {
                 // Check X-Frame-Options
                 $ch = curl_init();
 

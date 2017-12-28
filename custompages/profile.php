@@ -816,13 +816,13 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
 
                     currentAge = age;
 
-                    if (/*age >= 4 &&*/ !age || age <= 17) {
+                    if (/*age >= 4 &&*/ !age || age < 17) {
                         occupationOptions
                             .filter(function (i) {
                                 return i <= 1;
                             })
                             .show();
-                    } else if (age > 17) {
+                    } else if (age >= 17) {
                         occupationOptions
                             .filter(function (i) {
                                 return i > 1;

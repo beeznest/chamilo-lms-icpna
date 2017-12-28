@@ -11429,6 +11429,8 @@ EOD;
         $protocolFixApplied = false;
         //Scheme validation to avoid "Notices" when the lesson doesn't contain a valid scheme
         $scheme = isset($urlInfo['scheme']) ? $urlInfo['scheme'] : null;
+        $host = isset($urlInfo['host']) ? $urlInfo['host'] : null;
+
         if ($platformProtocol != $scheme) {
             Session::write('x_frame_source', $src);
             $src = 'blank.php?error=x_frames_options';

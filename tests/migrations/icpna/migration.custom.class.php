@@ -263,6 +263,7 @@ class MigrationCustom
     {
         if (is_array($omigrate) && $omigrate['boost_users']) {
             if (isset($omigrate['users'][$uidIdPersona])) {
+                error_log('Get user ID by persona ID -- omigrate => '.$omigrate['users'][$uidIdPersona]);
                 return $omigrate['users'][$uidIdPersona];
             }
         }
@@ -271,12 +272,9 @@ class MigrationCustom
         $uidIdPersona = strtoupper($uidIdPersona);
         $values = $extra_field->get_item_id_from_field_variable_and_field_value(
             'uididpersona',
-            $uidIdPersona,
-            false,
-            false,
-            false,
-            true
+            $uidIdPersona
         );
+        error_log('Get user ID by persona ID -- extrafieldvalue => '.print_r($values, true));
         if ($values) {
             return $values['item_id'];
         } else {
@@ -1119,6 +1117,28 @@ class MigrationCustom
                 $user_info['email'] = 'NO TIENE';
             }
 
+            $chamiloUserInfo = api_get_user_info_from_username($user_info['username']);
+
+            if ($chamiloUserInfo !== false) {
+                if (!empty($user_info['extra_uididpersona'])) {
+                    $extraFieldValue = new ExtraFieldValue('user');
+                    $params = [
+                        'item_id' => $chamiloUserInfo['id'],
+                        'variable' => 'uididpersona',
+                        'value' => $user_info['extra_uididpersona']
+                    ];
+                    $extraFieldValue->save($params);
+                }
+
+                return [
+                    'entity' => 'user',
+                    'before' => null,
+                    'after' => $chamiloUserInfo,
+                    'message' => "Existing user $uidIdPersonaId: ".print_r($chamiloUserInfo, true),
+                    'status_id' => self::TRANSACTION_STATUS_DEPRECATED
+                ];
+            }
+
             $chamilo_user_id = self::create_user_custom_ws(
                 $user_info['firstname'],
                 $user_info['lastname'],
@@ -1289,7 +1309,6 @@ class MigrationCustom
         $user_id = self::getUserIDByPersonaID($uidIdPersona, $data_list);
 
         if (empty($user_id)) {
-            error_log('YYYY - data_list: '.print_r($data_list, true));
             error_log('YYYY - User '.$uidIdPersona.' could not be found');
             return array(
                 'message' => "User does not exists in DB: $uidIdPersona",
@@ -4191,7 +4210,8 @@ class MigrationCustom
         $count = Database::num_rows($res);
         if ($count > 0) {
             //user already exists, return
-            error_log('El usuario ya existe en la plataforma');
+            $auxRow = Database::fetch_assoc($res);
+            error_log("El usuario '$username' ya existe en la plataforma - id: {$auxRow['id']}");
             return false;
         }
 

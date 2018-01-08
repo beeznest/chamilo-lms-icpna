@@ -33,15 +33,11 @@ class CSurveyInvitationRepository extends EntityRepository
                 ->createQuery("
                         SELECT i FROM ChamiloCourseBundle:CSurveyInvitation i
                         INNER JOIN ChamiloCourseBundle:CSurvey s WITH s.code = i.surveyCode
-                        INNER JOIN ChamiloCoreBundle:ExtraFieldValues efv WITH efv.itemId = s.iid
-                        INNER JOIN ChamiloCoreBundle:ExtraField ef WITH efv.field = ef.id
                         WHERE i.answered = 0
                             AND i.cId = :course
                             AND i.user = :user
                             AND i.sessionId = :session
                             AND :now BETWEEN s.availFrom AND s.availTill
-                            AND ef.variable = :variable
-                            AND efv.value = '1'
                         ORDER BY s.availTill ASC
                     ")
                 ->setMaxResults(1)
@@ -49,8 +45,7 @@ class CSurveyInvitationRepository extends EntityRepository
                     'course' => $courseId,
                     'user' => $userId,
                     'session' => $sessionId,
-                    'now' => $now->format('Y-m-d'),
-                    'variable' => 'show_in_modal'
+                    'now' => $now->format('Y-m-d')
                 ])
                 ->getSingleResult();
         } catch (NoResultException $e) {

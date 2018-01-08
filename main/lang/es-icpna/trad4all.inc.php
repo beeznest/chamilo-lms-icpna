@@ -210,3 +210,6 @@ $FirstName="Primer nombre";
 $EditInformation="Actualizar datos personales";
 $OnlyNumbers = "Solamente números";
 $EditStudentInformation="Actualizar datos personales - Alumno";
+$SurveyModalIntro="¡Completa la encuesta en línea y opina sobre tu teacher Mr./Ms. <strong>%s</strong>!";
+$SurveyUntilDateX="Tienes hasta el <strong>%s</strong>.";
+$SurveyModalEnd="Tu opinión sincera nos permitirá seguir mejorando el servicio educativo que te ofrecemos.";

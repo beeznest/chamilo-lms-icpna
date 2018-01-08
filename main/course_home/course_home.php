@@ -331,6 +331,7 @@ if ($allow === true) {
 }
 
 $content = '<div id="course_tools">'.$diagram.$content.'</div>';
+$content .= SurveyManager::returnSurveyInvitationInModal();
 
 $tpl = new Template(null);
 $tpl->assign('message', $show_message);

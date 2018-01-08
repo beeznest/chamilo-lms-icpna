@@ -470,6 +470,13 @@ ALTER TABLE c_survey_question ADD is_required TINYINT(1) DEFAULT 0 NOT NULL;
 // Hide survey edition tools for all or some surveys.
 //Set an asterisk to hide for all, otherwise set an array with the survey codes in which the options will be blocked
 //$_configuration['hide_survey_edition'] = ['codes' => []];
+// Allow show a survey in a modal dialog box to ivitate the user to fill it
+// REquires DB change:
+/*
+INSERT INTO extra_field (extra_field_type, field_type, variable, display_text, visible_to_self, changeable, created_at)
+VALUES (12, 13, 'show_in_modal', 'ShowInModalDialogBox', 1, 1, NOW());
+*/
+//$_configuration['allow_survey_in_modal'] = false;
 // ------
 
 // Allow career diagram, requires a DB change:

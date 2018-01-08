@@ -3,6 +3,8 @@
 
 use Chamilo\CourseBundle\Entity\CSurveyInvitation;
 use Doctrine\Common\Collections\Criteria;
+use Chamilo\CourseBundle\Entity\Repository\CSurveyInvitationRepository;
+use Chamilo\CourseBundle\Entity\CSurvey;
 
 /**
  * Class SurveyManager
@@ -1851,5 +1853,51 @@ class SurveyManager
 
         header('Location: '.api_get_path(WEB_CODE_PATH).'survey/fillsurvey.php?'.$urlParams.'&'.api_get_cidreq());
         exit;
+    }
+
+    /**
+     * Return a modal dialog box showing the last survey invitation to user
+     * @return string
+     */
+    public static function returnSurveyInvitationInModal()
+    {
+        if (!api_get_configuration_value('allow_survey_in_modal')) {
+            return;
+        }
+
+        $em = Database::getManager();
+        /** @var CSurveyInvitationRepository $invitationRepo */
+        $invitationRepo = $em->getRepository('ChamiloCourseBundle:CSurveyInvitation');
+
+        $userId = api_get_user_id();
+        $courseId = api_get_course_int_id();
+        $sessionId = api_get_session_id();
+
+        if (!$userId) {
+            return;
+        }
+
+        $invitation = $invitationRepo->findOneToModal($userId, $courseId, $sessionId);
+
+        if (!$invitation) {
+            return;
+        }
+
+        /** @var CSurvey $survey */
+        $survey = $em
+            ->getRepository('ChamiloCourseBundle:CSurvey')
+            ->findOneBy([
+                'cId' => $courseId,
+                'code' => $invitation->getSurveyCode(),
+                'sessionId' => $sessionId
+            ]);
+
+        $view = new Template('', false, false, false, false, false, false);
+        $view->assign('survey', $survey);
+        $view->assign('invitation', $invitation);
+        $template = $view->get_template('survey/modal.tpl');
+        $body = $view->fetch($template);
+
+        return Display::returnSimpleModal(get_lang('Survey'), $body);
     }
 }

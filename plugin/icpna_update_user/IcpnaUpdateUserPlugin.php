@@ -329,13 +329,7 @@ class IcpnaUpdateUserPlugin extends Plugin
         $return['extra_indoor_number'] = trim($return['extra_indoor_number']);
 
         // Check birthdate and ignore guardian data if adult
-        $birthDate = new DateTime($return['extra_birthdate']);
-        $now = new DateTime();
-        $interval = $now->diff($birthDate);
-        $ageInDays = (int) $interval->format('%R%a');
-        $adult = 18*365.25;
-        $remainingDaysToBeAdult = $adult - $ageInDays;
-        if ($remainingDaysToBeAdult > 0) {
+        if (!self::isLegalAge($return['extra_birthdate'])) {
             $return['extra_guardian_name'] = (string) $tableResult->strNombrePadre;
             $return['extra_guardian_email'] = (string) $tableResult->vchEmailApoderado;
             $return['extra_guardian_id_document_type'] = (string) $tableResult->uidIdDocumentoIdentidadPadre;
@@ -468,5 +462,21 @@ class IcpnaUpdateUserPlugin extends Plugin
         }
 
         return $return;
+    }
+
+    /**
+     * @param string $strBirthdate Date of birthdate
+     * @return bool
+     */
+    public static function isLegalAge($strBirthdate)
+    {
+        $birthdate = new DateTime($strBirthdate);
+        $now = new DateTime();
+        $interval = $now->diff($birthdate);
+        $ageInDays = (int) $interval->format('%a');
+        $adult = 18 * 365.25;
+        $remainingDaysToBeAdult = $adult - $ageInDays;
+
+        return $remainingDaysToBeAdult >= 0;
     }
 }

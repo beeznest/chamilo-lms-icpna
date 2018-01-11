@@ -272,6 +272,29 @@ class IcpnaUpdateUserPlugin extends Plugin
     }
 
     /**
+     * Convert SOAP result values to string
+     * @param \SimpleXMLElement $objResult
+     * @return array
+     */
+    private static function stringifyResult(SimpleXMLElement $objResult)
+    {
+        $toJson = json_encode($objResult);
+        $toArray = json_decode($toJson, true);
+
+        foreach ($toArray as &$item) {
+            if (is_array($item) && empty($item)) {
+                $item = '';
+            }
+
+            if (!is_array($item)) {
+                $item = trim($item);
+            }
+        }
+
+        return $toArray;
+    }
+
+    /**
      * Call to obtienedatospersonales function
      * @param $uididPersona
      * @return array
@@ -279,61 +302,62 @@ class IcpnaUpdateUserPlugin extends Plugin
     public function getUserInfo($uididPersona)
     {
         $tableResult = $this->getTableResult('obtienedatospersonales', ['uididpersona' => $uididPersona]);
+        $tableResult = self::stringifyResult($tableResult);
 
-        $uidIdOcupacion = (string) $tableResult->uidIdOcupacion;
-        $uidIdCentroEstudios = (string) $tableResult->uidIdCentroEstudios;
-        $birthdate = (string) $tableResult->sdtFechaNacimiento;
+        $birthdate = $tableResult['sdtFechaNacimiento'];
         $birthdate = explode('T', $birthdate);
 
         $return = [
-            'extra_id_document_type' => (string) $tableResult->uidIdDocumentoIdentidad,
-            'extra_id_document_number' => (string) $tableResult->vchDocumentoNumero,
-            'firstname' => (string) $tableResult->vchPrimerNombre,
-            'extra_middle_name' => (string) $tableResult->vchSegundoNombre,
-            'lastname' => (string) $tableResult->vchPaterno,
-            'extra_mothers_name' => (string) $tableResult->vchMaterno,
-            'extra_sex' => (string) $tableResult->chrSexo,
+            'extra_id_document_type' => $tableResult['uidIdDocumentoIdentidad'],
+            'extra_id_document_number' => $tableResult['vchDocumentoNumero'],
+            'firstname' => $tableResult['vchPrimerNombre'],
+            'extra_middle_name' => $tableResult['vchSegundoNombre'],
+            'lastname' => $tableResult['vchPaterno'],
+            'extra_mothers_name' => $tableResult['vchMaterno'],
+            'extra_sex' => $tableResult['chrSexo'],
             'extra_birthdate' => $birthdate[0],
-            'extra_nationality' => (string) $tableResult->uididpaisorigen,
-            'extra_address_department' => (string) $tableResult->uidIdDepartamento,
-            'extra_address_province' => (string) $tableResult->uidIdProvincia,
-            'extra_address_district' => (string) $tableResult->uidIdDistrito,
-            'extra_urbanization' => (string) $tableResult->vchNombreUrbanizacion,
-            'extra_type_of_road' => (string) $tableResult->uidIdTipoVia,
-            'extra_address' => (string) $tableResult->vchDireccionPersona,
-            'extra_door_number' => (string) $tableResult->chrNroPuerta,
-            'extra_indoor_number' => (string) $tableResult->chrNroInterior,
-            'email' => (string) $tableResult->vchEmailPersona,
-            'phone' => (string) $tableResult->vchTelefonoPersona,
-            'extra_mobile_phone_number' => (string) $tableResult->vchcelularPersona,
-            'extra_occupation' => $uidIdOcupacion,
-            'extra_occupation_department' => (string) $tableResult->uididdepartamentocentroestudios,
-            'extra_occupation_province' => (string) $tableResult->uididprovinciacentroestudios,
-            'extra_occupation_district' => (string) $tableResult->uididdistritocentroestudios,
-            'extra_occupation_center_name_1' => '4378e853-269b-4040-9e9d-a175c8e62bf5' === $uidIdOcupacion
-                ? $uidIdCentroEstudios
-                : null,
-            'extra_occupation_center_name_2' => '051052f7-71c0-4721-8983-9c112bef88d7' === $uidIdOcupacion
-                ? $uidIdCentroEstudios
-                : null,
-            'extra_occupation_center_name_3' => '84478ce8-2971-43b1-86b8-93405fb0453b' === $uidIdOcupacion
-                ? $uidIdCentroEstudios
-                : null,
-            'extra_occupation_center_name_4' => '4c0762b7-bc8c-4ff2-b145-6bd8e96f0f47' === $uidIdOcupacion
-                ? (string) $tableResult->vchcentrolaboral
-                : null,
-            'extra_university_career' => (string) $tableResult->uididcarrerauniversitaria,
+            'extra_nationality' => $tableResult['uididpaisorigen'],
+            'extra_address_department' => $tableResult['uidIdDepartamento'],
+            'extra_address_province' => $tableResult['uidIdProvincia'],
+            'extra_address_district' => $tableResult['uidIdDistrito'],
+            'extra_urbanization' => $tableResult['vchNombreUrbanizacion'],
+            'extra_type_of_road' => $tableResult['uidIdTipoVia'],
+            'extra_address' => $tableResult['vchDireccionPersona'],
+            'extra_door_number' => $tableResult['chrNroPuerta'],
+            'extra_indoor_number' => $tableResult['chrNroInterior'],
+            'email' => $tableResult['vchEmailPersona'],
+            'phone' => $tableResult['vchTelefonoPersona'],
+            'extra_mobile_phone_number' => $tableResult['vchcelularPersona'],
+            'extra_occupation' => $tableResult['uidIdOcupacion'],
+            'extra_occupation_department' => $tableResult['uididdepartamentocentroestudios'],
+            'extra_occupation_province' => $tableResult['uididprovinciacentroestudios'],
+            'extra_occupation_district' => $tableResult['uididdistritocentroestudios'],
+            'extra_occupation_center_name_1' => '4378e853-269b-4040-9e9d-a175c8e62bf5' === $tableResult['uidIdOcupacion']
+                ? $tableResult['uidIdCentroEstudios']
+                : '',
+            'extra_occupation_center_name_2' => '051052f7-71c0-4721-8983-9c112bef88d7' === $tableResult['uidIdOcupacion']
+                ? $tableResult['uidIdCentroEstudios']
+                : '',
+            'extra_occupation_center_name_3' => '84478ce8-2971-43b1-86b8-93405fb0453b' === $tableResult['uidIdOcupacion']
+                ? $tableResult['uidIdCentroEstudios']
+                : '',
+            'extra_occupation_center_name_4' => '4c0762b7-bc8c-4ff2-b145-6bd8e96f0f47' === $tableResult['uidIdOcupacion']
+                ? $tableResult['vchcentrolaboral']
+                : '',
+            'extra_university_career' => isset($tableResult['uididcarrerauniversitaria'])
+                ? $tableResult['uididcarrerauniversitaria']
+                : '',
         ];
 
-        $return['extra_door_number'] = trim($return['extra_door_number']);
-        $return['extra_indoor_number'] = trim($return['extra_indoor_number']);
+        $return['extra_guardian_name'] = $tableResult['strNombrePadre'];
+        $return['extra_guardian_id_document_type'] = $tableResult['uidIdDocumentoIdentidadPadre'];
+        $return['extra_guardian_email'] = filter_var($tableResult['vchEmailApoderado'], FILTER_VALIDATE_EMAIL)
+            ? $tableResult['vchEmailApoderado']
+            : '';
+        $return['extra_guardian_id_document_number'] = $tableResult['vchDocumentoNumeroPadre'];
 
-        // Check birthdate and ignore guardian data if adult
-        if (!self::isLegalAge($return['extra_birthdate'])) {
-            $return['extra_guardian_name'] = (string) $tableResult->strNombrePadre;
-            $return['extra_guardian_email'] = (string) $tableResult->vchEmailApoderado;
-            $return['extra_guardian_id_document_type'] = (string) $tableResult->uidIdDocumentoIdentidadPadre;
-            $return['extra_guardian_id_document_number'] = (string) $tableResult->vchDocumentoNumeroPadre;
+        if ($tableResult['vchDocumentoNumero'] == $tableResult['vchDocumentoNumeroPadre']) {
+            $return['extra_guardian_id_document_number'] = '';
         }
 
         return $return;

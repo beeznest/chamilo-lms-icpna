@@ -317,10 +317,10 @@ class IcpnaUpdateUserPlugin extends Plugin
                 $tableResult['uidIdDocumentoIdentidad'],
                 $tableResult['vchDocumentoNumero']
             ),
-            'firstname' => $tableResult['vchPrimerNombre'],
-            'extra_middle_name' => $tableResult['vchSegundoNombre'],
-            'lastname' => $tableResult['vchPaterno'],
-            'extra_mothers_name' => $tableResult['vchMaterno'],
+            'firstname' => self::filterPersonaName($tableResult['vchPrimerNombre']),
+            'extra_middle_name' => self::filterPersonaName($tableResult['vchSegundoNombre']),
+            'lastname' => self::filterPersonaName($tableResult['vchPaterno']),
+            'extra_mothers_name' => self::filterPersonaName($tableResult['vchMaterno']),
             'extra_sex' => $tableResult['chrSexo'],
             'extra_birthdate' => $birthdate[0],
             'extra_nationality' => $tableResult['uididpaisorigen'],
@@ -356,11 +356,13 @@ class IcpnaUpdateUserPlugin extends Plugin
                 : '',
         ];
 
-        $return['extra_guardian_name'] = $tableResult['strNombrePadre'];
-        $return['extra_guardian_id_document_type'] = $tableResult['uidIdDocumentoIdentidadPadre'];
+        $return['extra_guardian_name'] = self::filterPersonaName($tableResult['strNombrePadre']);
+        $return['extra_guardian_id_document_type'] = isset($tableResult['uidIdDocumentoIdentidadPadre'])
+            ? $tableResult['uidIdDocumentoIdentidadPadre']
+            : '';
         $return['extra_guardian_email'] = self::filterEmail($tableResult['vchEmailApoderado']);
         $return['extra_guardian_id_document_number'] = self::filterDocIdNumber(
-            $tableResult['uidIdDocumentoIdentidadPadre'],
+            $return['extra_guardian_id_document_type'],
             $tableResult['vchDocumentoNumeroPadre']
         );
 
@@ -369,6 +371,22 @@ class IcpnaUpdateUserPlugin extends Plugin
         }
 
         return $return;
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    private static function filterPersonaName($name)
+    {
+        $name = trim($name);
+        $name = filter_var(
+            $name,
+            FILTER_VALIDATE_REGEXP,
+            ['options' => ['regexp' => '/^[a-zA-Zá-úÁ-ÚñÑ]+[a-zA-Zá-úÁ-ÚñÑ\s\-]*$/']]
+        );
+
+        return (string) $name;
     }
 
     /**
@@ -410,6 +428,8 @@ class IcpnaUpdateUserPlugin extends Plugin
                     ['options' => ['regexp' => '/^[a-zA-Z0-9]{9,12}$/']]
                 );
                 break;
+            default:
+                $number = '';
         }
 
         return (string) $number;

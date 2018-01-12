@@ -12,6 +12,11 @@ class IcpnaUpdateUserPlugin extends Plugin
     const DOCID_TYPE_CE = 'f86e0340-eb26-4b5d-8686-f24550fd8b49';
     const DOCID_TYPE_PP = '6f03e7df-13d1-4076-a3f0-b69fd1b3551a';
 
+    const OCCUPATION_TYPE_SCH = '528c79fa-a924-4091-b25b-3f870650cf93';
+    const OCCUPATION_TYPE_TEC = 'd4730b5f-e080-406d-846e-2f80c77f999';
+    const OCCUPATION_TYPE_UNI = '41ce5c66-1884-4a0d-8f7d-062a1ecb9b79';
+    const OCCUPATION_TYPE_TRA = '30080101-15fa-46de-ac6e-a9d9a3c3d26e';
+
     /**
      * IcpnaUpdateUserPlugin constructor.
      */
@@ -383,16 +388,16 @@ class IcpnaUpdateUserPlugin extends Plugin
             'extra_occupation_department' => $tableResult['uididdepartamentocentroestudios'],
             'extra_occupation_province' => $tableResult['uididprovinciacentroestudios'],
             'extra_occupation_district' => $tableResult['uididdistritocentroestudios'],
-            'extra_occupation_center_name_1' => '4378e853-269b-4040-9e9d-a175c8e62bf5' === $tableResult['uidIdOcupacion']
+            'extra_occupation_center_name_1' => self::OCCUPATION_TYPE_SCH === $tableResult['uidIdOcupacion']
                 ? $tableResult['uidIdCentroEstudios']
                 : '',
-            'extra_occupation_center_name_2' => '051052f7-71c0-4721-8983-9c112bef88d7' === $tableResult['uidIdOcupacion']
+            'extra_occupation_center_name_2' => self::OCCUPATION_TYPE_TEC === $tableResult['uidIdOcupacion']
                 ? $tableResult['uidIdCentroEstudios']
                 : '',
-            'extra_occupation_center_name_3' => '84478ce8-2971-43b1-86b8-93405fb0453b' === $tableResult['uidIdOcupacion']
+            'extra_occupation_center_name_3' => self::OCCUPATION_TYPE_UNI === $tableResult['uidIdOcupacion']
                 ? $tableResult['uidIdCentroEstudios']
                 : '',
-            'extra_occupation_center_name_4' => '4c0762b7-bc8c-4ff2-b145-6bd8e96f0f47' === $tableResult['uidIdOcupacion']
+            'extra_occupation_center_name_4' => self::OCCUPATION_TYPE_TRA === $tableResult['uidIdOcupacion']
                 ? $tableResult['vchcentrolaboral']
                 : '',
             'extra_university_career' => $tableResult['uididcarrerauniversitaria'],

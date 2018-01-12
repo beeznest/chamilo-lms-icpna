@@ -299,6 +299,48 @@ class IcpnaUpdateUserPlugin extends Plugin
     }
 
     /**
+     * Set the default fields to SOAP results
+     * @param array $stringifiedResult
+     * @return array
+     */
+    private static function filterResult(array $stringifiedResult)
+    {
+        return array_merge([
+            'uidIdDocumentoIdentidad' => '',
+            'vchDocumentoNumero' => '',
+            'vchPrimerNombre' => '',
+            'vchSegundoNombre' => '',
+            'vchPaterno' => '',
+            'vchMaterno' => '',
+            'chrSexo' => '',
+            'sdtFechaNacimiento' => '',
+            'uididpaisorigen' => '',
+            'uidIdDepartamento' => '',
+            'uidIdProvincia' => '',
+            'uidIdDistrito' => '',
+            'vchNombreUrbanizacion' => '',
+            'uidIdTipoVia' => '',
+            'vchDireccionPersona' => '',
+            'chrNroPuerta' => '',
+            'chrNroInterior' => '',
+            'vchEmailPersona' => '',
+            'vchTelefonoPersona' => '',
+            'vchcelularPersona' => '',
+            'uidIdOcupacion' => '',
+            'uididdepartamentocentroestudios' => '',
+            'uididprovinciacentroestudios' => '',
+            'uididdistritocentroestudios' => '',
+            'uidIdCentroEstudios' => '',
+            'vchcentrolaboral' => '',
+            'uididcarrerauniversitaria' => '',
+            'strNombrePadre' => '',
+            'uidIdDocumentoIdentidadPadre' => '',
+            'vchEmailApoderado' => '',
+            'vchDocumentoNumeroPadre' => ''
+        ], $stringifiedResult);
+    }
+
+    /**
      * Call to obtienedatospersonales function
      * @param $uididPersona
      * @return array
@@ -306,7 +348,9 @@ class IcpnaUpdateUserPlugin extends Plugin
     public function getUserInfo($uididPersona)
     {
         $tableResult = $this->getTableResult('obtienedatospersonales', ['uididpersona' => $uididPersona]);
-        $tableResult = self::stringifyResult($tableResult);
+        $tableResult = self::filterResult(
+            self::stringifyResult($tableResult)
+        );
 
         $birthdate = $tableResult['sdtFechaNacimiento'];
         $birthdate = explode('T', $birthdate);
@@ -351,15 +395,11 @@ class IcpnaUpdateUserPlugin extends Plugin
             'extra_occupation_center_name_4' => '4c0762b7-bc8c-4ff2-b145-6bd8e96f0f47' === $tableResult['uidIdOcupacion']
                 ? $tableResult['vchcentrolaboral']
                 : '',
-            'extra_university_career' => isset($tableResult['uididcarrerauniversitaria'])
-                ? $tableResult['uididcarrerauniversitaria']
-                : '',
+            'extra_university_career' => $tableResult['uididcarrerauniversitaria'],
         ];
 
         $return['extra_guardian_name'] = self::filterPersonaName($tableResult['strNombrePadre']);
-        $return['extra_guardian_id_document_type'] = isset($tableResult['uidIdDocumentoIdentidadPadre'])
-            ? $tableResult['uidIdDocumentoIdentidadPadre']
-            : '';
+        $return['extra_guardian_id_document_type'] = $tableResult['uidIdDocumentoIdentidadPadre'];
         $return['extra_guardian_email'] = self::filterEmail($tableResult['vchEmailApoderado']);
         $return['extra_guardian_id_document_number'] = self::filterDocIdNumber(
             $return['extra_guardian_id_document_type'],

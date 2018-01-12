@@ -8,6 +8,10 @@ class IcpnaUpdateUserPlugin extends Plugin
     const SETTING_ENABLE = 'enable_hook';
     const SETTING_WEB_SERVICE = 'web_service';
 
+    const DOCID_TYPE_DNI = '4b99eee6-3d67-45a3-b3ed-f15d6f9fbc9f';
+    const DOCID_TYPE_CE = 'f86e0340-eb26-4b5d-8686-f24550fd8b49';
+    const DOCID_TYPE_PP = '6f03e7df-13d1-4076-a3f0-b69fd1b3551a';
+
     /**
      * IcpnaUpdateUserPlugin constructor.
      */
@@ -309,7 +313,10 @@ class IcpnaUpdateUserPlugin extends Plugin
 
         $return = [
             'extra_id_document_type' => $tableResult['uidIdDocumentoIdentidad'],
-            'extra_id_document_number' => $tableResult['vchDocumentoNumero'],
+            'extra_id_document_number' => self::filterDocIdNumber(
+                $tableResult['uidIdDocumentoIdentidad'],
+                $tableResult['vchDocumentoNumero']
+            ),
             'firstname' => $tableResult['vchPrimerNombre'],
             'extra_middle_name' => $tableResult['vchSegundoNombre'],
             'lastname' => $tableResult['vchPaterno'],
@@ -325,7 +332,7 @@ class IcpnaUpdateUserPlugin extends Plugin
             'extra_address' => $tableResult['vchDireccionPersona'],
             'extra_door_number' => $tableResult['chrNroPuerta'],
             'extra_indoor_number' => $tableResult['chrNroInterior'],
-            'email' => $tableResult['vchEmailPersona'],
+            'email' => self::filterEmail($tableResult['vchEmailPersona']),
             'phone' => $tableResult['vchTelefonoPersona'],
             'extra_mobile_phone_number' => $tableResult['vchcelularPersona'],
             'extra_occupation' => $tableResult['uidIdOcupacion'],
@@ -351,16 +358,61 @@ class IcpnaUpdateUserPlugin extends Plugin
 
         $return['extra_guardian_name'] = $tableResult['strNombrePadre'];
         $return['extra_guardian_id_document_type'] = $tableResult['uidIdDocumentoIdentidadPadre'];
-        $return['extra_guardian_email'] = filter_var($tableResult['vchEmailApoderado'], FILTER_VALIDATE_EMAIL)
-            ? $tableResult['vchEmailApoderado']
-            : '';
-        $return['extra_guardian_id_document_number'] = $tableResult['vchDocumentoNumeroPadre'];
+        $return['extra_guardian_email'] = self::filterEmail($tableResult['vchEmailApoderado']);
+        $return['extra_guardian_id_document_number'] = self::filterDocIdNumber(
+            $tableResult['uidIdDocumentoIdentidadPadre'],
+            $tableResult['vchDocumentoNumeroPadre']
+        );
 
-        if ($tableResult['vchDocumentoNumero'] == $tableResult['vchDocumentoNumeroPadre']) {
+        if ($return['extra_id_document_number'] == $return['extra_guardian_id_document_number']) {
             $return['extra_guardian_id_document_number'] = '';
         }
 
         return $return;
+    }
+
+    /**
+     * @param string $email
+     * @return string
+     */
+    private static function filterEmail($email)
+    {
+        $email = trim($email);
+        $email = filter_var($email, FILTER_VALIDATE_EMAIL);
+
+        return (string) $email;
+    }
+
+    /**
+     * @param string $type
+     * @param string $number
+     * @return string
+     */
+    private static function filterDocIdNumber($type, $number)
+    {
+        $number = trim($number);
+
+        switch ($type) {
+            case self::DOCID_TYPE_DNI:
+                $number = filter_var($number, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => '/^\d{8}$/']]);
+                break;
+            case self::DOCID_TYPE_CE:
+                $number = filter_var(
+                    $number,
+                    FILTER_VALIDATE_REGEXP,
+                    ['options' => ['regexp' => '/^[a-zA-Z0-9]{12}$/']]
+                );
+                break;
+            case self::DOCID_TYPE_PP:
+                $number = filter_var(
+                    $number,
+                    FILTER_VALIDATE_REGEXP,
+                    ['options' => ['regexp' => '/^[a-zA-Z0-9]{9,12}$/']]
+                );
+                break;
+        }
+
+        return (string) $number;
     }
 
     /**

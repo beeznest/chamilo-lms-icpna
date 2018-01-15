@@ -2783,7 +2783,7 @@ class UserManager
                 }
             }
 
-            if ($row['movedStatus'] != 0) {
+            if (!$userIsTeacher && $row['movedStatus'] != 0) {
                 continue;
             }
 

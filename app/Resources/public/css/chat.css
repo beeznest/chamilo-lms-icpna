@@ -157,6 +157,8 @@
 
 #chat-users {
 	margin-left: 0;
+	max-height: 528px;
+	overflow: auto;
 }
 #chat-users div.chat-user > div {
 	padding: 5px;

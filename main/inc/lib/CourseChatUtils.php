@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Criteria;
 use Chamilo\CourseBundle\Entity\CChatConnected;
 use Chamilo\CoreBundle\Entity\Course;
 use Chamilo\CoreBundle\Entity\Session;
+use Chamilo\CoreBundle\Entity\EventSent;
 
 /**
  * Class CourseChat
@@ -225,6 +226,8 @@ class CourseChatUtils
 
         update_existing_document($courseInfo, $doc_id, $chat_size);
         item_property_update_on_folder($courseInfo, $basepath_chat, $this->userId);
+
+        $this->saveMessageNotification($friendId);
 
         return true;
     }
@@ -1702,6 +1705,8 @@ class CourseChatUtils
             ';
         }
 
+        $this->removeMessageNotification($friendId);
+
         return $history;
     }
 
@@ -1796,5 +1801,116 @@ class CourseChatUtils
         }
 
         return $usersInfo;
+    }
+
+    /**
+     * @return array
+     */
+    public function findMyChaths()
+    {
+        $courseInfo = api_get_course_info_by_id($this->courseId);
+        $document_path = api_get_path(SYS_COURSE_PATH) . $courseInfo['path'] . '/document';
+        $chatPath = $document_path . '/chat_files/';
+
+        if (!is_dir($chatPath)) {
+            return [];
+        }
+
+        $dir = scandir($chatPath);
+        $date = date('Y-m-d');
+        $chatWith = [];
+
+        foreach ($dir as $item) {
+            $match = [];
+            if (
+                preg_match('/messages-' . $date . '_uid-' . $this->userId . '-(\d{1,})\.log.\bhtml\b/i', $item, $match) ||
+                preg_match('/messages-' . $date . '_uid-(\d{1,})-' . $this->userId . '\.log.\bhtml\b/i', $item, $match)
+            ) {
+                $friend = api_get_user_info($match[1]);
+                $chatWith[] = [
+                    'id' => $friend['id'],
+                    'name' => api_get_person_name($friend['firstname'], $friend['lastname']),
+                    'unreadMessages' => $this->countMessageNotifications($friend['id'])
+                ];
+
+                continue;
+            }
+        }
+
+        return $chatWith;
+    }
+
+    /**
+     * Save a new EventSent for a new message notification
+     * @param int $friendId
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    private function saveMessageNotification($friendId)
+    {
+        if (!$friendId) {
+            return;
+        }
+
+        $em = Database::getManager();
+
+        $event = new EventSent();
+        $event
+            ->setUserFrom($this->userId)
+            ->setUserTo($friendId)
+            ->setEventTypeName(EventSent::TYPE_COURSE_CHAT_NOTIFICACTION);
+
+        $em->persist($event);
+        $em->flush();
+    }
+
+    /**
+     * Remove all message notifications
+     * @param int $friendId
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    private function removeMessageNotification($friendId)
+    {
+        if (!$friendId) {
+            return;
+        }
+
+        $em = Database::getManager();
+
+        /** @var array $results */
+        $results = $em
+            ->getRepository('ChamiloCoreBundle:EventSent')
+            ->findBy([
+                'userFrom' => $friendId,
+                'userTo' => $this->userId
+            ]);
+
+        /** @var EventSent $result */
+        foreach ($results as $result) {
+            $em->remove($result);
+        }
+
+        $em->flush();
+    }
+
+    /**
+     * Get the number of messages notification for a user with a friend
+     * @param int $friendId
+     * @return int
+     */
+    private function countMessageNotifications($friendId)
+    {
+        if (!$friendId) {
+            return 0;
+        }
+
+        /** @var array $results */
+        $results = Database::getManager()
+            ->getRepository('ChamiloCoreBundle:EventSent')
+            ->findBy([
+                'userFrom' => $friendId,
+                'userTo' => $this->userId
+            ]);
+
+        return count($results);
     }
 }

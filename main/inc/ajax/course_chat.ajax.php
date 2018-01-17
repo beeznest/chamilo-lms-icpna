@@ -29,6 +29,7 @@ switch ($_REQUEST['action']) {
         $oldFileSize = isset($_GET['size']) ? intval($_GET['size']) : -1;
         $newUsersOnline = $courseChatUtils->countUsersOnline();
         $oldUsersOnline = isset($_GET['users_online']) ? intval($_GET['users_online']) : 0;
+        $chats = $courseChatUtils->findMyChaths();
 
         $json = [
             'status' => true,
@@ -37,7 +38,8 @@ switch ($_REQUEST['action']) {
                 'history' => $newFileSize !== $oldFileSize ? $courseChatUtils->readMessages(false, $friend) : null,
                 'usersOnline' => $newUsersOnline,
                 'userList' => $newUsersOnline != $oldUsersOnline ? $courseChatUtils->listUsersOnline() : null,
-                'currentFriend' => $friend
+                'currentFriend' => $friend,
+                'myChats' => $chats
             ]
         ];
 

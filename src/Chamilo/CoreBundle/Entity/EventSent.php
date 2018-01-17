@@ -12,6 +12,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class EventSent
 {
+    const TYPE_COURSE_CHAT_NOTIFICACTION = 'course_chat_notification';
+
     /**
      * @var integer
      *

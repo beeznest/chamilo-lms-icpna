@@ -12,3 +12,4 @@ $SurveyModalIntro="¡Complete the online survey and give your opinion about your
 $SurveyUntilDateX="You have until <strong>%s</strong>.";
 $SurveyModalEnd="Your sincere opinion will allow us to continue improving the educational service that we offer you.";
 $ShowInModalDialogBox="Show in modal dialog box?";
+$ResetFieldX="Reiniciar %s";

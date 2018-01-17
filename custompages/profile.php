@@ -1312,10 +1312,12 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                         .attr({
                             type: 'button',
                             class: 'btn btn-default btn-sm',
-                            title: '<?php echo sprintf(get_lang('ResetFieldX'), 'Imagen') ?>'
+                            title: '<?php echo sprintf(get_lang('ResetFieldX', null, 'spanish', true), 'Imagen') ?>'
                         })
                         .html('<span class="fa fa-trash text-danger" aria-hidden="true"></span>' +
-                            '<span class="sr-only"><?php echo sprintf(get_lang('ResetFieldX'), 'Imagen') ?></span>')
+                            '<span class="sr-only">'
+                                <?php echo sprintf(get_lang('ResetFieldX', null, 'spanish', true), 'Imagen') ?>
+                            </span>')
                         .on('click', function () {
                             $txtPicture.val('');
                             $('#picture_preview_image').cropper('clear').cropper('reset');

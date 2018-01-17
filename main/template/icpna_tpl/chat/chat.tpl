@@ -6,13 +6,15 @@
         <div class="col-sm-8 col-md-7 col-lg-8">
             <div id="chat-tabs">
                 <ul class="nav nav-tabs" role="tablist">
-                    <li role="presentation" class="active">
-                        <a href="#all" aria-controls="all" role="tab" data-toggle="tab">{{ 'All'|get_lang }}</a>
-                    </li>
+                    {% if not restrict_to_coach %}
+                        <li role="presentation" class="active">
+                            <a href="#all" aria-controls="all" role="tab" data-toggle="tab">{{ 'All'|get_lang }}</a>
+                        </li>
+                    {% endif %}
                 </ul>
                 <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" id="all">
-                        <div class="course-chat chat-history" id="chat-history"></div>
+                    <div role="tabpanel" class="tab-pane active" id="{{ restrict_to_coach ? '' : 'all' }}">
+                        <div class="course-chat chat-history" id="{{ restrict_to_coach ? '' : 'chat-history' }}"></div>
                     </div>
                 </div>
             </div>
@@ -41,7 +43,8 @@
                                             <textarea id="chat-writer" name="message"></textarea>
                                         </div>
                                         <div class="col-sm-3">
-                                            <button id="chat-send-message" type="button" class="btn btn-primary">{{ 'Send'|get_lang }}</button>
+                                            <button id="chat-send-message" type="button" disabled
+                                                    class="btn btn-primary">{{ 'Send'|get_lang }}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -71,33 +74,32 @@
             call: false,
             track: function () {
                 return $
-                        .get(ChChat._ajaxUrl, {
-                            action: 'track',
-                            size: ChChat._historySize,
-                            users_online: ChChat.usersOnline,
-                            friend: ChChat.currentFriend
-                        })
-                        .done(function (response) {
-                            if (response.data.history) {
-                                ChChat._historySize = response.data.oldFileSize;
-                                ChChat.setHistory(response.data.history);
-                            }
+                    .get(ChChat._ajaxUrl, {
+                        action: 'track',
+                        size: ChChat._historySize,
+                        users_online: ChChat.usersOnline,
+                        friend: ChChat.currentFriend
+                    })
+                    .done(function (response) {
+                        if (response.data.history) {
+                            ChChat._historySize = response.data.oldFileSize;
+                            ChChat.setHistory(response.data.history);
+                        }
 
-                            if (response.data.userList) {
-                                ChChat.usersOnline = response.data.usersOnline;
-                                ChChat.setConnectedUsers(response.data.userList);
-                            }
-                        });
+                        if (response.data.userList) {
+                            ChChat.usersOnline = response.data.usersOnline;
+                            ChChat.setConnectedUsers(response.data.userList);
+                        }
+                    });
             },
             setHistory: function (messageList) {
                 var chatHistoryContainer = ChChat.currentFriend ? ('#chat-history-' + ChChat.currentFriend) : '#chat-history';
 
                 $(chatHistoryContainer)
-                        .html(messageList)
-                        .prop('scrollTop', function () {
-                            return this.scrollHeight;
-                        });
-
+                    .html(messageList)
+                    .prop('scrollTop', function () {
+                        return this.scrollHeight;
+                    });
                 $('#chat-alert').get(0).play();
             },
             setConnectedUsers: function (userList) {
@@ -105,42 +107,41 @@
 
                 userList.forEach(function (user) {
                     var buttonStatus = user.isConnected ? 'success' : 'muted',
-                            buttonTitle = user.isConnected ? '{{ 'StartAChat'|get_lang }}' : '{{ 'LeaveAMessage'|get_lang }}';
+                        buttonTitle = user.isConnected ? '{{ 'StartAChat'|get_lang }}' : '{{ 'LeaveAMessage'|get_lang }}';
 
                     html += '<li class="col-xs-12 chat-user">' +
-                            '   <div>' +
-                            '       <img src="'+ user.image_url + '" alt="' + user.complete_name + '" class="img-circle user-image-chat"/>' +
-                            '       <ul class="list-unstyled">' +
-                            '           <li>' + user.complete_name;
+                        '   <div>' +
+                        '       <img src="' + user.image_url + '" alt="' + user.complete_name + '" class="img-circle user-image-chat"/>' +
+                        '       <ul class="list-unstyled">' +
+                        '           <li>' + user.complete_name;
 
                     if (user.id != {{ _u.user_id }}) {
                         html += '           <button type="button" class="btn btn-link btn-xs" title="' + buttonTitle + '" data-name="' + user.complete_name + '" data-user="' + user.id + '">' +
-                                '               <i class="fa fa-comments text-' + buttonStatus + '"></i><span class="sr-only">' + buttonTitle + '</span>' +
-                                '           </button>';
+                            '               <i class="fa fa-comments text-' + buttonStatus + '"></i><span class="sr-only">' + buttonTitle + '</span>' +
+                            '           </button>';
                     }
-
                     html += '           </li>' +
-                            '           <li><small>' + user.username + '</small></li>' +
-                            '       </ul>' +
-                            '   </div>' +
-                            '</li>';
+                        '           <li><small>' + user.username + '</small></li>' +
+                        '       </ul>' +
+                        '   </div>' +
+                        '</li>';
                 });
 
                 $('#chat-users').html(html);
             },
             onPreviewListener: function () {
                 $
-                        .post(ChChat._ajaxUrl, {
-                            action: 'preview',
-                            'message': $('textarea#chat-writer').val()
-                        })
-                        .done(function (response) {
-                            if (!response.status) {
-                                return;
-                            }
+                    .post(ChChat._ajaxUrl, {
+                        action: 'preview',
+                        'message': $('textarea#chat-writer').val()
+                    })
+                    .done(function (response) {
+                        if (!response.status) {
+                            return;
+                        }
 
-                            $('#html-preview').html(response.data.message);
-                        });
+                        $('#html-preview').html(response.data.message);
+                    });
             },
             onSendMessageListener: function (e) {
                 e.preventDefault();
@@ -153,41 +154,39 @@
                 self.disabled = true;
 
                 $
-                        .post(ChChat._ajaxUrl, {
-                            action: 'write',
-                            message: $('textarea#chat-writer').val(),
-                            friend: ChChat.currentFriend
-                        })
-                        .done(function (response) {
-                            self.disabled = false;
+                    .post(ChChat._ajaxUrl, {
+                        action: 'write',
+                        message: $('textarea#chat-writer').val(),
+                        friend: ChChat.currentFriend
+                    })
+                    .done(function (response) {
+                        self.disabled = false;
 
-                            if (!response.status) {
-                                return;
-                            }
+                        if (!response.status) {
+                            return;
+                        }
 
-                            $('textarea#chat-writer').val('');
-                            $(".emoji-wysiwyg-editor").html('');
-                        });
+                        $('textarea#chat-writer').val('');
+                        $(".emoji-wysiwyg-editor").html('');
+                    });
             },
             onResetListener: function (e) {
                 if (!confirm("{{ 'ConfirmReset'|get_lang }}")) {
                     e.preventDefault();
-
                     return;
                 }
-
                 $
-                        .get(ChChat._ajaxUrl, {
-                            action: 'reset',
-                            friend: ChChat.currentFriend
-                        })
-                        .done(function (response) {
-                            if (!response.status) {
-                                return;
-                            }
+                    .get(ChChat._ajaxUrl, {
+                        action: 'reset',
+                        friend: ChChat.currentFriend
+                    })
+                    .done(function (response) {
+                        if (!response.status) {
+                            return;
+                        }
 
-                            ChChat.setHistory(response.data);
-                        });
+                        ChChat.setHistory(response.data);
+                    });
             },
             init: function () {
                 ChChat.track().done(function () {
@@ -209,72 +208,63 @@
         $.emojiarea.icons = {{ icons|json_encode }};
 
         $('body').on('click', '#chat-reset', ChChat.onResetListener);
-
         $('#preview').on('click', ChChat.onPreviewListener);
-
         $('#emojis').on('click', function () {
-            $('[data-toggle="tab"][href="#tab1"]')
-                    .show()
-                    .tab('show');
+            $('[data-toggle="tab"][href="#tab1"]').show().tab('show');
         });
 
         $('textarea#chat-writer').emojiarea({
             button: '#emojis'
         });
 
-        $('body').delay(1500).find('.emoji-wysiwyg-editor').textcomplete([
-            {
-                match: /\B:([\-+\w]*)$/,
-                search: function (term, callback) {
-                    var results = [];
-                    var results2 = [];
-                    var results3 = [];
-                    $.each(emojiStrategy, function (shortname, data) {
-                        if (shortname.indexOf(term) > -1) {
-                            results.push(shortname);
-                        } else {
-                            if ((data.aliases !== null) && (data.aliases.indexOf(term) > -1)) {
-                                results2.push(shortname);
-                            } else if ((data.keywords !== null) && (data.keywords.indexOf(term) > -1)) {
-                                results3.push(shortname);
-                            }
+        $('body').delay(1500).find('.emoji-wysiwyg-editor').textcomplete([{
+            match: /\B:([\-+\w]*)$/,
+            search: function (term, callback) {
+                var results = [];
+                var results2 = [];
+                var results3 = [];
+                $.each(emojiStrategy, function (shortname, data) {
+                    if (shortname.indexOf(term) > -1) {
+                        results.push(shortname);
+                    } else {
+                        if ((data.aliases !== null) && (data.aliases.indexOf(term) > -1)) {
+                            results2.push(shortname);
+                        } else if ((data.keywords !== null) && (data.keywords.indexOf(term) > -1)) {
+                            results3.push(shortname);
                         }
-                    });
-
-                    if (term.length >= 3) {
-                        results.sort(function (a, b) {
-                            return (a.length > b.length);
-                        });
-                        results2.sort(function (a, b) {
-                            return (a.length > b.length);
-                        });
-                        results3.sort();
                     }
+                });
 
-                    var newResults = results.concat(results2).concat(results3);
+                if (term.length >= 3) {
+                    results.sort(function (a, b) {
+                        return (a.length > b.length);
+                    });
+                    results2.sort(function (a, b) {
+                        return (a.length > b.length);
+                    });
+                    results3.sort();
+                }
 
-                    callback(newResults);
-                },
-                template: function (shortname) {
-                    return '<img class="emojione" src="{{ _p.web_lib }}javascript/emojione/png/'
-                            + emojiStrategy[shortname].unicode
-                            + '.png"> :' + shortname + ':';
-                },
-                replace: function (shortname) {
-                    return ':' + shortname + ': ';
-                },
-                index: 1,
-                maxCount: 10
-            }
-        ], {});
+                var newResults = results.concat(results2).concat(results3);
+                callback(newResults);
+            },
+            template: function (shortname) {
+                return '<img class="emojione" src="{{ _p.web_lib }}javascript/emojione/png/'
+                    + emojiStrategy[shortname].unicode
+                    + '.png"> :' + shortname + ':';
+            },
+            replace: function (shortname) {
+                return ':' + shortname + ': ';
+            },
+            index: 1,
+            maxCount: 10
+        }], {});
 
         $('button#chat-send-message').on('click', ChChat.onSendMessageListener);
-
         $('#chat-users').on('click', 'button.btn', function (e) {
             e.preventDefault();
-
             var jSelf = $(this),
-                    userId = parseInt(jSelf.data('user')) || 0;
+                userId = parseInt(jSelf.data('user')) || 0;
 
             if (!userId) {
                 return;
@@ -287,6 +277,8 @@
                     exists = true;
                 }
             });
+
+            $('button#chat-send-message').prop('disabled', false);
 
             if (exists) {
                 $('#chat-tab-' + userId).tab('show');
@@ -311,9 +303,7 @@
 
         $('#chat-tabs ul.nav-tabs').on('shown.bs.tab', 'li a', function (e) {
             var jSelf = $(this);
-
             var userId = parseInt(jSelf.parent().data('user')) || 0;
-
             if (!userId) {
                 ChChat.currentFriend = 0;
 

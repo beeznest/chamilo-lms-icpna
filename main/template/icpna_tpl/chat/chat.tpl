@@ -1,4 +1,4 @@
-<div class="page-chat">
+<div class="page-chat container-fluid">
     <div class="row">
         <div class="col-sm-4 col-md-5 col-lg-4">
             <ul class="row list-unstyled" id="chat-users"></ul>
@@ -38,13 +38,16 @@
                             <div class="tab-content">
                                 <div class="tab-pane active" id="tab1">
                                     <div class="row">
-                                        <div class="col-sm-9">
+                                        <div class="col-sm-10">
                                             <span class="sr-only">{{ 'Message'|get_lang }}</span>
                                             <textarea id="chat-writer" name="message"></textarea>
                                         </div>
-                                        <div class="col-sm-3">
-                                            <button id="chat-send-message" type="button" disabled
-                                                    class="btn btn-primary">{{ 'Send'|get_lang }}</button>
+                                        <div class="col-sm-2">
+                                            <button id="chat-send-message" type="button" class="btn btn-primary btn-lg"
+                                                    disabled title="{{ 'Send'|get_lang }}">
+                                                <span class="fa fa-send" aria-hidden="true"></span>
+                                                <span class="sr-only">{{ 'Send'|get_lang }}</span>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -90,6 +93,27 @@
                             ChChat.usersOnline = response.data.usersOnline;
                             ChChat.setConnectedUsers(response.data.userList);
                         }
+
+                        if (response.data.myChats) {
+                            $.each(response.data.myChats, function (i, myChat) {
+                                var liUserChat = $('#chat-users li[data-user="' + myChat.id + '"]'),
+                                    btnMessage = liUserChat.find('button .fa');
+
+                                if (!myChat.unreadMessages) {
+                                    liUserChat.removeClass('pay-attention');
+                                    btnMessage.text('');
+
+                                    return;
+                                }
+
+                                liUserChat
+                                    .addClass('pay-attention')
+                                    .insertBefore(
+                                        $('#chat-users li').first()
+                                    );
+                                btnMessage.text(' ' + myChat.unreadMessages);
+                            });
+                        }
                     });
             },
             setHistory: function (messageList) {
@@ -109,7 +133,7 @@
                     var buttonStatus = user.isConnected ? 'success' : 'muted',
                         buttonTitle = user.isConnected ? '{{ 'StartAChat'|get_lang }}' : '{{ 'LeaveAMessage'|get_lang }}';
 
-                    html += '<li class="col-xs-12 chat-user">' +
+                    html += '<li class="col-xs-12 chat-user" data-user="' + user.id + '">' +
                         '   <div>' +
                         '       <img src="' + user.image_url + '" alt="' + user.complete_name + '" class="img-circle user-image-chat"/>' +
                         '       <ul class="list-unstyled">' +

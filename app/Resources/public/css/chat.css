@@ -165,7 +165,11 @@
 }
 
 .pay-attention {
-	color: #5274ba;
-	text-shadow: 0px 0px 3px #5274ba;
-	background-color: #CBD7C2;
+	color: #FFF;
+	text-shadow: 0px 0px 10px #FFF;
+	background-color: #4069BF;
+}
+.pay-attention .btn .fa {
+	color: #FFF;
+	text-shadow: 0px 0px 10px #FFF;
 }

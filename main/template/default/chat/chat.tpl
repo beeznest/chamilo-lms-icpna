@@ -1,9 +1,9 @@
 <div class="page-chat container-fluid">
     <div class="row">
-        <div class="col-sm-4 col-md-5 col-lg-4">
+        <div class="col-sm-4 col-lg-3">
             <ul class="row list-unstyled" id="chat-users"></ul>
         </div>
-        <div class="col-sm-8 col-md-7 col-lg-8">
+        <div class="col-sm-8 col-lg-9">
             <div id="chat-tabs">
                 <ul class="nav nav-tabs" role="tablist">
                     {% if not restrict_to_coach %}
@@ -13,7 +13,7 @@
                     {% endif %}
                 </ul>
                 <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" id="{{ restrict_to_coach ? '' : 'all' }}">
+                    <div role="tabpanel" class="tab-pane active" id="{{ restrict_to_coach ? 'tab-pane-0' : 'all' }}">
                         <div class="course-chat chat-history" id="{{ restrict_to_coach ? '' : 'chat-history' }}"></div>
                     </div>
                 </div>
@@ -34,6 +34,12 @@
                                         <span class="sr-only">{{ 'Emoji'|get_lang }}</span>{{ emoji_smile }}
                                     </button>
                                 </li>
+                                <li class="pull-right">
+                                    <button type="button" class="btn btn-danger btn-xs" disabled id="btn-close-chat">
+                                        <span class="fa fa-times" aria-hidden="true"></span>
+                                        {{ 'Close'|get_lang }}
+                                    </button>
+                                </li>
                             </ul>
                             <div class="tab-content">
                                 <div class="tab-pane active" id="tab1">
@@ -43,8 +49,8 @@
                                             <textarea id="chat-writer" name="message"></textarea>
                                         </div>
                                         <div class="col-sm-2">
-                                            <button id="chat-send-message" type="button" class="btn btn-primary btn-lg"
-                                                    disabled title="{{ 'Send'|get_lang }}">
+                                            <button id="chat-send-message" type="button" title="{{ 'Send'|get_lang }}"
+                                                    class="btn btn-primary btn-lg btn-block" disabled>
                                                 <span class="fa fa-send" aria-hidden="true"></span>
                                                 <span class="sr-only">{{ 'Send'|get_lang }}</span>
                                             </button>
@@ -303,6 +309,7 @@
             });
 
             $('button#chat-send-message').prop('disabled', false);
+            $('button#btn-close-chat').prop('disabled', false);
 
             if (exists) {
                 $('#chat-tab-' + userId).tab('show');
@@ -323,6 +330,24 @@
             ');
 
             $('#chat-tab-' + userId).tab('show');
+        });
+        $('button#btn-close-chat').on('click', function () {
+            var currentTab = $('#chat-tabs ul.nav-tabs li[data-user="' + ChChat.currentFriend + '"]'),
+                prevTab = currentTab.prev(),
+                nextTab = currentTab.next();
+
+            currentTab.remove();
+            $('#chat-tabs .tab-content #chat-' + ChChat.currentFriend).remove();
+
+            if (prevTab.length) {
+                prevTab.find('> a').tab('show');
+            } else if (nextTab.length){
+                nextTab.find('> a').tab('show');
+            } else {
+                $('#tab-pane-0').addClass('active');
+
+                this.disabled = true;
+            }
         });
 
         $('#chat-tabs ul.nav-tabs').on('shown.bs.tab', 'li a', function (e) {

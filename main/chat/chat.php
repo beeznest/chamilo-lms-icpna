@@ -51,6 +51,14 @@ $view->assign('icons', $iconList);
 $view->assign('emoji_strategy', CourseChatUtils::getEmojiStrategry());
 $view->assign('emoji_smile', \Emojione\Emojione::toImage(':smile:'));
 $view->assign('restrict_to_coach', api_get_configuration_value('course_chat_restrict_to_coach'));
+$view->assign(
+    'user_is_coach',
+    api_is_course_session_coach(
+        api_get_user_id(),
+        api_get_course_int_id(),
+        api_get_session_id()
+    )
+);
 
 $template = $view->get_template('chat/chat.tpl');
 $content = $view->fetch($template);

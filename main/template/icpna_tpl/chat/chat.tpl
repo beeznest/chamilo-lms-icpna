@@ -6,15 +6,13 @@
         <div class="col-sm-8 col-lg-9">
             <div id="chat-tabs">
                 <ul class="nav nav-tabs" role="tablist">
-                    {% if not restrict_to_coach %}
-                        <li role="presentation" class="active">
-                            <a href="#all" aria-controls="all" role="tab" data-toggle="tab">{{ 'All'|get_lang }}</a>
-                        </li>
-                    {% endif %}
+                    <li role="presentation" class="active">
+                        <a href="#all" aria-controls="all" role="tab" data-toggle="tab">{{ 'All'|get_lang }}</a>
+                    </li>
                 </ul>
                 <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" id="{{ restrict_to_coach ? 'tab-pane-0' : 'all' }}">
-                        <div class="course-chat chat-history" id="{{ restrict_to_coach ? '' : 'chat-history' }}"></div>
+                    <div role="tabpanel" class="tab-pane active" id="all">
+                        <div class="course-chat chat-history" id="chat-history"></div>
                     </div>
                 </div>
             </div>
@@ -50,7 +48,8 @@
                                         </div>
                                         <div class="col-sm-2">
                                             <button id="chat-send-message" type="button" title="{{ 'Send'|get_lang }}"
-                                                    class="btn btn-primary btn-lg btn-block" disabled>
+                                                    class="btn btn-primary btn-lg btn-block"
+                                                    {{ user_is_coach ? '' : 'disabled' }}>
                                                 <span class="fa fa-send" aria-hidden="true"></span>
                                                 <span class="sr-only">{{ 'Send'|get_lang }}</span>
                                             </button>
@@ -69,9 +68,9 @@
     </div>
 </div>
 <audio id="chat-alert">
-    <source src="{{ _p.web_main }}/chat/sound/notification.wav" type="audio/wav"></source>
-    <source src="{{ _p.web_main }}chat/sound/notification.ogg" type="audio/ogg"></source>
-    <source src="{{ _p.web_main }}chat/sound/notification.mp3" type="audio/mpeg"></source>
+    <source src="{{ _p.web_main }}/chat/sound/notification.wav" type="audio/wav">
+    <source src="{{ _p.web_main }}chat/sound/notification.ogg" type="audio/ogg">
+    <source src="{{ _p.web_main }}chat/sound/notification.mp3" type="audio/mpeg">
 </audio>
 <script>
     $(document).on('ready', function () {
@@ -344,8 +343,6 @@
             } else if (nextTab.length){
                 nextTab.find('> a').tab('show');
             } else {
-                $('#tab-pane-0').addClass('active');
-
                 this.disabled = true;
             }
         });
@@ -356,16 +353,25 @@
             if (!userId) {
                 ChChat.currentFriend = 0;
 
+                $('button#btn-close-chat').prop('disabled', true);
+
+                if ({{ user_is_coach ? 'false' : 'true' }}) {
+                    $('button#chat-send-message').prop('disabled', true);
+                }
+
                 return;
             }
 
             ChChat.currentFriend = userId;
 
             $(this).tab('show');
+            $('button#chat-send-message').prop('disabled', false);
+            $('button#btn-close-chat').prop('disabled', false);
         });
 
         $('.emoji-wysiwyg-editor').on('keyup', function (e) {
-            if (e.ctrlKey && e.keyCode === 13) {
+            if (e.ctrlKey && e.keyCode === 13 &&
+                (ChChat.currentFriend || {{ user_is_coach ? 'true' : 'false' }})) {
                 $('button#chat-send-message').trigger('click');
             }
         });

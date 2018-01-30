@@ -3071,6 +3071,154 @@ class DocumentManager
     }
 
     /**
+     * Encrypt a file with a password.
+     * The input file will be replaced with the file encrypted.
+     * @param string $password
+     * @param string $inputFilePath
+     * @return mixed
+     */
+    public static function encryptFile($password, $inputFilePath)
+    {
+        $encryptedFilePath = api_get_path(SYS_ARCHIVE_PATH).api_get_unique_id().'.enc';
+        $chunkSize = 4096;
+
+        $alg = SODIUM_CRYPTO_PWHASH_ALG_DEFAULT;
+        $opsLimit = SODIUM_CRYPTO_PWHASH_OPSLIMIT_MODERATE;
+        $memLimit = SODIUM_CRYPTO_PWHASH_MEMLIMIT_MODERATE;
+        $salt = random_bytes(SODIUM_CRYPTO_PWHASH_SALTBYTES);
+
+        $secretKey = sodium_crypto_pwhash(
+            SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_KEYBYTES,
+            $password,
+            $salt,
+            $opsLimit,
+            $memLimit,
+            $alg
+        );
+
+        $fdIn = fopen($inputFilePath, 'rb');
+        $fdOut = fopen($encryptedFilePath, 'wb');
+
+        fwrite($fdOut, pack('C', $alg));
+        fwrite($fdOut, pack('P', $opsLimit));
+        fwrite($fdOut, pack('P', $memLimit));
+        fwrite($fdOut, $salt);
+
+        list($stream, $header) = sodium_crypto_secretstream_xchacha20poly1305_init_push($secretKey);
+
+        fwrite($fdOut, $header);
+
+        $tag = SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_MESSAGE;
+
+        do {
+            $chunk = fread($fdIn, $chunkSize);
+
+            if (feof($fdIn)) {
+                $tag = SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL;
+            }
+
+            $encrypted_chunk = sodium_crypto_secretstream_xchacha20poly1305_push($stream, $chunk, '', $tag);
+            fwrite($fdOut, $encrypted_chunk);
+        } while ($tag !== SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL);
+
+        fclose($fdOut);
+        fclose($fdIn);
+
+        rename($encryptedFilePath, $inputFilePath);
+    }
+
+    /**
+     * Decrypt a file with a password and put it in cache folder.
+     * @param string $password
+     * @param string $encryptedFilePath The origin encrypted file path
+     * @return string
+     * @throws \Exception
+     */
+    public static function decryptFile($password, $encryptedFilePath)
+    {
+        $decryptedFilePath = api_get_path(SYS_ARCHIVE_PATH).api_get_unique_id().'.dec';
+
+        $chunkSize = 4096;
+
+        $fdIn = fopen($encryptedFilePath, 'rb');
+        $fdOut = fopen($decryptedFilePath, 'wb');
+
+        $alg = unpack('C', fread($fdIn, 1))[1];
+        $opslimit = unpack('P', fread($fdIn, 8))[1];
+        $memlimit = unpack('P', fread($fdIn, 8))[1];
+        $salt = fread($fdIn, SODIUM_CRYPTO_PWHASH_SALTBYTES);
+
+        $header = fread($fdIn, SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES);
+
+        $secretKey = sodium_crypto_pwhash(
+            SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_KEYBYTES,
+            $password,
+            $salt,
+            $opslimit,
+            $memlimit,
+            $alg
+        );
+
+        $stream = sodium_crypto_secretstream_xchacha20poly1305_init_pull($header, $secretKey);
+
+        do {
+            $chunk = fread($fdIn, $chunkSize + SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES);
+            $res = sodium_crypto_secretstream_xchacha20poly1305_pull($stream, $chunk);
+
+            if ($res === false) {
+                break;
+            }
+
+            list($decryptedChunk, $tag) = $res;
+            fwrite($fdOut, $decryptedChunk);
+        } while (!feof($fdIn) && $tag !== SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL);
+
+        $ok = feof($fdIn);
+
+        fclose($fdOut);
+        fclose($fdIn);
+
+        if (!$ok) {
+            throw new Exception(get_lang('YouAreNotAllowedToDownloadThisFile'));
+        }
+
+        return $decryptedFilePath;
+    }
+
+    /**
+     * @param $files
+     * @param $path
+     * @param $title
+     * @param $password
+     * @param $ifExists
+     * @param null $comment
+     * @param string $fileKey
+     */
+    public static function uploadEncryptedDocument(
+        $files,
+        $path,
+        $title,
+        $password,
+        $ifExists,
+        $comment = null,
+        $fileKey = 'file'
+    ) {
+        $documentInfo = self::upload_document(
+            $files,
+            $path,
+            $title,
+            $comment,
+            0,
+            $ifExists,
+            false,
+            true,
+            $fileKey
+        );
+
+        self::encryptFile($password, $documentInfo['absolute_path']);
+    }
+
+    /**
      * Obtains the text inside the file with the right parser
      */
     public static function get_text_content($doc_path, $doc_mime)

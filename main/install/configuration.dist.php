@@ -729,3 +729,8 @@ $_configuration['gradebook_badge_sidebar'] = [
 // Restrict course chat only for course coach in sessions
 // Course coaches will can chat with students only. And students will can chat with all course coaches
 //$_configuration['course_chat_restrict_to_coach'] = false;
+// ------
+//
+// Allow upload files encrypted
+// Require install Sodium on the server
+//$_configuration['document_upload_encrypted'] = false;

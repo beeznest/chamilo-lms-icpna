@@ -38,8 +38,14 @@ require_once __DIR__.'/../inc/global.inc.php';
 // Including additional libraries
 require_once api_get_path(LIBRARY_PATH).'specific_fields_manager.lib.php';
 
+$allowEncryptedUpload = api_get_configuration_value('document_upload_encrypted');
+
 // Adding extra javascript to the form
 $htmlHeadXtra[] = api_get_jquery_libraries_js(array('jquery-ui', 'jquery-upload'));
+
+if ($allowEncryptedUpload) {
+    $htmlHeadXtra[] = api_get_password_checker_js('#upload_title', '#password1');
+}
 
 // Variables
 $is_allowed_to_edit = api_is_allowed_to_edit(null, true);
@@ -188,16 +194,27 @@ $index = isset($_POST['index_document']) ? $_POST['index_document'] : null;
 // User has submitted a file
 
 if (!empty($_FILES)) {
-    DocumentManager::upload_document(
-        $_FILES,
-        $_POST['curdirpath'],
-        $_POST['title'],
-        $_POST['comment'],
-        $unzip,
-        $_POST['if_exists'],
-        $index,
-        true
-    );
+    if (!isset($_POST['encrypt_upload'])) {
+        DocumentManager::upload_document(
+            $_FILES,
+            $_POST['curdirpath'],
+            $_POST['title'],
+            $_POST['comment'],
+            $unzip,
+            $_POST['if_exists'],
+            $index,
+            true
+        );
+    } else {
+        DocumentManager::uploadEncryptedDocument(
+            $_FILES,
+            $_POST['curdirpath'],
+            $_POST['title'],
+            $_POST['password1'],
+            $_POST['if_exists'],
+            $_POST['comment']
+        );
+    }
 
     $redirectUrl = api_get_self().'?'.api_get_cidreq();
 
@@ -321,11 +338,63 @@ $multipleForm = new FormValidator(
 );
 $multipleForm->addMultipleUpload($url);
 
+if ($allowEncryptedUpload) {
+    $frmEncrypt = new FormValidator(
+        'encrypt_upload',
+        'POST',
+        $action.'#tabs-3',
+        '',
+        ['enctype' => 'multipart/form-data']
+    );
+    $frmEncrypt->addHidden('id', $document_id);
+    $frmEncrypt->addHidden('curdirpath', $path);
+    $frmEncrypt->addFile(
+        'file',
+        [get_lang('File'), get_lang('AudioFile'), $label],
+        ['accept' => 'audio/*']
+    );
+    $frmEncrypt->addText('title', get_lang('Title'));
+    $frmEncrypt->addTextarea('comment', get_lang('Comment'));
+    $frmEncrypt->addElement('password', 'password1', get_lang('Pass'), ['id'=> 'password1', 'size' => 40]);
+    $frmEncrypt->addElement('password', 'password2', get_lang('Confirmation'), ['size' => 40]);
+    $frmEncrypt->addPasswordRule('password1');
+    $frmEncrypt->addButtonAdvancedSettings('advanced_params_3');
+    $frmEncrypt->addHtml('<div id="advanced_params_3_options" style="display:none">');
+    $frmEncrypt->addRadio(
+        'if_exists',
+        get_lang('UplWhatIfFileExists'),
+        [
+            'nothing' => get_lang('UplDoNothing'),
+            'overwrite' => get_lang('UplOverwriteLong'),
+            'rename' => get_lang('UplRenameLong')
+        ]
+    );
+    $frmEncrypt->addElement('html', '</div>');
+    $frmEncrypt->addButtonSend(get_lang('SendDocument'), 'encrypt_upload');
+    $frmEncrypt->addProgress('DocumentUpload', 'file');
+    $frmEncrypt->addRule('file', get_lang('ThisFieldIsRequired'), 'required');
+    $frmEncrypt->addRule('password1', get_lang('ThisFieldIsRequired'), 'required');
+    $frmEncrypt->addRule('password2', get_lang('ThisFieldIsRequired'), 'required');
+    $frmEncrypt->addRule(['password1', 'password2'], get_lang('PassTwo'), 'compare');
+    $frmEncrypt->setDefaults([
+        'if_exists' => $defaultFileExistsOption
+    ]);
+}
+
 $headers = array(
     get_lang('Upload'),
-    get_lang('Upload').' ('.get_lang('Simple').')'
+    get_lang('Upload').' ('.get_lang('Simple').')',
 );
+$items = [
+    $multipleForm->returnForm(),
+    $form->returnForm()
+];
 
-echo Display::tabs($headers, array($multipleForm->returnForm(), $form->returnForm()), 'tabs');
+if ($allowEncryptedUpload) {
+    $headers[] = get_lang('EncryptedUpload');
+    $items[] = $frmEncrypt->returnForm();
+}
+
+echo Display::tabs($headers, $items, 'tabs');
 
 Display::display_footer();

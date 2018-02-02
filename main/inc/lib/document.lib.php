@@ -2,6 +2,7 @@
 /* For licensing terms, see /license.txt */
 
 use Chamilo\CourseBundle\Entity\CDocument;
+use Chamilo\CoreBundle\Entity\TrackEDefault;
 
 /**
  *  Class DocumentManager
@@ -3228,6 +3229,36 @@ class DocumentManager
         $document->setFiletype(CDocument::TYPE_FILE_ENCRYPTED);
 
         $em->persist($document);
+        $em->flush();
+    }
+
+    /**
+     * Save a register for log the access to encrypted file
+     * @param int $documentId
+     * @param string $action
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public static function trackEncryptedFile($documentId, $action)
+    {
+        $em = Database::getManager();
+        $userId = api_get_user_id();
+        $docId = intval($documentId);
+        $courseId = api_get_course_int_id();
+        $sessionId = api_get_session_id();
+
+        $track = new TrackEDefault();
+        $track
+            ->setDefaultUserId($userId)
+            ->setCId($courseId)
+            ->setDefaultDate(
+                api_get_utc_datetime(null, false, true)
+            )
+            ->setDefaultEventType('show_safely')
+            ->setDefaultValueType($action)
+            ->setDefaultValue($docId)
+            ->setSessionId($sessionId);
+
+        $em->persist($track);
         $em->flush();
     }
 

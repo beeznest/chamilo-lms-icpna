@@ -1,7 +1,5 @@
 <?php
 /* For licensing terms, see /license.txt */
-use Chamilo\CoreBundle\Entity\TrackEDefault;
-
 /**
  * Responses to AJAX calls for the document upload
  */
@@ -203,27 +201,10 @@ switch ($action) {
             break;
         }
 
-        $userId = api_get_user_id();
-        $docId = intval($_POST['id']);
-        $courseId = api_get_course_int_id();
-        $sessionId = api_get_session_id();
-
-        $track = new TrackEDefault();
-        $track
-            ->setDefaultUserId($userId)
-            ->setCId($courseId)
-            ->setDefaultDate(
-                api_get_utc_datetime(null, false, true)
-            )
-            ->setDefaultEventType('show_safely')
-            ->setDefaultValueType(
-                str_replace('show_safely_', '', $action)
-            )
-            ->setDefaultValue($docId)
-            ->setSessionId($sessionId);
-
-        $em->persist($track);
-        $em->flush();
+        DocumentManager::trackEncryptedFile(
+            $_POST['id'],
+            str_replace('show_safely_', '', $action)
+        );
         break;
 }
 exit;

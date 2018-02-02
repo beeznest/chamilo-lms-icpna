@@ -93,6 +93,8 @@ $form->setDefaults([
 $form->freeze(['file_name', 'file_size']);
 $form->addButtonNext(get_lang('Validate'));
 
+DocumentManager::trackEncryptedFile($documentData['iid'], 'access');
+
 // View
 $htmlHeadXtra[] = api_get_js('fetch/fetch.js');
 $htmlHeadXtra[] = '

@@ -110,7 +110,7 @@ $actionsLeft = Display::url(
     api_get_path(WEB_CODE_PATH).'document/document.php?'.api_get_cidreq().'&id='.$parentId
 );
 
-$toolName = get_lang('SecuredFile');
+$toolName = get_lang('EncryptedFile');
 
 $template = new Template($toolName);
 $template->assign('form', $form->returnForm());

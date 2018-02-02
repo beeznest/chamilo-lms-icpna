@@ -214,3 +214,6 @@ $SurveyModalIntro="¡Completa la encuesta en línea y opina sobre tu teacher Mr.
 $SurveyUntilDateX="Tienes hasta el <strong>%s</strong>.";
 $SurveyModalEnd="Tu opinión sincera nos permitirá seguir mejorando el servicio educativo que te ofrecemos.";
 $ShowInModalDialogBox="¿Mostrar en caja de diálogo emergente?";
+$EncryptedFile="Archivo cifrado";
+$WrongPassword="Contraseña incorrecta";
+$EncryptedUpload="Subida (Con cifrado)";

@@ -1,6 +1,8 @@
 <?php
 /* For licensing terms, see /license.txt */
 
+use Chamilo\CourseBundle\Entity\CDocument;
+
 /**
  *  Class DocumentManager
  *  This is the document library for Chamilo.
@@ -3179,20 +3181,23 @@ class DocumentManager
         fclose($fdIn);
 
         if (!$ok) {
-            throw new Exception(get_lang('YouAreNotAllowedToDownloadThisFile'));
+            throw new Exception(get_lang('WrongPassword'));
         }
 
         return $decryptedFilePath;
     }
 
     /**
-     * @param $files
-     * @param $path
-     * @param $title
-     * @param $password
-     * @param $ifExists
-     * @param null $comment
-     * @param string $fileKey
+     * @param array $files File data from upload
+     * @param string $path File path
+     * @param string $title File title
+     * @param string $password The password to encrypt the file
+     * @param string $ifExists Action to do if file already exists
+     * @param string|null $comment Optional
+     * @param string $fileKey Optional
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
      */
     public static function uploadEncryptedDocument(
         $files,
@@ -3216,6 +3221,14 @@ class DocumentManager
         );
 
         self::encryptFile($password, $documentInfo['absolute_path']);
+
+        $em = Database::getManager();
+        /** @var CDocument $document */
+        $document = $em->find('ChamiloCourseBundle:CDocument', $documentInfo['iid']);
+        $document->setFiletype(CDocument::TYPE_FILE_ENCRYPTED);
+
+        $em->persist($document);
+        $em->flush();
     }
 
     /**
@@ -5717,14 +5730,26 @@ class DocumentManager
                     } else {
                         $pdfPreview = Display::url(
                             Display::return_icon('preview.png', get_lang('Preview'), null, ICON_SIZE_SMALL),
-                            api_get_path(WEB_CODE_PATH).'document/showinframes.php?'.$courseParams.'&id='.$document_data['id'],
+                            api_get_path(WEB_CODE_PATH).'document/showinframes.php?'.$courseParams.'&id='
+                            .$document_data['id'],
                             array('style' => 'float:right')
                         );
                     }
+
                     // No plugin just the old and good showinframes.php page
-                    return '<a href="'.$url.'" title="'.$tooltip_title_alt.'" style="float:left" '.$visibility_class.' >'.$title.'</a>'.
-                    $pdfPreview.$force_download_html.$send_to.$copy_to_myfiles.$open_in_new_window_link.$pdf_icon;
+                    return '<a href="'.$url.'" title="'.$tooltip_title_alt.'" style="float:left" '.$visibility_class
+                        .' >'.$title.'</a>'.
+                        $pdfPreview.$force_download_html.$send_to.$copy_to_myfiles.$open_in_new_window_link.$pdf_icon;
                 }
+            } elseif ($filetype == CDocument::TYPE_FILE_ENCRYPTED) {
+                if ($isAllowedToEdit) {
+                    $url = 'show_safely.php?'.$courseParams.'&id='.$document_data['id'];
+
+                    return '<a href="'.$url.'" title="'.$tooltip_title_alt.'"'.$visibility_class.' style="float:left">'
+                        .$title.'</a>';
+                }
+
+                return '<span class="text-muted">'.$title.'</span>';
             } else {
                 return '<a href="'.$url.'" title="'.$tooltip_title_alt.'" '.$visibility_class.' style="float:left">'.$title.'</a>'.
                 $force_download_html.$send_to.$copy_to_myfiles.$open_in_new_window_link.$pdf_icon;
@@ -5763,6 +5788,18 @@ class DocumentManager
                         self::build_document_icon_tag($filetype, $path, $isAllowedToEdit).
                         Display::return_icon('shared.png', get_lang('ResourceShared'), array()).'</a>';
                     }
+                } elseif ($filetype == CDocument::TYPE_FILE_ENCRYPTED) {
+                    if ($isAllowedToEdit) {
+                        $url = 'show_safely.php?'.$courseParams.'&id='.$document_data['id'];
+
+                        return '<a href="'.$url.'" title="'.$tooltip_title_alt.'" target="'.$target.'"'
+                            .$visibility_class.' style="float:left">'
+                            .self::build_document_icon_tag($filetype, $path, $isAllowedToEdit)
+                            .Display::return_icon('shared.png', get_lang('ResourceShared')).'</a>';
+                    }
+
+                    return self::build_document_icon_tag($filetype, $path, $isAllowedToEdit)
+                        .Display::return_icon('shared.png', get_lang('ResourceShared'));
                 } else {
                     return '<a href="'.$url.'" title="'.$tooltip_title_alt.'" target="'.$target.'"'.$visibility_class.' style="float:left">'.
                     self::build_document_icon_tag($filetype, $path, $isAllowedToEdit).
@@ -5796,6 +5833,16 @@ class DocumentManager
                         return '<a href="'.$url.'" title="'.$tooltip_title_alt.'" '.$visibility_class.' style="float:left">'.
                         self::build_document_icon_tag($filetype, $path, $isAllowedToEdit).'</a>';
                     }
+                } elseif ($filetype == CDocument::TYPE_FILE_ENCRYPTED) {
+                    if ($isAllowedToEdit) {
+                        $url = 'show_safely.php?'.$courseParams.'&id='.$document_data['id'];
+
+                        return '<a href="'.$url.'" title="'.$tooltip_title_alt.'" target="'.$target.'"'
+                            .$visibility_class.' style="float:left">'
+                            .self::build_document_icon_tag($filetype, $path, $isAllowedToEdit).'</a>';
+                    }
+
+                    return self::build_document_icon_tag($filetype, $path, $isAllowedToEdit);
                 } else {
                     return '<a href="'.$url.'" title="'.$tooltip_title_alt.'" target="'.$target.'"'.$visibility_class.' style="float:left">'.
                     self::build_document_icon_tag($filetype, $path, $isAllowedToEdit).'</a>';
@@ -5822,6 +5869,9 @@ class DocumentManager
         $user_image = false;
         if ($type == 'file') {
             $icon = choose_image($basename);
+            $basename = substr(strrchr($basename, '.'), 1);
+        } elseif ($type == CDocument::TYPE_FILE_ENCRYPTED) {
+            $icon = 'lock.png';
             $basename = substr(strrchr($basename, '.'), 1);
         } else {
             if ($path == '/shared_folder') {

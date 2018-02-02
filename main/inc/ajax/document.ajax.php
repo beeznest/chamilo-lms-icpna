@@ -1,5 +1,6 @@
 <?php
 /* For licensing terms, see /license.txt */
+use Chamilo\CoreBundle\Entity\TrackEDefault;
 
 /**
  * Responses to AJAX calls for the document upload
@@ -7,6 +8,9 @@
 require_once __DIR__.'/../global.inc.php';
 
 $action = $_REQUEST['a'];
+
+$em = Database::getManager();
+
 switch ($action) {
     case 'get_dir_size':
         api_protect_course_script(true);
@@ -143,6 +147,83 @@ switch ($action) {
         //obtained the bootstrap-select selected value via ajax
         $dirValue = isset($_POST['dirValue']) ? $_POST['dirValue'] : null;
         echo Security::remove_XSS($dirValue);
+        break;
+    case 'show_safely':
+        api_protect_course_script(true);
+        api_protect_teacher_script(true);
+
+        if (!isset($_POST['id'], $_POST['pass'])) {
+            break;
+        }
+
+        $documentId = $_POST['id'];
+        $password = $_POST['pass'];
+        $course = api_get_course_info();
+        $sessionId = api_get_session_id();
+        $userId = api_get_user_id();
+
+        try {
+            $check = Security::check_token('post');
+            //Security::clear_token(); //Clear the token to avoid more than one audio play
+
+            if (!$check) {
+                throw new Exception(get_lang('YouAreNotAllowedToDownloadThisFile'));
+            }
+
+            $documentData = DocumentManager::get_document_data_by_id(
+                $documentId,
+                $course['code'],
+                false,
+                $sessionId
+            );
+
+            $filePath = DocumentManager::decryptFile($password, $documentData['absolute_path']);
+
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Cache-Control: no-cache, must-revalidate');
+            header('Pragma: no-cache');
+            header('Content-Length: '.filesize($filePath));
+
+            readfile($filePath);
+
+            unlink($filePath);
+
+            Event::event_download($documentData['path']);
+        } catch (Exception $e) {
+            http_response_code(403);
+
+            echo $e->getMessage();
+        }
+        break;
+    case 'show_safely_play':
+        // no break;
+    case 'show_safely_pause':
+        if (!isset($_POST['id'])) {
+            break;
+        }
+
+        $userId = api_get_user_id();
+        $docId = intval($_POST['id']);
+        $courseId = api_get_course_int_id();
+        $sessionId = api_get_session_id();
+
+        $track = new TrackEDefault();
+        $track
+            ->setDefaultUserId($userId)
+            ->setCId($courseId)
+            ->setDefaultDate(
+                api_get_utc_datetime(null, false, true)
+            )
+            ->setDefaultEventType('show_safely')
+            ->setDefaultValueType(
+                str_replace('show_safely_', '', $action)
+            )
+            ->setDefaultValue($docId)
+            ->setSessionId($sessionId);
+
+        $em->persist($track);
+        $em->flush();
         break;
 }
 exit;

@@ -18,6 +18,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class CDocument
 {
+    const TYPE_FILE_ENCRYPTED = 'fencrypted';
+
     /**
      * @var integer
      *

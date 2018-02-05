@@ -734,3 +734,5 @@ $_configuration['gradebook_badge_sidebar'] = [
 // Allow upload files encrypted
 // Require install Sodium on the server
 //$_configuration['document_upload_encrypted'] = false;
+// Validate the download for encrypted files to users with this ip (string) or ip range (array)
+//$_configuration['document_download_encrypted_valid_ip'] = '127.0.0.1/1';

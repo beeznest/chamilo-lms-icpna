@@ -1,5 +1,8 @@
 <?php
 /* For licensing terms, see /license.txt */
+
+use Symfony\Component\HttpFoundation\IpUtils;
+
 /**
  * @package chamilo.document
  */
@@ -13,6 +16,16 @@ $isAllowedToEdit = api_is_allowed_to_edit();
 
 if (!isset($_REQUEST['id']) || !$isAllowedToEdit) {
     api_not_allowed(true);
+}
+
+$ipRangeValidation = api_get_configuration_value('document_download_encrypted_valid_ip');
+
+if (false !== $ipRangeValidation) {
+    $userIp = api_get_real_ip();
+
+    if (IpUtils::checkIp($userIp, $ipRangeValidation) === false) {
+        api_not_allowed(true);
+    }
 }
 
 $documentId = intval($_REQUEST['id']);

@@ -168,6 +168,10 @@ switch ($action) {
                 throw new Exception(get_lang('YouAreNotAllowedToDownloadThisFile'));
             }
 
+            if (empty($password)) {
+                throw new Exception(get_lang('EnterPassword'));
+            }
+
             $documentData = DocumentManager::get_document_data_by_id(
                 $documentId,
                 $course['code'],

@@ -3221,6 +3221,10 @@ class DocumentManager
             $fileKey
         );
 
+        if (false == $documentInfo) {
+            return false;
+        }
+
         self::encryptFile($password, $documentInfo['absolute_path']);
 
         $em = Database::getManager();
@@ -3230,6 +3234,8 @@ class DocumentManager
 
         $em->persist($document);
         $em->flush();
+
+        return true;
     }
 
     /**

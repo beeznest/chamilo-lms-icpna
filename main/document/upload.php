@@ -195,7 +195,7 @@ $index = isset($_POST['index_document']) ? $_POST['index_document'] : null;
 
 if (!empty($_FILES)) {
     if (!isset($_POST['encrypt_upload'])) {
-        DocumentManager::upload_document(
+        $uploadOk = DocumentManager::upload_document(
             $_FILES,
             $_POST['curdirpath'],
             $_POST['title'],
@@ -206,26 +206,41 @@ if (!empty($_FILES)) {
             true
         );
     } else {
-        DocumentManager::uploadEncryptedDocument(
-            $_FILES,
-            $_POST['curdirpath'],
-            $_POST['title'],
-            $_POST['password1'],
-            $_POST['if_exists'],
-            $_POST['comment']
-        );
+        $uploadOk = false;
+
+        if (empty($_POST['curdirpath']) || empty($_POST['title']) || empty($_POST['password1'])
+            || empty($_POST['password2'])) {
+            Display::addFlash(
+                Display::return_message(get_lang('FieldsRequ'), 'error')
+            );
+        } elseif($_POST['password1'] !== $_POST['password2']) {
+            Display::addFlash(
+                Display::return_message(get_lang('PassTwo'), 'error')
+            );
+        } else {
+            $uploadOk = DocumentManager::uploadEncryptedDocument(
+                $_FILES,
+                $_POST['curdirpath'],
+                $_POST['title'],
+                $_POST['password1'],
+                $_POST['if_exists'],
+                $_POST['comment']
+            );
+        }
     }
 
-    $redirectUrl = api_get_self().'?'.api_get_cidreq();
+    if ($uploadOk) {
+        $redirectUrl = api_get_self().'?'.api_get_cidreq();
 
-    if ($document_data) {
-        $redirectUrl .= '&'.http_build_query([
-            'id' => $document_data['iid']
-        ]);
+        if ($document_data) {
+            $redirectUrl .= '&'.http_build_query([
+                'id' => $document_data['iid']
+            ]);
+        }
+
+        header("Location: $redirectUrl");
+        exit;
     }
-
-    header("Location: $redirectUrl");
-    exit;
 }
 
 // Display the header

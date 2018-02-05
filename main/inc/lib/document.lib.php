@@ -3245,6 +3245,10 @@ class DocumentManager
         $docId = intval($documentId);
         $courseId = api_get_course_int_id();
         $sessionId = api_get_session_id();
+        $value = serialize([
+            'doc' => $docId,
+            'ip' => api_get_real_ip()
+        ]);
 
         $track = new TrackEDefault();
         $track
@@ -3255,7 +3259,7 @@ class DocumentManager
             )
             ->setDefaultEventType('show_safely')
             ->setDefaultValueType($action)
-            ->setDefaultValue($docId)
+            ->setDefaultValue($value)
             ->setSessionId($sessionId);
 
         $em->persist($track);

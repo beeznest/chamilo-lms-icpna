@@ -188,6 +188,7 @@ switch ($action) {
             unlink($filePath);
 
             Event::event_download($documentData['path']);
+            DocumentManager::trackEncryptedFile($_POST['id'], 'download');
         } catch (Exception $e) {
             http_response_code(403);
 

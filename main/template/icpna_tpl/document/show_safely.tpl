@@ -96,5 +96,11 @@
                 .then(handleBlob)
                 .catch(handleError);
         });
+
+        $('body').on('contextmenu', 'audio', function (e) {
+            e.preventDefault();
+
+            return;
+        });
     });
 </script>

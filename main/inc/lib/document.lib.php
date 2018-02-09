@@ -3,6 +3,7 @@
 
 use Chamilo\CourseBundle\Entity\CDocument;
 use Chamilo\CoreBundle\Entity\TrackEDefault;
+use Defuse\Crypto;
 
 /**
  *  Class DocumentManager
@@ -3078,54 +3079,14 @@ class DocumentManager
      * The input file will be replaced with the file encrypted.
      * @param string $password
      * @param string $inputFilePath
-     * @return mixed
+     * @throws \Defuse\Crypto\Exception\EnvironmentIsBrokenException
+     * @throws \Defuse\Crypto\Exception\IOException
      */
     public static function encryptFile($password, $inputFilePath)
     {
         $encryptedFilePath = api_get_path(SYS_ARCHIVE_PATH).api_get_unique_id().'.enc';
-        $chunkSize = 4096;
 
-        $alg = SODIUM_CRYPTO_PWHASH_ALG_DEFAULT;
-        $opsLimit = SODIUM_CRYPTO_PWHASH_OPSLIMIT_MODERATE;
-        $memLimit = SODIUM_CRYPTO_PWHASH_MEMLIMIT_MODERATE;
-        $salt = random_bytes(SODIUM_CRYPTO_PWHASH_SALTBYTES);
-
-        $secretKey = sodium_crypto_pwhash(
-            SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_KEYBYTES,
-            $password,
-            $salt,
-            $opsLimit,
-            $memLimit,
-            $alg
-        );
-
-        $fdIn = fopen($inputFilePath, 'rb');
-        $fdOut = fopen($encryptedFilePath, 'wb');
-
-        fwrite($fdOut, pack('C', $alg));
-        fwrite($fdOut, pack('P', $opsLimit));
-        fwrite($fdOut, pack('P', $memLimit));
-        fwrite($fdOut, $salt);
-
-        list($stream, $header) = sodium_crypto_secretstream_xchacha20poly1305_init_push($secretKey);
-
-        fwrite($fdOut, $header);
-
-        $tag = SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_MESSAGE;
-
-        do {
-            $chunk = fread($fdIn, $chunkSize);
-
-            if (feof($fdIn)) {
-                $tag = SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL;
-            }
-
-            $encrypted_chunk = sodium_crypto_secretstream_xchacha20poly1305_push($stream, $chunk, '', $tag);
-            fwrite($fdOut, $encrypted_chunk);
-        } while ($tag !== SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL);
-
-        fclose($fdOut);
-        fclose($fdIn);
+        Crypto\File::encryptFileWithPassword($inputFilePath, $encryptedFilePath, $password);
 
         rename($encryptedFilePath, $inputFilePath);
     }
@@ -3141,48 +3102,12 @@ class DocumentManager
     {
         $decryptedFilePath = api_get_path(SYS_ARCHIVE_PATH).api_get_unique_id().'.dec';
 
-        $chunkSize = 4096;
-
-        $fdIn = fopen($encryptedFilePath, 'rb');
-        $fdOut = fopen($decryptedFilePath, 'wb');
-
-        $alg = unpack('C', fread($fdIn, 1))[1];
-        $opslimit = unpack('P', fread($fdIn, 8))[1];
-        $memlimit = unpack('P', fread($fdIn, 8))[1];
-        $salt = fread($fdIn, SODIUM_CRYPTO_PWHASH_SALTBYTES);
-
-        $header = fread($fdIn, SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES);
-
-        $secretKey = sodium_crypto_pwhash(
-            SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_KEYBYTES,
-            $password,
-            $salt,
-            $opslimit,
-            $memlimit,
-            $alg
-        );
-
-        $stream = sodium_crypto_secretstream_xchacha20poly1305_init_pull($header, $secretKey);
-
-        do {
-            $chunk = fread($fdIn, $chunkSize + SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES);
-            $res = sodium_crypto_secretstream_xchacha20poly1305_pull($stream, $chunk);
-
-            if ($res === false) {
-                break;
-            }
-
-            list($decryptedChunk, $tag) = $res;
-            fwrite($fdOut, $decryptedChunk);
-        } while (!feof($fdIn) && $tag !== SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL);
-
-        $ok = feof($fdIn);
-
-        fclose($fdOut);
-        fclose($fdIn);
-
-        if (!$ok) {
+        try {
+            Crypto\File::decryptFileWithPassword($encryptedFilePath, $decryptedFilePath, $password);
+        } catch (\Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException $e) {
             throw new Exception(get_lang('WrongPassword'));
+        } catch (Exception $e) {
+            throw $e;
         }
 
         return $decryptedFilePath;
@@ -3196,9 +3121,7 @@ class DocumentManager
      * @param string $ifExists Action to do if file already exists
      * @param string|null $comment Optional
      * @param string $fileKey Optional
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\TransactionRequiredException
+     * @return bool
      */
     public static function uploadEncryptedDocument(
         $files,
@@ -3225,17 +3148,32 @@ class DocumentManager
             return false;
         }
 
-        self::encryptFile($password, $documentInfo['absolute_path']);
+        try {
+            self::encryptFile($password, $documentInfo['absolute_path']);
 
-        $em = Database::getManager();
-        /** @var CDocument $document */
-        $document = $em->find('ChamiloCourseBundle:CDocument', $documentInfo['iid']);
-        $document->setFiletype(CDocument::TYPE_FILE_ENCRYPTED);
+            $em = Database::getManager();
+            /** @var CDocument $document */
+            $document = $em->find('ChamiloCourseBundle:CDocument', $documentInfo['iid']);
+            $document->setFiletype(CDocument::TYPE_FILE_ENCRYPTED);
 
-        $em->persist($document);
-        $em->flush();
+            $em->persist($document);
+            $em->flush();
 
-        return true;
+            return true;
+        } catch (Exception $e) {
+            $courseInfo = api_get_course_info();
+
+            self::delete_document(
+                $courseInfo,
+                $documentInfo['path'],
+                api_get_path(SYS_COURSE_PATH).$courseInfo['directory'].'/document',
+                api_get_session_id(),
+                $documentInfo['iid'],
+                api_get_group_id()
+            );
+
+            return false;
+        }
     }
 
     /**

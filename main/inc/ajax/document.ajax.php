@@ -5,6 +5,8 @@
  */
 require_once __DIR__.'/../global.inc.php';
 
+use \Defuse\Crypto;
+
 $action = $_REQUEST['a'];
 
 $em = Database::getManager();

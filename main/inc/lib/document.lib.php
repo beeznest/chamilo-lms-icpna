@@ -5850,7 +5850,7 @@ class DocumentManager
             $icon = choose_image($basename);
             $basename = substr(strrchr($basename, '.'), 1);
         } elseif ($type == CDocument::TYPE_FILE_ENCRYPTED) {
-            $icon = 'lock.png';
+            $icon = 'encrypted_audio.png';
             $basename = substr(strrchr($basename, '.'), 1);
         } else {
             if ($path == '/shared_folder') {

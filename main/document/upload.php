@@ -217,7 +217,7 @@ if (!empty($_FILES)) {
             Display::addFlash(
                 Display::return_message(get_lang('PassTwo'), 'error')
             );
-        } else {
+        } elseif (api_check_password($_POST['password1'])) {
             $uploadOk = DocumentManager::uploadEncryptedDocument(
                 $_FILES,
                 $_POST['curdirpath'],

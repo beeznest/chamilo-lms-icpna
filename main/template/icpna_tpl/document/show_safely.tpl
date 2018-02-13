@@ -25,12 +25,7 @@
             </button>
         </p>
         <div class="clearfix">
-            <div class="progress">
-                <div class="progress-bar progress-bar-striped active" id="player-progress" role="progressbar"
-                     aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
-                    0%
-                </div>
-            </div>
+            <input type="range" min="0" max="100" step="0.01" value="0" id="player-range" class="btn btn-default">
         </div>
     </div>
 </div>
@@ -43,18 +38,16 @@
             $('#player-duration').text(
                 parseTime(audio.duration)
             );
+            $('#player-range').attr('max', audio.duration);
         }
 
         function handleTimeUpdate() {
-            var percent = audio.currentTime / audio.duration * 100;
-            percent = percent.toFixed(2);
-
-            $('#player-progress').text(percent + '%').css('width', percent+'%').attr('aria-valuenow', percent);
+            $('#player-range').val(audio.currentTime);
             $('#player-current-time').text(
                 parseTime(audio.currentTime)
             );
 
-            if (percent >= 100.00) {
+            if (audio.currentTime >= audio.duration) {
                 $('#player-btn-stop').hide();
                 $('#player-btn-pause').hide();
                 $('#player-btn-play').show();
@@ -98,6 +91,13 @@
 
             audio.pause();
             audio.currentTime = 0;
+        });
+        $('#player-range').on('change', function () {
+            if (!audio) {
+                return;
+            }
+
+            audio.currentTime = this.value;
         });
 
         $('form#validate').on('submit', function (e) {

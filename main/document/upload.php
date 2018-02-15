@@ -44,7 +44,7 @@ $allowEncryptedUpload = api_get_configuration_value('document_upload_encrypted')
 $htmlHeadXtra[] = api_get_jquery_libraries_js(array('jquery-ui', 'jquery-upload'));
 
 if ($allowEncryptedUpload) {
-    $htmlHeadXtra[] = api_get_password_checker_js('#upload_title', '#password1');
+    $htmlHeadXtra[] = api_get_password_checker_js('#upload_title', '#password1', true);
 }
 
 // Variables
@@ -385,7 +385,7 @@ if ($allowEncryptedUpload) {
         ]
     );
     $frmEncrypt->addElement('html', '</div>');
-    $frmEncrypt->addButtonSend(get_lang('SendDocument'), 'encrypt_upload');
+    $frmEncrypt->addButtonSend(get_lang('SendDocument'), 'encrypt_upload', false, ['disabled' => 'disabled']);
     $frmEncrypt->addProgress('DocumentUpload', 'file');
     $frmEncrypt->addRule('file', get_lang('ThisFieldIsRequired'), 'required');
     $frmEncrypt->addRule('password1', get_lang('ThisFieldIsRequired'), 'required');

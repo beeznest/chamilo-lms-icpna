@@ -7311,9 +7311,10 @@ function api_get_user_info_from_official_code($officialCode)
 /**
  * @param string $usernameInputId
  * @param string $passwordInputId
+ * @param bool $blockSubmit Optional. If true then the form submit will be disabled
  * @return null|string
  */
-function api_get_password_checker_js($usernameInputId, $passwordInputId)
+function api_get_password_checker_js($usernameInputId, $passwordInputId, $blockSubmit = false)
 {
     $checkPass = api_get_setting('allow_strength_pass_checker');
     $useStrengthPassChecker = $checkPass === 'true';
@@ -7368,6 +7369,20 @@ function api_get_password_checker_js($usernameInputId, $passwordInputId)
                 return result === key ? '' : result; // This assumes you return the                
             }
         };
+    ";
+    if ($blockSubmit) {
+        $js .= "
+            options.common = {
+                onScore: function (options, word, totalScoreCalculated) {
+                    $('".$passwordInputId."').parents('form').find(':submit')
+                        .prop('disabled', totalScoreCalculated < options.ui.scores[3]);
+    
+                    return totalScoreCalculated;
+                }
+            };
+        ";
+    }
+    $js .= "
         $('".$passwordInputId."').pwstrength(options);
     });
     </script>";

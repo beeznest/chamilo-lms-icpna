@@ -7369,6 +7369,9 @@ function api_get_password_checker_js($usernameInputId, $passwordInputId, $blockS
                 return result === key ? '' : result; // This assumes you return the                
             }
         };
+        options.ui = {
+            showErrors: true
+        };
     ";
     if ($blockSubmit) {
         $js .= "

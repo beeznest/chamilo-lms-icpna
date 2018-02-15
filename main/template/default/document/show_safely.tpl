@@ -109,6 +109,10 @@
 
             this.reset();
 
+            frm.find(':submit')
+                .prop('disabled', true)
+                .html('<span class="fa fa-spinner fa-pulse"></span> {{ 'Waiting'|get_lang }}');
+
             function handleReponse(response) {
                 if (response.ok) {
                     return response.blob();
@@ -166,6 +170,10 @@
                             .addClass('has-error')
                             .find('.help-block')
                             .text(errorMessage);
+
+                        frm.find(':submit')
+                            .prop('disabled', false)
+                            .html('<span class="fa fa-arrow-right"></span> {{ 'Validate'|get_lang }}');
                     });
             }
 

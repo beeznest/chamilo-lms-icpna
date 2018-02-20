@@ -720,6 +720,55 @@ $_configuration['gradebook_badge_sidebar'] = [
 // Show skills as a hierarchical table
 //$_configuration['table_of_hierarchical_skill_presentation'] = false;
 
+// Restrict course chat only for course coach in sessions
+// Course coaches will can chat with students only. And students will can chat with all course coaches
+//$_configuration['course_chat_restrict_to_coach'] = false;
+
+// Allow teachers, drhs and admins to access blocked LP's because a prerequisite.
+//$_configuration['allow_teachers_to_access_blocked_lp_by_prerequisite'] = false;
+
+// Allow connect skills with course tools
+// Uncomment doctrine tags for Entities:
+//SkillRelItemRelUser|SkillRelItem|Skill.items
+// DB changes:
+/*
+CREATE TABLE skill_rel_item_rel_user (id INT AUTO_INCREMENT NOT NULL, skill_rel_item_id INT NOT NULL, user_id INT NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, created_by INT NOT NULL, updated_by INT NOT NULL, INDEX IDX_D1133E0DFD4B12DC (skill_rel_item_id), INDEX IDX_D1133E0DA76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
+CREATE TABLE skill_rel_item (id INT AUTO_INCREMENT NOT NULL, skill_id INT DEFAULT NULL, item_type INT NOT NULL, item_id INT NOT NULL, obtain_conditions VARCHAR(255) DEFAULT NULL, requires_validation TINYINT(1) NOT NULL, is_real TINYINT(1) NOT NULL, c_id INT DEFAULT NULL, session_id INT DEFAULT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, created_by INT NOT NULL, updated_by INT NOT NULL, INDEX IDX_EB5B2A0D5585C142 (skill_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
+ALTER TABLE skill_rel_item_rel_user ADD CONSTRAINT FK_D1133E0DFD4B12DC FOREIGN KEY (skill_rel_item_id) REFERENCES skill_rel_item (id);
+ALTER TABLE skill_rel_item_rel_user ADD CONSTRAINT FK_D1133E0DA76ED395 FOREIGN KEY (user_id) REFERENCES user (id);
+ALTER TABLE skill_rel_item ADD CONSTRAINT FK_EB5B2A0D5585C142 FOREIGN KEY (skill_id) REFERENCES skill (id);
+ALTER TABLE skill_rel_item_rel_user ADD result_id INT DEFAULT NULL;
+
+*/
+//$_configuration['allow_skill_rel_items'] = false;
+
+// Generate random login when importing users
+//$_configuration['generate_random_login'] = false;
+
+// Remove html tags when exporting glossary definitions in a CSV file
+//$_configuration['allow_remove_tags_in_glossary_export'] = false;
+
+// Show base course categories in portal children
+//$_configuration['allow_base_course_category'] = false;
+
+// Send two emails when creating a user. One with the username other with the password.
+//$_configuration['send_two_inscription_confirmation_mail'] = false;
+
+// LP view custom settings
+// $_configuration['lp_view_settings'] = ['display' => ['show_reporting_icon' => true]];
+
+// Force to hide the invisible course documents in sessions
+//$_configuration['hide_invisible_course_documents_in_sessions'] = false;
+
+// Show more expected choice and status in exercise results BT#13950
+//$_configuration['show_exercise_expected_choice'] = false;
+
+// Hide exercise question label (ribbon) BT#13950
+//$_configuration['exercise_hide_label'] = false;
+
+// Send welcome message by email and to the chamilo inbox BT#14034
+//$_configuration['send_inscription_msg_to_inbox'] = false;
+
 // ------ Custom DB changes
 // Add user activation by confirmation email
 // This option prevents the new user to login in the platform if your account is not confirmed via email

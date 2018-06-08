@@ -13,7 +13,7 @@ class IcpnaUpdateUserPlugin extends Plugin
     const DOCID_TYPE_PP = '6f03e7df-13d1-4076-a3f0-b69fd1b3551a';
 
     const OCCUPATION_TYPE_SCH = '528c79fa-a924-4091-b25b-3f870650cf93';
-    const OCCUPATION_TYPE_TEC = 'd4730b5f-e080-406d-846e-2f80c77f999';
+    const OCCUPATION_TYPE_TEC = 'd4730b5f-e080-406d-846e-2f80c77f999c';
     const OCCUPATION_TYPE_UNI = '41ce5c66-1884-4a0d-8f7d-062a1ecb9b79';
     const OCCUPATION_TYPE_TRA = '30080101-15fa-46de-ac6e-a9d9a3c3d26e';
 

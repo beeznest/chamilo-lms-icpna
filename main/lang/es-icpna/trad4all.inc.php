@@ -217,3 +217,4 @@ $ShowInModalDialogBox="¿Mostrar en caja de diálogo emergente?";
 $EncryptedFile="Archivo cifrado";
 $WrongPassword="Contraseña incorrecta";
 $EncryptedUpload="Subida (Con cifrado)";
+$MandatorySurveyNoAnswered="Estimado(a) Alumno (a): Porque valoramos tu opinión, te invitamos a desarrollar esta breve encuesta de satisfacción sobre el desempeño de tu docente.";

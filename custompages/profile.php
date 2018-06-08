@@ -185,7 +185,7 @@ $formRenderer->setElementTemplate(
             <div class="row">
                 <div class="col-sm-12">
                     <div class="alert alert-warning">
-                    Si eres menor de edad, es necesario registrar los datos de tu padre, madre o apoderado
+                    Si eres menor de edad, registre los datos de tu padre, madre o apoderado
                     </div>
                 </div>
             </div>
@@ -806,11 +806,12 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                 }
 
                 function onStudentBirthday() {
+                /*
                     $txtGuardianName.required(false);
                     $txtGuardianEmail.required(false);
                     $slctGuardianDocument.required(false);
                     $txtGuardianDocument.required(false);
-
+                */
                     var age = checkAge(),
                         occupationOptions = $slctOccupation.find('option').hide();
 
@@ -864,11 +865,12 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
 
                         return;
                     }
-
+                /*
                     $txtGuardianName.required(true);
                     $txtGuardianEmail.required(true);
                     $slctGuardianDocument.required(true);
                     $txtGuardianDocument.required(true);
+                 */
 
                     if (age >= 14 && age < 18) {
                         $modalTitle.html(

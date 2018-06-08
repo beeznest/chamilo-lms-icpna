@@ -13,7 +13,7 @@ require_once __DIR__.'/../../../main/inc/global.inc.php';
 
 $em = Database::getManager();
 
-$masterCourseCode = 'MSV';
+$masterCourseCode = 'SVM';
 /** @var \DateTime $today */
 $today = api_get_utc_datetime(null, false, true);
 $todayDate = $today->format('Y-m-d');

@@ -14,8 +14,16 @@ require_once __DIR__.'/../../../main/inc/global.inc.php';
 $em = Database::getManager();
 
 $masterCourseCode = 'SVM';
-/** @var \DateTime $today */
-$today = api_get_utc_datetime(null, false, true);
+
+$allowSurveyAvailabilityDatetime = api_get_configuration_value('allow_survey_availability_datetime');
+
+if ($allowSurveyAvailabilityDatetime) {
+    $timeZone = new DateTimeZone(api_get_timezone());
+    $today = new DateTime(api_get_local_time(), $timeZone);
+} else {
+    /** @var \DateTime $today */
+    $today = api_get_utc_datetime(null, false, true);
+}
 $todayDate = $today->format('Y-m-d');
 
 $result = Database::query("SELECT * FROM survey_calendar WHERE DATE(reply_date) = '$todayDate'");

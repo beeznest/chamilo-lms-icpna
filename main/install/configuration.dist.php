@@ -472,6 +472,10 @@ ALTER TABLE c_survey_question ADD is_required TINYINT(1) DEFAULT 0 NOT NULL;
 //$_configuration['hide_survey_edition'] = ['codes' => []];
 // Allow show a survey in a modal dialog box to ivitate the user to fill it
 //$_configuration['allow_survey_in_modal'] = false;
+// Allows to set the date and time of availability for surveys. Requires DB changes:
+// ALTER TABLE c_survey CHANGE avail_from avail_from DATETIME DEFAULT NULL, CHANGE avail_till avail_till DATETIME DEFAULT NULL;
+// Requires change the Doctrine type from date to datime in CSurvey::$availFrom and CSurvey::$availTill
+//$_configuration['allow_survey_availability_datetime'] = false;
 // ------
 
 // Allow career diagram, requires a DB change:

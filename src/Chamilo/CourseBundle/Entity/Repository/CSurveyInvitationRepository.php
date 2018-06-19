@@ -25,6 +25,7 @@ class CSurveyInvitationRepository extends EntityRepository
      */
     public function findOneToModal($userId, $courseId, $sessionId = 0)
     {
+        $allowSurveyAvailabilityDatetime = api_get_configuration_value('allow_survey_availability_datetime');
         $now = new \DateTime('UTC', new \DateTimeZone('UTC'));
 
         try {
@@ -45,7 +46,7 @@ class CSurveyInvitationRepository extends EntityRepository
                     'course' => $courseId,
                     'user' => $userId,
                     'session' => $sessionId,
-                    'now' => $now->format('Y-m-d')
+                    'now' => $allowSurveyAvailabilityDatetime ? $now->format('Y-m-d H:i:s') : $now->format('Y-m-d')
                 ])
                 ->getSingleResult();
         } catch (NoResultException $e) {

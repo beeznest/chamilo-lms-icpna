@@ -34,7 +34,7 @@ class CSurveyInvitationRepository extends EntityRepository
                 ->createQuery("
                         SELECT i FROM ChamiloCourseBundle:CSurveyInvitation i
                         INNER JOIN ChamiloCourseBundle:CSurvey s
-                            WITH (s.code = i.surveyCode AND s.cId = i.cId)
+                            WITH (s.code = i.surveyCode AND s.cId = i.cId AND s.sessionId = i.sessionId)
                         WHERE i.answered = 0
                             AND i.cId = :course
                             AND i.user = :user

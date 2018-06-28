@@ -7,7 +7,6 @@ use Doctrine\ORM\EntityRepository;
 use Chamilo\CourseBundle\Entity\CSurveyInvitation;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
-use Essence\Exception;
 
 /**
  * Class CSurveyInvitationRepository
@@ -16,12 +15,14 @@ use Essence\Exception;
 class CSurveyInvitationRepository extends EntityRepository
 {
     /**
-     * Find a survey invitation to be shown in modal dialog box
-     * Requires than allow_survey_in_modal is enabled in configuration file
-     * @param int $userId User ID
-     * @param int $courseId Course ID
-     * @param int $sessionId Optional. Session ID
-     * @return \Chamilo\CourseBundle\Entity\CSurveyInvitation|mixed|null
+     * Find a survey invitation to be shown in modal dialog box.
+     * Requires than allow_survey_in_modal is enabled in configuration file.
+     *
+     * @param int $userId    User ID.
+     * @param int $courseId  Course ID.
+     * @param int $sessionId Optional. Session ID.
+     *
+     * @return CSurveyInvitation|null
      */
     public function findOneToModal($userId, $courseId, $sessionId = 0)
     {
@@ -54,7 +55,7 @@ class CSurveyInvitationRepository extends EntityRepository
             $invitation = null;
         } catch (NonUniqueResultException $e) {
             $invitation = null;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $invitation = null;
         }
 

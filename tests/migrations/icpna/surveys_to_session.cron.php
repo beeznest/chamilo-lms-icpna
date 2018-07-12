@@ -103,7 +103,8 @@ while ($row = Database::fetch_assoc($result)) {
             $sessionCourse,
             $efSurvey['value'],
             new DateTime($row['start_date'], new DateTimeZone('UTC')),
-            new DateTime($row['end_date'], new DateTimeZone('UTC'))
+            new DateTime($row['end_date'], new DateTimeZone('UTC')),
+            !!$row['is_mandatory']
         );
     }
 }
@@ -111,12 +112,15 @@ while ($row = Database::fetch_assoc($result)) {
 echo 'Finish'.PHP_EOL;
 
 /**
- * @param \Chamilo\CoreBundle\Entity\Course $originCourse
+ * @param \Chamilo\CoreBundle\Entity\Course  $originCourse
  * @param \Chamilo\CoreBundle\Entity\Session $session
- * @param \Chamilo\CoreBundle\Entity\Course $sessionCourse
- * @param string $surveyCode
- * @param \DateTime $fixedDayToStart
- * @param \DateTime $fixedDayToEnd
+ * @param \Chamilo\CoreBundle\Entity\Course  $sessionCourse
+ * @param string                             $surveyCode
+ * @param \DateTime                          $fixedDayToStart
+ * @param \DateTime                          $fixedDayToEnd
+ *
+ * @param bool                               $isMandatory
+ *
  * @throws \Doctrine\ORM\ORMException
  * @throws \Doctrine\ORM\OptimisticLockException
  * @throws \Doctrine\ORM\TransactionRequiredException
@@ -127,7 +131,8 @@ function replicateInSessions(
     Course $sessionCourse,
     $surveyCode,
     DateTime $fixedDayToStart,
-    DateTime $fixedDayToEnd
+    DateTime $fixedDayToEnd,
+    $isMandatory = false
 ) {
     $em = Database::getManager();
 
@@ -171,6 +176,18 @@ function replicateInSessions(
             );
         $em->persist($newSurvey);
         $em->flush();
+
+        if ($isMandatory) {
+            $extraField = new ExtraFieldValue('survey');
+            $extraField->save(
+                [
+                    'variable' => 'is_mandatory',
+                    'value' => 1,
+                    'item_id' => $newSurveyId,
+                ]
+            );
+            echo "\t\tSurvey marked as mandatory".PHP_EOL;
+        }
 
         $_GET['survey_id'] = $newSurvey->getSurveyId();
         $_GET['course'] = $sessionCourse->getCode();

@@ -144,7 +144,7 @@ function replicateInSessions(
 
     /** @var CSurvey $survey */
     foreach ($courseSurveys as $survey) {
-        if (strpos($survey->getCode(), $surveyCode) === false) {
+        if ($survey->getCode() != $surveyCode) {
             continue;
         }
 

@@ -1271,7 +1271,7 @@ $form->addHtml('<div class="start-survey">');
 if ($survey_data['survey_type'] === '0') {
     if ($survey_data['show_form_profile'] == 0) {
         // The normal survey as always
-        if (($show < $numberofpages) || !$_GET['show']) {
+        if (($show < $numberofpages)) {
             if ($show == 0) {
                 $form->addButton(
                     'next_survey_page',
@@ -1288,7 +1288,7 @@ if ($survey_data['survey_type'] === '0') {
                 );
             }
         }
-        if ($show >= $numberofpages && $_GET['show']) {
+        if ($show >= $numberofpages) {
             $form->addButton(
                 'finish_survey',
                 get_lang('FinishSurvey'),
@@ -1300,7 +1300,7 @@ if ($survey_data['survey_type'] === '0') {
         // The normal survey as always but with the form profile
         if (isset($_GET['show'])) {
             $numberofpages = count($paged_questions);
-            if (($show < $numberofpages) || !$_GET['show']) { //$show = $_GET['show'] + 1
+            if (($show < $numberofpages)) { //$show = $_GET['show'] + 1
                 if ($show == 0) {
                     $form->addButton(
                         'next_survey_page',
@@ -1318,7 +1318,7 @@ if ($survey_data['survey_type'] === '0') {
                 }
             }
 
-            if ($show >= $numberofpages && $_GET['show']) {
+            if ($show >= $numberofpages) {
                 $form->addButton(
                     'finish_survey',
                     get_lang('FinishSurvey'),

@@ -489,19 +489,7 @@ $form->insertElementBefore(
 
 // Translate chamilo default profile elements
 $form->getElement('firstname')->_label = get_lang('FirstName', null, 'es-icpna', true);
-$form->getElement('firstname')->setAttribute('maxlength', 30);
-$form->getElement('firstname')->setAttribute('pattern', '[a-zA-Zá-úÁ-ÚñÑ]+[a-zA-Zá-úÁ-ÚñÑ\s\-]*');
-$form->getElement('firstname')->setAttribute('title', get_lang('OnlyLetters', null, 'spanish', true));
-$form->getElement('extra_middle_name')->setAttribute('maxlength', 30);
-$form->getElement('extra_middle_name')->setAttribute('pattern', '[a-zA-Zá-úÁ-ÚñÑ]+[a-zA-Zá-úÁ-ÚñÑ\s\-]*');
-$form->getElement('extra_middle_name')->setAttribute('title', get_lang('OnlyLetters', null, 'spanish', true));
 $form->getElement('lastname')->_label = get_lang('LastName', null, 'es-icpna', true);
-$form->getElement('lastname')->setAttribute('maxlength', 30);
-$form->getElement('lastname')->setAttribute('pattern', '[a-zA-Zá-úÁ-ÚñÑ]+[a-zA-Zá-úÁ-ÚñÑ\s\-]*');
-$form->getElement('lastname')->setAttribute('title', get_lang('OnlyLetters', null, 'spanish', true));
-$form->getElement('extra_mothers_name')->setAttribute('maxlength', 30);
-$form->getElement('extra_mothers_name')->setAttribute('pattern', '[a-zA-Zá-úÁ-ÚñÑ]+[a-zA-Zá-úÁ-ÚñÑ\s\-]*');
-$form->getElement('extra_mothers_name')->setAttribute('title', get_lang('OnlyLetters', null, 'spanish', true));
 $form->getElement('email')->_label = get_lang('Email', null, 'spanish', true);
 $form->getElement('email')->setAttribute('maxlength', 50);
 $form->getElement('email')->setAttribute('type', 'email');
@@ -539,6 +527,8 @@ $form->getElement('extra_guardian_name')->setAttribute('maxlength', 60);
 $form->getElement('extra_guardian_name')->setAttribute('pattern', '[a-zA-Zá-úÁ-ÚñÑ]+[a-zA-Zá-úÁ-ÚñÑ\s\-]*');
 $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
 $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
+
+$form->freeze(['extra_middle_name', 'extra_mothers_name']);
 ?>
 
     <div class="row">
@@ -662,8 +652,6 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
             $(document).ready(function () {
                 var $slctDocument = $('#extra_id_document_type'),
                     $txtDocument = $('#extra_id_document_number'),
-                    $txtFirstname = $('#profile_firstname'),
-                    $txtLastname = $('#profile_lastname'),
                     $divGuardian = $('#guardian_div'),
                     $modalTitle = $('#title-modal'),
                     $modalText = $('#text-modal'),
@@ -697,6 +685,8 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                     $txtPicture = $('#picture'),
                     url = _p.web_plugin + 'icpna_update_user/ajax.php',
                     $form = $('form#profile');
+
+                $('#extra_middle_name, #extra_mothers_name').remove();
 
                 $form.get(0).onsubmit = null;
                 $form.on('submit', function (e) {
@@ -1208,8 +1198,6 @@ $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
                         }
                     });
                 });
-                $txtFirstname.required(true);
-                $txtLastname.required(true);
                 $txtEmail.required(true).on('change', function () {
                     validateEmail(this);
                 });

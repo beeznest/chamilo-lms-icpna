@@ -716,6 +716,7 @@ if ($form->validate()) {
     Session::write('_user', $userInfo);
 
     if ($hook) {
+        $hook->setEventData(['user' => $user]);
         $hook->notifyUpdateUser(HOOK_EVENT_TYPE_POST);
     }
 

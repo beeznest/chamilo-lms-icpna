@@ -1246,8 +1246,11 @@ class MigrationCustom
         global $data_list;
         $user_id = self::getUserIDByPersonaID($uidIdPersonaId, $data_list);
         if ($user_id) {
-            $user_info = Migration::soap_call($web_service_details, 'usuarioDetalles',
-                array('intIdSede' => $data['branch_id'], 'uididpersona' => $uidIdPersonaId));
+            $user_info = Migration::soap_call(
+                $web_service_details,
+                'usuarioDetalles',
+                ['intIdSede' => $data['branch_id'], 'uididpersona' => $uidIdPersonaId]
+            );
             if ($user_info['error'] == false) {
                 unset($user_info['error']);
                 //Edit user
@@ -1259,8 +1262,18 @@ class MigrationCustom
                     $user_info['lastname'],
                     $user_info['username'],
                     $user_info['password'],
-                    null,
-                    $user_info['email']
+                    $chamilo_user_info_before['auth_source'],
+                    $user_info['email'],
+                    $chamilo_user_info_before['status'],
+                    $chamilo_user_info_before['official_code'],
+                    $chamilo_user_info_before['phone'],
+                    $chamilo_user_info_before['picture_uri'],
+                    $chamilo_user_info_before['expiration_date'],
+                    $chamilo_user_info_before['active'],
+                    $chamilo_user_info_before['creator_id'],
+                    $chamilo_user_info_before['hr_dept_id'],
+                    [],
+                    $chamilo_user_info_before['language']
                 );
                 $chamilo_user_info = api_get_user_info($user_id, false, false, true);
                 // We extra-update the user to set a password that works with the salt

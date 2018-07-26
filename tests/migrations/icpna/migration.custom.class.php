@@ -1254,7 +1254,7 @@ class MigrationCustom
                 $user_info['user_id'] = $user_id;
                 $chamilo_user_info_before = api_get_user_info($user_id, false, false, true);
                 UserManager::update_user(
-                    $user_info['id'],
+                    $user_info['user_id'],
                     $user_info['firstname'],
                     $user_info['lastname'],
                     $user_info['username'],

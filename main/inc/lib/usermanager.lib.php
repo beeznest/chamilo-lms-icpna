@@ -2714,20 +2714,48 @@ class UserManager
             ";
         }
 
+        /*
         $dql .= "
                 WHERE (scu.user = :user OR s.generalCoach = :user) AND url.accessUrlId = :url
                 ORDER BY sc.name, s.name";
+        */
+        // The OR operation on scu.user = :user OR s.generalCoach = :user is
+        // awfully inefficient (1m25s, BT#14115) but executing a similar query
+        // twice and grouping the results takes about 1/1000th time
+        // (0.1s + 0.0s) for the same set of data, so do it that way
+        $trail = ' AND url.accessUrlId = :url ORDER BY sc.name, s.name';
 
-        $dql = Database::getManager()
-            ->createQuery($dql)
+        $dqlStudent = $dql." WHERE scu.user = :user ".$trail;
+        $dqlCoach = $dql." WHERE s.generalCoach = :user ".$trail;
+
+        $accessUrlId = api_get_current_access_url_id();
+        $dqlStudent = Database::getManager()
+            ->createQuery($dqlStudent)
             ->setParameters(
-                ['user' => $user_id, 'url' => api_get_current_access_url_id()]
+                ['user' => $user_id, 'url' => $accessUrlId]
             )
         ;
+        $dqlCoach = Database::getManager()
+            ->createQuery($dqlCoach)
+            ->setParameters(
+                ['user' => $user_id, 'url' => $accessUrlId]
+            )
+        ;
+        $sessionDataStudent = $dqlStudent->getResult();
+        $sessionDataCoach = $dqlCoach->getResult();
 
-        $sessionData = $dql->getResult();
+        $sessionData = [];
+        // First fill $sessionData with student sessions
+        foreach ($sessionDataStudent as $row) {
+            $sessionData[$row['id']] = $row;
+        }
+        // Overwrite session data of the student with session data of the coach
+        // There shouldn't be such a duplicate subscription, but just in case.
+        foreach ($sessionDataCoach as $row) {
+            $sessionData[$row['id']] = $row;
+        }
+
         $categories = [];
-
         foreach ($sessionData as $row) {
             $session_id = $row['id'];
             $coachList = SessionManager::getCoachesBySession($session_id);
@@ -2783,7 +2811,7 @@ class UserManager
                 }
             }
 
-            if (!$userIsTeacher && $row['movedStatus'] != 0) {
+            if ($row['movedStatus'] != 0) {
                 continue;
             }
 

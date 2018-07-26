@@ -1117,6 +1117,7 @@ class UserManager
         }
 
         if (!empty($hook)) {
+            $hook->setEventData(['user_id' => $user->getId()]);
             $hook->notifyUpdateUser(HOOK_EVENT_TYPE_POST);
         }
 

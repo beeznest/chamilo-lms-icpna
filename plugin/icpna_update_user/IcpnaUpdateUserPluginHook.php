@@ -94,7 +94,7 @@ class IcpnaUpdateUserPluginHook extends HookObserver implements HookUpdateUserOb
             return false;
         }
 
-        $user = api_get_user_entity($data['return']);
+        $user = api_get_user_entity($data['user_id']);
         $extraData = UserManager::get_extra_user_data($user->getId(), true);
 
         if (!isset($extraData['extra_uididpersona'])) {

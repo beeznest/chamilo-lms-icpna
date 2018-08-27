@@ -93,6 +93,8 @@ while ($row = Database::fetch_assoc($result)) {
 
         ChamiloSession::write('id_session', $session->getId());
         ChamiloSession::write('_real_cid', $sessionCourse->getId());
+        /** @var array $_course Global variable about course info */
+        $_course = api_get_course_info_by_id($sessionCourse->getId());
 
         $efv = new ExtraFieldValue('course');
         $efSurvey = $efv->get_values_by_handler_and_field_variable($sessionCourse->getId(), 'survey');

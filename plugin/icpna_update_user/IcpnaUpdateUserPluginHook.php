@@ -104,6 +104,10 @@ class IcpnaUpdateUserPluginHook extends HookObserver implements HookUpdateUserOb
 
         $wsUserInfo = IcpnaUpdateUserPlugin::create()->getUserInfo($extraData['extra_uididpersona']);
 
+        if (empty($wsUserInfo)) {
+            return false;
+        }
+
         $this->updateUserInfo($user, $wsUserInfo);
         $this->updateUserExtraInfo($user, $extraData, $wsUserInfo);
         $this->updateSessionUserInfo($user);

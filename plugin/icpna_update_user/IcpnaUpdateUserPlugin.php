@@ -353,6 +353,11 @@ class IcpnaUpdateUserPlugin extends Plugin
     public function getUserInfo($uididPersona)
     {
         $tableResult = $this->getTableResult('obtienedatospersonales', ['uididpersona' => $uididPersona]);
+
+        if (empty($tableResult)) {
+            return [];
+        }
+
         $tableResult = self::filterResult(
             self::stringifyResult($tableResult)
         );

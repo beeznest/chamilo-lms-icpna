@@ -63,12 +63,14 @@
                                     </div>
                                 </li>
                                 <li role="separator" class="divider"></li>
-                                <li class="user-body">
-                                    <a href="{{ profile_url }}">
-                                        <span class="fa fa-pencil-square-o" aria-hidden="true"></span>
-                                        {{ 'EditStudentInformation'|get_lang }}
-                                    </a>
-                                </li>
+                                {% if _u.status != 1 %}
+                                    <li class="user-body">
+                                        <a href="{{ profile_url }}">
+                                            <span class="fa fa-pencil-square-o" aria-hidden="true"></span>
+                                            {{ 'EditStudentInformation'|get_lang }}
+                                        </a>
+                                    </li>
+                                {% endif %}
                                 <li class="user-body">
                                     <a title="{{ "Inbox"|get_lang }}" href="{{ message_url }}">
                                         <em class="fa fa-envelope" aria-hidden="true"></em> {{ "Inbox"|get_lang }}

@@ -16,6 +16,10 @@ use ChamiloSession as Session;
 $cidReset = true;
 require_once __DIR__.'/../inc/global.inc.php';
 
+if (!api_is_student()) {
+    api_not_allowed(true);
+}
+
 if (api_get_setting('allow_social_tool') == 'true') {
     $this_section = SECTION_SOCIAL;
 } else {

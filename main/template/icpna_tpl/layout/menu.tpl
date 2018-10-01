@@ -63,7 +63,7 @@
                                     </div>
                                 </li>
                                 <li role="separator" class="divider"></li>
-                                {% if _u.status != 1 %}
+                                {% if _u.status == 5 %}
                                     <li class="user-body">
                                         <a href="{{ profile_url }}">
                                             <span class="fa fa-pencil-square-o" aria-hidden="true"></span>

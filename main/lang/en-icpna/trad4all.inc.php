@@ -16,3 +16,4 @@ $ResetFieldX="Reiniciar %s";
 $EncryptedFile="Archivo cifrado";
 $WrongPassword="Wrong password";
 $EncryptedUpload="Encrypted upload";
+$EditProfileNotAllowed="The option to modify personal information is not available to teachers. Please, contact your branch management area if needed.";

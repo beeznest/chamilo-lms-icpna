@@ -17,7 +17,10 @@ $cidReset = true;
 require_once __DIR__.'/../inc/global.inc.php';
 
 if (!api_is_student()) {
-    api_not_allowed(true);
+    api_not_allowed(
+        true,
+        Display::return_message(get_lang('EditProfileNotAllowed'), 'warning')
+    );
 }
 
 if (api_get_setting('allow_social_tool') == 'true') {

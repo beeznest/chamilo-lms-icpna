@@ -7,5 +7,6 @@
 $matches['web_service_calls'] = array(       
     'url' => "http://***/***/***?wsdl",
     'filename' => 'migration.custom.class.php',
-    'class' => 'MigrationCustom',       
+    'class' => 'MigrationCustom',
+    'accessUrlId' => 0,
 );

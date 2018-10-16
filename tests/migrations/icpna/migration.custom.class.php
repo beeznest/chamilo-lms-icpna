@@ -1619,7 +1619,7 @@ class MigrationCustom
      */
     static function transaction_8($data, $web_service_details)
     {
-        global $data_list;
+        global $data_list, $matches;
         $session_info = Migration::soap_call($web_service_details, 'programaDetalles',
             array('intIdSede' => $data['branch_id'], 'uididprograma' => $data['item_id']));
 
@@ -1665,7 +1665,8 @@ class MigrationCustom
                 null,
                 $extra,
                 null,
-                null
+                null,
+                $matches['accessUrlId'] ? ((int) $matches['accessUrlId']) : null
             );
             //$session_id = SessionManager::add($session_info);
             $session_info = api_get_session_info($session_id);

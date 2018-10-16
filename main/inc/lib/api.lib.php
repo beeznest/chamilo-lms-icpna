@@ -5816,7 +5816,11 @@ function api_get_current_access_url_id() {
     $result = Database::query($sql);
     if (Database::num_rows($result) > 0) {
         $access_url_id = Database::result($result, 0, 0);
-        return $access_url_id;
+        if ($access_url_id === false) {
+            return -1;
+        }
+
+        return (int) $access_url_id;
     }
     //if the url in WEB_PATH was not found, it can only mean that there is
     // either a configuration problem or the first URL has not been defined yet

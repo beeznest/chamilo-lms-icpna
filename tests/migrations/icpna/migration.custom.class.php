@@ -1492,13 +1492,17 @@ class MigrationCustom
      */
     static function transaction_5($data, $web_service_details)
     {
-        global $data_list;
+        global $data_list, $matches;
         $uidCursoId = $data['item_id'];
         $course_info = Migration::soap_call($web_service_details, 'cursoDetalles',
             array('intIdSede' => $data['branch_id'], 'uididcurso' => $uidCursoId));
         if ($course_info['error'] == false) {
             unset($course_info['error']);
-            $course_info = CourseManager::create_course($course_info);
+            $course_info = CourseManager::create_course(
+                $course_info,
+                0,
+                isset($matches['accessUrlId']) ? (int) $matches['accessUrlId'] : 1
+            );
             $course_info = api_get_course_info($course_info['code'], true);
             if (!empty($course_info)) {
                 $data_list['courses'][$uidCursoId] = $course_info['code'];

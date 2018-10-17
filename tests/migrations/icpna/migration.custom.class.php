@@ -4193,6 +4193,8 @@ class MigrationCustom
         $uididpersona
     ) {
 
+        global $matches;
+
         if (empty($uididpersona)) {
             return false;
         }
@@ -4261,11 +4263,13 @@ class MigrationCustom
             $sql = "UPDATE $t_user SET user_id = $return WHERE id = $return";
             Database::query($sql);
 
-            if (api_get_multiple_access_url()) {
-                UrlManager::add_user_to_url($userId, api_get_current_access_url_id());
+            if (!empty($matches['accessUrlId'])) {
+                UrlManager::add_user_to_url($userId, $matches['accessUrlId']);
             } else {
                 //we are adding by default the access_url_user table with access_url_id = 1
-                UrlManager::add_user_to_url($userId, 1);
+                $currentAccessUrlId = api_get_multiple_access_url() ? api_get_current_access_url_id(): 1;
+
+                UrlManager::add_user_to_url($userId, $currentAccessUrlId);
             }
 
             //$extraData = self::get_extra_user_data_custom_ws();

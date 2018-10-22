@@ -939,14 +939,25 @@ class CourseBuilder
 
     /**
      * Build the Survey Questions
+     *
      * @param int $courseId Internal course ID
+     *
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function build_survey_questions($courseId)
     {
         $table_que = Database::get_course_table(TABLE_SURVEY_QUESTION);
         $table_opt = Database::get_course_table(TABLE_SURVEY_QUESTION_OPTION);
 
+        $courseId = (int) $courseId;
+        $idList = isset($this->specific_id_list['surveys']) ? $this->specific_id_list['surveys'] : [];
+
         $sql = 'SELECT * FROM '.$table_que.' WHERE c_id = '.$courseId.'  ';
+
+        if (!empty($idList)) {
+            $sql .= " AND survey_id IN (".implode(', ', $idList).")";
+        }
+
         $db_result = Database::query($sql);
         $is_required = 0;
         while ($obj = Database::fetch_object($db_result)) {

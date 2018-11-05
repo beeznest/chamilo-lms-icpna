@@ -663,9 +663,9 @@ class TestCategory
     */
     public static function sortTabByBracketLabel($in_tab)
     {
-        $tabResult = array();
-        $tabCatName = array(); // tab of category name
-        while (list($cat_id, $tabquestion) = each($in_tab)) {
+        $tabResult = [];
+        $tabCatName = []; // tab of category name
+        foreach ($in_tab as $cat_id => $tabquestion) {
             $category = new TestCategory();
             $category = $category->getCategory($cat_id);
             $tabCatName[$cat_id] = $category->name;
@@ -674,7 +674,7 @@ class TestCategory
         // sort table by value, keeping keys as they are
         asort($tabCatName);
         // keys of $tabCatName are keys order for $in_tab
-        while (list($key, $val) = each($tabCatName)) {
+        foreach ($tabCatName as $key => $val) {
             $tabResult[$key] = $in_tab[$key];
         }
 

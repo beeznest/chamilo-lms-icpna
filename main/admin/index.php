@@ -107,6 +107,8 @@ if (api_is_platform_admin()) {
     if (isset($extAuthSource) && isset($extAuthSource['extldap']) && count($extAuthSource['extldap']) > 0) {
         $items[] = array('url' => 'ldap_users_list.php', 'label' => get_lang('ImportLDAPUsersIntoPlatform'));
     }
+
+    $items[] = array('url' => 'extra_fields.php?type=user', 'label' => get_lang('ManageUserFields'));
 } else {
     $items = [
         array('url' => 'user_list.php', 'label' => get_lang('UserList')),

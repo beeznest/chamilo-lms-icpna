@@ -2812,7 +2812,7 @@ class UserManager
                 }
             }
 
-            if ($row['movedStatus'] != 0) {
+            if (isset($row['movedStatus']) && $row['movedStatus'] != 0) {
                 continue;
             }
 

@@ -1,0 +1,23 @@
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <form id="loginForm" name="loginForm" method="post" action="{{ path }}">
+            <input name="login" id="login" value="{{ username }}" type="hidden">
+            <input name="password" id="password" value="{{ password }}" type="hidden">
+        </form>
+        <p class="lead">{{ 'Loading'|get_lang }}</p>
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped active" role="presentation" aria-valuenow="100"
+                 aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                <span class="sr-only">{{ 'Loading'|get_lang }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).on('ready', function () {
+        var $loginForm = $('#loginForm');
+
+        $loginForm.trigger('submit');
+    });
+</script>

@@ -2953,8 +2953,10 @@ function api_is_allowed_to_edit(
     $is_allowed_coach_to_edit = api_is_coach(null, null, $check_student_view);
     $session_visibility = api_get_session_visibility($sessionId);
 
+    $allowSessionAdminEdit = api_get_configuration_value('session_admins_edit_courses_content') === true;
+
     // Admins can edit anything.
-    if (api_is_platform_admin(false)) {
+    if (api_is_platform_admin($allowSessionAdminEdit)) {
         //The student preview was on
         if ($check_student_view &&
             isset($_SESSION['studentview']) &&

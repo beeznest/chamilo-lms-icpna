@@ -813,8 +813,8 @@ if (!empty($_SESSION['_user']['user_id']) && !($login || $logout)) {
         }
     }
     $uidReset = true;
-    //    $cidReset = true;
-    //    $gidReset = true;
+    $cidReset = true;
+    $gidReset = true;
 } // end else
 
  // Now check for anonymous user mode

@@ -7562,8 +7562,8 @@ function api_can_login_as($loginAsUserId, $userId = null)
         }
     }
 
-    $userInfo = api_get_user_info($userId);
-    $isDrh = function() use($loginAsUserId) {
+    $userInfo = api_get_user_info($loginAsUserId);
+    $isDrh = function () use ($loginAsUserId) {
         if (api_is_drh()) {
             if (api_drh_can_access_all_session_content()) {
                 $users = SessionManager::getAllUsersFromCoursesFromAllSessionFromStatus(

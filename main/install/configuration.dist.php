@@ -777,7 +777,226 @@ ALTER TABLE skill_rel_item_rel_user ADD result_id INT DEFAULT NULL;
 // Send welcome message by email and to the chamilo inbox BT#14034
 //$_configuration['send_inscription_msg_to_inbox'] = false;
 
-// ------ Custom DB changes
+// Allow administrators to see personal messages between a teacher and a student.
+// Please make sure you include a note in your terms and conditions as this might
+// affect privacy protection.
+//$_configuration['allow_user_message_tracking'] = false;
+
+// Add a portfolio tool (duplicating the Notebook tool). Requires DB changes:
+/*
+CREATE TABLE portfolio (id INT AUTO_INCREMENT NOT NULL, user_id INT NOT NULL, c_id INT DEFAULT NULL, session_id INT DEFAULT NULL, category_id INT DEFAULT NULL, title VARCHAR(255) NOT NULL, content LONGTEXT NOT NULL, creation_date DATETIME NOT NULL, update_date DATETIME NOT NULL, is_visible TINYINT(1) DEFAULT '1' NOT NULL, INDEX user (user_id), INDEX course (c_id), INDEX session (session_id), INDEX category (category_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
+CREATE TABLE portfolio_category (id INT AUTO_INCREMENT NOT NULL, user_id INT NOT NULL, title VARCHAR(255) NOT NULL, description LONGTEXT DEFAULT NULL, is_visible TINYINT(1) DEFAULT '1' NOT NULL, INDEX user (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
+ALTER TABLE portfolio ADD CONSTRAINT FK_A9ED1062A76ED395 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE;
+ALTER TABLE portfolio ADD CONSTRAINT FK_A9ED106291D79BD3 FOREIGN KEY (c_id) REFERENCES course (id) ON DELETE CASCADE;
+ALTER TABLE portfolio ADD CONSTRAINT FK_A9ED1062613FECDF FOREIGN KEY (session_id) REFERENCES session (id) ON DELETE CASCADE;
+ALTER TABLE portfolio ADD CONSTRAINT FK_A9ED106212469DE2 FOREIGN KEY (category_id) REFERENCES portfolio_category (id) ON DELETE SET NULL;
+ALTER TABLE portfolio_category ADD CONSTRAINT FK_7AC64359A76ED395 FOREIGN KEY (user_id) REFERENCES user (id);
+INSERT INTO settings_current(variable, subkey, type, category, selected_value, title, comment, scope, subkeytext, access_url_changeable) VALUES('course_create_active_tools','portfolio','checkbox','Tools','true','CourseCreateActiveToolsTitle','CourseCreateActiveToolsComment',NULL,'Portfolio', 0);
+*/
+// In 1.11.8, before enabling this feature, you also need to:
+// - edit src/Chamilo/CoreBundle/Entity/Portfolio.php and PortfolioCategory.php
+//   and follow the instructions about the @ORM\Entity() line
+// - launch composer install to rebuild the autoload.php
+//$_configuration['allow_portfolio_tool'] = false;
+
+// Enable best score column in gradebook. Previously called disable_gradebook_stats
+//$_configuration['gradebook_enable_best_score'] = false;
+
+// Allow teachers to access student skills BT#14161 (skills setting must be enabled in the platform)
+//$_configuration['allow_teacher_access_student_skills'] = false;
+
+// Allow sharing options for the documents inside a group
+//ALTER TABLE c_group_info ADD document_access INT DEFAULT 0 NOT NULL;
+//$_configuration['group_document_access'] = false;
+
+// Allow sharing options for the documents inside a group category
+//ALTER TABLE c_group_category ADD document_access INT DEFAULT 0 NOT NULL;
+//$_configuration['group_category_document_access'] = false;
+
+// Allow LP export to chamilo format (CourseBackup)
+//$_configuration['allow_lp_chamilo_export'] = false;
+
+// Allow exercise auto launch
+//$_configuration['allow_exercise_auto_launch'] = false;
+// ALTER TABLE c_quiz ADD autolaunch TINYINT(1) DEFAULT 0;
+
+// Enable speed controller in video player
+// $_configuration['video_features'] = ['features' => ['speed']];
+
+// Disable token verification when sending a message
+// $_configuration['disable_token_in_new_message'] = false;
+
+// My courses session order. Possible field values: "start_date" or "end_date". Order values: "asc" or "desc"
+// $_configuration['my_courses_session_order'] = ['field' => 'end_date', 'order' => 'desc'];
+
+// Allow set courses in session in read-only mode. Require DB changes:
+/*
+INSERT INTO extra_field (extra_field_type, field_type, variable, display_text, visible_to_self, changeable, filter, created_at)
+VALUES (2, 13, 'session_courses_read_only_mode', 'Lock Course In Session', 1, 1, 1, NOW());
+*/
+// $_configuration['session_courses_read_only_mode'] = false;
+
+// Allow SCORM packages when importing a course
+// $_configuration['allow_import_scorm_package_in_course_builder'] = false;
+
+// Hide announcement "sent to" label
+// $_configuration['hide_announcement_sent_to_users_info'] = false;
+
+// Hide gradebook graph
+// $_configuration['gradebook_hide_graph'] = false;
+
+// Hide gradebook "download report in PDF" button
+// $_configuration['gradebook_hide_pdf_report_button'] = false;
+
+// Show pending survey link in user menu
+// $_configuration['show_pending_survey_in_menu'] = false;
+
+// GDPR: European's General Data Protection Rules activation option
+// Set to true to disable the new personal data page inside the social network menu
+// $_configuration['disable_gdpr'] = true;
+
+// GDPR requires users to be informed of the Data Protection Officer name and contact point
+// These can only be defined here for now, but will be moved to web settings in the future.
+// Name of the person or organization that is responsible for the treatment of personal info
+//$_configuration['data_protection_officer_name'] = '';
+// A description of the role of the DP Officer in this context
+//$_configuration['data_protection_officer_role'] = '';
+// An e-mail address where to contact the data protection officer for queries
+//$_configuration['data_protection_officer_email'] = '';
+
+// Show multiple conditions to user during sign up process
+// Example with a GDPR condition
+/*$_configuration['show_conditions_to_user'] = [
+    'conditions' => [
+        [
+            'variable' => 'gdpr', // internal extra field name
+            'display_text' => 'GDPRTitle', // checkbox title will be translated with get_lang('GDPRTitle')
+            'text_area' => 'GDPRTextArea', // this will be translated using get_lang('GDPRTextArea')
+        ],
+        [
+            'variable' => 'my_terms',
+            'display_text' => 'My test conditions',
+            'text_area' => 'This is a long text area, with lot of terms and conditions ... ',
+        ],
+    ],
+];*/
+
+// Hide LP item prerequisite label in the LP view
+//$_configuration['hide_accessibility_label_on_lp_item'] = true;
+
+// Round score in exercise category export
+//$_configuration['exercise_category_round_score_in_export'] = false;
+
+// Redirect index to url for logged in users
+// In this example the index.php will be redirected to user_portal.php for logged in users
+//$_configuration['redirect_index_to_url_for_logged_users'] = 'user_portal.php';
+
+// Teachers can CRUD classes
+// ALTER TABLE usergroup ADD author_id INT DEFAULT NULL;
+//$_configuration['allow_teachers_to_classes'] = false;
+
+// Validate user login via a webservice, Chamilo will send a "login" and "password" parameters
+// to the "myWebServiceFunctionToLogin" function, the result should be "1" if the user have access.
+/*$_configuration['webservice_validation'] = [
+    'options' => [
+        'wsdl' => 'https://example.com/soap?wsdl',
+        'check_login_function' => 'myWebServiceFunctionToLogin'
+    ]
+];*/
+
+// Hide the username when showing the complete name for a user.
+// Example: using api_get_user_info()['complete_name_with_username'] or $user->getCompleteNameWithUsername()
+//$_configuration['hide_username_with_complete_name'] = false;
+
+// Hide the username in course chat
+//$_configuration['hide_username_in_course_chat'] = false;
+
+// Allow multiple attempts in gradebook evaluations
+// CREATE TABLE gradebook_result_attempt (id INT AUTO_INCREMENT NOT NULL, result_id INT NOT NULL, score DOUBLE, comment LONGTEXT DEFAULT NULL, created_at DATETIME, updated_at DATETIME, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
+//$_configuration['gradebook_multiple_evaluation_attempts'] = false;
+
+// Hide country flags in the language switcher
+// $_configuration['hide_flag_language_switcher'] = false;
+
+// Hide complete name in who is online page
+// $_configuration['hide_complete_name_in_whoisonline'] = false;
+
+// Block student publication edition BT#14985
+// $_configuration['block_student_publication_edition'] = false;
+
+// Block student publication add documents BT#14986
+//$_configuration['block_student_publication_add_documents'] = false;
+
+// Block student publication score edition BT#14987
+// $_configuration['block_student_publication_score_edition'] = false;
+
+// Enable system to manage e-mail templates in users registration forms
+/*CREATE TABLE mail_template(
+  id int not null primary key auto_increment,
+  name varchar(255) not null, -- a friendly name for the template, to remember what it is like
+  template text, -- the template content (in Twig format)
+  type varchar(255) not null, -- the type of the mail (we can use current template names to fill that)
+  created_at DATETIME NOT NULL,
+  updated_at DATETIME NOT NULL,
+  author_id INT NOT NULL,
+  url_id INT NOT NULL,
+  default_template TINYINT not null,
+  system int not null default 0 -- whether it can be deleted or not (system = 1 means it's initially from Chamilo, any other template can be created/deleted/edited, but the ones with system=1 cannot)
+);*/
+// $_configuration['mail_template_system'] = false;
+
+// Students can only upload one publication
+// $_configuration['allow_only_one_student_publication_per_user'] = false;
+
+// Hide percentage in best/average gradebook results
+//$_configuration['hide_gradebook_percentage_user_result'] = true;
+
+// Use exercise platform score settings in the gradebook graph
+// $_configuration['gradebook_use_exercise_score_settings_in_categories'] = true;
+
+// Activate the view with ViewerJS for PDF files within the lessons for IPad and IPhone
+// $_configuration['allow_pdf_viewerjs_in_lp'] = false;
+
+// Allow DRH user to access all visible session course announcements
+// $_configuration['allow_drh_access_announcement'] = false;
+
+// Allow my personal files link in the homepage
+// $_configuration['allow_my_files_link_in_homepage'] = false;
+
+// This option sets default parameters in the main/session/session_import.php
+/*$_configuration['session_import_settings'] = [
+    'options' =>  [
+        'session_exists_default_option' => '1',
+        'send_mail_default_option' => '1',
+    ]
+];*/
+
+// This option sets default parameters in the main/admin/user_import.php
+/*$_configuration['user_import_settings'] = [
+    'options' =>  [
+        'send_mail_default_option' => '1',
+    ]
+];*/
+
+// Disable all new exercise attempts in all the platform
+// $_configuration['exercises_disable_new_attempts'] = false;
+
+// Improve speed when rendering gradebook student reports using Doctrine APCU cache
+// $_configuration['gradebook_use_apcu_cache'] = true;
+
+// Add collapsable option for user course categories
+// ALTER TABLE user_course_category ADD collapsed TINYINT(1) DEFAULT NULL;
+// $_configuration['allow_user_course_category_collapsable'] = false;
+
+// Add collapsable option when showing the course list inside a session in userportal.php
+// ALTER TABLE session_rel_user ADD collapsed TINYINT(1) DEFAULT NULL;
+// Create a new session extra field called "collapsed" (checkbox yes/no - option)
+// $_configuration['allow_user_session_collapsable'] = false;
+
+// Allow to session admins login as teachers
+//$_configuration['allow_session_admin_login_as_teacher'] = false;
+
+// ------ Custom DB changes (keep this at the end)
 // Add user activation by confirmation email
 // This option prevents the new user to login in the platform if your account is not confirmed via email
 // You need add a new option called "confirmation" to the registration settings

@@ -5,12 +5,21 @@
                 {% if session_category.show_actions %}
                     <a href="{{ _p.web_main ~ 'session/session_category_edit.php?id=' ~ session_category.id }}"
                        class="thumbnail">
-                        <img src="{{ "sessions_category.png"|icon(48) }}" width="48" height="48"
-                             alt="{{ session_category.title }}" title="{{ session_category.title }}">
+                        {% if session_category.title == 'Your Professional Development' %}
+                            {{ 'sess_cat_gghh.png'|img }}
+                        {% else %}
+                            <img src="{{ "sessions_category.png"|icon(48) }}" width="48" height="48"
+                                 alt="{{ session_category.title }}" title="{{ session_category.title }}">
+                        {% endif %}
                     </a>
                 {% else %}
-                    <img src="{{ "sessions_category.png"|icon(48) }}" width="48" height="48"
-                         alt="{{ session_category.title }}" title="{{ session_category.title }}">
+                    {% if session_category.title == 'Your Professional Development' %}
+                        <img src="{{ "sess_cat_gghh.png"|icon(48) }}" height="48" class="thumbnail"
+                             alt="{{ session_category.title }}" title="{{ session_category.title }}">
+                    {% else %}
+                        <img src="{{ "sessions_category.png"|icon(48) }}" width="48" height="48" class="thumbnail"
+                             alt="{{ session_category.title }}" title="{{ session_category.title }}">
+                    {% endif %}
                 {% endif %}
             </div>
             <div class="col-md-10">

@@ -345,3 +345,12 @@ a:focus {
     font-size: 14px;
     font-weight: bold;
 }
+
+.icpna-gh-sessions.panel,
+.icpna-gh-sessions.panel .panel,
+.icpna-gh-sessions .panel-heading {
+    border-color: #fff2cc;
+}
+.icpna-gh-sessions .panel-heading {
+    background-color: #fff2cc;
+}

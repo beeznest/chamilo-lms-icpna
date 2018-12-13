@@ -1,11 +1,13 @@
-<div class="panel panel-default">
+{% set filter_category = 'Your Professional Development' %}
+
+<div class="panel panel-default {{ session_category.title == filter_category ? 'icpna-gh-sessions' : '' }}">
     <div class="panel-body">
         <div class="row">
             <div class="col-md-2">
                 {% if session_category.show_actions %}
                     <a href="{{ _p.web_main ~ 'session/session_category_edit.php?id=' ~ session_category.id }}"
                        class="thumbnail">
-                        {% if session_category.title == 'Your Professional Development' %}
+                        {% if session_category.title == filter_category %}
                             {{ 'sess_cat_gghh.png'|img }}
                         {% else %}
                             <img src="{{ "sessions_category.png"|icon(48) }}" width="48" height="48"
@@ -13,7 +15,7 @@
                         {% endif %}
                     </a>
                 {% else %}
-                    {% if session_category.title == 'Your Professional Development' %}
+                    {% if session_category.title == filter_category %}
                         <img src="{{ "sess_cat_gghh.png"|icon(48) }}" height="48" class="thumbnail"
                              alt="{{ session_category.title }}" title="{{ session_category.title }}">
                     {% else %}

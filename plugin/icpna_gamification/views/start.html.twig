@@ -1,0 +1,22 @@
+{% set plugin_name = 'IcpnaGamificationPlugin' %}
+
+<p class="lead">{{ 'LevelUpDescription'|get_plugin_lang(plugin_name) }}</p>
+
+<div class="row">
+    <div class="col-md-6 col-lg-5 col-lg-offset-1">
+        <div class="thumbnail">
+            <img src="{{ attendance_image }}" alt="{{ 'Attendance'|get_plugin_lang(plugin_name) }}">
+            <div class="caption">
+                <p>{{ attendance_text }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-5">
+        <div class="thumbnail">
+            <img src="{{ activities_image }}" alt="{{ 'Activities'|get_plugin_lang(plugin_name) }}">
+            <div class="caption">
+                <p>{{ activities_text }}</p>
+            </div>
+        </div>
+    </div>
+</div>

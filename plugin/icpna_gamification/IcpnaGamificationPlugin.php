@@ -190,7 +190,11 @@ class IcpnaGamificationPlugin extends Plugin
 
         $client = new SoapClient($wsUrl);
         $clientResult = $client
-            ->obtieneDatosGam([$username, $programa['value'], $sede['value']])
+            ->obtieneDatosGam([
+                'CodigoAlumno' => $username,
+                'UidIdPrograma' => $programa['value'],
+                'UidIdSede' => $sede['value'],
+            ])
             ->obtieneDatosGamResult
             ->any;
 

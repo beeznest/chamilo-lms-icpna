@@ -31,7 +31,7 @@ $objTpl->assign('password', $password);
 $objTpl->assign('path', $loginProcess[$id]);
 $objTpl->assign('redirect_path', $loginProcess[$id]);
 
-$content = $objTpl->fetch($plugin->get_name().'/views/start.html.twig');
+$content = $objTpl->fetch($plugin->get_name().'/views/start_sso.html.twig');
 
 $objTpl->assign('header', $buttonName[$id]);
 $objTpl->assign('content', $content);

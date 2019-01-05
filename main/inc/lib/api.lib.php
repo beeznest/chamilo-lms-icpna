@@ -8010,14 +8010,16 @@ function api_mail_html(
 
     // Reply to first
     if (isset($extra_headers['reply_to']) && empty($platform_email['SMTP_UNIQUE_REPLY_TO'])) {
-        $mail->AddReplyTo(
-            $extra_headers['reply_to']['mail'],
-            $extra_headers['reply_to']['name']
-        );
+        if (PHPMailer::validateAddress($extra_headers['reply_to']['mail'])) {
+            $mail->AddReplyTo(
+                $extra_headers['reply_to']['mail'],
+                $extra_headers['reply_to']['name']
+            );
             // Errors to sender
-        $mail->AddCustomHeader('Errors-To: '.$extra_headers['reply_to']['mail']);
-        $mail->Sender = $extra_headers['reply_to']['mail'];
-        unset($extra_headers['reply_to']);
+            $mail->AddCustomHeader('Errors-To: '.$extra_headers['reply_to']['mail']);
+            $mail->Sender = $extra_headers['reply_to']['mail'];
+            unset($extra_headers['reply_to']);
+        }
     } else {
         $mail->AddCustomHeader('Errors-To: '.$defaultEmail);
     }

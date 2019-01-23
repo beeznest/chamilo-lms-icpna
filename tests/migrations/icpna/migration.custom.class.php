@@ -1501,7 +1501,7 @@ class MigrationCustom
             $course_info = CourseManager::create_course(
                 $course_info,
                 0,
-                isset($matches['accessUrlId']) ? (int) $matches['accessUrlId'] : 1
+                isset($matches['web_service_calls']['accessUrlId']) ? (int) $matches['web_service_calls']['accessUrlId'] : 1
             );
             $course_info = api_get_course_info($course_info['code'], true);
             if (!empty($course_info)) {
@@ -1670,7 +1670,7 @@ class MigrationCustom
                 $extra,
                 null,
                 null,
-                $matches['accessUrlId'] ? ((int) $matches['accessUrlId']) : null
+                isset($matches['web_service_calls']['accessUrlId']) ? ((int) $matches['web_service_calls']['accessUrlId']) : 1
             );
             //$session_id = SessionManager::add($session_info);
             $session_info = api_get_session_info($session_id);
@@ -4267,8 +4267,8 @@ class MigrationCustom
             $sql = "UPDATE $t_user SET user_id = $return WHERE id = $return";
             Database::query($sql);
 
-            if (!empty($matches['accessUrlId'])) {
-                UrlManager::add_user_to_url($userId, $matches['accessUrlId']);
+            if (!empty($matches['web_service_calls']['accessUrlId'])) {
+                UrlManager::add_user_to_url($userId, $matches['web_service_calls']['accessUrlId']);
             } else {
                 //we are adding by default the access_url_user table with access_url_id = 1
                 $currentAccessUrlId = api_get_multiple_access_url() ? api_get_current_access_url_id(): 1;

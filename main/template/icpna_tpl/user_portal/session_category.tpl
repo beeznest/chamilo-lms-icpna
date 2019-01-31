@@ -8,7 +8,8 @@
                     <a href="{{ _p.web_main ~ 'session/session_category_edit.php?id=' ~ session_category.id }}"
                        class="thumbnail">
                         {% if session_category.title == filter_category %}
-                            {{ 'sess_cat_gghh.png'|img }}
+                            <img src="{{ "sess_cat_gghh.png"|icon }}" height="80"
+                                 alt="{{ session_category.title }}" title="{{ session_category.title }}">
                         {% else %}
                             <img src="{{ "sessions_category.png"|icon(48) }}" width="48" height="48"
                                  alt="{{ session_category.title }}" title="{{ session_category.title }}">
@@ -16,7 +17,7 @@
                     </a>
                 {% else %}
                     {% if session_category.title == filter_category %}
-                        <img src="{{ "sess_cat_gghh.png"|icon(48) }}" height="48" class="thumbnail"
+                        <img src="{{ "sess_cat_gghh.png"|icon }}" height="80" class="thumbnail"
                              alt="{{ session_category.title }}" title="{{ session_category.title }}">
                     {% else %}
                         <img src="{{ "sessions_category.png"|icon(48) }}" width="48" height="48" class="thumbnail"

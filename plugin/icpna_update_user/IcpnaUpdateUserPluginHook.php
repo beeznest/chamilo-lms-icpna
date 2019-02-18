@@ -96,6 +96,11 @@ class IcpnaUpdateUserPluginHook extends HookObserver implements HookUpdateUserOb
 
         /** @var User $user */
         $user = $data['user'];
+
+        if (User::STUDENT !== $user->getStatus()) {
+            return false;
+        }
+
         $extraData = UserManager::get_extra_user_data($user->getId(), true);
 
         if (!isset($extraData['extra_uididpersona'])) {

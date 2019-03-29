@@ -5,7 +5,7 @@ $strings['plugin_title'] = "ICPNA Tab Zone";
 $strings['plugin_comment'] = "Este plugin agrega una nueva pestaña para la zona de docentes o estudiantes.";
 
 $strings['StudentsZone'] = "Zona de estudiantes";
-$strings['TeachersZone'] = "CPT";
+$strings['TeachersZone'] = "Zona de profesores";
 
 $strings['tool_enable'] = "Habilitar herramienta";
 $strings['enable_student_zone'] = "Habilitar zona para estudiantes";

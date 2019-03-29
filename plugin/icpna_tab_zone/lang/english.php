@@ -4,7 +4,7 @@
 $strings['plugin_title'] = "ICPNA Tab Zone";
 $strings['plugin_comment'] = "This plugin add a new tab for trainers or learners zone.";
 
-$strings['StudentsZone'] = "Learners zone";
+$strings['StudentsZone'] = "Students zone";
 $strings['TeachersZone'] = "Teachers zone";
 
 $strings['tool_enable'] = "Enable Tool";

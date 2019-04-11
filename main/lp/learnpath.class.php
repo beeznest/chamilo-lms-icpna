@@ -2231,11 +2231,16 @@ class learnpath
         $tbl_lp_item = Database::get_course_table(TABLE_LP_ITEM);
         $tbl_lp_item_view = Database::get_course_table(TABLE_LP_ITEM_VIEW);
 
+        /** @var learnpathItem $item */
+        $item = $this->items[$lpItemId];
+        $itemViewId = (int) $item->db_item_view_id;
+
         // Getting all the information about the item.
-        $sql = "SELECT * FROM $tbl_lp_item as lp
+        $sql = "SELECT lp.audio, lp.item_type, lp_view.status FROM $tbl_lp_item as lp
                 INNER JOIN $tbl_lp_item_view as lp_view
                 ON (lp.id = lp_view.lp_item_id AND lp.c_id = lp_view.c_id)
                 WHERE
+                    lp_view.iid = $itemViewId AND
                     lp.id = '$lpItemId' AND
                     lp.c_id = $course_id AND
                     lp_view.c_id = $course_id";
@@ -2262,6 +2267,8 @@ class learnpath
             } else {
                 $autostart_audio = 'true';
             }
+
+            error_log($autostart_audio);
 
             $courseInfo = api_get_course_info();
             $audio = $row['audio'];

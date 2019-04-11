@@ -2268,8 +2268,6 @@ class learnpath
                 $autostart_audio = 'true';
             }
 
-            error_log($autostart_audio);
-
             $courseInfo = api_get_course_info();
             $audio = $row['audio'];
 

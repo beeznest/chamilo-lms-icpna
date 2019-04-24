@@ -757,14 +757,14 @@ $form->freeze(['extra_middle_name', 'extra_mothers_name']);
 
                 function onDocumentIdTypeSelected(selectedIndex, $el) {
                     switch (selectedIndex) {
-                        case 1:
+                        case 2:
                             $el.attr({
                                 pattern: '\\d{8}',
                                 maxlength: '8',
                                 title: '<?php echo get_lang('OnlyNumbers', null, 'es-icpna', true) ?>. 8 dígitos'
                             });
                             break;
-                        case 2:
+                        case 1:
                             $el.attr({
                                 pattern: '[a-zA-Z0-9]{12}',
                                 maxlength: '12',

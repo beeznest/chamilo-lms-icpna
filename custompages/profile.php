@@ -94,7 +94,7 @@ $formRenderer->setElementTemplate(
     '
         <div class="form-group {error_class}">
             <label {label-for} class="col-sm-2 control-label {extra_label_class}" >{label}</label>
-            <div class="col-sm-4">
+            <div class="col-sm-4" id="extra-id-document-type-wrapper">
                 {element}
                 <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
             </div>
@@ -227,7 +227,8 @@ $form->removeElement('extra_id_document_type');
 $form->addSelect(
     'extra_id_document_type',
     'Documento de identidad',
-    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
+    //['' => get_lang('SelectAnOption', null, 'spanish', true)],
+    [],
     ['id' => 'extra_id_document_type']
 );
 
@@ -528,7 +529,7 @@ $form->getElement('extra_guardian_name')->setAttribute('pattern', '[a-zA-Zá-ú�
 $form->getElement('extra_guardian_email')->setAttribute('maxlength', 50);
 $form->getElement('extra_guardian_email')->setAttribute('type', 'email');
 
-$form->freeze(['extra_middle_name', 'extra_mothers_name']);
+$form->freeze(['extra_id_document_type', 'extra_id_document_number', 'extra_middle_name', 'extra_mothers_name']);
 ?>
 
     <div class="row">
@@ -1112,7 +1113,7 @@ $form->freeze(['extra_middle_name', 'extra_mothers_name']);
                             xhrOccupationResponse,
                             xhrUniCareersResponse
                         ) {
-                            addOptions(docTypeResponse[0], $slctDocument);
+                            // addOptions(docTypeResponse[0], $slctDocument);
                             addOptions(docTypeResponse[0], $slctGuardianDocument);
                             addOptions(nationalityResponse[0], $slctNationality);
                             addOptions(departmentResponse[0], $slctAddressDepartment);
@@ -1121,7 +1122,17 @@ $form->freeze(['extra_middle_name', 'extra_mothers_name']);
                             addOptions(xhrOccupationResponse[0], $slctOccupation);
                             addOptions(xhrUniCareersResponse[0], $slctUniCarrers);
 
-                            $slctDocument.selectpicker('val', defaultValues.extra_id_document_type);
+                            $(docTypeResponse[0]).each(function (i, option) {
+                                if (defaultValues.extra_id_document_type === option.value) {
+                                    $('#extra-id-document-type-wrapper')
+                                        .html('<span class="freeze">'
+                                            + option.text
+                                            + '<input type="hidden" name="extra_id_document_type" value="'
+                                            + option.value
+                                            + '" id="extra_id_document_type" required="required"></span>');
+                                }
+                            });
+                            // $slctDocument.selectpicker('val', defaultValues.extra_id_document_type);
                             $slctGuardianDocument.selectpicker('val', defaultValues.extra_guardian_id_document_type);
                             $slctNationality.selectpicker('val', defaultValues.extra_nationality);
                             $slctAddressDepartment.selectpicker('val', defaultValues.extra_address_department);

@@ -4,13 +4,15 @@
 use ChamiloSession as Session;
 
 /**
- * API event handler functions for AICC / CMIv4 in API communication mode
+ * API event handler functions for AICC / CMIv4 in API communication mode.
  *
  * @author   Denes Nagy <darkden@freemail.hu>
  * @author   Yannick Warnier <ywarnier@beeznest.org>
+ *
  * @version  v 1.0
- * @access   public
+ *
  * @package  chamilo.learnpath
+ *
  * @license    GNU/GPL
  */
 
@@ -19,7 +21,7 @@ use ChamiloSession as Session;
  * The first section (below) is the initialisation part.
  * The second section is the AICC object part
  * The third section defines the event handlers for Chamilo's internal messaging
- * and frames refresh
+ * and frames refresh.
  *
  * This script implements the API messaging for AICC. The HACP messaging is
  * made by another set of scripts.
@@ -32,8 +34,9 @@ $use_anonymous = true;
 require_once __DIR__.'/../inc/global.inc.php';
 
 // Is this needed? This is probabaly done in the header file.
-$file = $_SESSION['file'];
-$oLP = unserialize(Session::read('lpobject'));
+$file = Session::read('file');
+/** @var learnpath $oLP */
+$oLP = UnserializeApi::unserialize('lp', Session::read('lpobject'));
 $oItem = $oLP->items[$oLP->current];
 if (!is_object($oItem)) {
     error_log('New LP - scorm_api - Could not load oItem item', 0);
@@ -43,7 +46,7 @@ $autocomplete_when_80pct = 0;
 
 /* JavaScript Functions */
 
-?>var scorm_logs=<?php echo (empty($oLP->scorm_debug) ? '0' : '3'); ?>; //debug log level for SCORM. 0 = none, 1=light, 2=a lot, 3=all - displays logs in log frame
+?>var scorm_logs=<?php echo empty($oLP->scorm_debug) ? '0' : '3'; ?>; //debug log level for SCORM. 0 = none, 1=light, 2=a lot, 3=all - displays logs in log frame
 var lms_logs=0; //debug log level for LMS actions. 0=none, 1=light, 2=a lot, 3=all
 //logit_lms('scormfunctions.php included',0);
 
@@ -141,10 +144,10 @@ function LMSGetValue(param) {
     }else if(param == 'cmi.core.student_id'){
         result='<?php echo $_user['user_id']; ?>';
     }else if(param == 'cmi.core.student_name'){
-      <?php
-        $who = addslashes(api_get_person_name($_user['firstName'], $_user['lastName']));
-        echo "result='$who';";
-      ?>
+    <?php
+    $who = addslashes(api_get_person_name($_user['firstName'], $_user['lastName']));
+    echo "result='$who';";
+    ?>
     }else if(param == 'cmi.core.lesson_location'){
         result=lesson_location;
     }else if(param == 'cmi.core.total_time'){
@@ -173,19 +176,19 @@ function LMSGetValue(param) {
     /*
     // Switch not working??? WTF???
     switch(param) {
-        case 'cmi.core._children'		:
+        case 'cmi.core._children':
             result='entry, exit, lesson_status, student_id, student_name, lesson_location, total_time, credit, lesson_mode, score, session_time';
             break;
-        case 'cmi.core_children'		:
+        case 'cmi.core_children':
             result='entry, exit, lesson_status, student_id, student_name, lesson_location, total_time, credit, lesson_mode, score, session_time';
             break;
-        case 'cmi.core.entry'			:
+        case 'cmi.core.entry':
             result='';
             break;
-        case 'cmi.core.exit'			:
+        case 'cmi.core.exit':
             result='';
             break;
-        case 'cmi.core.lesson_status'	:
+        case 'cmi.core.lesson_status':
             if(lesson_status != '') {
                 result=lesson_status;
             }
@@ -193,51 +196,51 @@ function LMSGetValue(param) {
                 result='not attempted';
             }
             break;
-        case 'cmi.core.student_id'	   :
+        case 'cmi.core.student_id':
             result='<?php echo $_user['user_id']; ?>';
             break;
-        case 'cmi.core.student_name'	:
+        case 'cmi.core.student_name':
           <?php
             $who = addslashes(api_get_person_name($_user['firstName'], $_user['lastName']));
             echo "result='$who';";
           ?>	break;
-        case 'cmi.core.lesson_location'	:
+        case 'cmi.core.lesson_location':
             result='';
             break;
-        case 'cmi.core.total_time'	:
+        case 'cmi.core.total_time':
             result=total_time;
             break;
-        case 'cmi.core.score._children'	:
+        case 'cmi.core.score._children':
             result='raw,min,max';
             break;
-        case 'cmi.core.score.raw'	:
+        case 'cmi.core.score.raw':
             result=score;
             break;
-        case 'cmi.core.score.max'	:
+        case 'cmi.core.score.max':
             result=max;
             break;
-        case 'cmi.core.score.min'	:
+        case 'cmi.core.score.min':
             result=min;
             break;
-        case 'cmi.core.score'		:
+        case 'cmi.core.score':
             result=score;
             break;
-        case 'cmi.core.credit'		:
+        case 'cmi.core.credit':
             result='no-credit';
             break;
-        case 'cmi.core.lesson_mode'	:
+        case 'cmi.core.lesson_mode':
             result='normal';
             break;
-        case 'cmi.suspend_data'		:
+        case 'cmi.suspend_data':
             result='<?php echo $oItem->get_suspend_data(); ?>';
             break;
-        case 'cmi.launch_data'		:
+        case 'cmi.launch_data':
             result='';
             break;
         case 'cmi.objectives._count':
             result='<?php echo $oItem->get_view_count(); ?>';
             break;
-        default 					:
+        default:
             result='';
             break;
     }
@@ -255,9 +258,11 @@ function LMSSetValue(param, val) {
     case 'cmi.core.lesson_status'	:
         saved_lesson_status = lesson_status;
         lesson_status = val;
-        <?php if ($oLP->mode != 'fullscreen') { ?>
+        <?php if ($oLP->mode != 'fullscreen') {
+              ?>
         //var update = update_toc(lesson_status,lms_item_id);
-        <?php } ?>
+        <?php
+          } ?>
         break;
     case 'cmi.completion_status'	: lesson_status = val;	break; //1.3
     case 'cmi.core.session_time'	: session_time = val;	break;
@@ -275,11 +280,13 @@ function LMSSetValue(param, val) {
     return(true);
 }
 function savedata(origin) { //origin can be 'commit', 'finish' or 'terminate'
-    <?php if ($autocomplete_when_80pct) { ?>
+    <?php if ($autocomplete_when_80pct) {
+        ?>
     if( ( lesson_status == 'incomplete') && (score >= (0.8*max) ) ){
       lesson_status = 'completed';
     }
-    <?php }?>
+    <?php
+    }?>
     param = 'id='+lms_item_id+'&origin='+origin+'&score='+score+'&max='+max+'&min='+min+'&lesson_status='+lesson_status+'&time='+session_time+'&suspend_data='+suspend_data;
 
     url="http://<?php
@@ -379,7 +386,7 @@ function addListeners(){
     }
     //assign event handlers to objects
     if(lms_lp_type==1 || lms_item_type=='asset'){
-        logit_lms('Dokeos LP or asset',2);
+        logit_lms('Chamilo LP or asset',2);
         // If this path is a Chamilo learnpath, then start manual save
         // when something is loaded in there.
         var myelem = document.getElementById('content_id');
@@ -484,7 +491,8 @@ function logit_lms(message,priority) {
  */
 function update_toc(update_action,update_id)
 {
-    <?php if ($oLP->mode != 'fullscreen') { ?>
+    <?php if ($oLP->mode != 'fullscreen') {
+    ?>
         var myframe = frames["toc_name"];
         var myelem = myframe.document.getElementById("toc_"+update_id);
         var myelemimg = myframe.document.getElementById("toc_img_"+update_id);
@@ -539,7 +547,8 @@ function update_toc(update_action,update_id)
             }
         }
         return true;
-    <?php } ?>
+    <?php
+} ?>
     return true;
 }
 /**

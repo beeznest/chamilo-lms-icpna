@@ -1,6 +1,4 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
 /**
  * Base class for <input /> form elements
  *
@@ -35,25 +33,6 @@
  */
 class HTML_QuickForm_input extends HTML_QuickForm_element
 {
-    // {{{ constructor
-
-    /**
-     * Class constructor
-     *
-     * @param    string     Input field name attribute
-     * @param    mixed      Label(s) for the input field
-     * @param    mixed      Either a typical HTML attribute string or an associative array
-     * @since     1.0
-     * @access    public
-     * @return    void
-     */
-    public function __construct($elementName=null, $elementLabel=null, $attributes=null)
-    {
-        parent::__construct($elementName, $elementLabel, $attributes);
-    } //end constructor
-
-    // }}}
-    // {{{ setType()
 
     /**
      * Sets the element type
@@ -63,14 +42,11 @@ class HTML_QuickForm_input extends HTML_QuickForm_element
      * @access    public
      * @return    void
      */
-    function setType($type)
+    public function setType($type)
     {
         $this->_type = $type;
         $this->updateAttributes(array('type'=>$type));
-    } // end func setType
-
-    // }}}
-    // {{{ setName()
+    }
 
     /**
      * Sets the input field name
@@ -80,13 +56,10 @@ class HTML_QuickForm_input extends HTML_QuickForm_element
      * @access    public
      * @return    void
      */
-    function setName($name)
+    public function setName($name)
     {
         $this->updateAttributes(array('name'=>$name));
-    } //end func setName
-
-    // }}}
-    // {{{ getName()
+    }
 
     /**
      * Returns the element name
@@ -95,13 +68,10 @@ class HTML_QuickForm_input extends HTML_QuickForm_element
      * @access    public
      * @return    string
      */
-    function getName()
+    public function getName()
     {
         return $this->getAttribute('name');
-    } //end func getName
-
-    // }}}
-    // {{{ setValue()
+    }
 
     /**
      * Sets the value of the form element
@@ -113,11 +83,8 @@ class HTML_QuickForm_input extends HTML_QuickForm_element
      */
     public function setValue($value)
     {
-        $this->updateAttributes(array('value'=>$value));
-    } // end func setValue
-
-    // }}}
-    // {{{ getValue()
+        $this->updateAttributes(array('value' => $value));
+    }
 
     /**
      * Returns the value of the form element
@@ -129,10 +96,7 @@ class HTML_QuickForm_input extends HTML_QuickForm_element
     public function getValue()
     {
         return $this->getAttribute('value');
-    } // end func getValue
-
-    // }}}
-    // {{{ toHtml()
+    }
 
     /**
      * Returns the input field in HTML
@@ -148,10 +112,7 @@ class HTML_QuickForm_input extends HTML_QuickForm_element
         } else {
             return $this->_getTabs() . '<input' . $this->_getAttrString($this->_attributes) . ' />';
         }
-    } //end func toHtml
-
-    // }}}
-    // {{{ onQuickFormEvent()
+    }
 
     /**
      * Called by HTML_QuickForm whenever form event is made on this element
@@ -164,7 +125,7 @@ class HTML_QuickForm_input extends HTML_QuickForm_element
      * @return    void
      * @throws
      */
-    function onQuickFormEvent($event, $arg, &$caller)
+    public function onQuickFormEvent($event, $arg, &$caller)
     {
         // do not use submit values for button-type elements
         $type = $this->getType();
@@ -186,7 +147,7 @@ class HTML_QuickForm_input extends HTML_QuickForm_element
    /**
     * We don't need values from button-type elements (except submit) and files
     */
-    function exportValue(&$submitValues, $assoc = false)
+    public function exportValue(&$submitValues, $assoc = false)
     {
         $type = $this->getType();
         if ('reset' == $type || 'image' == $type || 'button' == $type || 'file' == $type) {

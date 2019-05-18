@@ -13,15 +13,22 @@ if (api_get_setting('allow_user_course_subscription_by_course_admin') == 'false'
     }
 }
 
+// Make sure we know if we're importing students or teachers into the course
+$userType = STUDENT;
+if (!empty($_REQUEST['type']) && $_REQUEST['type'] == COURSEMANAGER) {
+    $userType = COURSEMANAGER;
+}
+
 $tool_name = get_lang('ImportUsersToACourse');
 
-$interbreadcrumb[] = array("url" => "user.php", "name" => get_lang("Users"));
-$interbreadcrumb[] = array("url" => "#", "name" => get_lang("ImportUsersToACourse"));
+$interbreadcrumb[] = ["url" => "user.php", "name" => get_lang("Users")];
+$interbreadcrumb[] = ["url" => "#", "name" => get_lang("ImportUsersToACourse")];
 
 $form = new FormValidator('user_import', 'post', 'user_import.php');
 $form->addElement('header', $tool_name);
 $form->addElement('file', 'import_file', get_lang('ImportCSVFileLocation'));
 $form->addElement('checkbox', 'unsubscribe_users', null, get_lang('UnsubscribeUsersAlreadyAddedInCourse'));
+$form->addElement('hidden', 'type', $userType);
 $form->addButtonImport(get_lang('Import'));
 
 $course_code = api_get_course_id();
@@ -32,7 +39,7 @@ if (empty($course_code)) {
 
 $session_id = api_get_session_id();
 $message = '';
-$user_to_show = array();
+$user_to_show = [];
 $type = '';
 
 if ($form->validate()) {
@@ -40,8 +47,8 @@ if ($form->validate()) {
         $unsubscribe_users = isset($_POST['unsubscribe_users']) ? true : false;
         //@todo : csvToArray deprecated
         $users = Import::csvToArray($_FILES['import_file']['tmp_name']);
-        $invalid_users  = array();
-        $clean_users    = array();
+        $invalid_users = [];
+        $clean_users = [];
 
         if (!empty($users)) {
             $empty_line = 0;
@@ -71,12 +78,24 @@ if ($form->validate()) {
                 $message = get_lang('ListOfUsersSubscribedToCourse');
 
                 if ($unsubscribe_users) {
-                    $current_user_list = CourseManager::get_user_list_from_course_code($course_code, $session_id);
+                    $current_user_list = CourseManager::get_user_list_from_course_code(
+                        $course_code,
+                        $session_id,
+                        null,
+                        null,
+                        $userType
+                    );
                     if (!empty($current_user_list)) {
-                        $user_ids = array();
+                        $user_ids = [];
                         foreach ($current_user_list as $user) {
-                            if (!CourseManager::is_course_teacher($user['user_id'], $course_code)) {
-                                $user_ids[] = $user['user_id'];
+                            if ($userType == COURSEMANAGER) {
+                                if (CourseManager::is_course_teacher($user['user_id'], $course_code)) {
+                                    $user_ids[] = $user['user_id'];
+                                }
+                            } else {
+                                if (!CourseManager::is_course_teacher($user['user_id'], $course_code)) {
+                                    $user_ids[] = $user['user_id'];
+                                }
                             }
                         }
                         CourseManager::unsubscribe_user($user_ids, $course_code, $session_id);
@@ -85,10 +104,10 @@ if ($form->validate()) {
 
                 foreach ($clean_users as $userId) {
                     $userInfo = api_get_user_info($userId);
-                    CourseManager::subscribe_user($userId, $course_code, STUDENT, $session_id);
+                    CourseManager::subscribeUser($userId, $course_code, $userType, $session_id);
                     if (empty($session_id)) {
                         //just to make sure
-                        if (CourseManager :: is_user_subscribed_in_course($userId, $course_code)) {
+                        if (CourseManager::is_user_subscribed_in_course($userId, $course_code)) {
                             $user_to_show[] = $userInfo['complete_name'];
                         }
                     } else {
@@ -116,7 +135,7 @@ if (!empty($message)) {
         $userMessage = null;
         foreach ($user_to_show as $user) {
             if (!is_array($user)) {
-                $user = array($user);
+                $user = [$user];
             }
             $user = array_filter($user);
             $userMessage .= implode(', ', $user)."<br />";

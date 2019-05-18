@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class SequenceFormula
+ * Class SequenceFormula.
  *
  * @ORM\Table(name="sequence_formula")
  * @ORM\Entity
@@ -14,31 +14,30 @@ use Doctrine\ORM\Mapping as ORM;
 class SequenceFormula
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue()
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="SequenceMethod")
      * @ORM\JoinColumn(name="sequence_method_id", referencedColumnName="id")
-     **/
-    private $method;
+     */
+    protected $method;
 
     /**
      * @ORM\ManyToOne(targetEntity="SequenceVariable")
      * @ORM\JoinColumn(name="sequence_variable_id", referencedColumnName="id")
-     **/
-    private $variable;
-
+     */
+    protected $variable;
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -55,6 +54,7 @@ class SequenceFormula
 
     /**
      * @param mixed $method
+     *
      * @return SequenceFormula
      */
     public function setMethod($method)
@@ -74,6 +74,7 @@ class SequenceFormula
 
     /**
      * @param mixed $variable
+     *
      * @return SequenceFormula
      */
     public function setVariable($variable)
@@ -82,6 +83,4 @@ class SequenceFormula
 
         return $this;
     }
-
-
 }

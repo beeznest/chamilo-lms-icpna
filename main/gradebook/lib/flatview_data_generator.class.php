@@ -4,7 +4,8 @@
 /**
  * Class FlatViewDataGenerator
  * Class to select, sort and transform object data into array data,
- * used for the teacher's flat view
+ * used for the teacher's flat view.
+ *
  * @author Bert Steppé
  *
  * @package chamilo.gradebook
@@ -16,32 +17,33 @@ class FlatViewDataGenerator
     const FVDG_SORT_FIRSTNAME = 2;
     const FVDG_SORT_ASC = 4;
     const FVDG_SORT_DESC = 8;
+    public $params;
+    /** @var Category */
+    public $category;
 
     private $users;
     private $evals;
     private $links;
     private $evals_links;
-    public $params;
-    public $category;
     private $mainCourseCategory;
 
     /**
-     * @param array $users
-     * @param array $evals
-     * @param array $links
-     * @param array $params
+     * @param array         $users
+     * @param array         $evals
+     * @param array         $links
+     * @param array         $params
      * @param Category|null $mainCourseCategory
      */
     public function __construct(
-        $users = array(),
-        $evals = array(),
-        $links = array(),
-        $params = array(),
+        $users = [],
+        $evals = [],
+        $links = [],
+        $params = [],
         $mainCourseCategory = null
     ) {
-        $this->users = (isset($users) ? $users : array());
-        $this->evals = (isset($evals) ? $evals : array());
-        $this->links = (isset($links) ? $links : array());
+        $this->users = isset($users) ? $users : [];
+        $this->evals = isset($evals) ? $evals : [];
+        $this->links = isset($links) ? $links : [];
         $this->evals_links = array_merge($this->evals, $this->links);
         $this->params = $params;
         $this->mainCourseCategory = $mainCourseCategory;
@@ -56,7 +58,8 @@ class FlatViewDataGenerator
     }
 
     /**
-     * Get total number of users (rows)
+     * Get total number of users (rows).
+     *
      * @return int
      */
     public function get_total_users_count()
@@ -65,7 +68,8 @@ class FlatViewDataGenerator
     }
 
     /**
-     * Get total number of evaluations/links (columns) (the 2 users columns not included)
+     * Get total number of evaluations/links (columns) (the 2 users columns not included).
+     *
      * @return int
      */
     public function get_total_items_count()
@@ -74,15 +78,17 @@ class FlatViewDataGenerator
     }
 
     /**
-     * Get array containing column header names (incl user columns)
-     * @param int $items_start Start item offset
-     * @param int $items_count Number of items to get
+     * Get array containing column header names (incl user columns).
+     *
+     * @param int  $items_start Start item offset
+     * @param int  $items_count Number of items to get
      * @param bool $show_detail whether to show the details or not
+     *
      * @return array List of headers
      */
     public function get_header_names($items_start = 0, $items_count = null, $show_detail = false)
     {
-        $headers = array();
+        $headers = [];
         if (isset($this->params['show_official_code']) && $this->params['show_official_code']) {
             $headers[] = get_lang('OfficialCode');
         }
@@ -110,7 +116,6 @@ class FlatViewDataGenerator
         }
 
         $parent_id = $this->category->get_parent_id();
-
         if ($parent_id == 0 ||
             isset($this->params['only_subcat']) &&
             $this->params['only_subcat'] == $this->category->get_id()
@@ -129,8 +134,7 @@ class FlatViewDataGenerator
         }
 
         //@todo move these in a function
-        $sum_categories_weight_array = array();
-
+        $sum_categories_weight_array = [];
         $mainCategoryId = null;
         $mainCourseCategory = $this->getMainCourseCategory();
 
@@ -139,7 +143,12 @@ class FlatViewDataGenerator
         }
 
         if (isset($this->category) && !empty($this->category)) {
-            $categories = Category::load(null, null, null, $this->category->get_id());
+            $categories = Category::load(
+                null,
+                null,
+                null,
+                $this->category->get_id()
+            );
             if (!empty($categories)) {
                 foreach ($categories as $category) {
                     $sum_categories_weight_array[$category->get_id()] = $category->get_weight();
@@ -150,7 +159,6 @@ class FlatViewDataGenerator
         }
 
         // No category was added
-
         $course_code = api_get_course_id();
         $session_id = api_get_session_id();
 
@@ -161,10 +169,10 @@ class FlatViewDataGenerator
             'ORDER BY id'
         );
 
-        $evaluationsAdded = array();
+        $evaluationsAdded = [];
         if ($parent_id == 0 && !empty($allcat)) {
             // Means there are any subcategory
-
+            /** @var Category $sub_cat */
             foreach ($allcat as $sub_cat) {
                 $sub_cat_weight = round(100 * $sub_cat->get_weight() / $main_weight, 1);
                 $add_weight = " $sub_cat_weight %";
@@ -245,7 +253,7 @@ class FlatViewDataGenerator
     {
         $max = 0;
         foreach ($this->users as $user) {
-            $item  = $this->evals_links [$id];
+            $item = $this->evals_links[$id];
             $score = $item->calc_score($user[0]);
             if ($score[0] > $max) {
                 $max = $score[0];
@@ -256,17 +264,18 @@ class FlatViewDataGenerator
     }
 
     /**
-     * Get array containing evaluation items
+     * Get array containing evaluation items.
+     *
      * @return array
      */
     public function get_evaluation_items($items_start = 0, $items_count = null)
     {
-        $headers = array();
+        $headers = [];
         if (!isset($items_count)) {
             $items_count = count($this->evals_links) - $items_start;
         }
         for ($count = 0; ($count < $items_count) && ($items_start + $count < count($this->evals_links)); $count++) {
-            $item = $this->evals_links [$count + $items_start];
+            $item = $this->evals_links[$count + $items_start];
             $headers[] = $item->get_name();
         }
 
@@ -274,14 +283,21 @@ class FlatViewDataGenerator
     }
 
     /**
-     * Get actual array data
-     * @param integer $users_count
-     * @param integer $items_count
+     * Get actual array data.
+     *
+     * @param int  $users_sorting
+     * @param int  $users_start
+     * @param null $users_count
+     * @param int  $items_start
+     * @param null $items_count
+     * @param bool $ignore_score_color
+     * @param bool $show_all
+     *
      * @return array 2-dimensional array - each array contains the elements:
-     * 0: user id
-     * 1: user lastname
-     * 2: user firstname
-     * 3+: evaluation/link scores
+     *               0: user id
+     *               1: user lastname
+     *               2: user firstname
+     *               3+: evaluation/link scores
      */
     public function get_data(
         $users_sorting = 0,
@@ -306,17 +322,16 @@ class FlatViewDataGenerator
             $items_count = 0;
         }
 
-        $userTable = array();
+        $userTable = [];
         foreach ($this->users as $user) {
             $userTable[] = $user;
         }
 
         // sort users array
         if ($users_sorting & self::FVDG_SORT_LASTNAME) {
-            usort($userTable, array('FlatViewDataGenerator', 'sort_by_last_name'));
-
+            usort($userTable, ['FlatViewDataGenerator', 'sort_by_last_name']);
         } elseif ($users_sorting & self::FVDG_SORT_FIRSTNAME) {
-            usort($userTable, array('FlatViewDataGenerator', 'sort_by_first_name'));
+            usort($userTable, ['FlatViewDataGenerator', 'sort_by_first_name']);
         }
 
         if ($users_sorting & self::FVDG_SORT_DESC) {
@@ -327,16 +342,11 @@ class FlatViewDataGenerator
         $selected_users = array_slice($userTable, $users_start, $users_count);
 
         // Generate actual data array
-        $scoredisplay = ScoreDisplay::instance();
+        $scoreDisplay = ScoreDisplay::instance();
 
-        $data = array();
-        $displaytype = SCORE_DIV;
-        if ($ignore_score_color) {
-            $displaytype |= SCORE_IGNORE_SPLIT;
-        }
+        $data = [];
         //@todo move these in a function
-        $sum_categories_weight_array = array();
-
+        $sum_categories_weight_array = [];
         $mainCategoryId = null;
         $mainCourseCategory = $this->getMainCourseCategory();
         if (!empty($mainCourseCategory)) {
@@ -344,7 +354,12 @@ class FlatViewDataGenerator
         }
 
         if (isset($this->category) && !empty($this->category)) {
-            $categories = Category::load(null, null, null, $this->category->get_id());
+            $categories = Category::load(
+                null,
+                null,
+                null,
+                $this->category->get_id()
+            );
             if (!empty($categories)) {
                 foreach ($categories as $category) {
                     $sum_categories_weight_array[$category->get_id()] = $category->get_weight();
@@ -377,8 +392,11 @@ class FlatViewDataGenerator
             $export_to_pdf = true;
         }
 
+        $course_code = api_get_course_id();
+        $session_id = api_get_session_id();
+
         foreach ($selected_users as $user) {
-            $row = array();
+            $row = [];
             // User id
             if ($export_to_pdf) {
                 $row['user_id'] = $user_id = $user[0];
@@ -409,11 +427,11 @@ class FlatViewDataGenerator
             } else {
                 if ($export_to_pdf) {
                     if (api_is_western_name_order()) {
-                        $row['firstname']   = $user[3];
-                        $row['lastname']    = $user[2];
+                        $row['firstname'] = $user[3];
+                        $row['lastname'] = $user[2];
                     } else {
-                        $row['lastname']    = $user[2];
-                        $row['firstname']   = $user[3];
+                        $row['lastname'] = $user[2];
+                        $row['firstname'] = $user[3];
                     }
                 } else {
                     if (api_is_western_name_order()) {
@@ -432,8 +450,7 @@ class FlatViewDataGenerator
             $item_value_total = 0;
             $item_total = 0;
             $convert_using_the_global_weight = true;
-            $course_code = api_get_course_id();
-            $session_id = api_get_session_id();
+
             $allcat = $this->category->get_subcategories(
                 null,
                 $course_code,
@@ -441,7 +458,7 @@ class FlatViewDataGenerator
                 'ORDER BY id'
             );
 
-            $evaluationsAdded = array();
+            $evaluationsAdded = [];
             if ($parent_id == 0 && !empty($allcat)) {
                 /** @var Category $sub_cat */
                 foreach ($allcat as $sub_cat) {
@@ -455,7 +472,7 @@ class FlatViewDataGenerator
                         $linkScoreList = [];
                         foreach ($links as $link) {
                             $linkScore = $link->calc_score($user_id);
-                            $linkScoreList[] = $scoredisplay->display_score(
+                            $linkScoreList[] = $scoreDisplay->display_score(
                                 $linkScore,
                                 SCORE_SIMPLE
                             );
@@ -464,7 +481,7 @@ class FlatViewDataGenerator
                         $evalScoreList = [];
                         foreach ($evaluations as $evaluation) {
                             $evalScore = $evaluation->calc_score($user_id);
-                            $evalScoreList[] = $scoredisplay->display_score(
+                            $evalScoreList[] = $scoreDisplay->display_score(
                                 $evalScore,
                                 SCORE_SIMPLE
                             );
@@ -473,7 +490,6 @@ class FlatViewDataGenerator
 
                     $real_score = $score;
                     $divide = $score[1] == 0 ? 1 : $score[1];
-
                     $sub_cat_percentage = $sum_categories_weight_array[$sub_cat->get_id()];
                     $item_value = $score[0] / $divide * $main_weight;
 
@@ -481,19 +497,40 @@ class FlatViewDataGenerator
                     $percentage = $sub_cat->get_weight() / ($sub_cat_percentage) * $sub_cat_percentage / $this->category->get_weight();
                     $item_value = $percentage * $item_value;
                     $item_total += $sub_cat->get_weight();
-                    /*
-                        if ($convert_using_the_global_weight) {
-                            $score[0] = $score[0]/$main_weight*$sub_cat->get_weight();
-                            $score[1] = $main_weight ;
-                        }
-                    */
+
+                    $style = api_get_configuration_value('gradebook_report_score_style');
+                    $defaultStyle = SCORE_DIV_SIMPLE_WITH_CUSTOM;
+                    if (!empty($style)) {
+                        $defaultStyle = (int) $style;
+                    }
+
                     if (api_get_setting('gradebook_show_percentage_in_reports') === 'false') {
-                        $real_score = $scoredisplay->display_score($real_score, SCORE_SIMPLE, true);
-                        $temp_score = $scoredisplay->display_score($score, SCORE_DIV_SIMPLE_WITH_CUSTOM, null);
+                        $defaultShowPercentageValue = SCORE_SIMPLE;
+                        if (!empty($style)) {
+                            $defaultShowPercentageValue = $style;
+                        }
+                        $real_score = $scoreDisplay->display_score(
+                            $real_score,
+                            $defaultShowPercentageValue,
+                            true
+                        );
+                        $temp_score = $scoreDisplay->display_score(
+                            $score,
+                            SCORE_DIV_SIMPLE_WITH_CUSTOM,
+                            null
+                        );
                         $temp_score = Display::tip($real_score, $temp_score);
                     } else {
-                        $real_score = $scoredisplay->display_score($real_score, SCORE_DIV_PERCENT, SCORE_ONLY_SCORE);
-                        $temp_score = $scoredisplay->display_score($score, SCORE_DIV_SIMPLE_WITH_CUSTOM, null);
+                        $real_score = $scoreDisplay->display_score(
+                            $real_score,
+                            SCORE_DIV_PERCENT,
+                            SCORE_ONLY_SCORE
+                        );
+                        $temp_score = $scoreDisplay->display_score(
+                            $score,
+                            $defaultStyle,
+                            null
+                        );
                         $temp_score = Display::tip($temp_score, $real_score);
                     }
 
@@ -521,10 +558,6 @@ class FlatViewDataGenerator
                         }
                     }
                     $item_value_total += $item_value;
-                }
-
-                if ($convert_using_the_global_weight) {
-                    //$item_total = $main_weight;
                 }
             } else {
                 // All evaluations
@@ -557,24 +590,30 @@ class FlatViewDataGenerator
 
             $item_total += $result['item_total'];
             $item_value_total += $result['item_value_total'];
-            $total_score = array($item_value_total, $item_total);
+            $total_score = [$item_value_total, $item_total];
+
+            $style = api_get_configuration_value('gradebook_report_score_style');
+            $defaultStyle = SCORE_DIV_SIMPLE_WITH_CUSTOM_LETTERS;
+            if (!empty($style)) {
+                $defaultStyle = (int) $style;
+            }
 
             if (!$show_all) {
                 if ($export_to_pdf) {
-                    $row['total'] = $scoredisplay->display_score($total_score);
+                    $row['total'] = $scoreDisplay->display_score($total_score);
                 } else {
-                    $row[] = $scoredisplay->display_score($total_score);
+                    $row[] = $scoreDisplay->display_score($total_score);
                 }
             } else {
                 if ($export_to_pdf) {
-                    $row['total'] = $scoredisplay->display_score(
+                    $row['total'] = $scoreDisplay->display_score(
                         $total_score,
-                        SCORE_DIV_SIMPLE_WITH_CUSTOM_LETTERS
+                        $defaultStyle
                     );
                 } else {
-                    $row[] = $scoredisplay->display_score(
+                    $row[] = $scoreDisplay->display_score(
                         $total_score,
-                        SCORE_DIV_SIMPLE_WITH_CUSTOM_LETTERS
+                        $defaultStyle
                     );
                 }
             }
@@ -586,14 +625,15 @@ class FlatViewDataGenerator
     }
 
     /**
-     * Parse evaluations
+     * Parse evaluations.
      *
-     * @param int $user_id
+     * @param int   $user_id
      * @param array $sum_categories_weight_array
-     * @param int $items_count
-     * @param int $items_start
-     * @param int $show_all
-     * @param int $parentCategoryIdFilter filter by category id if set
+     * @param int   $items_count
+     * @param int   $items_start
+     * @param int   $show_all
+     * @param int   $parentCategoryIdFilter      filter by category id if set
+     *
      * @return array
      */
     public function parseEvaluations(
@@ -602,17 +642,17 @@ class FlatViewDataGenerator
         $items_count,
         $items_start,
         $show_all,
-        & $row,
+        &$row,
         $parentCategoryIdFilter = null,
-        $evaluationsAlreadyAdded = array()
+        $evaluationsAlreadyAdded = []
     ) {
         // Generate actual data array
-        $scoredisplay = ScoreDisplay::instance();
+        $scoreDisplay = ScoreDisplay::instance();
         $item_total = 0;
         $item_value_total = 0;
+        $evaluationsAdded = [];
 
-        $evaluationsAdded = array();
-
+        $model = ExerciseLib::getCourseScoreModel();
         for ($count = 0; $count < $items_count && ($items_start + $count < count($this->evals_links)); $count++) {
             /** @var AbstractLink $item */
             $item = $this->evals_links[$count + $items_start];
@@ -636,7 +676,6 @@ class FlatViewDataGenerator
             $divide = isset($score[1]) && !empty($score[1]) && $score[1] > 0 ? $score[1] : 1;
 
             // Sub cat weight
-            //$sub_cat_percentage = $sum_categories_weight_array[$item->get_category_id()];
             $item_value = isset($score[0]) ? $score[0] / $divide : 0;
 
             // Fixing total when using one or multiple gradebooks.
@@ -655,14 +694,43 @@ class FlatViewDataGenerator
             }
 
             $item_total += $item->get_weight();
-            $complete_score = $scoredisplay->display_score($score, SCORE_DIV_PERCENT, SCORE_ONLY_SCORE);
+
+            $style = api_get_configuration_value('gradebook_report_score_style');
+            $defaultStyle = SCORE_DIV_SIMPLE_WITH_CUSTOM;
+            if (!empty($style)) {
+                $defaultStyle = (int) $style;
+            }
+
+            $complete_score = $scoreDisplay->display_score(
+                $score,
+                SCORE_DIV_PERCENT,
+                SCORE_ONLY_SCORE
+            );
+
             if (api_get_setting('gradebook_show_percentage_in_reports') == 'false') {
-                $real_score = $scoredisplay->display_score($real_score, SCORE_SIMPLE);
-                $temp_score = $scoredisplay->display_score(array($item_value, null), SCORE_DIV_SIMPLE_WITH_CUSTOM);
+                $defaultShowPercentageValue = SCORE_SIMPLE;
+                if (!empty($style)) {
+                    $defaultShowPercentageValue = $style;
+                }
+                $real_score = $scoreDisplay->display_score(
+                    $real_score,
+                    $defaultShowPercentageValue
+                );
+                $temp_score = $scoreDisplay->display_score(
+                    [$item_value, null],
+                    SCORE_DIV_SIMPLE_WITH_CUSTOM
+                );
                 $temp_score = Display::tip($real_score, $temp_score);
             } else {
-                $temp_score = $scoredisplay->display_score($real_score, SCORE_DIV_PERCENT_WITH_CUSTOM);
+                $temp_score = $scoreDisplay->display_score(
+                    $real_score,
+                    $defaultStyle
+                );
                 $temp_score = Display::tip($temp_score, $complete_score);
+            }
+
+            if (!empty($model)) {
+                $temp_score = $temp_score.'&nbsp;'.ExerciseLib::show_score($score[0], $score[1]);
             }
 
             if (!isset($this->params['only_total_category']) ||
@@ -671,7 +739,7 @@ class FlatViewDataGenerator
                 if (!$show_all) {
                     if (in_array(
                         $item->get_type(),
-                        array(
+                        [
                             LINK_EXERCISE,
                             LINK_DROPBOX,
                             LINK_STUDENTPUBLICATION,
@@ -680,7 +748,7 @@ class FlatViewDataGenerator
                             LINK_ATTENDANCE,
                             LINK_SURVEY,
                             LINK_HOTPOTATOES,
-                        )
+                        ]
                     )
                     ) {
                         if (!empty($score[0])) {
@@ -698,33 +766,35 @@ class FlatViewDataGenerator
             $item_value_total += $item_value;
         }
 
-        return array(
+        return [
             'item_total' => $item_total,
             'item_value_total' => $item_value_total,
-            'evaluations_added' => $evaluationsAdded
-        );
+            'evaluations_added' => $evaluationsAdded,
+        ];
     }
 
     /**
-     * Get actual array data evaluation/link scores
+     * Get actual array data evaluation/link scores.
+     *
      * @param int $session_id
+     *
      * @return array
      */
-    public function get_evaluation_sumary_results($session_id = null)
+    public function getEvaluationSummaryResults($session_id = null)
     {
-        $usertable = array();
+        $usertable = [];
         foreach ($this->users as $user) {
             $usertable[] = $user;
         }
         $selected_users = $usertable;
 
         // generate actual data array for all selected users
-        $data = array();
+        $data = [];
 
         foreach ($selected_users as $user) {
-            $row = array();
+            $row = [];
             for ($count = 0; $count < count($this->evals_links); $count++) {
-                $item = $this->evals_links [$count];
+                $item = $this->evals_links[$count];
                 $score = $item->calc_score($user[0]);
                 $porcent_score = isset($score[1]) && $score[1] > 0 ? ($score[0] * 100) / $score[1] : 0;
                 $row[$item->get_name()] = $porcent_score;
@@ -733,9 +803,9 @@ class FlatViewDataGenerator
         }
 
         // get evaluations for every user by item
-        $data_by_item = array();
+        $data_by_item = [];
         foreach ($data as $uid => $items) {
-            $tmp = array();
+            $tmp = [];
             foreach ($items as $item => $value) {
                 $tmp[] = $item;
                 if (in_array($item, $tmp)) {
@@ -747,7 +817,7 @@ class FlatViewDataGenerator
         /* Get evaluation summary results
            (maximum, minimum and average of evaluations for all students)
         */
-        $result = array();
+        $result = [];
         foreach ($data_by_item as $k => $v) {
             $average = round(array_sum($v) / count($v));
             arsort($v);
@@ -758,11 +828,11 @@ class FlatViewDataGenerator
                 $minimum = 0;
             }
 
-            $summary = array(
+            $summary = [
                 'max' => $maximum,
                 'min' => $minimum,
-                'avg' => $average
-            );
+                'avg' => $average,
+            ];
             $result[$k] = $summary;
         }
 
@@ -775,18 +845,18 @@ class FlatViewDataGenerator
     public function get_data_to_graph()
     {
         // do some checks on users/items counts, redefine if invalid values
-        $usertable = array();
+        $usertable = [];
         foreach ($this->users as $user) {
             $usertable[] = $user;
         }
         // sort users array
-        usort($usertable, array('FlatViewDataGenerator', 'sort_by_first_name'));
+        usort($usertable, ['FlatViewDataGenerator', 'sort_by_first_name']);
 
-        $data = array();
+        $data = [];
 
         $selected_users = $usertable;
         foreach ($selected_users as $user) {
-            $row = array();
+            $row = [];
             $row[] = $user[0]; // user id
             $item_value = 0;
             $item_total = 0;
@@ -798,7 +868,6 @@ class FlatViewDataGenerator
                 $divide = (($score[1]) == 0) ? 1 : $score[1];
                 $item_value += $score[0] / $divide * $item->get_weight();
                 $item_total += $item->get_weight();
-
 
                 $score_denom = ($score[1] == 0) ? 1 : $score[1];
                 $score_final = ($score[0] / $score_denom) * 100;
@@ -815,8 +884,10 @@ class FlatViewDataGenerator
     }
 
     /**
-     * This is a function to show the generated data
+     * This is a function to show the generated data.
+     *
      * @param bool $displayWarning
+     *
      * @return array
      */
     public function get_data_to_graph2($displayWarning = true)
@@ -824,19 +895,19 @@ class FlatViewDataGenerator
         $course_code = api_get_course_id();
         $session_id = api_get_session_id();
         // do some checks on users/items counts, redefine if invalid values
-        $usertable = array();
+        $usertable = [];
         foreach ($this->users as $user) {
             $usertable[] = $user;
         }
         // sort users array
-        usort($usertable, array('FlatViewDataGenerator', 'sort_by_first_name'));
+        usort($usertable, ['FlatViewDataGenerator', 'sort_by_first_name']);
 
         // generate actual data array
-        $scoredisplay = ScoreDisplay::instance();
-        $data = array();
+        $scoreDisplay = ScoreDisplay::instance();
+        $data = [];
         $selected_users = $usertable;
         foreach ($selected_users as $user) {
-            $row = array();
+            $row = [];
             $row[] = $user[0]; // user id
             $item_value = 0;
             $item_total = 0;
@@ -861,82 +932,82 @@ class FlatViewDataGenerator
                     $item_value = $score[0] / $divide * $main_weight;
                     $item_total += $sub_cat->get_weight();
 
-                    $row[] = array(
+                    $row[] = [
                         $item_value,
                         trim(
-                            $scoredisplay->display_score(
+                            $scoreDisplay->display_score(
                                 $real_score,
                                 SCORE_CUSTOM,
                                 null,
                                 true
                             )
-                        )
-                    );
+                        ),
+                    ];
                     $item_value_total += $item_value;
                     $final_score += $score[0];
                     //$final_score = ($final_score / $item_total) * 100;
-
                 }
-                $total_score = array($final_score, $item_total);
-                $row[] = array(
+                $total_score = [$final_score, $item_total];
+                $row[] = [
                     $final_score,
                     trim(
-                        $scoredisplay->display_score(
+                        $scoreDisplay->display_score(
                             $total_score,
                             SCORE_CUSTOM,
                             null,
                             true
                         )
-                    )
-                );
+                    ),
+                ];
             } else {
                 for ($count = 0; $count < count($this->evals_links); $count++) {
-                    $item = $this->evals_links [$count];
+                    $item = $this->evals_links[$count];
                     $score = $item->calc_score($user[0]);
                     $divide = ($score[1]) == 0 ? 1 : $score[1];
                     $item_value += $score[0] / $divide * $item->get_weight();
                     $item_total += $item->get_weight();
                     $score_denom = ($score[1] == 0) ? 1 : $score[1];
                     $score_final = ($score[0] / $score_denom) * 100;
-                    $row[] = array(
+                    $row[] = [
                         $score_final,
                         trim(
-                            $scoredisplay->display_score(
+                            $scoreDisplay->display_score(
                                 $score,
                                 SCORE_CUSTOM,
                                 null,
                                 true
                             )
-                        )
-                    );
-
+                        ),
+                    ];
                 }
-                $total_score = array($item_value, $item_total);
+                $total_score = [$item_value, $item_total];
                 $score_final = ($item_value / $item_total) * 100;
                 if ($displayWarning) {
                     echo Display::return_message($total_score[1], 'warning');
                 }
-                $row[] = array(
+                $row[] = [
                     $score_final,
                     trim(
-                        $scoredisplay->display_score(
+                        $scoreDisplay->display_score(
                             $total_score,
                             SCORE_CUSTOM,
                             null,
                             true
                         )
-                    )
-                );
+                    ),
+                ];
             }
 
             $data[] = $row;
         }
+
         return $data;
     }
 
     /**
      * @param $item1
      * @param $item2
+     *
      * @return int
      */
     public function sort_by_last_name($item1, $item2)
@@ -947,6 +1018,7 @@ class FlatViewDataGenerator
     /**
      * @param $item1
      * @param $item2
+     *
      * @return int
      */
     public function sort_by_first_name($item1, $item2)

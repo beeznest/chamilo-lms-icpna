@@ -5,15 +5,13 @@ namespace Chamilo\ContactBundle\Controller;
 
 use Chamilo\ContactBundle\Entity\Category;
 use Chamilo\ContactBundle\Form\Type\ContactType;
+use Chamilo\UserBundle\Entity\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Chamilo\UserBundle\Entity\User;
 
 /**
- *
- * Class ContactController
+ * Class ContactController.
  *
  * @Route("/")
  *
@@ -25,6 +23,7 @@ class ContactController extends Controller
      * @Route("/", name="contact")
      *
      * @param Request $request
+     *
      * @return mixed
      */
     public function indexAction(Request $request)
@@ -37,9 +36,8 @@ class ContactController extends Controller
         if ($user) {
             $data = [
                 'firstname' => $user->getFirstname(),
-                'lastname' =>  $user->getFirstname(),
-                'email' =>  $user->getEmail(),
-
+                'lastname' => $user->getFirstname(),
+                'email' => $user->getEmail(),
             ];
         }
 
@@ -62,20 +60,20 @@ class ContactController extends Controller
                     ->setBody(
                         $this->renderView(
                             '@ChamiloContact/contact.html.twig',
-                            array(
+                            [
                                 'ip' => $request->getClientIp(),
                                 'firstname' => $form->get('firstname')->getData(),
                                 'lastname' => $form->get('lastname')->getData(),
                                 'subject' => $form->get('subject')->getData(),
                                 'email' => $form->get('email')->getData(),
-                                'message' => $form->get('message')->getData()
-                            )
+                                'message' => $form->get('message')->getData(),
+                            ]
                         )
                     );
 
                 $this->get('mailer')->send($message);
                 $this->addFlash(
-                    'success', 
+                    'success',
                     'Your email has been sent! Thanks!'
                 );
 
@@ -85,9 +83,9 @@ class ContactController extends Controller
 
         return $this->render(
             '@ChamiloContact/index.html.twig',
-            array(
-                'form' => $form->createView()
-            )
+            [
+                'form' => $form->createView(),
+            ]
         );
     }
 }

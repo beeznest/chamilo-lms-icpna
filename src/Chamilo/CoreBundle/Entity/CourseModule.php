@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CourseModule
+ * CourseModule.
  *
  * @ORM\Table(name="course_module")
  * @ORM\Entity
@@ -14,62 +14,61 @@ use Doctrine\ORM\Mapping as ORM;
 class CourseModule
 {
     /**
+     * @var int
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    protected $id;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
      */
-    private $name;
+    protected $name;
 
     /**
      * @var string
      *
      * @ORM\Column(name="link", type="string", length=255, nullable=false)
      */
-    private $link;
+    protected $link;
 
     /**
      * @var string
      *
      * @ORM\Column(name="image", type="string", length=100, nullable=true)
      */
-    private $image;
+    protected $image;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="row", type="integer", nullable=false)
      */
-    private $row;
+    protected $row;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="column", type="integer", nullable=false)
      */
-    private $column;
+    protected $column;
 
     /**
      * @var string
      *
      * @ORM\Column(name="position", type="string", length=20, nullable=false)
      */
-    private $position;
+    protected $position;
 
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $id;
-
-
-
-    /**
-     * Set name
+     * Set name.
      *
      * @param string $name
+     *
      * @return CourseModule
      */
     public function setName($name)
@@ -80,7 +79,7 @@ class CourseModule
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
@@ -90,9 +89,10 @@ class CourseModule
     }
 
     /**
-     * Set link
+     * Set link.
      *
      * @param string $link
+     *
      * @return CourseModule
      */
     public function setLink($link)
@@ -103,7 +103,7 @@ class CourseModule
     }
 
     /**
-     * Get link
+     * Get link.
      *
      * @return string
      */
@@ -113,9 +113,10 @@ class CourseModule
     }
 
     /**
-     * Set image
+     * Set image.
      *
      * @param string $image
+     *
      * @return CourseModule
      */
     public function setImage($image)
@@ -126,7 +127,7 @@ class CourseModule
     }
 
     /**
-     * Get image
+     * Get image.
      *
      * @return string
      */
@@ -136,9 +137,10 @@ class CourseModule
     }
 
     /**
-     * Set row
+     * Set row.
      *
-     * @param integer $row
+     * @param int $row
+     *
      * @return CourseModule
      */
     public function setRow($row)
@@ -149,9 +151,9 @@ class CourseModule
     }
 
     /**
-     * Get row
+     * Get row.
      *
-     * @return integer
+     * @return int
      */
     public function getRow()
     {
@@ -159,9 +161,10 @@ class CourseModule
     }
 
     /**
-     * Set column
+     * Set column.
      *
-     * @param integer $column
+     * @param int $column
+     *
      * @return CourseModule
      */
     public function setColumn($column)
@@ -172,9 +175,9 @@ class CourseModule
     }
 
     /**
-     * Get column
+     * Get column.
      *
-     * @return integer
+     * @return int
      */
     public function getColumn()
     {
@@ -182,9 +185,10 @@ class CourseModule
     }
 
     /**
-     * Set position
+     * Set position.
      *
      * @param string $position
+     *
      * @return CourseModule
      */
     public function setPosition($position)
@@ -195,7 +199,7 @@ class CourseModule
     }
 
     /**
-     * Get position
+     * Get position.
      *
      * @return string
      */
@@ -205,9 +209,9 @@ class CourseModule
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {

@@ -1,37 +1,36 @@
 <?php
 /* For licensing terms, see /license.txt */
-/**
- * Accessurledituserstourl class definition
- * @package chamilo.library
- */
 
 /**
- * Accessurledituserstourl class definition
+ * AccessUrlEditUsersToUrl class definition
  * Contains several functions dealing with displaying,
- * editing,... of a Access_url_edit_users_to_url_functions
+ * editing,... of a Access_url_edit_users_to_url_functions.
  *
  * @version 1.0
+ *
  * @author Toon Keppens <toon@vi-host.net>
  * @author Julio Montoya - Cleaning code
  * @author Ricardo Rodriguez - Separated the function and code
+ *
  * @package chamilo.library
  */
-class Accessurledituserstourl
+class AccessUrlEditUsersToUrl
 {
     /**
      * Search users by username, firstname or lastname, based on the given
-     * search string
+     * search string.
+     *
      * @param string Search string
      * @param int Deprecated param
+     *
      * @return xajaxResponse Xajax response block
      * @assert () === false
      */
-    public function search_users($needle, $id)
+    public static function search_users($needle, $id)
     {
         $tbl_user = Database::get_main_table(TABLE_MAIN_USER);
         $xajax_response = new xajaxResponse();
         $return = '';
-
         if (!empty($needle)) {
             // xajax send utf8 datas... datas in db can be non-utf8 datas
             $charset = api_get_system_encoding();
@@ -45,7 +44,6 @@ class Accessurledituserstourl
                    ' OR lastname LIKE "'.$needle.'%") '.
                     $order_clause.
                    ' LIMIT 11';
-
             $rs = Database::query($sql);
             $i = 0;
 
@@ -63,7 +61,7 @@ class Accessurledituserstourl
             'innerHTML',
             api_utf8_encode($return)
         );
+
         return $xajax_response;
     }
 }
-

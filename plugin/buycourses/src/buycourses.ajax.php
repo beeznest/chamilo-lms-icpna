@@ -1,16 +1,16 @@
 <?php
 /* For licensing terms, see /license.txt */
 
+use Chamilo\CoreBundle\Entity\Course;
+use Chamilo\CoreBundle\Entity\Session;
+use Chamilo\CourseBundle\Entity\CLp;
+use Chamilo\UserBundle\Entity\User;
+
 /**
- * Responses to AJAX calls
+ * Responses to AJAX calls.
+ *
  * @package chamilo.plugin.buycourses
  */
-
-use Chamilo\UserBundle\Entity\User,
-    Chamilo\CoreBundle\Entity\Course,
-    Chamilo\CoreBundle\Entity\Session,
-    Chamilo\CourseBundle\Entity\CLp;
-
 $cidReset = true;
 
 require_once __DIR__.'/../../../main/inc/global.inc.php';
@@ -75,8 +75,11 @@ switch ($action) {
         $html .= '<li><b>'.$plugin->get_lang('OrderPrice').':</b> '.$sale['price'].'</li>';
         $html .= '<li><b>'.$plugin->get_lang('CurrencyType').':</b> '.$currency['iso_code'].'</li>';
         $html .= '<li><b>'.$plugin->get_lang('ProductType').':</b> '.$productType.'</li>';
-        $html .= '<li><b>'.$plugin->get_lang('OrderDate').':</b> '.api_format_date($sale['date'],
-                DATE_TIME_FORMAT_LONG_24H).'</li>';
+        $html .= '<li><b>'.$plugin->get_lang('OrderDate').':</b> '.
+            api_format_date(
+                $sale['date'],
+                DATE_TIME_FORMAT_LONG_24H
+            ).'</li>';
         $html .= '<li><b>'.$plugin->get_lang('Buyer').':</b> '.$userInfo['complete_name'].'</li>';
         $html .= '<li><b>'.$plugin->get_lang('PaymentMethods').':</b> '.$paymentType.'</li>';
         $html .= '</ul>';
@@ -199,7 +202,7 @@ switch ($action) {
         $paypalPassword = $paypalParams['password'];
         $paypalSignature = $paypalParams['signature'];
 
-        require_once("paypalfunctions.php");
+        require_once "paypalfunctions.php";
 
         $allPayouts = [];
         $totalAccounts = 0;
@@ -208,12 +211,19 @@ switch ($action) {
         $payouts = isset($_POST['payouts']) ? $_POST['payouts'] : '';
 
         if (!$payouts) {
-            echo Display::return_message(get_plugin_lang("SelectOptionToProceed", "BuyCoursesPlugin"), 'error', false);
+            echo Display::return_message(
+                get_plugin_lang("SelectOptionToProceed", "BuyCoursesPlugin"),
+                'error',
+                false
+            );
             break;
         }
 
         foreach ($payouts as $index => $id) {
-            $allPayouts[] = $plugin->getPayouts(BuyCoursesPlugin::PAYOUT_STATUS_PENDING, $id);
+            $allPayouts[] = $plugin->getPayouts(
+                BuyCoursesPlugin::PAYOUT_STATUS_PENDING,
+                $id
+            );
         }
 
         $currentCurrency = $plugin->getSelectedCurrency();
@@ -221,10 +231,20 @@ switch ($action) {
         $result = MassPayment($allPayouts, $isoCode);
         if ($result['ACK'] === 'Success') {
             foreach ($allPayouts as $payout) {
-                $plugin->setStatusPayouts($payout['id'], BuyCoursesPlugin::PAYOUT_STATUS_COMPLETED);
+                $plugin->setStatusPayouts(
+                    $payout['id'],
+                    BuyCoursesPlugin::PAYOUT_STATUS_COMPLETED
+                );
+                if ($plugin->get('invoicing_enable') === 'true') {
+                    $plugin->setInvoice($payout['id']);
+                }
             }
 
-            echo Display::return_message(get_plugin_lang("PayoutSuccess", "BuyCoursesPlugin"), 'success', false);
+            echo Display::return_message(
+                get_plugin_lang("PayoutSuccess", "BuyCoursesPlugin"),
+                'success',
+                false
+            );
         } else {
             echo Display::return_message(
                 '<b>'.$result['L_SEVERITYCODE0'].' '.$result['L_ERRORCODE0'].'</b> - '.$result['L_SHORTMESSAGE0']
@@ -243,7 +263,10 @@ switch ($action) {
 
         // $payoutId only gets used in setStatusPayout(), where it is filtered
         $payoutId = isset($_POST['id']) ? $_POST['id'] : '';
-        $plugin->setStatusPayouts($payoutId, BuyCoursesPlugin::PAYOUT_STATUS_CANCELED);
+        $plugin->setStatusPayouts(
+            $payoutId,
+            BuyCoursesPlugin::PAYOUT_STATUS_CANCELED
+        );
 
         echo '';
 
@@ -266,15 +289,15 @@ switch ($action) {
             break;
         }
 
-        require_once("Requests.php");
+        require_once "Requests.php";
         Requests::register_autoloader();
-        require_once("culqi.php");
+        require_once "culqi.php";
 
         $culqiParams = $plugin->getCulqiParams();
 
         // API Key y autenticación
         $SECRET_API_KEY = $culqiParams['api_key'];
-        $culqi = new Culqi\Culqi(array('api_key' => $SECRET_API_KEY));
+        $culqi = new Culqi\Culqi(['api_key' => $SECRET_API_KEY]);
 
         $environment = $culqiParams['integration'];
         $environment = $environment
@@ -287,7 +310,7 @@ switch ($action) {
         $currency = $plugin->getSelectedCurrency();
 
         try {
-            $cargo = $culqi->Cargos->create(array(
+            $cargo = $culqi->Cargos->create([
                 "moneda" => $currency['iso_code'],
                 "monto" => intval(floatval($sale['price']) * 100),
                 "usuario" => $user['username'],
@@ -300,18 +323,15 @@ switch ($action) {
                 "nombres" => $user['firstname'],
                 "apellidos" => $user['lastname'],
                 "correo_electronico" => $user['email'],
-                "token" => $tokenId
-            ));
+                "token" => $tokenId,
+            ]);
 
             if (is_object($cargo)) {
                 $saleIsCompleted = $plugin->completeSale($sale['id']);
 
                 if ($saleIsCompleted) {
                     Display::addFlash(
-                        Display::return_message(
-                            sprintf($plugin->get_lang('SubscriptionToCourseXSuccessful'), $sale['product_name']),
-                            'success'
-                        )
+                        $plugin->getSubscriptionSuccessMessage($sale)
                     );
                 }
             }
@@ -358,15 +378,15 @@ switch ($action) {
             break;
         }
 
-        require_once("Requests.php");
+        require_once "Requests.php";
         Requests::register_autoloader();
-        require_once("culqi.php");
+        require_once "culqi.php";
 
         $culqiParams = $plugin->getCulqiParams();
 
         // API Key y autenticación
         $SECRET_API_KEY = $culqiParams['api_key'];
-        $culqi = new Culqi\Culqi(array('api_key' => $SECRET_API_KEY));
+        $culqi = new Culqi\Culqi(['api_key' => $SECRET_API_KEY]);
 
         $environment = $culqiParams['integration'];
         $environment = $environment
@@ -377,7 +397,7 @@ switch ($action) {
         $user = api_get_user_info();
 
         try {
-            $cargo = $culqi->Cargos->create(array(
+            $cargo = $culqi->Cargos->create([
                 "moneda" => $serviceSale['currency'],
                 "monto" => intval(floatval($serviceSale['price']) * 100),
                 "usuario" => $user['username'],
@@ -390,8 +410,8 @@ switch ($action) {
                 "nombres" => $user['firstname'],
                 "apellidos" => $user['lastname'],
                 "correo_electronico" => $user['email'],
-                "token" => $tokenId
-            ));
+                "token" => $tokenId,
+            ]);
 
             if (is_object($cargo)) {
                 $saleIsCompleted = $plugin->completeServiceSale($serviceSale['id']);

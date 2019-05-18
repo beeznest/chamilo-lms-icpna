@@ -1,11 +1,12 @@
 <?php
 /* For licensing terms, see /license.txt */
 
-use Zend\Feed\Reader\Reader;
+use ChamiloSession as Session;
 use Zend\Feed\Reader\Entry\Rss;
+use Zend\Feed\Reader\Reader;
 
 /**
- * Class SocialManager
+ * Class SocialManager.
  *
  * This class provides methods for the social network management.
  * Include/require it in your code to use its features.
@@ -14,26 +15,31 @@ use Zend\Feed\Reader\Entry\Rss;
  */
 class SocialManager extends UserManager
 {
+    const DEFAULT_WALL_POSTS = 10;
+    const DEFAULT_SCROLL_NEW_POST = 5;
+
     /**
-     * Constructor
+     * Constructor.
      */
     public function __construct()
     {
     }
 
     /**
-     * Allow to see contacts list
+     * Allow to see contacts list.
+     *
      * @author isaac flores paz
+     *
      * @return array
      */
     public static function show_list_type_friends()
     {
-        $friend_relation_list = array();
         $table = Database::get_main_table(TABLE_MAIN_USER_FRIEND_RELATION_TYPE);
         $sql = 'SELECT id, title FROM '.$table.'
                 WHERE id<>6 
                 ORDER BY id ASC';
         $result = Database::query($sql);
+        $friend_relation_list = [];
         while ($row = Database::fetch_array($result, 'ASSOC')) {
             $friend_relation_list[] = $row;
         }
@@ -46,9 +52,12 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Get relation type contact by name
+     * Get relation type contact by name.
+     *
      * @param string names of the kind of relation
+     *
      * @return int
+     *
      * @author isaac flores paz
      */
     public static function get_relation_type_by_name($relation_type_name)
@@ -62,11 +71,14 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Get the kind of relation between contacts
+     * Get the kind of relation between contacts.
+     *
      * @param int user id
      * @param int user friend id
      * @param string
+     *
      * @return int
+     *
      * @author isaac flores paz
      */
     public static function get_relation_between_contacts($user_id, $user_friend)
@@ -95,28 +107,30 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Get count of friends from user
+     * Get count of friends from user.
      *
      * @param int $userId
+     *
      * @return int
      */
     public static function getCountFriends($userId)
     {
-        $tbl_my_friend = Database::get_main_table(TABLE_MAIN_USER_REL_USER);
+        $table = Database::get_main_table(TABLE_MAIN_USER_REL_USER);
         $userId = (int) $userId;
         if (empty($userId)) {
             return 0;
         }
 
         $sql = 'SELECT count(friend_user_id) count
-                FROM '.$tbl_my_friend.'
+                FROM '.$table.'
                 WHERE
                     relation_type NOT IN ('.USER_RELATION_TYPE_DELETED.', '.USER_RELATION_TYPE_RRHH.') AND
-                    friend_user_id<>'.($userId).' AND
-                    user_id='.($userId);
+                    friend_user_id<>'.$userId.' AND
+                    user_id='.$userId;
         $res = Database::query($sql);
         if (Database::num_rows($res)) {
             $row = Database::fetch_array($res, 'ASSOC');
+
             return (int) $row['count'];
         }
 
@@ -124,12 +138,15 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Gets friends id list
+     * Gets friends id list.
+     *
      * @param int  user id
      * @param int group id
      * @param string name to search
      * @param bool true will load firstname, lastname, and image name
+     *
      * @return array
+     *
      * @author Julio Montoya <gugli100@gmail.com> Cleaning code, function renamed, $load_extra_info option added
      * @author isaac flores paz
      */
@@ -139,14 +156,15 @@ class SocialManager extends UserManager
         $search_name = null,
         $load_extra_info = true
     ) {
-        $list_ids_friends = array();
+        $user_id = (int) $user_id;
+
         $tbl_my_friend = Database::get_main_table(TABLE_MAIN_USER_REL_USER);
         $tbl_my_user = Database::get_main_table(TABLE_MAIN_USER);
         $sql = 'SELECT friend_user_id FROM '.$tbl_my_friend.'
                 WHERE
                     relation_type NOT IN ('.USER_RELATION_TYPE_DELETED.', '.USER_RELATION_TYPE_RRHH.') AND
-                    friend_user_id<>'.((int) $user_id).' AND
-                    user_id='.((int) $user_id);
+                    friend_user_id<>'.$user_id.' AND
+                    user_id='.$user_id;
         if (isset($id_group) && $id_group > 0) {
             $sql .= ' AND relation_type='.$id_group;
         }
@@ -163,29 +181,32 @@ class SocialManager extends UserManager
         }
 
         $res = Database::query($sql);
+        $list = [];
         while ($row = Database::fetch_array($res, 'ASSOC')) {
             if ($load_extra_info) {
-                $my_user_info = api_get_user_info($row['friend_user_id']);
-                $list_ids_friends[] = array(
+                $userInfo = api_get_user_info($row['friend_user_id']);
+                $list[] = [
                     'friend_user_id' => $row['friend_user_id'],
-                    'firstName' => $my_user_info['firstName'],
-                    'lastName' => $my_user_info['lastName'],
-                    'username' => $my_user_info['username'],
-                    'image' => $my_user_info['avatar'],
-                    'user_info' => $my_user_info,
-                );
+                    'firstName' => $userInfo['firstName'],
+                    'lastName' => $userInfo['lastName'],
+                    'username' => $userInfo['username'],
+                    'image' => $userInfo['avatar'],
+                    'user_info' => $userInfo,
+                ];
             } else {
-                $list_ids_friends[] = $row;
+                $list[] = $row;
             }
         }
 
-        return $list_ids_friends;
+        return $list;
     }
 
     /**
-     * get web path of user invitate
+     * get web path of user invitate.
+     *
      * @author isaac flores paz
      * @author Julio Montoya setting variable array
+     *
      * @param int user id
      *
      * @return array
@@ -193,7 +214,7 @@ class SocialManager extends UserManager
     public static function get_list_web_path_user_invitation_by_user_id($user_id)
     {
         $list_ids = self::get_list_invitation_of_friends_by_user_id($user_id);
-        $list = array();
+        $list = [];
         foreach ($list_ids as $values_ids) {
             $list[] = UserManager::get_user_picture_path_by_id(
                 $values_ids['user_sender_id'],
@@ -205,28 +226,33 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Sends an invitation to contacts
+     * Sends an invitation to contacts.
+     *
      * @param int user id
      * @param int user friend id
      * @param string title of the message
      * @param string content of the message
-     * @return boolean
+     *
+     * @return bool
+     *
      * @author isaac flores paz
      * @author Julio Montoya <gugli100@gmail.com> Cleaning code
      */
-    public static function send_invitation_friend($user_id, $friend_id, $message_title, $message_content)
-    {
+    public static function send_invitation_friend(
+        $user_id,
+        $friend_id,
+        $message_title,
+        $message_content
+    ) {
         $tbl_message = Database::get_main_table(TABLE_MESSAGE);
-        $user_id = intval($user_id);
-        $friend_id = intval($friend_id);
+        $user_id = (int) $user_id;
+        $friend_id = (int) $friend_id;
 
         //Just in case we replace the and \n and \n\r while saving in the DB
-        $message_content = str_replace(array("\n", "\n\r"), '<br />', $message_content);
+        $message_content = str_replace(["\n", "\n\r"], '<br />', $message_content);
 
         $clean_message_content = Database::escape_string($message_content);
-
         $now = api_get_utc_datetime();
-
         $sql = 'SELECT COUNT(*) AS count FROM '.$tbl_message.'
                 WHERE
                     user_sender_id='.$user_id.' AND
@@ -243,21 +269,22 @@ class SocialManager extends UserManager
                 'msg_status' => MESSAGE_STATUS_INVITATION_PENDING,
                 'send_date' => $now,
                 'title' => $message_title,
-                'content'  => $message_content,
+                'content' => $message_content,
                 'group_id' => 0,
                 'parent_id' => 0,
-                'update_date' => $now
+                'update_date' => $now,
             ];
-            Database::insert($tbl_message, $params);
+            $messageId = Database::insert($tbl_message, $params);
 
-            $sender_info = api_get_user_info($user_id);
+            $senderInfo = api_get_user_info($user_id);
             $notification = new Notification();
-            $notification->save_notification(
+            $notification->saveNotification(
+                $messageId,
                 Notification::NOTIFICATION_TYPE_INVITATION,
-                array($friend_id),
+                [$friend_id],
                 $message_title,
                 $message_content,
-                $sender_info
+                $senderInfo
             );
 
             return true;
@@ -272,6 +299,7 @@ class SocialManager extends UserManager
                         msg_status=5, content = "'.$clean_message_content.'"
                         WHERE user_sender_id='.$user_id.' AND user_receiver_id='.$friend_id.' AND msg_status = 7 ';
                 Database::query($sql);
+
                 return true;
             } else {
                 return false;
@@ -280,35 +308,45 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Get number messages of the inbox
+     * Get number messages of the inbox.
+     *
      * @author isaac flores paz
-     * @param int user receiver id
+     *
+     * @param int $userId user receiver id
+     *
      * @return int
      */
-    public static function get_message_number_invitation_by_user_id($user_receiver_id)
+    public static function get_message_number_invitation_by_user_id($userId)
     {
-        $tbl_message = Database::get_main_table(TABLE_MESSAGE);
-        $sql = 'SELECT COUNT(*) as count_message_in_box FROM '.$tbl_message.'
+        $table = Database::get_main_table(TABLE_MESSAGE);
+        $userId = (int) $userId;
+        $sql = 'SELECT COUNT(*) as count_message_in_box FROM '.$table.'
                 WHERE
-                    user_receiver_id='.intval($user_receiver_id).' AND
+                    user_receiver_id='.$userId.' AND
                     msg_status='.MESSAGE_STATUS_INVITATION_PENDING;
         $res = Database::query($sql);
         $row = Database::fetch_array($res, 'ASSOC');
+        if ($row) {
+            return (int) $row['count_message_in_box'];
+        }
 
-        return $row['count_message_in_box'];
+        return 0;
     }
 
     /**
-     * Get number of messages sent to other users
-     * @param int $sender_id
+     * Get number of messages sent to other users.
+     *
+     * @param int $userId
+     *
      * @return int
      */
-    public static function getCountMessagesSent($sender_id)
+    public static function getCountMessagesSent($userId)
     {
-        $tbl_message = Database::get_main_table(TABLE_MESSAGE);
-        $sql = 'SELECT COUNT(*) FROM '.$tbl_message.'
+        $userId = (int) $userId;
+        $table = Database::get_main_table(TABLE_MESSAGE);
+        $sql = 'SELECT COUNT(*) FROM '.$table.'
                 WHERE
-                    user_sender_id='.intval($sender_id).' AND
+                    user_sender_id='.$userId.' AND
                     msg_status < 5';
         $res = Database::query($sql);
         $row = Database::fetch_row($res);
@@ -317,14 +355,16 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Get number of messages received from other users
+     * Get number of messages received from other users.
+     *
      * @param int $receiver_id
+     *
      * @return int
      */
     public static function getCountMessagesReceived($receiver_id)
     {
-        $tbl_message = Database::get_main_table(TABLE_MESSAGE);
-        $sql = 'SELECT COUNT(*) FROM '.$tbl_message.'
+        $table = Database::get_main_table(TABLE_MESSAGE);
+        $sql = 'SELECT COUNT(*) FROM '.$table.'
                 WHERE
                     user_receiver_id='.intval($receiver_id).' AND
                     msg_status < 4';
@@ -335,21 +375,25 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Get number of messages posted on own wall
+     * Get number of messages posted on own wall.
+     *
      * @param int $userId
+     *
      * @return int
      */
     public static function getCountWallPostedMessages($userId)
     {
+        $userId = (int) $userId;
+
         if (empty($userId)) {
             return 0;
         }
 
-        $tbl_message = Database::get_main_table(TABLE_MESSAGE);
+        $table = Database::get_main_table(TABLE_MESSAGE);
         $sql = 'SELECT COUNT(*) 
-                FROM '.$tbl_message.'
+                FROM '.$table.'
                 WHERE
-                    user_sender_id='.intval($userId).' AND
+                    user_sender_id='.$userId.' AND
                     (msg_status = '.MESSAGE_STATUS_WALL.' OR 
                     msg_status = '.MESSAGE_STATUS_WALL_POST.') AND 
                     parent_id = 0';
@@ -360,26 +404,35 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Get invitation list received by user
+     * Get invitation list received by user.
+     *
      * @author isaac flores paz
+     *
      * @param int $userId
+     * @param int $limit
      *
      * @return array
      */
-    public static function get_list_invitation_of_friends_by_user_id($userId)
+    public static function get_list_invitation_of_friends_by_user_id($userId, $limit = 0)
     {
+        $userId = (int) $userId;
+        $limit = (int) $limit;
+
         if (empty($userId)) {
             return [];
         }
 
-        $tbl_message = Database::get_main_table(TABLE_MESSAGE);
+        $table = Database::get_main_table(TABLE_MESSAGE);
         $sql = 'SELECT user_sender_id, send_date, title, content
-                FROM '.$tbl_message.'
+                FROM '.$table.'
                 WHERE
-                    user_receiver_id = '.intval($userId).' AND
+                    user_receiver_id = '.$userId.' AND
                     msg_status = '.MESSAGE_STATUS_INVITATION_PENDING;
+        if ($limit != null && $limit > 0) {
+            $sql .= ' LIMIT '.$limit;
+        }
         $res = Database::query($sql);
-        $list = array();
+        $list = [];
         while ($row = Database::fetch_array($res, 'ASSOC')) {
             $list[] = $row;
         }
@@ -388,13 +441,18 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Get invitation list sent by user
+     * Get invitation list sent by user.
+     *
      * @author Julio Montoya <gugli100@gmail.com>
+     *
      * @param int $userId
+     *
      * @return array
      */
     public static function get_list_invitation_sent_by_user_id($userId)
     {
+        $userId = (int) $userId;
+
         if (empty($userId)) {
             return [];
         }
@@ -403,10 +461,10 @@ class SocialManager extends UserManager
         $sql = 'SELECT user_receiver_id, send_date,title,content
                 FROM '.$table.'
                 WHERE
-                    user_sender_id = '.intval($userId).' AND
+                    user_sender_id = '.$userId.' AND
                     msg_status = '.MESSAGE_STATUS_INVITATION_PENDING;
         $res = Database::query($sql);
-        $list = array();
+        $list = [];
         while ($row = Database::fetch_array($res, 'ASSOC')) {
             $list[$row['user_receiver_id']] = $row;
         }
@@ -415,14 +473,18 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Get count invitation sent by user
+     * Get count invitation sent by user.
+     *
      * @author Julio Montoya <gugli100@gmail.com>
+     *
      * @param int $userId
      *
      * @return int
      */
     public static function getCountInvitationSent($userId)
     {
+        $userId = (int) $userId;
+
         if (empty($userId)) {
             return 0;
         }
@@ -431,11 +493,12 @@ class SocialManager extends UserManager
         $sql = 'SELECT count(user_receiver_id) count
                 FROM '.$table.'
                 WHERE
-                    user_sender_id = '.intval($userId).' AND
+                    user_sender_id = '.$userId.' AND
                     msg_status = '.MESSAGE_STATUS_INVITATION_PENDING;
         $res = Database::query($sql);
         if (Database::num_rows($res)) {
             $row = Database::fetch_array($res, 'ASSOC');
+
             return (int) $row['count'];
         }
 
@@ -443,9 +506,11 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Accepts invitation
+     * Accepts invitation.
+     *
      * @param int $user_send_id
      * @param int $user_receiver_id
+     *
      * @return bool
      *
      * @author isaac flores paz
@@ -457,8 +522,8 @@ class SocialManager extends UserManager
             return false;
         }
 
-        $tbl_message = Database::get_main_table(TABLE_MESSAGE);
-        $sql = "UPDATE $tbl_message
+        $table = Database::get_main_table(TABLE_MESSAGE);
+        $sql = "UPDATE $table
                 SET msg_status = ".MESSAGE_STATUS_INVITATION_ACCEPTED."
                 WHERE
                     user_sender_id = ".((int) $user_send_id)." AND
@@ -470,9 +535,11 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Denies invitation
+     * Denies invitation.
+     *
      * @param int user sender id
      * @param int user receiver id
+     *
      * @return bool
      *
      * @author isaac flores paz
@@ -483,8 +550,8 @@ class SocialManager extends UserManager
         if (empty($user_send_id) || empty($user_receiver_id)) {
             return false;
         }
-        $tbl_message = Database::get_main_table(TABLE_MESSAGE);
-        $sql = 'DELETE FROM '.$tbl_message.'
+        $table = Database::get_main_table(TABLE_MESSAGE);
+        $sql = 'DELETE FROM '.$table.'
                 WHERE
                     user_sender_id =  '.((int) $user_send_id).' AND
                     user_receiver_id='.((int) $user_receiver_id).' AND
@@ -495,31 +562,37 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Allow attaching to group
+     * Allow attaching to group.
+     *
      * @author Isaac Flores Paz
+     *
      * @param int $id_friend_qualify User to qualify
-     * @param int $type_qualify Kind of rating
-     * @return void
+     * @param int $type_qualify      Kind of rating
+     *
      * @deprecated 2017-03
      */
     public static function qualify_friend($id_friend_qualify, $type_qualify)
     {
-        $tbl_user_friend = Database::get_main_table(TABLE_MAIN_USER_REL_USER);
+        $table = Database::get_main_table(TABLE_MAIN_USER_REL_USER);
         $user_id = api_get_user_id();
-        $sql = 'UPDATE '.$tbl_user_friend.' SET relation_type='.((int) $type_qualify).'
-                WHERE user_id = '.((int) $user_id).' AND friend_user_id='.(int) $id_friend_qualify;
+        $sql = 'UPDATE '.$table.' SET relation_type='.((int) $type_qualify).'
+                WHERE user_id = '.$user_id.' AND friend_user_id='.(int) $id_friend_qualify;
         Database::query($sql);
     }
 
     /**
-     * Get user's feeds
-     * @param   int $user User ID
-     * @param   int $limit Limit of posts per feed
-     * @return  string  HTML section with all feeds included
+     * Get user's feeds.
+     *
+     * @param int $user  User ID
+     * @param int $limit Limit of posts per feed
+     *
+     * @return string HTML section with all feeds included
+     *
      * @author  Yannick Warnier
+     *
      * @since   Dokeos 1.8.6.1
      */
-    public static function get_user_feeds($user, $limit = 5)
+    public static function getUserRssFeed($user, $limit = 5)
     {
         $feed = UserManager::get_extra_user_data_by_field($user, 'rssfeeds');
 
@@ -531,37 +604,39 @@ class SocialManager extends UserManager
             return '';
         }
         $res = '';
-
         foreach ($feeds as $url) {
             if (empty($url)) {
                 continue;
             }
-            $channel = Reader::import($url);
-
-            $i = 1;
-            if (!empty($channel)) {
-                $icon_rss = '';
-                if (!empty($feed)) {
-                    $icon_rss = Display::url(
-                        Display::return_icon('social_rss.png', '', array(), 22),
-                        Security::remove_XSS($feed['rssfeeds']),
-                        array('target' => '_blank')
-                    );
-                }
-
-                $res .= '<h3 class="title-rss">'.$icon_rss.' '.$channel->getTitle().'</h3>';
-                $res .= '<div class="rss-items">';
-                /** @var Rss $item */
-                foreach ($channel as $item) {
-                    if ($limit >= 0 and $i > $limit) {
-                        break;
+            try {
+                $channel = Reader::import($url);
+                $i = 1;
+                if (!empty($channel)) {
+                    $iconRss = '';
+                    if (!empty($feed)) {
+                        $iconRss = Display::url(
+                            Display::return_icon('social_rss.png', '', [], 22),
+                            Security::remove_XSS($feed['rssfeeds']),
+                            ['target' => '_blank']
+                        );
                     }
-                    $res .= '<h4 class="rss-title"><a href="'.$item->getLink().'">'.$item->getTitle().'</a></h4>';
-                    $res .= '<div class="rss-date">'.api_get_local_time($item->getDateCreated()).'</div>';
-                    $res .= '<div class="rss-content"><p>'.$item->getDescription().'</p></div>';
-                    $i++;
+
+                    $res .= '<h3 class="title-rss">'.$iconRss.' '.$channel->getTitle().'</h3>';
+                    $res .= '<div class="rss-items">';
+                    /** @var Rss $item */
+                    foreach ($channel as $item) {
+                        if ($limit >= 0 and $i > $limit) {
+                            break;
+                        }
+                        $res .= '<h4 class="rss-title"><a href="'.$item->getLink().'">'.$item->getTitle().'</a></h4>';
+                        $res .= '<div class="rss-date">'.api_get_local_time($item->getDateCreated()).'</div>';
+                        $res .= '<div class="rss-content"><p>'.$item->getDescription().'</p></div>';
+                        $i++;
+                    }
+                    $res .= '</div>';
                 }
-                $res .= '</div>';
+            } catch (Exception $e) {
+                error_log($e->getMessage());
             }
         }
 
@@ -569,13 +644,13 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Sends invitations to friends
+     * Sends invitations to friends.
      *
-     * @param int  $userId
+     * @param int    $userId
      * @param string $subject
      * @param string $content
      *
-     * @return string message invitation
+     * @return bool
      */
     public static function sendInvitationToUser($userId, $subject = '', $content = '')
     {
@@ -595,6 +670,7 @@ class SocialManager extends UserManager
                     Display::return_message(get_lang('ErrorSendingMessage'), 'error', false)
                 );
             }
+
             return false;
         } elseif (isset($userId) && !isset($subject)) {
             if (isset($userId) && $userId > 0) {
@@ -627,11 +703,13 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Helper functions definition
+     * Helper functions definition.
      */
     public static function get_logged_user_course_html($my_course, $count)
     {
         $result = '';
+        $count = (int) $count;
+
         // Table definitions
         $main_user_table = Database::get_main_table(TABLE_MAIN_USER);
         $tbl_session = Database::get_main_table(TABLE_MAIN_SESSION);
@@ -648,19 +726,19 @@ class SocialManager extends UserManager
         if (api_get_setting('course_images_in_courses_list') === 'true') {
             if (file_exists($course_path.'/course-pic85x85.png')) {
                 $image = $my_course['course_info']['course_image'];
-                $imageCourse = Display::img($image, $course_title, array('class'=>'img-course'));
+                $imageCourse = Display::img($image, $course_title, ['class' => 'img-course']);
             } else {
                 $imageCourse = Display::return_icon(
                     'session_default_small.png',
                     $course_title,
-                    array('class' => 'img-course')
+                    ['class' => 'img-course']
                 );
             }
         } else {
             $imageCourse = Display::return_icon(
                 'course.png',
                 get_lang('Course'),
-                array('class' => 'img-default')
+                ['class' => 'img-default']
             );
         }
 
@@ -678,12 +756,10 @@ class SocialManager extends UserManager
         ) {
             $result .= '<span class="title">'.$course_title.'<span>';
         } else {
-            $result .= $course_title." ".get_lang('CourseClosed');
+            $result .= $course_title.' '.get_lang('CourseClosed');
         }
 
         $result .= '</li>';
-
-
         $session = '';
         if (!empty($my_course['session_name']) && !empty($my_course['id_session'])) {
             // Request for the name of the general coach
@@ -696,57 +772,61 @@ class SocialManager extends UserManager
             $sessioncoach = Database::store_result($rs);
             $sessioncoach = $sessioncoach[0];
 
-            $session = array();
+            $session = [];
             $session['title'] = $my_course['session_name'];
             if ($my_course['access_start_date'] == '0000-00-00') {
                 $session['dates'] = get_lang('WithoutTimeLimits');
                 if (api_get_setting('show_session_coach') === 'true') {
-                    $session['coach'] = get_lang('GeneralCoach').': '.api_get_person_name($sessioncoach['firstname'], $sessioncoach['lastname']);
+                    $session['coach'] = get_lang('GeneralCoach').': '.
+                        api_get_person_name($sessioncoach['firstname'], $sessioncoach['lastname']);
                 }
             } else {
-                $session ['dates'] = ' - '.get_lang('From').' '.$my_course['access_start_date'].' '.get_lang('To').' '.$my_course['access_end_date'];
+                $session['dates'] = ' - '.get_lang('From').' '.$my_course['access_start_date'].' '.get_lang('To').' '.$my_course['access_end_date'];
                 if (api_get_setting('show_session_coach') === 'true') {
-                    $session['coach'] = get_lang('GeneralCoach').': '.api_get_person_name($sessioncoach['firstname'], $sessioncoach['lastname']);
+                    $session['coach'] = get_lang('GeneralCoach').': '.
+                        api_get_person_name($sessioncoach['firstname'], $sessioncoach['lastname']);
                 }
             }
         }
 
         $my_course['id_session'] = isset($my_course['id_session']) ? $my_course['id_session'] : 0;
-        $output = array(
+        $output = [
             $my_course['user_course_cat'],
             $result,
             $my_course['id_session'],
-            $session
-        );
+            $session,
+        ];
 
         return $output;
     }
 
     /**
-     * Shows the avatar block in social pages
+     * Shows the avatar block in social pages.
      *
-     * @param string $show highlight link possible values:
-     * group_add,
-     * home,
-     * messages,
-     * messages_inbox,
-     * messages_compose,
-     * messages_outbox,
-     * invitations,
-     * shared_profile,
-     * friends,
-     * groups search
-     * @param int $group_id
-     * @param int $user_id
-     *
+     * @param string $show     highlight link possible values:
+     *                         group_add,
+     *                         home,
+     *                         messages,
+     *                         messages_inbox,
+     *                         messages_compose,
+     *                         messages_outbox,
+     *                         invitations,
+     *                         shared_profile,
+     *                         friends,
+     *                         groups search
+     * @param int    $group_id
+     * @param int    $user_id
      */
     public static function show_social_avatar_block($show = '', $group_id = 0, $user_id = 0)
     {
+        $user_id = (int) $user_id;
+        $group_id = (int) $group_id;
+
         if (empty($user_id)) {
             $user_id = api_get_user_id();
         }
 
-        $show_groups = array(
+        $show_groups = [
             'groups',
             'group_messages',
             'messages_list',
@@ -757,7 +837,7 @@ class SocialManager extends UserManager
             'invite_friends',
             'waiting_list',
             'browse_groups',
-        );
+        ];
 
         $template = new Template(null, false, false, false, false, false);
 
@@ -776,7 +856,6 @@ class SocialManager extends UserManager
             $template->assign('show_group', true);
             $template->assign('group_id', $group_id);
             $template->assign('user_group_image', $userGroupImage);
-            //$template->assign('user_group', $group_info);
             $template->assign(
                 'user_is_group_admin',
                 $userGroup->is_group_admin(
@@ -797,7 +876,7 @@ class SocialManager extends UserManager
                     'normal' => UserManager::getUserPicture(
                         $user_id,
                         USER_IMAGE_SIZE_MEDIUM
-                    )
+                    ),
                 ]
             );
         }
@@ -808,24 +887,23 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Shows the right menu of the Social Network tool
+     * Shows the right menu of the Social Network tool.
      *
-     * @param string $show highlight link possible values:
-     * group_add,
-     * home,
-     * messages,
-     * messages_inbox,
-     * messages_compose ,
-     * messages_outbox,
-     * invitations,
-     * shared_profile,
-     * friends,
-     * groups search
-     * @param int $group_id group id
-     * @param int $user_id user id
-     * @param bool $show_full_profile show profile or not (show or hide the user image/information)
-     * @param bool $show_delete_account_button
-     *
+     * @param string $show                       highlight link possible values:
+     *                                           group_add,
+     *                                           home,
+     *                                           messages,
+     *                                           messages_inbox,
+     *                                           messages_compose ,
+     *                                           messages_outbox,
+     *                                           invitations,
+     *                                           shared_profile,
+     *                                           friends,
+     *                                           groups search
+     * @param int    $group_id                   group id
+     * @param int    $user_id                    user id
+     * @param bool   $show_full_profile          show profile or not (show or hide the user image/information)
+     * @param bool   $show_delete_account_button
      */
     public static function show_social_menu(
         $show = '',
@@ -834,12 +912,15 @@ class SocialManager extends UserManager
         $show_full_profile = false,
         $show_delete_account_button = false
     ) {
+        $user_id = (int) $user_id;
+        $group_id = (int) $group_id;
+
         if (empty($user_id)) {
             $user_id = api_get_user_id();
         }
 
         $usergroup = new UserGroup();
-        $show_groups = array(
+        $show_groups = [
             'groups',
             'group_messages',
             'messages_list',
@@ -850,10 +931,10 @@ class SocialManager extends UserManager
             'invite_friends',
             'waiting_list',
             'browse_groups',
-        );
+        ];
 
         // get count unread message and total invitations
-        $count_unread_message = MessageManager::get_number_of_messages(true);
+        $count_unread_message = MessageManager::getNumberOfMessages(true);
         $count_unread_message = !empty($count_unread_message) ? Display::badge($count_unread_message) : null;
 
         $number_of_new_messages_of_friend = self::get_message_number_invitation_by_user_id(api_get_user_id());
@@ -874,77 +955,88 @@ class SocialManager extends UserManager
         $messagesIcon = Display::return_icon('sn-message.png', get_lang('Messages'), null, ICON_SIZE_SMALL);
         $sharedProfileIcon = Display::return_icon('sn-profile.png', get_lang('ViewMySharedProfile'));
         $searchIcon = Display::return_icon('sn-search.png', get_lang('Search'), null, ICON_SIZE_SMALL);
+        $portfolioIcon = Display::return_icon('wiki_task.png', get_lang('Portfolio'));
+        $personalDataIcon = Display::return_icon('database.png', get_lang('PersonalDataReport'));
+
+        $forumCourseId = api_get_configuration_value('global_forums_course_id');
+        $groupUrl = api_get_path(WEB_CODE_PATH).'social/groups.php';
+        if (!empty($forumCourseId)) {
+            $courseInfo = api_get_course_info_by_id($forumCourseId);
+            if (!empty($courseInfo)) {
+                $groupUrl = api_get_path(WEB_CODE_PATH).'forum/index.php?cidReq='.$courseInfo['code'];
+            }
+        }
 
         $html = '';
         $active = null;
         if (!in_array(
             $show,
-            array('shared_profile', 'groups', 'group_edit', 'member_list', 'waiting_list', 'invite_friends')
+            ['shared_profile', 'groups', 'group_edit', 'member_list', 'waiting_list', 'invite_friends']
         )) {
             $links = '<ul class="nav nav-pills nav-stacked">';
-            $active = $show == 'home' ? 'active' : null;
+            $active = $show === 'home' ? 'active' : null;
             $links .= '
-                <li class="home-icon ' . $active.'">
-                    <a href="' . api_get_path(WEB_CODE_PATH).'social/home.php">
-                        ' . $homeIcon.' '.get_lang('Home').'
+                <li class="home-icon '.$active.'">
+                    <a href="'.api_get_path(WEB_CODE_PATH).'social/home.php">
+                        '.$homeIcon.' '.get_lang('Home').'
                     </a>
                 </li>';
             $active = $show == 'messages' ? 'active' : null;
             $links .= '
-                <li class="messages-icon ' . $active.'">
-                    <a href="' . api_get_path(WEB_CODE_PATH).'messages/inbox.php?f=social">
-                        ' . $messagesIcon.' '.get_lang('Messages').$count_unread_message.'
+                <li class="messages-icon '.$active.'">
+                    <a href="'.api_get_path(WEB_CODE_PATH).'messages/inbox.php">
+                        '.$messagesIcon.' '.get_lang('Messages').$count_unread_message.'
                     </a>
                 </li>';
 
-            //Invitations
+            // Invitations
             $active = $show == 'invitations' ? 'active' : null;
             $links .= '
-                <li class="invitations-icon ' . $active.'">
-                    <a href="' . api_get_path(WEB_CODE_PATH).'social/invitations.php">
-                        ' . $invitationsIcon.' '.get_lang('Invitations').$total_invitations.'
+                <li class="invitations-icon '.$active.'">
+                    <a href="'.api_get_path(WEB_CODE_PATH).'social/invitations.php">
+                        '.$invitationsIcon.' '.get_lang('Invitations').$total_invitations.'
                     </a>
                 </li>';
 
-            //Shared profile and groups
+            // Shared profile and groups
             $active = $show == 'shared_profile' ? 'active' : null;
             $links .= '
-                <li class="shared-profile-icon' . $active.'">
-                    <a href="' . api_get_path(WEB_CODE_PATH).'social/profile.php">
-                        ' . $sharedProfileIcon.' '.get_lang('ViewMySharedProfile').'
+                <li class="shared-profile-icon'.$active.'">
+                    <a href="'.api_get_path(WEB_CODE_PATH).'social/profile.php">
+                        '.$sharedProfileIcon.' '.get_lang('ViewMySharedProfile').'
                     </a>
                 </li>';
             $active = $show == 'friends' ? 'active' : null;
             $links .= '
-                <li class="friends-icon ' . $active.'">
-                    <a href="' . api_get_path(WEB_CODE_PATH).'social/friends.php">
-                        ' . $friendsIcon.' '.get_lang('Friends').'
+                <li class="friends-icon '.$active.'">
+                    <a href="'.api_get_path(WEB_CODE_PATH).'social/friends.php">
+                        '.$friendsIcon.' '.get_lang('Friends').'
                     </a>
                 </li>';
-            $active = $show == 'browse_groups' ? 'active' : null;
+            $active = $show === 'browse_groups' ? 'active' : null;
             $links .= '
-                <li class="browse-groups-icon ' . $active.'">
-                    <a href="' . api_get_path(WEB_CODE_PATH).'social/groups.php">
-                        ' . $groupsIcon.' '.get_lang('SocialGroups').'
+                <li class="browse-groups-icon '.$active.'">
+                    <a href="'.$groupUrl.'">
+                        '.$groupsIcon.' '.get_lang('SocialGroups').'
                     </a>
                 </li>';
 
-            //Search users
+            // Search users
             $active = $show == 'search' ? 'active' : null;
             $links .= '
-                <li class="search-icon ' . $active.'">
-                    <a href="' . api_get_path(WEB_CODE_PATH).'social/search.php">
-                        ' . $searchIcon.' '.get_lang('Search').'
+                <li class="search-icon '.$active.'">
+                    <a href="'.api_get_path(WEB_CODE_PATH).'social/search.php">
+                        '.$searchIcon.' '.get_lang('Search').'
                     </a>
                 </li>';
 
-            //My files
+            // My files
             $active = $show == 'myfiles' ? 'active' : null;
 
             $myFiles = '
-                <li class="myfiles-icon ' . $active.'">
-                    <a href="' . api_get_path(WEB_CODE_PATH).'social/myfiles.php">
-                        ' . $filesIcon.' '.get_lang('MyFiles').'
+                <li class="myfiles-icon '.$active.'">
+                    <a href="'.api_get_path(WEB_CODE_PATH).'social/myfiles.php">
+                        '.$filesIcon.' '.get_lang('MyFiles').'
                     </a>
                 </li>';
 
@@ -952,7 +1044,27 @@ class SocialManager extends UserManager
                 $myFiles = '';
             }
             $links .= $myFiles;
-            $links .= '</ul>';
+            if (api_get_configuration_value('allow_portfolio_tool')) {
+                $links .= '
+                    <li class="portoflio-icon '.($show == 'portfolio' ? 'active' : '').'">
+                        <a href="'.api_get_path(WEB_CODE_PATH).'portfolio/index.php">
+                            '.$portfolioIcon.' '.get_lang('Portfolio').'
+                        </a>
+                    </li>
+                ';
+            }
+
+            if (!api_get_configuration_value('disable_gdpr')) {
+                $active = $show == 'personal-data' ? 'active' : null;
+                $personalData = '
+                    <li class="personal-data-icon '.$active.'">
+                        <a href="'.api_get_path(WEB_CODE_PATH).'social/personal_data.php">
+                            '.$personalDataIcon.' '.get_lang('PersonalDataReport').'
+                        </a>
+                    </li>';
+                $links .= $personalData;
+                $links .= '</ul>';
+            }
 
             $html .= Display::panelCollapse(
                 get_lang('SocialNetwork'),
@@ -972,58 +1084,60 @@ class SocialManager extends UserManager
             );
         }
 
-        if ($show == 'shared_profile') {
+        if ($show === 'shared_profile') {
             $links = '<ul class="nav nav-pills nav-stacked">';
             // My own profile
             if ($show_full_profile && $user_id == intval(api_get_user_id())) {
                 $links .= '
-                    <li class="home-icon ' . $active.'">
-                        <a href="' . api_get_path(WEB_CODE_PATH).'social/home.php">
-                            ' . $homeIcon.' '.get_lang('Home').'
+                    <li class="home-icon '.$active.'">
+                        <a href="'.api_get_path(WEB_CODE_PATH).'social/home.php">
+                            '.$homeIcon.' '.get_lang('Home').'
                         </a>
                     </li>
-                    <li class="messages-icon ' . $active.'">
-                        <a href="' . api_get_path(WEB_CODE_PATH).'messages/inbox.php?f=social">
-                            ' . $messagesIcon.' '.get_lang('Messages').$count_unread_message.'
+                    <li class="messages-icon '.$active.'">
+                        <a href="'.api_get_path(WEB_CODE_PATH).'messages/inbox.php">
+                            '.$messagesIcon.' '.get_lang('Messages').$count_unread_message.'
                         </a>
                     </li>';
-                $active = $show == 'invitations' ? 'active' : null;
+                $active = $show === 'invitations' ? 'active' : null;
                 $links .= '
-                    <li class="invitations-icon' . $active.'">
-                        <a href="' . api_get_path(WEB_CODE_PATH).'social/invitations.php">
-                            ' . $invitationsIcon.' '.get_lang('Invitations').$total_invitations.'
+                    <li class="invitations-icon'.$active.'">
+                        <a href="'.api_get_path(WEB_CODE_PATH).'social/invitations.php">
+                            '.$invitationsIcon.' '.get_lang('Invitations').$total_invitations.'
                         </a>
                     </li>';
 
                 $links .= '
                     <li class="shared-profile-icon active">
-                        <a href="' . api_get_path(WEB_CODE_PATH).'social/profile.php">
-                            ' . $sharedProfileIcon.' '.get_lang('ViewMySharedProfile').'
+                        <a href="'.api_get_path(WEB_CODE_PATH).'social/profile.php">
+                            '.$sharedProfileIcon.' '.get_lang('ViewMySharedProfile').'
                         </a>
                     </li>
                     <li class="friends-icon">
-                        <a href="' . api_get_path(WEB_CODE_PATH).'social/friends.php">
-                            ' . $friendsIcon.' '.get_lang('Friends').'
-                        </a>
-                    </li>
-                    <li class="browse-groups-icon">
-                        <a href="' . api_get_path(WEB_CODE_PATH).'social/groups.php">
-                            ' . $groupsIcon.' '.get_lang('SocialGroups').'
+                        <a href="'.api_get_path(WEB_CODE_PATH).'social/friends.php">
+                            '.$friendsIcon.' '.get_lang('Friends').'
                         </a>
                     </li>';
+
+                $links .= '<li class="browse-groups-icon">
+                        <a href="'.$groupUrl.'">
+                            '.$groupsIcon.' '.get_lang('SocialGroups').'
+                        </a>
+                        </li>';
+
                 $active = $show == 'search' ? 'active' : null;
                 $links .= '
-                    <li class="search-icon ' . $active.'">
-                        <a href="' . api_get_path(WEB_CODE_PATH).'social/search.php">
-                            ' . $searchIcon.' '.get_lang('Search').'
+                    <li class="search-icon '.$active.'">
+                        <a href="'.api_get_path(WEB_CODE_PATH).'social/search.php">
+                            '.$searchIcon.' '.get_lang('Search').'
                         </a>
                     </li>';
                 $active = $show == 'myfiles' ? 'active' : null;
 
                 $myFiles = '
-                    <li class="myfiles-icon ' . $active.'">
-                     <a href="' . api_get_path(WEB_CODE_PATH).'social/myfiles.php">
-                            ' . $filesIcon.' '.get_lang('MyFiles').'
+                    <li class="myfiles-icon '.$active.'">
+                     <a href="'.api_get_path(WEB_CODE_PATH).'social/myfiles.php">
+                            '.$filesIcon.' '.get_lang('MyFiles').'
                         </a>
                     </li>';
 
@@ -1031,6 +1145,16 @@ class SocialManager extends UserManager
                     $myFiles = '';
                 }
                 $links .= $myFiles;
+
+                if (api_get_configuration_value('allow_portfolio_tool')) {
+                    $links .= '
+                        <li class="portoflio-icon '.($show == 'portfolio' ? 'active' : '').'">
+                            <a href="'.api_get_path(WEB_CODE_PATH).'portfolio/index.php">
+                                '.$portfolioIcon.' '.get_lang('Portfolio').'
+                            </a>
+                        </li>
+                    ';
+                }
             }
 
             // My friend profile.
@@ -1040,12 +1164,10 @@ class SocialManager extends UserManager
                     'new-message.png',
                     $sendMessageText
                 );
-                $sendMessageUrl = api_get_path(WEB_AJAX_PATH)
-                    . 'user_manager.ajax.php?'
-                    . http_build_query([
-                        'a' => 'get_user_popup',
-                        'user_id' => $user_id,
-                    ]);
+                $sendMessageUrl = api_get_path(WEB_AJAX_PATH).'user_manager.ajax.php?'.http_build_query([
+                    'a' => 'get_user_popup',
+                    'user_id' => $user_id,
+                ]);
 
                 $links .= '<li>';
                 $links .= Display::url(
@@ -1058,18 +1180,33 @@ class SocialManager extends UserManager
                     ]
                 );
                 $links .= '</li>';
+
+                if (api_get_configuration_value('allow_portfolio_tool')) {
+                    $links .= '
+                        <li class="portoflio-icon '.($show == 'portfolio' ? 'active' : '').'">
+                            <a href="'.api_get_path(WEB_CODE_PATH).'portfolio/index.php?user='.$user_id.'">
+                                '.$portfolioIcon.' '.get_lang('Portfolio').'
+                            </a>
+                        </li>
+                    ';
+                }
             }
 
             // Check if I already sent an invitation message
-            $invitation_sent_list = self::get_list_invitation_sent_by_user_id(
-                api_get_user_id()
-            );
+            $invitation_sent_list = self::get_list_invitation_sent_by_user_id(api_get_user_id());
 
-            if (isset($invitation_sent_list[$user_id]) && is_array($invitation_sent_list[$user_id]) && count($invitation_sent_list[$user_id]) > 0) {
-                $links .= '<li><a href="'.api_get_path(WEB_CODE_PATH).'social/invitations.php">'.Display::return_icon('invitation.png', get_lang('YouAlreadySentAnInvitation')).'&nbsp;&nbsp;'.get_lang('YouAlreadySentAnInvitation').'</a></li>';
+            if (isset($invitation_sent_list[$user_id]) && is_array($invitation_sent_list[$user_id]) &&
+                count($invitation_sent_list[$user_id]) > 0
+            ) {
+                $links .= '<li><a href="'.api_get_path(WEB_CODE_PATH).'social/invitations.php">'.
+                    Display::return_icon('invitation.png', get_lang('YouAlreadySentAnInvitation'))
+                    .'&nbsp;&nbsp;'.get_lang('YouAlreadySentAnInvitation').'</a></li>';
             } else {
                 if (!$show_full_profile) {
-                    $links .= '<li><a class="btn-to-send-invitation" href="#" data-send-to="'.$user_id.'" title="'.get_lang('SendInvitation').'">'.Display::return_icon('invitation.png', get_lang('SocialInvitationToFriends')).'&nbsp;'.get_lang('SendInvitation').'</a></li>';
+                    $links .= '<li>
+                        <a class="btn-to-send-invitation" href="#" data-send-to="'.$user_id.'" title="'.get_lang('SendInvitation').'">'.
+                        Display::return_icon('invitation.png', get_lang('SocialInvitationToFriends')).'&nbsp;'.get_lang('SendInvitation').
+                        '</a></li>';
                 }
             }
 
@@ -1085,12 +1222,12 @@ class SocialManager extends UserManager
 
             if ($show_full_profile && $user_id == intval(api_get_user_id())) {
                 $personal_course_list = UserManager::get_personal_session_course_list($user_id);
-                $course_list_code = array();
+                $course_list_code = [];
                 $i = 1;
                 if (is_array($personal_course_list)) {
                     foreach ($personal_course_list as $my_course) {
                         if ($i <= 10) {
-                            $course_list_code[] = array('code' => $my_course['code']);
+                            $course_list_code[] = ['code' => $my_course['code']];
                         } else {
                             break;
                         }
@@ -1102,7 +1239,7 @@ class SocialManager extends UserManager
 
                 // Announcements
                 $my_announcement_by_user_id = intval($user_id);
-                $announcements = array();
+                $announcements = [];
                 foreach ($course_list_code as $course) {
                     $course_info = api_get_course_info($course['code']);
                     if (!empty($course_info)) {
@@ -1113,7 +1250,10 @@ class SocialManager extends UserManager
 
                         if (!empty($content)) {
                             $url = Display::url(
-                                Display::return_icon('announcement.png', get_lang('Announcements')).$course_info['name'].' ('.$content['count'].')',
+                                Display::return_icon(
+                                    'announcement.png',
+                                    get_lang('Announcements')
+                                ).$course_info['name'].' ('.$content['count'].')',
                                 api_get_path(WEB_CODE_PATH).'announcements/announcements.php?cidReq='.$course['code']
                             );
                             $announcements[] = Display::tag('li', $url);
@@ -1140,7 +1280,7 @@ class SocialManager extends UserManager
                 Display::return_icon(
                     'delete.png',
                     get_lang('Unsubscribe'),
-                    array(),
+                    [],
                     ICON_SIZE_TINY
                 ).get_lang('Unsubscribe'),
                 $url
@@ -1155,16 +1295,18 @@ class SocialManager extends UserManager
 
     /**
      * Displays a sortable table with the list of online users.
+     *
      * @param array $user_list The list of users to be shown
-     * @param bool $wrap Whether we want the function to wrap the spans list in a div or not
+     * @param bool  $wrap      Whether we want the function to wrap the spans list in a div or not
+     *
      * @return string HTML block or null if and ID was defined
      * @assert (null) === false
      */
     public static function display_user_list($user_list, $wrap = true)
     {
-        $html = null;
+        $html = '';
 
-        if (isset($_GET['id']) or count($user_list) < 1) {
+        if (isset($_GET['id']) || count($user_list) < 1) {
             return false;
         }
 
@@ -1173,15 +1315,15 @@ class SocialManager extends UserManager
             $course_url = '&amp;cidReq='.Security::remove_XSS($_GET['cidReq']);
         }
 
+        $hide = api_get_configuration_value('hide_complete_name_in_whoisonline');
         foreach ($user_list as $uid) {
-            $user_info = api_get_user_info($uid, $checkIfUserOnline = true);
+            $user_info = api_get_user_info($uid, true);
             $lastname = $user_info['lastname'];
             $firstname = $user_info['firstname'];
             $completeName = $firstname.', '.$lastname;
-
             $user_rol = $user_info['status'] == 1 ? Display::return_icon('teacher.png', get_lang('Teacher'), null, ICON_SIZE_TINY) : Display::return_icon('user.png', get_lang('Student'), null, ICON_SIZE_TINY);
             $status_icon_chat = null;
-            if ($user_info['user_is_online_in_chat'] == 1) {
+            if (isset($user_info['user_is_online_in_chat']) && $user_info['user_is_online_in_chat'] == 1) {
                 $status_icon_chat = Display::return_icon('online.png', get_lang('Online'));
             } else {
                 $status_icon_chat = Display::return_icon('offline.png', get_lang('Offline'));
@@ -1192,6 +1334,13 @@ class SocialManager extends UserManager
             if (api_get_setting('show_official_code_whoisonline') == 'true') {
                 $officialCode .= '<div class="items-user-official-code"><p style="min-height: 30px;" title="'.get_lang('OfficialCode').'">'.$user_info['official_code'].'</p></div>';
             }
+
+            if ($hide === true) {
+                $completeName = '';
+                $firstname = '';
+                $lastname = '';
+            }
+
             $img = '<img class="img-responsive img-circle" title="'.$completeName.'" alt="'.$completeName.'" src="'.$userPicture.'">';
 
             $url = null;
@@ -1217,20 +1366,22 @@ class SocialManager extends UserManager
                             <div class="items-user-status">'.$status_icon_chat.' '.$user_rol.'</div>
                         </div>
                       </div>';
-
         }
 
         return $html;
     }
 
     /**
-     * Displays the information of an individual user
+     * Displays the information of an individual user.
+     *
      * @param int $user_id
+     *
+     * @return string
      */
     public static function display_individual_user($user_id)
     {
         global $interbreadcrumb;
-        $safe_user_id = intval($user_id);
+        $safe_user_id = (int) $user_id;
         $currentUserId = api_get_user_id();
 
         $user_table = Database::get_main_table(TABLE_MAIN_USER);
@@ -1242,7 +1393,7 @@ class SocialManager extends UserManager
             $userInfo = api_get_user_info($user_id);
             $alt = $userInfo['complete_name'].($currentUserId == $user_id ? '&nbsp;('.get_lang('Me').')' : '');
             $status = get_status_from_code($user_object->status);
-            $interbreadcrumb[] = array('url' => 'whoisonline.php', 'name' => get_lang('UsersOnLineList'));
+            $interbreadcrumb[] = ['url' => 'whoisonline.php', 'name' => get_lang('UsersOnLineList')];
 
             $html .= '<div class ="thumbnail">';
             $fullurl = $userInfo['avatar'];
@@ -1285,7 +1436,8 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Display productions in who is online
+     * Display productions in who is online.
+     *
      * @param int $user_id User id
      */
     public static function display_productions($user_id)
@@ -1325,11 +1477,12 @@ class SocialManager extends UserManager
     /**
      * @param string $content
      * @param string $span_count
+     *
      * @return string
      */
     public static function social_wrapper_div($content, $span_count)
     {
-        $span_count = intval($span_count);
+        $span_count = (int) $span_count;
         $html = '<div class="span'.$span_count.'">';
         $html .= '<div class="well_border">';
         $html .= $content;
@@ -1339,15 +1492,14 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Dummy function
-     *
+     * Dummy function.
      */
     public static function get_plugins($place = SOCIAL_CENTER_PLUGIN)
     {
         $content = '';
         switch ($place) {
             case SOCIAL_CENTER_PLUGIN:
-                $social_plugins = array(1, 2);
+                $social_plugins = [1, 2];
                 if (is_array($social_plugins) && count($social_plugins) > 0) {
                     $content .= '<div id="social-plugins">';
                     foreach ($social_plugins as $plugin) {
@@ -1366,28 +1518,41 @@ class SocialManager extends UserManager
 
         return $content;
     }
+
     /**
-     * Sends a message to someone's wall
-     * @param int $userId id of author
-     * @param int $friendId id where we send the message
+     * Sends a message to someone's wall.
+     *
+     * @param int    $userId         id of author
+     * @param int    $friendId       id where we send the message
      * @param string $messageContent of the message
-     * @param int $messageId id parent
-     * @param string $messageStatus status type of message
-     * @return boolean
+     * @param int    $messageId      id parent
+     * @param string $messageStatus  status type of message
+     *
+     * @return int
+     *
      * @author Yannick Warnier
      */
-    public static function sendWallMessage($userId, $friendId, $messageContent, $messageId = 0, $messageStatus = '')
-    {
+    public static function sendWallMessage(
+        $userId,
+        $friendId,
+        $messageContent,
+        $messageId = 0,
+        $messageStatus = ''
+    ) {
         $tblMessage = Database::get_main_table(TABLE_MESSAGE);
-        $userId = intval($userId);
-        $friendId = intval($friendId);
-        $messageId = intval($messageId);
+        $userId = (int) $userId;
+        $friendId = (int) $friendId;
+        $messageId = (int) $messageId;
+
+        if (empty($userId) || empty($friendId)) {
+            return 0;
+        }
 
         // Just in case we replace the and \n and \n\r while saving in the DB
-        $messageContent = str_replace(array("\n", "\n\r"), '<br />', $messageContent);
+        $messageContent = str_replace(["\n", "\n\r"], '<br />', $messageContent);
         $now = api_get_utc_datetime();
 
-        $attributes = array(
+        $attributes = [
             'user_sender_id' => $userId,
             'user_receiver_id' => $friendId,
             'msg_status' => $messageStatus,
@@ -1396,123 +1561,233 @@ class SocialManager extends UserManager
             'content' => $messageContent,
             'parent_id' => $messageId,
             'group_id' => 0,
-            'update_date' => $now
-        );
+            'update_date' => $now,
+        ];
 
         return Database::insert($tblMessage, $attributes);
     }
 
     /**
-     * Send File attachment (jpg,png)
+     * Send File attachment (jpg,png).
+     *
      * @author Anibal Copitan
-     * @param int $userId id user
-     * @param array $fileAttach
-     * @param int $messageId id message (relation with main message)
+     *
+     * @param int    $userId      id user
+     * @param array  $fileAttach
+     * @param int    $messageId   id message (relation with main message)
      * @param string $fileComment description attachment file
-     * @return bool
+     *
+     * @return bool|int
      */
-    public static function sendWallMessageAttachmentFile($userId, $fileAttach, $messageId, $fileComment = '')
-    {
-        $tbl_message_attach = Database::get_main_table(TABLE_MESSAGE_ATTACHMENT);
-
-        // create directory
-        $social = '/social/';
-        $pathMessageAttach = UserManager::getUserPathById($userId, 'system').'message_attachments'.$social;
-        $safeFileComment = Database::escape_string($fileComment);
+    public static function sendWallMessageAttachmentFile(
+        $userId,
+        $fileAttach,
+        $messageId,
+        $fileComment = ''
+    ) {
         $safeFileName = Database::escape_string($fileAttach['name']);
 
         $extension = strtolower(substr(strrchr($safeFileName, '.'), 1));
         $allowedTypes = api_get_supported_image_extensions();
-        if (!in_array($extension, $allowedTypes)) {
-            $flag = false;
-        } else {
-            $newFileName = uniqid('').'.'.$extension;
-            if (!file_exists($pathMessageAttach)) {
-                @mkdir($pathMessageAttach, api_get_permissions_for_new_directories(), true);
-            }
 
-            $newPath = $pathMessageAttach.$newFileName;
-            if (is_uploaded_file($fileAttach['tmp_name'])) {
-                @copy($fileAttach['tmp_name'], $newPath);
-            }
+        $allowedTypes[] = 'mp4';
+        $allowedTypes[] = 'webm';
+        $allowedTypes[] = 'ogg';
 
-            $small = self::resize_picture($newPath, IMAGE_WALL_SMALL_SIZE);
-            $medium = self::resize_picture($newPath, IMAGE_WALL_MEDIUM_SIZE);
-
-            $big = new Image($newPath);
-            $ok = $small && $small->send_image($pathMessageAttach.IMAGE_WALL_SMALL.'_'.$newFileName) &&
-                $medium && $medium->send_image($pathMessageAttach.IMAGE_WALL_MEDIUM.'_'.$newFileName) &&
-                $big && $big->send_image($pathMessageAttach.IMAGE_WALL_BIG.'_'.$newFileName);
-
-            // Insert
-            $newFileName = $social.$newFileName;
-
-            $params = [
-                'filename' => $safeFileName,
-                'comment' => $safeFileComment,
-                'path' => $newFileName,
-                'message_id' => $messageId,
-                'size' => $fileAttach['size'],
-            ];
-            Database::insert($tbl_message_attach, $params);
-            $flag = true;
+        if (in_array($extension, $allowedTypes)) {
+            return MessageManager::saveMessageAttachmentFile($fileAttach, $fileComment, $messageId, $userId);
         }
 
-        return $flag;
+        return false;
     }
 
     /**
-     * Gets all messages from someone's wall (within specific limits)
-     * @param int $userId id of wall shown
-     * @param string $messageStatus status wall message
-     * @param int|string $parentId id message (Post main)
-     * @param string $start Date from which we want to show the messages, in UTC time
-     * @param int $limit Limit for the number of parent messages we want to show
-     * @param int $offset Wall message query offset
-     * @return array
+     * Gets all messages from someone's wall (within specific limits).
+     *
+     * @param int        $userId     id of wall shown
+     * @param int|string $parentId   id message (Post main)
+     * @param int|array  $groupId
+     * @param int|array  $friendId
+     * @param string     $startDate  Date from which we want to show the messages, in UTC time
+     * @param int        $start      Limit for the number of parent messages we want to show
+     * @param int        $length     Wall message query offset
+     * @param bool       $getCount
+     * @param array      $threadList
+     *
+     * @return array|int
+     *
      * @author Yannick Warnier
      */
-    public static function getWallMessages($userId, $messageStatus, $parentId = '', $start = null, $limit = 10, $offset = 0)
-    {
-        if (empty($start)) {
-            $start = '0000-00-00';
-        }
-
+    public static function getWallMessages(
+        $userId,
+        $parentId = 0,
+        $groupId = 0,
+        $friendId = 0,
+        $startDate = '',
+        $start = 0,
+        $length = 10,
+        $getCount = false,
+        $threadList = []
+    ) {
         $tblMessage = Database::get_main_table(TABLE_MESSAGE);
-        $tblMessageAttachment = Database::get_main_table(TABLE_MESSAGE_ATTACHMENT);
 
-        $userId = intval($userId);
-        $start = Database::escape_string($start);
-        $limit = intval($limit);
+        $parentId = (int) $parentId;
+        $userId = (int) $userId;
+        $start = (int) $start;
+        $length = (int) $length;
+        $startDate = Database::escape_string($startDate);
 
-        $sql = "SELECT
+        $select = " SELECT
                     id,
                     user_sender_id,
                     user_receiver_id,
                     send_date,
                     content,
                     parent_id,
-                    (
-                        SELECT ma.path FROM $tblMessageAttachment ma
-                        WHERE  ma.message_id = tm.id 
-                    ) as path,
-                    (
-                        SELECT ma.filename FROM $tblMessageAttachment ma 
-                        WHERE ma.message_id = tm.id 
-                    ) as filename
+                    msg_status,
+                    group_id,
+                    '' as forum_id,
+                    '' as thread_id,
+                    '' as c_id
+                  ";
+
+        if ($getCount) {
+            $select = ' SELECT count(id) count ';
+        }
+
+        $sql = "$select                    
                     FROM $tblMessage tm
                 WHERE
-                    user_receiver_id = $userId AND 
-                    send_date > '$start'
-        ";
+                    msg_status <> ".MESSAGE_STATUS_WALL_DELETE.' AND ';
 
-        $sql .= (empty($messageStatus) || is_null($messageStatus)) ? '' : " AND msg_status = '$messageStatus' ";
-        $sql .= (empty($parentId) || is_null($parentId)) ? '' : " AND parent_id = '$parentId' ";
-        $sql .= " ORDER BY send_date DESC LIMIT $offset, $limit ";
-        $messages = array();
+        // My own posts
+        $userReceiverCondition = ' (
+            user_receiver_id = '.$userId.' AND 
+            msg_status IN ('.MESSAGE_STATUS_WALL_POST.', '.MESSAGE_STATUS_WALL.') AND
+            parent_id = '.$parentId.'
+        )';
+
+        // User condition
+        $sql .= $userReceiverCondition;
+
+        // Get my group posts
+        $groupCondition = '';
+        if (!empty($groupId)) {
+            if (is_array($groupId)) {
+                $groupId = array_map('intval', $groupId);
+                $groupId = implode("','", $groupId);
+                $groupCondition = " OR ( group_id IN ('$groupId') ";
+            } else {
+                $groupId = (int) $groupId;
+                $groupCondition = " OR ( group_id = '$groupId' ";
+            }
+            $groupCondition .= ' AND msg_status IN ('.MESSAGE_STATUS_NEW.', '.MESSAGE_STATUS_UNREAD.')) ';
+        }
+
+        $friendCondition = '';
+        // Get my friend posts
+        if (!empty($friendId)) {
+            if (is_array($friendId)) {
+                $friendId = array_map('intval', $friendId);
+                $friendId = implode("','", $friendId);
+                $friendCondition = " OR ( user_receiver_id IN ('$friendId') ";
+            } else {
+                $friendId = (int) $friendId;
+                $friendCondition = " OR ( user_receiver_id = '$friendId' ";
+            }
+            $friendCondition .= ' AND msg_status IN ('.MESSAGE_STATUS_WALL_POST.') AND parent_id = 0) ';
+        }
+
+        if (!empty($groupCondition) || !empty($friendCondition)) {
+            $sql .= " $groupCondition $friendCondition ";
+        }
+
+        if (!empty($threadList)) {
+            if ($getCount) {
+                $select = ' SELECT count(iid) count ';
+            } else {
+                $select = " SELECT 
+                                iid,
+                                poster_id,
+                                '' as user_receiver_id,
+                                post_date,
+                                post_text,
+                                '' as parent_id,
+                                ".MESSAGE_STATUS_FORUM.",
+                                '' as group_id,
+                                forum_id,
+                                thread_id,
+                                c_id                            
+        ";
+            }
+
+            $threadList = array_map('intval', $threadList);
+            $threadList = implode("','", $threadList);
+            $condition = " thread_id IN ('$threadList') ";
+            $sql .= "                
+                UNION (
+                    $select
+                    FROM c_forum_post  
+                    WHERE $condition                                         
+                )
+                ";
+        }
+
+        if ($getCount) {
+            $res = Database::query($sql);
+            $row = Database::fetch_array($res);
+
+            return (int) $row['count'];
+        }
+
+        $sql .= ' ORDER BY send_date DESC ';
+        $sql .= " LIMIT $start, $length ";
+
+        $messages = [];
         $res = Database::query($sql);
+        $em = Database::getManager();
         if (Database::num_rows($res) > 0) {
-            while ($row = Database::fetch_array($res)) {
+            $repo = $em->getRepository('ChamiloCourseBundle:CForumPost');
+            $repoThread = $em->getRepository('ChamiloCourseBundle:CForumThread');
+            $groups = [];
+            $forums = [];
+            $userGroup = new UserGroup();
+            $urlGroup = api_get_path(WEB_CODE_PATH).'social/group_view.php?id=';
+            while ($row = Database::fetch_array($res, 'ASSOC')) {
+                $row['group_info'] = [];
+                if (!empty($row['group_id'])) {
+                    if (!in_array($row['group_id'], $groups)) {
+                        $group = $userGroup->get($row['group_id']);
+                        $group['url'] = $urlGroup.$group['id'];
+                        $groups[$row['group_id']] = $group;
+                        $row['group_info'] = $group;
+                    } else {
+                        $row['group_info'] = $groups[$row['group_id']];
+                    }
+                }
+
+                // forums
+                $row['post_title'] = '';
+                $row['forum_title'] = '';
+                $row['thread_url'] = '';
+                if ($row['msg_status'] == MESSAGE_STATUS_FORUM) {
+                    /** @var \Chamilo\CourseBundle\Entity\CForumPost $post */
+                    $post = $repo->find($row['id']);
+                    /** @var \Chamilo\CourseBundle\Entity\CForumThread $thread */
+                    $thread = $repoThread->find($row['thread_id']);
+                    if ($post && $thread) {
+                        $courseInfo = api_get_course_info_by_id($post->getCId());
+                        $row['post_title'] = $post->getForumId();
+                        $row['forum_title'] = $thread->getThreadTitle();
+                        $row['thread_url'] = api_get_path(WEB_CODE_PATH).'forum/viewthread.php?'.http_build_query([
+                            'cidReq' => $courseInfo['code'],
+                            'forum' => $post->getForumId(),
+                            'thread' => $post->getThreadId(),
+                            'post_id' => $post->getIid(),
+                        ]).'#post_id_'.$post->getIid();
+                    }
+                }
+
                 $messages[] = $row;
             }
         }
@@ -1521,77 +1796,52 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Gets all messages from someone's wall (within specific limits), formatted
-     * @param int       $userId     USER ID of the person's wall
-     * @param int       $friendId   id person
-     * @param int       $idMessage  id message
-     * @param string    $start      Start date (from when we want the messages until today)
-     * @param int       $limit      Limit to the number of messages we want
-     * @param int       $offset     Wall messages offset
-     * @return string  HTML formatted string to show messages
+     * Gets all messages from someone's wall (within specific limits), formatted.
+     *
+     * @param int    $userId      USER ID of the person's wall
+     * @param array  $messageInfo
+     * @param string $start       Start date (from when we want the messages until today)
+     * @param int    $limit       Limit to the number of messages we want
+     * @param int    $offset      Wall messages offset
+     *
+     * @return string HTML formatted string to show messages
      */
-    public static function getWallMessagesHTML($userId, $friendId, $idMessage, $start = null, $limit = 10, $offset = 0)
-    {
-        if (empty($start)) {
-            $start = '0000-00-00';
-        }
-
-        $isOwnWall = (api_get_user_id() == $userId && $userId == $friendId);
-        $messages = self::getWallMessages($userId, MESSAGE_STATUS_WALL, $idMessage, $start, $limit, $offset);
-        $formattedList = '<div class="sub-mediapost">';
-        $users = array();
+    public static function getWallPostComments(
+        $userId,
+        $messageInfo,
+        $start = null,
+        $limit = 10,
+        $offset = 0
+    ) {
+        $messageId = $messageInfo['id'];
+        $messages = MessageManager::getMessagesByParent($messageInfo['id'], 0, $offset, $limit);
+        $formattedList = '<div class="sub-mediapost row">';
+        $users = [];
 
         // The messages are ordered by date descendant, for comments we need ascendant
         krsort($messages);
         foreach ($messages as $message) {
-            $date = api_get_local_time($message['send_date']);
             $userIdLoop = $message['user_sender_id'];
             if (!isset($users[$userIdLoop])) {
                 $users[$userIdLoop] = api_get_user_info($userIdLoop);
             }
-
-            $nameComplete = api_is_western_name_order()
-                ? $users[$userIdLoop]['firstname'].' '.$users[$userIdLoop]['lastname']
-                : $users[$userIdLoop]['lastname'].' '.$users[$userIdLoop]['firstname'];
-            $url = api_get_path(WEB_CODE_PATH).'social/profile.php?u='.$userIdLoop;
-            $media = '';
-            $media .= '<div class="rep-post">';
-            $media .= '<div class="col-md-2 col-xs-2 social-post-answers">';
-            $media .= '<div class="user-image pull-right">';
-            $media .= '<a href="'.$url.'" ><img src="'.$users[$userIdLoop]['avatar'].
-                       '" alt="'.$users[$userIdLoop]['complete_name'].'" class="avatar-thumb"></a>';
-            $media .= '</div>';
-            $media .= '</div>';
-            $media .= '<div class="col-md-9 col-xs-9 social-post-answers">';
-            $media .= '<div class="user-data">';
-            $media .= '<div class="username">'.'<a href="'.$url.'">'.$nameComplete.'</a> <span>'.Security::remove_XSS($message['content']).'</span></div>';
-            $media .= '<div class="time timeago" title="'.$date.'">'.$date.'</div>';
-            $media .= '<br />';
-            $media .= '</div>';
-            $media .= '</div>';
-            $media .= '</div>';
-            if ($isOwnWall) {
-                $media .= '<div class="col-md-1 col-xs-1 social-post-answers">';
-                $media .= '<div class="pull-right deleted-mgs">';
-                $media .= '<a title="'.get_lang("SocialMessageDelete").'" href="'.api_get_path(WEB_CODE_PATH).'social/profile.php?messageId='.
-                    $message['id'].'">x</a>';
-                $media .= '</div>';
-                $media .= '</div>';
-            }
-
+            $media = self::processPostComment($message, $users);
             $formattedList .= $media;
         }
 
         $formattedList .= '</div>';
-
         $formattedList .= '<div class="mediapost-form">';
-            $formattedList .= '<form name="social_wall_message" method="POST">
-                <label for="social_wall_new_msg" class="hide">'.get_lang('SocialWriteNewComment').'</label>
-                <input type="hidden" name = "messageId" value="'.$idMessage.'" />
-                <textarea placeholder="'.get_lang('SocialWriteNewComment').
-                '" name="social_wall_new_msg" rows="1" style="width:80%;" ></textarea>
-                <button type="submit" name="social_wall_new_msg_submit"
-                class="pull-right btn btn-default" /><em class="fa fa-pencil"></em> '.get_lang('Post').'</button>
+        $formattedList .= '<form class="form-horizontal" id="form_comment_'.$messageId.'" name="post_comment" method="POST">
+                <div class="col-sm-9">
+                <label for="comment" class="hide">'.get_lang('SocialWriteNewComment').'</label>
+                <input type="hidden" name = "messageId" value="'.$messageId.'" />
+                <textarea rows="3" class="form-control" placeholder="'.get_lang('SocialWriteNewComment').'" name="comment" rows="1" ></textarea>
+                </div>
+                <div class="col-sm-3">
+                <a onclick="submitComment('.$messageId.');" href="javascript:void(0);" name="social_wall_new_msg_submit" class="btn btn-default btn-post">
+                    <em class="fa fa-pencil"></em> '.get_lang('Post').'
+                </a>
+                </div>
                 </form>';
         $formattedList .= '</div>';
 
@@ -1599,27 +1849,135 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Gets all user's starting wall messages (within specific limits)
-     * @param   int     $userId     User's id
-     * @param   int     $friendId   Friend's id
-     * @param   date    $start      Start date (from when we want the messages until today)
-     * @param   int     $limit      Limit to the number of messages we want
-     * @param   int     $offset     Wall messages offset
-     * @return  array   $data       return user's starting wall messages along with message extra data
+     * @param array $message
+     * @param array $users
+     *
+     * @return string
      */
-    public static function getWallMessagesPostHTML($userId, $friendId = 0, $start = null, $limit = 10, $offset = 0)
+    public static function processPostComment($message, $users = [])
     {
-        if (empty($start)) {
-            $start = '0000-00-00';
+        if (empty($message)) {
+            return false;
         }
-        $isOwnWall = (api_get_user_id() == $userId && $userId == $friendId);
-        $messages = self::getWallMessages($userId, MESSAGE_STATUS_WALL_POST, null, $start, $limit, $offset);
-        $users = array();
-        $data = array();
+
+        $date = Display::dateToStringAgoAndLongDate($message['send_date']);
+        $currentUserId = api_get_user_id();
+        $userIdLoop = $message['user_sender_id'];
+        $receiverId = $message['user_receiver_id'];
+
+        if (!isset($users[$userIdLoop])) {
+            $users[$userIdLoop] = api_get_user_info($userIdLoop);
+        }
+
+        $iconStatus = $users[$userIdLoop]['icon_status'];
+        $nameComplete = $users[$userIdLoop]['complete_name'];
+        $url = api_get_path(WEB_CODE_PATH).'social/profile.php?u='.$userIdLoop;
+
+        $comment = '<div class="rep-post col-md-12">';
+        $comment .= '<div class="col-md-2 col-xs-2 social-post-answers">';
+        $comment .= '<div class="user-image pull-right">';
+        $comment .= '<a href="'.$url.'">
+                        <img src="'.$users[$userIdLoop]['avatar'].'" 
+                        alt="'.$users[$userIdLoop]['complete_name'].'" 
+                        class="avatar-thumb">
+                     </a>';
+        $comment .= '</div>';
+        $comment .= '</div>';
+        $comment .= '<div class="col-md-7 col-xs-7 social-post-answers">';
+        $comment .= '<div class="user-data">';
+        $comment .= $iconStatus;
+        $comment .= '<div class="username"><a href="'.$url.'">'.$nameComplete.'</a> 
+                        <span>'.Security::remove_XSS($message['content']).'</span>
+                       </div>';
+        $comment .= '<div>'.$date.'</div>';
+        $comment .= '<br />';
+        $comment .= '</div>';
+        $comment .= '</div>';
+
+        $comment .= '<div class="col-md-3 col-xs-3 social-post-answers">';
+        $comment .= '<div class="pull-right btn-group btn-group-sm">';
+
+        $comment .= MessageManager::getLikesButton(
+            $message['id'],
+            $currentUserId
+        );
+
+        $isOwnWall = $currentUserId == $userIdLoop || $currentUserId == $receiverId;
+        if ($isOwnWall) {
+            $comment .= Display::url(
+                    Display::returnFontAwesomeIcon('trash', '', true),
+                'javascript:void(0)',
+                [
+                    'id' => 'message_'.$message['id'],
+                    'title' => get_lang('SocialMessageDelete'),
+                    'onclick' => 'deleteComment('.$message['id'].')',
+                    'class' => 'btn btn-default',
+                ]
+            );
+        }
+        $comment .= '</div>';
+        $comment .= '</div>';
+        $comment .= '</div>';
+
+        return $comment;
+    }
+
+    /**
+     * @param array $message
+     *
+     * @return array
+     */
+    public static function getAttachmentPreviewList($message)
+    {
+        $messageId = $message['id'];
+
+        $list = [];
+
+        if (empty($message['group_id'])) {
+            $files = MessageManager::getAttachmentList($messageId);
+            if ($files) {
+                $downloadUrl = api_get_path(WEB_CODE_PATH).'social/download.php?message_id='.$messageId;
+                foreach ($files as $row_file) {
+                    $url = $downloadUrl.'&attachment_id='.$row_file['id'];
+                    $display = Display::fileHtmlGuesser($row_file['filename'], $url);
+                    $list[] = $display;
+                }
+            }
+        } else {
+            $list = MessageManager::getAttachmentLinkList($messageId);
+        }
+
+        return $list;
+    }
+
+    /**
+     * @param array $message
+     *
+     * @return string
+     */
+    public static function getPostAttachment($message)
+    {
+        $previews = self::getAttachmentPreviewList($message);
+
+        if (empty($previews)) {
+            return '';
+        }
+
+        return implode('', $previews);
+    }
+
+    /**
+     * @param array $messages
+     *
+     * @return array
+     */
+    public static function formatWallMessages($messages)
+    {
+        $data = [];
+        $users = [];
         foreach ($messages as $key => $message) {
             $userIdLoop = $message['user_sender_id'];
             $userFriendIdLoop = $message['user_receiver_id'];
-
             if (!isset($users[$userIdLoop])) {
                 $users[$userIdLoop] = api_get_user_info($userIdLoop);
             }
@@ -1628,16 +1986,13 @@ class SocialManager extends UserManager
                 $users[$userFriendIdLoop] = api_get_user_info($userFriendIdLoop);
             }
 
-            $html = '';
-            $html .= self::headerMessagePost(
-                $message['user_sender_id'],
-                $message['user_receiver_id'],
-                $users,
-                $message,
-                $isOwnWall
+            $html = self::headerMessagePost(
+                $users[$userIdLoop],
+                $users[$userFriendIdLoop],
+                $message
             );
 
-            $data[$key]['id'] = $message['id'];
+            $data[$key] = $message;
             $data[$key]['html'] = $html;
         }
 
@@ -1645,80 +2000,10 @@ class SocialManager extends UserManager
     }
 
     /**
-     * Returns the formatted header message post
-     * @param   int     $authorId   Author's id
-     * @param   int     $receiverId Receiver's id
-     * @param   array   $users      Author's and receiver's data
-     * @param   array   $message    Message data
-     * @param   boolean $isOwnWall  Determines if the author is in its own social wall or not
-     * @return  string  $html       The formatted header message post
-     */
-    private static function headerMessagePost($authorId, $receiverId, $users, $message, $isOwnWall = false)
-    {
-        $date = api_get_local_time($message['send_date']);
-        $avatarAuthor = $users[$authorId]['avatar'];
-        $urlAuthor = api_get_path(WEB_CODE_PATH).'social/profile.php?u='.$authorId;
-        $nameCompleteAuthor = api_get_person_name(
-            $users[$authorId]['firstname'],
-            $users[$authorId]['lastname']
-        );
-
-        $urlReceiver = api_get_path(WEB_CODE_PATH).'social/profile.php?u='.$receiverId;
-        $nameCompleteReceiver = api_get_person_name(
-            $users[$receiverId]['firstname'],
-            $users[$receiverId]['lastname']
-        );
-
-        $htmlReceiver = '';
-        if ($authorId != $receiverId) {
-            $htmlReceiver = ' > <a href="'.$urlReceiver.'">'.$nameCompleteReceiver.'</a> ';
-        }
-
-        $wallImage = '';
-        if (!empty($message['path'])) {
-            $imageBig = UserManager::getUserPicture($authorId, USER_IMAGE_SIZE_BIG);
-            $imageSmall = UserManager::getUserPicture($authorId, USER_IMAGE_SIZE_SMALL);
-
-            $wallImage = '<a class="thumbnail ajax" href="'.$imageBig.'"><img src="'.$imageSmall.'"></a>';
-        }
-
-        $htmlDelete = '';
-        if ($isOwnWall) {
-            $htmlDelete .= '<a title="'.get_lang("SocialMessageDelete").'" href="'.api_get_path(WEB_CODE_PATH).'social/profile.php?messageId='.
-            $message['id'].'">x</a>';
-        }
-
-        $html = '';
-        $html .= '<div class="top-mediapost" >';
-        if ($isOwnWall) {
-            $html .= '<div class="pull-right deleted-mgs">';
-            $html .= $htmlDelete;
-            $html .= '</div>';
-        }
-        $html .= '<div class="user-image" >';
-        $html .= '<a href="'.$urlAuthor.'">'.'<img class="avatar-thumb" src="'.$avatarAuthor.'" alt="'.$nameCompleteAuthor.'"></a>';
-        $html .= '</div>';
-        $html .= '<div class="user-data">';
-        $html .= '<div class="username"><a href="'.$urlAuthor.'">'.$nameCompleteAuthor.'</a>'.$htmlReceiver.'</div>';
-        $html .= '<div class="time timeago" title="'.$date.'">'.$date.'</div>';
-        $html .= '</div>';
-        $html .= '<div class="msg-content">';
-        $html .= '<div class="img-post">';
-        $html .= $wallImage;
-        $html .= '</div>';
-        $html .= '<p>'.Security::remove_XSS($message['content']).'</p>';
-        $html .= '</div>';
-        $html .= '</div>'; // end mediaPost
-
-        // Popularity post functionality
-        $html .= '<div class="popularity-mediapost"></div>';
-
-        return $html;
-    }
-
-    /**
-     * get html data with OpenGrap passing the Url
+     * get html data with OpenGrap passing the URL.
+     *
      * @param $link url
+     *
      * @return string data html
      */
     public static function readContentWithOpenGraph($link)
@@ -1736,8 +2021,9 @@ class SocialManager extends UserManager
         $image = $graph->image;
         $description = $graph->description;
         $title = $graph->title;
-        $html  = '<div class="thumbnail social-thumbnail">';
-        $html .= empty($image) ? '' : '<a target="_blank" href="'.$url.'"><img class="img-responsive social-image" src="'.$image.'" /></a>';
+        $html = '<div class="thumbnail social-thumbnail">';
+        $html .= empty($image) ? '' : '<a target="_blank" href="'.$url.'">
+                <img class="img-responsive social-image" src="'.$image.'" /></a>';
         $html .= '<div class="social-description">';
         $html .= '<a target="_blank" href="'.$url.'"><h5 class="social-title"><b>'.$title.'</b></h5></a>';
         $html .= empty($description) ? '' : '<span>'.$description.'</span>';
@@ -1749,10 +2035,11 @@ class SocialManager extends UserManager
     }
 
     /**
-     * verify if Url Exist - Using Curl
+     * verify if Url Exist - Using Curl.
+     *
      * @param $uri url
      *
-     * @return boolean
+     * @return bool
      */
     public static function verifyUrl($uri)
     {
@@ -1768,36 +2055,57 @@ class SocialManager extends UserManager
         curl_close($curl);
         if (!empty($response)) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
-    * Delete messages delete logic
-    * @param int $id id message to delete.
-    * @return bool status query
-    */
+     * Soft delete a message and his chidren.
+     *
+     * @param int $id id message to delete
+     *
+     * @return bool status query
+     */
     public static function deleteMessage($id)
     {
-        $id = intval($id);
-        $tblMessage = Database::get_main_table(TABLE_MESSAGE);
-        $statusMessage = MESSAGE_STATUS_WALL_DELETE;
-        $sql = "UPDATE $tblMessage SET msg_status = '$statusMessage' WHERE id = '{$id}' ";
+        $id = (int) $id;
+        $messageInfo = MessageManager::get_message_by_id($id);
+        if (!empty($messageInfo)) {
+            // Delete comments too
+            $messages = MessageManager::getMessagesByParent($id);
+            if (!empty($messages)) {
+                foreach ($messages as $message) {
+                    self::deleteMessage($message['id']);
+                }
+            }
 
-        return Database::query($sql);
+            // Soft delete message
+            $tblMessage = Database::get_main_table(TABLE_MESSAGE);
+            $statusMessage = MESSAGE_STATUS_WALL_DELETE;
+            $sql = "UPDATE $tblMessage SET msg_status = '$statusMessage' WHERE id = '{$id}' ";
+            Database::query($sql);
+
+            MessageManager::delete_message_attachment_file($id, $messageInfo['user_sender_id']);
+            MessageManager::delete_message_attachment_file($id, $messageInfo['user_receiver_id']);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
-     * Generate the social block for a user
+     * Generate the social block for a user.
+     *
      * @param Template $template
-     * @param int $userId The user id
-     * @param string $groupBlock Optional. Highlight link possible values:
-     * group_add, home, messages, messages_inbox, messages_compose,
-     * messages_outbox, invitations, shared_profile, friends, groups, search
-     * @param int $groupId Optional. Group ID
-     * @param $show_full_profile
-     * @param $returnHtml
+     * @param int      $userId            The user id
+     * @param string   $groupBlock        Optional. Highlight link possible values:
+     *                                    group_add, home, messages, messages_inbox, messages_compose,
+     *                                    messages_outbox, invitations, shared_profile, friends, groups, search
+     * @param int      $groupId           Optional. Group ID
+     * @param bool     $show_full_profile
+     *
      * @return string The HTML code with the social block
      */
     public static function setSocialUserBlock(
@@ -1813,7 +2121,7 @@ class SocialManager extends UserManager
         }
 
         $currentUserId = api_get_user_id();
-        $userId = intval($userId);
+        $userId = (int) $userId;
         $userRelationType = 0;
 
         $socialAvatarBlock = self::show_social_avatar_block(
@@ -1826,17 +2134,65 @@ class SocialManager extends UserManager
         if ($currentUserId === $userId) {
             $profileEditionLink = Display::getProfileEditionLink($userId);
         } else {
-            $userRelationType = self::get_relation_between_contacts(
-                $currentUserId,
-                $userId
-            );
+            $userRelationType = self::get_relation_between_contacts($currentUserId, $userId);
+        }
+
+        $options = api_get_configuration_value('profile_fields_visibility');
+        if (isset($options['options'])) {
+            $options = $options['options'];
         }
 
         $vCardUserLink = Display::getVCardUserLink($userId);
+        if (isset($options['vcard']) && $options['vcard'] === false) {
+            $vCardUserLink = '';
+        }
 
         $userInfo = api_get_user_info($userId, true, false, true, true);
 
+        if (isset($options['firstname']) && $options['firstname'] === false) {
+            $userInfo['firstname'] = '';
+        }
+        if (isset($options['lastname']) && $options['lastname'] === false) {
+            $userInfo['lastname'] = '';
+        }
+
+        if (isset($options['email']) && $options['email'] === false) {
+            $userInfo['email'] = '';
+        }
+
+        // Ofaj
+        $hasCertificates = Certificate::getCertificateByUser($userId);
+        $userInfo['has_certificates'] = 0;
+        if (!empty($hasCertificates)) {
+            $userInfo['has_certificates'] = 1;
+        }
+
+        $userInfo['is_admin'] = UserManager::is_admin($userId);
+
+        $languageId = api_get_language_id($userInfo['language']);
+        $languageInfo = api_get_language_info($languageId);
+        if ($languageInfo) {
+            $userInfo['language'] = [
+                'label' => $languageInfo['original_name'],
+                'value' => $languageInfo['english_name'],
+                'code' => $languageInfo['isocode'],
+            ];
+        }
+
+        if (isset($options['language']) && $options['language'] === false) {
+            $userInfo['language'] = '';
+        }
+
+        if (isset($options['photo']) && $options['photo'] === false) {
+            $socialAvatarBlock = '';
+        }
+
+        $extraFieldBlock = self::getExtraFieldBlock($userId, true);
+        $showLanguageFlag = api_get_configuration_value('social_show_language_flag_in_profile');
+
         $template->assign('user', $userInfo);
+        $template->assign('show_language_flag', $showLanguageFlag);
+        $template->assign('extra_info', $extraFieldBlock);
         $template->assign('social_avatar_block', $socialAvatarBlock);
         $template->assign('profile_edition_link', $profileEditionLink);
         //Added the link to export the vCard to the Template
@@ -1855,10 +2211,16 @@ class SocialManager extends UserManager
             $template->assign('gamification_points', $gamificationPoints);
         }
         $chatEnabled = api_is_global_chat_enabled();
+
+        if (isset($options['chat']) && $options['chat'] === false) {
+            $chatEnabled = '';
+        }
+
         $template->assign('chat_enabled', $chatEnabled);
         $template->assign('user_relation', $userRelationType);
         $template->assign('user_relation_type_friend', USER_RELATION_TYPE_FRIEND);
         $template->assign('show_full_profile', $show_full_profile);
+
         $templateName = $template->get_template('social/user_block.tpl');
 
         if (in_array($groupBlock, ['groups', 'group_edit', 'member_list'])) {
@@ -1877,11 +2239,12 @@ class SocialManager extends UserManager
      * @param int $user_id
      * @param $link_shared
      * @param $show_full_profile
+     *
      * @return string
      */
     public static function listMyFriends($user_id, $link_shared, $show_full_profile)
     {
-        //SOCIALGOODFRIEND , USER_RELATION_TYPE_FRIEND, USER_RELATION_TYPE_PARENT
+        // SOCIALGOODFRIEND , USER_RELATION_TYPE_FRIEND, USER_RELATION_TYPE_PARENT
         $friends = self::get_friends($user_id, USER_RELATION_TYPE_FRIEND);
         $number_of_images = 30;
         $number_friends = count($friends);
@@ -1901,24 +2264,28 @@ class SocialManager extends UserManager
             $friendHtml .= '<ul class="nav nav-list">';
             $j = 1;
             for ($k = 0; $k < $number_friends; $k++) {
-                if ($j > $number_of_images) break;
-
+                if ($j > $number_of_images) {
+                    break;
+                }
                 if (isset($friends[$k])) {
                     $friend = $friends[$k];
                     $name_user = api_get_person_name($friend['firstName'], $friend['lastName']);
                     $user_info_friend = api_get_user_info($friend['friend_user_id'], true);
 
                     if ($user_info_friend['user_is_online']) {
-                        $statusIcon = Display::span('', array('class' => 'online_user_in_text'));
+                        $statusIcon = Display::span('', ['class' => 'online_user_in_text']);
                     } else {
-                        $statusIcon = Display::span('', array('class' => 'offline_user_in_text'));
+                        $statusIcon = Display::span('', ['class' => 'offline_user_in_text']);
                     }
 
                     $friendHtml .= '<li>';
                     $friendHtml .= '<div>';
 
                     // the height = 92 must be the same in the image_friend_network span style in default.css
-                    $friends_profile = UserManager::getUserPicture($friend['friend_user_id'], USER_IMAGE_SIZE_SMALL);
+                    $friends_profile = UserManager::getUserPicture(
+                        $friend['friend_user_id'],
+                        USER_IMAGE_SIZE_SMALL
+                    );
                     $friendHtml .= '<img src="'.$friends_profile.'" id="imgfriend_'.$friend['friend_user_id'].'" title="'.$name_user.'"/>';
                     $link_shared = (empty($link_shared)) ? '' : '&'.$link_shared;
                     $friendHtml .= $statusIcon.'<a href="profile.php?'.'u='.$friend['friend_user_id'].$link_shared.'">'.$name_user.'</a>';
@@ -1929,8 +2296,9 @@ class SocialManager extends UserManager
             }
             $friendHtml .= '</ul>';
         } else {
-            $friendHtml .= '<div class="">'.get_lang('NoFriendsInYourContactList').'<br />'
-                .'<a class="btn btn-primary" href="'.api_get_path(WEB_PATH).'whoisonline.php"><em class="fa fa-search"></em> '.get_lang('TryAndFindSomeFriends').'</a></div>';
+            $friendHtml .= '<div class="">'.get_lang('NoFriendsInYourContactList').'<br />
+                <a class="btn btn-primary" href="'.api_get_path(WEB_PATH).'whoisonline.php">
+                <em class="fa fa-search"></em> '.get_lang('TryAndFindSomeFriends').'</a></div>';
         }
 
         $friendHtml = Display::panel($friendHtml, get_lang('SocialFriend').' ('.$number_friends.')');
@@ -1941,156 +2309,1044 @@ class SocialManager extends UserManager
     /**
      * @param int $user_id
      * @param $link_shared
-     * @param $show_full_profile
+     * @param bool $showLinkToChat
+     *
      * @return string
      */
-    public static function listMyFriendsBlock($user_id, $link_shared = '', $show_full_profile = '')
+    public static function listMyFriendsBlock($user_id, $link_shared = '', $showLinkToChat = false)
     {
         //SOCIALGOODFRIEND , USER_RELATION_TYPE_FRIEND, USER_RELATION_TYPE_PARENT
         $friends = self::get_friends($user_id, USER_RELATION_TYPE_FRIEND);
-        $number_of_images = 30;
-        $number_friends = count($friends);
+        $numberFriends = count($friends);
         $friendHtml = '';
 
-        if ($number_friends != 0) {
-            $friendHtml .= '<div class="list-group">';
+        if (!empty($numberFriends)) {
+            $friendHtml .= '<div class="list-group contact-list">';
             $j = 1;
-            for ($k = 0; $k < $number_friends; $k++) {
-                if ($j > $number_of_images) {
+
+            usort(
+                $friends,
+                function ($a, $b) {
+                    return strcmp($b['user_info']['user_is_online_in_chat'], $a['user_info']['user_is_online_in_chat']);
+                }
+            );
+
+            foreach ($friends as $friend) {
+                if ($j > $numberFriends) {
                     break;
                 }
-                if (isset($friends[$k])) {
-                    $friend = $friends[$k];
-                    $name_user = api_get_person_name($friend['firstName'], $friend['lastName']);
-                    $user_info_friend = api_get_user_info($friend['friend_user_id'], true);
+                $name_user = api_get_person_name($friend['firstName'], $friend['lastName']);
+                $user_info_friend = api_get_user_info($friend['friend_user_id'], true);
 
-                    if (!empty($user_info_friend['user_is_online'])) {
-                        $statusIcon = Display::return_icon('statusonline.png', get_lang('Online'));
-                        $status = 1;
-                    } else {
-                        $statusIcon = Display::return_icon('statusoffline.png', get_lang('Offline'));
-                        $status = 0;
-                    }
-
-                    $friendAvatarMedium = UserManager::getUserPicture(
-                        $friend['friend_user_id'],
-                        USER_IMAGE_SIZE_MEDIUM
-                    );
-                    $friendAvatarSmall = UserManager::getUserPicture(
-                        $friend['friend_user_id'],
-                        USER_IMAGE_SIZE_SMALL
-                    );
-                    $friend_avatar = '<img src="'.$friendAvatarMedium.'" id="imgfriend_'.$friend['friend_user_id'].'" title="'.$name_user.'" class="user-image"/>';
-
-                    $relation = SocialManager::get_relation_between_contacts(
-                        $friend['friend_user_id'],
-                        api_get_user_id()
-                    );
-                    $showLinkToChat = api_is_global_chat_enabled() && $friend['friend_user_id'] != api_get_user_id() && $relation == USER_RELATION_TYPE_FRIEND;
-
-                    if ($showLinkToChat) {
-                        $friendHtml .= '<a onclick="javascript:chatWith(\''.$friend['friend_user_id'].'\', \''.$name_user.'\', \''.$status.'\',\''.$friendAvatarSmall.'\')" href="javascript:void(0);" class="list-group-item">';
-                        $friendHtml .= $friend_avatar.' <span class="username">'.$name_user.'</span>';
-                        $friendHtml .= '<span class="status">'.$statusIcon.'</span>';
-                    } else {
-                        $link_shared = empty($link_shared) ? '' : '&'.$link_shared;
-                        $friendHtml .= '<a href="profile.php?'.'u='.$friend['friend_user_id'].$link_shared.'" class="list-group-item">';
-                        $friendHtml .= $friend_avatar.' <span class="username-all">'.$name_user.'</span>';
-                    }
-
-                    $friendHtml .= '</a>';
+                $statusIcon = Display::return_icon('statusoffline.png', get_lang('Offline'));
+                $status = 0;
+                if (!empty($user_info_friend['user_is_online_in_chat'])) {
+                    $statusIcon = Display::return_icon('statusonline.png', get_lang('Online'));
+                    $status = 1;
                 }
+
+                $friendAvatarMedium = UserManager::getUserPicture(
+                    $friend['friend_user_id'],
+                    USER_IMAGE_SIZE_MEDIUM
+                );
+                $friendAvatarSmall = UserManager::getUserPicture(
+                    $friend['friend_user_id'],
+                    USER_IMAGE_SIZE_SMALL
+                );
+                $friend_avatar = '<img src="'.$friendAvatarMedium.'" id="imgfriend_'.$friend['friend_user_id'].'" title="'.$name_user.'" class="user-image"/>';
+
+                $relation = self::get_relation_between_contacts(
+                    $friend['friend_user_id'],
+                    api_get_user_id()
+                );
+
+                if ($showLinkToChat) {
+                    $friendHtml .= '<a onclick="javascript:chatWith(\''.$friend['friend_user_id'].'\', \''.$name_user.'\', \''.$status.'\',\''.$friendAvatarSmall.'\')" href="javascript:void(0);" class="list-group-item">';
+                    $friendHtml .= $friend_avatar.' <span class="username">'.$name_user.'</span>';
+                    $friendHtml .= '<span class="status">'.$statusIcon.'</span>';
+                } else {
+                    $link_shared = empty($link_shared) ? '' : '&'.$link_shared;
+                    $friendHtml .= '<a href="profile.php?'.'u='.$friend['friend_user_id'].$link_shared.'" class="list-group-item">';
+                    $friendHtml .= $friend_avatar.' <span class="username">'.$name_user.'</span>';
+                    $friendHtml .= '<span class="status">'.$statusIcon.'</span>';
+                }
+
+                $friendHtml .= '</a>';
+
                 $j++;
             }
             $friendHtml .= '</div>';
         } else {
-            $friendHtml .= '<div class="help">'.get_lang('NoFriendsInYourContactList').' '
-                .'<a href="'.api_get_path(WEB_PATH).'whoisonline.php"><em class="fa fa-search"></em> '.get_lang('TryAndFindSomeFriends').'</a></div>';
+            $friendHtml = Display::return_message(get_lang('NoFriendsInYourContactList'), 'warning');
         }
 
         return $friendHtml;
     }
 
     /**
+     * @return string Get the JS code necessary for social wall to load open graph from URLs.
+     */
+    public static function getScriptToGetOpenGraph()
+    {
+        return '<script>
+            $(function() {
+                $("[name=\'social_wall_new_msg_main\']").on("paste", function(e) {
+                    $.ajax({
+                        contentType: "application/x-www-form-urlencoded",
+                        beforeSend: function() {
+                            $("[name=\'wall_post_button\']").prop( "disabled", true );
+                            $(".panel-preview").hide();
+                            $(".spinner").html("'
+                                .'<div class=\'text-center\'>'
+                                .'<em class=\'fa fa-spinner fa-pulse fa-1x\'></em>'
+                                .'<p>'.get_lang('Loading').' '.get_lang('Preview').'</p>'
+                                .'</div>'
+                            .'");
+                        },
+                        type: "POST",
+                        url: "'.api_get_path(WEB_AJAX_PATH).'social.ajax.php?a=read_url_with_open_graph",
+                        data: "social_wall_new_msg_main=" + e.originalEvent.clipboardData.getData("text"),
+                        success: function(response) {
+                            $("[name=\'wall_post_button\']").prop("disabled", false);
+                            if (!response == false) {
+                                $(".spinner").html("");
+                                $(".panel-preview").show();
+                                $(".url_preview").html(response);
+                                $("[name=\'url_content\']").val(response);
+                                $(".url_preview img").addClass("img-responsive");
+                            } else {
+                                $(".spinner").html("");
+                            }
+                        }
+                    });
+                });
+            });
+        </script>';
+    }
+
+    /**
+     * @param string $urlForm
+     *
      * @return string
      */
-    public static function getWallForm($show_full_profile = true)
+    public static function getWallForm($urlForm)
     {
-        if ($show_full_profile) {
-            $userId = isset($_GET['u']) ? '?u='.intval($_GET['u']) : '';
-            $form = new FormValidator(
-                'social_wall_main',
-                'post',
-                api_get_path(WEB_CODE_PATH).'social/profile.php'.$userId,
-                null,
-                array('enctype' => 'multipart/form-data'),
-                FormValidator::LAYOUT_HORIZONTAL
-            );
+        $userId = isset($_GET['u']) ? '?u='.intval($_GET['u']) : '';
+        $form = new FormValidator(
+            'social_wall_main',
+            'post',
+            $urlForm.$userId,
+            null,
+            ['enctype' => 'multipart/form-data'],
+            FormValidator::LAYOUT_HORIZONTAL
+        );
 
-            $socialWallPlaceholder = isset($_GET['u']) ? get_lang('SocialWallWriteNewPostToFriend') : get_lang('SocialWallWhatAreYouThinkingAbout');
+        $socialWallPlaceholder = isset($_GET['u']) ? get_lang('SocialWallWriteNewPostToFriend') : get_lang(
+            'SocialWallWhatAreYouThinkingAbout'
+        );
 
-            $form->addTextarea(
-                'social_wall_new_msg_main',
-                null,
-                [
-                    'placeholder' => $socialWallPlaceholder,
-                    'cols-size' => [1, 10, 1],
-                    'aria-label' => $socialWallPlaceholder
-                ]
-            );
-            $form->addHidden('url_content', '');
-            $form->addButtonSend(get_lang('Post'), 'wall_post_button', false, ['cols-size' => [1, 10, 1]]);
-            $html = Display::panel($form->returnForm(), get_lang('SocialWall'));
+        $form->addTextarea(
+            'social_wall_new_msg_main',
+            null,
+            [
+                'placeholder' => $socialWallPlaceholder,
+                'cols-size' => [1, 10, 1],
+                'aria-label' => $socialWallPlaceholder,
+            ]
+        );
+        $form->addHtml('<div class="form-group">');
+        $form->addHtml('<div class="col-sm-4 col-md-offset-1">');
+        $form->addFile('picture', get_lang('UploadFile'), ['custom' => true]);
+        $form->addHtml('</div>');
+        $form->addHtml('<div class="col-sm-6">');
+        $form->addButtonSend(
+            get_lang('Post'),
+            'wall_post_button',
+            false,
+            [
+                'cols-size' => [1, 10, 1],
+                'custom' => true,
+            ]
+        );
+        $form->addHtml('</div>');
+        $form->addHtml('</div>');
 
-            return $html;
+        $form->addHidden('url_content', '');
+        $html = Display::panel($form->returnForm(), get_lang('SocialWall'));
+
+        return $html;
+    }
+
+    /**
+     * @param int   $userId
+     * @param int   $start
+     * @param int   $length
+     * @param array $threadList
+     *
+     * @return array
+     */
+    public static function getMyWallMessages($userId, $start = 0, $length = 10, $threadList = [])
+    {
+        $userGroup = new UserGroup();
+        $groups = $userGroup->get_groups_by_user($userId, [GROUP_USER_PERMISSION_READER, GROUP_USER_PERMISSION_ADMIN]);
+        $groupList = [];
+        if (!empty($groups)) {
+            $groupList = array_column($groups, 'id');
         }
+
+        $friends = self::get_friends($userId, USER_RELATION_TYPE_FRIEND);
+        $friendList = [];
+        if (!empty($friends)) {
+            $friendList = array_column($friends, 'friend_user_id');
+        }
+
+        $messages = self::getWallMessages(
+            $userId,
+            0,
+            $groupList,
+            $friendList,
+            '',
+            $start,
+            $length,
+            false,
+            $threadList
+        );
+
+        $countPost = self::getCountWallMessagesByUser($userId, $groupList, $friendList, $threadList);
+        $messages = self::formatWallMessages($messages);
+
+        $html = '';
+        foreach ($messages as $message) {
+            $post = $message['html'];
+            $comments = '';
+            if ($message['msg_status'] == MESSAGE_STATUS_WALL_POST) {
+                $comments = self::getWallPostComments($userId, $message);
+            }
+
+            $html .= self::wrapPost($message, $post.$comments);
+        }
+
+        return [
+            'posts' => $html,
+            'count' => $countPost,
+        ];
+    }
+
+    /**
+     * @param string $message
+     * @param string $content
+     *
+     * @return string
+     */
+    public static function wrapPost($message, $content)
+    {
+        return Display::panel($content, '',
+            '',
+            'default',
+            '',
+            'post_'.$message['id']
+        );
     }
 
     /**
      * @param int $userId
-     * @param int $friendId
+     *
+     * @return int
+     */
+    public static function getCountWallMessagesByUser($userId, $groupList = [], $friendList = [], $threadList = [])
+    {
+        $count = self::getWallMessages(
+            $userId,
+            0,
+            $groupList,
+            $friendList,
+            '',
+            0,
+            0,
+            true,
+            $threadList
+        );
+
+        return $count;
+    }
+
+    /**
+     * @param int $userId
+     *
      * @return string
      */
-    public static function getWallMessagesByUser($userId, $friendId)
+    public static function getWallMessagesByUser($userId)
     {
-        $messages = self::getWallMessagesPostHTML($userId, $friendId);
-        $html = '';
+        $messages = self::getWallMessages($userId);
+        $messages = self::formatWallMessages($messages);
 
+        $html = '';
         foreach ($messages as $message) {
             $post = $message['html'];
-            $comment = self::getWallMessagesHTML($userId, $friendId, $message['id']);
-            $html .= Display::panel($post.$comment, '');
+            $comments = self::getWallPostComments($userId, $message);
+            $html .= self::wrapPost($message, $post.$comments);
         }
 
         return $html;
     }
 
     /**
-     * Get HTML code block for user skills
-     * @param int $userId The user ID
+     * Get HTML code block for user skills.
+     *
+     * @param int    $userId      The user ID
+     * @param string $orientation
+     *
      * @return string
      */
-    public static function getSkillBlock($userId)
+    public static function getSkillBlock($userId, $orientation = 'horizontal')
     {
-        if (Skill::isAllow($userId, false) === false) {
+        if (Skill::isAllowed($userId, false) === false) {
             return '';
         }
 
         $skill = new Skill();
-        $ranking = $skill->get_user_skill_ranking($userId);
-        $skills = $skill->getUserSkills($userId, true);
+        $ranking = $skill->getUserSkillRanking($userId);
 
         $template = new Template(null, false, false, false, false, false);
         $template->assign('ranking', $ranking);
-        $template->assign('skills', $skills);
+        $template->assign('orientation', $orientation);
+        $template->assign('skills', $skill->getUserSkillsTable($userId, 0, 0, false)['skills']);
         $template->assign('user_id', $userId);
-        $template->assign(
-            'show_skills_report_link',
-            api_is_student() || api_is_student_boss() || api_is_drh()
-        );
+        $template->assign('show_skills_report_link', api_is_student() || api_is_student_boss() || api_is_drh());
 
         $skillBlock = $template->get_template('social/skills_block.tpl');
 
         return $template->fetch($skillBlock);
+    }
+
+    /**
+     * @param int $user_id
+     *
+     * @return string|array
+     */
+    public static function getExtraFieldBlock($user_id, $isArray = false)
+    {
+        $fieldVisibility = api_get_configuration_value('profile_fields_visibility');
+        $fieldVisibilityKeys = [];
+        if (isset($fieldVisibility['options'])) {
+            $fieldVisibility = $fieldVisibility['options'];
+            $fieldVisibilityKeys = array_keys($fieldVisibility);
+        }
+
+        $t_ufo = Database::get_main_table(TABLE_EXTRA_FIELD_OPTIONS);
+        $extra_user_data = UserManager::get_extra_user_data($user_id);
+
+        $extra_information = '';
+        if (is_array($extra_user_data) && count($extra_user_data) > 0) {
+            $extra_information_value = '';
+            $extraField = new ExtraField('user');
+            $listType = [];
+            $extraFieldItem = [];
+            foreach ($extra_user_data as $key => $data) {
+                if (empty($data)) {
+                    continue;
+                }
+                if (in_array($key, $fieldVisibilityKeys) && $fieldVisibility[$key] === false) {
+                    continue;
+                }
+
+                // Avoiding parameters
+                if (in_array(
+                    $key,
+                    [
+                        'mail_notify_invitation',
+                        'mail_notify_message',
+                        'mail_notify_group_message',
+                    ]
+                )) {
+                    continue;
+                }
+                // get display text, visibility and type from user_field table
+                $field_variable = str_replace('extra_', '', $key);
+
+                $extraFieldInfo = $extraField->get_handler_field_info_by_field_variable(
+                    $field_variable
+                );
+
+                if (in_array($extraFieldInfo['variable'], ['skype', 'linkedin_url'])) {
+                    continue;
+                }
+
+                // if is not visible skip
+                if ($extraFieldInfo['visible_to_self'] != 1) {
+                    continue;
+                }
+
+                // if is not visible to others skip also
+                if ($extraFieldInfo['visible_to_others'] != 1) {
+                    continue;
+                }
+
+                if (is_array($data)) {
+                    switch ($extraFieldInfo['field_type']) {
+                        case ExtraField::FIELD_TYPE_RADIO:
+                            $objEfOption = new ExtraFieldOption('user');
+                            $value = $data['extra_'.$extraFieldInfo['variable']];
+                            $optionInfo = $objEfOption->get_field_option_by_field_and_option(
+                                $extraFieldInfo['id'],
+                                $value
+                            );
+
+                            if ($optionInfo && isset($optionInfo[0])) {
+                                $optionInfo = $optionInfo[0];
+                                $extraFieldItem = [
+                                    'variable' => $extraFieldInfo['variable'],
+                                    'label' => ucfirst($extraFieldInfo['display_text']),
+                                    'value' => $optionInfo['display_text'],
+                                ];
+                            } else {
+                                $extraFieldItem = [
+                                    'variable' => $extraFieldInfo['variable'],
+                                    'label' => ucfirst($extraFieldInfo['display_text']),
+                                    'value' => implode(',', $data),
+                                ];
+                            }
+                            break;
+                        default:
+                            $extra_information_value .=
+                                '<li class="list-group-item">'.ucfirst($extraFieldInfo['display_text']).' '
+                                .' '.implode(',', $data).'</li>';
+                            $extraFieldItem = [
+                                'variable' => $extraFieldInfo['variable'],
+                                'label' => ucfirst($extraFieldInfo['display_text']),
+                                'value' => implode(',', $data),
+                            ];
+                            break;
+                    }
+                } else {
+                    switch ($extraFieldInfo['field_type']) {
+                        case ExtraField::FIELD_TYPE_RADIO:
+                            $objEfOption = new ExtraFieldOption('user');
+                            $optionInfo = $objEfOption->get_field_option_by_field_and_option($extraFieldInfo['id'], $extraFieldInfo['value']);
+                            break;
+                        case ExtraField::FIELD_TYPE_GEOLOCALIZATION_COORDINATES:
+                        case ExtraField::FIELD_TYPE_GEOLOCALIZATION:
+                            $data = explode('::', $data);
+                            $data = $data[0];
+                            $extra_information_value .= '<li class="list-group-item">'.ucfirst($extraFieldInfo['display_text']).': '.$data.'</li>';
+                            $extraFieldItem = [
+                                'variable' => $extraFieldInfo['variable'],
+                                'label' => ucfirst($extraFieldInfo['display_text']),
+                                'value' => $data,
+                            ];
+                            break;
+                        case ExtraField::FIELD_TYPE_DOUBLE_SELECT:
+                            $id_options = explode('::', $data);
+                            $value_options = [];
+                            // get option display text from user_field_options table
+                            foreach ($id_options as $id_option) {
+                                $sql = "SELECT display_text 
+                                    FROM $t_ufo 
+                                    WHERE id = '$id_option'";
+                                $res_options = Database::query($sql);
+                                $row_options = Database::fetch_row($res_options);
+                                $value_options[] = $row_options[0];
+                            }
+                            $extra_information_value .= '<li class="list-group-item">'.ucfirst($extraFieldInfo['display_text']).': '
+                                .' '.implode(' ', $value_options).'</li>';
+                            $extraFieldItem = [
+                                'variable' => $extraFieldInfo['variable'],
+                                'label' => ucfirst($extraFieldInfo['display_text']),
+                                'value' => $value_options,
+                            ];
+                            break;
+                        case ExtraField::FIELD_TYPE_TAG:
+                            $user_tags = UserManager::get_user_tags($user_id, $extraFieldInfo['id']);
+
+                            $tag_tmp = '';
+                            foreach ($user_tags as $tags) {
+                                $tag_tmp .= '<a class="label label_tag"'
+                                    .' href="'.api_get_path(WEB_PATH).'main/social/search.php?q='.$tags['tag'].'">'
+                                    .$tags['tag']
+                                    .'</a>';
+                            }
+                            if (is_array($user_tags) && count($user_tags) > 0) {
+                                $extra_information_value .= '<li class="list-group-item">'.ucfirst($extraFieldInfo['display_text']).': '
+                                    .' '.$tag_tmp.'</li>';
+                            }
+                            $extraFieldItem = [
+                                'variable' => $extraFieldInfo['variable'],
+                                'label' => ucfirst($extraFieldInfo['display_text']),
+                                'value' => $tag_tmp,
+                            ];
+                            break;
+                        case ExtraField::FIELD_TYPE_SOCIAL_PROFILE:
+                            $icon_path = UserManager::get_favicon_from_url($data);
+                            if (self::verifyUrl($icon_path) == false) {
+                                break;
+                            }
+                            $bottom = '0.2';
+                            //quick hack for hi5
+                            $domain = parse_url($icon_path, PHP_URL_HOST);
+                            if ($domain == 'www.hi5.com' || $domain == 'hi5.com') {
+                                $bottom = '-0.8';
+                            }
+                            $data = '<a href="'.$data.'">'
+                                .'<img src="'.$icon_path.'" alt="icon"'
+                                .' style="margin-right:0.5em;margin-bottom:'.$bottom.'em;" />'
+                                .$extraFieldInfo['display_text']
+                                .'</a>';
+                            $extra_information_value .= '<li class="list-group-item">'.$data.'</li>';
+                            $extraFieldItem = [
+                                'variable' => $extraFieldInfo['variable'],
+                                'label' => ucfirst($extraFieldInfo['display_text']),
+                                'value' => $data,
+                            ];
+                            break;
+                        case ExtraField::FIELD_TYPE_SELECT_WITH_TEXT_FIELD:
+                            $parsedData = explode('::', $data);
+
+                            if (!$parsedData) {
+                                break;
+                            }
+
+                            $objEfOption = new ExtraFieldOption('user');
+                            $optionInfo = $objEfOption->get($parsedData[0]);
+
+                            $extra_information_value .= '<li class="list-group-item">'
+                                .$optionInfo['display_text'].': '
+                                .$parsedData[1].'</li>';
+                            $extraFieldItem = [
+                                'variable' => $extraFieldInfo['variable'],
+                                'label' => ucfirst($extraFieldInfo['display_text']),
+                                'value' => $parsedData[1],
+                            ];
+                            break;
+                        case ExtraField::FIELD_TYPE_TRIPLE_SELECT:
+                            $optionIds = explode(';', $data);
+                            $optionValues = [];
+
+                            foreach ($optionIds as $optionId) {
+                                $objEfOption = new ExtraFieldOption('user');
+                                $optionInfo = $objEfOption->get($optionId);
+
+                                $optionValues[] = $optionInfo['display_text'];
+                            }
+                            $extra_information_value .= '<li class="list-group-item">'
+                                .ucfirst($extraFieldInfo['display_text']).': '
+                                .implode(' ', $optionValues).'</li>';
+                            $extraFieldItem = [
+                                'variable' => $extraFieldInfo['variable'],
+                                'label' => ucfirst($extraFieldInfo['display_text']),
+                                'value' => implode(' ', $optionValues),
+                            ];
+                            break;
+                        default:
+                            // Ofaj
+                            // Converts "Date of birth" into "age"
+                            if ($key === 'terms_datedenaissance') {
+                                $dataArray = date_to_str_ago($data, 'UTC', true);
+                                $dataToString = isset($dataArray['years']) && !empty($dataArray['years']) ? $dataArray['years'] : 0;
+                                if (!empty($dataToString)) {
+                                    $data = $dataToString;
+                                    $extraFieldInfo['display_text'] = get_lang('Age');
+                                }
+                            }
+
+                            $extra_information_value .= '<li class="list-group-item">'.ucfirst($extraFieldInfo['display_text']).': '.$data.'</li>';
+                            $extraFieldItem = [
+                                'variable' => $extraFieldInfo['variable'],
+                                'label' => ucfirst($extraFieldInfo['display_text']),
+                                'value' => $data,
+                            ];
+                            break;
+                    }
+                }
+
+                $listType[] = $extraFieldItem;
+            }
+
+            if ($isArray) {
+                return $listType;
+            } else {
+                // if there are information to show
+                if (!empty($extra_information_value)) {
+                    $extra_information_value = '<ul class="list-group">'.$extra_information_value.'</ul>';
+                    $extra_information .= Display::panelCollapse(
+                        get_lang('ExtraInformation'),
+                        $extra_information_value,
+                        'sn-extra-information',
+                        null,
+                        'sn-extra-accordion',
+                        'sn-extra-collapse'
+                    );
+                }
+            }
+        }
+
+        return $extra_information;
+    }
+
+    /**
+     * @param string $url
+     */
+    public static function handlePosts($url)
+    {
+        $friendId = isset($_GET['u']) ? (int) $_GET['u'] : api_get_user_id();
+        $url = Security::remove_XSS($url);
+
+        // Main post
+        if (!empty($_POST['social_wall_new_msg_main']) || !empty($_FILES['picture']['tmp_name'])) {
+            $messageContent = $_POST['social_wall_new_msg_main'];
+            if (!empty($_POST['url_content'])) {
+                $messageContent = $_POST['social_wall_new_msg_main'].'<br /><br />'.$_POST['url_content'];
+            }
+
+            $messageId = self::sendWallMessage(
+                api_get_user_id(),
+                $friendId,
+                $messageContent,
+                0,
+                MESSAGE_STATUS_WALL_POST
+            );
+
+            if ($messageId && !empty($_FILES['picture']['tmp_name'])) {
+                self::sendWallMessageAttachmentFile(
+                    api_get_user_id(),
+                    $_FILES['picture'],
+                    $messageId
+                );
+            }
+
+            Display::addFlash(Display::return_message(get_lang('MessageSent')));
+            header('Location: '.$url);
+            exit;
+        }
+    }
+
+    /**
+     * @param int   $countPost
+     * @param array $htmlHeadXtra
+     */
+    public static function getScrollJs($countPost, &$htmlHeadXtra)
+    {
+        // $ajax_url = api_get_path(WEB_AJAX_PATH).'message.ajax.php';
+        $socialAjaxUrl = api_get_path(WEB_AJAX_PATH).'social.ajax.php';
+        $javascriptDir = api_get_path(LIBRARY_PATH).'javascript/';
+        $locale = api_get_language_isocode();
+
+        // Add Jquery scroll pagination plugin
+        $htmlHeadXtra[] = api_get_js('jscroll/jquery.jscroll.js');
+        // Add Jquery Time ago plugin
+        $htmlHeadXtra[] = api_get_asset('jquery-timeago/jquery.timeago.js');
+        $timeAgoLocaleDir = $javascriptDir.'jquery-timeago/locales/jquery.timeago.'.$locale.'.js';
+        if (file_exists($timeAgoLocaleDir)) {
+            $htmlHeadXtra[] = api_get_js('jquery-timeago/locales/jquery.timeago.'.$locale.'.js');
+        }
+
+        if ($countPost > self::DEFAULT_WALL_POSTS) {
+            $htmlHeadXtra[] = '<script>
+            $(function() {
+                var container = $("#wallMessages");
+                container.jscroll({
+                    loadingHtml: "<div class=\"well_border\">'.get_lang('Loading').' </div>",
+                    nextSelector: "a.nextPage:last",
+                    contentSelector: "",
+                    callback: timeAgo                    
+                });
+            });
+            </script>';
+        }
+
+        $htmlHeadXtra[] = '<script>
+            function deleteMessage(id) 
+            {                      
+                $.ajax({
+                    url: "'.$socialAjaxUrl.'?a=delete_message" + "&id=" + id,
+                    success: function (result) {
+                        if (result) {
+                            $("#message_" + id).parent().parent().parent().parent().html(result);
+                        }
+                    }
+                });                        
+            }
+            
+            function deleteComment(id) 
+            {                      
+                $.ajax({
+                    url: "'.$socialAjaxUrl.'?a=delete_message" + "&id=" + id,
+                    success: function (result) {
+                        if (result) {
+                            $("#message_" + id).parent().parent().parent().html(result);
+                        }
+                    }
+                });                     
+            }           
+            
+            function submitComment(messageId) 
+            {
+                var data = $("#form_comment_"+messageId).serializeArray();                                
+                $.ajax({
+                    type : "POST",
+                    url: "'.$socialAjaxUrl.'?a=send_comment" + "&id=" + messageId,
+                    data: data,
+                    success: function (result) {                        
+                        if (result) {
+                            $("#post_" + messageId + " textarea").val("");
+                            $("#post_" + messageId + " .sub-mediapost").prepend(result);
+                            $("#post_" + messageId + " .sub-mediapost").append(
+                                $(\'<div id=result_\' + messageId +\'>'.addslashes(get_lang('Saved')).'</div>\')
+                            ); 
+                                                        
+                            $("#result_" + messageId + "").fadeIn("fast", function() {
+                                $("#result_" + messageId + "").delay(1000).fadeOut("fast", function() {
+                                    $(this).remove();
+                                }); 
+                            });
+                        }
+                    }
+                });  
+            } 
+            
+            $(function() {
+                timeAgo();
+                
+                /*$(".delete_message").on("click", function() {
+                    var id = $(this).attr("id");
+                    id = id.split("_")[1];          
+                    $.ajax({
+                        url: "'.$socialAjaxUrl.'?a=delete_message" + "&id=" + id,
+                        success: function (result) {
+                            if (result) {
+                                $("#message_" + id).parent().parent().parent().parent().html(result);
+                            }
+                        }
+                    });        
+                });                  
+                
+                
+                $(".delete_comment").on("click", function() {
+                    var id = $(this).attr("id");
+                    id = id.split("_")[1];                    
+                    $.ajax({
+                        url: "'.$socialAjaxUrl.'?a=delete_message" + "&id=" + id,
+                        success: function (result) {
+                            if (result) {
+                                $("#message_" + id).parent().parent().parent().html(result);
+                            }
+                        }
+                    });
+                });          
+                */
+            });
+            
+            function timeAgo() {
+                $(".timeago").timeago();
+            }
+            </script>';
+    }
+
+    /**
+     * @param int $userId
+     * @param int $countPost
+     *
+     * @return string
+     */
+    public static function getAutoExtendLink($userId, $countPost)
+    {
+        $userId = (int) $userId;
+        $socialAjaxUrl = api_get_path(WEB_AJAX_PATH).'social.ajax.php';
+        $socialAutoExtendLink = '';
+        if ($countPost > self::DEFAULT_WALL_POSTS) {
+            $socialAutoExtendLink = Display::url(
+                get_lang('SeeMore'),
+                $socialAjaxUrl.'?u='.$userId.'&a=list_wall_message&start='.
+                self::DEFAULT_WALL_POSTS.'&length='.self::DEFAULT_SCROLL_NEW_POST,
+                [
+                    'class' => 'nextPage next',
+                ]
+            );
+        }
+
+        return $socialAutoExtendLink;
+    }
+
+    /**
+     * @param int $userId
+     *
+     * @return array
+     */
+    public static function getThreadList($userId)
+    {
+        $forumCourseId = api_get_configuration_value('global_forums_course_id');
+
+        require_once api_get_path(SYS_CODE_PATH).'forum/forumfunction.inc.php';
+
+        $threads = [];
+        if (!empty($forumCourseId)) {
+            $courseInfo = api_get_course_info_by_id($forumCourseId);
+            getNotificationsPerUser($userId, true, $forumCourseId);
+            $notification = Session::read('forum_notification');
+            Session::erase('forum_notification');
+
+            $threadUrlBase = api_get_path(WEB_CODE_PATH).'forum/viewthread.php?'.http_build_query([
+                'cidReq' => $courseInfo['code'],
+            ]).'&';
+            if (isset($notification['thread']) && !empty($notification['thread'])) {
+                $threadList = array_filter(array_unique($notification['thread']));
+                $em = Database::getManager();
+                $repo = $em->getRepository('ChamiloCourseBundle:CForumThread');
+                foreach ($threadList as $threadId) {
+                    /** @var \Chamilo\CourseBundle\Entity\CForumThread $thread */
+                    $thread = $repo->find($threadId);
+                    if ($thread) {
+                        $threadUrl = $threadUrlBase.http_build_query([
+                            'forum' => $thread->getForumId(),
+                            'thread' => $thread->getIid(),
+                        ]);
+                        $threads[] = [
+                            'id' => $threadId,
+                            'url' => Display::url(
+                                $thread->getThreadTitle(),
+                                $threadUrl
+                            ),
+                            'name' => Display::url(
+                                $thread->getThreadTitle(),
+                                $threadUrl
+                            ),
+                            'description' => '',
+                        ];
+                    }
+                }
+            }
+        }
+
+        return $threads;
+    }
+
+    /**
+     * @param int $userId
+     *
+     * @return string
+     */
+    public static function getGroupBlock($userId)
+    {
+        $threadList = self::getThreadList($userId);
+        $userGroup = new UserGroup();
+
+        $forumCourseId = api_get_configuration_value('global_forums_course_id');
+        $courseInfo = null;
+        if (!empty($forumCourseId)) {
+            $courseInfo = api_get_course_info_by_id($forumCourseId);
+        }
+
+        $social_group_block = '';
+        if (!empty($courseInfo)) {
+            if (!empty($threadList)) {
+                $social_group_block .= '<div class="list-group">';
+                foreach ($threadList as $group) {
+                    $social_group_block .= ' <li class="list-group-item">';
+                    $social_group_block .= $group['name'];
+                    $social_group_block .= '</li>';
+                }
+                $social_group_block .= '</div>';
+            }
+
+            $social_group_block .= Display::url(
+                get_lang('SeeAllCommunities'),
+                api_get_path(WEB_CODE_PATH).'forum/index.php?cidReq='.$courseInfo['code']
+            );
+
+            if (!empty($social_group_block)) {
+                $social_group_block = Display::panelCollapse(
+                    get_lang('MyCommunities'),
+                    $social_group_block,
+                    'sm-groups',
+                    null,
+                    'grups-acordion',
+                    'groups-collapse'
+                );
+            }
+        } else {
+            // Load my groups
+            $results = $userGroup->get_groups_by_user(
+                $userId,
+                [
+                    GROUP_USER_PERMISSION_ADMIN,
+                    GROUP_USER_PERMISSION_READER,
+                    GROUP_USER_PERMISSION_MODERATOR,
+                    GROUP_USER_PERMISSION_HRM,
+                ]
+            );
+
+            $myGroups = [];
+            if (!empty($results)) {
+                foreach ($results as $result) {
+                    $id = $result['id'];
+                    $result['description'] = Security::remove_XSS($result['description'], STUDENT, true);
+                    $result['name'] = Security::remove_XSS($result['name'], STUDENT, true);
+
+                    $group_url = "group_view.php?id=$id";
+
+                    $link = Display::url(
+                        api_ucwords(cut($result['name'], 40, true)),
+                        $group_url
+                    );
+
+                    $result['name'] = $link;
+
+                    $picture = $userGroup->get_picture_group(
+                        $id,
+                        $result['picture'],
+                        null,
+                        GROUP_IMAGE_SIZE_BIG
+                    );
+
+                    $result['picture'] = '<img class="img-responsive" src="'.$picture['file'].'" />';
+                    $group_actions = '<div class="group-more"><a class="btn btn-default" href="groups.php?#tab_browse-2">'.
+                        get_lang('SeeMore').'</a></div>';
+                    $group_info = '<div class="description"><p>'.cut($result['description'], 120, true)."</p></div>";
+                    $myGroups[] = [
+                        'url' => Display::url(
+                            $result['picture'],
+                            $group_url
+                        ),
+                        'name' => $result['name'],
+                        'description' => $group_info.$group_actions,
+                    ];
+                }
+
+                $social_group_block .= '<div class="list-group">';
+                foreach ($myGroups as $group) {
+                    $social_group_block .= ' <li class="list-group-item">';
+                    $social_group_block .= $group['name'];
+                    $social_group_block .= '</li>';
+                }
+                $social_group_block .= '</div>';
+
+                $form = new FormValidator(
+                    'find_groups_form',
+                    'get',
+                    api_get_path(WEB_CODE_PATH).'social/search.php?search_type=2',
+                    null,
+                    null,
+                    FormValidator::LAYOUT_BOX_NO_LABEL
+                );
+                $form->addHidden('search_type', 2);
+
+                $form->addText(
+                    'q',
+                    get_lang('Search'),
+                    false,
+                    [
+                        'aria-label' => get_lang('Search'),
+                        'custom' => true,
+                        'placeholder' => get_lang('Search'),
+                    ]
+                );
+
+                $social_group_block .= $form->returnForm();
+
+                if (!empty($social_group_block)) {
+                    $social_group_block = Display::panelCollapse(
+                        get_lang('MyGroups'),
+                        $social_group_block,
+                        'sm-groups',
+                        null,
+                        'grups-acordion',
+                        'groups-collapse'
+                    );
+                }
+            }
+        }
+
+        return $social_group_block;
+    }
+
+    /**
+     * Returns the formatted header message post.
+     *
+     * @param int   $authorInfo
+     * @param int   $receiverInfo
+     * @param array $message      Message data
+     *
+     * @return string $html       The formatted header message post
+     */
+    private static function headerMessagePost($authorInfo, $receiverInfo, $message)
+    {
+        $currentUserId = api_get_user_id();
+        $authorId = (int) $authorInfo['user_id'];
+        $receiverId = (int) $receiverInfo['user_id'];
+        $iconStatus = $authorInfo['icon_status'];
+
+        $date = Display::dateToStringAgoAndLongDate($message['send_date']);
+        $avatarAuthor = $authorInfo['avatar'];
+        $urlAuthor = api_get_path(WEB_CODE_PATH).'social/profile.php?u='.$authorId;
+        $nameCompleteAuthor = $authorInfo['complete_name'];
+
+        $urlReceiver = api_get_path(WEB_CODE_PATH).'social/profile.php?u='.$receiverId;
+        $nameCompleteReceiver = $receiverInfo['complete_name'];
+
+        $htmlReceiver = '';
+        if ($authorId !== $receiverId) {
+            $htmlReceiver = ' > <a href="'.$urlReceiver.'">'.$nameCompleteReceiver.'</a> ';
+        }
+
+        if (!empty($message['group_info'])) {
+            $htmlReceiver = ' > <a href="'.$message['group_info']['url'].'">'.$message['group_info']['name'].'</a> ';
+        }
+        $canEdit = ($currentUserId == $authorInfo['user_id'] || $currentUserId == $receiverInfo['user_id']) && empty($message['group_info']);
+
+        if (!empty($message['thread_id'])) {
+            $htmlReceiver = ' > <a href="'.$message['thread_url'].'">'.$message['forum_title'].'</a> ';
+            $canEdit = false;
+        }
+
+        $postAttachment = self::getPostAttachment($message);
+
+        $html = '';
+        $html .= '<div class="top-mediapost" >';
+        $html .= '<div class="pull-right btn-group btn-group-sm">';
+
+        $html .= MessageManager::getLikesButton(
+            $message['id'],
+            $currentUserId,
+            !empty($message['group_info']['id']) ? (int) $message['group_info']['id'] : 0
+        );
+
+        if ($canEdit) {
+            $htmlDelete = Display::url(
+                Display::returnFontAwesomeIcon('trash', '', true),
+                'javascript:void(0)',
+                [
+                    'id' => 'message_'.$message['id'],
+                    'title' => get_lang('SocialMessageDelete'),
+                    'onclick' => 'deleteMessage('.$message['id'].')',
+                    'class' => 'btn btn-default',
+                ]
+            );
+
+            $html .= $htmlDelete;
+        }
+        $html .= '</div>';
+
+        $html .= '<div class="user-image" >';
+        $html .= '<a href="'.$urlAuthor.'">
+                    <img class="avatar-thumb" src="'.$avatarAuthor.'" alt="'.$nameCompleteAuthor.'"></a>';
+        $html .= '</div>';
+        $html .= '<div class="user-data">';
+        $html .= $iconStatus;
+        $html .= '<div class="username"><a href="'.$urlAuthor.'">'.$nameCompleteAuthor.'</a>'.$htmlReceiver.'</div>';
+        $html .= '<div class="post-date">'.$date.'</div>';
+        $html .= '</div>';
+        $html .= '<div class="msg-content">';
+        if (!empty($postAttachment)) {
+            $html .= '<div class="post-attachment thumbnail">';
+            $html .= $postAttachment;
+            $html .= '</div>';
+        }
+        $html .= '<div>'.Security::remove_XSS($message['content']).'</div>';
+        $html .= '</div>';
+        $html .= '</div>'; // end mediaPost
+
+        // Popularity post functionality
+        $html .= '<div class="popularity-mediapost"></div>';
+
+        return $html;
     }
 }

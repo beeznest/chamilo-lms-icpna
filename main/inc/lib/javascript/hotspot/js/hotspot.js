@@ -101,14 +101,12 @@ window.HotspotQuestion = (function () {
 
             if (x >= startX) {
                 width = x - startX;
-
                 this.set('radiusX', Math.round(width / 2));
                 this.set('centerX', startX + this.get('radiusX'));
             }
 
             if (y >= startY) {
                 height = y - startY;
-
                 this.set('radiusY', Math.round(height / 2));
                 this.set('centerY', startY + this.get('radiusY'));
             }
@@ -258,12 +256,9 @@ window.HotspotQuestion = (function () {
 
         var HotspotSVG = function (modelModel, index) {
             var self = this;
-
             this.model = modelModel;
             this.hotspotIndex = index;
-
             this.el = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-
             this.model.onChange(function (hotspotModel) {
                 self.render();
             });
@@ -368,7 +363,6 @@ window.HotspotQuestion = (function () {
             </div>\n\
         ';
             $el.html(template);
-
             $el.find('select')
                 .on('change', function () {
                     selectedHotspotIndex = self.hotspotIndex;
@@ -747,7 +741,6 @@ window.HotspotQuestion = (function () {
                     hotspotsSVG = new AdminHotspotsSVG(hotspotsCollection, this);
 
                 $(config.selector).css('width', this.width).append(hotspotsSVG.render().el);
-
                 $(config.selector).parent().prepend('\n\
                     <div id="hotspot-messages" class="alert alert-info">\n\
                         <h4><span class="fa fa-info-circle" aria-hidden="true"></span> ' + lang.HotspotStatus1 + '</h4>\n\
@@ -771,11 +764,9 @@ window.HotspotQuestion = (function () {
                         default:
                             hotspot = SquareModel.decode(hotspotInfo);
                             break;
-
                         case 'circle':
                             hotspot = EllipseModel.decode(hotspotInfo);
                             break;
-
                         case 'poly':
                             hotspot = PolygonModel.decode(hotspotInfo);
                             break;
@@ -898,9 +889,7 @@ window.HotspotQuestion = (function () {
                 })
                 .on('mousedown', 'circle, text', function (e) {
                     e.preventDefault();
-
                     isMoving = true;
-
                     if (e.target.tagName === 'circle') {
                         //Hack to move correctly the hot spots if there are more than one HS question in same page
                         answerIndex = $(e.target).next().html();
@@ -1144,24 +1133,23 @@ window.HotspotQuestion = (function () {
 
         switch (config.for) {
             case 'admin':
-                xhrQuestion = $.getJSON(config.relPath + 'exercise/hotspot_actionscript_admin.as.php', {
+                xhrQuestion = $.getJSON(config.relPath + 'exercise/hotspot_actionscript_admin.as.php?' + _p.web_cid_query, {
                     modifyAnswers: parseInt(config.questionId)
                 });
                 break;
-
             case 'user':
-                xhrQuestion = $.getJSON(config.relPath + 'exercise/hotspot_actionscript.as.php', {
+                xhrQuestion = $.getJSON(config.relPath + 'exercise/hotspot_actionscript.as.php?' + _p.web_cid_query, {
                     modifyAnswers: parseInt(config.questionId),
                     exe_id: parseInt(config.exerciseId)
                 });
                 break;
-
             case 'solution':
-            //no break
+                //no break
             case 'preview':
-                xhrQuestion = $.getJSON(config.relPath + 'exercise/hotspot_answers.as.php', {
+                xhrQuestion = $.getJSON(config.relPath + 'exercise/hotspot_answers.as.php?' + _p.web_cid_query, {
                     modifyAnswers: parseInt(config.questionId),
-                    exe_id: parseInt(config.exerciseId)
+                    exerciseId: parseInt(config.exerciseId),
+                    exeId: parseInt(config.exeId)
                 });
                 break;
         }
@@ -1171,13 +1159,11 @@ window.HotspotQuestion = (function () {
                 case 'admin':
                     startHotspotsAdmin(questionInfo);
                     break;
-
                 case 'user':
                     startHotspotsUser(questionInfo);
                     break;
-
                 case 'solution':
-                //no break
+                    // no break
                 case 'preview':
                     startHotspotsSolution(questionInfo);
                     break;
@@ -1774,21 +1760,22 @@ window.DelineationQuestion = (function () {
 
         switch (config.for) {
             case 'admin':
-                xhrQuestion = $.getJSON(config.relPath + 'exercise/hotspot_actionscript_admin.as.php', {
+                xhrQuestion = $.getJSON(config.relPath + 'exercise/hotspot_actionscript_admin.as.php?' + _p.web_cid_query, {
                     modifyAnswers: parseInt(config.questionId)
                 });
                 break;
             case 'user':
-                xhrQuestion = $.getJSON(config.relPath + 'exercise/hotspot_actionscript.as.php', {
+                xhrQuestion = $.getJSON(config.relPath + 'exercise/hotspot_actionscript.as.php?' + _p.web_cid_query, {
                     modifyAnswers: parseInt(config.questionId)
                 });
                 break;
             case 'solution':
-            //no break
+                // no break
             case 'preview':
-                xhrQuestion = $.getJSON(config.relPath + 'exercise/hotspot_answers.as.php', {
+                xhrQuestion = $.getJSON(config.relPath + 'exercise/hotspot_answers.as.php?' + _p.web_cid_query, {
                     modifyAnswers: parseInt(config.questionId),
-                    exe_id: parseInt(config.exerciseId)
+                    exerciseId: parseInt(config.exerciseId),
+                    exeId: parseInt(config.exeId)
                 });
                 break;
         }
@@ -1798,13 +1785,11 @@ window.DelineationQuestion = (function () {
                 case 'admin':
                     startAdminSvg(questionInfo);
                     break;
-
                 case 'user':
                     startUserSvg(questionInfo);
                     break;
-
                 case 'solution':
-                //no break
+                    // no break
                 case 'preview':
                     startPreviewSvg(questionInfo);
                     break;

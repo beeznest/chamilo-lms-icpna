@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * UserRelTag
+ * UserRelTag.
  *
  * @ORM\Table(
  *  name="user_rel_tag",
@@ -20,34 +20,33 @@ use Doctrine\ORM\Mapping as ORM;
 class UserRelTag
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="user_id", type="integer", nullable=false)
      */
-    private $userId;
+    protected $userId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="tag_id", type="integer", nullable=false)
      */
-    private $tagId;
+    protected $tagId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private $id;
-
-
+    protected $id;
 
     /**
-     * Set userId
+     * Set userId.
      *
-     * @param integer $userId
+     * @param int $userId
+     *
      * @return UserRelTag
      */
     public function setUserId($userId)
@@ -58,9 +57,9 @@ class UserRelTag
     }
 
     /**
-     * Get userId
+     * Get userId.
      *
-     * @return integer
+     * @return int
      */
     public function getUserId()
     {
@@ -68,9 +67,10 @@ class UserRelTag
     }
 
     /**
-     * Set tagId
+     * Set tagId.
      *
-     * @param integer $tagId
+     * @param int $tagId
+     *
      * @return UserRelTag
      */
     public function setTagId($tagId)
@@ -81,9 +81,9 @@ class UserRelTag
     }
 
     /**
-     * Get tagId
+     * Get tagId.
      *
-     * @return integer
+     * @return int
      */
     public function getTagId()
     {
@@ -91,9 +91,9 @@ class UserRelTag
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {

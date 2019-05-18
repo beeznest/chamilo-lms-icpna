@@ -394,7 +394,7 @@ class HTML_QuickForm_group extends HTML_QuickForm_element
     * @access public
     * @return void
     */
-    function accept(&$renderer, $required = false, $error = null)
+    public function accept(&$renderer, $required = false, $error = null)
     {
         $this->_createElementsIfNotExist();
         $renderer->startGroup($this, $required, $error);
@@ -404,6 +404,7 @@ class HTML_QuickForm_group extends HTML_QuickForm_element
 
             if ($this->_appendName) {
                 $elementName = $element->getName();
+
                 if (isset($elementName)) {
                     $element->setName($name . '['. (strlen($elementName)? $elementName: $key) .']');
                 } else {
@@ -412,7 +413,6 @@ class HTML_QuickForm_group extends HTML_QuickForm_element
             }
 
             $required = !$element->isFrozen() && in_array($element->getName(), $this->_required);
-
             $element->accept($renderer, $required);
 
             // restore the element's name
@@ -508,6 +508,7 @@ class HTML_QuickForm_group extends HTML_QuickForm_element
     {
         parent::freeze();
         foreach (array_keys($this->_elements) as $key) {
+            $this->_elements[$key]->freezeSeeOnlySelected = $this->freezeSeeOnlySelected;
             $this->_elements[$key]->freeze();
         }
     }
@@ -535,22 +536,7 @@ class HTML_QuickForm_group extends HTML_QuickForm_element
      */
     public function getTemplate($layout)
     {
-        $size = $this->getColumnsSize();
-
-        if (empty($size)) {
-            $size = array(2, 8, 2);
-        } else {
-            if (is_array($size)) {
-                if (count($size) == 1) {
-                    $size = array(2, intval($size[0]), 2);
-                } elseif (count($size) != 3) {
-                    $size = array(2, 8, 2);
-                }
-                // else just keep the $size array as received
-            } else {
-                $size = array(2, intval($size), 2);
-            }
-        }
+        $size = $this->calculateSize();
 
         switch ($layout) {
             case FormValidator::LAYOUT_INLINE:
@@ -568,7 +554,7 @@ class HTML_QuickForm_group extends HTML_QuickForm_element
                 break;
             case FormValidator::LAYOUT_HORIZONTAL:
                 return '
-                <div class="form-group {error_class}">
+                <div class="form-group {error_class}" id="'.$this->getName().'-group">
                     <label {label-for}  class="col-sm-'.$size[0].' control-label  {extra_label_class}" >
                         <!-- BEGIN required --><span class="form_required">*</span><!-- END required -->
                         {label}
@@ -582,7 +568,7 @@ class HTML_QuickForm_group extends HTML_QuickForm_element
                         <!-- END label_2 -->
 
                         <!-- BEGIN error -->
-                            <span class="help-inline">{error}</span>
+                            <span class="help-inline help-block">{error}</span>
                         <!-- END error -->
                     </div>
                     <div class="col-sm-'.$size[2].'">

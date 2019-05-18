@@ -4,14 +4,16 @@
 use JeroenDesloovere\VCard\VCard;
 
 /**
- * VCard Generator
+ * VCard Generator.
+ *
  * @package chamilo.social
+ *
  * @author José Loguercio Silva <jose.loguercio@beeznest.com>
  */
-
 require_once __DIR__.'/../inc/global.inc.php';
 
 api_block_anonymous_users();
+api_protect_admin_script();
 
 if (isset($_REQUEST['userId'])) {
     $userId = intval($_REQUEST['userId']);
@@ -22,12 +24,15 @@ if (isset($_REQUEST['userId'])) {
 // Return User Info to vCard Export
 $userInfo = api_get_user_info($userId, true, false, true);
 
+if (empty($userInfo)) {
+    api_not_allowed(true);
+}
+
 // Pre-Loaded User Info
 $language = get_lang('Language').': '.$userInfo['language'];
 
 // Instance the vCard Class
 $vcard = new VCard();
-
 // Adding the User Info to the vCard
 $vcard->addName($userInfo['firstname'], $userInfo['lastname']);
 

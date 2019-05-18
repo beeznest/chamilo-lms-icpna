@@ -6,7 +6,7 @@ namespace Chamilo\CourseBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CStudentPublicationRelDocument
+ * CStudentPublicationRelDocument.
  *
  * @ORM\Table(
  *  name="c_student_publication_rel_document",
@@ -21,46 +21,47 @@ use Doctrine\ORM\Mapping as ORM;
 class CStudentPublicationRelDocument
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="iid", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $iid;
+    protected $iid;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer")
      */
-    private $cId;
+    protected $cId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer", nullable=true)
      */
-    private $id;
+    protected $id;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="work_id", type="integer", nullable=false)
      */
-    private $workId;
+    protected $workId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="document_id", type="integer", nullable=false)
      */
-    private $documentId;
+    protected $documentId;
 
     /**
-     * Set workId
+     * Set workId.
      *
-     * @param integer $workId
+     * @param int $workId
+     *
      * @return CStudentPublicationRelDocument
      */
     public function setWorkId($workId)
@@ -71,9 +72,9 @@ class CStudentPublicationRelDocument
     }
 
     /**
-     * Get workId
+     * Get workId.
      *
-     * @return integer
+     * @return int
      */
     public function getWorkId()
     {
@@ -81,9 +82,10 @@ class CStudentPublicationRelDocument
     }
 
     /**
-     * Set documentId
+     * Set documentId.
      *
-     * @param integer $documentId
+     * @param int $documentId
+     *
      * @return CStudentPublicationRelDocument
      */
     public function setDocumentId($documentId)
@@ -94,9 +96,9 @@ class CStudentPublicationRelDocument
     }
 
     /**
-     * Get documentId
+     * Get documentId.
      *
-     * @return integer
+     * @return int
      */
     public function getDocumentId()
     {
@@ -104,9 +106,10 @@ class CStudentPublicationRelDocument
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return CStudentPublicationRelDocument
      */
     public function setCId($cId)
@@ -117,9 +120,9 @@ class CStudentPublicationRelDocument
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {
@@ -127,12 +130,32 @@ class CStudentPublicationRelDocument
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getIid()
+    {
+        return $this->iid;
+    }
+
+    /**
+     * @param int $iid
+     *
+     * @return CStudentPublicationRelDocument
+     */
+    public function setIid($iid)
+    {
+        $this->iid = $iid;
+
+        return $this;
     }
 }

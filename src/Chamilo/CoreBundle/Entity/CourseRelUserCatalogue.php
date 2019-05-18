@@ -7,7 +7,7 @@ use Chamilo\UserBundle\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CourseRelUserCatalogue
+ * CourseRelUserCatalogue.
  *
  * @ORM\Table(
  *      name="course_rel_user_catalogue",
@@ -22,20 +22,13 @@ use Doctrine\ORM\Mapping as ORM;
 class CourseRelUserCatalogue
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer", precision=0, scale=0, nullable=false, unique=false)
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $id;
-
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="visible", type="integer", precision=0, scale=0, nullable=false, unique=false)
-     */
-    private $visible;
+    protected $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="Chamilo\UserBundle\Entity\User", inversedBy="courses", cascade={"persist"})
@@ -50,7 +43,14 @@ class CourseRelUserCatalogue
     protected $course;
 
     /**
-     * Constructor
+     * @var bool
+     *
+     * @ORM\Column(name="visible", type="integer", precision=0, scale=0, nullable=false, unique=false)
+     */
+    protected $visible;
+
+    /**
+     * Constructor.
      */
     public function __construct()
     {
@@ -61,7 +61,7 @@ class CourseRelUserCatalogue
      */
     public function __toString()
     {
-        return strval($this->getCourse()->getCode());
+        return (string) $this->getCourse()->getCode();
     }
 
     /**
@@ -82,6 +82,7 @@ class CourseRelUserCatalogue
 
     /**
      * @param Course $course
+     *
      * @return $this
      */
     public function setCourse(Course $course)
@@ -92,7 +93,7 @@ class CourseRelUserCatalogue
     }
 
     /**
-     * Get Course
+     * Get Course.
      *
      * @return Course
      */
@@ -103,6 +104,7 @@ class CourseRelUserCatalogue
 
     /**
      * @param $user
+     *
      * @return $this
      */
     public function setUser($user)
@@ -113,7 +115,7 @@ class CourseRelUserCatalogue
     }
 
     /**
-     * Get User
+     * Get User.
      *
      * @return User
      */
@@ -123,9 +125,10 @@ class CourseRelUserCatalogue
     }
 
     /**
-     * Set relationType
+     * Set relationType.
      *
-     * @param integer $relationType
+     * @param int $relationType
+     *
      * @return CourseRelUserCatalogue
      */
     public function setRelationType($relationType)
@@ -136,9 +139,9 @@ class CourseRelUserCatalogue
     }
 
     /**
-     * Get relationType
+     * Get relationType.
      *
-     * @return integer
+     * @return int
      */
     public function getRelationType()
     {
@@ -146,9 +149,10 @@ class CourseRelUserCatalogue
     }
 
     /**
-     * Set visible
+     * Set visible.
      *
-     * @param boolean $visible
+     * @param bool $visible
+     *
      * @return CourseRelUserCatalogue
      */
     public function setVisible($visible)
@@ -159,13 +163,12 @@ class CourseRelUserCatalogue
     }
 
     /**
-     * Get visible
+     * Get visible.
      *
-     * @return boolean
+     * @return bool
      */
     public function getVisible()
     {
         return $this->visible;
     }
-
 }

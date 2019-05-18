@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * AccessUrlRelCourse
+ * AccessUrlRelCourse.
  *
  * @ORM\Table(name="access_url_rel_course")
  * @ORM\Entity
@@ -14,13 +14,13 @@ use Doctrine\ORM\Mapping as ORM;
 class AccessUrlRelCourse
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer", precision=0, scale=0, nullable=false, unique=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="Course", inversedBy="urls", cascade={"persist"})
@@ -39,13 +39,13 @@ class AccessUrlRelCourse
      */
     public function __toString()
     {
-        return strval('-');
+        return '-';
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -53,9 +53,10 @@ class AccessUrlRelCourse
     }
 
     /**
-     * Set url
+     * Set url.
      *
      * @param $url
+     *
      * @return AccessUrlRelCourse
      */
     public function setUrl($url)
@@ -72,7 +73,6 @@ class AccessUrlRelCourse
     {
         return $this->url;
     }
-
 
     /**
      * @param $course

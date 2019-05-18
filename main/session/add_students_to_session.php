@@ -1,5 +1,6 @@
 <?php
 /* For licensing terms, see /license.txt */
+
 /**
  *   @package chamilo.admin
  */
@@ -13,7 +14,10 @@ require_once __DIR__.'/../inc/global.inc.php';
 $this_section = SECTION_PLATFORM_ADMIN;
 
 // setting breadcrumbs
-$interbreadcrumb[] = array('url' => 'session_list.php', 'name' => get_lang('SessionList'));
+$interbreadcrumb[] = [
+    'url' => 'session_list.php',
+    'name' => get_lang('SessionList'),
+];
 
 // Setting the name of the tool
 $tool_name = get_lang('SubscribeStudentsToSession');
@@ -21,35 +25,37 @@ $add_type = 'multiple';
 if (isset($_REQUEST['add_type']) && $_REQUEST['add_type'] != '') {
     $add_type = Security::remove_XSS($_REQUEST['add_type']);
 }
-$form_sent  = 0;
-$errorMsg   = '';
-$users = $sessions = array();
-$id = isset($_GET['id']) ? intval($_GET['id']) : null;
+$form_sent = 0;
+$errorMsg = '';
+$users = $sessions = [];
+$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 SessionManager::protectSession($id);
 
-$htmlResult = null;
-
+$htmlResult = '';
 if (isset($_POST['form_sent']) && $_POST['form_sent']) {
     $form_sent = $_POST['form_sent'];
     if ($form_sent == 1) {
         $sessionSourceList = $_POST['sessions'];
         $sessionDestinationList = $_POST['sessions_destination'];
-        $result = SessionManager::copyStudentsFromSession($sessionSourceList, $sessionDestinationList);
+        $result = SessionManager::copyStudentsFromSession(
+            $sessionSourceList,
+            $sessionDestinationList
+        );
         foreach ($result as $message) {
             $htmlResult .= $message;
         }
     }
 }
 
-$session_list = SessionManager::get_sessions_list(array(), array('name'));
-$sessionList = array();
+$session_list = SessionManager::get_sessions_list([], ['name']);
+$sessionList = [];
 foreach ($session_list as $session) {
     $sessionList[$session['id']] = $session['name'];
 }
 Display::display_header($tool_name);
 ?>
 
-<form name="formulaire" method="post" action="<?php echo api_get_self(); ?>" style="margin:0px;" >
+<form name="formulaire" method="post" action="<?php echo api_get_self().'?id='.$id; ?>" style="margin:0px;" >
 <?php echo '<legend>'.$tool_name.' </legend>';
 echo $htmlResult;
 echo Display::input('hidden', 'form_sent', '1');
@@ -57,11 +63,11 @@ echo Display::input('hidden', 'form_sent', '1');
     <table border="0" cellpadding="5" cellspacing="0" width="100%">
         <tr>
             <td align="center">
-                <b><?php echo get_lang('Sessions') ?> :</b>
+                <b><?php echo get_lang('Sessions'); ?> :</b>
             </td>
             <td></td>
             <td align="center">
-                <b><?php echo get_lang('Sessions') ?> :</b>
+                <b><?php echo get_lang('Sessions'); ?> :</b>
             </td>
         </tr>
         <tr>
@@ -71,7 +77,7 @@ echo Display::input('hidden', 'form_sent', '1');
                      'sessions[]',
                      $sessionList,
                      '',
-                     array('style'=>'width:100%', 'multiple'=>'multiple', 'id'=>'sessions', 'size'=>'15px'),
+                     ['style' => 'width:100%', 'multiple' => 'multiple', 'id' => 'sessions', 'size' => '15px'],
                      false
                  );
                 ?>
@@ -84,7 +90,7 @@ echo Display::input('hidden', 'form_sent', '1');
                     'sessions_destination[]',
                     $sessionList,
                     '',
-                    array('style'=>'width:100%', 'id'=>'courses', 'size'=>'15px'),
+                    ['style' => 'width:100%', 'id' => 'courses', 'size' => '15px'],
                     false
                 );
                 ?>

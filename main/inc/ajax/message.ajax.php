@@ -1,13 +1,13 @@
 <?php
 /* For licensing terms, see /license.txt */
 
-/**
- * Responses to AJAX calls
- */
-
 use Chamilo\UserBundle\Entity\User;
-use Chamilo\UserBundle\Entity\Repository\UserRepository;
 
+$_dont_save_user_course_access = true;
+
+/**
+ * Responses to AJAX calls.
+ */
 require_once __DIR__.'/../global.inc.php';
 
 $action = $_GET['a'];
@@ -15,14 +15,14 @@ $action = $_GET['a'];
 switch ($action) {
     case 'get_count_message':
         $userId = api_get_user_id();
-        $total_invitations = 0;
+        $invitations = [];
         $group_pending_invitations = 0;
 
         // Setting notifications
         $count_unread_message = 0;
         if (api_get_setting('allow_message_tool') == 'true') {
             // get count unread message and total invitations
-            $count_unread_message = MessageManager::get_number_of_messages(true);
+            $count_unread_message = MessageManager::getNumberOfMessages(true);
         }
 
         if (api_get_setting('allow_social_tool') == 'true') {
@@ -40,11 +40,14 @@ switch ($action) {
             } else {
                 $group_pending_invitations = 0;
             }
-            $total_invitations = intval($number_of_new_messages_of_friend) + $group_pending_invitations + intval($count_unread_message);
+            $invitations = [
+                'ms_friends' => $number_of_new_messages_of_friend,
+                'ms_groups' => $group_pending_invitations,
+                'ms_inbox' => $count_unread_message,
+            ];
         }
-        //$total_invitations = !empty($total_invitations) ? Display::badge($total_invitations) : '';
-
-        echo $total_invitations;
+        header('Content-type:application/json');
+        echo json_encode($invitations);
         break;
     case 'send_message':
         $subject = isset($_REQUEST['subject']) ? trim($_REQUEST['subject']) : null;
@@ -53,6 +56,29 @@ switch ($action) {
         if (empty($subject) || empty($messageContent)) {
             echo Display::return_message(get_lang('ErrorSendingMessage'), 'error');
             exit;
+        }
+
+        $courseId = isset($_REQUEST['course_id']) ? (int) $_REQUEST['course_id'] : 0;
+        $sessionId = isset($_REQUEST['session_id']) ? (int) $_REQUEST['session_id'] : 0;
+
+        // Add course info
+        if (!empty($courseId)) {
+            $courseInfo = api_get_course_info_by_id($courseId);
+            if (!empty($courseInfo)) {
+                if (empty($sessionId)) {
+                    $courseNotification = sprintf(get_lang('ThisEmailWasSentViaCourseX'), $courseInfo['title']);
+                } else {
+                    $sessionInfo = api_get_session_info($sessionId);
+                    if (!empty($sessionInfo)) {
+                        $courseNotification = sprintf(
+                            get_lang('ThisEmailWasSentViaCourseXInSessionX'),
+                            $courseInfo['title'],
+                            $sessionInfo['name']
+                        );
+                    }
+                }
+                $messageContent .= '<br /><br />'.$courseNotification;
+            }
         }
 
         $result = MessageManager::send_message($_REQUEST['user_id'], $subject, $messageContent);
@@ -74,10 +100,7 @@ switch ($action) {
             break;
         }
 
-        /** @var UserRepository $repo */
-        $repo = Database::getManager()
-            ->getRepository('ChamiloUserBundle:User');
-
+        $repo = UserManager::getRepository();
         $users = $repo->findUsersToSendMessage(
             api_get_user_id(),
             $_REQUEST['q'],
@@ -89,7 +112,7 @@ switch ($action) {
 
         /** @var User $user */
         foreach ($users as $user) {
-            $userName = $user->getCompleteName();
+            $userName = $user->getCompleteNameWithUsername();
 
             if ($showEmail) {
                 $userName .= " ({$user->getEmail()})";
@@ -97,7 +120,7 @@ switch ($action) {
 
             $return['items'][] = [
                 'text' => $userName,
-                'id' => $user->getId()
+                'id' => $user->getId(),
             ];
         }
 
@@ -105,6 +128,5 @@ switch ($action) {
         break;
     default:
         echo '';
-
 }
 exit;

@@ -6,7 +6,7 @@ namespace Chamilo\CourseBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CGroupInfo
+ * CGroupInfo.
  *
  * @ORM\Table(
  *  name="c_group_info",
@@ -20,144 +20,152 @@ use Doctrine\ORM\Mapping as ORM;
 class CGroupInfo
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="iid", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $iid;
+    protected $iid;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer", nullable=true)
      */
-    private $id;
+    protected $id;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer")
      */
-    private $cId;
+    protected $cId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=100, nullable=true)
      */
-    private $name;
+    protected $name;
 
     /**
-     * @var boolean
+     * @var bool
      *
      * @ORM\Column(name="status", type="boolean", nullable=true)
      */
-    private $status;
+    protected $status;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="category_id", type="integer", nullable=false)
      */
-    private $categoryId;
+    protected $categoryId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="description", type="text", nullable=true)
      */
-    private $description;
+    protected $description;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="max_student", type="integer", nullable=false)
      */
-    private $maxStudent;
+    protected $maxStudent;
 
     /**
-     * @var boolean
+     * @var bool
      *
      * @ORM\Column(name="doc_state", type="boolean", nullable=false)
      */
-    private $docState;
+    protected $docState;
 
     /**
-     * @var boolean
+     * @var bool
      *
      * @ORM\Column(name="calendar_state", type="boolean", nullable=false)
      */
-    private $calendarState;
+    protected $calendarState;
 
     /**
-     * @var boolean
+     * @var bool
      *
      * @ORM\Column(name="work_state", type="boolean", nullable=false)
      */
-    private $workState;
+    protected $workState;
 
     /**
-     * @var boolean
+     * @var bool
      *
      * @ORM\Column(name="announcements_state", type="boolean", nullable=false)
      */
-    private $announcementsState;
+    protected $announcementsState;
 
     /**
-     * @var boolean
+     * @var bool
      *
      * @ORM\Column(name="forum_state", type="boolean", nullable=false)
      */
-    private $forumState;
+    protected $forumState;
 
     /**
-     * @var boolean
+     * @var bool
      *
      * @ORM\Column(name="wiki_state", type="boolean", nullable=false)
      */
-    private $wikiState;
+    protected $wikiState;
 
     /**
-     * @var boolean
+     * @var bool
      *
      * @ORM\Column(name="chat_state", type="boolean", nullable=false)
      */
-    private $chatState;
+    protected $chatState;
 
     /**
      * @var string
      *
      * @ORM\Column(name="secret_directory", type="string", length=255, nullable=true)
      */
-    private $secretDirectory;
+    protected $secretDirectory;
 
     /**
-     * @var boolean
+     * @var bool
      *
      * @ORM\Column(name="self_registration_allowed", type="boolean", nullable=false)
      */
-    private $selfRegistrationAllowed;
+    protected $selfRegistrationAllowed;
 
     /**
-     * @var boolean
+     * @var bool
      *
      * @ORM\Column(name="self_unregistration_allowed", type="boolean", nullable=false)
      */
-    private $selfUnregistrationAllowed;
+    protected $selfUnregistrationAllowed;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="session_id", type="integer", nullable=false)
      */
-    private $sessionId;
+    protected $sessionId;
 
     /**
-     * Set name
+     * @var int needed for setting['group_document_access']
+     *
+     * ORM\Column(name="doc_access", type="integer", nullable=false, options={"default":0})
+     */
+    //protected $docAccess;
+
+    /**
+     * Set name.
      *
      * @param string $name
+     *
      * @return CGroupInfo
      */
     public function setName($name)
@@ -168,7 +176,7 @@ class CGroupInfo
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
@@ -178,9 +186,10 @@ class CGroupInfo
     }
 
     /**
-     * Set status
+     * Set status.
      *
-     * @param boolean $status
+     * @param bool $status
+     *
      * @return CGroupInfo
      */
     public function setStatus($status)
@@ -191,9 +200,9 @@ class CGroupInfo
     }
 
     /**
-     * Get status
+     * Get status.
      *
-     * @return boolean
+     * @return bool
      */
     public function getStatus()
     {
@@ -201,9 +210,10 @@ class CGroupInfo
     }
 
     /**
-     * Set categoryId
+     * Set categoryId.
      *
-     * @param integer $categoryId
+     * @param int $categoryId
+     *
      * @return CGroupInfo
      */
     public function setCategoryId($categoryId)
@@ -214,9 +224,9 @@ class CGroupInfo
     }
 
     /**
-     * Get categoryId
+     * Get categoryId.
      *
-     * @return integer
+     * @return int
      */
     public function getCategoryId()
     {
@@ -224,9 +234,10 @@ class CGroupInfo
     }
 
     /**
-     * Set description
+     * Set description.
      *
      * @param string $description
+     *
      * @return CGroupInfo
      */
     public function setDescription($description)
@@ -237,7 +248,7 @@ class CGroupInfo
     }
 
     /**
-     * Get description
+     * Get description.
      *
      * @return string
      */
@@ -247,9 +258,10 @@ class CGroupInfo
     }
 
     /**
-     * Set maxStudent
+     * Set maxStudent.
      *
-     * @param integer $maxStudent
+     * @param int $maxStudent
+     *
      * @return CGroupInfo
      */
     public function setMaxStudent($maxStudent)
@@ -260,9 +272,9 @@ class CGroupInfo
     }
 
     /**
-     * Get maxStudent
+     * Get maxStudent.
      *
-     * @return integer
+     * @return int
      */
     public function getMaxStudent()
     {
@@ -270,9 +282,10 @@ class CGroupInfo
     }
 
     /**
-     * Set docState
+     * Set docState.
      *
-     * @param boolean $docState
+     * @param bool $docState
+     *
      * @return CGroupInfo
      */
     public function setDocState($docState)
@@ -283,9 +296,9 @@ class CGroupInfo
     }
 
     /**
-     * Get docState
+     * Get docState.
      *
-     * @return boolean
+     * @return bool
      */
     public function getDocState()
     {
@@ -293,9 +306,10 @@ class CGroupInfo
     }
 
     /**
-     * Set calendarState
+     * Set calendarState.
      *
-     * @param boolean $calendarState
+     * @param bool $calendarState
+     *
      * @return CGroupInfo
      */
     public function setCalendarState($calendarState)
@@ -306,9 +320,9 @@ class CGroupInfo
     }
 
     /**
-     * Get calendarState
+     * Get calendarState.
      *
-     * @return boolean
+     * @return bool
      */
     public function getCalendarState()
     {
@@ -316,9 +330,10 @@ class CGroupInfo
     }
 
     /**
-     * Set workState
+     * Set workState.
      *
-     * @param boolean $workState
+     * @param bool $workState
+     *
      * @return CGroupInfo
      */
     public function setWorkState($workState)
@@ -329,9 +344,9 @@ class CGroupInfo
     }
 
     /**
-     * Get workState
+     * Get workState.
      *
-     * @return boolean
+     * @return bool
      */
     public function getWorkState()
     {
@@ -339,9 +354,10 @@ class CGroupInfo
     }
 
     /**
-     * Set announcementsState
+     * Set announcementsState.
      *
-     * @param boolean $announcementsState
+     * @param bool $announcementsState
+     *
      * @return CGroupInfo
      */
     public function setAnnouncementsState($announcementsState)
@@ -352,9 +368,9 @@ class CGroupInfo
     }
 
     /**
-     * Get announcementsState
+     * Get announcementsState.
      *
-     * @return boolean
+     * @return bool
      */
     public function getAnnouncementsState()
     {
@@ -362,9 +378,10 @@ class CGroupInfo
     }
 
     /**
-     * Set forumState
+     * Set forumState.
      *
-     * @param boolean $forumState
+     * @param bool $forumState
+     *
      * @return CGroupInfo
      */
     public function setForumState($forumState)
@@ -375,9 +392,9 @@ class CGroupInfo
     }
 
     /**
-     * Get forumState
+     * Get forumState.
      *
-     * @return boolean
+     * @return bool
      */
     public function getForumState()
     {
@@ -385,9 +402,10 @@ class CGroupInfo
     }
 
     /**
-     * Set wikiState
+     * Set wikiState.
      *
-     * @param boolean $wikiState
+     * @param bool $wikiState
+     *
      * @return CGroupInfo
      */
     public function setWikiState($wikiState)
@@ -398,9 +416,9 @@ class CGroupInfo
     }
 
     /**
-     * Get wikiState
+     * Get wikiState.
      *
-     * @return boolean
+     * @return bool
      */
     public function getWikiState()
     {
@@ -408,9 +426,10 @@ class CGroupInfo
     }
 
     /**
-     * Set chatState
+     * Set chatState.
      *
-     * @param boolean $chatState
+     * @param bool $chatState
+     *
      * @return CGroupInfo
      */
     public function setChatState($chatState)
@@ -421,9 +440,9 @@ class CGroupInfo
     }
 
     /**
-     * Get chatState
+     * Get chatState.
      *
-     * @return boolean
+     * @return bool
      */
     public function getChatState()
     {
@@ -431,9 +450,10 @@ class CGroupInfo
     }
 
     /**
-     * Set secretDirectory
+     * Set secretDirectory.
      *
      * @param string $secretDirectory
+     *
      * @return CGroupInfo
      */
     public function setSecretDirectory($secretDirectory)
@@ -444,7 +464,7 @@ class CGroupInfo
     }
 
     /**
-     * Get secretDirectory
+     * Get secretDirectory.
      *
      * @return string
      */
@@ -454,9 +474,10 @@ class CGroupInfo
     }
 
     /**
-     * Set selfRegistrationAllowed
+     * Set selfRegistrationAllowed.
      *
-     * @param boolean $selfRegistrationAllowed
+     * @param bool $selfRegistrationAllowed
+     *
      * @return CGroupInfo
      */
     public function setSelfRegistrationAllowed($selfRegistrationAllowed)
@@ -467,9 +488,9 @@ class CGroupInfo
     }
 
     /**
-     * Get selfRegistrationAllowed
+     * Get selfRegistrationAllowed.
      *
-     * @return boolean
+     * @return bool
      */
     public function getSelfRegistrationAllowed()
     {
@@ -477,9 +498,10 @@ class CGroupInfo
     }
 
     /**
-     * Set selfUnregistrationAllowed
+     * Set selfUnregistrationAllowed.
      *
-     * @param boolean $selfUnregistrationAllowed
+     * @param bool $selfUnregistrationAllowed
+     *
      * @return CGroupInfo
      */
     public function setSelfUnregistrationAllowed($selfUnregistrationAllowed)
@@ -490,9 +512,9 @@ class CGroupInfo
     }
 
     /**
-     * Get selfUnregistrationAllowed
+     * Get selfUnregistrationAllowed.
      *
-     * @return boolean
+     * @return bool
      */
     public function getSelfUnregistrationAllowed()
     {
@@ -500,9 +522,10 @@ class CGroupInfo
     }
 
     /**
-     * Set sessionId
+     * Set sessionId.
      *
-     * @param integer $sessionId
+     * @param int $sessionId
+     *
      * @return CGroupInfo
      */
     public function setSessionId($sessionId)
@@ -513,9 +536,9 @@ class CGroupInfo
     }
 
     /**
-     * Get sessionId
+     * Get sessionId.
      *
-     * @return integer
+     * @return int
      */
     public function getSessionId()
     {
@@ -523,9 +546,10 @@ class CGroupInfo
     }
 
     /**
-     * Set id
+     * Set id.
      *
-     * @param integer $id
+     * @param int $id
+     *
      * @return CGroupInfo
      */
     public function setId($id)
@@ -536,9 +560,9 @@ class CGroupInfo
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -546,9 +570,10 @@ class CGroupInfo
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return CGroupInfo
      */
     public function setCId($cId)
@@ -559,9 +584,9 @@ class CGroupInfo
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {

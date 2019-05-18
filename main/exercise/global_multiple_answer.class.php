@@ -4,7 +4,7 @@
 use ChamiloSession as Session;
 
 /**
- * Class GlobalMultipleAnswer
+ * Class GlobalMultipleAnswer.
  */
 class GlobalMultipleAnswer extends Question
 {
@@ -22,12 +22,12 @@ class GlobalMultipleAnswer extends Question
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function createAnswersForm($form)
     {
         $nb_answers = isset($_POST['nb_answers']) ? $_POST['nb_answers'] : 4;
-        $nb_answers += (isset($_POST['lessAnswers']) ? -1 : (isset($_POST['moreAnswers']) ? 1 : 0));
+        $nb_answers += isset($_POST['lessAnswers']) ? -1 : (isset($_POST['moreAnswers']) ? 1 : 0);
 
         $obj_ex = Session::read('objExercise');
 
@@ -35,13 +35,13 @@ class GlobalMultipleAnswer extends Question
         $html = '<table class="data_table">
                 <tr>
                     <th width="10px">
-                        ' . get_lang('Number').'
+                        '.get_lang('Number').'
                     </th>
                     <th width="10px">
-                        ' . get_lang('True').'
+                        '.get_lang('True').'
                     </th>
                     <th width="50%">
-                        ' . get_lang('Answer').'
+                        '.get_lang('Answer').'
                     </th>';
 
         $html .= '<th>'.get_lang('Comment').'</th>';
@@ -52,13 +52,13 @@ class GlobalMultipleAnswer extends Question
             '<br /> '.Display::return_icon('fill_field.png'),
             $html
         );
-        $defaults = array();
+        $defaults = [];
         $correct = 0;
         $answer = false;
         if (!empty($this->id)) {
             $answer = new Answer($this->id);
             $answer->read();
-            if (count($answer->nbrAnswers) > 0 && !$form->isSubmitted()) {
+            if ($answer->nbrAnswers > 0 && !$form->isSubmitted()) {
                 $nb_answers = $answer->nbrAnswers;
             }
         }
@@ -66,7 +66,7 @@ class GlobalMultipleAnswer extends Question
         //  le nombre de r�ponses est bien enregistr� sous la forme int(nb)
         /* Ajout mise en forme nb reponse */
         $form->addElement('hidden', 'nb_answers');
-        $boxes_names = array();
+        $boxes_names = [];
 
         if ($nb_answers < 1) {
             $nb_answers = 1;
@@ -74,11 +74,11 @@ class GlobalMultipleAnswer extends Question
         }
 
         //D�but affichage score global dans la modification d'une question
-        $scoreA = "0"; //par reponse
-        $scoreG = "0"; //Global
+        $scoreA = 0; //par reponse
+        $scoreG = 0; //Global
 
         /* boucle pour sauvegarder les donn�es dans le tableau defaults */
-        for ($i = 1; $i <= $nb_answers; ++$i) {
+        for ($i = 1; $i <= $nb_answers; $i++) {
             /* si la reponse est de type objet */
             if (is_object($answer)) {
                 $defaults['answer['.$i.']'] = $answer->answer[$i];
@@ -97,7 +97,7 @@ class GlobalMultipleAnswer extends Question
                 $defaults['pts'] = 1;
             }
 
-            $renderer = & $form->defaultRenderer();
+            $renderer = &$form->defaultRenderer();
 
             $renderer->setElementTemplate(
                 '<td><!-- BEGIN error --><span class="form_error">{error}</span><!-- END error --><br/>{element}</td>',
@@ -131,24 +131,24 @@ class GlobalMultipleAnswer extends Question
                 'html_editor',
                 'answer['.$i.']',
                 null,
-                array(),
-                array(
+                [],
+                [
                     'ToolbarSet' => 'TestProposedAnswer',
                     'Width' => '100%',
                     'Height' => '100',
-                )
+                ]
             );
             $form->addRule('answer['.$i.']', get_lang('ThisFieldIsRequired'), 'required');
             $form->addElement(
                 'html_editor',
                 'comment['.$i.']',
                 null,
-                array(),
-                array(
+                [],
+                [
                     'ToolbarSet' => 'TestProposedAnswer',
                     'Width' => '100%',
                     'Height' => '100',
-                )
+                ]
             );
 
             $form->addElement('html', '</tr>');
@@ -174,11 +174,13 @@ class GlobalMultipleAnswer extends Question
 
         global $text;
 
-        if ($obj_ex->edit_exercise_in_lp == true) {
+        if ($obj_ex->edit_exercise_in_lp ||
+            (empty($this->exerciseList) && empty($obj_ex->id))
+        ) {
+            // setting the save button here and not in the question class.php
             $form->addButtonDelete(get_lang('LessAnswer'), 'lessAnswers');
             $form->addButtonCreate(get_lang('PlusAnswer'), 'moreAnswers');
             $form->addButtonSave($text, 'submitQuestion');
-            // setting the save button here and not in the question class.php
         }
 
         $renderer->setElementTemplate('{element}&nbsp;', 'lessAnswers');
@@ -196,11 +198,11 @@ class GlobalMultipleAnswer extends Question
                 $form->setDefaults($defaults);
             }
         }
-        $form->setConstants(array('nb_answers' => $nb_answers));
+        $form->setConstants(['nb_answers' => $nb_answers]);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function processAnswersCreation($form, $exercise)
     {
@@ -225,7 +227,7 @@ class GlobalMultipleAnswer extends Question
         $nbr_corrects = $nbr_corrects == 0 ? 1 : $nbr_corrects;
         $answer_score = $nbr_corrects == 0 ? 0 : $answer_score;
 
-        $answer_score = ($answer_score / $nbr_corrects);
+        $answer_score = $answer_score / $nbr_corrects;
 
         //$answer_score �quivaut � la valeur d'une bonne r�ponse
         // cr�ation variable pour r�cuperer la valeur de la coche pour la prise en compte des n�gatifs
@@ -257,7 +259,7 @@ class GlobalMultipleAnswer extends Question
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function return_header(
         $exercise,
@@ -265,12 +267,18 @@ class GlobalMultipleAnswer extends Question
         $score = null
     ) {
         $header = parent::return_header($exercise, $counter, $score);
-        $header .= '<table class="'.$this->question_table_class.'">
-        <tr>
-            <th>' . get_lang("Choice").'</th>
-            <th>' . get_lang("ExpectedChoice").'</th>
-            <th>' . get_lang("Answer").'</th>';
-        $header .= '<th>'.get_lang("Comment").'</th>';
+        $header .= '<table class="'.$this->question_table_class.'"><tr>';
+
+        if ($exercise->results_disabled != RESULT_DISABLE_SHOW_ONLY_IN_CORRECT_ANSWER) {
+            $header .= '<th>'.get_lang('Choice').'</th>';
+            $header .= '<th>'.get_lang('ExpectedChoice').'</th>';
+        }
+
+        $header .= '<th>'.get_lang('Answer').'</th>';
+        if ($exercise->showExpectedChoice()) {
+            $header .= '<th>'.get_lang('Status').'</th>';
+        }
+        $header .= '<th>'.get_lang('Comment').'</th>';
         $header .= '</tr>';
 
         return $header;

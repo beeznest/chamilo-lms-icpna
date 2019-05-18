@@ -2,30 +2,31 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * Class MaintenanceModePlugin
+ * Class MaintenanceModePlugin.
  */
 class MaintenanceModePlugin extends Plugin
 {
     /**
-     * @return EditHtaccessPlugin
+     * MaintenanceModePlugin constructor.
      */
-    public static function create()
-    {
-        static $result = null;
-        return $result ? $result : $result = new self();
-    }
-
-    /**
-     *
-     */
-    protected function __construct()
+    public function __construct()
     {
         parent::__construct(
             '0.1',
             'Julio Montoya',
-            array(
-                'tool_enable' => 'boolean'
-            )
+            [
+                'tool_enable' => 'boolean',
+            ]
         );
+    }
+
+    /**
+     * @return $this
+     */
+    public static function create()
+    {
+        static $result = null;
+
+        return $result ? $result : $result = new self();
     }
 }

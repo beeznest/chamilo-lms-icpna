@@ -13,7 +13,7 @@
  *                      multiple forums per group
  * - sticky messages
  * - new view option: nested view
- * - quoting a message
+ * - quoting a message.
  *
  * @Author Patrick Cool <patrick.cool@UGent.be>, Ghent University
  * @Copyright Ghent University
@@ -21,7 +21,6 @@
  *
  *  @package chamilo.forum
  */
-
 require_once __DIR__.'/../inc/global.inc.php';
 
 // The section (tabs).
@@ -35,8 +34,6 @@ $nameTools = get_lang('ToolForum');
 // Unset the formElements in session before the includes function works
 unset($_SESSION['formelements']);
 
-/* Including necessary files */
-require_once 'forumconfig.inc.php';
 require_once 'forumfunction.inc.php';
 
 // Are we in a lp ?
@@ -48,9 +45,10 @@ $origin = api_get_origin();
 
 // We are getting all the information about the current forum and forum category.
 // Note pcool: I tried to use only one sql statement (and function) for this,
-// but the problem is that the visibility of the forum AND forum cateogory are stored in the item_property table.
-$current_thread = get_thread_information($_GET['forum'], $_GET['thread']);
-$current_forum = get_forum_information($_GET['forum']);
+// but the problem is that the visibility of the forum AND forum category are stored in the item_property table.
+$forumId = isset($_GET['forum']) ? (int) $_GET['forum'] : 0;
+$current_thread = get_thread_information($forumId, $_GET['thread']);
+$current_forum = get_forum_information($forumId);
 $current_forum_category = get_forumcategory_information($current_forum['forum_category']);
 $current_post = get_post_information($_GET['post']);
 if (empty($current_post)) {
@@ -64,49 +62,47 @@ if (!$isEditable) {
     api_not_allowed(true);
 }
 
-/* Header and Breadcrumbs */
-if (isset($_SESSION['gradebook'])) {
-    $gradebook = $_SESSION['gradebook'];
-}
-
-if (!empty($gradebook) && $gradebook == 'view') {
-    $interbreadcrumb[] = array(
-        'url' => '../gradebook/'.$_SESSION['gradebook_dest'],
-        'name' => get_lang('ToolGradebook')
-    );
+if (api_is_in_gradebook()) {
+    $interbreadcrumb[] = [
+        'url' => Category::getUrl(),
+        'name' => get_lang('ToolGradebook'),
+    ];
 }
 
 $group_properties = GroupManager::get_group_properties(api_get_group_id());
 if ($origin == 'group') {
     $_clean['toolgroup'] = api_get_group_id();
-    $interbreadcrumb[] = array(
+    $interbreadcrumb[] = [
         'url' => api_get_path(WEB_CODE_PATH).'group/group.php?'.api_get_cidreq(),
         'name' => get_lang('Groups'),
-    );
-    $interbreadcrumb[] = array(
+    ];
+    $interbreadcrumb[] = [
         'url' => api_get_path(WEB_CODE_PATH).'group/group_space.php?'.api_get_cidreq(),
         'name' => get_lang('GroupSpace').' '.$group_properties['name'],
-    );
-    $interbreadcrumb[] = array(
-        'url' => api_get_path(WEB_CODE_PATH).'forum/viewforum.php?'.api_get_cidreq().'&forum='.intval($_GET['forum']),
+    ];
+    $interbreadcrumb[] = [
+        'url' => api_get_path(WEB_CODE_PATH).'forum/viewforum.php?'.api_get_cidreq().'&forum='.$forumId,
         'name' => prepare4display($current_forum['forum_title']),
-    );
-    $interbreadcrumb[] = array('url' => 'javascript: void (0);', 'name' => get_lang('EditPost'));
+    ];
+    $interbreadcrumb[] = ['url' => 'javascript: void (0);', 'name' => get_lang('EditPost')];
 } else {
-    $interbreadcrumb[] = array('url' => api_get_path(WEB_CODE_PATH).'forum/index.php?'.api_get_cidreq(), 'name' => $nameTools);
-    $interbreadcrumb[] = array(
+    $interbreadcrumb[] = [
+        'url' => api_get_path(WEB_CODE_PATH).'forum/index.php?'.api_get_cidreq(),
+        'name' => $nameTools,
+    ];
+    $interbreadcrumb[] = [
         'url' => api_get_path(WEB_CODE_PATH).'forum/viewforumcategory.php?forumcategory='.$current_forum_category['cat_id'].'&'.api_get_cidreq(),
-        'name' => prepare4display($current_forum_category['cat_title'])
-    );
-    $interbreadcrumb[] = array(
-        'url' => api_get_path(WEB_CODE_PATH).'forum/viewforum.php?forum='.intval($_GET['forum']).'&'.api_get_cidreq(),
-        'name' => prepare4display($current_forum['forum_title'])
-    );
-    $interbreadcrumb[] = array(
-        'url' => api_get_path(WEB_CODE_PATH).'forum/viewthread.php?'.api_get_cidreq().'&forum='.intval($_GET['forum']).'&thread='.intval($_GET['thread']),
-        'name' => prepare4display($current_thread['thread_title'])
-    );
-    $interbreadcrumb[] = array('url' => 'javascript: void (0);', 'name' => get_lang('EditPost'));
+        'name' => prepare4display($current_forum_category['cat_title']),
+    ];
+    $interbreadcrumb[] = [
+        'url' => api_get_path(WEB_CODE_PATH).'forum/viewforum.php?forum='.$forumId.'&'.api_get_cidreq(),
+        'name' => prepare4display($current_forum['forum_title']),
+    ];
+    $interbreadcrumb[] = [
+        'url' => api_get_path(WEB_CODE_PATH).'forum/viewthread.php?'.api_get_cidreq().'&forum='.$forumId.'&thread='.intval($_GET['thread']),
+        'name' => prepare4display($current_thread['thread_title']),
+    ];
+    $interbreadcrumb[] = ['url' => 'javascript: void (0);', 'name' => get_lang('EditPost')];
 }
 
 $table_link = Database::get_main_table(TABLE_MAIN_GRADEBOOK_LINK);
@@ -114,7 +110,7 @@ $table_link = Database::get_main_table(TABLE_MAIN_GRADEBOOK_LINK);
 /* Header */
 $htmlHeadXtra[] = <<<JS
     <script>
-    $(document).on('ready', function() {
+    $(function() {
         $('#reply-add-attachment').on('click', function(e) {
             e.preventDefault();
 
@@ -149,9 +145,9 @@ if (!api_is_allowed_to_edit(null, true) &&
 
 if (!api_is_allowed_to_edit(null, true) &&
     (
-        ($current_forum_category && $current_forum_category['locked'] <> 0) ||
-        $current_forum['locked'] <> 0 ||
-        $current_thread['locked'] <> 0
+        ($current_forum_category && $current_forum_category['locked'] != 0) ||
+        $current_forum['locked'] != 0 ||
+        $current_thread['locked'] != 0
     )
 ) {
     api_not_allowed(true);
@@ -182,13 +178,31 @@ if ($origin != 'learnpath') {
     echo '<span style="float:right;">'.search_link().'</span>';
     if ($origin == 'group') {
         echo '<a href="../group/group_space.php?'.api_get_cidreq().'">'.
-            Display::return_icon('back.png', get_lang('BackTo').' '.get_lang('Groups'), '', ICON_SIZE_MEDIUM).'</a>';
+            Display::return_icon(
+                'back.png',
+                get_lang('BackTo').' '.get_lang('Groups'),
+                '',
+                ICON_SIZE_MEDIUM
+            ).
+            '</a>';
     } else {
         echo '<a href="index.php?'.api_get_cidreq().'">'.
-            Display::return_icon('back.png', get_lang('BackToForumOverview'), '', ICON_SIZE_MEDIUM).'</a>';
+            Display::return_icon(
+                'back.png',
+                get_lang('BackToForumOverview'),
+                '',
+                ICON_SIZE_MEDIUM
+            ).
+            '</a>';
     }
-    echo '<a href="viewforum.php?forum='.intval($_GET['forum']).'&'.api_get_cidreq().'">'.
-        Display::return_icon('forum.png', get_lang('BackToForum'), '', ICON_SIZE_MEDIUM).'</a>';
+    echo '<a href="viewforum.php?forum='.$forumId.'&'.api_get_cidreq().'">'.
+        Display::return_icon(
+            'forum.png',
+            get_lang('BackToForum'),
+            '',
+            ICON_SIZE_MEDIUM
+        ).
+        '</a>';
     echo '</div>';
 }
 
@@ -201,7 +215,7 @@ echo Display::url(
     prepare4display($current_forum['forum_title']),
     'viewforum.php?'.api_get_cidreq().'&'.http_build_query([
         'origin' => $origin,
-        'forum' => $current_forum['forum_id']
+        'forum' => $current_forum['forum_id'],
     ]),
     ['class' => empty($current_forum['visibility']) ? 'text-muted' : null]
 );
@@ -218,7 +232,6 @@ getAttachedFiles(
 );
 
 show_edit_post_form(
-    $forum_setting,
     $current_post,
     $current_thread,
     $current_forum,

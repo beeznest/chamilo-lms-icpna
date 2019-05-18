@@ -1,10 +1,9 @@
 <?php
 
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage;
 
 /**
- * Chamilo session (i.e. the session that maintains the connection open after usr login)
+ * Chamilo session (i.e. the session that maintains the connection open after usr login).
  *
  * Usage:
  *
@@ -32,7 +31,8 @@ class ChamiloSession extends System\Session
     const NAME = 'ch_sid';
 
     /**
-     * Generate new session instance
+     * Generate new session instance.
+     *
      * @return ChamiloSession
      */
     public static function instance()
@@ -41,16 +41,19 @@ class ChamiloSession extends System\Session
         if (empty($result)) {
             $result = new ChamiloSession();
         }
+
         return $result;
     }
 
     /**
-     * Returns the session lifetime
+     * Returns the session lifetime.
+     *
      * @return int The session lifetime as defined in the config file, in seconds
      */
     public static function session_lifetime()
     {
         global $_configuration;
+
         return $_configuration['session_lifetime'];
     }
 
@@ -63,8 +66,8 @@ class ChamiloSession extends System\Session
      * to 360000 seconds
      *
      * @author Olivier Brouckaert
+     *
      * @param  string variable - the variable name to save into the session
-     * @return void
      */
     public static function start($already_installed = true)
     {
@@ -93,9 +96,7 @@ class ChamiloSession extends System\Session
 
         session_name(self::NAME);
         session_start();
-
         $session = self::instance();
-
         if ($already_installed) {
             if (!isset($session['checkChamiloURL'])) {
                 $session['checkChamiloURL'] = api_get_path(WEB_PATH);
@@ -104,21 +105,19 @@ class ChamiloSession extends System\Session
             }
         }
 
-        /*if (!$session->has('starttime') && !$session->is_expired()) {
-            $session->write('starttime', time());
-        }*/
         // If the session time has expired, refresh the starttime value,
         //  so we're starting to count down from a later time
-        if ($session->has('starttime') && $session->is_expired()) {
-            $session->destroy();
+        if (self::has('starttime') && $session->is_expired()) {
+            self::destroy();
         } else {
             //error_log('Time not expired, extend session for a bit more');
-            $session->write('starttime', time());
+            self::write('starttime', time());
         }
     }
 
     /**
-     * Session start time: that is the last time the user loaded a page (before this time)
+     * Session start time: that is the last time the user loaded a page (before this time).
+     *
      * @return int timestamp
      */
     public function start_time()
@@ -128,18 +127,21 @@ class ChamiloSession extends System\Session
 
     /**
      * Session end time: when the session expires. This is made of the last page
-     * load time + a number of seconds
+     * load time + a number of seconds.
+     *
      * @return int UNIX timestamp (server's timezone)
      */
     public function end_time()
     {
         $start_time = $this->start_time();
         $lifetime = self::session_lifetime();
+
         return $start_time + $lifetime;
     }
 
     /**
-     * Returns whether the session is expired
+     * Returns whether the session is expired.
+     *
      * @return bool True if the session is expired, false if it is still valid
      */
     public function is_expired()

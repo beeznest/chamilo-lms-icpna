@@ -2,7 +2,8 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * Script
+ * Script.
+ *
  * @package chamilo.gradebook
  */
 require_once __DIR__.'/../inc/global.inc.php';
@@ -23,7 +24,7 @@ if ($link->is_locked() && !api_is_platform_admin()) {
     api_not_allowed();
 }
 
-$linkcat  = isset($_GET['selectcat']) ? (int) $_GET['selectcat'] : 0;
+$linkcat = isset($_GET['selectcat']) ? (int) $_GET['selectcat'] : 0;
 $linkedit = isset($_GET['editlink']) ? Security::remove_XSS($_GET['editlink']) : '';
 $course_code = api_get_course_id();
 $session_id = api_get_session_id();
@@ -43,7 +44,7 @@ if ($session_id == 0) {
 }
 
 $form = new LinkAddEditForm(
-    LinkAddEditForm :: TYPE_EDIT,
+    LinkAddEditForm::TYPE_EDIT,
     $cats,
     null,
     $link,
@@ -68,7 +69,7 @@ if ($form->validate()) {
     $rs_attendance = Database::query($sql);
     if (Database::num_rows($rs_attendance) > 0) {
         $row_attendance = Database::fetch_array($rs_attendance);
-        $attendance_id  = $row_attendance['ref_id'];
+        $attendance_id = $row_attendance['ref_id'];
         $sql = 'UPDATE '.$tbl_attendance.' SET
                     attendance_weight ='.api_float_val($final_weight).'
                 WHERE c_id = '.$course_id.' AND id = '.intval($attendance_id);
@@ -101,20 +102,29 @@ if ($form->validate()) {
             'final_weight' => $final_weight,
             'course' => $course_id,
             'link' => intval($_GET['editlink']),
-            'type' => LINK_STUDENTPUBLICATION
+            'type' => LINK_STUDENTPUBLICATION,
         ]);
 
-    header('Location: '.$_SESSION['gradebook_dest'].'?linkedited=&selectcat='.$link->get_category_id().'&'.api_get_cidreq());
+    $logInfo = [
+        'tool' => TOOL_GRADEBOOK,
+        'tool_id' => 0,
+        'tool_id_detail' => 0,
+        'action' => 'edit-link',
+        'action_details' => '',
+    ];
+    Event::registerLog($logInfo);
+
+    header('Location: '.Category::getUrl().'linkedited=&selectcat='.$link->get_category_id());
     exit;
 }
 
-$interbreadcrumb[] = array(
-    'url' => Security::remove_XSS($_SESSION['gradebook_dest']).'?selectcat='.$linkcat,
-    'name' => get_lang('Gradebook')
-);
+$interbreadcrumb[] = [
+    'url' => Category::getUrl().'selectcat='.$linkcat,
+    'name' => get_lang('Gradebook'),
+];
 
 $htmlHeadXtra[] = '<script>
-$(document).ready( function() {
+$(function() {
     $("#hide_category_id").change(function() {
        $("#hide_category_id option:selected").each(function () {
            var cat_id = $(this).val();

@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * SkillProfile
+ * SkillProfile.
  *
  * @ORM\Table(name="skill_profile")
  * @ORM\Entity
@@ -14,32 +14,33 @@ use Doctrine\ORM\Mapping as ORM;
 class SkillProfile
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
      */
-    private $name;
+    protected $name;
 
     /**
      * @var string
      *
      * @ORM\Column(name="description", type="text", nullable=false)
      */
-    private $description;
+    protected $description;
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
+     *
      * @return SkillProfile
      */
     public function setName($name)
@@ -50,7 +51,7 @@ class SkillProfile
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
@@ -60,9 +61,10 @@ class SkillProfile
     }
 
     /**
-     * Set description
+     * Set description.
      *
      * @param string $description
+     *
      * @return SkillProfile
      */
     public function setDescription($description)
@@ -73,7 +75,7 @@ class SkillProfile
     }
 
     /**
-     * Get description
+     * Get description.
      *
      * @return string
      */
@@ -83,9 +85,9 @@ class SkillProfile
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {

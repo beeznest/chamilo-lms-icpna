@@ -1,15 +1,13 @@
 <?php
 /* For licensing terms, see /license.txt */
 
-use ChamiloSession as Session;
-
 /**
  *	Exercise list: This script shows the list of exercises for administrators and students.
- *	@package chamilo.exercise
- *	@author hubert.borderiou
  *
+ *	@package chamilo.exercise
+ *
+ *	@author hubert.borderiou
  */
-
 require_once __DIR__.'/../inc/global.inc.php';
 
 // Setting the tabs
@@ -44,7 +42,7 @@ if (empty($hotpotatoes_path)) {
 }
 
 if (!$is_allowedToEdit) {
-   // api_not_allowed();
+    // api_not_allowed();
 }
 
 if (!empty($_REQUEST['path'])) {
@@ -91,7 +89,6 @@ if ($is_allowedToEdit) {
             header("Location: $url");
             exit;
             break;
-
     }
 }
 
@@ -99,25 +96,18 @@ $nameTools = get_lang('Results');
 
 if ($is_allowedToEdit || $is_tutor) {
     $nameTools = get_lang('StudentScore');
-    $interbreadcrumb[] = array("url" => "exercise.php", "name" => get_lang('Exercises'));
+    $interbreadcrumb[] = ["url" => "exercise.php?".api_get_cidreq(), "name" => get_lang('Exercises')];
     $objExerciseTmp = new Exercise();
-    /*if ($objExerciseTmp->read($exercise_id)) {
-        $interbreadcrumb[] = array("url" => "admin.php?exerciseId=".$exercise_id, "name" => $objExerciseTmp->name);
-    }*/
 } else {
-    $interbreadcrumb[] = array("url" => "exercise.php", "name" => get_lang('Exercises'));
+    $interbreadcrumb[] = ["url" => "exercise.php?".api_get_cidreq(), "name" => get_lang('Exercises')];
     $objExerciseTmp = new Exercise();
-    /*if ($objExerciseTmp->read($exercise_id)) {
-        $nameTools = get_lang('Results').': '.$objExerciseTmp->name;
-    }*/
 }
 
 Display :: display_header($nameTools);
-$actions = Display::div($actions, array('class'=> 'actions'));
+$actions = Display::div($actions, ['class' => 'actions']);
 
 $extra = '<script>
-$(document).ready(function() {
-
+$(function() {
     $( "#dialog:ui-dialog" ).dialog( "destroy" );
     $( "#dialog-confirm" ).dialog({
         autoOpen: false,
@@ -148,12 +138,12 @@ $(document).ready(function() {
 </script>';
 
 $extra .= '<div id="dialog-confirm" title="'.get_lang("ConfirmYourChoice").'">';
-$form = new FormValidator('report', 'post', null, null, array('class' => 'form-vertical'));
-$form->addElement('radio', 'export_format', null, get_lang('ExportAsCSV'), 'csv', array('id' => 'export_format_csv_label'));
+$form = new FormValidator('report', 'post', null, null, ['class' => 'form-vertical']);
+$form->addElement('radio', 'export_format', null, get_lang('ExportAsCSV'), 'csv', ['id' => 'export_format_csv_label']);
 //$form->addElement('radio', 'export_format', null, get_lang('ExportAsXLS'), 'xls', array('id' => 'export_format_xls_label'));
 //$form->addElement('checkbox', 'load_extra_data', null, get_lang('LoadExtraData'), '0', array('id' => 'export_format_xls_label'));
-$form->setDefaults(array('export_format' => 'csv'));
-$extra .= $form->return_form();
+$form->setDefaults(['export_format' => 'csv']);
+$extra .= $form->returnForm();
 $extra .= '</div>';
 
 if ($is_allowedToEdit) {
@@ -168,7 +158,7 @@ $action_links = '';
 // Generating group list
 
 $group_list = GroupManager::get_group_list();
-$group_parameters = array('group_all:'.get_lang('All'), 'group_none:'.get_lang('None'));
+$group_parameters = ['group_all:'.get_lang('All'), 'group_none:'.get_lang('None')];
 
 foreach ($group_list as $group) {
     $group_parameters[] = $group['id'].':'.$group['name'];
@@ -179,41 +169,41 @@ if (!empty($group_parameters)) {
 
 if ($is_allowedToEdit || $is_tutor) {
     // The order is important you need to check the the $column variable in the model.ajax.php file
-    $columns = array(
+    $columns = [
         get_lang('FirstName'),
         get_lang('LastName'),
         get_lang('LoginName'),
         get_lang('Group'),
         get_lang('StartDate'),
         get_lang('Score'),
-        get_lang('Actions')
-    );
+        get_lang('Actions'),
+    ];
 
-  // Column config
-  // @todo fix search firstname/lastname that doesn't work. rmove search for the moment
-    $column_model = array(
-        array('name' => 'firstname', 'index' => 'firstname', 'width' => '50', 'align' => 'left', 'search' => 'false'),
-        array(
+    // Column config
+    // @todo fix search firstname/lastname that doesn't work. rmove search for the moment
+    $column_model = [
+        ['name' => 'firstname', 'index' => 'firstname', 'width' => '50', 'align' => 'left', 'search' => 'false'],
+        [
             'name' => 'lastname',
             'index' => 'lastname',
             'width' => '50',
             'align' => 'left',
             'formatter' => 'action_formatter',
             'search' => 'false',
-        ),
-        array(
+        ],
+        [
             'name' => 'login',
             'hidden' => 'true',
             'index' => 'username',
             'width' => '40',
             'align' => 'left',
             'search' => 'false',
-        ),
-        array('name' => 'group_name', 'index' => 'group_id', 'width' => '40', 'align' => 'left', 'search' => 'false'),
-        array('name' => 'exe_date', 'index' => 'exe_date', 'width' => '60', 'align' => 'left', 'search' => 'false'),
-        array('name' => 'score', 'index' => 'exe_result', 'width' => '50', 'align' => 'left', 'search' => 'false'),
-        array('name' => 'actions', 'index' => 'actions', 'width' => '60', 'align' => 'left', 'search' => 'false'),
-    );
+        ],
+        ['name' => 'group_name', 'index' => 'group_id', 'width' => '40', 'align' => 'left', 'search' => 'false'],
+        ['name' => 'exe_date', 'index' => 'exe_date', 'width' => '60', 'align' => 'left', 'search' => 'false'],
+        ['name' => 'score', 'index' => 'exe_result', 'width' => '50', 'align' => 'left', 'search' => 'false'],
+        ['name' => 'actions', 'index' => 'actions', 'width' => '60', 'align' => 'left', 'search' => 'false'],
+    ];
 
     $action_links = '
     // add username as title in lastname filed - ref 4226
@@ -227,19 +217,19 @@ if ($is_allowedToEdit || $is_tutor) {
     }';
 } else {
     //The order is important you need to check the the $column variable in the model.ajax.php file
-    $columns = array(
+    $columns = [
         get_lang('StartDate'),
         get_lang('Score'),
-        get_lang('Actions')
-    );
+        get_lang('Actions'),
+    ];
 
     //Column config
     // @todo fix search firstname/lastname that doesn't work. rmove search for the moment
-    $column_model = array(
-        array('name' => 'exe_date', 'index' => 'exe_date', 'width' => '60', 'align' => 'left', 'search' => 'false'),
-        array('name' => 'score', 'index' => 'exe_result', 'width' => '50', 'align' => 'left', 'search' => 'false'),
-        array('name' => 'actions', 'index' => 'actions', 'width' => '60', 'align' => 'left', 'search' => 'false'),
-    );
+    $column_model = [
+        ['name' => 'exe_date', 'index' => 'exe_date', 'width' => '60', 'align' => 'left', 'search' => 'false'],
+        ['name' => 'score', 'index' => 'exe_result', 'width' => '50', 'align' => 'left', 'search' => 'false'],
+        ['name' => 'actions', 'index' => 'actions', 'width' => '60', 'align' => 'left', 'search' => 'false'],
+    ];
 }
 
 //Autowidth
@@ -296,11 +286,12 @@ $(function() {
         $columns,
         $column_model,
         $extra_params,
-        array(),
+        [],
         $action_links,
         true
     );
-    if ($is_allowedToEdit || $is_tutor) { ?>
+    if ($is_allowedToEdit || $is_tutor) {
+        ?>
         //setSearchSelect("status");
         //
         //view:true, del:false, add:false, edit:false, excel:true}
@@ -322,13 +313,14 @@ $(function() {
         var sgrid = $("#results")[0];
         sgrid.triggerToolbar();
 
-    <?php } ?>
+    <?php
+    } ?>
 });
 </script>
 <form id="export_report_form" method="post" action="hotpotatoes_exercise_report.php?<?php echo api_get_cidreq(); ?>">
     <input type="hidden" name="csvBuffer" id="csvBuffer" value="" />
     <input type="hidden" name="export_report" id="export_report" value="1" />
-    <input type="hidden" name="path" id="path" value="<?php echo $hotpotatoes_path ?>" />
+    <input type="hidden" name="path" id="path" value="<?php echo $hotpotatoes_path; ?>" />
 </form>
 <?php
 

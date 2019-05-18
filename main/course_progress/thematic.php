@@ -2,9 +2,11 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * View (MVC patter) for thematic control
+ * View (MVC patter) for thematic control.
+ *
  * @author Christian Fasanando <christian1827@gmail.com>
  * @author Julio Montoya <gugli100@gmail.com> Bug fixing
+ *
  * @package chamilo.course_progress
  */
 
@@ -23,8 +25,14 @@ if (api_is_allowed_to_edit(null, true)) {
     switch ($action) {
         case 'thematic_add':
         case 'thematic_import_select':
-            $actionLeft = '<a href="index.php?'.api_get_cidreq().'">'.
-                Display::return_icon('back.png', get_lang('BackTo').' '.get_lang('ThematicDetails'), '', ICON_SIZE_MEDIUM).'</a>';
+            $actionLeft = '<a href="index.php?'.api_get_cidreq().'">';
+            $actionLeft .= Display::return_icon(
+                'back.png',
+                get_lang('BackTo').' '.get_lang('ThematicDetails'),
+                '',
+                ICON_SIZE_MEDIUM
+            );
+            $actionLeft .= '</a>';
             break;
         case 'thematic_list':
             $actionLeft = '<a href="index.php?'.api_get_cidreq().'&action=thematic_add'.$url_token.'">'.
@@ -54,31 +62,30 @@ if (api_is_allowed_to_edit(null, true)) {
                 ).'</a>';
     }
 
-    $toolbar = Display::toolbarAction('thematic-bar', array($actionLeft));
+    $toolbar = Display::toolbarAction('thematic-bar', [$actionLeft]);
 }
 
 if ($action == 'thematic_list') {
     $table = new SortableTable(
         'thematic_list',
-        array('Thematic', 'get_number_of_thematics'),
-        array('Thematic', 'get_thematic_data')
+        ['Thematic', 'get_number_of_thematics'],
+        ['Thematic', 'get_thematic_data']
     );
 
     $parameters['action'] = $action;
     $table->set_additional_parameters($parameters);
-    $table->set_header(0, '', false, array('style' => 'width:20px;'));
+    $table->set_header(0, '', false, ['style' => 'width:20px;']);
     $table->set_header(1, get_lang('Title'), false);
     if (api_is_allowed_to_edit(null, true)) {
         $table->set_header(
             2,
             get_lang('Actions'),
             false,
-            array('style' => 'text-align:center;width:40%;')
+            ['style' => 'text-align:center;width:40%;']
         );
-        $table->set_form_actions(array('thematic_delete_select' => get_lang('DeleteAllThematics')));
+        $table->set_form_actions(['thematic_delete_select' => get_lang('DeleteAllThematics')]);
     }
     $table->display();
-
 } elseif ($action == 'thematic_details') {
     if (isset($_GET['thematic_plan_save_message']) &&
         $_GET['thematic_plan_save_message'] == 'ok'
@@ -94,9 +101,9 @@ if ($action == 'thematic_list') {
 
     if (isset($last_id) && $last_id) {
         $link_to_thematic_plan = '<a href="index.php?'.api_get_cidreq().'&action=thematic_plan_list&thematic_id='.$last_id.'">'.
-            Display::return_icon('lesson_plan.png', get_lang('ThematicPlan'), array('style' => 'vertical-align:middle;float:none;'), ICON_SIZE_SMALL).'</a>';
+            Display::return_icon('lesson_plan.png', get_lang('ThematicPlan'), ['style' => 'vertical-align:middle;float:none;'], ICON_SIZE_SMALL).'</a>';
         $link_to_thematic_advance = '<a href="index.php?'.api_get_cidreq().'&action=thematic_advance_list&thematic_id='.$last_id.'">'.
-            Display::return_icon('lesson_plan_calendar.png', get_lang('ThematicAdvance'), array('style' => 'vertical-align:middle;float:none;'), ICON_SIZE_SMALL).'</a>';
+            Display::return_icon('lesson_plan_calendar.png', get_lang('ThematicAdvance'), ['style' => 'vertical-align:middle;float:none;'], ICON_SIZE_SMALL).'</a>';
         Display::addFlash(Display::return_message(
             get_lang('ThematicSectionHasBeenCreatedSuccessfull').'<br />'.sprintf(get_lang('NowYouShouldAddThematicPlanXAndThematicAdvanceX'), $link_to_thematic_plan, $link_to_thematic_advance),
             'confirmation',
@@ -122,7 +129,6 @@ if ($action == 'thematic_list') {
             $list['content'] = Security::remove_XSS($thematic['content'], STUDENT);
             $list['display_orden'] = $thematic['display_order'];
             $list['active'] = $thematic['active'];
-
             $my_thematic_id = $thematic['id'];
 
             $session_star = '';
@@ -146,18 +152,22 @@ if ($action == 'thematic_list') {
                         ICON_SIZE_TINY
                     ),
                     'index.php?'.api_get_cidreq().'&action=thematic_copy&thematic_id='.$my_thematic_id.$params.$url_token,
-                    array('class'=> 'btn btn-default')
+                    ['class' => 'btn btn-default']
                 );
                 if (api_get_session_id() == 0) {
                     if ($thematic['display_order'] > 1) {
-                        $toolbarThematic .= ' <a class="btn btn-default" href="'.api_get_self().'?action=moveup&'.api_get_cidreq().'&thematic_id='.$my_thematic_id.$params.$url_token.'">'.Display::return_icon('up.png', get_lang('Up'), '', ICON_SIZE_TINY).'</a>';
+                        $toolbarThematic .= ' <a class="btn btn-default" href="'.api_get_self().'?action=moveup&'.api_get_cidreq().'&thematic_id='.$my_thematic_id.$params.$url_token.'">'.
+                            Display::return_icon('up.png', get_lang('Up'), '', ICON_SIZE_TINY).'</a>';
                     } else {
-                        $toolbarThematic .= '<div class="btn btn-default">'.Display::return_icon('up_na.png', '&nbsp;', '', ICON_SIZE_TINY).'</div>';
+                        $toolbarThematic .= '<div class="btn btn-default">'.
+                            Display::return_icon('up_na.png', '&nbsp;', '', ICON_SIZE_TINY).'</div>';
                     }
                     if (isset($thematic['max_thematic_item']) && $thematic['display_order'] < $thematic['max_thematic_item']) {
-                        $toolbarThematic .= ' <a class="btn btn-default" href="'.api_get_self().'?action=movedown&a'.api_get_cidreq().'&thematic_id='.$my_thematic_id.$params.$url_token.'">'.Display::return_icon('down.png', get_lang('Down'), '', ICON_SIZE_TINY).'</a>';
+                        $toolbarThematic .= ' <a class="btn btn-default" href="'.api_get_self().'?action=movedown&a'.api_get_cidreq().'&thematic_id='.$my_thematic_id.$params.$url_token.'">'.
+                            Display::return_icon('down.png', get_lang('Down'), '', ICON_SIZE_TINY).'</a>';
                     } else {
-                        $toolbarThematic .= '<div class="btn btn-default">'.Display::return_icon('down_na.png', '&nbsp;', '', ICON_SIZE_TINY).'</div>';
+                        $toolbarThematic .= '<div class="btn btn-default">'.
+                            Display::return_icon('down_na.png', '&nbsp;', '', ICON_SIZE_TINY).'</div>';
                     }
                 }
                 if (api_get_session_id() == $thematic['session_id']) {
@@ -165,14 +175,20 @@ if ($action == 'thematic_list') {
                         Display::return_icon('pdf.png', get_lang('ExportToPDF'), null, ICON_SIZE_TINY),
                         api_get_self().'?'.api_get_cidreq()."$url_token&".http_build_query([
                             'action' => 'export_single_thematic',
-                            'thematic_id' => $my_thematic_id
+                            'thematic_id' => $my_thematic_id,
                         ]),
-                        array('class' => 'btn btn-default')
+                        ['class' => 'btn btn-default']
                     );
                     $toolbarThematic .= Display::url(
-                        Display::return_icon('export_to_documents.png', get_lang('ExportToDocArea'), [], ICON_SIZE_TINY),
-                        api_get_self().'?'.api_get_cidreq().$url_token.'&'
-                            .http_build_query(['action' => 'export_single_documents', 'thematic_id' => $my_thematic_id]),
+                        Display::return_icon(
+                            'export_to_documents.png',
+                            get_lang('ExportToDocArea'),
+                            [],
+                            ICON_SIZE_TINY
+                        ),
+                        api_get_self().'?'.api_get_cidreq().$url_token.'&'.http_build_query(
+                            ['action' => 'export_single_documents', 'thematic_id' => $my_thematic_id]
+                        ),
                         ['class' => 'btn btn-default']
                     );
                     $toolbarThematic .= '<a class="btn btn-default" href="index.php?'.api_get_cidreq().'&action=thematic_edit&thematic_id='
@@ -224,14 +240,14 @@ if ($action == 'thematic_list') {
             ['ToolbarSet' => 'Minimal']
         );
     } else {
-        $form->addText('title', get_lang('Title'), true, array('size' => '50'));
+        $form->addText('title', get_lang('Title'), true, ['size' => '50']);
     }
     $form->addHtmlEditor(
         'content',
         get_lang('Content'),
         false,
         false,
-        array('ToolbarSet' => 'TrainingDescription', 'Height' => '150')
+        ['ToolbarSet' => 'Basic', 'Height' => '150']
     );
     $form->addButtonSave(get_lang('Save'));
 
@@ -259,7 +275,11 @@ if ($action == 'thematic_list') {
     }
 } elseif ($action == 'thematic_import_select') {
     // Create form to upload csv file.
-    $form = new FormValidator('thematic_import', 'POST', 'index.php?action=thematic_import&'.api_get_cidreq().$url_token);
+    $form = new FormValidator(
+        'thematic_import',
+        'POST',
+        'index.php?action=thematic_import&'.api_get_cidreq().$url_token
+    );
     $form->addElement('header', get_lang('ImportThematic'));
     $form->addElement('file', 'file');
     $form->addElement('checkbox', 'replace', null, get_lang('DeleteAllThematic'));

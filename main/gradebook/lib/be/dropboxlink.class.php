@@ -2,8 +2,10 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * Gradebook link to dropbox item
+ * Gradebook link to dropbox item.
+ *
  * @author Bert Steppé
+ *
  * @package chamilo.gradebook
  */
 class DropboxLink extends EvalLink
@@ -11,7 +13,7 @@ class DropboxLink extends EvalLink
     private $dropbox_table = null;
 
     /**
-     * Constructor
+     * Constructor.
      */
     public function __construct()
     {
@@ -20,9 +22,8 @@ class DropboxLink extends EvalLink
     }
 
     /**
-     *
      * Returns the URL of a document
-     * This function is loaded when using a gradebook as a tab (gradebook = -1) see issue #2705
+     * This function is loaded when using a gradebook as a tab (gradebook = -1) see issue #2705.
      */
     public function get_view_url($stud_id)
     {
@@ -30,9 +31,11 @@ class DropboxLink extends EvalLink
         // with the same title as the evaluation name
 
         $eval = $this->get_evaluation();
-        $sql = 'SELECT filename FROM '.$this->get_dropbox_table()
-            .' WHERE c_id = '.$this->course_id.' AND uploader_id = '.intval($stud_id)
-            ." AND title = '".Database::escape_string($eval->get_name())."'";
+        $sql = 'SELECT filename FROM '.$this->get_dropbox_table().' 
+                WHERE 
+                    c_id = '.$this->course_id.' AND 
+                    uploader_id = '.intval($stud_id)." AND 
+                    title = '".Database::escape_string($eval->get_name())."'";
 
         $result = Database::query($sql);
         if ($fileurl = Database::fetch_row($result)) {
@@ -52,18 +55,18 @@ class DropboxLink extends EvalLink
         return false;
     }
 
-    /**
-     * Lazy load function to get the dropbox database table
-     */
-    private function get_dropbox_table()
-    {
-        $this->dropbox_table = Database::get_course_table(TABLE_DROPBOX_FILE);
-        return $this->dropbox_table;
-    }
-
     public function get_icon_name()
     {
         return 'dropbox';
     }
 
+    /**
+     * Lazy load function to get the dropbox database table.
+     */
+    private function get_dropbox_table()
+    {
+        $this->dropbox_table = Database::get_course_table(TABLE_DROPBOX_FILE);
+
+        return $this->dropbox_table;
+    }
 }

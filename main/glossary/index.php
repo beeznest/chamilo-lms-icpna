@@ -5,10 +5,10 @@ use ChamiloSession as Session;
 
 /**
  * @package chamilo.glossary
+ *
  * @author Christian Fasanando, initial version
  * @author Bas Wijnen import/export to CSV
  */
-
 require_once __DIR__.'/../inc/global.inc.php';
 
 $current_course_tool = TOOL_GLOSSARY;
@@ -25,15 +25,41 @@ $htmlHeadXtra[] = '<script>
 function setFocus(){
     $("#glossary_title").focus();
 }
-$(document).ready(function () {
+
+$(function() {
     setFocus();
+    $( "#dialog:ui-dialog" ).dialog( "destroy" );
+    $( "#dialog-confirm" ).dialog({
+        autoOpen: false,
+        show: "blind",
+        resizable: false,
+        height:300,
+        modal: true
+    });
+    $("#export_opener").click(function() {
+        var targetUrl = $(this).attr("href");        
+        $( "#dialog-confirm" ).dialog({
+            width:400,
+            height:300,
+            buttons: {
+                "'.addslashes(get_lang('Download')).'": function() {
+                    var export_format = $("input[name=export_format]:checked").val();
+                    location.href = targetUrl+"&export_format="+export_format;
+                    $( this ).dialog( "close" );
+                }
+            }
+        });
+        $( "#dialog-confirm" ).dialog("open");
+        return false;
+    });
 });
 </script>';
 
 // Tracking
 Event::event_access_tool(TOOL_GLOSSARY);
 
-function sorter($item1, $item2) {
+function sorter($item1, $item2)
+{
     if ($item1[2] == $item2[2]) {
         return 0;
     }
@@ -42,9 +68,9 @@ function sorter($item1, $item2) {
 }
 
 // Displaying the header
-$action = isset($_GET['action']) ? $_GET['action'] : '';
+$action = isset($_GET['action']) ? Security::remove_XSS($_GET['action']) : '';
 $currentUrl = api_get_self().'?'.api_get_cidreq();
-$interbreadcrumb[] = array('url' => 'index.php?'.api_get_cidreq(), 'name' => get_lang('Glossary'));
+$interbreadcrumb[] = ['url' => 'index.php?'.api_get_cidreq(), 'name' => get_lang('Glossary')];
 
 $content = '';
 $tool_name = '';
@@ -57,7 +83,7 @@ switch ($action) {
         $form = new FormValidator(
             'glossary',
             'post',
-            api_get_self().'?action='.Security::remove_XSS($_GET['action']).'&'.api_get_cidreq()
+            api_get_self().'?action=addglossary&'.api_get_cidreq()
         );
         // Setting the form elements
         $form->addElement('header', get_lang('TermAddNew'));
@@ -70,7 +96,7 @@ switch ($action) {
                 ['ToolbarSet' => 'Minimal']
             );
         } else {
-            $form->addElement('text', 'name', get_lang('TermName'), array('id' => 'glossary_title'));
+            $form->addElement('text', 'name', get_lang('TermName'), ['id' => 'glossary_title']);
         }
 
         $form->addElement(
@@ -78,7 +104,7 @@ switch ($action) {
             'description',
             get_lang('TermDefinition'),
             null,
-            array('ToolbarSet' => 'Glossary', 'Height' => '300')
+            ['ToolbarSet' => 'Glossary', 'Height' => '300']
         );
         $form->addButtonCreate(get_lang('TermAddButton'), 'SubmitGlossary');
         // setting the rules
@@ -96,8 +122,17 @@ switch ($action) {
         } else {
             $token = Security::get_token();
             $form->addElement('hidden', 'sec_token');
-            $form->setConstants(array('sec_token' => $token));
-            $content = $form->returnForm();
+            $form->setConstants(['sec_token' => $token]);
+            $content = Display::toolbarAction(
+                'add_glossary',
+                [
+                    Display::url(
+                        Display::return_icon('back.png', get_lang('Back'), [], ICON_SIZE_MEDIUM),
+                        api_get_self().'?'.api_get_cidreq()
+                    ),
+                ]
+            );
+            $content .= $form->returnForm();
         }
         break;
     case 'edit_glossary':
@@ -105,17 +140,17 @@ switch ($action) {
             api_not_allowed(true);
         }
         $tool_name = get_lang('Edit');
-        if (is_numeric($_GET['glossary_id'])) {
+        $glossaryId = isset($_GET['glossary_id']) ? (int) $_GET['glossary_id'] : 0;
+        if (!empty($glossaryId)) {
             // initiate the object
             $form = new FormValidator(
                 'glossary',
                 'post',
-                api_get_self().'?action='.Security::remove_XSS($_GET['action']).'&glossary_id='.intval($_GET['glossary_id']).'&'.api_get_cidreq()
+                api_get_self().'?action=edit_glossary&glossary_id='.$glossaryId.'&'.api_get_cidreq()
             );
             // Setting the form elements
             $form->addElement('header', get_lang('TermEdit'));
             $form->addElement('hidden', 'glossary_id');
-            $form->addElement('text', 'name', get_lang('TermName'));
             if (api_get_configuration_value('save_titles_as_html')) {
                 $form->addHtmlEditor(
                     'name',
@@ -125,7 +160,7 @@ switch ($action) {
                     ['ToolbarSet' => 'Minimal']
                 );
             } else {
-                $form->addElement('text', 'name', get_lang('TermName'), array('id' => 'glossary_title'));
+                $form->addElement('text', 'name', get_lang('TermName'), ['id' => 'glossary_title']);
             }
 
             $form->addElement(
@@ -133,11 +168,11 @@ switch ($action) {
                 'description',
                 get_lang('TermDefinition'),
                 null,
-                array('ToolbarSet' => 'Glossary', 'Height' => '300')
+                ['ToolbarSet' => 'Glossary', 'Height' => '300']
             );
 
             // setting the defaults
-            $glossary_data = GlossaryManager::get_glossary_information($_GET['glossary_id']);
+            $glossary_data = GlossaryManager::get_glossary_information($glossaryId);
 
             // Date treatment for timezones
             if (!empty($glossary_data['insert_date'])) {
@@ -149,7 +184,7 @@ switch ($action) {
             if (!empty($glossary_data['update_date'])) {
                 $glossary_data['update_date'] = Display::dateToStringAgoAndLongDate($glossary_data['update_date']);
             } else {
-                 $glossary_data['update_date'] = '';
+                $glossary_data['update_date'] = '';
             }
 
             $form->addLabel(get_lang('CreationDate'), $glossary_data['insert_date']);
@@ -174,8 +209,17 @@ switch ($action) {
             } else {
                 $token = Security::get_token();
                 $form->addElement('hidden', 'sec_token');
-                $form->setConstants(array('sec_token' => $token));
-                $content = $form->returnForm();
+                $form->setConstants(['sec_token' => $token]);
+                $content = Display::toolbarAction(
+                    'edit_glossary',
+                    [
+                        Display::url(
+                            Display::return_icon('back.png', get_lang('Back'), [], ICON_SIZE_MEDIUM),
+                            api_get_self().'?'.api_get_cidreq()
+                        ),
+                    ]
+                );
+                $content .= $form->returnForm();
             }
         }
         break;
@@ -206,11 +250,28 @@ switch ($action) {
             'post',
             api_get_self().'?action=import&'.api_get_cidreq()
         );
-        $form->addElement('header', '', get_lang('ImportGlossary'));
-        $form->addElement('file', 'file', get_lang('ImportCSVFileLocation'));
+        $form->addHeader(get_lang('ImportGlossary'));
+        $form->addElement('file', 'file', get_lang('File'));
+        $group = [];
+        $group[] = $form->createElement(
+            'radio',
+            'file_type',
+            '',
+            'CSV',
+            'csv'
+        );
+        $group[] = $form->createElement(
+            'radio',
+            'file_type',
+            '',
+            'XLS',
+            'xls'
+        );
+        $form->addGroup($group, '', get_lang('FileType'), null);
         $form->addElement('checkbox', 'replace', null, get_lang('DeleteAllGlossaryTerms'));
         $form->addElement('checkbox', 'update', null, get_lang('UpdateExistingGlossaryTerms'));
         $form->addButtonImport(get_lang('Import'), 'SubmitImport');
+        $form->setDefaults(['file_type' => 'csv']);
         $content = $form->returnForm();
 
         $content .= get_lang('CSVMustLookLike').' ('.get_lang('MandatoryFields').')';
@@ -221,14 +282,15 @@ switch ($action) {
         </pre>';
 
         if ($form->validate()) {
-            $termsDeleted = [];
+            $values = $form->getSubmitValues();
 
+            $termsDeleted = [];
             //this is a bad idea //jm
             if (isset($_POST['replace']) && $_POST['replace']) {
                 foreach (GlossaryManager::get_glossary_terms() as $term) {
                     if (!GlossaryManager::delete_glossary($term['id'], false)) {
                         Display::addFlash(
-                            Display::return_message(get_lang("CannotDeleteGlossary").':'.$term['id'], 'error')
+                            Display::return_message(get_lang('CannotDeleteGlossary').':'.$term['id'], 'error')
                         );
                     } else {
                         $termsDeleted[] = $term['name'];
@@ -238,7 +300,16 @@ switch ($action) {
 
             $updateTerms = isset($_POST['update']) && $_POST['update'] ? true : false;
 
-            $data = Import::csv_reader($_FILES['file']['tmp_name']);
+            $format = $values['file_type'];
+            switch ($format) {
+                case 'csv':
+                    $data = Import::csvToArray($_FILES['file']['tmp_name']);
+                    break;
+                case 'xls':
+                    $data = Import::xlsToArray($_FILES['file']['tmp_name']);
+                    break;
+            }
+
             $goodList = [];
             $updatedList = [];
             $addedList = [];
@@ -250,9 +321,12 @@ switch ($action) {
             if ($data) {
                 $termsToAdd = [];
                 foreach ($data as $item) {
+                    if (!isset($item['term'])) {
+                        continue;
+                    }
                     $items = [
                         'name' => $item['term'],
-                        'description' => $item['definition']
+                        'description' => $item['definition'],
                     ];
                     $termsToAdd[] = $items;
                     $termsPerKey[$item['term']] = $items;
@@ -306,26 +380,26 @@ switch ($action) {
 
             if (count($termsDeleted) > 0) {
                 Display::addFlash(
-                    Display::return_message(get_lang("TermDeleted").': '.implode(', ', $termsDeleted))
+                    Display::return_message(get_lang('TermDeleted').': '.implode(', ', $termsDeleted))
                 );
             }
 
             if (count($updatedList) > 0) {
                 Display::addFlash(
-                    Display::return_message(get_lang("TermsUpdated").': '.implode(', ', $updatedList))
+                    Display::return_message(get_lang('TermsUpdated').': '.implode(', ', $updatedList))
                 );
             }
 
             if (count($addedList) > 0) {
                 Display::addFlash(
-                    Display::return_message(get_lang("TermsAdded").': '.implode(', ', $addedList))
+                    Display::return_message(get_lang('TermsAdded').': '.implode(', ', $addedList))
                 );
             }
 
             if (count($badList) > 0) {
                 Display::addFlash(
                     Display::return_message(
-                        get_lang("GlossaryTermAlreadyExists").': '.implode(', ', $badList),
+                        get_lang('GlossaryTermAlreadyExists').': '.implode(', ', $badList),
                         'error'
                     )
                 );
@@ -334,7 +408,7 @@ switch ($action) {
             if (count($doubles) > 0) {
                 Display::addFlash(
                     Display::return_message(
-                        get_lang("TermsDuplicatedInFile").': '.implode(', ', $doubles),
+                        get_lang('TermsDuplicatedInFile').': '.implode(', ', $doubles),
                         'warning'
                     )
                 );
@@ -348,32 +422,20 @@ switch ($action) {
         if (!api_is_allowed_to_edit(null, true)) {
             api_not_allowed(true);
         }
-        $data = GlossaryManager::get_glossary_data(
-            0,
-            GlossaryManager::get_number_glossary_terms(api_get_session_id()),
-            0,
-            'ASC'
-        );
-
-        usort($data, "sorter");
-        $list = array();
-        $list[] = array('term', 'definition');
-        foreach ($data as $line) {
-            $list[] = array($line[0], $line[1]);
-        }
-        $filename = 'glossary_course_'.api_get_course_id();
-        Export::arrayToCsv($list, $filename);
-        break;
-    case 'export_to_pdf':
-        GlossaryManager::export_to_pdf();
+        $format = isset($_GET['export_format']) ? $_GET['export_format'] : 'csv';
+        GlossaryManager::exportToFormat($format);
         break;
     case 'changeview':
-        if (in_array($_GET['view'], array('list', 'table'))) {
+        if (in_array($_GET['view'], ['list', 'table'])) {
             Session::write('glossary_view', $_GET['view']);
         } else {
             $view = Session::read('glossary_view');
+            $defaultView = api_get_configuration_value('default_glossary_view');
+            if (empty($defaultView)) {
+                $defaultView = 'table';
+            }
             if (empty($view)) {
-                Session::write('glossary_view', 'table');
+                Session::write('glossary_view', $defaultView);
             }
         }
         header('Location: '.$currentUrl);
@@ -381,18 +443,60 @@ switch ($action) {
         break;
     case 'export_documents':
         GlossaryManager::movePdfToDocuments();
+        header('Location: '.$currentUrl);
+        exit;
         break;
     default:
         $tool_name = get_lang('List');
+        $htmlHeadXtra[] = '<script type="text/javascript" src="'.api_get_path(WEB_CODE_PATH).'glossary/glossary.js.php?add_ready=1&'.api_get_cidreq().'"></script>';
+        $htmlHeadXtra[] = api_get_js('jquery.highlight.js');
         $content = GlossaryManager::display_glossary();
         break;
 }
 
 Display::display_header($tool_name);
 
-// Tool introduction
 Display::display_introduction_section(TOOL_GLOSSARY);
 
 echo $content;
+
+$extra = '<div id="dialog-confirm" title="'.get_lang('ConfirmYourChoice').'">';
+$form = new FormValidator(
+    'report',
+    'post',
+    api_get_self().'?'.api_get_cidreq(),
+    null,
+    ['class' => 'form-vertical']
+);
+$form->addElement(
+    'radio',
+    'export_format',
+    null,
+    get_lang('ExportAsCSV'),
+    'csv',
+    ['id' => 'export_format_csv_label']
+);
+$form->addElement(
+    'radio',
+    'export_format',
+    null,
+    get_lang('ExportAsXLS'),
+    'xls',
+    ['id' => 'export_format_xls_label']
+);
+$form->addElement(
+    'radio',
+    'export_format',
+    null,
+    get_lang('ExportToPDF'),
+    'pdf',
+    ['id' => 'export_format_pdf_label']
+);
+
+$form->setDefaults(['export_format' => 'csv']);
+$extra .= $form->returnForm();
+$extra .= '</div>';
+
+echo $extra;
 
 Display::display_footer();

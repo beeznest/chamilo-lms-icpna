@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * SessionRelCourse
+ * SessionRelCourse.
  *
  * @ORM\Table(name="session_rel_course", indexes={@ORM\Index(name="idx_session_rel_course_course_id", columns={"c_id"})})
  * @ORM\Entity
@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 class SessionRelCourse
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
@@ -23,7 +23,7 @@ class SessionRelCourse
     protected $id;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="nbr_users", type="integer")
      */
@@ -36,20 +36,20 @@ class SessionRelCourse
     protected $session;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Chamilo\CoreBundle\Entity\Course", inversedBy="sessions", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="Course", inversedBy="sessions", cascade={"persist"})
      * @ORM\JoinColumn(name="c_id", referencedColumnName="id", nullable=false)
      */
     protected $course;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="position", type="integer", nullable=false)
      */
-    private $position;
+    protected $position;
 
     /**
-     * Constructor
+     * Constructor.
      */
     public function __construct()
     {
@@ -57,9 +57,9 @@ class SessionRelCourse
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -68,6 +68,7 @@ class SessionRelCourse
 
     /**
      * @param $session
+     *
      * @return $this
      */
     public function setSession($session)
@@ -78,7 +79,7 @@ class SessionRelCourse
     }
 
     /**
-     * Get course
+     * Get course.
      *
      * @return Course
      */
@@ -89,6 +90,7 @@ class SessionRelCourse
 
     /**
      * @param Course $course
+     *
      * @return $this
      */
     public function setCourse($course)
@@ -99,7 +101,7 @@ class SessionRelCourse
     }
 
     /**
-     * Get Session
+     * Get Session.
      *
      * @return Session
      */
@@ -109,9 +111,10 @@ class SessionRelCourse
     }
 
     /**
-     * Set nbrUsers
+     * Set nbrUsers.
      *
-     * @param integer $nbrUsers
+     * @param int $nbrUsers
+     *
      * @return SessionRelCourse
      */
     public function setNbrUsers($nbrUsers)
@@ -122,9 +125,9 @@ class SessionRelCourse
     }
 
     /**
-     * Get nbrUsers
+     * Get nbrUsers.
      *
-     * @return integer
+     * @return int
      */
     public function getNbrUsers()
     {
@@ -146,5 +149,4 @@ class SessionRelCourse
     {
         $this->position = $position;
     }
-
 }

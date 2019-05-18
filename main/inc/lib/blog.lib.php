@@ -2,20 +2,25 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * Class Blog
+ * Class Blog.
  *
  * Contains several functions dealing with displaying,
  * editing,... of a blog
+ *
  * @package chamilo.blogs
+ *
  * @author Toon Keppens <toon@vi-host.net>
  * @author Julio Montoya - Cleaning code
  */
 class Blog
 {
     /**
-     * Get the title of a blog
+     * Get the title of a blog.
+     *
      * @author Toon Keppens
+     *
      * @param int $blog_id The internal ID of the blog
+     *
      * @return string Blog Title
      */
     public static function getBlogTitle($blog_id)
@@ -23,10 +28,10 @@ class Blog
         $course_id = api_get_course_int_id();
 
         if (is_numeric($blog_id)) {
-            $tbl_blogs = Database::get_course_table(TABLE_BLOGS);
+            $table = Database::get_course_table(TABLE_BLOGS);
 
             $sql = "SELECT blog_name
-                    FROM $tbl_blogs
+                    FROM $table
                     WHERE c_id = $course_id AND blog_id = ".intval($blog_id);
 
             $result = Database::query($sql);
@@ -37,16 +42,19 @@ class Blog
     }
 
     /**
-     * Get the description of a blog
+     * Get the description of a blog.
+     *
      * @author Toon Keppens
+     *
      * @param int $blog_id The internal ID of the blog
+     *
      * @return string Blog description
      */
     public static function getBlogSubtitle($blog_id)
     {
-        $tbl_blogs = Database::get_course_table(TABLE_BLOGS);
+        $table = Database::get_course_table(TABLE_BLOGS);
         $course_id = api_get_course_int_id();
-        $sql = "SELECT blog_subtitle FROM $tbl_blogs
+        $sql = "SELECT blog_subtitle FROM $table
                 WHERE c_id = $course_id AND blog_id ='".intval($blog_id)."'";
         $result = Database::query($sql);
         $blog = Database::fetch_array($result);
@@ -55,9 +63,12 @@ class Blog
     }
 
     /**
-     * Get the users of a blog
+     * Get the users of a blog.
+     *
      * @author Toon Keppens
+     *
      * @param int $blog_id The ID of the blog
+     *
      * @return array Returns an array with [userid]=>[username]
      */
     public static function getBlogUsers($blog_id)
@@ -77,7 +88,7 @@ class Blog
                     blogs_rel_user.c_id = $course_id AND
                     blogs_rel_user.blog_id = '".(int) $blog_id."'";
         $result = Database::query($sql);
-        $blog_members = array();
+        $blog_members = [];
         while ($user = Database::fetch_array($result)) {
             $blog_members[$user['user_id']] = api_get_person_name(
                 $user['firstname'],
@@ -89,11 +100,12 @@ class Blog
     }
 
     /**
-     * Creates a new blog in the given course
+     * Creates a new blog in the given course.
+     *
      * @author Toon Keppens
-     * @param string $title The title of the new blog
+     *
+     * @param string $title    The title of the new blog
      * @param string $subtitle The description (or subtitle) of the new blog
-     * @return void
      */
     public static function addBlog($title, $subtitle)
     {
@@ -105,15 +117,13 @@ class Blog
         $tbl_blogs = Database::get_course_table(TABLE_BLOGS);
         $tbl_tool = Database::get_course_table(TABLE_TOOL_LIST);
         $tbl_blogs_posts = Database::get_course_table(TABLE_BLOGS_POSTS);
-        $title = Database::escape_string($title);
-        $subtitle = Database::escape_string($subtitle);
 
         //verified if exist blog
         $sql = "SELECT COUNT(*) as count FROM $tbl_blogs
                 WHERE
                     c_id = $course_id AND
-                    blog_name = '$title' AND
-                    blog_subtitle = '$subtitle'";
+                    blog_name = '".Database::escape_string($title)."' AND
+                    blog_subtitle = '".Database::escape_string($subtitle)."'  ";
         $res = Database::query($sql);
         $info_count = Database::result($res, 0, 0);
 
@@ -161,11 +171,19 @@ class Blog
             }
 
             // Put it on course homepage
-            $sql = "INSERT INTO $tbl_tool (c_id, name, link, image, visibility, admin, address, added_tool, session_id, target)
-                    VALUES ($course_id, '$title', 'blog/blog.php?blog_id=$this_blog_id','blog.gif','1','0','pastillegris.gif',0,'$session_id', '')";
-            Database::query($sql);
-
-            $toolId = Database::insert_id();
+            $params = [
+                'c_id' => $course_id,
+                'name' => $title,
+                'link' => 'blog/blog.php?blog_id='.$this_blog_id,
+                'image' => 'blog.gif',
+                'visibility' => '1',
+                'admin' => '0',
+                'address' => 'pastillegris.gif',
+                'added_tool' => 0,
+                'session_id' => $session_id,
+                'target' => '',
+            ];
+            $toolId = Database::insert($tbl_tool, $params);
             if ($toolId) {
                 $sql = "UPDATE $tbl_tool SET id = iid WHERE iid = $toolId";
                 Database::query($sql);
@@ -177,11 +195,12 @@ class Blog
     }
 
     /**
-     * Subscribes a user to a given blog
+     * Subscribes a user to a given blog.
+     *
      * @author Toon Keppens
+     *
      * @param int $blog_id The internal blog ID
      * @param int $user_id The internal user ID (of the user to be subscribed)
-     * @return void
      */
     public static function subscribeUser($blog_id, $user_id)
     {
@@ -220,12 +239,13 @@ class Blog
     }
 
     /**
-     * Update title and subtitle of a blog in the given course
+     * Update title and subtitle of a blog in the given course.
+     *
      * @author Toon Keppens
-     * @param int $blog_id The internal ID of the blog
-     * @param string $title The title to be set
+     *
+     * @param int    $blog_id  The internal ID of the blog
+     * @param string $title    The title to be set
      * @param string $subtitle The subtitle (or description) to be set
-     * @return void
      */
     public static function editBlog($blog_id, $title, $subtitle = '')
     {
@@ -266,10 +286,11 @@ class Blog
     }
 
     /**
-     * Deletes a blog and it's posts from the course database
+     * Deletes a blog and it's posts from the course database.
+     *
      * @author Toon Keppens
-     * @param Integer $blog_id The internal blog ID
-     * @return void
+     *
+     * @param int $blog_id The internal blog ID
      */
     public static function deleteBlog($blog_id)
     {
@@ -307,7 +328,7 @@ class Blog
         Database::query($sql);
 
         // Delete from course homepage
-        $sql = "DELETE FROM $tbl_tool WHERE c_id = $course_id AND link = 'blog/blog.php?blog_id=$blog_id";
+        $sql = "DELETE FROM $tbl_tool WHERE c_id = $course_id AND link = 'blog/blog.php?blog_id=".$blog_id."'";
         Database::query($sql);
 
         //update item_property (delete)
@@ -321,13 +342,16 @@ class Blog
     }
 
     /**
-     * Creates a new post in a given blog
+     * Creates a new post in a given blog.
+     *
      * @author Toon Keppens
-     * @param string $title The title of the new post
-     * @param string $full_text The full text of the new post
+     *
+     * @param string $title        The title of the new post
+     * @param string $full_text    The full text of the new post
      * @param string $file_comment The text of the comment (if any)
-     * @param int $blog_id The internal blog ID
-     * @return void
+     * @param int    $blog_id      The internal blog ID
+     *
+     * @return int
      */
     public static function createPost($title, $full_text, $file_comment, $blog_id)
     {
@@ -405,20 +429,24 @@ class Blog
             return $last_post_id;
         } else {
             echo Display::return_message(get_lang('UplNoFileUploaded'), 'error');
+
+            return 0;
         }
     }
 
     /**
-     * Edits a post in a given blog
+     * Edits a post in a given blog.
+     *
      * @author Toon Keppens
-     * @param int $post_id The internal ID of the post to edit
-     * @param string $title The title
+     *
+     * @param int    $post_id   The internal ID of the post to edit
+     * @param string $title     The title
      * @param string $full_text The full post text
-     * @param int $blog_id The internal ID of the blog in which the post is located
+     * @param int    $blog_id   The internal ID of the blog in which the post is located
      */
     public static function editPost($post_id, $title, $full_text, $blog_id)
     {
-        $tbl_blogs_posts = Database::get_course_table(TABLE_BLOGS_POSTS);
+        $table = Database::get_course_table(TABLE_BLOGS_POSTS);
         $course_id = api_get_course_int_id();
         $title = Database::escape_string($title);
         $full_text = Database::escape_string($full_text);
@@ -426,7 +454,7 @@ class Blog
         $blog_id = intval($blog_id);
 
         // Create the post
-        $sql = "UPDATE $tbl_blogs_posts SET
+        $sql = "UPDATE $table SET
                 title = '$title',
                 full_text = '$full_text'
                 WHERE c_id = $course_id AND post_id = $post_id AND blog_id = $blog_id
@@ -435,8 +463,10 @@ class Blog
     }
 
     /**
-     * Deletes an article and its comments
+     * Deletes an article and its comments.
+     *
      * @author Toon Keppens
+     *
      * @param int $blog_id The internal blog ID
      * @param int $post_id The internal post ID
      */
@@ -470,15 +500,17 @@ class Blog
     }
 
     /**
-     * Creates a comment on a post in a given blog
+     * Creates a comment on a post in a given blog.
+     *
      * @author Toon Keppens
-     * @param string $title The comment title
-     * @param string $full_text The full text of the comment
+     *
+     * @param string $title        The comment title
+     * @param string $full_text    The full text of the comment
      * @param string $file_comment A comment on a file, if any was uploaded
-     * @param int $blog_id The internal blog ID
-     * @param int $post_id The internal post ID
-     * @param int $parent_id The internal parent post ID
-     * @param int $task_id The internal task ID (if any)
+     * @param int    $blog_id      The internal blog ID
+     * @param int    $post_id      The internal post ID
+     * @param int    $parent_id    The internal parent post ID
+     * @param int    $task_id      The internal task ID (if any)
      */
     public static function createComment(
         $title,
@@ -568,10 +600,12 @@ class Blog
     }
 
     /**
-     * Deletes a comment from a blogpost
+     * Deletes a comment from a blogpost.
+     *
      * @author Toon Keppens
-     * @param int $blog_id The internal blog ID
-     * @param int $post_id The internal post ID
+     *
+     * @param int $blog_id    The internal blog ID
+     * @param int $post_id    The internal post ID
      * @param int $comment_id The internal comment ID
      */
     public static function deleteComment($blog_id, $post_id, $comment_id)
@@ -611,13 +645,15 @@ class Blog
     }
 
     /**
-     * Creates a new task in a blog
+     * Creates a new task in a blog.
+     *
      * @author Toon Keppens
-     * @param int $blog_id
+     *
+     * @param int    $blog_id
      * @param string $title
      * @param string $description
-     * @param string $articleDelete Set to 'on' to register as 'article_delete' in tasks_permissions
-     * @param string $articleEdit Set to 'on' to register as 'article_edit' in tasks_permissions
+     * @param string $articleDelete  Set to 'on' to register as 'article_delete' in tasks_permissions
+     * @param string $articleEdit    Set to 'on' to register as 'article_edit' in tasks_permissions
      * @param string $commentsDelete Set to 'on' to register as 'article_comments_delete' in tasks permissions
      * @param string $color
      */
@@ -694,16 +730,18 @@ class Blog
     }
 
     /**
-     * Edit a task in a blog
+     * Edit a task in a blog.
+     *
      * @author Toon Keppens
-     * @param int $blog_id The internal blog ID
-     * @param int $task_id The internal task ID
-     * @param string $title The task title
-     * @param string $description The task description
-     * @param string $articleDelete Set to 'on' to register as 'article_delete' in tasks_permissions
-     * @param string $articleEdit Set to 'on' to register as 'article_edit' in tasks_permissions
+     *
+     * @param int    $blog_id        The internal blog ID
+     * @param int    $task_id        The internal task ID
+     * @param string $title          The task title
+     * @param string $description    The task description
+     * @param string $articleDelete  Set to 'on' to register as 'article_delete' in tasks_permissions
+     * @param string $articleEdit    Set to 'on' to register as 'article_edit' in tasks_permissions
      * @param string $commentsDelete Set to 'on' to register as 'article_comments_delete' in tasks permissions
-     * @param string $color The color code
+     * @param string $color          The color code
      */
     public static function editTask(
         $blog_id,
@@ -776,41 +814,41 @@ class Blog
     }
 
     /**
-     * Deletes a task from a blog
+     * Deletes a task from a blog.
+     *
      * @param int $blog_id
      * @param int $task_id
-     * @return void
      */
     public static function deleteTask($blog_id, $task_id)
     {
-        $tbl_blogs_tasks = Database::get_course_table(TABLE_BLOGS_TASKS);
+        $table = Database::get_course_table(TABLE_BLOGS_TASKS);
         $course_id = api_get_course_int_id();
         $blog_id = intval($blog_id);
         $task_id = intval($task_id);
 
         // Delete posts
-        $sql = "DELETE FROM $tbl_blogs_tasks
+        $sql = "DELETE FROM $table
                 WHERE c_id = $course_id AND blog_id = $blog_id AND task_id = $task_id";
         Database::query($sql);
     }
 
     /**
-     * Deletes an assigned task from a blog
+     * Deletes an assigned task from a blog.
+     *
      * @param int $blog_id
      * @param int $task_id
      * @param int $user_id
-     * @return void
      */
     public static function deleteAssignedTask($blog_id, $task_id, $user_id)
     {
-        $tbl_blogs_tasks_rel_user = Database::get_course_table(TABLE_BLOGS_TASKS_REL_USER);
+        $table = Database::get_course_table(TABLE_BLOGS_TASKS_REL_USER);
         $course_id = api_get_course_int_id();
         $blog_id = intval($blog_id);
         $task_id = intval($task_id);
         $user_id = intval($user_id);
 
         // Delete posts
-        $sql = "DELETE FROM $tbl_blogs_tasks_rel_user
+        $sql = "DELETE FROM $table
                 WHERE
                     c_id = $course_id AND
                     blog_id = $blog_id AND
@@ -820,8 +858,10 @@ class Blog
     }
 
     /**
-     * Get personal task list
+     * Get personal task list.
+     *
      * @author Toon Keppens
+     *
      * @return string Returns an unsorted list (<ul></ul>) with the users' tasks
      */
     public static function getPersonalTasksList()
@@ -855,11 +895,9 @@ class Blog
             if (Database::num_rows($result) > 0) {
                 $html .= '<ul>';
                 while ($mytask = Database::fetch_array($result)) {
-                    $html .= '<li><a href="blog.php?action=execute_task&blog_id='.$mytask['blog_id'].'&task_id='.stripslashes(
-                            $mytask['task_id']
-                        ).'" title="[Blog: '.stripslashes($mytask['blog_name']).'] '.get_lang(
-                            'ExecuteThisTask'
-                        ).'">'.stripslashes($mytask['title']).'</a></li>';
+                    $html .= '<li>
+                            <a href="blog.php?action=execute_task&blog_id='.$mytask['blog_id'].'&task_id='.intval($mytask['task_id']).'" title="[Blog: '.stripslashes($mytask['blog_name']).'] '.get_lang('ExecuteThisTask').'">'.
+                        stripslashes($mytask['title']).'</a></li>';
                 }
                 $html .= '<ul>';
             } else {
@@ -873,10 +911,11 @@ class Blog
     }
 
     /**
-     * Changes the visibility of a blog
+     * Changes the visibility of a blog.
+     *
      * @author Toon Keppens
-     * @param Integer $blog_id
-     * @return void
+     *
+     * @param int $blog_id
      */
     public static function changeBlogVisibility($blog_id)
     {
@@ -899,7 +938,8 @@ class Blog
             Database::query($sql);
 
             $sql = "DELETE FROM $tbl_tool
-                    WHERE c_id = $course_id AND name = '".Database::escape_string($title)."' LIMIT 1";
+                    WHERE c_id = $course_id AND name = '".Database::escape_string($title)."' 
+                    LIMIT 1";
             Database::query($sql);
         } else {
             // Change visibility state, add to course home.
@@ -920,17 +960,19 @@ class Blog
     }
 
     /**
-     * Display the search results
-     * @param int $blog_id
+     * Display the search results.
+     *
+     * @param int    $blog_id
      * @param string $query_string
+     *
      * @return string|array
      */
     public static function getSearchResults($blog_id, $query_string)
     {
-        $query_string = Database::escape_string($query_string);
         $query_string_parts = explode(' ', $query_string);
-        $query_string = array();
+        $query_string = [];
         foreach ($query_string_parts as $query_part) {
+            $query_part = Database::escape_string($query_part);
             $query_string[] = " full_text LIKE '%".$query_part."%' OR title LIKE '%".$query_part."%' ";
         }
         $query_string = '('.implode('OR', $query_string).')';
@@ -940,11 +982,14 @@ class Blog
     }
 
     /**
-     * Shows the posts of a blog
+     * Shows the posts of a blog.
+     *
      * @author Toon Keppens
-     * @param int $blog_id
+     *
+     * @param int    $blog_id
      * @param string $filter
-     * @param int $max_number_of_posts
+     * @param int    $max_number_of_posts
+     *
      * @return string|array
      */
     public static function getPosts($blog_id, $filter = '1=1', $max_number_of_posts = 20)
@@ -955,23 +1000,24 @@ class Blog
 
         $course_id = api_get_course_int_id();
         $blog_id = intval($blog_id);
-        $filter = Database::escape_string($filter);
         $max_number_of_posts = intval($max_number_of_posts);
-
         // Get posts and authors
         $sql = "SELECT post.*, user.lastname, user.firstname, user.username
                 FROM $tbl_blogs_posts post
                 INNER JOIN $tbl_users user
                 ON post.author_id = user.user_id
-                WHERE 	post.blog_id = $blog_id AND
-                        post.c_id = $course_id AND
-                        $filter
-                ORDER BY post_id DESC LIMIT 0, $max_number_of_posts";
+                WHERE 	
+                    post.blog_id = $blog_id AND
+                    post.c_id = $course_id AND
+                    $filter
+                ORDER BY post_id DESC 
+                LIMIT 0, $max_number_of_posts";
         $result = Database::query($sql);
 
         // Display
         if (Database::num_rows($result) > 0) {
             $limit = 200;
+            $listArticle = [];
             while ($blog_post = Database::fetch_array($result)) {
                 // Get number of comments
                 $sql = "SELECT COUNT(1) as number_of_comments
@@ -989,6 +1035,7 @@ class Blog
                     $blog_id,
                     $blog_post['post_id']
                 );
+
                 // Prepare data
                 $article = [
                     'id_blog' => $blog_post['blog_id'],
@@ -1003,16 +1050,13 @@ class Blog
                     'post_date' => Display::dateToStringAgoAndLongDate($blog_post['date_creation']),
                     'n_comments' => $blog_post_comments['number_of_comments'],
                     'files' => $fileArray,
-                    'score_ranking' => $scoreRanking
-
+                    'score_ranking' => $scoreRanking,
                 ];
 
                 $listArticle[] = $article;
-
             }
 
             return $listArticle;
-
         } else {
             if ($filter == '1=1') {
                 return get_lang('NoArticles');
@@ -1023,29 +1067,31 @@ class Blog
     }
 
     /**
-     * Display posts from a certain date
-     * @param int $blog_id
+     * Display posts from a certain date.
+     *
+     * @param int    $blog_id
      * @param string $query_string
+     *
      * @return string|array
      */
     public static function getDailyResults($blog_id, $query_string)
     {
-        //$date_output = $query_string;
         $date = explode('-', $query_string);
-        $query_string = ' DAYOFMONTH(date_creation) ='.intval($date[2]).' AND MONTH(date_creation) ='.intval($date[1]).' AND YEAR(date_creation) ='.intval($date[0]);
-        // Put date in correct output format
-        //$date_output = api_format_date($date_output, DATE_FORMAT_LONG);
-        // Display the posts
-        //echo '<span class="blogpost_title">' . get_lang('PostsOf') . ': ' . $date_output . '</span>';
+        $query_string = ' 
+            DAYOFMONTH(date_creation) ='.intval($date[2]).' AND 
+            MONTH(date_creation) ='.intval($date[1]).' AND 
+            YEAR(date_creation) ='.intval($date[0]);
         $list = self::getPosts($blog_id, $query_string);
 
         return $list;
     }
 
     /**
-     * Displays a post and his comments
+     * Displays a post and his comments.
+     *
      * @param int $blog_id
      * @param int $post_id
+     *
      * @return array
      */
     public static function getSinglePost($blog_id, $post_id)
@@ -1109,7 +1155,12 @@ class Blog
                 ).'" onclick="javascript:if(!confirm(\''.addslashes(
                     api_htmlentities(get_lang("ConfirmYourChoice"), ENT_QUOTES, $charset)
                 ).'\')) return false;">';
-            $blogActions .= Display::return_icon('delete.png', get_lang('Delete'), null, ICON_SIZE_TINY);
+            $blogActions .= Display::return_icon(
+                'delete.png',
+                get_lang('Delete'),
+                null,
+                ICON_SIZE_TINY
+            );
             $blogActions .= '</a>';
         }
         $scoreRanking = self::displayRating('post', $blog_id, $post_id);
@@ -1121,7 +1172,10 @@ class Blog
             'author' => $blog_post['firstname'].' '.$blog_post['lastname'],
             'username' => $blog_post['username'],
             'title' => stripslashes($blog_post['title']),
-            'extract' => api_get_short_text_from_html(stripslashes($blog_post['full_text']), 400),
+            'extract' => api_get_short_text_from_html(
+                stripslashes($blog_post['full_text']),
+                400
+            ),
             'content' => $post_text,
             'post_date' => Display::dateToStringAgoAndLongDate($blog_post['date_creation']),
             'n_comments' => $blog_post_comments['number_of_comments'],
@@ -1133,7 +1187,7 @@ class Blog
             'score_ranking' => (int) $scoreRanking,
             'frm_rating' => api_is_allowed('BLOG_'.$blog_id, 'article_rate')
                 ? self::displayRatingCreateForm('post', $blog_id, $post_id)
-                : null
+                : null,
         ];
 
         return $article;
@@ -1147,6 +1201,7 @@ class Blog
      * @param int $blog_id
      * @param int $post_id
      * @param int $task_id
+     *
      * @return array
      */
     public static function getThreadedComments(
@@ -1247,7 +1302,12 @@ class Blog
                 'actions' => $commentActions,
                 'form_ranking' => $ratingSelect,
                 'score_ranking' => $scoreRanking,
-                'comments' => self::getThreadedComments($comment['iid'], $next_level, $blog_id, $post_id)
+                'comments' => self::getThreadedComments(
+                    $comment['iid'],
+                    $next_level,
+                    $blog_id,
+                    $post_id
+                ),
             ];
 
             $listComments[] = $comments;
@@ -1257,13 +1317,16 @@ class Blog
     }
 
     /**
-     * Shows the rating form if not already rated by that user
+     * Shows the rating form if not already rated by that user.
+     *
      * @author Toon Keppens
+     *
      * @param string $type
-     * @param int $blog_id
-     * @param int $post_id
-     * @param int $comment_id
-     * @return void
+     * @param int    $blog_id
+     * @param int    $post_id
+     * @param int    $comment_id
+     *
+     * @return string
      */
     public static function displayRatingCreateForm($type, $blog_id, $post_id, $comment_id = null)
     {
@@ -1315,7 +1378,15 @@ class Blog
                 $html .= '<div class="form-group">';
                 $html .= '<label class="col-sm-3 control-label">'.get_lang('RateThis').'</label>';
                 $html .= '<div class="col-sm-9">';
-                $html .= '<select  class="selectpicker" name="rating" onchange="document.forms[\'frm_rating_'.$type.'_'.$comment_id.'\'].submit()"><option value="">-</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option></select><input type="hidden" name="action" value="view_post" /><input type="hidden" name="type" value="'.$type.'" /><input type="hidden" name="do" value="rate" /><input type="hidden" name="blog_id" value="'.$blog_id.'" /><input type="hidden" name="post_id" value="'.$post_id.'" /><input type="hidden" name="comment_id" value="'.$comment_id.'" />';
+                $html .= '<select  class="selectpicker" name="rating" onchange="document.forms[\'frm_rating_'.$type.'_'.$comment_id.'\'].submit()">';
+                $html .= '<option value="">-</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
+                         </select>
+                         <input type="hidden" name="action" value="view_post" />
+                        <input type="hidden" name="type" value="'.$type.'" />
+                        <input type="hidden" name="do" value="rate" />
+                        <input type="hidden" name="blog_id" value="'.$blog_id.'" />
+                        <input type="hidden" name="post_id" value="'.$post_id.'" />
+                        <input type="hidden" name="comment_id" value="'.$comment_id.'" />';
                 $html .= '</div>';
                 $html .= '</div>';
                 $html .= '</form>';
@@ -1328,22 +1399,24 @@ class Blog
     }
 
     /**
-     * Shows the rating of user
+     * Shows the rating of user.
+     *
      * @param string $type
-     * @param integer $blog_id
-     * @param integer $item_id
-     * @return array
+     * @param int    $blog_id
+     * @param int    $item_id
+     *
+     * @return float
      */
     public static function displayRating($type, $blog_id, $item_id)
     {
-        $tbl_blogs_rating = Database::get_course_table(TABLE_BLOGS_RATING);
+        $table = Database::get_course_table(TABLE_BLOGS_RATING);
         $course_id = api_get_course_int_id();
         $blog_id = intval($blog_id);
         $item_id = intval($item_id);
         $type = Database::escape_string($type);
 
         // Calculate rating
-        $sql = "SELECT AVG(rating) as rating FROM $tbl_blogs_rating
+        $sql = "SELECT AVG(rating) as rating FROM $table
                 WHERE
                     c_id = $course_id AND
                     blog_id = $blog_id AND
@@ -1356,11 +1429,13 @@ class Blog
     }
 
     /**
-     * Displays the form to create a new post
+     * Displays the form to create a new post.
+     *
      * @author Toon Keppens
      *
      * @param int $blog_id
      * @param int $post_id
+     *
      * @return string HTML form
      */
     public static function displayCommentCreateForm($blog_id, $post_id)
@@ -1376,17 +1451,17 @@ class Blog
                 'action' => 'view_post',
                 'blog_id' => $blog_id,
                 'post_id' => $post_id,
-                'task_id' => $taskId
+                'task_id' => $taskId,
             ]),
             null,
-            array('enctype' => 'multipart/form-data')
+            ['enctype' => 'multipart/form-data']
         );
 
         $header = $taskId ? get_lang('ExecuteThisTask') : get_lang('AddNewComment');
         $form->addHeader($header);
         $form->addText('title', get_lang('Title'));
 
-        $config = array();
+        $config = [];
         if (!api_is_allowed_to_edit()) {
             $config['ToolbarSet'] = 'ProjectComment';
         } else {
@@ -1433,7 +1508,7 @@ class Blog
                     'blog_id' => $blog_id,
                     'post_id' => $post_id,
                     'action' => 'view_post',
-                    'task_id' => $taskId
+                    'task_id' => $taskId,
                 ])
             );
             exit;
@@ -1443,15 +1518,16 @@ class Blog
     }
 
     /**
-     * Adds rating to a certain post or comment
+     * Adds rating to a certain post or comment.
+     *
      * @author Toon Keppens
      *
      * @param string $type
-     * @param int $blog_id
-     * @param int $item_id
-     * @param int $rating
+     * @param int    $blog_id
+     * @param int    $item_id
+     * @param int    $rating
      *
-     * @return Boolean success
+     * @return bool success
      */
     public static function addRating($type, $blog_id, $item_id, $rating)
     {
@@ -1492,10 +1568,12 @@ class Blog
     }
 
     /**
-     * Displays the form to create a new post
+     * Displays the form to create a new post.
+     *
      * @author Toon Keppens
      *
-     * @param Integer $blog_id
+     * @param int $blog_id
+     *
      * @return string
      */
     public static function displayPostCreateForm($blog_id)
@@ -1510,12 +1588,12 @@ class Blog
             'post',
             api_get_path(WEB_CODE_PATH)."blog/blog.php?action=new_post&blog_id=".$blog_id."&".api_get_cidreq(),
             null,
-            array('enctype' => 'multipart/form-data')
+            ['enctype' => 'multipart/form-data']
         );
         $form->addHidden('post_title_edited', 'false');
         $form->addHeader(get_lang('NewPost'));
         $form->addText('title', get_lang('Title'));
-        $config = array();
+        $config = [];
         $config['ToolbarSet'] = !api_is_allowed_to_edit() ? 'ProjectStudent' : 'Project';
         $form->addHtmlEditor('full_text', get_lang('Content'), false, false, $config);
         $form->addFile('user_upload', get_lang('AddAnAttachment'));
@@ -1551,11 +1629,13 @@ class Blog
     }
 
     /**
-     * Displays the form to edit a post
+     * Displays the form to edit a post.
+     *
      * @author Toon Keppens
      *
      * @param int $blog_id
      * @param int $post_id
+     *
      * @return string
      */
     public static function displayPostEditForm($blog_id, $post_id)
@@ -1606,10 +1686,12 @@ class Blog
     }
 
     /**
-     * Displays a list of tasks in this blog
+     * Displays a list of tasks in this blog.
+     *
      * @author Toon Keppens
      *
      * @param int $blog_id
+     *
      * @return string
      */
     public static function displayTasksList($blog_id)
@@ -1624,17 +1706,17 @@ class Blog
             global $color2;
 
             $html .= '<div class="actions">';
-            $html .= '<a href="'.api_get_self().'?action=manage_tasks&blog_id='.$blog_id.'&do=add">';
+            $html .= '<a href="'.api_get_self().'?action=manage_tasks&blog_id='.$blog_id.'&do=add&'.api_get_cidreq().'">';
             $html .= Display::return_icon('blog_newtasks.gif', get_lang('AddTasks'));
             $html .= get_lang('AddTasks').'</a> ';
-            $html .= '<a href="'.api_get_self().'?action=manage_tasks&blog_id='.$blog_id.'&do=assign">';
+            $html .= '<a href="'.api_get_self().'?action=manage_tasks&blog_id='.$blog_id.'&do=assign&'.api_get_cidreq().'">';
             $html .= Display::return_icon('blog_task.gif', get_lang('AssignTasks'));
             $html .= get_lang('AssignTasks').'</a>';
             $html .= Display::url(
                 Display::return_icon('blog_admin_users.png', get_lang('RightsManager')),
                 api_get_self().'?'.http_build_query([
                     'action' => 'manage_rights',
-                    'blog_id' => $blog_id
+                    'blog_id' => $blog_id,
                 ]),
                 ['title' => get_lang('ManageRights')]
             );
@@ -1648,7 +1730,6 @@ class Blog
                 ."<th><b>".get_lang('Description')."</b></th>"
                 ."<th><b>".get_lang('Color')."</b></th>"
                 ."<th width='50'><b>".get_lang('Modify')."</b></th></tr>";
-
 
             $sql = " SELECT
                         blog_id,
@@ -1666,10 +1747,9 @@ class Blog
             while ($task = Database::fetch_array($result)) {
                 $counter++;
                 $css_class = (($counter % 2) == 0) ? "row_odd" : "row_even";
-                $delete_icon = ($task['system_task'] == '1') ? "delete_na.png" : "delete.png";
-                $delete_title = ($task['system_task'] == '1') ? get_lang('DeleteSystemTask') : get_lang('DeleteTask');
-                $delete_link = ($task['system_task'] == '1') ? '#' : api_get_self(
-                    ).'?action=manage_tasks&blog_id='.$task['blog_id'].'&do=delete&task_id='.$task['task_id'];
+                $delete_icon = $task['system_task'] == '1' ? "delete_na.png" : "delete.png";
+                $delete_title = $task['system_task'] == '1' ? get_lang('DeleteSystemTask') : get_lang('DeleteTask');
+                $delete_link = $task['system_task'] == '1' ? '#' : api_get_self().'?action=manage_tasks&blog_id='.$task['blog_id'].'&do=delete&task_id='.$task['task_id'].'&'.api_get_cidreq();
                 $delete_confirm = ($task['system_task'] == '1') ? '' : 'onclick="javascript:if(!confirm(\''.addslashes(
                         api_htmlentities(get_lang("ConfirmYourChoice"), ENT_QUOTES, $charset)
                     ).'\')) return false;"';
@@ -1679,8 +1759,7 @@ class Blog
                 $html .= '<td>'.Security::remove_XSS($task['description']).'</td>';
                 $html .= '<td><span style="background-color: #'.$task['color'].'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>';
                 $html .= '<td width="50">';
-                $html .= '<a href="'.api_get_self(
-                    ).'?action=manage_tasks&blog_id='.$task['blog_id'].'&do=edit&task_id='.$task['task_id'].'">';
+                $html .= '<a href="'.api_get_self().'?action=manage_tasks&blog_id='.$task['blog_id'].'&do=edit&task_id='.$task['task_id'].'&'.api_get_cidreq().'">';
                 $html .= Display::return_icon('edit.png', get_lang('EditTask'));
                 $html .= "</a>";
                 $html .= '<a href="'.$delete_link.'"';
@@ -1698,15 +1777,16 @@ class Blog
     }
 
     /**
-     * Displays a list of tasks assigned to a user in this blog
+     * Displays a list of tasks assigned to a user in this blog.
+     *
      * @author Toon Keppens
      *
      * @param int $blog_id
+     *
      * @return string
      */
     public static function displayAssignedTasksList($blog_id)
     {
-        // Init
         $tbl_users = Database::get_main_table(TABLE_MAIN_USER);
         $tbl_blogs_tasks = Database::get_course_table(TABLE_BLOGS_TASKS);
         $tbl_blogs_tasks_rel_user = Database::get_course_table(TABLE_BLOGS_TASKS_REL_USER);
@@ -1744,8 +1824,7 @@ class Blog
             $css_class = (($counter % 2) == 0) ? "row_odd" : "row_even";
             $delete_icon = ($assignment['system_task'] == '1') ? "delete_na.png" : "delete.png";
             $delete_title = ($assignment['system_task'] == '1') ? get_lang('DeleteSystemTask') : get_lang('DeleteTask');
-            $delete_link = ($assignment['system_task'] == '1') ? '#' : api_get_self(
-                ).'?action=manage_tasks&blog_id='.$assignment['blog_id'].'&do=delete&task_id='.$assignment['task_id'];
+            $delete_link = ($assignment['system_task'] == '1') ? '#' : api_get_self().'?action=manage_tasks&blog_id='.$assignment['blog_id'].'&do=delete&task_id='.$assignment['task_id'].'&'.api_get_cidreq();
             $delete_confirm = ($assignment['system_task'] == '1') ? '' : 'onclick="javascript:if(!confirm(\''.addslashes(
                     api_htmlentities(get_lang("ConfirmYourChoice"), ENT_QUOTES, $charset)
                 ).'\')) return false;"';
@@ -1754,23 +1833,19 @@ class Blog
 
             $return .= '<tr class="'.$css_class.'" valign="top">';
             $return .= '<td width="240">'.Display::tag(
-                    'span',
-                    api_get_person_name($assignment['firstname'], $assignment['lastname']),
-                    array('title' => $username)
-                ).'</td>';
+                'span',
+                api_get_person_name($assignment['firstname'], $assignment['lastname']),
+                ['title' => $username]
+            ).'</td>';
             $return .= '<td>'.stripslashes($assignment['title']).'</td>';
             $return .= '<td>'.stripslashes($assignment['description']).'</td>';
             $return .= '<td>'.$assignment['target_date'].'</td>';
             $return .= '<td width="50">';
-            $return .= '<a href="'.api_get_self(
-                ).'?action=manage_tasks&blog_id='.$assignment['blog_id'].'&do=edit_assignment&task_id='.$assignment['task_id'].'&user_id='.$assignment['user_id'].'">';
+            $return .= '<a href="'.api_get_self().'?action=manage_tasks&blog_id='.$assignment['blog_id'].'&do=edit_assignment&task_id='.$assignment['task_id'].'&user_id='.$assignment['user_id'].'&'.api_get_cidreq().'">';
             $return .= Display::return_icon('edit.png', get_lang('EditTask'));
             $return .= "</a>";
-            $return .= '<a href="'.api_get_self(
-                ).'?action=manage_tasks&blog_id='.$assignment['blog_id'].'&do=delete_assignment&task_id='.$assignment['task_id'].'&user_id='.$assignment['user_id'].'" ';
-            $return .= 'onclick="javascript:if(!confirm(\''.addslashes(
-                    api_htmlentities(get_lang("ConfirmYourChoice"), ENT_QUOTES, $charset)
-                ).'\')) return false;"';
+            $return .= '<a href="'.api_get_self().'?action=manage_tasks&blog_id='.$assignment['blog_id'].'&do=delete_assignment&task_id='.$assignment['task_id'].'&user_id='.$assignment['user_id'].'&'.api_get_cidreq().'" ';
+            $return .= 'onclick="javascript:if(!confirm(\''.addslashes(api_htmlentities(get_lang("ConfirmYourChoice"), ENT_QUOTES, $charset)).'\')) return false;"';
             $return .= Display::return_icon($delete_icon, $delete_title);
             $return .= "</a>";
             $return .= '</td>';
@@ -1782,17 +1857,21 @@ class Blog
     }
 
     /**
-     * Displays new task form
+     * Displays new task form.
+     *
      * @todo use FormValidator
+     *
      * @author Toon Keppens
+     *
      * @param int $blog_id
+     *
      * @return string HTML form
      */
     public static function displayTaskCreateForm($blog_id)
     {
         $blog_id = intval($blog_id);
         // Init
-        $colors = array(
+        $colors = [
             'FFFFFF',
             'FFFF99',
             'FFCC99',
@@ -1808,7 +1887,7 @@ class Blog
             '0033FF',
             '003366',
             '000000',
-        );
+        ];
 
         // form
         $return = '<form name="add_task" method="post" action="blog.php?action=manage_tasks&blog_id='.$blog_id.'">';
@@ -1861,7 +1940,6 @@ class Blog
         $return .= '		</div>
                 </div>';
 
-
         // task color
         $return .= '	<div class="control-group">
                     <label class="control-label">
@@ -1893,10 +1971,13 @@ class Blog
     }
 
     /**
-     * Displays edit task form
+     * Displays edit task form.
+     *
      * @author Toon Keppens
+     *
      * @param int $blog_id
      * @param int $task_id
+     *
      * @return string
      */
     public static function displayTaskEditForm($blog_id, $task_id)
@@ -1906,7 +1987,7 @@ class Blog
         $blog_id = intval($blog_id);
         $task_id = intval($task_id);
 
-        $colors = array(
+        $colors = [
             'FFFFFF',
             'FFFF99',
             'FFCC99',
@@ -1922,7 +2003,7 @@ class Blog
             '0033FF',
             '003366',
             '000000',
-        );
+        ];
 
         $sql = "SELECT blog_id, task_id, title, description, color FROM $tbl_blogs_tasks 
                 WHERE c_id = $course_id AND task_id = $task_id";
@@ -1949,7 +2030,7 @@ class Blog
                 WHERE c_id = $course_id AND task_id = $task_id";
         $result = Database::query($sql);
 
-        $arrPermissions = array();
+        $arrPermissions = [];
 
         while ($row = Database::fetch_array($result)) {
             $arrPermissions[] = $row['action'];
@@ -1996,7 +2077,7 @@ class Blog
             $style = 'style="background-color: #'.$color.'"';
             $return .= '<option value="'.$color.'" '.$style.' '.$selected.' >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>';
         }
-        $return .= '			   </select>
+        $return .= '</select>
                           </td>
                         </tr>
                         <tr>
@@ -2014,9 +2095,9 @@ class Blog
     }
 
     /**
-     * Displays assign task form
-     * @author Toon Keppens
+     * Displays assign task form.
      *
+     * @author Toon Keppens
      */
     public static function displayTaskAssignmentForm($blog_id)
     {
@@ -2024,14 +2105,16 @@ class Blog
         $form->addHidden('assign_task_submit', 'true');
 
         return $form->returnForm()
-            . PHP_EOL
-            . '<div style="clear: both; margin-bottom:10px;"></div>';
+            .PHP_EOL
+            .'<div style="clear: both; margin-bottom:10px;"></div>';
     }
 
     /**
-     * Returns an HTML form to assign a task
+     * Returns an HTML form to assign a task.
+     *
      * @param $blog_id
-     * @return string FormValidator
+     *
+     * @return FormValidator
      */
     public static function getTaskAssignmentForm($blog_id)
     {
@@ -2049,7 +2132,7 @@ class Blog
                 WHERE blogs_rel_user.c_id = $course_id AND blogs_rel_user.blog_id = $blog_id";
         $result = Database::query($sql);
 
-        $options = array();
+        $options = [];
         while ($user = Database::fetch_array($result)) {
             $options[$user['user_id']] = api_get_person_name($user['firstname'], $user['lastname']);
         }
@@ -2068,7 +2151,7 @@ class Blog
                 ORDER BY system_task, title";
         $result = Database::query($sql);
 
-        $taskOptions = array();
+        $taskOptions = [];
         while ($task = Database::fetch_array($result)) {
             $taskOptions[$task['task_id']] = stripslashes($task['title']);
         }
@@ -2093,16 +2176,19 @@ class Blog
     }
 
     /**
-     * Displays assign task form
+     * Displays assign task form.
+     *
      * @author Toon Keppens
+     *
      * @param int $blog_id
      * @param int $task_id
      * @param int $user_id
+     *
      * @return string HTML form
      */
     public static function displayAssignedTaskEditForm($blog_id, $task_id, $user_id)
     {
-        $tbl_blogs_tasks_rel_user = Database::get_course_table(TABLE_BLOGS_TASKS_REL_USER);
+        $table = Database::get_course_table(TABLE_BLOGS_TASKS_REL_USER);
 
         $course_id = api_get_course_int_id();
         $blog_id = intval($blog_id);
@@ -2112,7 +2198,7 @@ class Blog
         // Get assign date;
         $sql = "
             SELECT target_date
-            FROM $tbl_blogs_tasks_rel_user
+            FROM $table
             WHERE c_id = $course_id AND
                   blog_id = $blog_id AND
                   user_id = $user_id AND
@@ -2138,16 +2224,16 @@ class Blog
     }
 
     /**
-     * Assigns a task to a user in a blog
-     * @param int $blog_id
-     * @param int $user_id
-     * @param int $task_id
+     * Assigns a task to a user in a blog.
+     *
+     * @param int    $blog_id
+     * @param int    $user_id
+     * @param int    $task_id
      * @param string $target_date date
-     * @return void
      */
     public static function assignTask($blog_id, $user_id, $task_id, $target_date)
     {
-        $tbl_blogs_tasks_rel_user = Database::get_course_table(TABLE_BLOGS_TASKS_REL_USER);
+        $table = Database::get_course_table(TABLE_BLOGS_TASKS_REL_USER);
         $course_id = api_get_course_int_id();
         $blog_id = intval($blog_id);
         $user_id = intval($user_id);
@@ -2156,7 +2242,7 @@ class Blog
 
         $sql = "
             SELECT COUNT(*) as 'number'
-            FROM $tbl_blogs_tasks_rel_user
+            FROM $table
             WHERE c_id = $course_id 
             AND blog_id = $blog_id 
             AND	user_id = $user_id 
@@ -2167,7 +2253,7 @@ class Blog
 
         if ($row['number'] == 0) {
             $sql = "
-                INSERT INTO ".$tbl_blogs_tasks_rel_user." (
+                INSERT INTO ".$table." (
                     c_id,
                     blog_id,
                     user_id,
@@ -2186,7 +2272,8 @@ class Blog
     }
 
     /**
-     * Edit an assigned task
+     * Edit an assigned task.
+     *
      * @param $blog_id
      * @param $user_id
      * @param $task_id
@@ -2194,7 +2281,6 @@ class Blog
      * @param $old_user_id
      * @param $old_task_id
      * @param $old_target_date
-     * @return void
      */
     public static function updateAssignedTask(
         $blog_id,
@@ -2251,6 +2337,7 @@ class Blog
      *
      * @param int $blog_id
      * @param int $task_id
+     *
      * @return string
      */
     public static function displayPostSelectionForTask($blog_id, $task_id)
@@ -2294,7 +2381,7 @@ class Blog
                     Display::tag(
                         'span',
                         api_get_person_name($blog_post['firstname'], $blog_post['lastname']),
-                        array('title' => $username)
+                        ['title' => $username]
                     )
                 ).'<br />';
         }
@@ -2303,12 +2390,12 @@ class Blog
     }
 
     /**
-     * Unsubscribe a user from a given blog
+     * Unsubscribe a user from a given blog.
+     *
      * @author Toon Keppens
      *
      * @param int $blog_id
      * @param int $user_id
-     * @return void
      */
     public static function unsubscribeUser($blog_id, $user_id)
     {
@@ -2331,11 +2418,12 @@ class Blog
     /**
      * Displays the form to register users in a blog (in a course)
      * The listed users are users subscribed in the course.
+     *
      * @author Toon Keppens
      *
-     * @param Integer $blog_id
+     * @param int $blog_id
      *
-     * @return string Html Form with sortable table with users to subcribe in a blog, in a course.
+     * @return string html Form with sortable table with users to subcribe in a blog, in a course
      */
     public static function displayUserSubscriptionForm($blog_id)
     {
@@ -2361,29 +2449,29 @@ class Blog
                 WHERE blogs_rel_user.c_id = $course_id AND blogs_rel_user.blog_id = $blog_id";
         $result = Database::query($sql);
 
-        $blog_member_ids = array();
+        $blog_member_ids = [];
         while ($user = Database::fetch_array($result)) {
             $blog_member_ids[] = $user['user_id'];
         }
 
         // Set table headers
-        $column_header[] = array('', false, '');
+        $column_header[] = ['', false, ''];
         if ($is_western_name_order) {
-            $column_header[] = array(get_lang('FirstName'), true, '');
-            $column_header[] = array(get_lang('LastName'), true, '');
+            $column_header[] = [get_lang('FirstName'), true, ''];
+            $column_header[] = [get_lang('LastName'), true, ''];
         } else {
-            $column_header[] = array(get_lang('LastName'), true, '');
-            $column_header[] = array(get_lang('FirstName'), true, '');
+            $column_header[] = [get_lang('LastName'), true, ''];
+            $column_header[] = [get_lang('FirstName'), true, ''];
         }
-        $column_header[] = array(get_lang('Email'), false, '');
-        $column_header[] = array(get_lang('Register'), false, '');
+        $column_header[] = [get_lang('Email'), false, ''];
+        $column_header[] = [get_lang('Register'), false, ''];
 
         $student_list = CourseManager:: get_student_list_from_course_code(
             $currentCourse,
             false,
             $session_id
         );
-        $user_data = array();
+        $user_data = [];
 
         // Add users that are not in this blog to the list.
         foreach ($student_list as $key => $user) {
@@ -2392,22 +2480,33 @@ class Blog
             }
             if (!in_array($user['user_id'], $blog_member_ids)) {
                 $a_infosUser = api_get_user_info($user['user_id']);
-                $row = array();
+                $row = [];
                 $row[] = '<input type="checkbox" name="user[]" value="'.$a_infosUser['user_id'].'" '.((isset($_GET['selectall']) && $_GET['selectall'] == "subscribe") ? ' checked="checked" ' : '').'/>';
                 $username = api_htmlentities(sprintf(get_lang('LoginX'), $a_infosUser["username"]), ENT_QUOTES);
                 if ($is_western_name_order) {
                     $row[] = $a_infosUser["firstname"];
-                    $row[] = Display::tag('span', $a_infosUser["lastname"], array('title' => $username));
+                    $row[] = Display::tag(
+                        'span',
+                        $a_infosUser["lastname"],
+                        ['title' => $username]
+                    );
                 } else {
-                    $row[] = Display::tag('span', $a_infosUser["lastname"], array('title' => $username));
+                    $row[] = Display::tag(
+                        'span',
+                        $a_infosUser["lastname"],
+                        ['title' => $username]
+                    );
                     $row[] = $a_infosUser["firstname"];
                 }
-                $row[] = Display::icon_mailto_link($a_infosUser["email"]);
+                $row[] = Display::icon_mailto_link($a_infosUser['email']);
 
-                //Link to register users
-                if ($a_infosUser["user_id"] != api_get_user_id()) {
-                    $row[] = "<a class=\"btn btn-primary \" href=\"".api_get_self()."?action=manage_members&blog_id=$blog_id&register=yes&user_id=".$a_infosUser["user_id"]."\">".
-                        get_lang('Register')."</a>";
+                // Link to register users
+                if ($a_infosUser['user_id'] != api_get_user_id()) {
+                    $row[] = Display::url(
+                        get_lang('Register'),
+                        api_get_self()."?action=manage_members&blog_id=$blog_id&register=yes&user_id=".$a_infosUser["user_id"].'&'.api_get_cidreq(),
+                        ['class' => 'btn btn-primary']
+                    );
                 } else {
                     $row[] = '';
                 }
@@ -2418,11 +2517,11 @@ class Blog
         // Display
         $query_vars['action'] = 'manage_members';
         $query_vars['blog_id'] = $blog_id;
-        $html .= '<form class="form-inline" method="post" action="blog.php?action=manage_members&blog_id='.$blog_id.'">';
+        $html .= '<form class="form-inline" method="post" action="blog.php?action=manage_members&blog_id='.$blog_id.'&'.api_get_cidreq().'">';
         $html .= Display::return_sortable_table($column_header, $user_data, null, null, $query_vars);
-        $link = '';
-        $link .= isset ($_GET['action']) ? 'action='.Security::remove_XSS($_GET['action']).'&' : '';
-        $link .= "blog_id=$blog_id&";
+
+        $link = isset($_GET['action']) ? 'action='.Security::remove_XSS($_GET['action']).'&' : '';
+        $link .= "blog_id=$blog_id&".api_get_cidreq();
 
         $html .= '<a class="btn btn-default" href="blog.php?'.$link.'selectall=subscribe">'.get_lang('SelectAll').'</a> - ';
         $html .= '<a class="btn btn-default" href="blog.php?'.$link.'">'.get_lang('UnSelectAll').'</a> ';
@@ -2437,15 +2536,19 @@ class Blog
         $html .= '<button class="btn btn-default" type="submit">'.get_lang('Ok').'</button>';
         $html .= '</div>';
         $html .= '</form>';
+
         return $html;
     }
 
     /**
      * Displays the form to register users in a blog (in a course)
      * The listed users are users subcribed in the course.
+     *
      * @author Toon Keppens
+     *
      * @param int $blog_id
-     * @return false|null Form with sortable table with users to unsubcribe from a blog.
+     *
+     * @return false|null form with sortable table with users to unsubcribe from a blog
      */
     public static function displayUserUnsubscriptionForm($blog_id)
     {
@@ -2462,22 +2565,23 @@ class Blog
 
         $properties["width"] = "100%";
         //table column titles
-        $column_header[] = array('', false, '');
+        $column_header[] = ['', false, ''];
         if ($is_western_name_order) {
-            $column_header[] = array(get_lang('FirstName'), true, '');
-            $column_header[] = array(get_lang('LastName'), true, '');
+            $column_header[] = [get_lang('FirstName'), true, ''];
+            $column_header[] = [get_lang('LastName'), true, ''];
         } else {
-            $column_header[] = array(get_lang('LastName'), true, '');
-            $column_header[] = array(get_lang('FirstName'), true, '');
+            $column_header[] = [get_lang('LastName'), true, ''];
+            $column_header[] = [get_lang('FirstName'), true, ''];
         }
-        $column_header[] = array(get_lang('Email'), false, '');
-        $column_header[] = array(get_lang('TaskManager'), true, '');
-        $column_header[] = array(get_lang('UnRegister'), false, '');
+        $column_header[] = [get_lang('Email'), false, ''];
+        $column_header[] = [get_lang('TaskManager'), true, ''];
+        $column_header[] = [get_lang('UnRegister'), false, ''];
 
         $course_id = api_get_course_int_id();
 
         $sql = "SELECT user.user_id, user.lastname, user.firstname, user.email, user.username
-                FROM $tbl_users user INNER JOIN $tbl_blogs_rel_user blogs_rel_user
+                FROM $tbl_users user 
+                INNER JOIN $tbl_blogs_rel_user blogs_rel_user
                 ON user.user_id = blogs_rel_user.user_id
                 WHERE blogs_rel_user.c_id = $course_id AND  blogs_rel_user.blog_id = $blog_id";
 
@@ -2485,17 +2589,24 @@ class Blog
             return false;
         }
 
-        $user_data = array();
-
+        $user_data = [];
         while ($myrow = Database::fetch_array($sql_result)) {
-            $row = array();
+            $row = [];
             $row[] = '<input type="checkbox" name="user[]" value="'.$myrow['user_id'].'" '.((isset($_GET['selectall']) && $_GET['selectall'] == "unsubscribe") ? ' checked="checked" ' : '').'/>';
             $username = api_htmlentities(sprintf(get_lang('LoginX'), $myrow["username"]), ENT_QUOTES);
             if ($is_western_name_order) {
                 $row[] = $myrow["firstname"];
-                $row[] = Display::tag('span', $myrow["lastname"], array('title' => $username));
+                $row[] = Display::tag(
+                    'span',
+                    $myrow["lastname"],
+                    ['title' => $username]
+                );
             } else {
-                $row[] = Display::tag('span', $myrow["lastname"], array('title' => $username));
+                $row[] = Display::tag(
+                    'span',
+                    $myrow["lastname"],
+                    ['title' => $username]
+                );
                 $row[] = $myrow["firstname"];
             }
             $row[] = Display::icon_mailto_link($myrow["email"]);
@@ -2521,24 +2632,24 @@ class Blog
             //Link to register users
 
             if ($myrow["user_id"] != $_user['user_id']) {
-                $row[] = "<a class=\"btn btn-primary\" href=\"".api_get_self(
-                    )."?action=manage_members&blog_id=$blog_id&unregister=yes&user_id=".$myrow['user_id']."\">".get_lang(
-                        'UnRegister'
-                    )."</a>";
+                $row[] = Display::url(
+                    get_lang('UnRegister'),
+                    api_get_self()."?action=manage_members&blog_id=$blog_id&unregister=yes&user_id=".$myrow['user_id'].'&'.api_get_cidreq(),
+                    ['class' => 'btn btn-primary']
+                );
             } else {
                 $row[] = '';
             }
-
             $user_data[] = $row;
         }
 
         $query_vars['action'] = 'manage_members';
         $query_vars['blog_id'] = $blog_id;
-        $html .= '<form class="form-inline" method="post" action="blog.php?action=manage_members&blog_id='.$blog_id.'">';
+        $html .= '<form class="form-inline" method="post" action="blog.php?action=manage_members&blog_id='.$blog_id.'&'.api_get_cidreq().'">';
         $html .= Display::return_sortable_table($column_header, $user_data, null, null, $query_vars);
-        $link = '';
-        $link .= isset ($_GET['action']) ? 'action='.Security::remove_XSS($_GET['action']).'&' : '';
-        $link .= "blog_id=$blog_id&";
+
+        $link = isset($_GET['action']) ? 'action='.Security::remove_XSS($_GET['action']).'&' : '';
+        $link .= "blog_id=$blog_id&".api_get_cidreq();
 
         $html .= '<a class="btn btn-default" href="blog.php?'.$link.'selectall=unsubscribe">'.get_lang('SelectAll').'</a> - ';
         $html .= '<a class="btn btn-default" href="blog.php?'.$link.'">'.get_lang('UnSelectAll').'</a> ';
@@ -2559,27 +2670,36 @@ class Blog
 
     /**
      * Displays a matrix with selectboxes. On the left: users, on top: possible rights.
-     * The blog admin can thus select what a certain user can do in the current blog
+     * The blog admin can thus select what a certain user can do in the current blog.
      *
      * @param int $blog_id
+     *
+     * @return string
      */
     public static function displayUserRightsForm($blog_id)
     {
+        ob_start();
         echo '<legend>'.get_lang('RightsManager').'</legend>';
         echo '<br />';
 
         // Integration of patricks permissions system.
         require_once api_get_path(SYS_CODE_PATH).'permissions/blog_permissions.inc.php';
+        $content = ob_get_contents();
+        ob_get_clean();
+
+        return $content;
     }
 
     /**
-     * show the calender of the given month
+     * show the calender of the given month.
+     *
      * @author Patrick Cool
      * @author Toon Keppens
      *
-     * @param int $month The integer value of the month we are viewing
-     * @param int $year The 4-digit year indication e.g. 2005
+     * @param int $month   The integer value of the month we are viewing
+     * @param int $year    The 4-digit year indication e.g. 2005
      * @param int $blog_id
+     *
      * @return string html code
      */
     public static function displayMiniMonthCalendar($month, $year, $blog_id)
@@ -2590,8 +2710,8 @@ class Blog
         global $MonthsLong;
         $html = null;
 
-        $posts = array();
-        $tasks = array();
+        $posts = [];
+        $tasks = [];
 
         $tbl_users = Database::get_main_table(TABLE_MAIN_USER);
         $tbl_blogs_posts = Database::get_course_table(TABLE_BLOGS_POSTS);
@@ -2605,9 +2725,9 @@ class Blog
         $year = intval($year);
 
         //Handle leap year
-        $numberofdays = array(0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
+        $numberofdays = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
-        if (($year % 400 == 0) or ($year % 4 == 0 and $year % 100 <> 0)) {
+        if (($year % 400 == 0) or ($year % 4 == 0 and $year % 100 != 0)) {
             $numberofdays[2] = 29;
         }
 
@@ -2616,7 +2736,7 @@ class Blog
         $monthName = $MonthsLong[$month - 1];
 
         //Start the week on monday
-        $startdayofweek = $dayone['wday'] <> 0 ? ($dayone['wday'] - 1) : 6;
+        $startdayofweek = $dayone['wday'] != 0 ? ($dayone['wday'] - 1) : 6;
         $blogId = isset($_GET['blog_id']) ? intval($_GET['blog_id']) : null;
         $filter = isset($_GET['filter']) ? Security::remove_XSS($_GET['filter']) : null;
         $backwardsURL = api_get_self(
@@ -2750,7 +2870,6 @@ class Blog
 
     /**
      * Blog admin | Display the form to add a new blog.
-     * @return void (direct output)
      */
     public static function displayBlogCreateForm()
     {
@@ -2765,18 +2884,18 @@ class Blog
         $form->addElement('hidden', 'new_blog_submit', 'true');
         $form->addButtonSave(get_lang('SaveProject'));
 
-        $defaults = array(
+        $defaults = [
             'blog_name' => isset($_POST['blog_name']) ? Security::remove_XSS($_POST['blog_name']) : null,
             'blog_subtitle' => isset($_POST['blog_subtitle']) ? Security::remove_XSS($_POST['blog_subtitle']) : null,
-        );
+        ];
         $form->setDefaults($defaults);
         $form->display();
     }
 
     /**
      * Blog admin | Display the form to edit a blog.
+     *
      * @param int $blog_id
-     * @return void Direct output
      */
     public static function displayBlogEditForm($blog_id)
     {
@@ -2808,7 +2927,7 @@ class Blog
         $form->addElement('hidden', 'blog_id', $blog['blog_id']);
         $form->addButtonSave(get_lang('Save'));
 
-        $defaults = array();
+        $defaults = [];
         $defaults['blog_name'] = $blog['blog_name'];
         $defaults['blog_subtitle'] = $blog['blog_subtitle'];
         $form->setDefaults($defaults);
@@ -2816,8 +2935,7 @@ class Blog
     }
 
     /**
-     * Blog admin | Returns table with blogs in this course
-     * @return void Direct output
+     * Blog admin | Returns table with blogs in this course.
      */
     public static function displayBlogsList()
     {
@@ -2833,15 +2951,15 @@ class Blog
                 FROM $tbl_blogs WHERE c_id = $course_id
                 ORDER BY date_creation DESC";
         $result = Database::query($sql);
-        $list_info = array();
+        $list_info = [];
         if (Database::num_rows($result)) {
             while ($row_project = Database::fetch_row($result)) {
                 $list_info[] = $row_project;
             }
         }
 
-        $list_content_blog = array();
-        $list_body_blog = array();
+        $list_content_blog = [];
+        $list_body_blog = [];
 
         if (is_array($list_info)) {
             foreach ($list_info as $key => $info_log) {
@@ -2874,10 +2992,9 @@ class Blog
                 $my_image .= Display::return_icon('delete.png', get_lang('DeleteBlog'));
                 $my_image .= "</a>";
 
-
                 $list_body_blog[] = $my_image;
                 $list_content_blog[] = $list_body_blog;
-                $list_body_blog = array();
+                $list_body_blog = [];
             }
 
             $table = new SortableTableFromArrayConfig(
@@ -2894,12 +3011,16 @@ class Blog
     }
 
     /**
-     * Show a list with all the attachments according the parameter's
-     * @param int $blog_id the blog's id
-     * @param int $post_id the post's id
+     * Show a list with all the attachments according the parameter's.
+     *
+     * @param int $blog_id    the blog's id
+     * @param int $post_id    the post's id
      * @param int $comment_id the comment's id
+     *
      * @return array with the post info according the parameters
+     *
      * @author Julio Montoya
+     *
      * @version avril 2008, dokeos 1.8.5
      */
     public static function getBlogAttachments($blog_id, $post_id = 0, $comment_id = 0)
@@ -2909,14 +3030,14 @@ class Blog
         $blog_id = intval($blog_id);
         $comment_id = intval($comment_id);
         $post_id = intval($post_id);
-        $row = array();
+        $row = [];
         $where = '';
-        if (!empty ($post_id) && is_numeric($post_id)) {
+        if (!empty($post_id) && is_numeric($post_id)) {
             $where .= " AND post_id = $post_id ";
         }
 
-        if (!empty ($comment_id) && is_numeric($comment_id)) {
-            if (!empty ($post_id)) {
+        if (!empty($comment_id) && is_numeric($comment_id)) {
+            if (!empty($post_id)) {
                 $where .= ' AND ';
             }
             $where .= " comment_id = $comment_id ";
@@ -2939,11 +3060,13 @@ class Blog
 
     /**
      * Delete the all the attachments according the parameters.
+     *
      * @param int $blog_id
-     * @param int $post_id post's id
+     * @param int $post_id    post's id
      * @param int $comment_id the comment's id
-     * @return void
+     *
      * @author Julio Montoya
+     *
      * @version avril 2008, dokeos 1.8.5
      */
     public static function deleteAllBlogAttachments(
@@ -2961,12 +3084,12 @@ class Blog
         $where = null;
 
         // delete files in DB
-        if (!empty ($post_id) && is_numeric($post_id)) {
+        if (!empty($post_id) && is_numeric($post_id)) {
             $where .= " AND post_id = $post_id ";
         }
 
-        if (!empty ($comment_id) && is_numeric($comment_id)) {
-            if (!empty ($post_id)) {
+        if (!empty($comment_id) && is_numeric($comment_id)) {
+            if (!empty($post_id)) {
                 $where .= ' AND ';
             }
             $where .= " comment_id = $comment_id ";
@@ -2984,7 +3107,7 @@ class Blog
         while ($row = Database::fetch_row($result)) {
             $file = $updir.'/'.$row[0];
             if (Security::check_abs_path($file, $updir)) {
-                @ unlink($file);
+                @unlink($file);
             }
         }
         $sql = "DELETE FROM $blog_table_attachment
@@ -2993,10 +3116,12 @@ class Blog
     }
 
     /**
-     * Gets all the post from a given user id
-     * @param int $courseId
-     * @param int $userId
+     * Gets all the post from a given user id.
+     *
+     * @param int    $courseId
+     * @param int    $userId
      * @param string $courseCode
+     *
      * @return string
      */
     public static function getBlogPostFromUser($courseId, $userId, $courseCode)
@@ -3039,10 +3164,12 @@ class Blog
     }
 
     /**
-     * Gets all the post comments from a given user id
-     * @param int $courseId
-     * @param int $userId
+     * Gets all the post comments from a given user id.
+     *
+     * @param int    $courseId
+     * @param int    $userId
      * @param string $courseCode
+     *
      * @return string
      */
     public static function getBlogCommentsFromUser($courseId, $userId, $courseCode)
@@ -3080,10 +3207,12 @@ class Blog
     }
 
     /**
-     * Filter the post $fullText to get a extract of $length characters
+     * Filter the post $fullText to get a extract of $length characters.
+     *
      * @param string $fullText
-     * @param int $length
-     * @return null|string
+     * @param int    $length
+     *
+     * @return string|null
      */
     private static function getPostExtract($fullText, $length = BLOG_MAX_PREVIEW_CHARS)
     {

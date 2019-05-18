@@ -8,7 +8,7 @@ use Fhaculty\Graph\Graph;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * Class Sequence
+ * Class Sequence.
  *
  * @ORM\Table(name="sequence")
  * @ORM\Entity
@@ -16,43 +16,51 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class Sequence
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue()
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
      *
      * @ORM\Column(name="name", type="string")
      */
-    private $name;
+    protected $name;
 
     /**
      * @var string
      *
      * @ORM\Column(name="graph", type="text", nullable=true)
      */
-    private $graph;
+    protected $graph;
 
     /**
-     * @var \DateTime $created
+     * @var \DateTime
      *
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(name="created_at", type="datetime")
      */
-    private $createdAt;
+    protected $createdAt;
 
     /**
-     * @var \DateTime $updated
+     * @var \DateTime
      *
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(name="updated_at", type="datetime")
      */
-    private $updatedAt;
+    protected $updatedAt;
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->name;
+    }
 
     /**
      * @return int
@@ -64,6 +72,7 @@ class Sequence
 
     /**
      * @param int $id
+     *
      * @return Sequence
      */
     public function setId($id)
@@ -83,6 +92,7 @@ class Sequence
 
     /**
      * @param string $name
+     *
      * @return Sequence
      */
     public function setName($name)
@@ -91,7 +101,6 @@ class Sequence
 
         return $this;
     }
-
 
     /**
      * @return string
@@ -126,7 +135,7 @@ class Sequence
      */
     public function getUnSerializeGraph()
     {
-        return unserialize($this->graph);
+        return \UnserializeApi::unserialize('sequence_graph', $this->graph);
     }
 
     /**
@@ -140,14 +149,4 @@ class Sequence
 
         return $this;
     }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->name;
-    }
-
-
 }

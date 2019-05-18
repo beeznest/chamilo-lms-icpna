@@ -1,30 +1,24 @@
 <?php
-/**
- * NotificationModel.php
- * avanzu-admin
- * Date: 23.02.14
- */
 
 namespace Chamilo\ThemeBundle\Model;
 
-
+/**
+ * Class NotificationModel.
+ *
+ * @package Chamilo\ThemeBundle\Model
+ */
 class NotificationModel implements NotificationInterface
 {
-
-
     protected $type;
-
     protected $message;
-
     protected $icon;
 
-    function __construct($message = null, $type = 'info', $icon = 'fa fa-warning')
+    public function __construct($message = null, $type = 'info', $icon = 'fa fa-warning')
     {
         $this->message = $message;
-        $this->type    = $type;
-        $this->icon    = $icon;
+        $this->type = $type;
+        $this->icon = $icon;
     }
-
 
     /**
      * @param mixed $message
@@ -74,6 +68,7 @@ class NotificationModel implements NotificationInterface
     public function setIcon($icon)
     {
         $this->icon = $icon;
+
         return $this;
     }
 
@@ -89,5 +84,4 @@ class NotificationModel implements NotificationInterface
     {
         return $this->message;
     }
-
 }

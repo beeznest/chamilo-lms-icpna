@@ -1,11 +1,12 @@
 <?php
+/* For licensing terms, see /license.txt */
 
 namespace Chamilo\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * SearchEngineRef
+ * SearchEngineRef.
  *
  * @ORM\Table(name="search_engine_ref")
  * @ORM\Entity
@@ -17,51 +18,50 @@ class SearchEngineRef
      *
      * @ORM\Column(name="course_code", type="string", length=40, nullable=false)
      */
-    private $courseCode;
+    protected $courseCode;
 
     /**
      * @var string
      *
      * @ORM\Column(name="tool_id", type="string", length=100, nullable=false)
      */
-    private $toolId;
+    protected $toolId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="ref_id_high_level", type="integer", nullable=false)
      */
-    private $refIdHighLevel;
+    protected $refIdHighLevel;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="ref_id_second_level", type="integer", nullable=true)
      */
-    private $refIdSecondLevel;
+    protected $refIdSecondLevel;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="search_did", type="integer", nullable=false)
      */
-    private $searchDid;
+    protected $searchDid;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private $id;
-
-
+    protected $id;
 
     /**
-     * Set courseCode
+     * Set courseCode.
      *
      * @param string $courseCode
+     *
      * @return SearchEngineRef
      */
     public function setCourseCode($courseCode)
@@ -72,7 +72,7 @@ class SearchEngineRef
     }
 
     /**
-     * Get courseCode
+     * Get courseCode.
      *
      * @return string
      */
@@ -82,9 +82,10 @@ class SearchEngineRef
     }
 
     /**
-     * Set toolId
+     * Set toolId.
      *
      * @param string $toolId
+     *
      * @return SearchEngineRef
      */
     public function setToolId($toolId)
@@ -95,7 +96,7 @@ class SearchEngineRef
     }
 
     /**
-     * Get toolId
+     * Get toolId.
      *
      * @return string
      */
@@ -105,9 +106,10 @@ class SearchEngineRef
     }
 
     /**
-     * Set refIdHighLevel
+     * Set refIdHighLevel.
      *
-     * @param integer $refIdHighLevel
+     * @param int $refIdHighLevel
+     *
      * @return SearchEngineRef
      */
     public function setRefIdHighLevel($refIdHighLevel)
@@ -118,9 +120,9 @@ class SearchEngineRef
     }
 
     /**
-     * Get refIdHighLevel
+     * Get refIdHighLevel.
      *
-     * @return integer
+     * @return int
      */
     public function getRefIdHighLevel()
     {
@@ -128,9 +130,10 @@ class SearchEngineRef
     }
 
     /**
-     * Set refIdSecondLevel
+     * Set refIdSecondLevel.
      *
-     * @param integer $refIdSecondLevel
+     * @param int $refIdSecondLevel
+     *
      * @return SearchEngineRef
      */
     public function setRefIdSecondLevel($refIdSecondLevel)
@@ -141,9 +144,9 @@ class SearchEngineRef
     }
 
     /**
-     * Get refIdSecondLevel
+     * Get refIdSecondLevel.
      *
-     * @return integer
+     * @return int
      */
     public function getRefIdSecondLevel()
     {
@@ -151,9 +154,10 @@ class SearchEngineRef
     }
 
     /**
-     * Set searchDid
+     * Set searchDid.
      *
-     * @param integer $searchDid
+     * @param int $searchDid
+     *
      * @return SearchEngineRef
      */
     public function setSearchDid($searchDid)
@@ -164,9 +168,9 @@ class SearchEngineRef
     }
 
     /**
-     * Get searchDid
+     * Get searchDid.
      *
-     * @return integer
+     * @return int
      */
     public function getSearchDid()
     {
@@ -174,9 +178,9 @@ class SearchEngineRef
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {

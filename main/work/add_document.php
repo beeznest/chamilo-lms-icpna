@@ -6,11 +6,16 @@ require_once 'work.lib.php';
 
 $current_course_tool = TOOL_STUDENTPUBLICATION;
 
-$workId = isset($_GET['id']) ? intval($_GET['id']) : null;
-$docId = isset($_GET['document_id']) ? intval($_GET['document_id']) : null;
+$workId = isset($_GET['id']) ? (int) $_GET['id'] : null;
+$docId = isset($_GET['document_id']) ? (int) $_GET['document_id'] : null;
 $action = isset($_GET['action']) ? $_GET['action'] : null;
 
 if (empty($workId)) {
+    api_not_allowed(true);
+}
+
+$blockAddDocuments = api_get_configuration_value('block_student_publication_add_documents');
+if ($blockAddDocuments) {
     api_not_allowed(true);
 }
 
@@ -27,21 +32,22 @@ if (!api_is_allowed_to_edit()) {
 
 $courseInfo = api_get_course_info();
 
-$interbreadcrumb[] = array(
+$interbreadcrumb[] = [
     'url' => api_get_path(WEB_CODE_PATH).'work/work.php?'.api_get_cidreq(),
     'name' => get_lang('StudentPublications'),
-);
-$interbreadcrumb[] = array(
+];
+$interbreadcrumb[] = [
     'url' => api_get_path(WEB_CODE_PATH).'work/work_list_all.php?'.api_get_cidreq().'&id='.$workId,
     'name' => $my_folder_data['title'],
-);
-$interbreadcrumb[] = array('url' => '#', 'name' => get_lang('AddDocument'));
+];
+$interbreadcrumb[] = ['url' => '#', 'name' => get_lang('AddDocument')];
 
 switch ($action) {
     case 'delete':
         if (!empty($workId) && !empty($docId)) {
             deleteDocumentToWork($docId, $workId, api_get_course_int_id());
             $url = api_get_path(WEB_CODE_PATH).'work/add_document.php?id='.$workId.'&'.api_get_cidreq();
+            Display::addFlash(Display::return_message(get_lang('Deleted'), 'success'));
             header('Location: '.$url);
             exit;
         }
@@ -49,18 +55,18 @@ switch ($action) {
 }
 
 if (empty($docId)) {
-    Display :: display_header(null);
-
+    Display::display_header(null);
     $documents = getAllDocumentToWork($workId, api_get_course_int_id());
     if (!empty($documents)) {
         echo Display::page_subheader(get_lang('DocumentsAdded'));
         echo '<div class="well">';
+        $urlDocument = api_get_path(WEB_CODE_PATH).'work/add_document.php';
         foreach ($documents as $doc) {
             $documentId = $doc['document_id'];
             $docData = DocumentManager::get_document_data_by_id($documentId, $courseInfo['code']);
             if ($docData) {
-                $url = api_get_path(WEB_CODE_PATH).'work/add_document.php?action=delete&id='.$workId.'&document_id='.$documentId.'&'.api_get_cidreq();
-                $link = Display::url(get_lang('Delete'), $url);
+                $url = $urlDocument.'?action=delete&id='.$workId.'&document_id='.$documentId.'&'.api_get_cidreq();
+                $link = Display::url(get_lang('Remove'), $url, ['class' => 'btn btn-danger']);
                 echo $docData['title'].' '.$link.'<br />';
             }
         }
@@ -69,12 +75,16 @@ if (empty($docId)) {
 
     $documentTree = DocumentManager::get_document_preview(
         $courseInfo,
-        null,
+        false,
         null,
         api_get_session_id(),
         false,
         '/',
-        api_get_path(WEB_CODE_PATH).'work/add_document.php?id='.$workId.'&'.api_get_cidreq()
+        api_get_path(WEB_CODE_PATH).'work/add_document.php?id='.$workId.'&'.api_get_cidreq(),
+        false,
+        false,
+        false,
+        false
     );
     echo Display::page_subheader(get_lang('Documents'));
     echo $documentTree;
@@ -110,4 +120,3 @@ if (empty($docId)) {
     Display::display_header(null);
     $form->display();
 }
-

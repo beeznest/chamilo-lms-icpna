@@ -5,32 +5,11 @@
  * Notification class
  * This class provides methods for the Notification management.
  * Include/require it in your code to use its features.
+ *
  * @package chamilo.library
  */
 class Notification extends Model
 {
-    public $table;
-    public $columns = array(
-        'id',
-        'dest_user_id',
-        'dest_mail',
-        'title',
-        'content',
-        'send_freq',
-        'created_at',
-        'sent_at'
-    );
-
-    //Max length of the notification.content field
-    public $max_content_length = 254;
-    public $debug = false;
-
-    /* message, invitation, group messages */
-    public $type;
-    public $adminName;
-    public $adminEmail;
-    public $titlePrefix;
-
     // mail_notify_message ("At once", "Daily", "No")
     const NOTIFY_MESSAGE_AT_ONCE = 1;
     const NOTIFY_MESSAGE_DAILY = 8;
@@ -55,9 +34,30 @@ class Notification extends Model
     const NOTIFICATION_TYPE_GROUP = 3;
     const NOTIFICATION_TYPE_WALL_MESSAGE = 4;
     const NOTIFICATION_TYPE_DIRECT_MESSAGE = 5;
+    public $table;
+    public $columns = [
+        'id',
+        'dest_user_id',
+        'dest_mail',
+        'title',
+        'content',
+        'send_freq',
+        'created_at',
+        'sent_at',
+    ];
+
+    //Max length of the notification.content field
+    public $max_content_length = 254;
+    public $debug = false;
+
+    /* message, invitation, group messages */
+    public $type;
+    public $adminName;
+    public $adminEmail;
+    public $titlePrefix;
 
     /**
-     * Constructor
+     * Constructor.
      */
     public function __construct()
     {
@@ -104,14 +104,15 @@ class Notification extends Model
     }
 
     /**
-     *  Send the notifications
+     *  Send the notifications.
+     *
      *  @param int $frequency notification frequency
      */
     public function send($frequency = 8)
     {
         $notifications = $this->find(
             'all',
-            array('where' => array('sent_at IS NULL AND send_freq = ?' => $frequency))
+            ['where' => ['sent_at IS NULL AND send_freq = ?' => $frequency]]
         );
 
         if (!empty($notifications)) {
@@ -142,14 +143,15 @@ class Notification extends Model
     /**
      * @param string $title
      * @param array  $senderInfo
+     * @param bool   $forceTitleWhenSendingEmail force the use of $title as subject instead of "You have a new message"
      *
      * @return string
      */
-    public function formatTitle($title, $senderInfo)
+    public function formatTitle($title, $senderInfo, $forceTitleWhenSendingEmail = false)
     {
         $hook = HookNotificationTitle::create();
         if (!empty($hook)) {
-            $hook->setEventData(array('title' => $title));
+            $hook->setEventData(['title' => $title]);
             $data = $hook->notifyNotificationTitle(HOOK_EVENT_TYPE_PRE);
             if (isset($data['title'])) {
                 $title = $data['title'];
@@ -199,8 +201,13 @@ class Notification extends Model
                 break;
         }
 
+        // The title won't be changed, it will be used as is
+        if ($forceTitleWhenSendingEmail) {
+            $newTitle = $title;
+        }
+
         if (!empty($hook)) {
-            $hook->setEventData(array('title' => $newTitle));
+            $hook->setEventData(['title' => $newTitle]);
             $data = $hook->notifyNotificationTitle(HOOK_EVENT_TYPE_POST);
             if (isset($data['title'])) {
                 $newTitle = $data['title'];
@@ -211,29 +218,36 @@ class Notification extends Model
     }
 
     /**
-     * Save message notification
-     * @param int $type message type
-     * NOTIFICATION_TYPE_MESSAGE,
-     * NOTIFICATION_TYPE_INVITATION,
-     * NOTIFICATION_TYPE_GROUP
-     * @param array $userList recipients: user list of ids
+     * Save message notification.
+     *
+     * @param int    $type                       message type
+     *                                           NOTIFICATION_TYPE_MESSAGE,
+     *                                           NOTIFICATION_TYPE_INVITATION,
+     *                                           NOTIFICATION_TYPE_GROUP
+     * @param int    $messageId
+     * @param array  $userList                   recipients: user list of ids
      * @param string $title
      * @param string $content
-     * @param array $senderInfo result of api_get_user_info() or GroupPortalManager:get_group_data()
-     * @param array $attachments
-     *
+     * @param array  $senderInfo                 result of api_get_user_info() or GroupPortalManager:get_group_data()
+     * @param array  $attachments
+     * @param array  $smsParameters
+     * @param bool   $forceTitleWhenSendingEmail force the use of $title as subject instead of "You have a new message"
      */
-    public function save_notification(
+    public function saveNotification(
+        $messageId,
         $type,
         $userList,
         $title,
         $content,
-        $senderInfo = array(),
-        $attachments = array()
+        $senderInfo = [],
+        $attachments = [],
+        $smsParameters = [],
+        $forceTitleWhenSendingEmail = false
     ) {
-        $this->type = intval($type);
-        $content = $this->formatContent($content, $senderInfo);
-        $titleToNotification = $this->formatTitle($title, $senderInfo);
+        $this->type = (int) $type;
+        $messageId = (int) $messageId;
+        $content = $this->formatContent($messageId, $content, $senderInfo);
+        $titleToNotification = $this->formatTitle($title, $senderInfo, $forceTitleWhenSendingEmail);
         $settingToCheck = '';
         $avoid_my_self = false;
 
@@ -297,14 +311,13 @@ class Notification extends Model
                     case self::NOTIFY_INVITATION_AT_ONCE:
                     case self::NOTIFY_GROUP_AT_ONCE:
                         $extraHeaders = [];
-
                         if (isset($senderInfo['email'])) {
-                            $extraHeaders = array(
-                                'reply_to' => array(
+                            $extraHeaders = [
+                                'reply_to' => [
                                     'name' => $senderInfo['complete_name'],
-                                    'mail' => $senderInfo['email']
-                                )
-                            );
+                                    'mail' => $senderInfo['email'],
+                                ],
+                            ];
                         }
 
                         if (!empty($userInfo['email'])) {
@@ -316,7 +329,9 @@ class Notification extends Model
                                 $this->adminName,
                                 $this->adminEmail,
                                 $extraHeaders,
-                                $attachments
+                                $attachments,
+                                false,
+                                $smsParameters
                             );
                         }
                         $sendDate = api_get_utc_datetime();
@@ -324,14 +339,14 @@ class Notification extends Model
 
                 // Saving the notification to be sent some day.
                 $content = cut($content, $this->max_content_length);
-                $params = array(
+                $params = [
                     'sent_at' => $sendDate,
                     'dest_user_id' => $user_id,
                     'dest_mail' => $userInfo['email'],
                     'title' => $title,
                     'content' => $content,
-                    'send_freq' => $userSetting
-                );
+                    'send_freq' => $userSetting,
+                ];
 
                 $this->save($params);
             }
@@ -342,18 +357,20 @@ class Notification extends Model
 
     /**
      * Formats the content in order to add the welcome message,
-     * the notification preference, etc
+     * the notification preference, etc.
+     *
+     * @param int    $messageId
      * @param string $content
      * @param array  $senderInfo result of api_get_user_info() or
-     * GroupPortalManager:get_group_data()
+     *                           GroupPortalManager:get_group_data()
      *
      * @return string
      * */
-    public function formatContent($content, $senderInfo)
+    public function formatContent($messageId, $content, $senderInfo)
     {
         $hook = HookNotificationContent::create();
         if (!empty($hook)) {
-            $hook->setEventData(array('content' => $content));
+            $hook->setEventData(['content' => $content]);
             $data = $hook->notifyNotificationContent(HOOK_EVENT_TYPE_PRE);
             if (isset($data['content'])) {
                 $content = $data['content'];
@@ -361,39 +378,45 @@ class Notification extends Model
         }
 
         $newMessageText = $linkToNewMessage = '';
+        $showEmail = api_get_configuration_value('show_user_email_in_notification');
+        $senderInfoName = '';
+        if (!empty($senderInfo) && isset($senderInfo['complete_name'])) {
+            $senderInfoName = $senderInfo['complete_name'];
+            if ($showEmail && isset($senderInfo['complete_name_with_email_forced'])) {
+                $senderInfoName = $senderInfo['complete_name_with_email_forced'];
+            }
+        }
 
         switch ($this->type) {
             case self::NOTIFICATION_TYPE_DIRECT_MESSAGE:
                 $newMessageText = '';
                 $linkToNewMessage = Display::url(
                     get_lang('SeeMessage'),
-                    api_get_path(WEB_CODE_PATH).'messages/inbox.php'
+                    api_get_path(WEB_CODE_PATH).'messages/view_message.php?id='.$messageId
                 );
                 break;
             case self::NOTIFICATION_TYPE_MESSAGE:
+                $allow = api_get_configuration_value('messages_hide_mail_content');
+                if ($allow) {
+                    $content = '';
+                }
                 if (!empty($senderInfo)) {
-                    $senderName = api_get_person_name(
-                        $senderInfo['firstname'],
-                        $senderInfo['lastname'],
-                        null,
-                        PERSON_NAME_EMAIL_ADDRESS
+                    $newMessageText = sprintf(
+                        get_lang('YouHaveANewMessageFromX'),
+                        $senderInfoName
                     );
-                    $newMessageText = sprintf(get_lang('YouHaveANewMessageFromX'), $senderName);
                 }
                 $linkToNewMessage = Display::url(
                     get_lang('SeeMessage'),
-                    api_get_path(WEB_CODE_PATH).'messages/inbox.php'
+                    api_get_path(WEB_CODE_PATH).'messages/view_message.php?id='.$messageId
                 );
                 break;
             case self::NOTIFICATION_TYPE_INVITATION:
                 if (!empty($senderInfo)) {
-                    $senderName = api_get_person_name(
-                        $senderInfo['firstname'],
-                        $senderInfo['lastname'],
-                        null,
-                        PERSON_NAME_EMAIL_ADDRESS
+                    $newMessageText = sprintf(
+                        get_lang('YouHaveANewInvitationFromX'),
+                        $senderInfoName
                     );
-                    $newMessageText = sprintf(get_lang('YouHaveANewInvitationFromX'), $senderName);
                 }
                 $linkToNewMessage = Display::url(
                     get_lang('SeeInvitation'),
@@ -401,27 +424,21 @@ class Notification extends Model
                 );
                 break;
             case self::NOTIFICATION_TYPE_GROUP:
-                $topic_page = intval($_REQUEST['topics_page_nr']);
+                $topicPage = isset($_REQUEST['topics_page_nr']) ? (int) $_REQUEST['topics_page_nr'] : 0;
                 if (!empty($senderInfo)) {
                     $senderName = $senderInfo['group_info']['name'];
                     $newMessageText = sprintf(get_lang('YouHaveReceivedANewMessageInTheGroupX'), $senderName);
-                    $senderName = api_get_person_name(
-                        $senderInfo['user_info']['firstname'],
-                        $senderInfo['user_info']['lastname'],
-                        null,
-                        PERSON_NAME_EMAIL_ADDRESS
-                    );
                     $senderName = Display::url(
-                        $senderName,
+                        $senderInfoName,
                         api_get_path(WEB_CODE_PATH).'social/profile.php?'.$senderInfo['user_info']['user_id']
                     );
                     $newMessageText .= '<br />'.get_lang('User').': '.$senderName;
                 }
-                $group_url = api_get_path(WEB_CODE_PATH).'social/group_topics.php?id='.$senderInfo['group_info']['id'].'&topic_id='.$senderInfo['group_info']['topic_id'].'&msg_id='.$senderInfo['group_info']['msg_id'].'&topics_page_nr='.$topic_page;
-                $linkToNewMessage = Display::url(get_lang('SeeMessage'), $group_url);
+                $groupUrl = api_get_path(WEB_CODE_PATH).'social/group_topics.php?id='.$senderInfo['group_info']['id'].'&topic_id='.$senderInfo['group_info']['topic_id'].'&msg_id='.$senderInfo['group_info']['msg_id'].'&topics_page_nr='.$topicPage;
+                $linkToNewMessage = Display::url(get_lang('SeeMessage'), $groupUrl);
                 break;
         }
-        $preference_url = api_get_path(WEB_CODE_PATH).'auth/profile.php';
+        $preferenceUrl = api_get_path(WEB_CODE_PATH).'auth/profile.php';
 
         // You have received a new message text
         if (!empty($newMessageText)) {
@@ -437,11 +454,11 @@ class Notification extends Model
         $content = $content.'<br /><hr><i>'.
             sprintf(
                 get_lang('YouHaveReceivedThisNotificationBecauseYouAreSubscribedOrInvolvedInItToChangeYourNotificationPreferencesPleaseClickHereX'),
-                Display::url($preference_url, $preference_url)
+                Display::url($preferenceUrl, $preferenceUrl)
             ).'</i>';
 
         if (!empty($hook)) {
-            $hook->setEventData(array('content' => $content));
+            $hook->setEventData(['content' => $content]);
             $data = $hook->notifyNotificationContent(HOOK_EVENT_TYPE_POST);
             if (isset($data['content'])) {
                 $content = $data['content'];
@@ -452,10 +469,12 @@ class Notification extends Model
     }
 
     /**
-     * Send the push notifications to Chamilo Mobile app
-     * @param array $userIds The IDs of users who will be notified
-     * @param string $title The notification title
+     * Send the push notifications to Chamilo Mobile app.
+     *
+     * @param array  $userIds The IDs of users who will be notified
+     * @param string $title   The notification title
      * @param string $content The notification content
+     *
      * @return int The number of success notifications. Otherwise returns false
      */
     public static function sendPushNotification(array $userIds, $title, $content)
@@ -475,7 +494,6 @@ class Notification extends Model
         $content = html_entity_decode($content, ENT_QUOTES);
 
         $gcmRegistrationIds = [];
-
         foreach ($userIds as $userId) {
             $extraFieldValue = new ExtraFieldValue('user');
             $valueInfo = $extraFieldValue->get_values_by_handler_and_field_variable(
@@ -496,15 +514,15 @@ class Notification extends Model
 
         $headers = [
             'Authorization: key='.$gdcApiKey,
-            'Content-Type: application/json'
+            'Content-Type: application/json',
         ];
 
         $fields = json_encode([
             'registration_ids' => $gcmRegistrationIds,
             'data' => [
                 'title' => $title,
-                'message' => $content
-            ]
+                'message' => $content,
+            ],
         ]);
 
         $ch = curl_init();

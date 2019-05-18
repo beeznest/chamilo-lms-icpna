@@ -6,7 +6,7 @@ namespace Chamilo\CourseBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CStudentPublicationRelUser
+ * CStudentPublicationRelUser.
  *
  * @ORM\Table(
  *  name="c_student_publication_rel_user",
@@ -21,46 +21,47 @@ use Doctrine\ORM\Mapping as ORM;
 class CStudentPublicationRelUser
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="iid", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $iid;
+    protected $iid;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer", nullable=true)
      */
-    private $id;
+    protected $id;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer")
      */
-    private $cId;
+    protected $cId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="work_id", type="integer", nullable=false)
      */
-    private $workId;
+    protected $workId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="user_id", type="integer", nullable=false)
      */
-    private $userId;
+    protected $userId;
 
     /**
-     * Set workId
+     * Set workId.
      *
-     * @param integer $workId
+     * @param int $workId
+     *
      * @return CStudentPublicationRelUser
      */
     public function setWorkId($workId)
@@ -71,9 +72,9 @@ class CStudentPublicationRelUser
     }
 
     /**
-     * Get workId
+     * Get workId.
      *
-     * @return integer
+     * @return int
      */
     public function getWorkId()
     {
@@ -81,9 +82,10 @@ class CStudentPublicationRelUser
     }
 
     /**
-     * Set userId
+     * Set userId.
      *
-     * @param integer $userId
+     * @param int $userId
+     *
      * @return CStudentPublicationRelUser
      */
     public function setUserId($userId)
@@ -94,9 +96,9 @@ class CStudentPublicationRelUser
     }
 
     /**
-     * Get userId
+     * Get userId.
      *
-     * @return integer
+     * @return int
      */
     public function getUserId()
     {
@@ -104,9 +106,10 @@ class CStudentPublicationRelUser
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return CStudentPublicationRelUser
      */
     public function setCId($cId)
@@ -117,9 +120,9 @@ class CStudentPublicationRelUser
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {
@@ -127,9 +130,9 @@ class CStudentPublicationRelUser
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {

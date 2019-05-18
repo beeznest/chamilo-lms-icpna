@@ -287,6 +287,12 @@ class HTML_QuickForm_Renderer_Default extends HTML_QuickForm_Renderer
 
         if (is_array($label)) {
             $nameLabel = array_shift($label);
+            // In some cases, label (coming from display_text) might be a
+            // double-level array. In this case, take the first item of the
+            // sub-array as label
+            if (is_array($nameLabel)) {
+                $nameLabel = $nameLabel[0];
+            }
         } else {
             $nameLabel = $label;
         }
@@ -328,6 +334,7 @@ class HTML_QuickForm_Renderer_Default extends HTML_QuickForm_Renderer
         } else {
             $html = preg_replace("/([ \t\n\r]*)?<!-- BEGIN required -->.*<!-- END required -->([ \t\n\r]*)?/isU", '', $html);
         }
+
         if (isset($error)) {
             $html = str_replace('{error}', $error, $html);
             $html = str_replace('{error_class}', 'error has-error', $html);
@@ -370,7 +377,6 @@ class HTML_QuickForm_Renderer_Default extends HTML_QuickForm_Renderer
                 $required,
                 $error
             );
-
             $this->_html .= str_replace('{element}', $element->toHtml(), $html);
         } elseif (!empty($this->_groupElementTemplate)) {
             $html = str_replace('{label}', $element->getLabel(), $this->_groupElementTemplate);
@@ -382,7 +388,6 @@ class HTML_QuickForm_Renderer_Default extends HTML_QuickForm_Renderer
                 $html = preg_replace("/([ \t\n\r]*)?<!-- BEGIN required -->.*<!-- END required -->([ \t\n\r]*)?/isU", '', $html);
             }
             $this->_groupElements[] = str_replace('{element}', $element->toHtml(), $html);
-
         } else {
             $this->_groupElements[] = $element->toHtml();
         }

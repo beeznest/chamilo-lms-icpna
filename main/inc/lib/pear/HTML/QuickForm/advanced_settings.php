@@ -6,12 +6,11 @@
 class HTML_QuickForm_advanced_settings extends HTML_QuickForm_static
 {
     /**
-    * Class constructor
-    *
-    * @param string $text   raw HTML to add
-    * @access public
-    * @return void
-    */
+     * Class constructor
+     *
+     * @param string $name
+     * @param string $label
+     */
     public function __construct($name = '', $label = '')
     {
         if (empty($label)) {
@@ -54,8 +53,7 @@ class HTML_QuickForm_advanced_settings extends HTML_QuickForm_static
         }
 
         $html .= '           
-            <button id="'.$name.'" type="button" class="btn btn-default advanced_options"
-                    data-toggle="button" aria-pressed="false" autocomplete="off">
+            <button id="'.$name.'" type="button" class="btn btn-default advanced_options" aria-pressed="false">
                 <em class="fa fa-bars"></em> '.$label.'
             </button>
         ';

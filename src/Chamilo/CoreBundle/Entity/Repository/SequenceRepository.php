@@ -5,19 +5,20 @@ namespace Chamilo\CoreBundle\Entity\Repository;
 
 use Chamilo\CoreBundle\Entity\SequenceResource;
 use Doctrine\ORM\EntityRepository;
-use Fhaculty\Graph\Vertex;
 use Fhaculty\Graph\Set\Vertices;
+use Fhaculty\Graph\Vertex;
 
 /**
  * Class SequenceRepository
- * The functions inside this class should return an instance of QueryBuilder
+ * The functions inside this class should return an instance of QueryBuilder.
  *
  * @package Chamilo\CoreBundle\Entity\Repository
  */
 class SequenceRepository extends EntityRepository
 {
     /**
-     * Find the SequenceResource based in the resourceId and type
+     * Find the SequenceResource based in the resourceId and type.
+     *
      * @param int $resourceId
      * @param int $type
      *
@@ -39,7 +40,7 @@ class SequenceRepository extends EntityRepository
     public function getRequirementAndDependencies($resourceId, $type)
     {
         $sequence = $this->findRequirementForResource($resourceId, $type);
-        $result = ['requirements' => '', 'dependencies' => ''];
+        $result = ['requirements' => [], 'dependencies' => []];
         if ($sequence && $sequence->hasGraph()) {
             $graph = $sequence->getSequence()->getUnSerializeGraph();
             $vertex = $graph->getVertex($resourceId);
@@ -70,7 +71,6 @@ class SequenceRepository extends EntityRepository
      *
      * @param int $resourceId
      * @param int $type
-     * @return boolean
      */
     public function deleteResource($resourceId, $type)
     {
@@ -101,9 +101,10 @@ class SequenceRepository extends EntityRepository
     }
 
     /**
-     * Get the requirements for a resource only
+     * Get the requirements for a resource only.
+     *
      * @param int $resourceId The resource ID
-     * @param int $type The type of sequence resource
+     * @param int $type       The type of sequence resource
      *
      * @return array
      */
@@ -111,11 +112,11 @@ class SequenceRepository extends EntityRepository
     {
         $sequencesResource = $this->findBy([
             'resourceId' => $resourceId,
-            'type' => $type
+            'type' => $type,
         ]);
 
         $result = [];
-
+        /** @var SequenceResource $sequenceResource */
         foreach ($sequencesResource as $sequenceResource) {
             if (!$sequenceResource->hasGraph()) {
                 continue;
@@ -128,7 +129,7 @@ class SequenceRepository extends EntityRepository
 
             $sequenceInfo = [
                 'name' => $sequence->getName(),
-                'requirements' => []
+                'requirements' => [],
             ];
 
             foreach ($from as $subVertex) {
@@ -157,9 +158,10 @@ class SequenceRepository extends EntityRepository
     }
 
     /**
-     * Get the requirements and dependencies within a sequence for a resource
+     * Get the requirements and dependencies within a sequence for a resource.
+     *
      * @param int $resourceId The resource ID
-     * @param int $type The type of sequence resource
+     * @param int $type       The type of sequence resource
      *
      * @return array
      */
@@ -167,11 +169,12 @@ class SequenceRepository extends EntityRepository
     {
         $sequencesResource = $this->findBy([
             'resourceId' => $resourceId,
-            'type' => $type
+            'type' => $type,
         ]);
 
         $result = [];
 
+        /** @var SequenceResource $sequenceResource */
         foreach ($sequencesResource as $sequenceResource) {
             if (!$sequenceResource->hasGraph()) {
                 continue;
@@ -196,22 +199,23 @@ class SequenceRepository extends EntityRepository
             $result[$sequence->getId()] = [
                 'name' => $sequence->getName(),
                 'requirements' => $requirements,
-                'dependencies' => $dependencies
+                'dependencies' => $dependencies,
             ];
         }
 
         return [
-            'sequences' => $result
+            'sequences' => $result,
         ];
     }
 
     /**
-     * Get sessions from vertices
+     * Get sessions from vertices.
+     *
      * @param Vertices $verticesEdges The vertices
      *
      * @return array
      */
-    private function findSessionFromVerticesEdges(Vertices $verticesEdges)
+    protected function findSessionFromVerticesEdges(Vertices $verticesEdges)
     {
         $sessionVertices = [];
         foreach ($verticesEdges as $supVertex) {

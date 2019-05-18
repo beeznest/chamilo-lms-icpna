@@ -6,18 +6,17 @@ use ChamiloSession as Session;
 /**
  *  @package chamilo.admin
  */
-
 $cidReset = true;
 require_once __DIR__.'/../inc/global.inc.php';
 $this_section = SECTION_PLATFORM_ADMIN;
 
 api_protect_admin_script();
-Skill::isAllow();
+Skill::isAllowed();
 
-$interbreadcrumb[] = array(
+$interbreadcrumb[] = [
     'url' => 'index.php',
     "name" => get_lang('PlatformAdmin'),
-);
+];
 
 $skill = new Skill();
 $skill_profile = new SkillProfile();
@@ -28,26 +27,25 @@ $tpl = new Template(get_lang('Skills'));
 $form = new FormValidator('profile_search');
 
 $form->addElement('header', get_lang('SearchSkills'));
-$form->addElement('select', 'skills', null, null, array('id'=>'skills'));
+$form->addElement('select', 'skills', null, null, ['id' => 'skills']);
 $form->addButtonSearch(get_lang('Search'));
 
 $profiles = $skill_profile->get_all();
 
 $tpl->assign('profiles', $profiles);
 
-$total_skills_to_search = array();
+$total_skills_to_search = [];
 
 if ($form->validate()) {
     $values = $form->getSubmitValues();
 
     $skills = $values['skills'];
     if (!empty($skills)) {
-        $hidden_skills = isset($values['hidden_skills']) ? $values['hidden_skills'] : array();
+        $hidden_skills = isset($values['hidden_skills']) ? $values['hidden_skills'] : [];
         $skills = array_merge($skills, $hidden_skills);
         $skills = array_filter($skills);
         $skills = array_unique($skills);
         Session::write('skills', $skills);
-
     } else {
         $skills = Session::read('skills', []);
     }
@@ -55,17 +53,16 @@ if ($form->validate()) {
     $skills = Session::read('skills', []);
 }
 
-$user_list = array();
+$user_list = [];
 $count_skills = count($skills);
-
-$users = $skill_rel_user->get_user_by_skills($skills);
+$users = $skill_rel_user->getUserBySkills($skills);
 
 if (!empty($users)) {
     foreach ($users as $user) {
         $user_info = api_get_user_info($user['user_id']);
         $user_list[$user['user_id']]['user'] = $user_info;
         $my_user_skills = $skill_rel_user->getUserSkills($user['user_id']);
-        $user_skills = array();
+        $user_skills = [];
         $found_counts = 0;
         foreach ($my_user_skills as $my_skill) {
             $found = false;
@@ -73,16 +70,16 @@ if (!empty($users)) {
                 $found = true;
                 $found_counts++;
             }
-            $user_skills[] = array(
+            $user_skills[] = [
                 'skill_id' => $my_skill['skill_id'],
                 'found' => $found,
-            );
+            ];
             $total_skills_to_search[$my_skill['skill_id']] = $my_skill['skill_id'];
         }
         $user_list[$user['user_id']]['skills'] = $user_skills;
         $user_list[$user['user_id']]['total_found_skills'] = $found_counts;
     }
-    $ordered_user_list = array();
+    $ordered_user_list = [];
     foreach ($user_list as $user_id => $user_data) {
         $ordered_user_list[$user_data['total_found_skills']][] = $user_data;
     }
@@ -91,7 +88,6 @@ if (!empty($users)) {
     }
 }
 
-//$tpl->assign('user_list', $user_list);
 $tpl->assign('order_user_list', $ordered_user_list);
 $tpl->assign('total_search_skills', $count_skills);
 
@@ -109,13 +105,13 @@ if (!empty($skills)) {
     }
 }
 
-$total_skills_to_search = $skill->get_skills_info($total_skills_to_search);
+$total_skills_to_search = $skill->getSkillsInfo($total_skills_to_search);
 $action = isset($_REQUEST['a']) ? $_REQUEST['a'] : null;
 $id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : null;
 
 switch ($action) {
     case 'remove_skill':
-        $new_skill = array();
+        $new_skill = [];
         foreach ($skills as $skill_id) {
             if ($id != $skill_id) {
                 $new_skill[] = $skill_id;
@@ -126,12 +122,12 @@ switch ($action) {
         break;
     case 'load_profile':
         $skill_profile = new SkillRelProfile();
-        $skills = $skill_profile->get_skills_by_profile($id);
-        $total_skills_to_search = $skill->get_skills_info($skills);
+        $skills = $skill_profile->getSkillsByProfile($id);
+        $total_skills_to_search = $skill->getSkillsInfo($skills);
         break;
 }
 
-$skill_list = array();
+$skill_list = [];
 foreach ($total_skills_to_search as $skill_info) {
     $skill_list[$skill_info['id']] = $skill_info;
 }

@@ -4,8 +4,6 @@
 /**
  *    This script displays a participant edit form.
  */
-
-use \ChamiloSession as Session;
 require_once '../config.php';
 
 $course_plugin = 'sepe';
@@ -15,8 +13,8 @@ $_cid = 0;
 if (!empty($_POST)) {
     $check = Security::check_token('post');
     if ($check) {
-        $companyTutorId = (!empty($_POST['company_tutor_id']) ? intval($_POST['company_tutor_id']) : NULL);
-        $trainingTutorId = (!empty($_POST['training_tutor_id']) ? intval($_POST['training_tutor_id']) : NULL);
+        $companyTutorId = (!empty($_POST['company_tutor_id']) ? intval($_POST['company_tutor_id']) : null);
+        $trainingTutorId = (!empty($_POST['training_tutor_id']) ? intval($_POST['training_tutor_id']) : null);
         $tutorCompanyDocumentType = Database::escape_string(trim($_POST['tutor_company_document_type']));
         $tutorCompanyDocumentNumber = Database::escape_string(trim($_POST['tutor_company_document_number']));
         $tutorCompanyDocumentLetter = Database::escape_string(trim($_POST['tutor_company_document_letter']));
@@ -60,7 +58,10 @@ if (!empty($_POST)) {
 
         if (isset($trainingTutorId) && $trainingTutorId == 0) {
             $sql = "SELECT * FROM $tableTutorCompany 
-                    WHERE document_type = '".$tutorTrainingDocumentType."' AND document_number = '".$tutorTrainingDocumentNumber."' AND document_letter = '".$tutorTrainingDocumentLetter."';";
+                    WHERE 
+                        document_type = '".$tutorTrainingDocumentType."' AND 
+                        document_number = '".$tutorTrainingDocumentNumber."' AND 
+                        document_letter = '".$tutorTrainingDocumentLetter."';";
             $rs = Database::query($sql);
 
             if (Database::num_rows($rs) > 0) {
@@ -158,6 +159,7 @@ if (!empty($_POST)) {
         }
         session_write_close();
         header("Location: participant-action-edit.php?new_participant=0&participant_id=".$participantId."&action_id=".$actionId);
+        exit;
     } else {
         $participantId = intval($_POST['participant_id']);
         $actionId = intval($_POST['action_id']);
@@ -167,6 +169,7 @@ if (!empty($_POST)) {
         $_SESSION['sepe_message_error'] = $plugin->get_lang('ProblemToken');
         session_write_close();
         header("Location: participant-action-edit.php?new_participant=".$newParticipant."&participant_id=".$participantId."&action_id=".$actionId);
+        exit;
     }
 } else {
     $token = Security::get_token();
@@ -175,14 +178,23 @@ if (!empty($_POST)) {
 if (api_is_platform_admin()) {
     $actionId = intval($_GET['action_id']);
     $courseId = getCourse($actionId);
-    $interbreadcrumb[] = array("url" => "/plugin/sepe/src/sepe-administration-menu.php", "name" => $plugin->get_lang('MenuSepe'));
-    $interbreadcrumb[] = array("url" => "formative-actions-list.php", "name" => $plugin->get_lang('FormativesActionsList'));
-    $interbreadcrumb[] = array("url" => "formative-action.php?cid=".$courseId, "name" => $plugin->get_lang('FormativeAction'));
+    $interbreadcrumb[] = [
+        "url" => "/plugin/sepe/src/sepe-administration-menu.php",
+        "name" => $plugin->get_lang('MenuSepe'),
+    ];
+    $interbreadcrumb[] = [
+        "url" => "formative-actions-list.php",
+        "name" => $plugin->get_lang('FormativesActionsList'),
+    ];
+    $interbreadcrumb[] = [
+        "url" => "formative-action.php?cid=".$courseId,
+        "name" => $plugin->get_lang('FormativeAction'),
+    ];
     if (isset($_GET['new_participant']) && intval($_GET['new_participant']) == 1) {
         $templateName = $plugin->get_lang('NewParticipantAction');
         $tpl = new Template($templateName);
         $tpl->assign('action_id', $actionId);
-        $info = array();
+        $info = [];
         $tpl->assign('info', $info);
         $tpl->assign('new_participant', '1');
     } else {
@@ -202,7 +214,7 @@ if (api_is_platform_admin()) {
         $tpl->assign('listParticipantSpecialty', $listParticipantSpecialty);
     }
     $courseCode = getCourseCode($actionId);
-    $listStudentInfo = array();
+    $listStudentInfo = [];
     $listStudent = CourseManager::get_student_list_from_course_code($courseCode);
 
     foreach ($listStudent as $value) {
@@ -213,10 +225,10 @@ if (api_is_platform_admin()) {
         }
     }
     $tpl->assign('listStudent', $listStudentInfo);
-    $listTutorCompany = array();
+    $listTutorCompany = [];
     $listTutorCompany = listTutorType("company = '1'");
     $tpl->assign('list_tutor_company', $listTutorCompany);
-    $listTutorTraining = array();
+    $listTutorTraining = [];
     $listTutorTraining = listTutorType("training = '1'");
     $tpl->assign('list_tutor_training', $listTutorTraining);
     if (isset($_SESSION['sepe_message_info'])) {
@@ -234,4 +246,5 @@ if (api_is_platform_admin()) {
     $tpl->display_one_col_template();
 } else {
     header('Location:'.api_get_path(WEB_PATH));
+    exit;
 }

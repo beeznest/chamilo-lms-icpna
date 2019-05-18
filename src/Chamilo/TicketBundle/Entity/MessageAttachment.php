@@ -3,13 +3,10 @@
 
 namespace Chamilo\TicketBundle\Entity;
 
-use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
-use Chamilo\CoreBundle\Entity\Course;
-use Chamilo\CoreBundle\Entity\Session;
 
 /**
- * MessageAttachment
+ * MessageAttachment.
  *
  * @ORM\Table(name="ticket_message_attachments")
  * @ORM\Entity
@@ -17,7 +14,7 @@ use Chamilo\CoreBundle\Entity\Session;
 class MessageAttachment
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
@@ -30,7 +27,7 @@ class MessageAttachment
      *
      * @ORM\ManyToOne(targetEntity="Chamilo\TicketBundle\Entity\Ticket")
      * @ORM\JoinColumn(name="ticket_id", referencedColumnName="id")
-     **/
+     */
     protected $ticket;
 
     /**
@@ -38,7 +35,7 @@ class MessageAttachment
      *
      * @ORM\ManyToOne(targetEntity="Chamilo\TicketBundle\Entity\Message")
      * @ORM\JoinColumn(name="message_id", referencedColumnName="id")
-     **/
+     */
     protected $message;
 
     /**
@@ -55,15 +52,15 @@ class MessageAttachment
      */
     protected $filename;
 
-   /**
-     * @var integer
+    /**
+     * @var int
      *
      * @ORM\Column(name="size", type="integer", nullable=false, unique=false)
      */
     protected $size;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="sys_insert_user_id", type="integer", nullable=false, unique=false)
      */
@@ -77,7 +74,7 @@ class MessageAttachment
     protected $insertDateTime;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="sys_lastedit_user_id", type="integer", nullable=true, unique=false)
      */
@@ -90,4 +87,103 @@ class MessageAttachment
      */
     protected $lastEditDateTime;
 
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return MessageAttachment
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * @return Message
+     */
+    public function getMessage()
+    {
+        return $this->message;
+    }
+
+    /**
+     * @param Message $message
+     *
+     * @return MessageAttachment
+     */
+    public function setMessage($message)
+    {
+        $this->message = $message;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return MessageAttachment
+     */
+    public function setPath($path)
+    {
+        $this->path = $path;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFilename()
+    {
+        return $this->filename;
+    }
+
+    /**
+     * @param string $filename
+     *
+     * @return MessageAttachment
+     */
+    public function setFilename($filename)
+    {
+        $this->filename = $filename;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSize()
+    {
+        return $this->size;
+    }
+
+    /**
+     * @param int $size
+     *
+     * @return MessageAttachment
+     */
+    public function setSize($size)
+    {
+        $this->size = $size;
+
+        return $this;
+    }
 }

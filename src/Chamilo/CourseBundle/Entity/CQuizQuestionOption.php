@@ -6,7 +6,7 @@ namespace Chamilo\CourseBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CQuizQuestionOption
+ * CQuizQuestionOption.
  *
  * @ORM\Table(
  *  name="c_quiz_question_option",
@@ -19,53 +19,54 @@ use Doctrine\ORM\Mapping as ORM;
 class CQuizQuestionOption
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="iid", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $iid;
+    protected $iid;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer")
      */
-    private $cId;
+    protected $cId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer", nullable=true)
      */
-    private $id;
+    protected $id;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="question_id", type="integer", nullable=false)
      */
-    private $questionId;
+    protected $questionId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255, nullable=true)
      */
-    private $name;
+    protected $name;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="position", type="integer", nullable=false)
      */
-    private $position;
+    protected $position;
 
     /**
-     * Set questionId
+     * Set questionId.
      *
-     * @param integer $questionId
+     * @param int $questionId
+     *
      * @return CQuizQuestionOption
      */
     public function setQuestionId($questionId)
@@ -76,9 +77,9 @@ class CQuizQuestionOption
     }
 
     /**
-     * Get questionId
+     * Get questionId.
      *
-     * @return integer
+     * @return int
      */
     public function getQuestionId()
     {
@@ -86,9 +87,10 @@ class CQuizQuestionOption
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
+     *
      * @return CQuizQuestionOption
      */
     public function setName($name)
@@ -99,7 +101,7 @@ class CQuizQuestionOption
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
@@ -109,9 +111,10 @@ class CQuizQuestionOption
     }
 
     /**
-     * Set position
+     * Set position.
      *
-     * @param integer $position
+     * @param int $position
+     *
      * @return CQuizQuestionOption
      */
     public function setPosition($position)
@@ -122,9 +125,9 @@ class CQuizQuestionOption
     }
 
     /**
-     * Get position
+     * Get position.
      *
-     * @return integer
+     * @return int
      */
     public function getPosition()
     {
@@ -132,9 +135,10 @@ class CQuizQuestionOption
     }
 
     /**
-     * Set id
+     * Set id.
      *
-     * @param integer $id
+     * @param int $id
+     *
      * @return CQuizQuestionOption
      */
     public function setId($id)
@@ -145,9 +149,9 @@ class CQuizQuestionOption
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -155,9 +159,10 @@ class CQuizQuestionOption
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return CQuizQuestionOption
      */
     public function setCId($cId)
@@ -168,12 +173,32 @@ class CQuizQuestionOption
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {
         return $this->cId;
+    }
+
+    /**
+     * @return int
+     */
+    public function getIid()
+    {
+        return $this->iid;
+    }
+
+    /**
+     * @param int $iid
+     *
+     * @return CQuizQuestionOption
+     */
+    public function setIid($iid)
+    {
+        $this->iid = $iid;
+
+        return $this;
     }
 }

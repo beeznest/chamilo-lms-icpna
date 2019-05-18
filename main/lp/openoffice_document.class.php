@@ -4,15 +4,17 @@
 
 /**
  * Defines the OpenofficeDocument class, which is meant as a mother class
- * to help in the conversion of Office documents to learning paths
+ * to help in the conversion of Office documents to learning paths.
+ *
  * @package chamilo.learnpath
+ *
  * @author	Eric Marguin <eric.marguin@dokeos.com>
  * @author Julio Montoya
  * @license	GNU/GPL
  */
 
 /**
- * Defines the "OpenofficeDocument" child of class "learnpath"
+ * Defines the "OpenofficeDocument" child of class "learnpath".
  */
 abstract class OpenofficeDocument extends learnpath
 {
@@ -24,9 +26,10 @@ abstract class OpenofficeDocument extends learnpath
 
     /**
      * Class constructor. Based on the parent constructor.
+     *
      * @param	string	Course code
-     * @param	integer	Learnpath ID in DB
-     * @param	integer	User ID
+     * @param	int	Learnpath ID in DB
+     * @param	int	User ID
      */
     public function __construct($course_code = null, $resource_id = null, $user_id = null)
     {
@@ -39,10 +42,12 @@ abstract class OpenofficeDocument extends learnpath
     }
 
     /**
-     * Calls the LibreOffice server to convert the PPTs to a set of HTML + png files in a learning path
+     * Calls the LibreOffice server to convert the PPTs to a set of HTML + png files in a learning path.
+     *
      * @param string $file
      * @param string $action_after_conversion
-     * @param string $size The size to which we want the slides to be generated
+     * @param string $size                    The size to which we want the slides to be generated
+     *
      * @return bool|int
      */
     public function convert_document($file, $action_after_conversion = 'make_lp', $size = null)
@@ -52,7 +57,7 @@ abstract class OpenofficeDocument extends learnpath
         // Create the directory
         $result = $this->generate_lp_folder($_course, $this->file_name);
 
-         // Create the directory
+        // Create the directory
         $this->base_work_dir = api_get_path(SYS_COURSE_PATH).$_course['path'].'/document';
         ///learning_path/ppt_dirname directory
         $this->created_dir = $result['dir'];
@@ -61,6 +66,9 @@ abstract class OpenofficeDocument extends learnpath
         } else {
             $this->file_path = $this->created_dir.'/'.api_replace_dangerous_char($file['name']);
         }
+
+        $dirMode = api_get_permissions_for_new_directories();
+        $fileMode = api_get_permissions_for_new_files();
 
         //var_dump($this->file_name, $this->file_path, $this->base_work_dir, $this->created_dir);
 
@@ -118,14 +126,14 @@ abstract class OpenofficeDocument extends learnpath
             // Call to the function implemented by child.
             $cmd .= $this->add_command_parameters();
             // To allow openoffice to manipulate docs.
-            @chmod($this->base_work_dir, 0777);
-            @chmod($this->base_work_dir.$this->created_dir, 0777);
-            @chmod($this->base_work_dir.$this->file_path, 0777);
+            @chmod($this->base_work_dir, $dirMode);
+            @chmod($this->base_work_dir.$this->created_dir, $dirMode);
+            @chmod($this->base_work_dir.$this->file_path, $fileMode);
 
             $locale = $this->original_locale; // TODO: Improve it because we're not sure this locale is present everywhere.
             putenv('LC_ALL='.$locale);
 
-            $files = array();
+            $files = [];
             $return = 0;
             $shell = exec($cmd, $files, $return);
 
@@ -145,6 +153,7 @@ abstract class OpenofficeDocument extends learnpath
                         break;
                 }
                 DocumentManager::delete_document($_course, $this->created_dir, $this->base_work_dir);
+
                 return false;
             }
         } else {
@@ -157,7 +166,7 @@ abstract class OpenofficeDocument extends learnpath
                 foreach ($result['images'] as $image => $img_data) {
                     $image_path = $this->base_work_dir.$this->created_dir;
                     @file_put_contents($image_path.'/'.$image, base64_decode($img_data));
-                    @chmod($image_path.'/'.$image, 0777);
+                    @chmod($image_path.'/'.$image, $fileMode);
                 }
             }
 
@@ -183,91 +192,29 @@ abstract class OpenofficeDocument extends learnpath
             }
             chmod($this->base_work_dir, api_get_permissions_for_new_directories());
         }
+
         return $this->first_item;
     }
 
-    /**
-     * Get images files from remote host (with webservices)
-     * @param   array $file current ppt file details
-     * @param   string  $size The expected final size of the rendered slides
-     * @return  array images files
-     */
-    private function _get_remote_ppt2lp_files($file, $size = null)
-    {
-        // host
-        $ppt2lp_host = api_get_setting('service_ppt2lp', 'host');
-        // SOAP URI (just the host)
-        $matches = array();
-        $uri = '';
-        $result = preg_match('/^([a-zA-Z0-9]*):\/\/([^\/]*)\//', $ppt2lp_host, $matches);
-        if ($result) {
-            $uri = $matches[1].'://'.$matches[2].'/';
-        } else {
-            $uri = $ppt2lp_host;
-        }
-        // secret key
-        $secret_key = sha1(api_get_setting('service_ppt2lp', 'ftp_password'));
+    abstract public function make_lp();
 
-        // client
-        $options = array(
-            'location' => $ppt2lp_host,
-            'uri' => $uri,
-            'trace' => 1,
-            'exceptions' => true,
-            'cache_wsdl' => WSDL_CACHE_NONE,
-            'keep_alive' => false,
-            'features' => SOAP_SINGLE_ELEMENT_ARRAYS,
-            'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | 9,
-        );
-        if (substr($ppt2lp_host, 0, 5) === 'https') {
-            $options['ssl_method'] = SOAP_SSL_METHOD_TLS;
-            // If using SSL, please note that *not* supporting the SSLv2
-            // (broken in terms of security), the server tends to generate
-            // the following issue:
-            // SoapClient::__doRequest(): SSL: Connection reset by peer
-        }
-        $client = new SoapClient(null, $options);
-        $result = '';
+    abstract public function add_docs_to_visio();
 
-        $file_data = base64_encode(file_get_contents($file['tmp_name']));
-        $file_name = $file['name'];
-        if (empty($size)) {
-            $size = api_get_setting('service_ppt2lp', 'size');
-        }
-        $params = array(
-            'secret_key' => $secret_key,
-            'file_data' => $file_data,
-            'file_name' => $file_name,
-            'service_ppt2lp_size' => $size,
-        );
-
-        try {
-            //error_log('['.time().'] Calling wsConvertPpt webservice on ' . $ppt2lp_host);
-            $result = $client->__call('wsConvertPpt', array('pptData' => $params));
-        } catch (Exception $e) {
-            error_log('['.time().'] Chamilo SOAP call error: '.$e->getMessage());
-        }
-        // Make sure we destroy the SOAP client as it may generate SSL connection
-        // binding issue (if using SSL)
-        unset($client);
-        return $result;
-    }
-
-    abstract function make_lp();
-    abstract function add_docs_to_visio();
-    abstract function add_command_parameters();
+    abstract public function add_command_parameters();
 
     /**
-     * Used to convert copied from document
+     * Used to convert copied from document.
+     *
      * @param string $originalPath
      * @param string $convertedPath
      * @param string $convertedTitle
+     *
      * @return bool
      */
-    function convertCopyDocument($originalPath, $convertedPath, $convertedTitle)
+    public function convertCopyDocument($originalPath, $convertedPath, $convertedTitle)
     {
         $_course = api_get_course_info();
-        $ids = array();
+        $ids = [];
         $originalPathInfo = pathinfo($originalPath);
         $convertedPathInfo = pathinfo($convertedPath);
         $this->base_work_dir = $originalPathInfo['dirname'];
@@ -301,7 +248,7 @@ abstract class OpenofficeDocument extends learnpath
             $locale = $this->original_locale; // TODO: Improve it because we're not sure this locale is present everywhere.
             putenv('LC_ALL='.$locale);
 
-            $files = array();
+            $files = [];
             $return = 0;
             $shell = exec($cmd, $files, $return);
             // TODO: Chown is not working, root keep user privileges, should be www-data
@@ -324,6 +271,7 @@ abstract class OpenofficeDocument extends learnpath
                         break;
                 }
                 DocumentManager::delete_document($_course, $this->created_dir, $this->base_work_dir);
+
                 return false;
             }
         } else {
@@ -370,5 +318,75 @@ abstract class OpenofficeDocument extends learnpath
         }
 
         return $ids;
+    }
+
+    /**
+     * Get images files from remote host (with webservices).
+     *
+     * @param array  $file current ppt file details
+     * @param string $size The expected final size of the rendered slides
+     *
+     * @return array images files
+     */
+    private function _get_remote_ppt2lp_files($file, $size = null)
+    {
+        // host
+        $ppt2lp_host = api_get_setting('service_ppt2lp', 'host');
+        // SOAP URI (just the host)
+        $matches = [];
+        $uri = '';
+        $result = preg_match('/^([a-zA-Z0-9]*):\/\/([^\/]*)\//', $ppt2lp_host, $matches);
+        if ($result) {
+            $uri = $matches[1].'://'.$matches[2].'/';
+        } else {
+            $uri = $ppt2lp_host;
+        }
+        // secret key
+        $secret_key = sha1(api_get_setting('service_ppt2lp', 'ftp_password'));
+
+        // client
+        $options = [
+            'location' => $ppt2lp_host,
+            'uri' => $uri,
+            'trace' => 1,
+            'exceptions' => true,
+            'cache_wsdl' => WSDL_CACHE_NONE,
+            'keep_alive' => false,
+            'features' => SOAP_SINGLE_ELEMENT_ARRAYS,
+            'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | 9,
+        ];
+        if (substr($ppt2lp_host, 0, 5) === 'https') {
+            $options['ssl_method'] = SOAP_SSL_METHOD_TLS;
+            // If using SSL, please note that *not* supporting the SSLv2
+            // (broken in terms of security), the server tends to generate
+            // the following issue:
+            // SoapClient::__doRequest(): SSL: Connection reset by peer
+        }
+        $client = new SoapClient(null, $options);
+        $result = '';
+
+        $file_data = base64_encode(file_get_contents($file['tmp_name']));
+        $file_name = $file['name'];
+        if (empty($size)) {
+            $size = api_get_setting('service_ppt2lp', 'size');
+        }
+        $params = [
+            'secret_key' => $secret_key,
+            'file_data' => $file_data,
+            'file_name' => $file_name,
+            'service_ppt2lp_size' => $size,
+        ];
+
+        try {
+            //error_log('['.time().'] Calling wsConvertPpt webservice on ' . $ppt2lp_host);
+            $result = $client->__call('wsConvertPpt', ['pptData' => $params]);
+        } catch (Exception $e) {
+            error_log('['.time().'] Chamilo SOAP call error: '.$e->getMessage());
+        }
+        // Make sure we destroy the SOAP client as it may generate SSL connection
+        // binding issue (if using SSL)
+        unset($client);
+
+        return $result;
     }
 }

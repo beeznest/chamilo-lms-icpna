@@ -1,7 +1,6 @@
 <?php
 /* For licensing terms, see /license.txt */
 
-use ChamiloSession as Session;
 use Symfony\Component\Finder\Finder;
 
 require_once __DIR__.'/../inc/global.inc.php';
@@ -14,7 +13,7 @@ require_once 'work.lib.php';
 
 $this_section = SECTION_COURSES;
 
-$workId = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : null;
+$workId = isset($_REQUEST['id']) ? (int) $_REQUEST['id'] : 0;
 
 $is_allowed_to_edit = api_is_allowed_to_edit();
 $course_id = api_get_course_int_id();
@@ -30,23 +29,26 @@ if (empty($workId)) {
 }
 
 protectWork($courseInfo, $workId);
-
 $workInfo = get_work_data_by_id($workId);
+
+if (empty($workInfo)) {
+    api_not_allowed(true);
+}
 
 $student_can_edit_in_session = api_is_allowed_to_session_edit(false, true);
 
 $homework = get_work_assignment_by_id($workInfo['id']);
 $validationStatus = getWorkDateValidationStatus($homework);
 
-$interbreadcrumb[] = array(
+$interbreadcrumb[] = [
     'url' => api_get_path(WEB_CODE_PATH).'work/work.php?'.api_get_cidreq(),
     'name' => get_lang('StudentPublications'),
-);
-$interbreadcrumb[] = array(
+];
+$interbreadcrumb[] = [
     'url' => api_get_path(WEB_CODE_PATH).'work/work_list.php?'.api_get_cidreq().'&id='.$workId,
     'name' => $workInfo['title'],
-);
-$interbreadcrumb[] = array('url' => '#', 'name'  => get_lang('UploadCorrections'));
+];
+$interbreadcrumb[] = ['url' => '#', 'name' => get_lang('UploadCorrections')];
 
 $downloadLink = api_get_path(WEB_CODE_PATH).'work/downloadfolder.inc.php?id='.$workId.'&'.api_get_cidreq();
 
@@ -55,7 +57,7 @@ $form = new FormValidator(
     'POST',
     api_get_self()."?".api_get_cidreq()."&id=".$workId,
     '',
-    array('enctype' => "multipart/form-data")
+    ['enctype' => "multipart/form-data"]
 );
 
 $form->addElement('header', get_lang('UploadCorrections'));
@@ -84,7 +86,7 @@ if ($form->validate()) {
         $zipFileList = (array) $zip->listContent();
 
         $realSize = 0;
-        foreach ($zipFileList as & $this_content) {
+        foreach ($zipFileList as &$this_content) {
             $realSize += $this_content['size'];
         }
 
@@ -103,7 +105,7 @@ if ($form->validate()) {
         $destinationDir = api_get_path(SYS_ARCHIVE_PATH).$folder;
         mkdir($destinationDir, api_get_permissions_for_new_directories(), true);
 
-        /*	Uncompress zip file*/
+        // Uncompress zip file
         // We extract using a callback function that "cleans" the path
         $result = $zip->extract(
             PCLZIP_OPT_PATH,
@@ -127,7 +129,7 @@ if ($form->validate()) {
         $finalResult = [];
         foreach ($result as $item) {
             $title = $item['title_clean'];
-            $insert_date = str_replace(array(':', '-', ' '), '_', api_get_local_time($item['sent_date_from_db']));
+            $insert_date = str_replace([':', '-', ' '], '_', api_get_local_time($item['sent_date_from_db']));
             $title = api_replace_dangerous_char($insert_date.'_'.$item['username'].'_'.$title);
             $finalResult[$title] = $item['id'];
         }

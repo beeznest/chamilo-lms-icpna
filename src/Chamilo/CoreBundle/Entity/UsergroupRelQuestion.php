@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * UsergroupRelQuestion
+ * UsergroupRelQuestion.
  *
  * @ORM\Table(name="usergroup_rel_question")
  * @ORM\Entity
@@ -14,46 +14,47 @@ use Doctrine\ORM\Mapping as ORM;
 class UsergroupRelQuestion
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $id;
+    protected $id;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer", nullable=false)
      */
-    private $cId;
+    protected $cId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="question_id", type="integer", nullable=false)
      */
-    private $questionId;
+    protected $questionId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="usergroup_id", type="integer", nullable=false)
      */
-    private $usergroupId;
+    protected $usergroupId;
 
     /**
      * @var float
      *
      * @ORM\Column(name="coefficient", type="float", precision=6, scale=2, nullable=true)
      */
-    private $coefficient;
+    protected $coefficient;
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return UsergroupRelQuestion
      */
     public function setCId($cId)
@@ -64,9 +65,9 @@ class UsergroupRelQuestion
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {
@@ -74,9 +75,10 @@ class UsergroupRelQuestion
     }
 
     /**
-     * Set questionId
+     * Set questionId.
      *
-     * @param integer $questionId
+     * @param int $questionId
+     *
      * @return UsergroupRelQuestion
      */
     public function setQuestionId($questionId)
@@ -87,9 +89,9 @@ class UsergroupRelQuestion
     }
 
     /**
-     * Get questionId
+     * Get questionId.
      *
-     * @return integer
+     * @return int
      */
     public function getQuestionId()
     {
@@ -97,9 +99,10 @@ class UsergroupRelQuestion
     }
 
     /**
-     * Set usergroupId
+     * Set usergroupId.
      *
-     * @param integer $usergroupId
+     * @param int $usergroupId
+     *
      * @return UsergroupRelQuestion
      */
     public function setUsergroupId($usergroupId)
@@ -110,9 +113,9 @@ class UsergroupRelQuestion
     }
 
     /**
-     * Get usergroupId
+     * Get usergroupId.
      *
-     * @return integer
+     * @return int
      */
     public function getUsergroupId()
     {
@@ -120,9 +123,10 @@ class UsergroupRelQuestion
     }
 
     /**
-     * Set coefficient
+     * Set coefficient.
      *
      * @param float $coefficient
+     *
      * @return UsergroupRelQuestion
      */
     public function setCoefficient($coefficient)
@@ -133,7 +137,7 @@ class UsergroupRelQuestion
     }
 
     /**
-     * Get coefficient
+     * Get coefficient.
      *
      * @return float
      */
@@ -143,9 +147,9 @@ class UsergroupRelQuestion
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {

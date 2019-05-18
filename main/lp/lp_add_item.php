@@ -5,29 +5,28 @@ use ChamiloSession as Session;
 
 /**
  * This is a learning path creation and player tool in Chamilo - previously
- * learnpath_handler.php
+ * learnpath_handler.php.
  *
  * @author Patrick Cool
  * @author Denes Nagy
  * @author Roan Embrechts, refactoring and code cleaning
  * @author Yannick Warnier <ywarnier@beeznest.org> - cleaning and update
  * @author Julio Montoya  - Improving the list of templates
+ *
  * @package chamilo.learnpath
  */
-
 $this_section = SECTION_COURSES;
 
 api_protect_course_script();
 
 $isStudentView = isset($_REQUEST['isStudentView']) ? $_REQUEST['isStudentView'] : null;
-$learnpath_id = isset($_REQUEST['lp_id']) ? intval($_REQUEST['lp_id']) : null;
+$lpId = isset($_REQUEST['lp_id']) ? (int) $_REQUEST['lp_id'] : 0;
 $submit = isset($_POST['submit_button']) ? $_POST['submit_button'] : null;
 $type = isset($_GET['type']) ? $_GET['type'] : null;
 $action = isset($_GET['action']) ? $_GET['action'] : null;
-
 $is_allowed_to_edit = api_is_allowed_to_edit(null, false);
 
-$listUrl = api_get_path(WEB_CODE_PATH).'lp/lp_controller.php?action=view&lp_id='.$learnpath_id.'&'.api_get_cidreq().'&isStudentView=true';
+$listUrl = api_get_path(WEB_CODE_PATH).'lp/lp_controller.php?action=view&lp_id='.$lpId.'&'.api_get_cidreq().'&isStudentView=true';
 if (!$is_allowed_to_edit) {
     header("Location: $listUrl");
     exit;
@@ -46,20 +45,21 @@ if ($learnPath->get_lp_session_id() != api_get_session_id()) {
     exit;
 }
 
-$htmlHeadXtra[] = '<script>'.
-$learnPath->get_js_dropdown_array()."
-function load_cbo(id) {
+$htmlHeadXtra[] = '<script>'.$learnPath->get_js_dropdown_array()."
+function load_cbo(id, previousId) {
     if (!id) {
         return false;
     }
+    
+    previousId = previousId || 'previous';
 
-    var cbo = document.getElementById('previous');
-    for(var i = cbo.length - 1; i > 0; i--) {
+    var cbo = document.getElementById(previousId);
+    for (var i = cbo.length - 1; i > 0; i--) {
         cbo.options[i] = null;
     }
 
     var k=0;
-    for(var i = 1; i <= child_name[id].length; i++){
+    for (var i = 1; i <= child_name[id].length; i++){
         var option = new Option(child_name[id][i - 1], child_value[id][i - 1]);
         option.style.paddingLeft = '40px';
         cbo.options[i] = option;
@@ -67,7 +67,7 @@ function load_cbo(id) {
     }
 
     cbo.options[k].selected = true;
-    $('#previous').selectpicker('refresh');
+    $('#' + previousId).selectpicker('refresh');
 }
 
 $(function() {
@@ -85,49 +85,44 @@ $(function() {
 });
 </script>";
 
-/* SHOWING THE ADMIN TOOLS */
-if (isset($_SESSION['gradebook'])) {
-    $gradebook = $_SESSION['gradebook'];
+if (api_is_in_gradebook()) {
+    $interbreadcrumb[] = [
+        'url' => Category::getUrl(),
+        'name' => get_lang('ToolGradebook'),
+    ];
 }
 
-if (!empty($gradebook) && $gradebook == 'view') {
-    $interbreadcrumb[] = array(
-        'url' => '../gradebook/'.$_SESSION['gradebook_dest'],
-        'name' => get_lang('ToolGradebook')
-    );
-}
-
-$htmlHeadXtra[] = api_get_jquery_libraries_js(array('jquery-ui', 'jquery-upload'));
-$interbreadcrumb[] = array(
+$htmlHeadXtra[] = api_get_jquery_libraries_js(['jquery-ui', 'jquery-upload']);
+$interbreadcrumb[] = [
     'url' => 'lp_controller.php?action=list&'.api_get_cidreq(),
     'name' => get_lang('LearningPaths'),
-);
-$interbreadcrumb[] = array(
-    'url' => api_get_self()."?action=build&lp_id=$learnpath_id&".api_get_cidreq(),
+];
+$interbreadcrumb[] = [
+    'url' => api_get_self()."?action=build&lp_id=$lpId&".api_get_cidreq(),
     'name' => $learnPath->get_name(),
-);
+];
 
 switch ($type) {
     case 'dir':
-        $interbreadcrumb[] = array(
+        $interbreadcrumb[] = [
             'url' => 'lp_controller.php?action=add_item&type=step&lp_id='.$learnPath->get_id().'&'.api_get_cidreq(),
             'name' => get_lang('NewStep'),
-        );
-        $interbreadcrumb[] = array('url' => '#', 'name' => get_lang('NewChapter'));
+        ];
+        $interbreadcrumb[] = ['url' => '#', 'name' => get_lang('NewChapter')];
         break;
     case 'document':
-        $interbreadcrumb[] = array(
+        $interbreadcrumb[] = [
             'url' => 'lp_controller.php?action=add_item&type=step&lp_id='.$learnPath->get_id().'&'.api_get_cidreq(),
             'name' => get_lang('NewStep'),
-        );
+        ];
         break;
     default:
-        $interbreadcrumb[] = array('url' => '#', 'name' => get_lang('NewStep'));
+        $interbreadcrumb[] = ['url' => '#', 'name' => get_lang('NewStep')];
         break;
 }
 
 if ($action == 'add_item' && $type == 'document') {
-    $interbreadcrumb[] = array('url' => '#', 'name' => get_lang('NewDocumentCreated'));
+    $interbreadcrumb[] = ['url' => '#', 'name' => get_lang('NewDocumentCreated')];
 }
 
 // Theme calls.
@@ -164,15 +159,12 @@ function confirmation(name) {
     }
 }
 
-jQuery(document).ready(function(){
+$(function() {
     jQuery('.scrollbar-inner').scrollbar();
 
     $('#subtab ').on('click', 'a:first', function() {
         window.location.reload();
     });
-});
-
-$(document).ready(function() {
     expandColumnToogle('#hide_bar_template', {
         selector: '#lp_sidebar'
     }, {
@@ -180,7 +172,7 @@ $(document).ready(function() {
     });
 
     $('.lp-btn-associate-forum').on('click', function (e) {
-        var associate = confirm('<?php echo get_lang('ConfirmAssociateForumToLPItem') ?>');
+        var associate = confirm('<?php echo get_lang('ConfirmAssociateForumToLPItem'); ?>');
 
         if (!associate) {
             e.preventDefault();
@@ -188,7 +180,7 @@ $(document).ready(function() {
     });
 
     $('.lp-btn-dissociate-forum').on('click', function (e) {
-        var dissociate = confirm('<?php echo get_lang('ConfirmDissociateForumToLPItem') ?>');
+        var dissociate = confirm('<?php echo get_lang('ConfirmDissociateForumToLPItem'); ?>');
 
         if (!dissociate) {
             e.preventDefault();
@@ -197,11 +189,10 @@ $(document).ready(function() {
 
     // hide the current template list for new documment until it tab clicked
     $('#frmModel').hide();
-
 });
 
 // document template for new document tab handler
-$(document).on( 'shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
+$(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
     var id = e.target.id;
     if (id == 'subtab2') {
         $('#frmModel').show();
@@ -231,7 +222,7 @@ echo '</div>';
 echo '<div id="doc_form" class="col-md-8">';
 
 //@todo use session flash messages
-if (in_array($message, array('ItemUpdated'))) {
+if (in_array($message, ['ItemUpdated'])) {
     echo Display::return_message(get_lang($message));
 }
 
@@ -239,37 +230,61 @@ if (isset($new_item_id) && is_numeric($new_item_id)) {
     switch ($type) {
         case 'dir':
             echo $learnPath->display_manipulate($new_item_id, $_POST['type']);
-            echo Display::return_message(get_lang('NewChapterCreated'), 'confirmation');
+            echo Display::return_message(
+                get_lang('NewChapterCreated'),
+                'confirmation'
+            );
             break;
         case TOOL_LINK:
             echo $learnPath->display_manipulate($new_item_id, $type);
-            echo Display::return_message(get_lang('NewLinksCreated'), 'confirmation');
+            echo Display::return_message(
+                get_lang('NewLinksCreated'),
+                'confirmation'
+            );
             break;
         case TOOL_STUDENTPUBLICATION:
             echo $learnPath->display_manipulate($new_item_id, $type);
-            echo Display::return_message(get_lang('NewStudentPublicationCreated'), 'confirmation');
+            echo Display::return_message(
+                get_lang('NewStudentPublicationCreated'),
+                'confirmation'
+            );
             break;
         case TOOL_QUIZ:
             echo $learnPath->display_manipulate($new_item_id, $type);
-            echo Display::return_message(get_lang('NewExerciseCreated'), 'confirmation');
+            echo Display::return_message(
+                get_lang('NewExerciseCreated'),
+                'confirmation'
+            );
             break;
         case TOOL_DOCUMENT:
-            echo Display::return_message(get_lang('NewDocumentCreated'), 'confirmation');
+            echo Display::return_message(
+                get_lang('NewDocumentCreated'),
+                'confirmation'
+            );
             echo $learnPath->display_item($new_item_id);
             break;
         case TOOL_FORUM:
             echo $learnPath->display_manipulate($new_item_id, $type);
-            echo Display::return_message(get_lang('NewForumCreated'), 'confirmation');
+            echo Display::return_message(
+                get_lang('NewForumCreated'),
+                'confirmation'
+            );
             break;
         case 'thread':
             echo $learnPath->display_manipulate($new_item_id, $type);
-            echo Display::return_message(get_lang('NewThreadCreated'), 'confirmation');
+            echo Display::return_message(
+                get_lang('NewThreadCreated'),
+                'confirmation'
+            );
             break;
     }
 } else {
     switch ($type) {
         case 'dir':
-            echo $learnPath->display_item_form($type, get_lang('EnterDataNewChapter'));
+            echo $learnPath->display_item_form(
+                $type,
+                get_lang('EnterDataNewChapter')
+            );
             break;
         case TOOL_DOCUMENT:
             if (isset($_GET['file']) && is_numeric($_GET['file'])) {
@@ -282,7 +297,10 @@ if (isset($new_item_id) && is_numeric($new_item_id)) {
             echo $learnPath->display_hotpotatoes_form('add', 0, $_GET['file']);
             break;
         case TOOL_QUIZ:
-            echo Display::return_message(get_lang('ExerciseCantBeEditedAfterAddingToTheLP'), 'warning');
+            echo Display::return_message(
+                get_lang('ExerciseCantBeEditedAfterAddingToTheLP'),
+                'warning'
+            );
             echo $learnPath->display_quiz_form('add', 0, $_GET['file']);
             break;
         case TOOL_FORUM:

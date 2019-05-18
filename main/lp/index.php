@@ -1,8 +1,10 @@
 <?php
 /* For licensing terms, see /license.txt */
 /**
- * Redirection script
+ * Redirection script.
+ *
  * @package chamilo.learnpath
+ *
  * @author Yannick Warnier <ywarnier@beeznest.org>
  */
 
@@ -11,3 +13,4 @@ $use_anonymous = true;
 
 require_once __DIR__.'/../inc/global.inc.php';
 header('location: lp_controller.php?'.api_get_cidreq().'&action=list');
+exit;

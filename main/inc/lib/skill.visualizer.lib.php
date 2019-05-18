@@ -3,6 +3,7 @@
 
 /**
  * @package chamilo.admin
+ *
  * @todo lib not use. Only the class variables not the functions
  */
 class SkillVisualizer
@@ -25,16 +26,22 @@ class SkillVisualizer
 
     /**
      * SkillVisualizer constructor.
+     *
      * @param $skills
      * @param string $type
      */
     public function __construct($skills, $type = 'read')
     {
-        $this->skills   = $skills;
-        $this->type     = $type;
+        $this->skills = $skills;
+        $this->type = $type;
         $this->center_x = intval($this->offset_x + $this->canvas_x / 2 - $this->block_size / 2);
     }
 
+    /**
+     * @param $skill
+     * @param $position
+     * @param $class
+     */
     public function prepare_skill_box($skill, $position, $class)
     {
         $block_id = $skill['id'];
@@ -48,56 +55,24 @@ class SkillVisualizer
 
         $content = $skill['name'];
         $content .= '<div class="btn-group">';
-        $content .= Display::url(get_lang('Edit'), '#', array('id'=>'edit_block_'.$block_id, 'class'=>'edit_block btn'));
-        $content .= Display::url('+', '#', array('id'=>'edit_block_'.$block_id, 'class'=>'edit_block btn'));
+        $content .= Display::url(get_lang('Edit'), '#', ['id' => 'edit_block_'.$block_id, 'class' => 'edit_block btn']);
+        $content .= Display::url('+', '#', ['id' => 'edit_block_'.$block_id, 'class' => 'edit_block btn']);
         $content .= '</div>';
 
-        $this->html .= $content.' '.$gradebook_string;
+        $this->html .= $content;
 
         if ($this->type == 'edit' && $skill['parent_id'] != 0) {
             //$this->html .= Display::url(Display::return_icon('edit.png', get_lang('Edit'), array(), ICON_SIZE_SMALL), '#', array('id'=>'edit_block_'.$block_id,'class'=>'edit_block'));
             //$this->html .= Display::url(Display::return_icon('add.png', get_lang('Add'), array(), ICON_SIZE_SMALL), '#', array('id'=>'edit_block_'.$block_id,'class'=>'edit_block'));
             //$this->html .= Display::url(Display::return_icon('delete.png', get_lang('Delete'), array(), ICON_SIZE_SMALL), '#', array('id=>"edit_block_'.$block_id,'class'=>'edit_block'));
             //$this->html .= Display::url(Display::return_icon('up.png', get_lang('Close'), array(), ICON_SIZE_SMALL), '#', array('id'=>'close_block_'.$block_id,'class'=>'close_block'));
-
             //$this->html .= Display::url(Display::return_icon('down.png', get_lang('Open'), array(), ICON_SIZE_SMALL), '#', array('id'=>'open_block_'.$block_id,'class'=>'open_block'));
         }
         $this->html .= '</div>';
     }
 
     /**
-     * Adds a node using jplumb
-     */
-    private function add_item($skill, $position)
-    {
-        $block_id = $skill['id'];
-        $end_point = 'readEndpoint';
-        $class = 'default_window';
-        if ($this->type == 'edit') {
-            $class = 'edit_window';
-            $end_point = 'editEndpoint';
-        } else {
-            if ($skill['done_by_user'] == 1) {
-                $class = 'done_window';
-                $end_point = 'doneEndpoint';
-            } else {
-                $end_point = 'defaultEndpoint';
-            }
-        }
-        $this->prepare_skill_box($skill, $position, $class);
-
-        if ($skill['parent_id'] == 0) {
-            return;
-        }
-        //default_arrow_color
-
-        $this->js .= 'var e'.$block_id.' = prepare("block_'.$block_id.'",  '.$end_point.');'."\n";
-        $this->js .= 'var e'.$skill['parent_id'].' = prepare("block_'.$skill['parent_id'].'",  '.$end_point.');'."\n";
-        $this->js .= 'jsPlumb.connect({source: e'.$block_id.', target:e'.$skill['parent_id'].'});'."\n"; ;
-    }
-
-    /**
-     * Displays the HTMl part of jplumb
+     * Displays the HTMl part of jplumb.
      */
     public function display_html()
     {
@@ -105,7 +80,7 @@ class SkillVisualizer
     }
 
     /**
-     * Displays the Javascript part of jplumb
+     * Displays the Javascript part of jplumb.
      */
     public function display_js()
     {
@@ -125,9 +100,9 @@ class SkillVisualizer
         $skill_count = sizeof($this->skills);
         //$corner = 360 / $skill_count;
         $count = 0;
-        $brothers = array();
+        $brothers = [];
         foreach ($this->skills as &$skill) {
-            if (!in_array($skill['parent_id'], array(0, 1))) {
+            if (!in_array($skill['parent_id'], [0, 1])) {
                 continue;
             }
             $childs = isset($skill['children']) ? count($skill['children']) : 0;
@@ -167,9 +142,41 @@ class SkillVisualizer
 
             //$skill['description']  = "{$brothers[$skill['parent_id']]} $x - $y";
             //$skill['name']  =  $skill['name']."  |  $x = $my_count * 150  +  $parent_x - (150* $max/2) - 10*$childs ";
-            $this->add_item($skill, array('x' => $this->offset_x + $x, 'y' => $this->offset_y + $y));
+            $this->add_item($skill, ['x' => $this->offset_x + $x, 'y' => $this->offset_y + $y]);
         }
+
         return $this->get_html();
+    }
+
+    /**
+     * Adds a node using jplumb.
+     */
+    private function add_item($skill, $position)
+    {
+        $block_id = $skill['id'];
+        $end_point = 'readEndpoint';
+        $class = 'default_window';
+        if ($this->type == 'edit') {
+            $class = 'edit_window';
+            $end_point = 'editEndpoint';
+        } else {
+            if ($skill['done_by_user'] == 1) {
+                $class = 'done_window';
+                $end_point = 'doneEndpoint';
+            } else {
+                $end_point = 'defaultEndpoint';
+            }
+        }
+        $this->prepare_skill_box($skill, $position, $class);
+
+        if ($skill['parent_id'] == 0) {
+            return;
+        }
+        //default_arrow_color
+
+        $this->js .= 'var e'.$block_id.' = prepare("block_'.$block_id.'",  '.$end_point.');'."\n";
+        $this->js .= 'var e'.$skill['parent_id'].' = prepare("block_'.$skill['parent_id'].'",  '.$end_point.');'."\n";
+        $this->js .= 'jsPlumb.connect({source: e'.$block_id.', target:e'.$skill['parent_id'].'});'."\n";
     }
 
     private function get_html()

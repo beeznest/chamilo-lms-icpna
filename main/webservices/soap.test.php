@@ -1,11 +1,10 @@
 <?php /* For licensing terms, see /license.txt */
 /**
- * Test script for soap.php
+ * Test script for soap.php.
+ *
  * @author Yannick Warnier <yannick.warnier@beeznest.com>
+ *
  * @package chamilo.webservices
- */
-/**
- * Init
  */
 exit; //remove to enable
 // Include the necessary files, assuming this script is located in main/lp/ or something like that
@@ -28,15 +27,15 @@ $lpiid = 1; // set to your learnpath item ID
 $server = api_get_path(WEB_CODE_PATH).'webservices/registration.soap.php?wsdl';
 
 /**
- * Call the webservice
+ * Call the webservice.
  */
 
 // Init the SOAP connection
-$client = new SoapClient($server, array('cache_wsdl' => WSDL_CACHE_NONE));
+$client = new SoapClient($server, ['cache_wsdl' => WSDL_CACHE_NONE]);
 
 // Call the function we want with the right params...
 try {
-    $response = $client->{'WSSearchSession'}(array('term' => 'a', 'extrafields' => array(), 'secret_key' => $signature));
+    $response = $client->{'WSSearchSession'}(['term' => 'a', 'extrafields' => [], 'secret_key' => $signature]);
 } catch (Exception $e) {
     error_log(print_r($e->getMessage(), 1));
 }

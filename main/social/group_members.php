@@ -3,16 +3,16 @@
 
 /**
  * @package chamilo.social
+ *
  * @author Julio Montoya <gugli100@gmail.com>
  */
-
 $cidReset = true;
 require_once __DIR__.'/../inc/global.inc.php';
 
 api_block_anonymous_users();
 
 if (api_get_setting('allow_social_tool') != 'true') {
-    api_not_allowed();
+    api_not_allowed(true);
 }
 
 $this_section = SECTION_SOCIAL;
@@ -22,11 +22,11 @@ $user_role = '';
 
 //todo @this validation could be in a function in group_portal_manager
 if (empty($group_id)) {
-    api_not_allowed();
+    api_not_allowed(true);
 } else {
     $group_info = $userGroup->get($group_id);
     if (empty($group_info)) {
-        api_not_allowed();
+        api_not_allowed(true);
     }
     $user_role = $userGroup->get_user_group_role(
         api_get_user_id(),
@@ -34,28 +34,28 @@ if (empty($group_id)) {
     );
     if (!in_array(
         $user_role,
-        array(
+        [
             GROUP_USER_PERMISSION_ADMIN,
             GROUP_USER_PERMISSION_MODERATOR,
-            GROUP_USER_PERMISSION_READER
-        )
+            GROUP_USER_PERMISSION_READER,
+        ]
     )
     ) {
-        api_not_allowed();
+        api_not_allowed(true);
     }
 }
 
-$interbreadcrumb[] = array('url' => 'home.php', 'name' => get_lang('Social'));
-$interbreadcrumb[] = array('url' => 'groups.php', 'name' => get_lang('Groups'));
-$interbreadcrumb[] = array('url' => 'group_view.php?id='.$group_id, 'name' => $group_info['name']);
-$interbreadcrumb[] = array('url' => '#', 'name' => get_lang('MemberList'));
+$interbreadcrumb[] = ['url' => 'home.php', 'name' => get_lang('Social')];
+$interbreadcrumb[] = ['url' => 'groups.php', 'name' => get_lang('Groups')];
+$interbreadcrumb[] = ['url' => 'group_view.php?id='.$group_id, 'name' => $group_info['name']];
+$interbreadcrumb[] = ['url' => '#', 'name' => get_lang('MemberList')];
 
 //if i'm a moderator
 if (isset($_GET['action']) && $_GET['action'] == 'add') {
     // we add a user only if is a open group
     $user_join = intval($_GET['u']);
     //if i'm a moderator
-    if ($userGroup->is_group_moderator($group_id)) {
+    if ($userGroup->isGroupModerator($group_id)) {
         $userGroup->update_user_role($user_join, $group_id);
         Display::addFlash(Display::return_message(get_lang('UserAdded')));
     }
@@ -65,7 +65,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete') {
     // we add a user only if is a open group
     $user_join = intval($_GET['u']);
     //if i'm a moderator
-    if ($userGroup->is_group_moderator($group_id)) {
+    if ($userGroup->isGroupModerator($group_id)) {
         $userGroup->delete_user_rel_group($user_join, $group_id);
         Display::addFlash(Display::return_message(get_lang('UserDeleted')));
     }
@@ -102,15 +102,15 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete_moderator') {
 $users = $userGroup->get_users_by_group(
     $group_id,
     false,
-    array(
+    [
         GROUP_USER_PERMISSION_ADMIN,
         GROUP_USER_PERMISSION_READER,
-        GROUP_USER_PERMISSION_MODERATOR
-    ),
+        GROUP_USER_PERMISSION_MODERATOR,
+    ],
     0,
     1000
 );
-$new_member_list = array();
+$new_member_list = [];
 
 $social_avatar_block = SocialManager::show_social_avatar_block(
     'member_list',
@@ -130,10 +130,10 @@ foreach ($users as $user) {
         case GROUP_USER_PERMISSION_READER:
             if (in_array(
                 $user_role,
-                array(
+                [
                     GROUP_USER_PERMISSION_ADMIN,
-                    GROUP_USER_PERMISSION_MODERATOR
-                )
+                    GROUP_USER_PERMISSION_MODERATOR,
+                ]
             )
             ) {
                 $user['link'] = '<a href="group_members.php?id='.$group_id.'&u='.$user['id'].'&action=delete">'.
@@ -172,18 +172,18 @@ foreach ($users as $user) {
     }
 
     $userPicture = UserManager::getUserPicture($user['id']);
-    $user['image'] = '<img src="'.$userPicture.'"  width="50px" height="50px"  />';
+    $user['image'] = '<img src="'.$userPicture.'"  width="50px" height="50px" />';
     $new_member_list[] = $user;
 }
 if (count($new_member_list) > 0) {
     $social_right_content .= Display::return_sortable_grid(
         'list_members',
-        array(),
+        [],
         $new_member_list,
-        array('hide_navigation' => true, 'per_page' => 100),
-        array(),
+        ['hide_navigation' => true, 'per_page' => 100],
+        [],
         false,
-        array(true, false, true, true, false, true, true)
+        [true, false, true, false, false, true, true]
     );
 }
 

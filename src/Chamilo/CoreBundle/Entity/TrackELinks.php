@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * TrackELinks
+ * TrackELinks.
  *
  * @ORM\Table(name="track_e_links", indexes={
  *     @ORM\Index(name="idx_tel_c_id", columns={"c_id"}),
@@ -18,55 +18,54 @@ use Doctrine\ORM\Mapping as ORM;
 class TrackELinks
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="links_user_id", type="integer", nullable=true)
      */
-    private $linksUserId;
+    protected $linksUserId;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="links_date", type="datetime", nullable=false)
      */
-    private $linksDate;
+    protected $linksDate;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer", nullable=false)
      */
-    private $cId;
+    protected $cId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="links_link_id", type="integer", nullable=false)
      */
-    private $linksLinkId;
+    protected $linksLinkId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="links_session_id", type="integer", nullable=false)
      */
-    private $linksSessionId;
+    protected $linksSessionId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="links_id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private $linksId;
-
-
+    protected $linksId;
 
     /**
-     * Set linksUserId
+     * Set linksUserId.
      *
-     * @param integer $linksUserId
+     * @param int $linksUserId
+     *
      * @return TrackELinks
      */
     public function setLinksUserId($linksUserId)
@@ -77,9 +76,9 @@ class TrackELinks
     }
 
     /**
-     * Get linksUserId
+     * Get linksUserId.
      *
-     * @return integer
+     * @return int
      */
     public function getLinksUserId()
     {
@@ -87,9 +86,10 @@ class TrackELinks
     }
 
     /**
-     * Set linksDate
+     * Set linksDate.
      *
      * @param \DateTime $linksDate
+     *
      * @return TrackELinks
      */
     public function setLinksDate($linksDate)
@@ -100,7 +100,7 @@ class TrackELinks
     }
 
     /**
-     * Get linksDate
+     * Get linksDate.
      *
      * @return \DateTime
      */
@@ -110,9 +110,10 @@ class TrackELinks
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return TrackELinks
      */
     public function setCId($cId)
@@ -123,9 +124,9 @@ class TrackELinks
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {
@@ -133,9 +134,10 @@ class TrackELinks
     }
 
     /**
-     * Set linksLinkId
+     * Set linksLinkId.
      *
-     * @param integer $linksLinkId
+     * @param int $linksLinkId
+     *
      * @return TrackELinks
      */
     public function setLinksLinkId($linksLinkId)
@@ -146,9 +148,9 @@ class TrackELinks
     }
 
     /**
-     * Get linksLinkId
+     * Get linksLinkId.
      *
-     * @return integer
+     * @return int
      */
     public function getLinksLinkId()
     {
@@ -156,9 +158,10 @@ class TrackELinks
     }
 
     /**
-     * Set linksSessionId
+     * Set linksSessionId.
      *
-     * @param integer $linksSessionId
+     * @param int $linksSessionId
+     *
      * @return TrackELinks
      */
     public function setLinksSessionId($linksSessionId)
@@ -169,9 +172,9 @@ class TrackELinks
     }
 
     /**
-     * Get linksSessionId
+     * Get linksSessionId.
      *
-     * @return integer
+     * @return int
      */
     public function getLinksSessionId()
     {
@@ -179,9 +182,9 @@ class TrackELinks
     }
 
     /**
-     * Get linksId
+     * Get linksId.
      *
-     * @return integer
+     * @return int
      */
     public function getLinksId()
     {

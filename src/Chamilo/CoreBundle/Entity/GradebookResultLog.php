@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * GradebookResultLog
+ * GradebookResultLog.
  *
  * @ORM\Table(name="gradebook_result_log")
  * @ORM\Entity
@@ -14,55 +14,54 @@ use Doctrine\ORM\Mapping as ORM;
 class GradebookResultLog
 {
     /**
-     * @var integer
+     * @var int
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    protected $id;
+
+    /**
+     * @var int
      *
      * @ORM\Column(name="id_result", type="integer", nullable=false)
      */
-    private $idResult;
+    protected $idResult;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="user_id", type="integer", nullable=false)
      */
-    private $userId;
+    protected $userId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="evaluation_id", type="integer", nullable=false)
      */
-    private $evaluationId;
+    protected $evaluationId;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=false)
      */
-    private $createdAt;
+    protected $createdAt;
 
     /**
      * @var float
      *
      * @ORM\Column(name="score", type="float", precision=10, scale=0, nullable=true)
      */
-    private $score;
+    protected $score;
 
     /**
-     * @var integer
+     * Set idResult.
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $id;
-
-
-
-    /**
-     * Set idResult
+     * @param int $idResult
      *
-     * @param integer $idResult
      * @return GradebookResultLog
      */
     public function setIdResult($idResult)
@@ -73,9 +72,9 @@ class GradebookResultLog
     }
 
     /**
-     * Get idResult
+     * Get idResult.
      *
-     * @return integer
+     * @return int
      */
     public function getIdResult()
     {
@@ -83,9 +82,10 @@ class GradebookResultLog
     }
 
     /**
-     * Set userId
+     * Set userId.
      *
-     * @param integer $userId
+     * @param int $userId
+     *
      * @return GradebookResultLog
      */
     public function setUserId($userId)
@@ -96,9 +96,9 @@ class GradebookResultLog
     }
 
     /**
-     * Get userId
+     * Get userId.
      *
-     * @return integer
+     * @return int
      */
     public function getUserId()
     {
@@ -106,9 +106,10 @@ class GradebookResultLog
     }
 
     /**
-     * Set evaluationId
+     * Set evaluationId.
      *
-     * @param integer $evaluationId
+     * @param int $evaluationId
+     *
      * @return GradebookResultLog
      */
     public function setEvaluationId($evaluationId)
@@ -119,9 +120,9 @@ class GradebookResultLog
     }
 
     /**
-     * Get evaluationId
+     * Get evaluationId.
      *
-     * @return integer
+     * @return int
      */
     public function getEvaluationId()
     {
@@ -129,9 +130,10 @@ class GradebookResultLog
     }
 
     /**
-     * Set createdAt
+     * Set createdAt.
      *
      * @param \DateTime $createdAt
+     *
      * @return GradebookResultLog
      */
     public function setCreatedAt($createdAt)
@@ -142,7 +144,7 @@ class GradebookResultLog
     }
 
     /**
-     * Get createdAt
+     * Get createdAt.
      *
      * @return \DateTime
      */
@@ -152,9 +154,10 @@ class GradebookResultLog
     }
 
     /**
-     * Set score
+     * Set score.
      *
      * @param float $score
+     *
      * @return GradebookResultLog
      */
     public function setScore($score)
@@ -165,7 +168,7 @@ class GradebookResultLog
     }
 
     /**
-     * Get score
+     * Get score.
      *
      * @return float
      */
@@ -175,9 +178,9 @@ class GradebookResultLog
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {

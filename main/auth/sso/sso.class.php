@@ -9,11 +9,12 @@ use ChamiloSession as Session;
  * development there) and is based on the Drupal-Chamilo module implementation.
  * To develop a new authentication mechanism, please extend this class and
  * overwrite its method, then modify the corresponding calling code in
- * main/inc/local.inc.php
+ * main/inc/local.inc.php.
+ *
  * @package chamilo.auth.sso
  */
 /**
- * The SSO class allows for management or remote Single Sign On resources
+ * The SSO class allows for management or remote Single Sign On resources.
  */
 class sso
 {
@@ -30,7 +31,7 @@ class sso
     public $referrer_uri;
 
     /**
-     * Instanciates the object, initializing all relevant URL strings
+     * Instanciates the object, initializing all relevant URL strings.
      */
     public function __construct()
     {
@@ -50,7 +51,7 @@ class sso
     }
 
     /**
-     * Unlogs the user from the remote server
+     * Unlogs the user from the remote server.
      */
     public function logout()
     {
@@ -59,7 +60,7 @@ class sso
     }
 
     /**
-     * Sends the user to the master URL for a check of active connection
+     * Sends the user to the master URL for a check of active connection.
      */
     public function ask_master()
     {
@@ -79,8 +80,9 @@ class sso
     }
 
     /**
-     * Validates the received active connection data with the database
-     * @return	bool	Return the loginFailed variable value to local.inc.php
+     * Validates the received active connection data with the database.
+     *
+     * @return bool Return the loginFailed variable value to local.inc.php
      */
     public function check_user()
     {
@@ -116,7 +118,8 @@ class sso
                 global $_configuration;
                 // Two possible authentication methods here: legacy using password
                 // and new using a temporary, session-fixed, tempkey
-                if (($sso['username'] == $uData['username']
+                if ((
+                    $sso['username'] == $uData['username']
                         && $sso['secret'] === sha1(
                             $uData['username'].
                             Session::read('tempkey').
@@ -135,7 +138,6 @@ class sso
                         if (empty($uData['expiration_date'])
                             or $uData['expiration_date'] > date('Y-m-d H:i:s')
                             or $uData['expiration_date'] == '0000-00-00 00:00:00') {
-
                             //If Multiple URL is enabled
                             if (api_get_multiple_access_url()) {
                                 //Check the access_url configuration setting if
@@ -147,7 +149,7 @@ class sso
                                 $my_url_list = api_get_access_url_from_user($uData['user_id']);
                             } else {
                                 $current_access_url_id = 1;
-                                $my_url_list = array(1);
+                                $my_url_list = [1];
                             }
 
                             $my_user_is_admin = UserManager::is_admin($uData['user_id']);
@@ -160,7 +162,7 @@ class sso
                                         $_user = api_get_user_info($_user['user_id']);
                                         $_user['uidReset'] = true;
                                         Session::write('_user', $_user);
-                                        Event::event_login($_user['user_id']);
+                                        Event::eventLogin($_user['user_id']);
                                         // Redirect to homepage
                                         $sso_target = '';
                                         if (!empty($sso['ruri'])) {
@@ -200,7 +202,7 @@ class sso
                                     $is_platformAdmin = $uData['status'] == COURSEMANAGER;
                                     Session::write('is_platformAdmin', $is_platformAdmin);
                                     Session::write('_user', $_user);
-                                    Event::event_login($_user['user_id']);
+                                    Event::eventLogin($_user['user_id']);
                                 } else {
                                     //Secondary URL admin wants to login
                                     // so we check as a normal user
@@ -208,7 +210,7 @@ class sso
                                         $_user['user_id'] = $uData['user_id'];
                                         $_user = api_get_user_info($_user['user_id']);
                                         Session::write('_user', $_user);
-                                        Event::event_login($_user['user_id']);
+                                        Event::eventLogin($_user['user_id']);
                                     } else {
                                         $loginFailed = true;
                                         Session::erase('_uid');
@@ -261,24 +263,16 @@ class sso
             header('Location: '.api_get_path(WEB_PATH).'index.php?loginFailed=1&error=user_not_found');
             exit;
         }
+
         return $loginFailed;
     }
 
     /**
-     * Decode the cookie (this function may vary depending on the
-     * Single Sign On implementation
-     * @param	string	Encoded cookie
-     * @return  array   Parsed and unencoded cookie
-     */
-    private function decode_cookie($cookie)
-    {
-        return unserialize(base64_decode($cookie));
-    }
-
-    /**
-     * Generate the URL for profile editing for a any user or the current user
-     * @param int $userId Optional. The user id
-     * @param boolean $asAdmin Optional. Whether get the URL for the platform admin
+     * Generate the URL for profile editing for a any user or the current user.
+     *
+     * @param int  $userId  Optional. The user id
+     * @param bool $asAdmin Optional. Whether get the URL for the platform admin
+     *
      * @return string The SSO URL
      */
     public function generateProfileEditingURL($userId = 0, $asAdmin = false)
@@ -290,5 +284,21 @@ class sso
         }
 
         return api_get_path(WEB_CODE_PATH).'auth/profile.php';
+    }
+
+    /**
+     * Decode the cookie (this function may vary depending on the
+     * Single Sign On implementation.
+     *
+     * @param	string	Encoded cookie
+     *
+     * @return array Parsed and unencoded cookie
+     */
+    private function decode_cookie($cookie)
+    {
+        return UnserializeApi::unserialize(
+            'not_allowed_classes',
+            base64_decode($cookie)
+        );
     }
 }

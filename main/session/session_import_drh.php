@@ -15,12 +15,11 @@ api_protect_limit_for_session_admin();
 $form_sent = 0;
 $tool_name = get_lang('ImportSessionDrhList');
 
-//$interbreadcrumb[] = array('url' => 'index.php', 'name' => get_lang('PlatformAdmin'));
-$interbreadcrumb[] = array('url' => 'session_list.php', 'name' => get_lang('SessionList'));
+$interbreadcrumb[] = ['url' => 'session_list.php', 'name' => get_lang('SessionList')];
 
 set_time_limit(0);
 
-$inserted_in_course = array();
+$inserted_in_course = [];
 
 // Display the header.
 Display::display_header($tool_name);
@@ -34,7 +33,14 @@ if (!empty($error_message)) {
     echo Display::return_message($error_message, 'normal', false);
 }
 
-$form = new FormValidator('import_sessions', 'post', api_get_self(), null, array('enctype' => 'multipart/form-data'));
+$form = new FormValidator(
+    'import_sessions',
+    'post',
+    api_get_self(),
+    null,
+    ['enctype' => 'multipart/form-data']
+);
+
 $form->addElement('file', 'import_file', get_lang('ImportFileLocation'));
 $form->addElement('checkbox', 'remove_old_relationships', null, get_lang('RemoveOldRelationships'));
 //$form->addElement('checkbox', 'send_email', null, get_lang('SendMailToUsers'));
@@ -51,7 +57,9 @@ if ($form->validate()) {
             $sendMail,
             $removeOldRelationships
         );
-        echo Display::return_message($result, 'info', false);
+        Display::addFlash(Display::return_message($result, 'info', false));
+        header('Location: '.api_get_self());
+        exit;
     } else {
         $error_message = get_lang('NoInputFile');
     }

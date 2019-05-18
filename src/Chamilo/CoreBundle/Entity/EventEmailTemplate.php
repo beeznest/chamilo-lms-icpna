@@ -1,11 +1,12 @@
 <?php
+/* For licensing terms, see /license.txt */
 
 namespace Chamilo\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * EventEmailTemplate
+ * EventEmailTemplate.
  *
  * @ORM\Table(name="event_email_template", indexes={@ORM\Index(name="event_name_index", columns={"event_type_name"})})
  * @ORM\Entity
@@ -17,51 +18,50 @@ class EventEmailTemplate
      *
      * @ORM\Column(name="message", type="text", nullable=true)
      */
-    private $message;
+    protected $message;
 
     /**
      * @var string
      *
      * @ORM\Column(name="subject", type="string", length=255, nullable=true)
      */
-    private $subject;
+    protected $subject;
 
     /**
      * @var string
      *
      * @ORM\Column(name="event_type_name", type="string", length=255, nullable=true)
      */
-    private $eventTypeName;
+    protected $eventTypeName;
 
     /**
-     * @var boolean
+     * @var bool
      *
      * @ORM\Column(name="activated", type="boolean", nullable=false)
      */
-    private $activated;
+    protected $activated;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="language_id", type="integer", nullable=true)
      */
-    private $languageId;
+    protected $languageId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private $id;
-
-
+    protected $id;
 
     /**
-     * Set message
+     * Set message.
      *
      * @param string $message
+     *
      * @return EventEmailTemplate
      */
     public function setMessage($message)
@@ -72,7 +72,7 @@ class EventEmailTemplate
     }
 
     /**
-     * Get message
+     * Get message.
      *
      * @return string
      */
@@ -82,9 +82,10 @@ class EventEmailTemplate
     }
 
     /**
-     * Set subject
+     * Set subject.
      *
      * @param string $subject
+     *
      * @return EventEmailTemplate
      */
     public function setSubject($subject)
@@ -95,7 +96,7 @@ class EventEmailTemplate
     }
 
     /**
-     * Get subject
+     * Get subject.
      *
      * @return string
      */
@@ -105,9 +106,10 @@ class EventEmailTemplate
     }
 
     /**
-     * Set eventTypeName
+     * Set eventTypeName.
      *
      * @param string $eventTypeName
+     *
      * @return EventEmailTemplate
      */
     public function setEventTypeName($eventTypeName)
@@ -118,7 +120,7 @@ class EventEmailTemplate
     }
 
     /**
-     * Get eventTypeName
+     * Get eventTypeName.
      *
      * @return string
      */
@@ -128,9 +130,10 @@ class EventEmailTemplate
     }
 
     /**
-     * Set activated
+     * Set activated.
      *
-     * @param boolean $activated
+     * @param bool $activated
+     *
      * @return EventEmailTemplate
      */
     public function setActivated($activated)
@@ -141,9 +144,9 @@ class EventEmailTemplate
     }
 
     /**
-     * Get activated
+     * Get activated.
      *
-     * @return boolean
+     * @return bool
      */
     public function getActivated()
     {
@@ -151,9 +154,10 @@ class EventEmailTemplate
     }
 
     /**
-     * Set languageId
+     * Set languageId.
      *
-     * @param integer $languageId
+     * @param int $languageId
+     *
      * @return EventEmailTemplate
      */
     public function setLanguageId($languageId)
@@ -164,9 +168,9 @@ class EventEmailTemplate
     }
 
     /**
-     * Get languageId
+     * Get languageId.
      *
-     * @return integer
+     * @return int
      */
     public function getLanguageId()
     {
@@ -174,9 +178,9 @@ class EventEmailTemplate
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {

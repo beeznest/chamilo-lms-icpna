@@ -2,7 +2,8 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * List sessions in an efficient and usable way
+ * List sessions in an efficient and usable way.
+ *
  * @package chamilo.admin
  */
 $cidReset = true;
@@ -20,10 +21,14 @@ $idChecked = isset($_REQUEST['idChecked']) ? $_REQUEST['idChecked'] : null;
 $list_type = isset($_REQUEST['list_type']) ? $_REQUEST['list_type'] : 'simple';
 
 if ($action == 'delete') {
-    $response = SessionManager::delete($idChecked);
-
-    if ($response) {
-        Display::addFlash(Display::return_message(get_lang('Deleted')));
+    $sessionInfo = api_get_session_info($idChecked);
+    if ($sessionInfo) {
+        $response = SessionManager::delete($idChecked);
+        if ($response) {
+            Display::addFlash(
+                Display::return_message(get_lang('Deleted').': '.Security::remove_XSS($sessionInfo['name']))
+            );
+        }
     }
     header('Location: session_list.php');
     exit();
@@ -48,7 +53,7 @@ $sessionFilter = new FormValidator(
     'get',
     '',
     '',
-    array(),
+    [],
     FormValidator::LAYOUT_INLINE
 );
 $courseSelect = $sessionFilter->addElement(
@@ -56,7 +61,7 @@ $courseSelect = $sessionFilter->addElement(
     'course_name',
     get_lang('SearchCourse'),
     null,
-    array('url' => api_get_path(WEB_AJAX_PATH).'course.ajax.php?a=search_course')
+    ['url' => api_get_path(WEB_AJAX_PATH).'course.ajax.php?a=search_course']
 );
 
 if (!empty($courseId)) {
@@ -126,8 +131,8 @@ $extra_params['autowidth'] = 'true';
 $extra_params['height'] = 'auto';
 
 if (!isset($_GET['keyword'])) {
-    $extra_params['postData'] = array(
-        'filters' => array(
+    $extra_params['postData'] = [
+        'filters' => [
             "groupOp" => "AND",
             "rules" => $result['rules'],
             /*array(
@@ -135,8 +140,8 @@ if (!isset($_GET['keyword'])) {
                 array( "field" => "display_end_date", "op" => "gt", "data" => "")
             ),*/
             //'groups' => $groups
-        )
-    );
+        ],
+    ];
 }
 
 $hideSearch = api_get_configuration_value('hide_search_form_in_session_list');
@@ -152,6 +157,8 @@ $action_links = 'function action_formatter(cellvalue, options, rowObject) {
 }';
 
 $urlAjaxExtraField = api_get_path(WEB_AJAX_PATH).'extra_field.ajax.php?1=1';
+$allowOrder = api_get_configuration_value('session_list_order');
+$orderUrl = api_get_path(WEB_AJAX_PATH).'session.ajax.php?a=order';
 
 ?>
     <script>
@@ -193,7 +200,6 @@ $urlAjaxExtraField = api_get_path(WEB_AJAX_PATH).'extra_field.ajax.php?1=1';
         var second_filters = [];
 
         $(function() {
-
             date_pick_today = function(elem) {
                 $(elem).datetimepicker({dateFormat: "yy-mm-dd"});
                 $(elem).datetimepicker('setDate', (new Date()));
@@ -240,7 +246,7 @@ $urlAjaxExtraField = api_get_path(WEB_AJAX_PATH).'extra_field.ajax.php?1=1';
                 $columns,
                 $column_model,
                 $extra_params,
-                array(),
+                [],
                 $action_links,
                 true
             );
@@ -285,6 +291,31 @@ $urlAjaxExtraField = api_get_path(WEB_AJAX_PATH).'extra_field.ajax.php?1=1';
                 };
 
             original_cols = grid.jqGrid('getGridParam', 'colModel');
+
+            <?php if ($allowOrder) {
+                ?>
+            options = {
+                update: function (e, ui) {
+                    var rowNum = jQuery("#sessions").getGridParam('rowNum');
+                    var page = jQuery("#sessions").getGridParam('page');
+                    page = page - 1;
+                    var start = rowNum * page;
+                    var list = jQuery('#sessions').jqGrid('getRowData');
+                    var orderList = [];
+                    $(list).each(function(index, e) {
+                        index = index + start;
+                        orderList.push({'order':index, 'id': e.id});
+                    });
+                    orderList = JSON.stringify(orderList);
+                    $.get("<?php echo $orderUrl; ?>", "order="+orderList, function (result) {
+                        //console.log(result);
+                    });
+                }
+            };
+            // Sortable rows
+            grid.jqGrid('sortableRows', options);
+            <?php
+            } ?>
 
             grid.jqGrid('navGrid','#sessions_pager',
                 {edit:false,add:false,del:false},
@@ -338,9 +369,11 @@ if (api_is_platform_admin()) {
 }
 
 if ($list_type == 'complete') {
-    echo '<a href="'.api_get_self().'?list_type=simple">'.Display::return_icon('view_remove.png', get_lang('Simple'), '', ICON_SIZE_MEDIUM).'</a>';
+    echo '<a href="'.api_get_self().'?list_type=simple">'.
+        Display::return_icon('view_remove.png', get_lang('Simple'), '', ICON_SIZE_MEDIUM).'</a>';
 } else {
-    echo '<a href="'.api_get_self().'?list_type=complete">'.Display::return_icon('view_text.png', get_lang('Complete'), '', ICON_SIZE_MEDIUM).'</a>';
+    echo '<a href="'.api_get_self().'?list_type=complete">'.
+        Display::return_icon('view_text.png', get_lang('Complete'), '', ICON_SIZE_MEDIUM).'</a>';
 }
 
 echo $actions;
@@ -355,9 +388,9 @@ if (api_is_platform_admin()) {
         [],
         FormValidator::LAYOUT_INLINE
     );
-    $form->addElement('text', 'keyword', null, array(
-        'aria-label' => get_lang('Search')
-    ));
+    $form->addElement('text', 'keyword', null, [
+        'aria-label' => get_lang('Search'),
+    ]);
     $form->addButtonSearch(get_lang('Search'));
     $form->display();
     echo '</div>';
@@ -372,5 +405,3 @@ echo Display::grid_html('sessions');
 echo '</div>';
 
 Display::display_footer();
-
-

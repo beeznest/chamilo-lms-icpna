@@ -1,5 +1,6 @@
+{% import 'default/macro/macro.tpl' as display %}
 <script>
-jQuery(document).ready(function(){
+$(function() {
     jQuery('.scrollbar-inner').scrollbar();
 });
 </script>
@@ -7,7 +8,8 @@ jQuery(document).ready(function(){
     <div class="panel panel-default">
         <div class="panel-heading" role="tab" id="headingOne">
             <h4 class="panel-title">
-                <a role="button" data-toggle="collapse" data-parent="#skill-block" href="#skillList" aria-expanded="true" aria-controls="skillList">
+                <a role="button" data-toggle="collapse"
+                   data-parent="#skill-block" href="#skillList" aria-expanded="true" aria-controls="skillList">
                     {{ "Skills" | get_lang }}
                 </a>
                 <div class="btn-group pull-right">
@@ -30,22 +32,24 @@ jQuery(document).ready(function(){
                 </div>
             </h4>
         </div>
-        <div id="skillList" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-            <div class="panel-body">
+        <div id="skillList" class="panel-collapse collapse in list-{{ orientation }}" role="tabpanel" aria-labelledby="headingOne">
+            {% set panel_content %}
                 {% if skills %}
-                    <div class="scrollbar-inner badges-sidebar">
-                        <ul class="list-unstyled list-badges">
-                            {% for skill in skills %}
-                                <li class="thumbnail">
-                                    <a href="{{ _p.web }}skill/{{ skill.id }}/user/{{ user_id }}" target="_blank">
-                                        <img title="{{ skill.name }}" class="img-responsive" src="{{ skill.icon ? skill.web_icon_thumb_path : 'badges-default.png'|icon(64) }}" width="64" height="64" alt="{{ skill.name }}">
-                                        <div class="caption">
-                                            <p class="text-center">{{ skill.name }}</p>
-                                        </div>
-                                    </a>
-                                </li>
-                            {% endfor %}
-                        </ul>
+                    <div class="list-skills">
+                        {% for item in skills %}
+                        <div class="item">
+                            <div class="image">
+                                <a href="{{ item.skill_url }}" title="{{ item.skill_name }}">
+                                    {{ item.skill_badge }}
+                                </a>
+                            </div>
+                            <div class="caption">
+                                <a href="{{ item.skill_url }}" title="{{ item.skill_name }}">
+                                    {{ item.skill_name }}
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
                     </div>
                 {% else %}
                     <p>{{ 'WithoutAchievedSkills'|get_lang }}</p>
@@ -53,7 +57,8 @@ jQuery(document).ready(function(){
                         <a href="{{ _p.web_main ~ 'social/skills_wheel.php' }}">{{ 'SkillsWheel'|get_lang }}</a>
                     </p>
                 {% endif %}
-            </div>
+            {% endset %}
+            {{ display.panel('', panel_content) }}
         </div>
     </div>
 </div>

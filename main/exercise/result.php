@@ -4,18 +4,17 @@
 use ChamiloSession as Session;
 
 /**
- * Shows the exercise results
+ * Shows the exercise results.
  *
  * @author Julio Montoya - Simple exercise result page
- *
  */
 require_once __DIR__.'/../inc/global.inc.php';
 
-$id = isset($_REQUEST['id']) ? intval($_GET['id']) : null; //exe id
-$show_headers = isset($_REQUEST['show_headers']) ? intval($_REQUEST['show_headers']) : null; //exe id
+$id = isset($_REQUEST['id']) ? (int) $_GET['id'] : null; //exe id
+$show_headers = isset($_REQUEST['show_headers']) ? (int) $_REQUEST['show_headers'] : null;
 $origin = api_get_origin();
 
-if ($origin == 'learnpath') {
+if (in_array($origin, ['learnpath', 'embeddable'])) {
     $show_headers = false;
 }
 
@@ -40,9 +39,12 @@ $student_id = $track_exercise_info['exe_user_id'];
 $current_user_id = api_get_user_id();
 
 $objExercise = new Exercise();
-
 if (!empty($exercise_id)) {
     $objExercise->read($exercise_id);
+}
+
+if (empty($objExercise)) {
+    api_not_allowed($show_headers);
 }
 
 // Only users can see their own results
@@ -57,11 +59,11 @@ $htmlHeadXtra[] = '<script src="'.api_get_path(WEB_LIBRARY_JS_PATH).'hotspot/js/
 $htmlHeadXtra[] = '<script src="'.api_get_path(WEB_LIBRARY_JS_PATH).'annotation/js/annotation.js"></script>';
 
 if ($show_headers) {
-    $interbreadcrumb[] = array(
-        "url" => "exercise.php?".api_get_cidreq(),
-        "name" => get_lang('Exercises')
-    );
-    $interbreadcrumb[] = array("url" => "#", "name" => get_lang('Result'));
+    $interbreadcrumb[] = [
+        'url' => 'exercise.php?'.api_get_cidreq(),
+        'name' => get_lang('Exercises'),
+    ];
+    $interbreadcrumb[] = ['url' => '#', 'name' => get_lang('Result')];
     $this_section = SECTION_COURSES;
     Display::display_header();
 } else {
@@ -83,4 +85,6 @@ ExerciseLib::displayQuestionListByAttempt(
 
 if ($show_headers) {
     Display::display_footer();
+} else {
+    Display::display_reduced_footer();
 }

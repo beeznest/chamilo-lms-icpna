@@ -5,16 +5,69 @@ window.RecordAudio = (function () {
 
         var mediaConstraints = {audio: true},
             recordRTC = null,
+            txtName = $('#audio-title-rtc'),
             btnStart = $(rtcInfo.btnStartId),
             btnPause = $(rtcInfo.btnPauseId),
             btnPlay = $(rtcInfo.btnPlayId),
             btnStop = $(rtcInfo.btnStopId),
-            btnSave = $(rtcInfo.btnSaveId),
+            btnSave = rtcInfo.btnSaveId ? $(rtcInfo.btnSaveId) : null,
             tagAudio = $(rtcInfo.plyrPreviewId);
+
+        function saveAudio() {
+            var recordedBlob = recordRTC.getBlob();
+
+            if (!recordedBlob) {
+                return;
+            }
+
+            var btnSaveText = btnSave ? btnSave.html() : '';
+            var fileExtension = '.' + recordedBlob.type.split('/')[1];
+
+            var formData = new FormData();
+            formData.append('audio_blob', recordedBlob, fileName + fileExtension);
+            formData.append('audio_dir', rtcInfo.directory);
+
+            $.ajax({
+                url: _p.web_ajax + 'record_audio_rtc.ajax.php?' + $.param({
+                    type: rtcInfo.type,
+                    tool: (!!txtName.length ? 'document' : 'exercise')
+                }),
+                data: formData,
+                processData: false,
+                contentType: false,
+                type: 'POST',
+                beforeSend: function () {
+                    btnStart.prop('disabled', true);
+                    btnPause.prop('disabled', true);
+                    btnPlay.prop('disabled', true);
+                    btnStop.prop('disabled', true);
+                    if (btnSave) {
+                        btnSave.prop('disabled', true).text(btnSave.data('loadingtext'));
+                    }
+                }
+            }).done(function (response) {
+                if (!!txtName.length) {
+                    if (rtcInfo.reload_page == 1) {
+                        window.location.reload();
+                        return;
+                    }
+                }
+
+                $(response.message).insertAfter($(rtcInfo.blockId).find('.well'));
+            }).always(function () {
+                if (btnSave) {
+                    btnSave.prop('disabled', true).addClass('hidden').html(btnSaveText);
+                }
+                btnStop.prop('disabled', true).addClass('hidden');
+                btnPause.prop('disabled', true).addClass('hidden');
+                btnStart.prop('disabled', false).removeClass('hidden');
+                txtName.prop('readonly', false);
+            });
+        }
 
         btnStart.on('click', function () {
             if (!fileName) {
-                fileName = $('#audio-title-rtc').val();
+                fileName = txtName.val();
 
                 if (!$.trim(fileName)) {
                     return;
@@ -30,8 +83,10 @@ window.RecordAudio = (function () {
                 });
                 recordRTC.startRecording();
 
-                $('#audio-title-rtc').prop('readonly', true);
-                btnSave.prop('disabled', true).addClass('hidden');
+                txtName.prop('readonly', true);
+                if (btnSave) {
+                    btnSave.prop('disabled', true).addClass('hidden');
+                }
                 btnStop.prop('disabled', false).removeClass('hidden');
                 btnStart.prop('disabled', true).addClass('hidden');
                 btnPause.prop('disabled', false).removeClass('hidden');
@@ -82,7 +137,12 @@ window.RecordAudio = (function () {
                 btnStart.prop('disabled', false).removeClass('hidden');
                 btnPause.prop('disabled', true).addClass('hidden');
                 btnStop.prop('disabled', true).addClass('hidden');
-                btnSave.prop('disabled', false).removeClass('hidden');
+
+                if (btnSave) {
+                    btnSave.prop('disabled', false).removeClass('hidden');
+                } else {
+                    saveAudio();
+                }
 
                 tagAudio
                     .removeClass('hidden')
@@ -91,45 +151,15 @@ window.RecordAudio = (function () {
             });
         });
 
-        btnSave.on('click', function () {
-            if (!recordRTC) {
-                return;
-            }
-
-            var recordedBlob = recordRTC.getBlob();
-
-            if (!recordedBlob) {
-                return;
-            }
-
-            var fileExtension = '.' + recordedBlob.type.split('/')[1];
-
-            var formData = new FormData();
-            formData.append('audio_blob', recordedBlob, fileName + fileExtension);
-            formData.append('audio_dir', rtcInfo.directory);
-
-            $.ajax({
-                url: _p.web_ajax + 'record_audio_rtc.ajax.php',
-                data: formData,
-                processData: false,
-                contentType: false,
-                type: 'POST'
-            }).then(function (fileUrl) {
-                if (!fileUrl) {
+        if (btnSave) {
+            btnSave.on('click', function () {
+                if (!recordRTC) {
                     return;
                 }
 
-                btnSave.prop('disabled', true).addClass('hidden');
-                btnStop.prop('disabled', true).addClass('hidden');
-                btnStart.prop('disabled', false).removeClass('hidden');
-
-                if ($('#audio-title-rtc').length) {
-                    $('#audio-title-rtc').prop('readonly', false);
-
-                    window.location.reload();
-                }
+                saveAudio();
             });
-        });
+        }
     }
 
     function useWami(wamiInfo, fileName) {
@@ -169,7 +199,8 @@ window.RecordAudio = (function () {
                 recordUrl: _p.web_ajax + 'record_audio_wami.ajax.php?' + $.param({
                     waminame: fileName + '.wav',
                     wamidir: wamiInfo.directory,
-                    wamiuserid: wamiInfo.userId
+                    wamiuserid: wamiInfo.userId,
+                    type: wamiInfo.type
                 }),
                 buttonUrl: _p.web_lib + 'wami-recorder/buttons.png',
                 buttonNoUrl: _p.web_img + 'blank.gif'

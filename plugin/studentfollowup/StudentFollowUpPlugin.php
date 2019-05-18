@@ -1,24 +1,15 @@
 <?php
 /* For licensing terms, see /license.txt */
 
-use Symfony\Component\Filesystem\Filesystem;
 use Chamilo\CoreBundle\Entity\SessionRelCourseRelUser;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Class StudentFollowUpPlugin
+ * Class StudentFollowUpPlugin.
  */
 class StudentFollowUpPlugin extends Plugin
 {
     public $hasEntity = true;
-
-    /**
-     * @return StudentFollowUpPlugin
-     */
-    public static function create()
-    {
-        static $result = null;
-        return $result ? $result : $result = new self();
-    }
 
     /**
      * StudentFollowUpPlugin constructor.
@@ -28,19 +19,32 @@ class StudentFollowUpPlugin extends Plugin
         parent::__construct(
             '0.1',
             'Julio Montoya',
-            array(
+            [
                 'tool_enable' => 'boolean',
-            )
+            ]
         );
     }
 
     /**
-     *
+     * @return StudentFollowUpPlugin
      */
+    public static function create()
+    {
+        static $result = null;
+
+        return $result ? $result : $result = new self();
+    }
+
     public function install()
     {
         $pluginEntityPath = $this->getEntityPath();
         if (!is_dir($pluginEntityPath)) {
+            if (!is_writable(dirname($pluginEntityPath))) {
+                $message = get_lang('ErrorCreatingDir').': '.$pluginEntityPath;
+                Display::addFlash(Display::return_message($message, 'error'));
+
+                return false;
+            }
             mkdir($pluginEntityPath, api_get_permissions_for_new_directories());
         }
 
@@ -60,9 +64,6 @@ class StudentFollowUpPlugin extends Plugin
         }
     }
 
-    /**
-     *
-     */
     public function uninstall()
     {
         $pluginEntityPath = $this->getEntityPath();
@@ -86,6 +87,7 @@ class StudentFollowUpPlugin extends Plugin
     /**
      * @param int $studentId
      * @param int $currentUserId
+     *
      * @return array
      */
     public static function getPermissions($studentId, $currentUserId)
@@ -151,7 +153,7 @@ class StudentFollowUpPlugin extends Plugin
                         );
                         if (!empty($coachList) && in_array($currentUserId, $coachList)) {
                             $isCourseCoach = true;
-                            break(2);
+                            break 2;
                         }
                     }
                 }
@@ -171,9 +173,9 @@ class StudentFollowUpPlugin extends Plugin
 
     /**
      * @param string $status
-     * @param int $currentUserId
-     * @param int $start
-     * @param int $limit
+     * @param int    $currentUserId
+     * @param int    $start
+     * @param int    $limit
      *
      * @return array
      */
@@ -236,6 +238,17 @@ class StudentFollowUpPlugin extends Plugin
      */
     public static function getPageSize()
     {
-        return 2;
+        return 20;
+    }
+
+    /**
+     * @param int $userId
+     */
+    public function doWhenDeletingUser($userId)
+    {
+        $userId = (int) $userId;
+
+        Database::query("DELETE FROM sfu_post WHERE user_id = $userId");
+        Database::query("DELETE FROM sfu_post WHERE insert_user_id = $userId");
     }
 }

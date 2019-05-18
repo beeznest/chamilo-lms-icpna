@@ -6,7 +6,7 @@ namespace Chamilo\CourseBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * COnlineConnected
+ * COnlineConnected.
  *
  * @ORM\Table(
  *  name="c_online_connected",
@@ -19,39 +19,40 @@ use Doctrine\ORM\Mapping as ORM;
 class COnlineConnected
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="iid", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $iid;
+    protected $iid;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer")
      */
-    private $cId;
+    protected $cId;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="last_connection", type="datetime", nullable=false)
      */
-    private $lastConnection;
+    protected $lastConnection;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="user_id", type="integer")
      */
-    private $userId;
+    protected $userId;
 
     /**
-     * Set lastConnection
+     * Set lastConnection.
      *
      * @param \DateTime $lastConnection
+     *
      * @return COnlineConnected
      */
     public function setLastConnection($lastConnection)
@@ -62,7 +63,7 @@ class COnlineConnected
     }
 
     /**
-     * Get lastConnection
+     * Get lastConnection.
      *
      * @return \DateTime
      */
@@ -72,9 +73,10 @@ class COnlineConnected
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return COnlineConnected
      */
     public function setCId($cId)
@@ -85,9 +87,9 @@ class COnlineConnected
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {
@@ -95,9 +97,10 @@ class COnlineConnected
     }
 
     /**
-     * Set userId
+     * Set userId.
      *
-     * @param integer $userId
+     * @param int $userId
+     *
      * @return COnlineConnected
      */
     public function setUserId($userId)
@@ -108,9 +111,9 @@ class COnlineConnected
     }
 
     /**
-     * Get userId
+     * Get userId.
      *
-     * @return integer
+     * @return int
      */
     public function getUserId()
     {

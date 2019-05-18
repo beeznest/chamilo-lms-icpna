@@ -1,8 +1,6 @@
 <?php
 /* For licensing terms, see /license.txt */
 
-use ChamiloSession as Session;
-
 require_once __DIR__.'/../inc/global.inc.php';
 $current_course_tool = TOOL_STUDENTPUBLICATION;
 
@@ -24,6 +22,7 @@ $session_id = api_get_session_id();
 $course_info = api_get_course_info();
 $course_code = $course_info['code'];
 $group_id = api_get_group_id();
+$sessionId = api_get_session_id();
 
 if (empty($work_id)) {
     api_not_allowed(true);
@@ -53,22 +52,22 @@ $student_can_edit_in_session = api_is_allowed_to_session_edit(false, true);
 $homework = get_work_assignment_by_id($workInfo['id']);
 $validationStatus = getWorkDateValidationStatus($homework);
 
-$interbreadcrumb[] = array(
+$interbreadcrumb[] = [
     'url' => api_get_path(WEB_CODE_PATH).'work/work.php?'.api_get_cidreq(),
     'name' => get_lang('StudentPublications'),
-);
-$interbreadcrumb[] = array(
+];
+$interbreadcrumb[] = [
     'url' => api_get_path(WEB_CODE_PATH).'work/work_list.php?'.api_get_cidreq().'&id='.$work_id,
     'name' => $workInfo['title'],
-);
-$interbreadcrumb[] = array('url' => '#', 'name'  => get_lang('UploadFromTemplate'));
+];
+$interbreadcrumb[] = ['url' => '#', 'name' => get_lang('UploadFromTemplate')];
 
 $form = new FormValidator(
     'form',
     'POST',
     api_get_self()."?".api_get_cidreq()."&id=".$work_id,
     '',
-    array('enctype' => "multipart/form-data")
+    ['enctype' => "multipart/form-data"]
 );
 setWorkUploadForm($form, $workInfo['allow_text_assignment']);
 $form->addElement('hidden', 'document_id', $documentId);
@@ -94,7 +93,7 @@ if ($form->validate()) {
             $workInfo,
             $values,
             $course_info,
-            $id_session,
+            $sessionId,
             $group_id,
             $user_id,
             [],
@@ -110,7 +109,7 @@ if ($form->validate()) {
         exit;
     } else {
         // Bad token or can't add works
-        Display::addFlash(Display::return_message(get_lang('IsNotPosibleSaveTheDocument'), 'error'));
+        Display::addFlash(Display::return_message(get_lang('ImpossibleToSaveTheDocument'), 'error'));
     }
 }
 

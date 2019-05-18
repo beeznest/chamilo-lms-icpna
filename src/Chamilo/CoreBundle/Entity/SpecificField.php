@@ -1,13 +1,16 @@
 <?php
+/* For licensing terms, see /license.txt */
 
 namespace Chamilo\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * SpecificField
+ * SpecificField.
  *
- * @ORM\Table(name="specific_field", uniqueConstraints={@ORM\UniqueConstraint(name="unique_specific_field__code", columns={"code"})})
+ * @ORM\Table(
+ *     name="specific_field",
+ *     uniqueConstraints={@ORM\UniqueConstraint(name="unique_specific_field__code", columns={"code"})})
  * @ORM\Entity
  */
 class SpecificField
@@ -17,30 +20,29 @@ class SpecificField
      *
      * @ORM\Column(name="code", type="string", length=1, nullable=false)
      */
-    private $code;
+    protected $code;
 
     /**
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=200, nullable=false)
      */
-    private $name;
+    protected $name;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private $id;
-
-
+    protected $id;
 
     /**
-     * Set code
+     * Set code.
      *
      * @param string $code
+     *
      * @return SpecificField
      */
     public function setCode($code)
@@ -51,7 +53,7 @@ class SpecificField
     }
 
     /**
-     * Get code
+     * Get code.
      *
      * @return string
      */
@@ -61,9 +63,10 @@ class SpecificField
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
+     *
      * @return SpecificField
      */
     public function setName($name)
@@ -74,7 +77,7 @@ class SpecificField
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
@@ -84,9 +87,9 @@ class SpecificField
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {

@@ -1,16 +1,16 @@
 <?php
-/**
- * NavbarNotificationListDemoListener.php
- * avanzu-admin
- * Date: 23.02.14
- */
+/* For licensing terms, see /license.txt */
 
 namespace Chamilo\ThemeBundle\EventListener;
-
 
 use Chamilo\ThemeBundle\Event\NotificationListEvent;
 use Chamilo\ThemeBundle\Model\NotificationModel;
 
+/**
+ * Class NavbarNotificationListDemoListener.
+ *
+ * @package Chamilo\ThemeBundle\EventListener
+ */
 class NavbarNotificationListDemoListener
 {
     public function onListNotifications(NotificationListEvent $event)
@@ -22,10 +22,9 @@ class NavbarNotificationListDemoListener
 
     protected function getNotifications()
     {
-        return array(
+        return [
             new NotificationModel('some notification'),
             new NotificationModel('some more notices', 'success'),
-        );
+        ];
     }
-
 }

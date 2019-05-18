@@ -1,16 +1,14 @@
 <?php
 /* For licensing terms, see /license.txt */
 
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
-
 /**
- * Chamilo LMS
+ * Chamilo LMS.
  *
  * Updates the Chamilo files from version 1.10.0 to version 1.11.0
  * This script operates only in the case of an update, and only to change the
  * active version number (and other things that might need a change) in the
  * current configuration file.
+ *
  * @package chamilo.install
  */
 error_log("Starting ".basename(__FILE__));
@@ -44,19 +42,30 @@ if (defined('SYSTEM_INSTALLATION')) {
         @rrmdir($skypePluginPath);
     }
 
-    // Delete files from ICPNA plugins
-    $pluginFileToDelete = [
-        'external_page_ngl/src/external_page_ngl_plugin.class.php',
-        'external_page_ngl/src/showPage.php'
+    // Some entities have been removed in 1.11. Delete the corresponding files
+    $entitiesToRemove = [
+        api_get_path(SYS_PLUGIN_PATH).'external_page_ngl/src/external_page_ngl_plugin.class.php',
+        api_get_path(SYS_PLUGIN_PATH).'external_page_ngl/src/showPage.php',
+        api_get_path(SYS_PATH).'src/Chamilo/CoreBundle/Entity/Groups.php',
+        api_get_path(SYS_PATH).'src/Chamilo/CoreBundle/Entity/GroupRelGroup.php',
+        api_get_path(SYS_PATH).'src/Chamilo/CoreBundle/Entity/GroupRelTag.php',
+        api_get_path(SYS_PATH).'src/Chamilo/CoreBundle/Entity/GroupRelUser.php',
     ];
-    $pluginPath = api_get_path(SYS_PLUGIN_PATH);
-
-    foreach ($pluginFileToDelete as $filePath) {
-        if (!file_exists($pluginPath.$filePath)) {
-            continue;
+    foreach ($entitiesToRemove as $entity) {
+        if (file_exists($entity)) {
+            $success = unlink($entity);
+            if (!$success) {
+                error_log('Could not delete '.$entity.', probably due to permissions. Please delete manually to avoid entities inconsistencies');
+            }
+        } else {
+            error_log('Could not delete. It seems the file '.$entity.' does not exists.');
         }
+    }
 
-        @unlink($pluginPath.$filePath);
+    $oldDefaultCertificatePath = api_get_path(SYS_CODE_PATH).'default_course_document/certificates/';
+
+    if (is_dir($oldDefaultCertificatePath)) {
+        @rrmdir($oldDefaultCertificatePath);
     }
 
     if ($debug) {

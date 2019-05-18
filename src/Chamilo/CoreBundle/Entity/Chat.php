@@ -6,61 +6,64 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Chat
+ * Chat.
  *
- * @ORM\Table(name="chat", indexes={@ORM\Index(name="idx_chat_to_user", columns={"to_user"}), @ORM\Index(name="idx_chat_from_user", columns={"from_user"})})
+ * @ORM\Table(name="chat", indexes={
+ *     @ORM\Index(name="idx_chat_to_user", columns={"to_user"}),
+ *     @ORM\Index(name="idx_chat_from_user", columns={"from_user"})
+ * })
  * @ORM\Entity
  */
 class Chat
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue()
      */
-    private $id;
+    protected $id;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="from_user", type="integer", nullable=true)
      */
-    private $fromUser;
+    protected $fromUser;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="to_user", type="integer", nullable=true)
      */
-    private $toUser;
+    protected $toUser;
 
     /**
      * @var string
      *
      * @ORM\Column(name="message", type="text", nullable=false)
      */
-    private $message;
+    protected $message;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="sent", type="datetime", nullable=false)
      */
-    private $sent;
+    protected $sent;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="recd", type="integer", nullable=false)
      */
-    private $recd;
+    protected $recd;
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -68,9 +71,10 @@ class Chat
     }
 
     /**
-     * Set fromUser
+     * Set fromUser.
      *
-     * @param integer $fromUser
+     * @param int $fromUser
+     *
      * @return Chat
      */
     public function setFromUser($fromUser)
@@ -81,9 +85,9 @@ class Chat
     }
 
     /**
-     * Get fromUser
+     * Get fromUser.
      *
-     * @return integer
+     * @return int
      */
     public function getFromUser()
     {
@@ -91,9 +95,10 @@ class Chat
     }
 
     /**
-     * Set toUser
+     * Set toUser.
      *
-     * @param integer $toUser
+     * @param int $toUser
+     *
      * @return Chat
      */
     public function setToUser($toUser)
@@ -104,9 +109,9 @@ class Chat
     }
 
     /**
-     * Get toUser
+     * Get toUser.
      *
-     * @return integer
+     * @return int
      */
     public function getToUser()
     {
@@ -114,9 +119,10 @@ class Chat
     }
 
     /**
-     * Set message
+     * Set message.
      *
      * @param string $message
+     *
      * @return Chat
      */
     public function setMessage($message)
@@ -127,7 +133,7 @@ class Chat
     }
 
     /**
-     * Get message
+     * Get message.
      *
      * @return string
      */
@@ -137,9 +143,10 @@ class Chat
     }
 
     /**
-     * Set sent
+     * Set sent.
      *
      * @param \DateTime $sent
+     *
      * @return Chat
      */
     public function setSent($sent)
@@ -150,7 +157,7 @@ class Chat
     }
 
     /**
-     * Get sent
+     * Get sent.
      *
      * @return \DateTime
      */
@@ -160,9 +167,10 @@ class Chat
     }
 
     /**
-     * Set recd
+     * Set recd.
      *
-     * @param integer $recd
+     * @param int $recd
+     *
      * @return Chat
      */
     public function setRecd($recd)
@@ -173,9 +181,9 @@ class Chat
     }
 
     /**
-     * Get recd
+     * Get recd.
      *
-     * @return integer
+     * @return int
      */
     public function getRecd()
     {

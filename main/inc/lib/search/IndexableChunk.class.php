@@ -20,7 +20,8 @@ define('XAPIAN_PREFIX_COURSEID', 'C');
 define('XAPIAN_PREFIX_TOOLID', 'O');
 
 /**
- * Class
+ * Class.
+ *
  * @package chamilo.include.search
  */
 abstract class _IndexableChunk
@@ -41,7 +42,7 @@ abstract class _IndexableChunk
      * 'SE_TOOL_ID' => string <- tool id from mainapi lib constants
      * 'SE_DATA' => mixed <- extra information, depends on SE_TOOL_ID
      * 'SE_USER' => id <- user id from user table in main db
-     * )
+     * ).
      */
     public $xapian_data;
 
@@ -49,58 +50,62 @@ abstract class _IndexableChunk
      * array(
      *   name => string
      *   flag => char
-     * )
+     * ).
      */
     public $terms;
 
     /**
-     * Add a value to the indexed item
-     * @param  string  Key
-     * @param  string  Value
-     * @return  void
+     * Class constructor. Just generates an empty 'data' array attribute.
      */
-    function addValue($key, $value) {
-        $this->data[$key] = $value;
-    }
-
-    /**
-     * Add a term (like xapian definition)
-     * @param string Term
-     * @param string Flag (one character)
-     */
-    public function addTerm($term, $flag) {
-        global $charset;
-        if (strlen($flag) == 1) {
-            $this->terms[] = array('name' => api_convert_encoding(stripslashes($term), 'UTF-8', $charset), 'flag' => $flag);
-        }
-    }
-
-    /**
-     * Class constructor. Just generates an empty 'data' array attribute
-     */
-    function __construct() {
-        $this->data = array();
+    public function __construct()
+    {
+        $this->data = [];
     }
 
     /**
      * Class desctructor. Unsets attributes.
      */
-    function __destruct() {
+    public function __destruct()
+    {
         unset($this->data);
         unset($this->terms);
     }
 
+    /**
+     * Add a value to the indexed item.
+     *
+     * @param  string  Key
+     * @param  string  Value
+     */
+    public function addValue($key, $value)
+    {
+        $this->data[$key] = $value;
+    }
+
+    /**
+     * Add a term (like xapian definition).
+     *
+     * @param string Term
+     * @param string Flag (one character)
+     */
+    public function addTerm($term, $flag)
+    {
+        global $charset;
+        if (strlen($flag) == 1) {
+            $this->terms[] = ['name' => api_convert_encoding(stripslashes($term), 'UTF-8', $charset), 'flag' => $flag];
+        }
+    }
 }
 
 /**
  * Extension of the _IndexableChunk class to make IndexableChunk extensible.
+ *
  * @package chamilo.include.search
  */
 class IndexableChunk extends _IndexableChunk
 {
-
     /**
-     * Let add course id term
+     * Let add course id term.
      */
     public function addCourseId($course_id)
     {
@@ -108,7 +113,7 @@ class IndexableChunk extends _IndexableChunk
     }
 
     /**
-     * Let add tool id term
+     * Let add tool id term.
      */
     public function addToolId($tool_id)
     {

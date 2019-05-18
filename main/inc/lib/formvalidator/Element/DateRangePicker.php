@@ -2,14 +2,18 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * Form element to select a range of dates (with popup datepicker)
+ * Form element to select a range of dates (with popup datepicker).
  */
 class DateRangePicker extends HTML_QuickForm_text
 {
     /**
-     * Constructor
+     * DateRangePicker constructor.
+     *
+     * @param string       $elementName
+     * @param string|array $elementLabel
+     * @param array        $attributes
      */
-    public function __construct($elementName = null, $elementLabel = null, $attributes = null)
+    public function __construct($elementName, $elementLabel = null, $attributes = null)
     {
         if (!isset($attributes['id'])) {
             $attributes['id'] = $elementName;
@@ -40,21 +44,99 @@ class DateRangePicker extends HTML_QuickForm_text
     public function setValue($value)
     {
         $this->updateAttributes(
-            array(
-                'value' => $value
-            )
+            [
+                'value' => $value,
+            ]
         );
     }
 
     /**
-     * Get the necessary javascript for this datepicker
+     * @param array $dateRange
+     *
+     * @return array
+     */
+    public function parseDateRange($dateRange)
+    {
+        $dateRange = Security::remove_XSS($dateRange);
+        $dates = explode('/', $dateRange);
+        $dates = array_map('trim', $dates);
+        $start = isset($dates[0]) ? $dates[0] : '';
+        $end = isset($dates[1]) ? $dates[1] : '';
+
+        $formatter = new IntlDateFormatter(
+            'en',
+            IntlDateFormatter::NONE,
+            IntlDateFormatter::NONE,
+            'UTC',
+            IntlDateFormatter::GREGORIAN,
+            'yyyy-MM-dd HH:mm'
+        );
+        $resultStart = $formatter->format($formatter->parse($start));
+        $resultEnd = $formatter->format($formatter->parse($end));
+
+        return [
+            'start' => $resultStart,
+            'end' => $resultEnd,
+        ];
+    }
+
+    /**
+     * @param array $dates result of parseDateRange()
+     *
+     * @return bool
+     */
+    public function validateDates($dates, $format = null)
+    {
+        if (empty($dates['start']) || empty($dates['end'])) {
+            return false;
+        }
+
+        $format = $format ? $format : 'Y-m-d H:i';
+        $d = DateTime::createFromFormat($format, $dates['start']);
+        $resultStart = $d && $d->format($format) == $dates['start'];
+
+        $d = DateTime::createFromFormat($format, $dates['end']);
+        $resultEnd = $d && $d->format($format) == $dates['end'];
+
+        if (!$resultStart || !$resultEnd) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param mixed $value
+     * @param array $submitValues
+     * @param array $errors
+     *
+     * @return string
+     */
+    public function getSubmitValue($value, &$submitValues, &$errors)
+    {
+        /** @var DateRangePicker $element */
+        $elementName = $this->getName();
+        $parsedDates = $this->parseDateRange($value);
+        $validateFormat = $this->getAttribute('validate_format');
+
+        if (!$this->validateDates($parsedDates, $validateFormat)) {
+            $errors[$elementName] = get_lang('CheckDates');
+        }
+        $submitValues[$elementName.'_start'] = $parsedDates['start'];
+        $submitValues[$elementName.'_end'] = $parsedDates['end'];
+
+        return $value;
+    }
+
+    /**
+     * Get the necessary javascript for this datepicker.
+     *
      * @return string
      */
     private function getElementJS()
     {
         $js = null;
         $id = $this->getAttribute('id');
-
         $dateRange = $this->getAttribute('value');
 
         $defaultDates = null;
@@ -66,7 +148,7 @@ class DateRangePicker extends HTML_QuickForm_text
         }
 
         $minDate = null;
-        $minDateValue = $this->getAttribute('minDate');
+        $minDateValue = Security::remove_XSS($this->getAttribute('minDate'));
         if (!empty($minDateValue)) {
             $minDate = "
                 minDate: '{$minDateValue}',
@@ -74,7 +156,7 @@ class DateRangePicker extends HTML_QuickForm_text
         }
 
         $maxDate = null;
-        $maxDateValue = $this->getAttribute('maxDate');
+        $maxDateValue = Security::remove_XSS($this->getAttribute('maxDate'));
         if (!empty($maxDateValue)) {
             $maxDate = "
                 maxDate: '{$maxDateValue}',
@@ -82,13 +164,13 @@ class DateRangePicker extends HTML_QuickForm_text
         }
 
         $format = 'YYYY-MM-DD HH:mm';
-        $formatValue = $this->getAttribute('format');
+        $formatValue = Security::remove_XSS($this->getAttribute('format'));
         if (!empty($formatValue)) {
             $format = $formatValue;
         }
 
         $timePicker = 'true';
-        $timePickerValue = $this->getAttribute('timePicker');
+        $timePickerValue = Security::remove_XSS($this->getAttribute('timePicker'));
         if (!empty($timePickerValue)) {
             $timePicker = $timePickerValue;
         }
@@ -105,6 +187,9 @@ class DateRangePicker extends HTML_QuickForm_text
                     $minDate
                     ranges: {
                          '".addslashes(get_lang('Today'))."': [moment(), moment()],
+                         '".addslashes(get_lang('Yesterday'))."': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],                                                  
+                         '".addslashes(get_lang('ThisMonth'))."': [moment().startOf('month'), moment().endOf('month')],
+                         '".addslashes(get_lang('LastMonth'))."': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],                      
                          '".addslashes(get_lang('ThisWeek'))."': [moment().weekday(1), moment().weekday(5)],
                          '".addslashes(get_lang('NextWeek'))."': [moment().weekday(8), moment().weekday(12)]
                     },
@@ -133,70 +218,5 @@ class DateRangePicker extends HTML_QuickForm_text
         </script>";
 
         return $js;
-    }
-
-    /**
-     * @param array $dateRange
-     *
-     * @return array
-     */
-    public function parseDateRange($dateRange)
-    {
-        $dates = explode('/', $dateRange);
-        $dates = array_map('trim', $dates);
-        $start = isset($dates[0]) ? $dates[0] : '';
-        $end = isset($dates[1]) ? $dates[1] : '';
-
-        return array(
-            'start' => $start,
-            'end' => $end
-        );
-    }
-
-    /**
-     * @param array $dates result of parseDateRange()
-     *
-     * @return bool
-     */
-    public function validateDates($dates, $format = null)
-    {
-        if (empty($dates['start']) || empty($dates['end'])) {
-            return false;
-        }
-
-        $format = $format ? $format : 'Y-m-d H:i';
-        $d = DateTime::createFromFormat($format, $dates['start']);
-        $resultStart = $d && $d->format($format) == $dates['start'];
-
-        $d = DateTime::createFromFormat($format, $dates['end']);
-        $resultEnd = $d && $d->format($format) == $dates['end'];
-
-        if (!($resultStart) || !$resultEnd) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param mixed $value
-     * @param array $submitValues
-     * @param array $errors
-     * @return string
-     */
-    public function getSubmitValue($value, &$submitValues, &$errors)
-    {
-        /** @var DateRangePicker $element */
-        $elementName = $this->getName();
-        $parsedDates = $this->parseDateRange($value);
-        $validateFormat = $this->getAttribute('validate_format');
-
-        if (!$this->validateDates($parsedDates, $validateFormat)) {
-            $errors[$elementName] = get_lang('CheckDates');
-        }
-        $submitValues[$elementName.'_start'] = $parsedDates['start'];
-        $submitValues[$elementName.'_end'] = $parsedDates['end'];
-
-        return $value;
     }
 }

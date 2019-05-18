@@ -6,7 +6,7 @@ namespace Chamilo\CourseBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CBlogTaskRelUser
+ * CBlogTaskRelUser.
  *
  * @ORM\Table(
  *  name="c_blog_task_rel_user",
@@ -21,53 +21,54 @@ use Doctrine\ORM\Mapping as ORM;
 class CBlogTaskRelUser
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="iid", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $iid;
+    protected $iid;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer")
      */
-    private $cId;
+    protected $cId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="blog_id", type="integer")
      */
-    private $blogId;
+    protected $blogId;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="target_date", type="date", nullable=false)
      */
-    private $targetDate;
+    protected $targetDate;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="user_id", type="integer")
      */
-    private $userId;
+    protected $userId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="task_id", type="integer")
      */
-    private $taskId;
+    protected $taskId;
 
     /**
-     * Set targetDate
+     * Set targetDate.
      *
      * @param \DateTime $targetDate
+     *
      * @return CBlogTaskRelUser
      */
     public function setTargetDate($targetDate)
@@ -78,7 +79,7 @@ class CBlogTaskRelUser
     }
 
     /**
-     * Get targetDate
+     * Get targetDate.
      *
      * @return \DateTime
      */
@@ -88,9 +89,10 @@ class CBlogTaskRelUser
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return CBlogTaskRelUser
      */
     public function setCId($cId)
@@ -101,9 +103,9 @@ class CBlogTaskRelUser
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {
@@ -111,9 +113,10 @@ class CBlogTaskRelUser
     }
 
     /**
-     * Set blogId
+     * Set blogId.
      *
-     * @param integer $blogId
+     * @param int $blogId
+     *
      * @return CBlogTaskRelUser
      */
     public function setBlogId($blogId)
@@ -124,9 +127,9 @@ class CBlogTaskRelUser
     }
 
     /**
-     * Get blogId
+     * Get blogId.
      *
-     * @return integer
+     * @return int
      */
     public function getBlogId()
     {
@@ -134,9 +137,10 @@ class CBlogTaskRelUser
     }
 
     /**
-     * Set userId
+     * Set userId.
      *
-     * @param integer $userId
+     * @param int $userId
+     *
      * @return CBlogTaskRelUser
      */
     public function setUserId($userId)
@@ -147,9 +151,9 @@ class CBlogTaskRelUser
     }
 
     /**
-     * Get userId
+     * Get userId.
      *
-     * @return integer
+     * @return int
      */
     public function getUserId()
     {
@@ -157,9 +161,10 @@ class CBlogTaskRelUser
     }
 
     /**
-     * Set taskId
+     * Set taskId.
      *
-     * @param integer $taskId
+     * @param int $taskId
+     *
      * @return CBlogTaskRelUser
      */
     public function setTaskId($taskId)
@@ -170,9 +175,9 @@ class CBlogTaskRelUser
     }
 
     /**
-     * Get taskId
+     * Get taskId.
      *
-     * @return integer
+     * @return int
      */
     public function getTaskId()
     {

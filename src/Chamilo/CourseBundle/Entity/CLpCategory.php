@@ -3,13 +3,14 @@
 
 namespace Chamilo\CourseBundle\Entity;
 
+use Chamilo\UserBundle\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * CLpCategory
+ * CLpCategory.
  *
  * @ORM\Table(
  *  name="c_lp_category",
@@ -22,37 +23,37 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class CLpCategory
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="iid", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $iid;
+    protected $iid;
 
     /**
      * @Gedmo\SortableGroup
      * @ORM\Column(name="c_id", type="integer")
      */
-    private $cId;
+    protected $cId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="name")
      */
-    private $name;
+    protected $name;
 
     /**
      * @Gedmo\SortablePosition
      * @ORM\Column(name="position", type="integer")
      */
-    private $position;
+    protected $position;
 
     /**
      * @ORM\OneToMany(targetEntity="Chamilo\CourseBundle\Entity\CLpCategoryUser", mappedBy="category", cascade={"persist", "remove"}, orphanRemoval=true)
-     **/
-    private $users;
+     */
+    protected $users;
 
     /**
      * CLpCategory constructor.
@@ -63,9 +64,10 @@ class CLpCategory
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return CLpCategory
      */
     public function setCId($cId)
@@ -76,9 +78,9 @@ class CLpCategory
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {
@@ -86,9 +88,10 @@ class CLpCategory
     }
 
     /**
-     * Set id
+     * Set id.
      *
-     * @param integer $id
+     * @param int $id
+     *
      * @return CLpCategory
      */
     public function setId($id)
@@ -99,9 +102,9 @@ class CLpCategory
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -110,6 +113,7 @@ class CLpCategory
 
     /**
      * @param $name
+     *
      * @return $this
      */
     public function setName($name)
@@ -120,7 +124,7 @@ class CLpCategory
     }
 
     /**
-     * Get category name
+     * Get category name.
      *
      * @return string
      */
@@ -131,6 +135,7 @@ class CLpCategory
 
     /**
      * @param $position
+     *
      * @return $this
      */
     public function setPosition($position)
@@ -182,6 +187,7 @@ class CLpCategory
 
     /**
      * @param CLpCategoryUser $categoryUser
+     *
      * @return bool
      */
     public function hasUser(CLpCategoryUser $categoryUser)
@@ -203,6 +209,7 @@ class CLpCategory
 
     /**
      * @param User $user
+     *
      * @return bool
      */
     public function hasUserAdded($user)
@@ -213,7 +220,6 @@ class CLpCategory
             $categoryUser->setUser($user);
 
             return $this->hasUser($categoryUser);
-
         }
 
         return false;
@@ -221,6 +227,7 @@ class CLpCategory
 
     /**
      * @param CLpCategoryUser $user
+     *
      * @return $this
      */
     public function removeUsers(CLpCategoryUser $user)

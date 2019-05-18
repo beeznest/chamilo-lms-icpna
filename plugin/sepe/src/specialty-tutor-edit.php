@@ -4,8 +4,6 @@
 /**
  *    This script displays a specialty tutors edit form.
  */
-
-use \ChamiloSession as Session;
 require_once '../config.php';
 
 $course_plugin = 'sepe';
@@ -153,6 +151,7 @@ if (!empty($_POST)) {
         }
         session_write_close();
         header("Location: specialty-action-edit.php?new_specialty=0&specialty_id=".$specialtyId."&action_id=".$actionId);
+        exit;
     } else {
         $actionId = intval($_POST['action_id']);
         $newTutor = intval($_POST['new_tutor']);
@@ -163,6 +162,7 @@ if (!empty($_POST)) {
         $_SESSION['sepe_message_error'] = $plugin->get_lang('ProblemToken');
         session_write_close();
         header("Location: specialty-tutor-edit.php?new_tutor=".$newTutor."&specialty_id=".$specialtyId."&tutor_id=".$specialtyTutorId."&action_id=".$actionId);
+        exit;
     }
 } else {
     $token = Security::get_token();
@@ -170,16 +170,16 @@ if (!empty($_POST)) {
 
 if (api_is_platform_admin()) {
     $courseId = getCourse(intval($_GET['action_id']));
-    $interbreadcrumb[] = array("url" => "/plugin/sepe/src/sepe-administration-menu.php", "name" => $plugin->get_lang('MenuSepe'));
-    $interbreadcrumb[] = array("url" => "formative-actions-list.php", "name" => $plugin->get_lang('FormativesActionsList'));
-    $interbreadcrumb[] = array("url" => "formative-action.php?cid=".$courseId, "name" => $plugin->get_lang('FormativeAction'));
-    $interbreadcrumb[] = array("url" => "specialty-action-edit.php?new_specialty=0&specialty_id=".intval($_GET['specialty_id'])."&action_id=".$_GET['action_id'], "name" => $plugin->get_lang('SpecialtyFormativeAction'));
+    $interbreadcrumb[] = ["url" => "/plugin/sepe/src/sepe-administration-menu.php", "name" => $plugin->get_lang('MenuSepe')];
+    $interbreadcrumb[] = ["url" => "formative-actions-list.php", "name" => $plugin->get_lang('FormativesActionsList')];
+    $interbreadcrumb[] = ["url" => "formative-action.php?cid=".$courseId, "name" => $plugin->get_lang('FormativeAction')];
+    $interbreadcrumb[] = ["url" => "specialty-action-edit.php?new_specialty=0&specialty_id=".intval($_GET['specialty_id'])."&action_id=".$_GET['action_id'], "name" => $plugin->get_lang('SpecialtyFormativeAction')];
     if (isset($_GET['new_tutor']) && intval($_GET['new_tutor']) == 1) {
         $templateName = $plugin->get_lang('NewSpecialtyTutor');
         $tpl = new Template($templateName);
         $tpl->assign('action_id', intval($_GET['action_id']));
         $tpl->assign('specialty_id', intval($_GET['specialty_id']));
-        $info = array();
+        $info = [];
         $tpl->assign('info', $info);
         $tpl->assign('new_tutor', '1');
         $platformUserId = '';
@@ -193,7 +193,6 @@ if (api_is_platform_admin()) {
         $tpl->assign('info', $info);
         $tpl->assign('new_tutor', '0');
         $platformUserId = $info['platform_user_id'];
-
     }
     $tutorsList = getTutorsSpecialty(intval($_GET['specialty_id']));
     $tpl->assign('ExistingTutorsList', $tutorsList);
@@ -217,4 +216,5 @@ if (api_is_platform_admin()) {
     $tpl->display_one_col_template();
 } else {
     header('Location:'.api_get_path(WEB_PATH));
+    exit;
 }

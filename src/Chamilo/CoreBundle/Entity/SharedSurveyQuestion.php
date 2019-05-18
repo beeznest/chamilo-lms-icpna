@@ -1,11 +1,12 @@
 <?php
+/* For licensing terms, see /license.txt */
 
 namespace Chamilo\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * SharedSurveyQuestion
+ * SharedSurveyQuestion.
  *
  * @ORM\Table(name="shared_survey_question")
  * @ORM\Entity
@@ -13,76 +14,75 @@ use Doctrine\ORM\Mapping as ORM;
 class SharedSurveyQuestion
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="survey_id", type="integer", nullable=false)
      */
-    private $surveyId;
+    protected $surveyId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="survey_question", type="text", nullable=false)
      */
-    private $surveyQuestion;
+    protected $surveyQuestion;
 
     /**
      * @var string
      *
      * @ORM\Column(name="survey_question_comment", type="text", nullable=false)
      */
-    private $surveyQuestionComment;
+    protected $surveyQuestionComment;
 
     /**
      * @var string
      *
      * @ORM\Column(name="type", type="string", length=250, nullable=false)
      */
-    private $type;
+    protected $type;
 
     /**
      * @var string
      *
      * @ORM\Column(name="display", type="string", length=10, nullable=false)
      */
-    private $display;
+    protected $display;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="sort", type="integer", nullable=false)
      */
-    private $sort;
+    protected $sort;
 
     /**
      * @var string
      *
      * @ORM\Column(name="code", type="string", length=40, nullable=false)
      */
-    private $code;
+    protected $code;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="max_value", type="integer", nullable=false)
      */
-    private $maxValue;
+    protected $maxValue;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="question_id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private $questionId;
-
-
+    protected $questionId;
 
     /**
-     * Set surveyId
+     * Set surveyId.
      *
-     * @param integer $surveyId
+     * @param int $surveyId
+     *
      * @return SharedSurveyQuestion
      */
     public function setSurveyId($surveyId)
@@ -93,9 +93,9 @@ class SharedSurveyQuestion
     }
 
     /**
-     * Get surveyId
+     * Get surveyId.
      *
-     * @return integer
+     * @return int
      */
     public function getSurveyId()
     {
@@ -103,9 +103,10 @@ class SharedSurveyQuestion
     }
 
     /**
-     * Set surveyQuestion
+     * Set surveyQuestion.
      *
      * @param string $surveyQuestion
+     *
      * @return SharedSurveyQuestion
      */
     public function setSurveyQuestion($surveyQuestion)
@@ -116,7 +117,7 @@ class SharedSurveyQuestion
     }
 
     /**
-     * Get surveyQuestion
+     * Get surveyQuestion.
      *
      * @return string
      */
@@ -126,9 +127,10 @@ class SharedSurveyQuestion
     }
 
     /**
-     * Set surveyQuestionComment
+     * Set surveyQuestionComment.
      *
      * @param string $surveyQuestionComment
+     *
      * @return SharedSurveyQuestion
      */
     public function setSurveyQuestionComment($surveyQuestionComment)
@@ -139,7 +141,7 @@ class SharedSurveyQuestion
     }
 
     /**
-     * Get surveyQuestionComment
+     * Get surveyQuestionComment.
      *
      * @return string
      */
@@ -149,9 +151,10 @@ class SharedSurveyQuestion
     }
 
     /**
-     * Set type
+     * Set type.
      *
      * @param string $type
+     *
      * @return SharedSurveyQuestion
      */
     public function setType($type)
@@ -162,7 +165,7 @@ class SharedSurveyQuestion
     }
 
     /**
-     * Get type
+     * Get type.
      *
      * @return string
      */
@@ -172,9 +175,10 @@ class SharedSurveyQuestion
     }
 
     /**
-     * Set display
+     * Set display.
      *
      * @param string $display
+     *
      * @return SharedSurveyQuestion
      */
     public function setDisplay($display)
@@ -185,7 +189,7 @@ class SharedSurveyQuestion
     }
 
     /**
-     * Get display
+     * Get display.
      *
      * @return string
      */
@@ -195,9 +199,10 @@ class SharedSurveyQuestion
     }
 
     /**
-     * Set sort
+     * Set sort.
      *
-     * @param integer $sort
+     * @param int $sort
+     *
      * @return SharedSurveyQuestion
      */
     public function setSort($sort)
@@ -208,9 +213,9 @@ class SharedSurveyQuestion
     }
 
     /**
-     * Get sort
+     * Get sort.
      *
-     * @return integer
+     * @return int
      */
     public function getSort()
     {
@@ -218,9 +223,10 @@ class SharedSurveyQuestion
     }
 
     /**
-     * Set code
+     * Set code.
      *
      * @param string $code
+     *
      * @return SharedSurveyQuestion
      */
     public function setCode($code)
@@ -231,7 +237,7 @@ class SharedSurveyQuestion
     }
 
     /**
-     * Get code
+     * Get code.
      *
      * @return string
      */
@@ -241,9 +247,10 @@ class SharedSurveyQuestion
     }
 
     /**
-     * Set maxValue
+     * Set maxValue.
      *
-     * @param integer $maxValue
+     * @param int $maxValue
+     *
      * @return SharedSurveyQuestion
      */
     public function setMaxValue($maxValue)
@@ -254,9 +261,9 @@ class SharedSurveyQuestion
     }
 
     /**
-     * Get maxValue
+     * Get maxValue.
      *
-     * @return integer
+     * @return int
      */
     public function getMaxValue()
     {
@@ -264,9 +271,9 @@ class SharedSurveyQuestion
     }
 
     /**
-     * Get questionId
+     * Get questionId.
      *
-     * @return integer
+     * @return int
      */
     public function getQuestionId()
     {

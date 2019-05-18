@@ -350,19 +350,19 @@ class HTML_QuickForm extends HTML_Common
                 if (is_array($filter) && (2 != count($filter) || !is_callable($filter))) {
                     foreach ($filter as $val) {
                         if (!is_callable($val)) {
-                            throw new \Exception("Callback function does not exist in QuickForm::setDefaults()");
+                            throw new \Exception('Callback function does not exist in QuickForm::setDefaults()');
                         } else {
                             $defaultValues = $this->_recursiveFilter($val, $defaultValues);
                         }
                     }
                 } elseif (!is_callable($filter)) {
-                    throw new \Exception("Callback function does not exist in QuickForm::setDefaults()");
+                    throw new \Exception('Callback function does not exist in QuickForm::setDefaults()');
                 } else {
                     $defaultValues = $this->_recursiveFilter($filter, $defaultValues);
                 }
             }
 
-            $this->_defaultValues = HTML_QuickForm::arrayMerge($this->_defaultValues, $defaultValues);
+            $this->_defaultValues = self::arrayMerge($this->_defaultValues, $defaultValues);
             $this->_constantValues = $this->_defaultValues;
             foreach (array_keys($this->_elements) as $key) {
                 $this->_elements[$key]->onQuickFormEvent('updateValue', null, $this);
@@ -548,8 +548,8 @@ class HTML_QuickForm extends HTML_Common
     public function &addElement($element)
     {
         if (is_object($element) && is_subclass_of($element, 'html_quickform_element')) {
-           $elementObject = &$element;
-           $elementObject->onQuickFormEvent('updateValue', null, $this);
+            $elementObject = &$element;
+            $elementObject->onQuickFormEvent('updateValue', null, $this);
         } else {
             $args = func_get_args();
             $elementObject =& $this->_loadElement('addElement', $element, array_slice($args, 1));
@@ -589,6 +589,9 @@ class HTML_QuickForm extends HTML_Common
         return $elementObject;
     }
 
+    /**
+     * @return array
+     */
     public function getElements()
     {
         return $this->_elements;
@@ -671,13 +674,22 @@ class HTML_QuickForm extends HTML_Common
      * @access   public
      * @throws   HTML_QuickForm_Error
      */
-    public function &addGroup($elements, $name=null, $groupLabel='', $separator=null, $appendName = true)
-    {
+    public function &addGroup(
+        $elements,
+        $name = null,
+        $groupLabel = '',
+        $separator = null,
+        $appendName = true,
+        $createElement = false
+    ) {
         static $anonGroups = 1;
 
         if (0 == strlen($name)) {
-            $name       = 'qf_group_' . $anonGroups++;
+            $name = 'qf_group_'.$anonGroups++;
             $appendName = false;
+        }
+        if ($createElement) {
+            return $this->createElement('group', $name, $groupLabel, $elements, $separator, $appendName);
         }
         $group = & $this->addElement('group', $name, $groupLabel, $elements, $separator, $appendName);
         return $group;
@@ -1428,8 +1440,7 @@ class HTML_QuickForm extends HTML_Common
      */
     public function validate()
     {
-        if (count($this->_rules) == 0 && count($this->_formRules) == 0 &&
-            $this->isSubmitted()) {
+        if (count($this->_rules) == 0 && count($this->_formRules) == 0 && $this->isSubmitted()) {
             return (0 == count($this->_errors));
         } elseif (!$this->isSubmitted()) {
 

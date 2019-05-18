@@ -5,13 +5,10 @@
  * @package chamilo.webservices
  */
 require_once __DIR__.'/../inc/global.inc.php';
-
-$libpath = api_get_path(LIBRARY_PATH);
-
 require_once __DIR__.'/cm_webservice.php';
 
 /**
- * Description of cm_soap_inbox
+ * Description of cm_soap_inbox.
  *
  * @author marcosousa
  */
@@ -27,6 +24,7 @@ class WSCMCourses extends WSCM
             foreach ($listOfCourses as $course) {
                 $courses_id .= $course['code']."#";
             }
+
             return $courses_id;
         } else {
             return get_lang('InvalidId');

@@ -1,5 +1,6 @@
 <?php
 /* For licensing terms, see /license.txt */
+
 /**
  *   @package chamilo.admin
  */
@@ -9,43 +10,48 @@ $cidReset = true;
 // including some necessary files
 require_once __DIR__.'/../inc/global.inc.php';
 
-// setting the section (for the tabs)
+// Setting the section (for the tabs)
 $this_section = SECTION_PLATFORM_ADMIN;
 
-// setting breadcrumbs
-//$interbreadcrumb[] = array('url' => 'index.php','name' => get_lang('PlatformAdmin'));
-$interbreadcrumb[] = array('url' => 'session_list.php', 'name' => get_lang('SessionList'));
+// Setting breadcrumbs
+$interbreadcrumb[] = [
+    'url' => 'session_list.php',
+    'name' => get_lang('SessionList'),
+];
 
 // Setting the name of the tool
 $tool_name = get_lang('EnrollTrainersFromExistingSessions');
 
-$form_sent  = 0;
-$errorMsg   = '';
-$id = intval($_GET['id']);
+$form_sent = 0;
+$errorMsg = '';
+$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
 SessionManager::protectSession($id);
 
-$htmlResult = null;
-
+$htmlResult = '';
 if (isset($_POST['form_sent']) && $_POST['form_sent']) {
     $form_sent = $_POST['form_sent'];
 
-    if ($form_sent == 1 && isset($_POST['sessions']) && isset($_POST['courses'])) {
+    if ($form_sent == 1 &&
+        isset($_POST['sessions']) && isset($_POST['courses'])
+    ) {
         $sessions = $_POST['sessions'];
         $courses = $_POST['courses'];
-
-        $htmlResult = SessionManager::copyCoachesFromSessionToCourse($sessions, $courses);
+        $htmlResult = SessionManager::copyCoachesFromSessionToCourse(
+            $sessions,
+            $courses
+        );
     }
 }
 
-$session_list = SessionManager::get_sessions_list(array(), array('name'));
-$sessionList = array();
+$session_list = SessionManager::get_sessions_list([], ['name']);
+$sessionList = [];
 foreach ($session_list as $session) {
     $sessionList[$session['id']] = $session['name'];
 }
 
 $courseList = CourseManager::get_courses_list(0, 0, 'title');
-$courseOptions = array();
+$courseOptions = [];
 foreach ($courseList as $course) {
     $courseOptions[$course['id']] = $course['title'];
 }
@@ -60,11 +66,11 @@ echo Display::input('hidden', 'form_sent', '1');
 <table border="0" cellpadding="5" cellspacing="0" width="100%">
     <tr>
         <td align="center">
-            <b><?php echo get_lang('Sessions') ?> :</b>
+            <b><?php echo get_lang('Sessions'); ?> :</b>
         </td>
         <td></td>
         <td align="center">
-            <b><?php echo get_lang('Courses') ?> :</b>
+            <b><?php echo get_lang('Courses'); ?> :</b>
         </td>
     </tr>
     <tr>
@@ -74,7 +80,7 @@ echo Display::input('hidden', 'form_sent', '1');
                     'sessions[]',
                     $sessionList,
                     '',
-                    array('style'=>'width:360px', 'multiple'=>'multiple', 'id'=>'sessions', 'size'=>'15px'),
+                    ['style' => 'width:360px', 'multiple' => 'multiple', 'id' => 'sessions', 'size' => '15px'],
                     false
                 );
             ?>
@@ -87,7 +93,7 @@ echo Display::input('hidden', 'form_sent', '1');
                 'courses[]',
                 $courseOptions,
                 '',
-                array('style'=>'width:360px', 'id'=>'courses', 'size'=>'15px'),
+                ['style' => 'width:360px', 'id' => 'courses', 'size' => '15px'],
                 false
             );
             ?>

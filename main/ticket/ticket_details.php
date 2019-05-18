@@ -4,7 +4,6 @@
 /**
  * @package chamilo.plugin.ticket
  */
-
 $cidReset = true;
 
 require_once __DIR__.'/../inc/global.inc.php';
@@ -13,25 +12,25 @@ api_block_anonymous_users();
 
 $user_id = api_get_user_id();
 $isAdmin = api_is_platform_admin();
-$interbreadcrumb[] = array(
+$interbreadcrumb[] = [
     'url' => api_get_path(WEB_CODE_PATH).'ticket/tickets.php',
-    'name' => get_lang('MyTickets')
-);
-$interbreadcrumb[] = array('url' => '#', 'name' => get_lang('TicketDetail'));
+    'name' => get_lang('MyTickets'),
+];
+$interbreadcrumb[] = ['url' => '#', 'name' => get_lang('TicketDetail')];
 
 $disableReponseButtons = '';
 $htmlHeadXtra[] = '<script>
-$(document).ready(function() {
+$(function() {
 	$("#dialog-form").dialog({
 		autoOpen: false,
 		height: 450,
 		width: 600,
 		modal: true,
 		buttons: {
-            ' . get_lang('Accept').': function(){
+            '.get_lang('Accept').': function(){
                 $("#frmResponsable").submit()
             },
-            ' . ucfirst(get_lang('Close')).': function() {
+            '.ucfirst(get_lang('Close')).': function() {
                 $(this).dialog("close");
             }
             }
@@ -42,13 +41,13 @@ $(document).ready(function() {
         });
 
         $(".responseyes").click(function () {
-            if(!confirm("' . get_lang('AreYouSure').' : '.strtoupper(get_lang('Yes')).'. '.get_lang('IfYouAreSureTheTicketWillBeClosed').'")){
+            if(!confirm("'.get_lang('AreYouSure').' : '.strtoupper(get_lang('Yes')).'. '.get_lang('IfYouAreSureTheTicketWillBeClosed').'")){
                 return false;
             }
         });
 
-        $("input#responseno").click(function () {
-            if(!confirm("' . get_lang('AreYouSure').' : '.strtoupper(get_lang('No')).'")){
+        $(".responseno").click(function () {
+            if(!confirm("'.get_lang('AreYouSure').' : '.strtoupper(get_lang('No')).'")){
                 return false;
             }
         });     
@@ -94,7 +93,7 @@ function add_image_form() {
     });
 
     img_remove = $("<img/>", {
-        src: "' . Display::returnIconPath('delete.png').'"
+        src: "'.Display::returnIconPath('delete.png').'"
     });
 
     new_filepath_id = $("#filepath_" + counter_image);
@@ -120,12 +119,17 @@ $htmlHeadXtra[] = '<style>
 }
 </style>';
 
-$ticket_id = $_GET['ticket_id'];
+$ticket_id = (int) $_REQUEST['ticket_id'];
 $ticket = TicketManager::get_ticket_detail_by_id($ticket_id);
-if (!isset($ticket['ticket'])) {
+if (!isset($ticket['ticket']) ||
+    // make sure it's either a user assigned to this ticket, or the reporter, or and admin
+    !($ticket['ticket']['assigned_last_user'] == $user_id ||
+      $ticket['ticket']['sys_insert_user_id'] == $user_id ||
+      $isAdmin)
+    ) {
     api_not_allowed(true);
 }
-if (!isset($_GET['ticket_id'])) {
+if (!isset($_REQUEST['ticket_id'])) {
     header('Location: '.api_get_path(WEB_CODE_PATH).'ticket/tickets.php');
     exit;
 }
@@ -151,7 +155,7 @@ if (!isset($_GET['ticket_id'])) {
 $title = 'Ticket #'.$ticket['ticket']['code'];
 
 if (isset($_REQUEST['close'])) {
-    TicketManager::close_ticket($_REQUEST['ticket_id'], $user_id);
+    TicketManager::close_ticket($ticket_id, $user_id);
     $ticket['ticket']['status_id'] = TicketManager::STATUS_CLOSE;
     $ticket['ticket']['status'] = get_lang('Closed');
 }
@@ -170,18 +174,18 @@ foreach ($messages as $message) {
 
     $receivedMessage = '';
     if (!empty($message['subject'])) {
-        $receivedMessage = '<b>'.get_lang('Subject').': </b> '.$message['subject'].'<br/>';
+        $receivedMessage = '<b>'.get_lang('Subject').': </b> '.Security::remove_XSS($message['subject']).'<br />';
     }
 
     if (!empty($message['message'])) {
-        $receivedMessage = '<b>'.get_lang('Message').':</b><br/>'.$message['message'].'<br/>';
+        $receivedMessage = '<b>'.get_lang('Message').':</b><br />'.Security::remove_XSS($message['message']).'<br />';
     }
 
     $attachmentLinks = '';
     if (isset($message['attachments'])) {
-        $attributeClass = array(
-            'class' => 'attachment-link'
-        );
+        $attributeClass = [
+            'class' => 'attachment-link',
+        ];
         foreach ($message['attachments'] as $attach) {
             $attachmentLinks .= Display::tag('div', $attach['attachment_link'], $attributeClass);
         }
@@ -207,7 +211,7 @@ foreach ($messages as $message) {
     $counter++;
 }
 
-$subject = get_lang('ReplyShort').': '.$ticket['ticket']['subject'];
+$subject = get_lang('ReplyShort').': '.Security::remove_XSS($ticket['ticket']['subject']);
 
 if ($ticket['ticket']['status_id'] != TicketManager::STATUS_FORWARDED &&
     $ticket['ticket']['status_id'] != TicketManager::STATUS_CLOSE
@@ -220,10 +224,8 @@ if ($ticket['ticket']['status_id'] != TicketManager::STATUS_FORWARDED &&
         $formToShow = $form->returnForm();
 
         if ($form->validate()) {
-            $ticket_id = $_POST['ticket_id'];
-            $content = $_POST['content'];
+            $ticket_id = (int) $_POST['ticket_id'];
             $messageToSend = '';
-            $subject = $_POST['subject'];
             $message = isset($_POST['confirmation']) ? true : false;
             $file_attachments = $_FILES;
 
@@ -259,8 +261,8 @@ if ($ticket['ticket']['status_id'] != TicketManager::STATUS_FORWARDED &&
 
                 TicketManager::updateTicket(
                     [
-                        'priority_id' => $_POST['priority_id'],
-                        'status_id' => $_POST['status_id']
+                        'priority_id' => (int) $_POST['priority_id'],
+                        'status_id' => (int) $_POST['status_id'],
                     ],
                     $ticket_id,
                     api_get_user_id()
@@ -312,11 +314,11 @@ if ($ticket['ticket']['status_id'] != TicketManager::STATUS_FORWARDED &&
                 }
             }
 
-            $messageToSend .= $content;
+            $messageToSend .= $_POST['content'];
 
             TicketManager::insertMessage(
                 $ticket_id,
-                $subject,
+                $_POST['subject'],
                 $messageToSend,
                 $file_attachments,
                 $user_id,
@@ -348,17 +350,13 @@ $bold = '';
 if ($ticket['ticket']['status_id'] == TicketManager::STATUS_CLOSE) {
     $bold = 'style = "font-weight: bold;"';
 }
-if ($isAdmin) {
-    $senderData = get_lang('AddedBy').' '.$ticket['ticket']['user_url'].' ('.$ticket['usuario']['complete_name_with_message_link'].').';
-} else {
-    $senderData = get_lang('AddedBy').' '.$ticket['usuario']['complete_name_with_message_link'].' ('.$ticket['usuario']['username'].').';
-}
+$senderData = get_lang('AddedBy').' '.$ticket['usuario']['complete_name_with_message_link'];
 
 echo '<table width="100%" >
         <tr>
           <td colspan="3">
           <h1>'.$title.'</h1>
-          <h2>'.$ticket['ticket']['subject'].'</h2>
+          <h2>'.Security::remove_XSS($ticket['ticket']['subject']).'</h2>
           <p>
             '.$senderData.' '.
             get_lang('Created').' '.
@@ -377,46 +375,47 @@ echo '<table width="100%" >
           </td>
         </tr>
         <tr>
-           <td><p><b>' . get_lang('Category').': </b>'.$ticket['ticket']['name'].'</p></td>
+           <td><p><b>'.get_lang('Category').': </b>'.$ticket['ticket']['name'].'</p></td>
         </tr>
         <tr>
-           <td><p ' . $bold.'><b>'.get_lang('Status').':</b> '.$ticket['ticket']['status'].'</p></td>
+           <td><p '.$bold.'><b>'.get_lang('Status').':</b> '.$ticket['ticket']['status'].'</p></td>
         </tr>
         <tr>
-            <td><p><b>' . get_lang('Priority').': </b>'.$ticket['ticket']['priority'].'<p></td>
+            <td><p><b>'.get_lang('Priority').': </b>'.$ticket['ticket']['priority'].'<p></td>
         </tr>';
 
 if (!empty($ticket['ticket']['assigned_last_user'])) {
     $assignedUser = api_get_user_info($ticket['ticket']['assigned_last_user']);
     echo '<tr>
-            <td><p><b>' . get_lang('AssignedTo').': </b>'.$assignedUser['complete_name_with_message_link'].'<p></td>
+            <td><p><b>'.get_lang('AssignedTo').': </b>'.$assignedUser['complete_name_with_message_link'].'<p></td>
         </tr>';
 } else {
     echo '<tr>
-            <td><p><b>' . get_lang('AssignedTo').': </b>-<p></td>
+            <td><p><b>'.get_lang('AssignedTo').': </b>-<p></td>
         </tr>';
 }
 if ($ticket['ticket']['course_url'] != null) {
     if (!empty($ticket['ticket']['session_id'])) {
         $sessionInfo = api_get_session_info($ticket['ticket']['session_id']);
         echo '<tr>
-            <td><b>' . get_lang('Session').':</b> '.$sessionInfo['name'].' </td>
+            <td><b>'.get_lang('Session').':</b> '.$sessionInfo['name'].' </td>
             <td></td>
             <td colspan="2"></td>
           </tr>';
     }
 
     echo '<tr>
-            <td><b>' . get_lang('Course').':</b> '.$ticket['ticket']['course_url'].' </td>
+            <td><b>'.get_lang('Course').':</b> '.$ticket['ticket']['course_url'].' </td>
             <td></td>
             <td colspan="2"></td>
           </tr>';
 }
+
 echo '<tr>
         <td>
         <hr />
-        <b>' . get_lang('Description').':</b> <br />
-        '.$ticket['ticket']['message'].'
+        <b>'.get_lang('Description').':</b> <br />
+        '.Security::remove_XSS($ticket['ticket']['message']).'
         <hr />
         </td>            
      </tr>
@@ -429,9 +428,9 @@ echo $formToShow;
 
 Display::display_footer();
 
-
 /**
  * @param array $ticket
+ *
  * @return FormValidator
  */
 function getForm($ticket)
@@ -444,10 +443,10 @@ function getForm($ticket)
         'POST',
         api_get_self().'?ticket_id='.$ticket['id'],
         '',
-        array(
+        [
             'enctype' => 'multipart/form-data',
-            'class' => 'form-horizontal'
-        )
+            'class' => 'form-horizontal',
+        ]
     );
 
     if ($isAdmin) {
@@ -465,10 +464,10 @@ function getForm($ticket)
             'priority_id',
             get_lang('Priority'),
             $priorityList,
-            array(
+            [
                 'id' => 'priority_id',
-                'for' => 'priority_id'
-            )
+                'for' => 'priority_id',
+            ]
         );
 
         $form->addSelectAjax(
@@ -480,9 +479,9 @@ function getForm($ticket)
 
         $form->setDefaults(
             [
-                'priority_id' =>  $ticket['priority_id'],
-                'status_id' =>  $ticket['status_id'],
-                'assigned_last_user' => $ticket['assigned_last_user']
+                'priority_id' => $ticket['priority_id'],
+                'status_id' => $ticket['status_id'],
+                'assigned_last_user' => $ticket['assigned_last_user'],
             ]
         );
     }
@@ -491,11 +490,11 @@ function getForm($ticket)
         'text',
         'subject',
         get_lang('Subject'),
-        array(
+        [
             'for' => 'subject',
             'value' => $subject,
-            'style' => 'width: 540px;'
-        )
+            'style' => 'width: 540px;',
+        ]
     );
 
     $form->addElement('hidden', 'ticket_id', $ticket['id']);
@@ -505,11 +504,11 @@ function getForm($ticket)
         get_lang('Message'),
         false,
         false,
-        array(
+        [
             'ToolbarSet' => 'Profile',
             'Width' => '550',
-            'Height' => '250'
-        )
+            'Height' => '250',
+        ]
     );
 
     if ($isAdmin) {
@@ -529,7 +528,7 @@ function getForm($ticket)
     $form->addLabel(
         '',
         '<span id="link-more-attach">
-         <span class="btn btn-success" onclick="return add_image_form()">' . get_lang('AddOneMoreFile').'</span>
+         <span class="btn btn-success" onclick="return add_image_form()">'.get_lang('AddOneMoreFile').'</span>
          </span>
          ('.sprintf(get_lang('MaximunFileSizeX'), format_file_size(api_get_setting('message_max_upload_filesize'))).')'
     );

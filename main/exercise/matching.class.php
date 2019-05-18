@@ -3,13 +3,14 @@
 
 /**
  * Class Matching
- * Matching questions type class
+ * Matching questions type class.
  *
  * This class allows to instantiate an object of
  * type MULTIPLE_ANSWER (MULTIPLE CHOICE, MULTIPLE ANSWER)
  * extending the class question
  *
  * @author Eric Marguin
+ *
  * @package chamilo.exercise
  */
 class Matching extends Question
@@ -18,7 +19,7 @@ class Matching extends Question
     public static $explanationLangVar = 'Matching';
 
     /**
-     * Constructor
+     * Constructor.
      */
     public function __construct()
     {
@@ -28,20 +29,20 @@ class Matching extends Question
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function createAnswersForm($form)
     {
-        $defaults = array();
+        $defaults = [];
         $nb_matches = $nb_options = 2;
-        $matches = array();
+        $matches = [];
         $answer = null;
         $counter = 1;
 
         if (isset($this->id)) {
             $answer = new Answer($this->id);
             $answer->read();
-            if (count($answer->nbrAnswers) > 0) {
+            if ($answer->nbrAnswers > 0) {
                 for ($i = 1; $i <= $answer->nbrAnswers; $i++) {
                     $correct = $answer->isCorrect($i);
                     if (empty($correct)) {
@@ -64,7 +65,7 @@ class Matching extends Question
                 $nb_options++;
             }
         } elseif (!empty($this->id)) {
-            if (count($answer->nbrAnswers) > 0) {
+            if ($answer->nbrAnswers > 0) {
                 $nb_matches = $nb_options = 0;
                 for ($i = 1; $i <= $answer->nbrAnswers; $i++) {
                     if ($answer->isCorrect($i)) {
@@ -87,12 +88,12 @@ class Matching extends Question
         }
 
         if (empty($matches)) {
-            for ($i = 1; $i <= $nb_options; ++$i) {
+            for ($i = 1; $i <= $nb_options; $i++) {
                 // fill the array with A, B, C.....
                 $matches[$i] = chr(64 + $i);
             }
         } else {
-            for ($i = $counter; $i <= $nb_options; ++$i) {
+            for ($i = $counter; $i <= $nb_options; $i++) {
                 // fill the array with A, B, C.....
                 $matches[$i] = chr(64 + $i);
             }
@@ -105,10 +106,10 @@ class Matching extends Question
         $html = '<table class="table table-striped table-hover">
             <thead>
                 <tr>
-                    <th width="5%">' . get_lang('Number').'</th>
-                    <th width="70%">' . get_lang('Answer').'</th>
-                    <th width="15%">' . get_lang('MatchesTo').'</th>
-                    <th width="10%">' . get_lang('Weighting').'</th>
+                    <th width="5%">'.get_lang('Number').'</th>
+                    <th width="70%">'.get_lang('Answer').'</th>
+                    <th width="15%">'.get_lang('MatchesTo').'</th>
+                    <th width="10%">'.get_lang('Weighting').'</th>
                 </tr>
             </thead>
             <tbody>';
@@ -123,13 +124,13 @@ class Matching extends Question
             );
         }
 
-        $editorConfig = array(
+        $editorConfig = [
             'ToolbarSet' => 'TestMatching',
             'Width' => '100%',
-            'Height' => '125'
-        );
+            'Height' => '125',
+        ];
 
-        for ($i = 1; $i <= $nb_matches; ++$i) {
+        for ($i = 1; $i <= $nb_matches; $i++) {
             $renderer = &$form->defaultRenderer();
             $renderer->setElementTemplate(
                 '<td><!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->{element}</td>',
@@ -177,8 +178,8 @@ class Matching extends Question
         $html = '<table class="table table-striped table-hover">
             <thead>
                 <tr>
-                    <th width="15%">' . get_lang('Number').'</th>
-                    <th width="85%">' . get_lang('Answer').'</th>
+                    <th width="15%">'.get_lang('Number').'</th>
+                    <th width="85%">'.get_lang('Answer').'</th>
                 </tr>
             </thead>
             <tbody>';
@@ -192,7 +193,7 @@ class Matching extends Question
             );
         }
 
-        for ($i = 1; $i <= $nb_options; ++$i) {
+        for ($i = 1; $i <= $nb_options; $i++) {
             $renderer = &$form->defaultRenderer();
             $renderer->setElementTemplate(
                 '<td><!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->{element}</td>',
@@ -215,7 +216,7 @@ class Matching extends Question
         $form->addHtml('</table>');
 
         global $text;
-        $group = array();
+        $group = [];
         // setting the save button here and not in the question class.php
         $group[] = $form->addButtonDelete(get_lang('DelElem'), 'lessOptions', true);
         $group[] = $form->addButtonCreate(get_lang('AddElem'), 'moreOptions', true);
@@ -231,15 +232,15 @@ class Matching extends Question
         }
 
         $form->setConstants(
-            array(
+            [
                 'nb_matches' => $nb_matches,
-                'nb_options' => $nb_options
-            )
+                'nb_options' => $nb_options,
+            ]
         );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function processAnswersCreation($form, $exercise)
     {
@@ -250,14 +251,14 @@ class Matching extends Question
         $objAnswer = new Answer($this->id);
 
         // Insert the options
-        for ($i = 1; $i <= $nb_options; ++$i) {
+        for ($i = 1; $i <= $nb_options; $i++) {
             $position++;
             $option = $form->getSubmitValue('option['.$i.']');
             $objAnswer->createAnswer($option, 0, '', 0, $position);
         }
 
         // Insert the answers
-        for ($i = 1; $i <= $nb_matches; ++$i) {
+        for ($i = 1; $i <= $nb_matches; $i++) {
             $position++;
             $answer = $form->getSubmitValue('answer['.$i.']');
             $matches = $form->getSubmitValue('matches['.$i.']');
@@ -277,22 +278,33 @@ class Matching extends Question
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function return_header($exercise, $counter = null, $score = null)
     {
         $header = parent::return_header($exercise, $counter, $score);
         $header .= '<table class="'.$this->question_table_class.'">';
-        $header .= '<tr>
-                <th>'.get_lang('ElementList').'</th>
-                <th>'.get_lang('CorrespondsTo').'</th>
-              </tr>';
+        $header .= '<tr>';
+
+        $header .= '<th>'.get_lang('ElementList').'</th>';
+        if ($exercise->results_disabled != RESULT_DISABLE_SHOW_ONLY_IN_CORRECT_ANSWER) {
+            $header .= '<th>'.get_lang('Choice').'</th>';
+            $header .= '<th>'.get_lang('ExpectedChoice').'</th>';
+        }
+
+        if ($exercise->showExpectedChoice()) {
+            $header .= '<th>'.get_lang('Status').'</th>';
+        } else {
+            $header .= '<th>'.get_lang('CorrespondsTo').'</th>';
+        }
+        $header .= '</tr>';
 
         return $header;
     }
 
     /**
-     * Check if a answer is correct
+     * Check if a answer is correct.
+     *
      * @param int $position
      * @param int $answer
      * @param int $questionId
@@ -311,7 +323,7 @@ class Matching extends Question
             ->setParameters([
                 'position' => $position,
                 'answer' => $answer,
-                'question' => $questionId
+                'question' => $questionId,
             ])
             ->getSingleScalarResult();
 

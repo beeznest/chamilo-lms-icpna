@@ -1,7 +1,9 @@
 <?php
 /* For licensing terms, see /license.txt */
+
 /**
  * @package chamilo.admin
+ *
  * @author Julio Montoya <gugli100@gmail.com>
  */
 // resetting the course id
@@ -11,7 +13,7 @@ require_once __DIR__.'/../inc/global.inc.php';
 
 $xajax = new xajax();
 $xajax->registerFunction(
-    array('search_courses', 'Accessurleditcoursestourl', 'search_courses')
+    ['search_courses', 'Accessurleditcoursestourl', 'search_courses']
 );
 
 // setting the section (for the tabs)
@@ -31,8 +33,8 @@ $tbl_access_url = Database::get_main_table(TABLE_MAIN_ACCESS_URL);
 
 // setting breadcrumbs
 $tool_name = get_lang('EditCoursesToURL');
-$interbreadcrumb[] = array('url' => 'index.php', 'name' => get_lang('PlatformAdmin'));
-$interbreadcrumb[] = array('url' => 'access_urls.php', 'name' => get_lang('MultipleAccessURLs'));
+$interbreadcrumb[] = ['url' => 'index.php', 'name' => get_lang('PlatformAdmin')];
+$interbreadcrumb[] = ['url' => 'access_urls.php', 'name' => get_lang('MultipleAccessURLs')];
 
 $add_type = 'multiple';
 if (isset($_REQUEST['add_type']) && $_REQUEST['add_type'] != '') {
@@ -44,7 +46,7 @@ if (isset($_REQUEST['access_url_id']) && $_REQUEST['access_url_id'] != '') {
     $access_url_id = Security::remove_XSS($_REQUEST['access_url_id']);
 }
 
-$xajax -> processRequests();
+$xajax->processRequests();
 $htmlHeadXtra[] = $xajax->getJavascript('../inc/lib/xajax/');
 $htmlHeadXtra[] = '<script>
 function add_user_to_url(code, content) {
@@ -75,15 +77,15 @@ function remove_item(origin) {
 </script>';
 
 $form_sent = 0;
-$UserList = $SessionList = array();
-$users = $sessions = array();
+$UserList = $SessionList = [];
+$users = $sessions = [];
 
 if (isset($_POST['form_sent']) && $_POST['form_sent']) {
     $form_sent = $_POST['form_sent'];
     $course_list = $_POST['course_list'];
 
     if (!is_array($course_list)) {
-        $course_list = array();
+        $course_list = [];
     }
 
     if ($form_sent == 1) {
@@ -110,7 +112,7 @@ echo '</div>';
 
 api_display_tool_title($tool_name);
 
-$no_course_list = $course_list = array();
+$no_course_list = $course_list = [];
 $ajax_search = $add_type == 'unique' ? true : false;
 
 if ($ajax_search) {
@@ -142,22 +144,26 @@ if ($ajax_search) {
 }
 
 if ($add_type == 'multiple') {
-    $link_add_type_unique = '<a href="'.api_get_self().'?add_type=unique&access_url_id='.$access_url_id.'">'.get_lang('SessionAddTypeUnique').'</a>';
+    $link_add_type_unique = '<a href="'.api_get_self().'?add_type=unique&access_url_id='.$access_url_id.'">'.
+        get_lang('SessionAddTypeUnique').'</a>';
     $link_add_type_multiple = get_lang('SessionAddTypeMultiple');
 } else {
     $link_add_type_unique = get_lang('SessionAddTypeUnique');
-    $link_add_type_multiple = '<a href="'.api_get_self().'?add_type=multiple&access_url_id='.$access_url_id.'">'.get_lang('SessionAddTypeMultiple').'</a>';
+    $link_add_type_multiple = '<a href="'.api_get_self().'?add_type=multiple&access_url_id='.$access_url_id.'">'.
+        get_lang('SessionAddTypeMultiple').'</a>';
 }
 $url_list = UrlManager::get_url_data();
 ?>
 <div style="text-align: left;">
-    <?php echo $link_add_type_unique ?>&nbsp;|&nbsp;<?php echo $link_add_type_multiple ?>
+    <?php echo $link_add_type_unique; ?>&nbsp;|&nbsp;<?php echo $link_add_type_multiple; ?>
 </div>
 <br /><br />
-<form name="formulaire" method="post" action="<?php echo api_get_self(); ?>" style="margin:0px;" <?php if ($ajax_search) {echo ' onsubmit="valide();"'; }?> >
+<form name="formulaire" method="post" action="<?php echo api_get_self(); ?>" style="margin:0px;" <?php if ($ajax_search) {
+    echo ' onsubmit="valide();"';
+}?> >
     <?php echo get_lang('SelectUrl').' : '; ?>
     <select name="access_url_id" onchange="javascript:send();">
-        <option value="0">-- <?php echo get_lang('SelectUrl')?> -- </option>
+        <option value="0">-- <?php echo get_lang('SelectUrl'); ?> -- </option>
         <?php
         $url_selected = '';
         foreach ($url_list as $url_obj) {
@@ -178,11 +184,11 @@ $url_list = UrlManager::get_url_data();
     </select>
     <br /><br />
     <input type="hidden" name="form_sent" value="1" />
-    <input type="hidden" name="add_type" value = "<?php echo $add_type ?>" />
+    <input type="hidden" name="add_type" value = "<?php echo $add_type; ?>" />
     <table border="0" cellpadding="5" cellspacing="0" width="100%">
         <!-- Users -->
         <tr>
-            <td align="center"><b><?php echo get_lang('CourseListInPlatform') ?> :</b>
+            <td align="center"><b><?php echo get_lang('CourseListInPlatform'); ?> :</b>
             </td>
             <td></td>
             <td align="center"><b><?php echo get_lang('CourseListIn').' '.$url_selected; ?></b></td>
@@ -205,8 +211,7 @@ $url_list = UrlManager::get_url_data();
                                 <option value="<?php echo $no_course['id']; ?>"><?php echo $no_course['title'].' ('.$no_course['code'].')'; ?></option>
                             <?php
                             }
-                            unset($no_course_list);
-                            ?>
+                        unset($no_course_list); ?>
                         </select>
                     <?php
                     }
@@ -239,8 +244,7 @@ $url_list = UrlManager::get_url_data();
                 <select id="destination_users" name="course_list[]" multiple="multiple" size="15" style="width:380px;">
                     <?php
                     foreach ($course_list as $course) {
-                        $courseInfo = api_get_course_info_by_id($course['id']);
-                        ?>
+                        $courseInfo = api_get_course_info_by_id($course['id']); ?>
                         <option value="<?php echo $course['id']; ?>">
                             <?php echo $course['title'].' ('.$courseInfo['code'].')'; ?>
                         </option>
@@ -291,10 +295,10 @@ $url_list = UrlManager::get_url_data();
     }
 
     function mysort(a, b) {
-        if(a.text.toLowerCase() > b.text.toLowerCase()){
+        if (a.text.toLowerCase() > b.text.toLowerCase()){
             return 1;
         }
-        if(a.text.toLowerCase() < b.text.toLowerCase()){
+        if (a.text.toLowerCase() < b.text.toLowerCase()){
             return -1;
         }
         return 0;

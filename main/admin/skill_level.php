@@ -1,13 +1,13 @@
 <?php
-
 /* For licensing terms, see /license.txt */
 
+use Chamilo\SkillBundle\Entity\Level;
+
 /**
- * Add a skill Level
+ * Add a skill Level.
  *
  * @package chamilo.skill
  */
-
 $cidReset = true;
 
 require_once __DIR__.'/../inc/global.inc.php';
@@ -29,14 +29,14 @@ $id = isset($_GET['id']) ? $_GET['id'] : '';
 
 $item = null;
 if (!empty($id)) {
-    /** @var \Chamilo\SkillBundle\Entity\Level $item */
+    /** @var Level $item */
     $item = $em->getRepository('ChamiloSkillBundle:Level')->find($id);
     if (!$item) {
         api_not_allowed();
     }
 }
 
-$form = new FormValidator('Level', 'GET', api_get_self().'?action='.$action.'&id='.$id);
+$form = new FormValidator('level', 'GET', api_get_self().'?action='.$action.'&id='.$id);
 $form->addText('name', get_lang('Name'));
 $form->addText('short_name', get_lang('ShortName'));
 $form->addSelectFromCollection('profile_id', get_lang('Profile'), $profiles);
@@ -51,29 +51,37 @@ if (!empty($item)) {
         'profile_id' => $item->getProfile()->getId(),
     ]);
 }
-$formToDisplay = $form->returnForm();
 
-$interbreadcrumb[] = array('url' => 'index.php', 'name' => get_lang('PlatformAdmin'));
-$interbreadcrumb[] = array('url' => api_get_self(), 'name' => get_lang('SkillProfile'));
+$formToDisplay = '';
 
-$tpl = new Template($action);
+$interbreadcrumb[] = ['url' => 'index.php', 'name' => get_lang('PlatformAdmin')];
+$interbreadcrumb[] = ['url' => api_get_path(WEB_CODE_PATH).'admin/skill.php', 'name' => get_lang('ManageSkillsLevels')];
+$interbreadcrumb[] = ['url' => api_get_self(), 'name' => get_lang('SkillLevel')];
+
 switch ($action) {
     case 'add':
-        $tpl->assign('form', $formToDisplay);
+        $formToDisplay = $form->returnForm();
         if ($form->validate()) {
             $values = $form->exportValues();
-            $item = new \Chamilo\SkillBundle\Entity\Level();
-            $item->setName($values['name']);
-            $item->setShortName($values['short_name']);
-            $profile = $em->getRepository('ChamiloSkillBundle:Profile')->find($values['profile_id']);
-            $item->setProfile($profile);
-
-            $em->persist($item);
-            $em->flush();
+            if (isset($values['profile_id']) && !empty($values['profile_id'])) {
+                $profile = $em->getRepository('ChamiloSkillBundle:Profile')->find($values['profile_id']);
+                if ($profile) {
+                    $item = new Level();
+                    $item->setName($values['name']);
+                    $item->setShortName($values['short_name']);
+                    $item->setProfile($profile);
+                    $em->persist($item);
+                    $em->flush();
+                    Display::addFlash(Display::return_message(get_lang('Added')));
+                } else {
+                    Display::addFlash(Display::return_message(get_lang('Added')));
+                }
+            } else {
+                Display::addFlash(Display::return_message(get_lang('YouNeedToCreateASkillProfile')));
+            }
             header('Location: '.$listAction);
             exit;
         }
-
         $toolbarAction = Display::url(
             Display::return_icon(
                 'list_badges.png',
@@ -86,7 +94,7 @@ switch ($action) {
         );
         break;
     case 'edit':
-        $tpl->assign('form', $formToDisplay);
+        $formToDisplay = $form->returnForm();
         $toolbarAction = Display::url(
             Display::return_icon(
                 'list_badges.png',
@@ -104,7 +112,9 @@ switch ($action) {
             $item->setName($values['name']);
             $item->setShortName($values['short_name']);
             $profile = $em->getRepository('ChamiloSkillBundle:Profile')->find($values['profile_id']);
-            $item->setProfile($profile);
+            if ($profile) {
+                $item->setProfile($profile);
+            }
 
             $em->persist($item);
             $em->flush();
@@ -123,8 +133,11 @@ switch ($action) {
             $listAction,
             ['title' => get_lang('List')]
         );
-        $em->remove($item);
-        $em->flush();
+        if ($item) {
+            $em->remove($item);
+            $em->flush();
+            Display::addFlash(Display::return_message(get_lang('Deleted')));
+        }
         header('Location: '.$listAction);
         exit;
 
@@ -142,12 +155,11 @@ switch ($action) {
         );
 }
 
+$tpl = new Template($action);
+$tpl->assign('form', $formToDisplay);
 $tpl->assign('list', $list);
 $templateName = $tpl->get_template('admin/skill_level.tpl');
 $contentTemplate = $tpl->fetch($templateName);
-$tpl->assign(
-    'actions',
-    Display::toolbarAction('toolbar', [$toolbarAction])
-);
+$tpl->assign('actions', Display::toolbarAction('toolbar', [$toolbarAction]));
 $tpl->assign('content', $contentTemplate);
 $tpl->display_one_col_template();

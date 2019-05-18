@@ -1,21 +1,18 @@
 <?php
-/**
- * ContextListener.php
- * publisher
- * Date: 23.05.14
- */
+/* For licensing terms, see /license.txt */
 
 namespace Chamilo\ThemeBundle\EventListener;
 
-
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\Security\Core\User\User;
-use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * Class ContextListener.
+ *
+ * @package Chamilo\ThemeBundle\EventListener
+ */
 class ContextListener
 {
-
     protected $indicator = '^/admin';
     protected $container = null;
 
@@ -27,7 +24,7 @@ class ContextListener
     public function onRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        $uri     = $request->getPathInfo();
+        $uri = $request->getPathInfo();
         if (!preg_match('!'.$this->indicator.'!', $uri)) {
             return;
         }

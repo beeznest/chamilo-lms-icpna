@@ -2,42 +2,50 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * The google maps class allows to use
+ * The google maps class allows to use.
+ *
  * @author José Loguercio Silva <jose.loguercio@beeznest.com>
+ *
  * @package chamilo.plugin.google_maps
  */
 class GoogleMapsPlugin extends Plugin
 {
+    public $javascriptIncluded;
+
     /**
-     * Class constructor
+     * Class constructor.
      */
     protected function __construct()
     {
-        $parameters = array(
+        $parameters = [
             'enable_api' => 'boolean',
             'api_key' => 'text',
-            'extra_field_name' => 'text'
-        );
+            'extra_field_name' => 'text',
+        ];
+
+        $this->javascriptIncluded = false;
 
         parent::__construct('1.0', 'José Loguercio Silva', $parameters);
     }
 
     /**
-     * Get the plugin Name
+     * Get the plugin Name.
      *
      * @return string
      */
     public function get_name()
     {
-        return "google_maps";
+        return 'google_maps';
     }
 
     /**
-     * Instance the plugin
+     * Instance the plugin.
+     *
      * @staticvar null $result
+     *
      * @return GoogleMapsPlugin
      */
-    static function create()
+    public static function create()
     {
         static $result = null;
 
@@ -45,8 +53,7 @@ class GoogleMapsPlugin extends Plugin
     }
 
     /**
-     * Install the plugin
-     * @return void
+     * Install the plugin.
      */
     public function install()
     {
@@ -54,8 +61,7 @@ class GoogleMapsPlugin extends Plugin
     }
 
     /**
-     * Uninstall the plugin
-     * @return void
+     * Uninstall the plugin.
      */
     public function uninstall()
     {

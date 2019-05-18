@@ -5,19 +5,17 @@ use ChamiloSession as Session;
 
 /**
  * This file allows record audio files.
+ *
  * @package chamilo.document
  */
-
 require_once __DIR__.'/../inc/global.inc.php';
-
-$_SESSION['whereami'] = 'document/voicerecord';
 $this_section = SECTION_COURSES;
-
 $groupRights = Session::read('group_member_with_upload_rights');
 $nameTools = get_lang('VoiceRecord');
 
 api_protect_course_script();
 api_block_anonymous_users();
+api_protect_course_group(GroupManager::GROUP_TOOL_DOCUMENTS);
 
 $document_data = DocumentManager::get_document_data_by_id(
     $_GET['id'],
@@ -79,8 +77,7 @@ if (!is_dir($filepath)) {
 
 //groups //TODO: clean
 if (!empty($groupId)) {
-    $interbreadcrumb[] = array("url" => "../group/group_space.php?".api_get_cidreq(), "name" => get_lang('GroupSpace'));
-    $noPHP_SELF = true;
+    $interbreadcrumb[] = ["url" => "../group/group_space.php?".api_get_cidreq(), "name" => get_lang('GroupSpace')];
     $group = GroupManager :: get_group_properties($groupId);
     $path = explode('/', $dir);
     if ('/'.$path[1] != $group['directory']) {
@@ -88,7 +85,7 @@ if (!empty($groupId)) {
     }
 }
 
-$interbreadcrumb[] = array("url" => "./document.php?id=".$document_id.'&'.api_get_cidreq(), "name" => get_lang('Documents'));
+$interbreadcrumb[] = ["url" => "./document.php?id=".$document_id.'&'.api_get_cidreq(), "name" => get_lang('Documents')];
 
 if (!api_is_allowed_in_course()) {
     api_not_allowed(true);
@@ -126,10 +123,10 @@ if (isset($document_data['parents'])) {
                 continue;
             }
         }
-        $interbreadcrumb[] = array(
+        $interbreadcrumb[] = [
             'url' => $document_sub_data['document_url'],
             'name' => $document_sub_data['title'],
-        );
+        ];
         $counter++;
     }
 }
@@ -156,6 +153,7 @@ $actions = Display::toolbarButton(
 $template = new Template($nameTools);
 $template->assign('directory', $wamidir);
 $template->assign('user_id', api_get_user_id());
+$template->assign('reload_page', 1);
 
 $layout = $template->get_template('document/record_audio.tpl');
 $content = $template->fetch($layout);

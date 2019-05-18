@@ -1,31 +1,41 @@
 <?php
 /* For licensing terms, see /license.txt */
 
+use Chamilo\CoreBundle\Entity\Repository\LegalRepository;
+
 /**
- * Sessions list script
+ * Sessions list script.
+ *
  * @package chamilo.admin
  */
-
 $cidReset = true;
 require_once __DIR__.'/../inc/global.inc.php';
+
 $this_section = SECTION_PLATFORM_ADMIN;
 api_protect_admin_script();
-$interbreadcrumb[] = array("url" => 'index.php', "name" => get_lang('PlatformAdmin'));
+$interbreadcrumb[] = ['url' => 'index.php', 'name' => get_lang('PlatformAdmin')];
 $tool_name = get_lang('TermsAndConditions');
-Display :: display_header($tool_name);
+Display::display_header($tool_name);
 
 $parameters['sec_token'] = Security::get_token();
 
 // action menu
 echo '<div class="actions">';
-echo '<a href="'.api_get_path(WEB_CODE_PATH).'admin/legal_add.php">'.
-    Display::return_icon('edit.gif', get_lang('EditTermsAndConditions'), '').get_lang('EditTermsAndConditions').'</a>&nbsp;&nbsp;';
+echo '<a href="'.api_get_path(WEB_CODE_PATH).'admin/legal_add.php">';
+echo Display::return_icon(
+    'edit.png',
+    get_lang('EditTermsAndConditions')
+);
+echo get_lang('EditTermsAndConditions').'</a>&nbsp;&nbsp;';
 echo '</div>';
 
-$legal_count = LegalManager::count();
+$em = Database::getManager();
+/** @var LegalRepository $legalTermsRepo */
+$legalTermsRepo = $em->getRepository('ChamiloCoreBundle:Legal');
+$legalCount = $legalTermsRepo->countAllActiveLegalTerms();
 $languages = api_get_languages();
 $available_languages = count($languages['folder']);
-if ($legal_count != $available_languages) {
+if ($legalCount != $available_languages) {
     echo Display::return_message(get_lang('YouShouldCreateTermAndConditionsForAllAvailableLanguages'), 'warning');
 }
 
@@ -42,12 +52,12 @@ $table->display();
 // this 2 "mask" function are here just because the SortableTable
 function get_legal_data_mask($id, $params = null, $row = null)
 {
-	return LegalManager::get_legal_data($id, $params, $row);
+    return LegalManager::get_legal_data($id, $params, $row);
 }
 
 function count_mask()
 {
-	return LegalManager::count();
+    return LegalManager::count();
 }
 
 Display :: display_footer();

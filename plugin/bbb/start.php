@@ -1,13 +1,24 @@
 <?php
+/* For license terms, see /license.txt */
+
 /**
- * This script initiates a video conference session, calling the BigBlueButton API
+ * This script initiates a video conference session, calling the BigBlueButton API.
+ *
  * @package chamilo.plugin.bigbluebutton
  */
-
-require __DIR__.'/../../vendor/autoload.php';
+require_once __DIR__.'/../../vendor/autoload.php';
 
 $course_plugin = 'bbb'; //needed in order to load the plugin lang variables
 require_once __DIR__.'/config.php';
+
+$logInfo = [
+    'tool' => 'Videoconference',
+    'tool_id' => 0,
+    'tool_id_detail' => 0,
+    'action' => '',
+    'action_details' => '',
+];
+Event::registerLog($logInfo);
 
 $tool_name = get_lang('Videoconference');
 $tpl = new Template($tool_name);
@@ -17,7 +28,16 @@ $host = '';
 $salt = '';
 $isGlobal = isset($_GET['global']) ? true : false;
 $isGlobalPerUser = isset($_GET['user_id']) ? (int) $_GET['user_id'] : false;
+$interface = isset($_GET['interface']) ? (int) $_GET['interface'] : 0;
+
 $bbb = new bbb('', '', $isGlobal, $isGlobalPerUser);
+
+$conferenceManager = $bbb->isConferenceManager();
+if ($bbb->isGlobalConference()) {
+    api_block_anonymous_users();
+} else {
+    api_protect_course_script(true);
+}
 
 if ($bbb->pluginEnabled) {
     if ($bbb->isServerRunning()) {
@@ -45,19 +65,30 @@ if ($bbb->pluginEnabled) {
                 }
             }
 
-            $meetingParams = array();
+            $meetingParams = [];
             $meetingParams['meeting_name'] = $bbb->getCurrentVideoConferenceName();
+            $meetingParams['interface'] = $interface;
 
             if ($bbb->meetingExists($meetingParams['meeting_name'])) {
-                $url = $bbb->joinMeeting($meetingParams['meeting_name']) ?: $bbb->createMeeting($meetingParams);
+                $joinUrl = $bbb->joinMeeting($meetingParams['meeting_name']);
+                if ($joinUrl) {
+                    $url = $joinUrl;
+                } else {
+                    $url = $bbb->createMeeting($meetingParams);
+                }
             } else {
                 $url = $bbb->isConferenceManager() ? $bbb->createMeeting($meetingParams) : $bbb->getListingUrl();
             }
 
             $meetingInfo = $bbb->findMeetingByName($meetingParams['meeting_name']);
-
-            $bbb->saveParticipant($meetingInfo['id'], api_get_user_id());
-            $bbb->redirectToBBB($url);
+            if (!empty($meetingInfo) && $url) {
+                $bbb->saveParticipant($meetingInfo['id'], api_get_user_id(), $interface);
+                $bbb->redirectToBBB($url);
+            } else {
+                $url = $bbb->getListingUrl();
+                header('Location: '.$url);
+                exit;
+            }
         } else {
             $url = $bbb->getListingUrl();
             header('Location: '.$url);

@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * TrackECourseAccess
+ * TrackECourseAccess.
  *
  * @ORM\Table(
  *  name="track_e_course_access",
@@ -22,67 +22,68 @@ use Doctrine\ORM\Mapping as ORM;
 class TrackECourseAccess
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="course_access_id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $courseAccessId;
+    protected $courseAccessId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer", nullable=false)
      */
-    private $cId;
+    protected $cId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="user_id", type="integer", nullable=false)
      */
-    private $userId;
+    protected $userId;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="login_course_date", type="datetime", nullable=false)
      */
-    private $loginCourseDate;
+    protected $loginCourseDate;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="logout_course_date", type="datetime", nullable=true)
      */
-    private $logoutCourseDate;
+    protected $logoutCourseDate;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="counter", type="integer", nullable=false)
      */
-    private $counter;
+    protected $counter;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="session_id", type="integer", nullable=false)
      */
-    private $sessionId;
+    protected $sessionId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="user_ip", type="string", length=39, nullable=false)
      */
-    private $userIp;
+    protected $userIp;
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return TrackECourseAccess
      */
     public function setCId($cId)
@@ -93,9 +94,9 @@ class TrackECourseAccess
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {
@@ -103,9 +104,10 @@ class TrackECourseAccess
     }
 
     /**
-     * Set userId
+     * Set userId.
      *
-     * @param integer $userId
+     * @param int $userId
+     *
      * @return TrackECourseAccess
      */
     public function setUserId($userId)
@@ -116,9 +118,9 @@ class TrackECourseAccess
     }
 
     /**
-     * Get userId
+     * Get userId.
      *
-     * @return integer
+     * @return int
      */
     public function getUserId()
     {
@@ -126,9 +128,10 @@ class TrackECourseAccess
     }
 
     /**
-     * Set loginCourseDate
+     * Set loginCourseDate.
      *
      * @param \DateTime $loginCourseDate
+     *
      * @return TrackECourseAccess
      */
     public function setLoginCourseDate($loginCourseDate)
@@ -139,7 +142,7 @@ class TrackECourseAccess
     }
 
     /**
-     * Get loginCourseDate
+     * Get loginCourseDate.
      *
      * @return \DateTime
      */
@@ -149,9 +152,10 @@ class TrackECourseAccess
     }
 
     /**
-     * Set logoutCourseDate
+     * Set logoutCourseDate.
      *
      * @param \DateTime $logoutCourseDate
+     *
      * @return TrackECourseAccess
      */
     public function setLogoutCourseDate($logoutCourseDate)
@@ -162,7 +166,7 @@ class TrackECourseAccess
     }
 
     /**
-     * Get logoutCourseDate
+     * Get logoutCourseDate.
      *
      * @return \DateTime
      */
@@ -172,9 +176,10 @@ class TrackECourseAccess
     }
 
     /**
-     * Set counter
+     * Set counter.
      *
-     * @param integer $counter
+     * @param int $counter
+     *
      * @return TrackECourseAccess
      */
     public function setCounter($counter)
@@ -185,9 +190,9 @@ class TrackECourseAccess
     }
 
     /**
-     * Get counter
+     * Get counter.
      *
-     * @return integer
+     * @return int
      */
     public function getCounter()
     {
@@ -195,9 +200,10 @@ class TrackECourseAccess
     }
 
     /**
-     * Set sessionId
+     * Set sessionId.
      *
-     * @param integer $sessionId
+     * @param int $sessionId
+     *
      * @return TrackECourseAccess
      */
     public function setSessionId($sessionId)
@@ -208,9 +214,9 @@ class TrackECourseAccess
     }
 
     /**
-     * Get sessionId
+     * Get sessionId.
      *
-     * @return integer
+     * @return int
      */
     public function getSessionId()
     {
@@ -218,9 +224,10 @@ class TrackECourseAccess
     }
 
     /**
-     * Set userIp
+     * Set userIp.
      *
      * @param string $userIp
+     *
      * @return TrackECourseAccess
      */
     public function setUserIp($userIp)
@@ -231,7 +238,7 @@ class TrackECourseAccess
     }
 
     /**
-     * Get userIp
+     * Get userIp.
      *
      * @return string
      */
@@ -241,9 +248,9 @@ class TrackECourseAccess
     }
 
     /**
-     * Get courseAccessId
+     * Get courseAccessId.
      *
-     * @return integer
+     * @return int
      */
     public function getCourseAccessId()
     {

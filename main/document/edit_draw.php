@@ -9,12 +9,11 @@ use ChamiloSession as Session;
  * @package chamilo.document
  *
  * @author Juan Carlos Ra�a Trabado
+ *
  * @since 25/september/2010
-*/
-
+ */
 require_once __DIR__.'/../inc/global.inc.php';
 
-$_SESSION['whereami'] = 'document/editdraw';
 $this_section = SECTION_COURSES;
 $groupRights = Session::read('group_member_with_upload_rights');
 
@@ -27,6 +26,7 @@ $document_data = DocumentManager::get_document_data_by_id(
     true
 );
 
+$file_path = '';
 if (empty($document_data)) {
     api_not_allowed();
 } else {
@@ -44,11 +44,11 @@ $current_session_id = api_get_session_id();
 $group_id = api_get_group_id();
 
 //path for svg-edit save
-$_SESSION['draw_dir'] = Security::remove_XSS($dir);
-if ($_SESSION['draw_dir'] == '/') {
-    $_SESSION['draw_dir'] = '';
+Session::write('draw_dir', Security::remove_XSS($dir));
+if ($dir == '/') {
+    Session::write('draw_dir', '');
 }
-$_SESSION['draw_file'] = basename(Security::remove_XSS($file_path));
+Session::write('draw_file', basename(Security::remove_XSS($file_path)));
 $get_file = Security::remove_XSS($file_path);
 $file = basename($get_file);
 $temp_file = explode(".", $file);
@@ -86,40 +86,39 @@ if (!is_dir($filepath)) {
 
 //groups //TODO:clean
 if (!empty($group_id)) {
-    $interbreadcrumb[] = array(
+    $interbreadcrumb[] = [
         'url' => api_get_path(WEB_CODE_PATH).'group/group_space.php?'.api_get_cidreq(),
         'name' => get_lang('GroupSpace'),
-    );
+    ];
     $group_document = true;
-    $noPHP_SELF = true;
 }
 
 $is_certificate_mode = DocumentManager::is_certificate_mode($dir);
 
 if (!$is_certificate_mode) {
-    $interbreadcrumb[] = array(
+    $interbreadcrumb[] = [
         "url" => "./document.php?curdirpath=".urlencode($my_cur_dir_path).'&'.api_get_cidreq(),
         "name" => get_lang('Documents'),
-    );
+    ];
 } else {
-    $interbreadcrumb[] = array(
-        'url' => '../gradebook/'.$_SESSION['gradebook_dest'],
-        'name' => get_lang('Gradebook')
-    );
+    $interbreadcrumb[] = [
+        'url' => Category::getUrl(),
+        'name' => get_lang('Gradebook'),
+    ];
 }
 
 // Interbreadcrumb for the current directory root path
 if (empty($document_data['parents'])) {
-    $interbreadcrumb[] = array('url' => '#', 'name' => $document_data['title']);
+    $interbreadcrumb[] = ['url' => '#', 'name' => $document_data['title']];
 } else {
     foreach ($document_data['parents'] as $document_sub_data) {
         if ($document_data['title'] == $document_sub_data['title']) {
             continue;
         }
-        $interbreadcrumb[] = array(
+        $interbreadcrumb[] = [
             'url' => $document_sub_data['document_url'],
-            'name' => $document_sub_data['title']
-        );
+            'name' => $document_sub_data['title'],
+        ];
     }
 }
 
@@ -141,16 +140,15 @@ echo '</div>';
 
 if (api_browser_support('svg')) {
     //automatic loading the course language
-    $svgedit_code_translation_table = array(
+    $svgedit_code_translation_table = [
         '' => 'en',
         'pt' => 'pt-Pt',
-        'sr' => 'sr_latn'
-    );
+        'sr' => 'sr_latn',
+    ];
     $langsvgedit = api_get_language_isocode();
     $langsvgedit = isset($svgedit_code_translation_table[$langsvgedit]) ? $svgedit_code_translation_table[$langsvgedit] : $langsvgedit;
     $langsvgedit = file_exists(api_get_path(LIBRARY_PATH).'javascript/svgedit/locale/lang.'.$langsvgedit.'.js') ? $langsvgedit : 'en';
-    $svg_url = api_get_path(WEB_LIBRARY_PATH).'javascript/svgedit/svg-editor.php?url=../../../../../courses/'.$courseDir.$dir.$file.'&lang='.$langsvgedit;
-    ?>
+    $svg_url = api_get_path(WEB_LIBRARY_PATH).'javascript/svgedit/svg-editor.php?url=../../../../../courses/'.$courseDir.$dir.$file.'&lang='.$langsvgedit; ?>
     <script>
     document.write ('<iframe id="frame" frameborder="0" scrolling="no" src="<?php echo  $svg_url; ?>" width="100%" height="100%"><noframes><p>Sorry, your browser does not handle frames</p></noframes></iframe>');
     function resizeIframe() {

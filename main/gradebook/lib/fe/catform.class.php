@@ -2,9 +2,10 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * Class CatForm
+ * Class CatForm.
  *
  * @author Stijn Konings
+ *
  * @package chamilo.gradebook
  */
 class CatForm extends FormValidator
@@ -13,17 +14,18 @@ class CatForm extends FormValidator
     const TYPE_EDIT = 2;
     const TYPE_MOVE = 3;
     const TYPE_SELECT_COURSE = 4;
-    /** @var Category  */
+    /** @var Category */
     private $category_object;
 
     /**
      * CatForm constructor.
-     * Builds a form containing form items based on a given parameter
-     * @param string $form_type 1=add, 2=edit,3=move,4=browse
+     * Builds a form containing form items based on a given parameter.
+     *
+     * @param string $form_type       1=add, 2=edit,3=move,4=browse
      * @param string $category_object
      * @param string $form_name
      * @param string $method
-     * @param null $action
+     * @param null   $action
      */
     public function __construct(
         $form_type,
@@ -49,13 +51,23 @@ class CatForm extends FormValidator
         $this->setDefaults();
     }
 
+    public function display()
+    {
+        parent::display();
+    }
+
+    public function setDefaults($defaults = [], $filter = null)
+    {
+        parent::setDefaults($defaults, $filter);
+    }
+
     /**
      * This function will build a move form that will allow the user to move a category to
-     * a another
+     * a another.
      */
     protected function build_move_form()
     {
-        $renderer = & $this->defaultRenderer();
+        $renderer = &$this->defaultRenderer();
         $renderer->setCustomElementTemplate('<span>{element}</span> ');
         $this->addElement(
             'static',
@@ -82,43 +94,27 @@ class CatForm extends FormValidator
 
     /**
      * This function builds an 'add category form, if parent id is 0, it will only
-     * show courses
+     * show courses.
      */
     protected function build_add_form()
     {
         //check if we are a root category
         //if so, you can only choose between courses
         if ($this->category_object->get_parent_id() == '0') {
-            $coursecat = Category::get_not_created_course_categories(
-                api_get_user_id()
-            );
-            if (count($coursecat) == 0) {
-                //$select->addoption(get_lang('CourseIndependent'),'COURSEINDEPENDENT','disabled');
-            } else {
-                //$select->addoption(get_lang('CourseIndependent'),'COURSEINDEPENDENT');
-            }
-            //only return courses that are not yet created by the teacher
-            if (!empty($coursecat)) {
-                foreach ($coursecat as $row) {
-                    //$select->addoption($row[1],$row[0]);
-                }
-            } else {
-                //$select->addoption($row[1],$row[0]);
-            }
             $this->setDefaults(
-                array(
+                [
                     'select_course' => $this->category_object->get_course_code(
                     ),
                     'hid_user_id' => $this->category_object->get_user_id(),
-                    'hid_parent_id' => $this->category_object->get_parent_id()
-                )
+                    'hid_parent_id' => $this->category_object->get_parent_id(),
+                ]
             );
         } else {
             $this->setDefaults(
-                array(
+                [
                     'hid_user_id' => $this->category_object->get_user_id(),
-                    'hid_parent_id' => $this->category_object->get_parent_id()
-                )
+                    'hid_parent_id' => $this->category_object->get_parent_id(),
+                ]
             );
             $this->addElement(
                 'hidden',
@@ -130,7 +126,7 @@ class CatForm extends FormValidator
     }
 
     /**
-     * Builds an form to edit a category
+     * Builds an form to edit a category.
      */
     protected function build_editing_form()
     {
@@ -169,7 +165,7 @@ class CatForm extends FormValidator
         }
 
         $this->setDefaults(
-            array(
+            [
                 'name' => $category_name,
                 'description' => $this->category_object->get_description(),
                 'hid_user_id' => $this->category_object->get_user_id(),
@@ -181,7 +177,7 @@ class CatForm extends FormValidator
                 'certif_min_score' => $this->category_object->getCertificateMinScore(),
                 'generate_certificates' => $this->category_object->getGenerateCertificates(),
                 'is_requirement' => $this->category_object->getIsRequirement(),
-            )
+            ]
         );
         $this->addElement('hidden', 'hid_id', $this->category_object->get_id());
         $this->addElement(
@@ -193,15 +189,39 @@ class CatForm extends FormValidator
     }
 
     /**
-     *
+     * This function builds an 'select course' form in the add category process,
+     * if parent id is 0, it will only show courses.
      */
+    protected function build_select_course_form()
+    {
+        $select = $this->addElement(
+            'select',
+            'select_course',
+            [get_lang('PickACourse'), 'test'],
+            null
+        );
+        $coursecat = Category::get_all_courses(api_get_user_id());
+        //only return courses that are not yet created by the teacher
+
+        foreach ($coursecat as $row) {
+            $select->addoption($row[1], $row[0]);
+        }
+        $this->setDefaults([
+            'hid_user_id' => $this->category_object->get_user_id(),
+            'hid_parent_id' => $this->category_object->get_parent_id(),
+        ]);
+        $this->addElement('hidden', 'hid_user_id');
+        $this->addElement('hidden', 'hid_parent_id');
+        $this->addElement('submit', null, get_lang('Ok'));
+    }
+
     private function build_basic_form()
     {
         $this->addText(
             'name',
             get_lang('CategoryName'),
             true,
-            array('maxlength' => '50')
+            ['maxlength' => '50']
         );
         $this->addRule('name', get_lang('ThisFieldIsRequired'), 'required');
 
@@ -214,38 +234,36 @@ class CatForm extends FormValidator
 
         $global_weight = api_get_setting('gradebook_default_weight');
 
+        $value = 100;
         if (isset($global_weight)) {
             $value = $global_weight;
-        } else {
-            $value = 100;
         }
 
         $this->addFloat(
             'weight',
-            array(
+            [
                 get_lang('TotalWeight'),
                 get_lang('TotalSumOfWeights'),
-            ),
+            ],
             true,
-            array('value' => $value, 'maxlength' => '5')
+            ['value' => $value, 'maxlength' => '5']
         );
 
         $skillsDefaults = [];
-
         if (api_is_platform_admin() || api_is_drh()) {
             if (Skill::isToolAvailable()) {
                 $skillSelect = $this->addElement(
                     'select_ajax',
                     'skills',
-                    array(
+                    [
                         get_lang('Skills'),
-                        get_lang('SkillsAchievedWhenAchievingThisGradebook')
-                    ),
+                        get_lang('SkillsAchievedWhenAchievingThisGradebook'),
+                    ],
                     null,
                     [
                         'id' => 'skills',
                         'multiple' => 'multiple',
-                        'url' => api_get_path(WEB_AJAX_PATH).'skill.ajax.php?a=search_skills'
+                        'url' => api_get_path(WEB_AJAX_PATH).'skill.ajax.php?a=search_skills',
                     ]
                 );
 
@@ -253,7 +271,6 @@ class CatForm extends FormValidator
                 $skills = $this->category_object->get_skills();
                 foreach ($skills as $skill) {
                     $skillsDefaults[] = $skill['id'];
-
                     $skillSelect->addOption($skill['name'], $skill['id']);
                 }
             }
@@ -266,7 +283,7 @@ class CatForm extends FormValidator
                 'certif_min_score',
                 get_lang('CertificateMinScore'),
                 true,
-                array('maxlength' => '5')
+                ['maxlength' => '5']
             );
             $this->addRule(
                 'certif_min_score',
@@ -330,7 +347,7 @@ class CatForm extends FormValidator
                 }
             }
 
-            $generateCertificatesParams = array();
+            $generateCertificatesParams = [];
             if ($this->category_object->getGenerateCertificates()) {
                 $generateCertificatesParams['checked'] = 'checked';
             }
@@ -349,7 +366,7 @@ class CatForm extends FormValidator
                 'is_requirement',
                 [
                     null,
-                    get_lang('ConsiderThisGradebookAsRequirementForASessionSequence')
+                    get_lang('ConsiderThisGradebookAsRequirementForASessionSequence'),
                 ],
                 get_lang('IsRequirement')
             );
@@ -371,43 +388,6 @@ class CatForm extends FormValidator
         if (isset($setting['gradebook']) && $setting['gradebook'] == 'false') {
             $visibility_default = 0;
         }
-        $this->setDefaults(array('visible' => $visibility_default, 'skills' => $skillsDefaults));
-    }
-
-    /**
-     * This function builds an 'select course' form in the add category process,
-     * if parent id is 0, it will only show courses
-     */
-    protected function build_select_course_form()
-    {
-        $select = $this->addElement(
-            'select',
-            'select_course',
-            array(get_lang('PickACourse'), 'test'),
-            null
-        );
-        $coursecat = Category::get_all_courses(api_get_user_id());
-        //only return courses that are not yet created by the teacher
-
-        foreach ($coursecat as $row) {
-            $select->addoption($row[1], $row[0]);
-        }
-        $this->setDefaults(array(
-            'hid_user_id' => $this->category_object->get_user_id(),
-            'hid_parent_id' => $this->category_object->get_parent_id()
-        ));
-        $this->addElement('hidden', 'hid_user_id');
-        $this->addElement('hidden', 'hid_parent_id');
-        $this->addElement('submit', null, get_lang('Ok'));
-    }
-
-    function display()
-    {
-        parent::display();
-    }
-
-    function setDefaults($defaults = array(), $filter = null)
-    {
-        parent::setDefaults($defaults, $filter);
+        $this->setDefaults(['visible' => $visibility_default, 'skills' => $skillsDefaults]);
     }
 }

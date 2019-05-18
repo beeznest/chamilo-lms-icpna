@@ -3,12 +3,13 @@
 
 /**
  * @package chamilo.forum
+ *
  * @todo fix all this qualify files avoid including files, use classes POO jmontoya
  */
-
 require_once __DIR__.'/../inc/global.inc.php';
-require_once 'forumconfig.inc.php';
 require_once 'forumfunction.inc.php';
+
+api_protect_course_script(true);
 
 $nameTools = get_lang('ToolForum');
 $this_section = SECTION_COURSES;
@@ -63,7 +64,7 @@ if (isset($_POST['idtextqualify'])) {
                 'action' => 'liststd',
                 'content' => 'thread',
                 'id' => $threadId,
-                'list' => 'qualify'
+                'list' => 'qualify',
             ])
         );
         exit;
@@ -76,7 +77,7 @@ if (isset($_POST['idtextqualify'])) {
 
 /*     Including necessary files */
 $htmlHeadXtra[] = '<script>
-    $(document).ready(function(){
+    $(function() {
         $(\'.hide-me\').slideUp()
     });
 
@@ -90,18 +91,11 @@ $currentForumCategory = get_forumcategory_information(
 );
 $groupId = api_get_group_id();
 
-/*
-    Header and Breadcrumbs
-*/
-if (isset($_SESSION['gradebook'])) {
-    $gradebook = $_SESSION['gradebook'];
-}
-
-if (!empty($gradebook) && $gradebook == 'view') {
-    $interbreadcrumb[] = array(
-        'url' => '../gradebook/'.$_SESSION['gradebook_dest'],
-        'name' => get_lang('ToolGradebook')
-    );
+if (api_is_in_gradebook()) {
+    $interbreadcrumb[] = [
+        'url' => Category::getUrl(),
+        'name' => get_lang('ToolGradebook'),
+    ];
 }
 
 $search = isset($_GET['search']) ? Security::remove_XSS(urlencode($_GET['search'])) : '';
@@ -111,64 +105,59 @@ if ($origin == 'learnpath') {
 } else {
     if (!empty($groupId)) {
         $group_properties = GroupManager::get_group_properties($groupId);
-        $interbreadcrumb[] = array(
+        $interbreadcrumb[] = [
             "url" => "../group/group.php?".api_get_cidreq(),
-            "name" => get_lang('Groups')
-        );
-        $interbreadcrumb[] = array(
+            "name" => get_lang('Groups'),
+        ];
+        $interbreadcrumb[] = [
             "url" => "../group/group_space.php?".api_get_cidreq(),
-            "name" => get_lang('GroupSpace').' ('.$group_properties['name'].')'
-        );
-        $interbreadcrumb[] = array(
+            "name" => get_lang('GroupSpace').' ('.$group_properties['name'].')',
+        ];
+        $interbreadcrumb[] = [
             "url" => "viewforum.php?".api_get_cidreq()."&forum=".intval($_GET['forum'])."&search=".$search,
-            "name" => prepare4display($currentForum['forum_title'])
-        );
-        if ($message <> 'PostDeletedSpecial') {
-            $interbreadcrumb[] = array(
+            "name" => prepare4display($currentForum['forum_title']),
+        ];
+        if ($message != 'PostDeletedSpecial') {
+            $interbreadcrumb[] = [
                 "url" => "viewthread.php?".api_get_cidreq()."&forum=".intval($_GET['forum'])."&thread=".intval($_GET['thread']),
-                "name" => prepare4display($currentThread['thread_title'])
-            );
+                "name" => prepare4display($currentThread['thread_title']),
+            ];
         }
 
-        $interbreadcrumb[] = array(
+        $interbreadcrumb[] = [
             "url" => "#",
-            "name" => get_lang('QualifyThread')
-        );
+            "name" => get_lang('QualifyThread'),
+        ];
 
         // the last element of the breadcrumb navigation is already set in interbreadcrumb, so give empty string
         Display::display_header('');
         api_display_tool_title($nameTools);
     } else {
         $info_thread = get_thread_information($currentForum['forum_id'], $_GET['thread']);
-        $interbreadcrumb[] = array(
+        $interbreadcrumb[] = [
             "url" => "index.php?".api_get_cidreq()."&search=".$search,
-            "name" => $nameTools
-        );
-        $interbreadcrumb[] = array(
+            "name" => $nameTools,
+        ];
+        $interbreadcrumb[] = [
             "url" => "viewforumcategory.php?".api_get_cidreq()."&forumcategory=".$currentForumCategory['cat_id']."&search=".$search,
-            "name" => prepare4display($currentForumCategory['cat_title'])
-        );
-        $interbreadcrumb[] = array(
+            "name" => prepare4display($currentForumCategory['cat_title']),
+        ];
+        $interbreadcrumb[] = [
             "url" => "viewforum.php?".api_get_cidreq()."&forum=".intval($_GET['forum'])."&search=".$search,
-            "name" => prepare4display($currentForum['forum_title'])
-        );
+            "name" => prepare4display($currentForum['forum_title']),
+        ];
 
-        if ($message <> 'PostDeletedSpecial') {
-            if (isset($_GET['gradebook']) && $_GET['gradebook'] == 'view') {
-                $info_thread = get_thread_information($currentForum['forum_id'], $_GET['thread']);
-                $interbreadcrumb[] = array(
-                    "url" => "viewthread.php?".api_get_cidreq()."&forum=".$info_thread['forum_id']."&thread=".intval($_GET['thread']),
-                    "name" => prepare4display($currentThread['thread_title'])
-                );
-            } else {
-                $interbreadcrumb[] = array(
-                    "url" => "viewthread.php?".api_get_cidreq()."&forum=".intval($_GET['forum'])."&thread=".intval($_GET['thread']),
-                    "name" => prepare4display($currentThread['thread_title'])
-                );
-            }
+        if ($message != 'PostDeletedSpecial') {
+            $interbreadcrumb[] = [
+                "url" => "viewthread.php?".api_get_cidreq()."&forum=".$info_thread['forum_id']."&thread=".intval($_GET['thread']),
+                "name" => prepare4display($currentThread['thread_title']),
+            ];
         }
         // the last element of the breadcrumb navigation is already set in interbreadcrumb, so give empty string
-        $interbreadcrumb[] = array("url" => "#", "name" => get_lang('QualifyThread'));
+        $interbreadcrumb[] = [
+            "url" => "#",
+            "name" => get_lang('QualifyThread'),
+        ];
         Display::display_header('');
     }
 }
@@ -239,7 +228,7 @@ $form->addLabel(
 );
 $form->addText(
     'idtextqualify',
-    array(get_lang('Qualification'), get_lang('MaxScore').' '.$maxQualify),
+    [get_lang('Qualification'), get_lang('MaxScore').' '.$maxQualify],
     $qualify
 );
 
@@ -279,9 +268,7 @@ if (isset($rows)) {
 
         echo "<tr>";
         echo "<td rowspan=\"3\" class=\"$leftclass\">";
-
         echo '<br /><b>'.api_convert_and_format_date($row['post_date'], DATE_TIME_FORMAT_LONG).'</b><br />';
-
         echo "</td>";
 
         // The post title
@@ -313,21 +300,18 @@ if (isset($rows)) {
 }
 
 $form->addButtonSave(get_lang('QualifyThisThread'));
-$form->setDefaults(array('idtextqualify' => $qualify));
+$form->setDefaults(['idtextqualify' => $qualify]);
 $form->display();
 
 // Show past data
 if (api_is_allowed_to_edit() && $counter > 0) {
-    if (isset($_GET['gradebook'])) {
-        $view_gradebook = '&gradebook=view';
-    }
     echo '<h4>'.get_lang('QualificationChangesHistory').'</h4>';
     if (isset($_GET['type']) && $_GET['type'] === 'false') {
-        $buttons = '<a class="btn btn-default" href="forumqualify.php?'.api_get_cidreq().'&forum='.intval($_GET['forum']).'&origin='.$origin.'&thread='.$threadId.'&user='.intval($_GET['user']).'&user_id='.intval($_GET['user_id']).'&type=true&idtextqualify='.$score.$view_gradebook.'#history">'.
+        $buttons = '<a class="btn btn-default" href="forumqualify.php?'.api_get_cidreq().'&forum='.intval($_GET['forum']).'&origin='.$origin.'&thread='.$threadId.'&user='.intval($_GET['user']).'&user_id='.intval($_GET['user_id']).'&type=true&idtextqualify='.$score.'#history">'.
             get_lang('MoreRecent').'</a> <a class="btn btn-default disabled" >'.get_lang('Older').'</a>';
     } else {
         $buttons = '<a class="btn btn-default">'.get_lang('MoreRecent').'</a>
-                        <a class="btn btn-default" href="forumqualify.php?'.api_get_cidreq().'&forum='.intval($_GET['forum']).'&origin='.$origin.'&thread='.$threadId.'&user='.intval($_GET['user']).'&user_id='.intval($_GET['user_id']).'&type=false&idtextqualify='.$score.$view_gradebook.'#history">'.
+                        <a class="btn btn-default" href="forumqualify.php?'.api_get_cidreq().'&forum='.intval($_GET['forum']).'&origin='.$origin.'&thread='.$threadId.'&user='.intval($_GET['user']).'&user_id='.intval($_GET['user_id']).'&type=false&idtextqualify='.$score.'#history">'.
             get_lang('Older').'</a>';
     }
 

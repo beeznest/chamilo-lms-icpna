@@ -6,6 +6,12 @@ $current_course_tool = TOOL_STUDENTPUBLICATION;
 
 api_protect_course_script(true);
 
+$blockEdition = api_get_configuration_value('block_student_publication_edition');
+
+if ($blockEdition && !api_is_platform_admin()) {
+    api_not_allowed(true);
+}
+
 // Including files
 require_once 'work.lib.php';
 
@@ -99,53 +105,40 @@ if (!empty($my_folder_data)) {
     }
 }
 
-$interbreadcrumb[] = array(
+$interbreadcrumb[] = [
     'url' => api_get_path(WEB_CODE_PATH).'work/work.php?'.api_get_cidreq(),
-    'name' => get_lang('StudentPublications')
-);
+    'name' => get_lang('StudentPublications'),
+];
 
 if (api_is_allowed_to_edit()) {
-    $interbreadcrumb[] = array(
+    $interbreadcrumb[] = [
         'url' => api_get_path(WEB_CODE_PATH).'work/work_list_all.php?'.api_get_cidreq().'&id='.$work_id,
-        'name' =>  $parent_data['title']
-    );
+        'name' => $parent_data['title'],
+    ];
 } else {
-    $interbreadcrumb[] = array(
+    $interbreadcrumb[] = [
         'url' => api_get_path(WEB_CODE_PATH).'work/work_list.php?'.api_get_cidreq().'&id='.$work_id,
-        'name' =>  $parent_data['title']
-    );
+        'name' => $parent_data['title'],
+    ];
 }
 
 // form title
 $form_title = get_lang('Edit');
 
-$interbreadcrumb[] = array('url' => '#', 'name'  => $form_title);
+$interbreadcrumb[] = ['url' => '#', 'name' => $form_title];
 
 $form = new FormValidator(
     'form',
     'POST',
     api_get_self()."?".api_get_cidreq()."&id=".$work_id,
     '',
-    array('enctype' => "multipart/form-data")
+    ['enctype' => "multipart/form-data"]
 );
 $form->addElement('header', $form_title);
-
 $show_progress_bar = false;
-/*
-if ($submitGroupWorkUrl) {
-    // For user coming from group space to publish his work
-    $realUrl = str_replace($_configuration['root_sys'], api_get_path(WEB_PATH), str_replace("\\", '/', realpath($submitGroupWorkUrl)));
-    $form->addElement('hidden', 'newWorkUrl', $submitGroupWorkUrl);
-    $text_document = $form->addElement('text', 'document', get_lang('Document'));
-    $defaults['document'] = '<a href="' . format_url($submitGroupWorkUrl) . '">' . $realUrl . '</a>';
-    $text_document->freeze();
-} elseif ($item_id && ($is_allowed_to_edit or $is_author)) {
-    $workUrl = $currentCourseRepositoryWeb . $workUrl;
-}*/
-
 $form->addElement('hidden', 'id', $work_id);
 $form->addElement('hidden', 'item_id', $item_id);
-$form->addText('title', get_lang('Title'), true, array('id' => 'file_upload'));
+$form->addText('title', get_lang('Title'), true, ['id' => 'file_upload']);
 if ($is_allowed_to_edit && !empty($item_id)) {
     $sql = "SELECT contains_file, url
             FROM $work_table
@@ -157,7 +150,7 @@ if ($is_allowed_to_edit && !empty($item_id)) {
             $form->addLabel(
                 get_lang('Download'),
                 '<a href="'.api_get_path(WEB_CODE_PATH).'work/download.php?id='.$item_id.'&'.api_get_cidreq().'">'.
-                    Display::return_icon('save.png', get_lang('Save'), array(), ICON_SIZE_MEDIUM).'
+                    Display::return_icon('save.png', get_lang('Save'), [], ICON_SIZE_MEDIUM).'
                 </a>'
             );
         }
@@ -286,7 +279,7 @@ if ($form->validate()) {
         Security::clear_token();
     } else {
         // Bad token or can't add works
-        Display::addFlash(Display::return_message(get_lang('IsNotPosibleSaveTheDocument'), 'error'));
+        Display::addFlash(Display::return_message(get_lang('ImpossibleToSaveTheDocument'), 'error'));
     }
 
     $script = 'work_list.php';

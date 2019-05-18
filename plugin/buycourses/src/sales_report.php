@@ -2,7 +2,8 @@
 /* For license terms, see /license.txt */
 
 /**
- * List of pending payments of the Buy Courses plugin
+ * List of pending payments of the Buy Courses plugin.
+ *
  * @package chamilo.plugin.buycourses
  */
 //Initialization
@@ -17,6 +18,7 @@ $plugin = BuyCoursesPlugin::create();
 $paypalEnable = $plugin->get('paypal_enable');
 $commissionsEnable = $plugin->get('commissions_enable');
 $includeServices = $plugin->get('include_services');
+$invoicingEnable = $plugin->get('invoicing_enable') === 'true';
 
 if (isset($_GET['order'])) {
     $sale = $plugin->getSale($_GET['order']);
@@ -32,15 +34,12 @@ if (isset($_GET['order'])) {
             $plugin->completeSale($sale['id']);
             $plugin->storePayouts($sale['id']);
             Display::addFlash(
-                Display::return_message(
-                    sprintf($plugin->get_lang('SubscriptionToCourseXSuccessful'), $sale['product_name']),
-                    'success'
-                )
+                $plugin->getSubscriptionSuccessMessage($sale)
             );
 
             $urlToRedirect .= http_build_query([
                 'status' => BuyCoursesPlugin::SALE_STATUS_COMPLETED,
-                'sale' => $sale['id']
+                'sale' => $sale['id'],
             ]);
             break;
         case 'cancel':
@@ -55,7 +54,7 @@ if (isset($_GET['order'])) {
 
             $urlToRedirect .= http_build_query([
                 'status' => BuyCoursesPlugin::SALE_STATUS_CANCELED,
-                'sale' => $sale['id']
+                'sale' => $sale['id'],
             ]);
             break;
     }
@@ -103,7 +102,7 @@ $form->addHtml('</div>');
 $form->addButtonFilter(get_lang('Search'));
 $form->setDefaults([
     'filter_type' => $selectedFilterType,
-    'status' => $selectedStatus
+    'status' => $selectedStatus,
 ]);
 
 switch ($selectedFilterType) {
@@ -122,13 +121,15 @@ foreach ($sales as $sale) {
         'id' => $sale['id'],
         'reference' => $sale['reference'],
         'status' => $sale['status'],
-        'date' => api_format_date($sale['date'], DATE_TIME_FORMAT_LONG_24H),
+        'date' => api_convert_and_format_date($sale['date'], DATE_TIME_FORMAT_LONG_24H),
         'currency' => $sale['iso_code'],
         'price' => $sale['price'],
         'product_name' => $sale['product_name'],
         'product_type' => $productTypes[$sale['product_type']],
         'complete_user_name' => api_get_person_name($sale['firstname'], $sale['lastname']),
-        'payment_type' => $paymentTypes[$sale['payment_type']]
+        'payment_type' => $paymentTypes[$sale['payment_type']],
+        'invoice' => $sale['invoice'],
+        'num_invoice' => $plugin->getNumInvoice($sale['id'], 0),
     ];
 }
 
@@ -139,8 +140,10 @@ $templateName = $plugin->get_lang('SalesReport');
 
 $template = new Template($templateName);
 
+$toolbar = "";
+
 if ($paypalEnable == "true" && $commissionsEnable == "true") {
-    $toolbar = Display::toolbarButton(
+    $toolbar .= Display::toolbarButton(
         $plugin->get_lang('PaypalPayoutCommissions'),
         api_get_path(WEB_PLUGIN_PATH).'buycourses/src/paypal_payout.php',
         'paypal',
@@ -155,7 +158,7 @@ if ($paypalEnable == "true" && $commissionsEnable == "true") {
 }
 
 if ($commissionsEnable == "true") {
-    $toolbar = Display::toolbarButton(
+    $toolbar .= Display::toolbarButton(
         $plugin->get_lang('PayoutReport'),
         api_get_path(WEB_PLUGIN_PATH).'buycourses/src/payout_report.php',
         'money',
@@ -176,6 +179,7 @@ $template->assign('sale_list', $saleList);
 $template->assign('sale_status_canceled', BuyCoursesPlugin::SALE_STATUS_CANCELED);
 $template->assign('sale_status_pending', BuyCoursesPlugin::SALE_STATUS_PENDING);
 $template->assign('sale_status_completed', BuyCoursesPlugin::SALE_STATUS_COMPLETED);
+$template->assign('invoicing_enable', $invoicingEnable);
 
 $content = $template->fetch('buycourses/view/sales_report.tpl');
 

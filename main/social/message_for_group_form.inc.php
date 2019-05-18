@@ -2,10 +2,10 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * Form for group message
+ * Form for group message.
+ *
  * @package chamilo.social
  */
-
 $cidReset = true;
 require_once __DIR__.'/../inc/global.inc.php';
 
@@ -17,8 +17,8 @@ if (api_get_setting('allow_social_tool') != 'true') {
 $tok = Security::get_token();
 
 if (isset($_REQUEST['user_friend'])) {
-    $info_user_friend = array();
-    $info_path_friend = array();
+    $info_user_friend = [];
+    $info_path_friend = [];
     $userfriend_id = intval($_REQUEST['user_friend']);
     $info_user_friend = api_get_user_info($userfriend_id);
     $info_path_friend = UserManager::get_user_picture_path_by_id($userfriend_id, 'web');
@@ -26,8 +26,7 @@ if (isset($_REQUEST['user_friend'])) {
 
 $group_id = isset($_GET['group_id']) ? intval($_GET['group_id']) : null;
 $message_id = isset($_GET['message_id']) ? intval($_GET['message_id']) : null;
-$actions = array('add_message_group', 'edit_message_group', 'reply_message_group');
-
+$actions = ['add_message_group', 'edit_message_group', 'reply_message_group'];
 $allowed_action = isset($_GET['action']) && in_array($_GET['action'], $actions) ? Security::remove_XSS($_GET['action']) : '';
 
 $to_group = '';
@@ -69,13 +68,13 @@ $form = new FormValidator(
     'post',
     $url,
     null,
-    array('enctype' => 'multipart/form-data')
+    ['enctype' => 'multipart/form-data']
 );
-$form->addElement('hidden', 'action', $allowed_action);
-$form->addElement('hidden', 'group_id', $group_id);
-$form->addElement('hidden', 'parent_id', $message_id);
-$form->addElement('hidden', 'message_id', $message_id);
-$form->addElement('hidden', 'token', $tok);
+$form->addHidden('action', $allowed_action);
+$form->addHidden('group_id', $group_id);
+$form->addHidden('parent_id', $message_id);
+$form->addHidden('message_id', $message_id);
+$form->addHidden('token', $tok);
 
 $tpl = new Template(get_lang('Groups'));
 
@@ -93,13 +92,11 @@ if (api_get_setting('allow_message_tool') === 'true') {
     $form->addElement(
         'label',
         get_lang('AttachmentFiles'),
-        '
-            <div id="link-more-attach">
-                <a class="btn btn-default" href="javascript://" onclick="return add_image_form()">
-                    ' . get_lang('AddOneMoreFile').'
-                </a>
-            </div>
-        '
+        '<div id="link-more-attach">
+            <a class="btn btn-default" href="javascript://" onclick="return add_image_form()">
+                '.get_lang('AddOneMoreFile').'
+            </a>
+        </div>'
     );
 
     $form->addElement('label', null, '<div id="filepaths"></div>');
@@ -114,6 +111,7 @@ if (api_get_setting('allow_message_tool') === 'true') {
     $form->addButtonSend(get_lang('SendMessage'));
 
     $form->setDefaults(['content' => $message, 'title' => $subject]);
-    $form->display();
+    $tpl->assign('content', $form->returnForm());
 }
-$tpl->display_blank_template();
+
+$tpl->displayBlankTemplateNoHeader();

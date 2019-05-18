@@ -1,14 +1,13 @@
 <?php
 /* For licensing terms, see /license.txt */
 
-/**
-*
-* @package chamilo.learnpath
-*/
+use ChamiloSession as Session;
 
+/**
+ * @package chamilo.learnpath
+ */
 require_once __DIR__.'/../inc/global.inc.php';
 
-$_SESSION['whereami'] = 'lp/impress';
 $this_section = SECTION_COURSES;
 
 //To prevent the template class
@@ -36,35 +35,33 @@ $visibility = api_get_item_visibility(
     api_get_group_id()
 );
 if (!api_is_allowed_to_edit(null, true) && intval($visibility) == 0) {
-     api_not_allowed();
+    api_not_allowed();
 }
-
-if (empty($_SESSION['oLP'])) {
+/** @var learnpath $lp */
+$lp = Session::read('oLP');
+if (!$lp) {
     api_not_allowed(true);
 }
 
 $debug = 0;
-
-if ($debug) { error_log('------ Entering lp_impress.php -------'); }
-
 $course_code = api_get_course_id();
 $course_id = api_get_course_int_id();
 $htmlHeadXtra[] = api_get_css(api_get_path(WEB_LIBRARY_PATH).'javascript/impress/impress-demo.css');
-$list = $_SESSION['oLP']->get_toc();
+$list = $lp->get_toc();
 
 $is_allowed_to_edit = api_is_allowed_to_edit(null, true, false, false);
 if ($is_allowed_to_edit) {
     echo '<div style="position: fixed; top: 0px; left: 0px; pointer-events: auto;width:100%">';
     global $interbreadcrumb;
-    $interbreadcrumb[] = array(
+    $interbreadcrumb[] = [
         'url' => 'lp_controller.php?action=list&isStudentView=false&'.api_get_cidreq(),
         'name' => get_lang('LearningPaths'),
-    );
-    $interbreadcrumb[] = array(
-        'url' => api_get_self()."?action=add_item&type=step&lp_id=".$_SESSION['oLP']->lp_id."&isStudentView=false&".api_get_cidreq(),
-        'name' => $_SESSION['oLP']->get_name(),
-    );
-    $interbreadcrumb[] = array('url' => '#', 'name' => get_lang('Preview'));
+    ];
+    $interbreadcrumb[] = [
+        'url' => api_get_self()."?action=add_item&type=step&lp_id=".$lp->lp_id."&isStudentView=false&".api_get_cidreq(),
+        'name' => $lp->get_name(),
+    ];
+    $interbreadcrumb[] = ['url' => '#', 'name' => get_lang('Preview')];
     echo return_breadcrumb($interbreadcrumb, null, null);
     echo '</div>';
 }
@@ -75,7 +72,7 @@ foreach ($list as $toc) {
     $x = 1000 * $step;
     $html .= '<div id="step-'.$step.'" class="step slide" data-x="'.$x.'" data-y="-1500"  >';
     $html .= '<div class="impress-content">';
-    $src = $_SESSION['oLP']->get_link('http', $toc['id']);
+    $src = $lp->get_link('http', $toc['id']);
     if ($toc['type'] !== 'dir') {
         //just showing the src in a iframe ...
         $html .= '<h2>'.$toc['title'].'</h2>';

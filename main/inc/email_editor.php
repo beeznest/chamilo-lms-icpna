@@ -8,19 +8,19 @@ use ChamiloSession as Session;
  * the platform's users.
  * It can be called from the JavaScript library email_links.lib.php which
  * overtakes the mailto: links to use the internal interface instead.
+ *
  * @author	Yannick Warnier <ywarnier@beeznest.org>
  * @author Julio Montoya <gugli100@gmail.com> Updating form with formvalidator
  */
-
 require_once __DIR__.'/../inc/global.inc.php';
 
-if (empty($_user['user_id'])) {
+if (empty(api_get_user_id())) {
     api_not_allowed(true);
 }
 
-if (empty($_SESSION['origin_url'])) {
-    $origin_url = $_SERVER['HTTP_REFERER'];
-    Session::write('origin_url', $origin_url);
+$originUrl = Session::read('origin_url');
+if (empty($originUrl)) {
+    Session::write('origin_url', $_SERVER['HTTP_REFERER']);
 }
 
 $action = isset($_GET['action']) ? $_GET['action'] : null;
@@ -30,7 +30,7 @@ $form->addElement('hidden', 'dest');
 $form->addElement('text', 'email_address', get_lang('EmailDestination'));
 $form->addElement('text', 'email_title', get_lang('EmailTitle'));
 $form->freeze('email_address');
-$form->addElement('textarea', 'email_text', get_lang('EmailText'), array('rows' => '6'));
+$form->addElement('textarea', 'email_text', get_lang('EmailText'), ['rows' => '6']);
 $form->addRule('email_address', get_lang('ThisFieldIsRequired'), 'required');
 $form->addRule('email_title', get_lang('ThisFieldIsRequired'), 'required');
 $form->addRule('email_text', get_lang('ThisFieldIsRequired'), 'required');
@@ -56,17 +56,17 @@ switch ($action) {
         $emailText = Security::remove_XSS($_REQUEST['email_text']);
 }
 
-$defaults = array(
+$defaults = [
     'dest' => $emailDest,
     'email_address' => $emailDest,
     'email_title' => $emailTitle,
-    'email_text' => $emailText
-);
+    'email_text' => $emailText,
+];
 
 $form->setDefaults($defaults);
 
 if ($form->validate()) {
-    $text = Security::remove_XSS($_POST['email_text'])."\n\n---\n".get_lang('EmailSentFromLMS')." ".api_get_path(WEB_PATH);
+    $text = Security::remove_XSS($_POST['email_text'])."\n\n---\n".get_lang('EmailSentFromLMS').' '.api_get_path(WEB_PATH);
     $email_administrator = Security::remove_XSS($_POST['dest']);
     $user_id = api_get_user_id();
     $title = Security::remove_XSS($_POST['email_title']);
@@ -78,13 +78,12 @@ if ($form->validate()) {
             $title,
             $text,
             api_get_person_name($_user['firstname'], $_user['lastname']),
-            $_user['mail']
-        );
-        UserManager::send_message_in_outbox(
-            $email_administrator,
-            $user_id,
-            $title,
-            $content
+            '',
+            ['reply_to' => [
+                    'mail' => $_user['mail'],
+                    'name' => api_get_person_name($_user['firstname'], $_user['lastname']),
+                ],
+            ]
         );
     } else {
         api_mail_html(
@@ -95,9 +94,9 @@ if ($form->validate()) {
             get_lang('Anonymous')
         );
     }
-    $orig = $_SESSION['origin_url'];
+    $orig = Session::read('origin_url');
     Session::erase('origin_url');
-    header('location:'.$orig);
+    header('Location:'.$orig);
     exit;
 }
 Display::display_header(get_lang('SendEmail'));

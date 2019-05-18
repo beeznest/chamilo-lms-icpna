@@ -69,6 +69,7 @@ class HTML_Common
      * @access    private
      */
     var $_comment = '';
+    public $freezeSeeOnlySelected;
 
     /**
      * Class constructor
@@ -79,6 +80,7 @@ class HTML_Common
      */
     public function __construct($attributes = null, $tabOffset = 0)
     {
+        $this->freezeSeeOnlySelected = false;
         $this->setAttributes($attributes);
         $this->setTabOffset($tabOffset);
     } // end constructor
@@ -126,7 +128,7 @@ class HTML_Common
     function _getTabs()
     {
         return str_repeat($this->_getTab(), $this->_tabOffset);
-    } // end func _getTabs
+    }
 
     /**
      * Returns an HTML formatted attribute string
@@ -143,9 +145,10 @@ class HTML_Common
             foreach ($attributes as $key => $value) {
             	// Modified by Ivan Tcholakov, 16-MAR-2010
                 $value = @htmlspecialchars($value, ENT_COMPAT, $charset);
-                $strAttr .= ' ' . $key . '= "' . $value. '"';
+                $strAttr .= ' ' . $key . '="' . $value. '"';
             }
         }
+
         return $strAttr;
     }
 
@@ -155,7 +158,7 @@ class HTML_Common
      * @access   private
      * @return   array
      */
-    function _parseAttributes($attributes)
+    public function _parseAttributes($attributes)
     {
         if (is_array($attributes)) {
             $ret = array();
@@ -241,7 +244,7 @@ class HTML_Common
         if (isset($attributes[$attr])) {
             unset($attributes[$attr]);
         }
-    } //end func _removeAttr
+    }
 
     /**
      * Returns the value of the given attribute
@@ -251,14 +254,15 @@ class HTML_Common
      * @access    public
      * @return    string|null   returns null if an attribute does not exist
      */
-    function getAttribute($attr)
+    public function getAttribute($attr)
     {
         $attr = strtolower($attr);
         if (isset($this->_attributes[$attr])) {
             return $this->_attributes[$attr];
         }
+
         return null;
-    } //end func getAttribute
+    }
 
     /**
      * Sets the value of the attribute
@@ -456,17 +460,6 @@ class HTML_Common
      */
     function charset($newCharset = null)
     {
-        // Modified by Ivan Tcholakov, 16-MAR-2010
-        //static $charset = 'ISO-8859-1';
-        static $charset;
-        if (!isset($charset)) {
-            $charset = api_get_system_encoding();
-        }
-        //
-
-        if (!is_null($newCharset)) {
-            $charset = $newCharset;
-        }
-        return $charset;
-    } // end func charset
+        return 'UTF-8';
+    }
 }

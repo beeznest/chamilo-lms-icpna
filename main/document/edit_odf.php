@@ -1,10 +1,10 @@
 <?php
 /* For licensing terms, see /license.txt */
 /**
- * ODF document editor script
+ * ODF document editor script.
+ *
  * @package chamilo.document
  */
-
 require_once __DIR__.'/../inc/global.inc.php';
 
 $documentId = isset($_GET['id']) ? intval($_GET['id']) : 0;
@@ -27,7 +27,7 @@ if (empty($documentInfo)) {
 //Check user visibility
 $is_visible = DocumentManager::check_visibility_tree(
     $documentId,
-    api_get_course_id(),
+    api_get_course_info(),
     api_get_session_id(),
     api_get_user_id(),
     api_get_group_id()
@@ -76,11 +76,11 @@ $htmlHeadXtra[] = api_get_js('wodotexteditor/wodotexteditor.js');
 $htmlHeadXtra[] = api_get_js('wodotexteditor/localfileeditor.js');
 $htmlHeadXtra[] = api_get_js('wodotexteditor/FileSaver.js');
 $htmlHeadXtra[] = '
-    <script type="text/javascript" charset="utf-8">
-        $(document).on(\'ready\', function() {
-            createEditor(\''.$fileUrl.'\');
-        });
-    </script>
+<script>
+    $(function() {
+        createEditor(\''.$fileUrl.'\');
+    });
+</script>
 ';
 $htmlHeadXtra[] = '
     <style>
@@ -96,7 +96,7 @@ $htmlHeadXtra[] = '
 // Interbreadcrumb for the current directory root path
 $interbreadcrumb[] = [
     'url' => api_get_path(WEB_CODE_PATH).'document/document.php',
-    'name' => get_lang('Documents')
+    'name' => get_lang('Documents'),
 ];
 
 if (!empty($documentInfo['parents'])) {
@@ -107,7 +107,7 @@ if (!empty($documentInfo['parents'])) {
 
         $interbreadcrumb[] = [
             'url' => $documentParent['document_url'],
-            'name' => $documentParent['title']
+            'name' => $documentParent['title'],
         ];
     }
 }

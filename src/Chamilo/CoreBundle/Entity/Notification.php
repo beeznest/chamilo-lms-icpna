@@ -6,77 +6,85 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Notification
+ * Notification.
  *
- * @ORM\Table(name="notification", indexes={@ORM\Index(name="mail_notify_sent_index", columns={"sent_at"}), @ORM\Index(name="mail_notify_freq_index", columns={"sent_at", "send_freq", "created_at"})})
+ * @ORM\Table(
+ *     name="notification",
+ *     indexes={
+ *          @ORM\Index(name="mail_notify_sent_index", columns={"sent_at"}),
+ *          @ORM\Index(
+ *              name="mail_notify_freq_index",
+ *              columns={"sent_at", "send_freq", "created_at"}
+ *          )
+ *     }
+ * )
  * @ORM\Entity
  */
 class Notification
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="dest_user_id", type="integer", nullable=false)
      */
-    private $destUserId;
+    protected $destUserId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="dest_mail", type="string", length=255, nullable=true)
      */
-    private $destMail;
+    protected $destMail;
 
     /**
      * @var string
      *
      * @ORM\Column(name="title", type="string", length=255, nullable=true)
      */
-    private $title;
+    protected $title;
 
     /**
      * @var string
      *
      * @ORM\Column(name="content", type="text", nullable=true)
      */
-    private $content;
+    protected $content;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="send_freq", type="smallint", nullable=true)
      */
-    private $sendFreq;
+    protected $sendFreq;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=false)
      */
-    private $createdAt;
+    protected $createdAt;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="sent_at", type="datetime", nullable=true)
      */
-    private $sentAt;
+    protected $sentAt;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="bigint")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private $id;
-
-
+    protected $id;
 
     /**
-     * Set destUserId
+     * Set destUserId.
      *
-     * @param integer $destUserId
+     * @param int $destUserId
+     *
      * @return Notification
      */
     public function setDestUserId($destUserId)
@@ -87,9 +95,9 @@ class Notification
     }
 
     /**
-     * Get destUserId
+     * Get destUserId.
      *
-     * @return integer
+     * @return int
      */
     public function getDestUserId()
     {
@@ -97,9 +105,10 @@ class Notification
     }
 
     /**
-     * Set destMail
+     * Set destMail.
      *
      * @param string $destMail
+     *
      * @return Notification
      */
     public function setDestMail($destMail)
@@ -110,7 +119,7 @@ class Notification
     }
 
     /**
-     * Get destMail
+     * Get destMail.
      *
      * @return string
      */
@@ -120,9 +129,10 @@ class Notification
     }
 
     /**
-     * Set title
+     * Set title.
      *
      * @param string $title
+     *
      * @return Notification
      */
     public function setTitle($title)
@@ -133,7 +143,7 @@ class Notification
     }
 
     /**
-     * Get title
+     * Get title.
      *
      * @return string
      */
@@ -143,9 +153,10 @@ class Notification
     }
 
     /**
-     * Set content
+     * Set content.
      *
      * @param string $content
+     *
      * @return Notification
      */
     public function setContent($content)
@@ -156,7 +167,7 @@ class Notification
     }
 
     /**
-     * Get content
+     * Get content.
      *
      * @return string
      */
@@ -166,9 +177,10 @@ class Notification
     }
 
     /**
-     * Set sendFreq
+     * Set sendFreq.
      *
-     * @param integer $sendFreq
+     * @param int $sendFreq
+     *
      * @return Notification
      */
     public function setSendFreq($sendFreq)
@@ -179,9 +191,9 @@ class Notification
     }
 
     /**
-     * Get sendFreq
+     * Get sendFreq.
      *
-     * @return integer
+     * @return int
      */
     public function getSendFreq()
     {
@@ -189,9 +201,10 @@ class Notification
     }
 
     /**
-     * Set createdAt
+     * Set createdAt.
      *
      * @param \DateTime $createdAt
+     *
      * @return Notification
      */
     public function setCreatedAt($createdAt)
@@ -202,7 +215,7 @@ class Notification
     }
 
     /**
-     * Get createdAt
+     * Get createdAt.
      *
      * @return \DateTime
      */
@@ -212,9 +225,10 @@ class Notification
     }
 
     /**
-     * Set sentAt
+     * Set sentAt.
      *
      * @param \DateTime $sentAt
+     *
      * @return Notification
      */
     public function setSentAt($sentAt)
@@ -225,7 +239,7 @@ class Notification
     }
 
     /**
-     * Get sentAt
+     * Get sentAt.
      *
      * @return \DateTime
      */
@@ -235,9 +249,9 @@ class Notification
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {

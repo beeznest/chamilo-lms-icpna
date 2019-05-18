@@ -5,7 +5,6 @@ use ChamiloSession as Session;
 
 // External login module : WS (for Web Services)
 /**
- *
  * This file is included in main/inc/local.inc.php at user login if the user
  * have 'ws' in his auth_source field instead of 'platform'.
  */
@@ -29,7 +28,7 @@ if ($isValid === 1) {
     Session::write('_user', $_user);
     $uidReset = true;
     $logging_in = true;
-    Event::event_login($_user['user_id']);
+    Event::eventLogin($_user['user_id']);
 } else {
     //error_log('WS authentication error - user not approved by external WS');
     $loginFailed = true;
@@ -40,7 +39,8 @@ if ($isValid === 1) {
 }
 
 /**
- * Checks whether a user has the right to enter on the platform or not
+ * Checks whether a user has the right to enter on the platform or not.
+ *
  * @param string The username, as provided in form
  * @param string The cleartext password, as provided in form
  * @param string The WS URL, as provided at the beginning of this script
@@ -85,11 +85,11 @@ function loginWSAuthenticate($username, $password, $wsUrl)
     // The call to the webservice will change depending on your definition
     try {
         $response = $client->validateUser(
-            array(
+            [
                 'user' => $username,
                 'pass' => $passCrypted,
                 'system' => 'chamilo',
-            )
+            ]
         );
     } catch (SoapFault $fault) {
         error_log('Caught something');
@@ -99,17 +99,9 @@ function loginWSAuthenticate($username, $password, $wsUrl)
         } else {
             error_log('Could not connect to WS host');
         }
+
         return 0;
     }
 
     return $response->validateUserResult;
 }
-
-
-
-
-
-
-
-
-

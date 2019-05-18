@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class Sequence
+ * Class Sequence.
  *
  * @ORM\Table(name="sequence_value")
  * @ORM\Entity
@@ -14,87 +14,87 @@ use Doctrine\ORM\Mapping as ORM;
 class SequenceValue
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue()
      */
-    private $id;
+    protected $id;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="user_id", type="integer")
      */
-    private $userId;
+    protected $userId;
 
     /**
      * @ORM\ManyToOne(targetEntity="SequenceRowEntity")
      * @ORM\JoinColumn(name="sequence_row_entity_id", referencedColumnName="id")
-     **/
-    private $entity;
+     */
+    protected $entity;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="advance", type="float")
      */
-    private $advance;
+    protected $advance;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="complete_items", type="integer")
      */
-    private $completeItems;
+    protected $completeItems;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="total_items", type="integer")
      */
-    private $totalItems;
+    protected $totalItems;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="success", type="boolean")
      */
-    private $success;
+    protected $success;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="success_date", type="datetime", nullable=true)
      */
-    private $successDate;
+    protected $successDate;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="available", type="boolean")
      */
-    private $available;
+    protected $available;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="available_start_date", type="datetime", nullable=true)
      */
-    private $availableStartDate;
+    protected $availableStartDate;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="available_end_date", type="datetime", nullable=true)
      */
-    private $availableEndDate;
+    protected $availableEndDate;
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -300,6 +300,4 @@ class SequenceValue
 
         return $this;
     }
-
-
 }

@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * GradebookLink
+ * GradebookLink.
  *
  * @ORM\Table(name="gradebook_link")
  * @ORM\Entity
@@ -14,81 +14,109 @@ use Doctrine\ORM\Mapping as ORM;
 class GradebookLink
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $id;
+    protected $id;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="type", type="integer", nullable=false)
      */
-    private $type;
+    protected $type;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="ref_id", type="integer", nullable=false)
      */
-    private $refId;
+    protected $refId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="user_id", type="integer", nullable=false)
      */
-    private $userId;
+    protected $userId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="course_code", type="string", length=40, nullable=false)
      */
-    private $courseCode;
+    protected $courseCode;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="category_id", type="integer", nullable=false)
      */
-    private $categoryId;
+    protected $categoryId;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=false)
      */
-    private $createdAt;
+    protected $createdAt;
 
     /**
      * @var float
      *
      * @ORM\Column(name="weight", type="float", precision=10, scale=0, nullable=false)
      */
-    private $weight;
+    protected $weight;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="visible", type="integer", nullable=false)
      */
-    private $visible;
+    protected $visible;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="locked", type="integer", nullable=false)
      */
-    private $locked;
+    protected $locked;
 
     /**
-     * Set type
+     * @var float
      *
-     * @param integer $type
+     * ORM\Column(name="best_score", type="float", precision=6, scale=2, nullable=true)
+     */
+    protected $bestScore;
+
+    /**
+     * @var float
+     *
+     * ORM\Column(name="average_score", type="float", precision=6, scale=2, nullable=true)
+     */
+    protected $averageScore;
+
+    /**
+     * @var float
+     *
+     * ORM\Column(name="score_weight", type="float", precision=6, scale=2, nullable=true)
+     */
+    protected $scoreWeight;
+
+    /**
+     * @var array
+     *
+     * ORM\Column(name="user_score_list", type="array", nullable=true)
+     */
+    protected $userScoreList;
+
+    /**
+     * Set type.
+     *
+     * @param int $type
      *
      * @return GradebookLink
      */
@@ -100,9 +128,9 @@ class GradebookLink
     }
 
     /**
-     * Get type
+     * Get type.
      *
-     * @return integer
+     * @return int
      */
     public function getType()
     {
@@ -110,9 +138,10 @@ class GradebookLink
     }
 
     /**
-     * Set refId
+     * Set refId.
      *
-     * @param integer $refId
+     * @param int $refId
+     *
      * @return GradebookLink
      */
     public function setRefId($refId)
@@ -123,9 +152,9 @@ class GradebookLink
     }
 
     /**
-     * Get refId
+     * Get refId.
      *
-     * @return integer
+     * @return int
      */
     public function getRefId()
     {
@@ -133,9 +162,10 @@ class GradebookLink
     }
 
     /**
-     * Set userId
+     * Set userId.
      *
-     * @param integer $userId
+     * @param int $userId
+     *
      * @return GradebookLink
      */
     public function setUserId($userId)
@@ -146,9 +176,9 @@ class GradebookLink
     }
 
     /**
-     * Get userId
+     * Get userId.
      *
-     * @return integer
+     * @return int
      */
     public function getUserId()
     {
@@ -156,9 +186,10 @@ class GradebookLink
     }
 
     /**
-     * Set courseCode
+     * Set courseCode.
      *
      * @param string $courseCode
+     *
      * @return GradebookLink
      */
     public function setCourseCode($courseCode)
@@ -169,7 +200,7 @@ class GradebookLink
     }
 
     /**
-     * Get courseCode
+     * Get courseCode.
      *
      * @return string
      */
@@ -179,9 +210,10 @@ class GradebookLink
     }
 
     /**
-     * Set categoryId
+     * Set categoryId.
      *
-     * @param integer $categoryId
+     * @param int $categoryId
+     *
      * @return GradebookLink
      */
     public function setCategoryId($categoryId)
@@ -192,9 +224,9 @@ class GradebookLink
     }
 
     /**
-     * Get categoryId
+     * Get categoryId.
      *
-     * @return integer
+     * @return int
      */
     public function getCategoryId()
     {
@@ -202,9 +234,10 @@ class GradebookLink
     }
 
     /**
-     * Set createdAt
+     * Set createdAt.
      *
      * @param \DateTime $createdAt
+     *
      * @return GradebookLink
      */
     public function setCreatedAt($createdAt)
@@ -215,7 +248,7 @@ class GradebookLink
     }
 
     /**
-     * Get createdAt
+     * Get createdAt.
      *
      * @return \DateTime
      */
@@ -225,9 +258,10 @@ class GradebookLink
     }
 
     /**
-     * Set weight
+     * Set weight.
      *
      * @param float $weight
+     *
      * @return GradebookLink
      */
     public function setWeight($weight)
@@ -238,7 +272,7 @@ class GradebookLink
     }
 
     /**
-     * Get weight
+     * Get weight.
      *
      * @return float
      */
@@ -248,9 +282,10 @@ class GradebookLink
     }
 
     /**
-     * Set visible
+     * Set visible.
      *
-     * @param integer $visible
+     * @param int $visible
+     *
      * @return GradebookLink
      */
     public function setVisible($visible)
@@ -261,9 +296,9 @@ class GradebookLink
     }
 
     /**
-     * Get visible
+     * Get visible.
      *
-     * @return integer
+     * @return int
      */
     public function getVisible()
     {
@@ -271,9 +306,10 @@ class GradebookLink
     }
 
     /**
-     * Set locked
+     * Set locked.
      *
-     * @param integer $locked
+     * @param int $locked
+     *
      * @return GradebookLink
      */
     public function setLocked($locked)
@@ -284,9 +320,9 @@ class GradebookLink
     }
 
     /**
-     * Get locked
+     * Get locked.
      *
-     * @return integer
+     * @return int
      */
     public function getLocked()
     {
@@ -294,12 +330,96 @@ class GradebookLink
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return float
+     */
+    public function getBestScore()
+    {
+        return $this->bestScore;
+    }
+
+    /**
+     * @param float $bestScore
+     *
+     * @return GradebookLink
+     */
+    public function setBestScore($bestScore)
+    {
+        $this->bestScore = $bestScore;
+
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getAverageScore()
+    {
+        return $this->averageScore;
+    }
+
+    /**
+     * @param float $averageScore
+     *
+     * @return GradebookLink
+     */
+    public function setAverageScore($averageScore)
+    {
+        $this->averageScore = $averageScore;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUserScoreList()
+    {
+        if (empty($this->userScoreList)) {
+            return [];
+        }
+
+        return $this->userScoreList;
+    }
+
+    /**
+     * @param array $userScoreList
+     *
+     * @return GradebookLink
+     */
+    public function setUserScoreList($userScoreList)
+    {
+        $this->userScoreList = $userScoreList;
+
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getScoreWeight()
+    {
+        return $this->scoreWeight;
+    }
+
+    /**
+     * @param float $scoreWeight
+     *
+     * @return GradebookLink
+     */
+    public function setScoreWeight($scoreWeight)
+    {
+        $this->scoreWeight = $scoreWeight;
+
+        return $this;
     }
 }

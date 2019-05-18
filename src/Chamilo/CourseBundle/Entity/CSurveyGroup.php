@@ -6,7 +6,7 @@ namespace Chamilo\CourseBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CSurveyGroup
+ * CSurveyGroup.
  *
  * @ORM\Table(
  *  name="c_survey_group",
@@ -19,53 +19,54 @@ use Doctrine\ORM\Mapping as ORM;
 class CSurveyGroup
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="iid", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $iid;
+    protected $iid;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer")
      */
-    private $cId;
+    protected $cId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer", nullable=true)
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=20, nullable=false)
      */
-    private $name;
+    protected $name;
 
     /**
      * @var string
      *
      * @ORM\Column(name="description", type="string", length=255, nullable=false)
      */
-    private $description;
+    protected $description;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="survey_id", type="integer", nullable=false)
      */
-    private $surveyId;
+    protected $surveyId;
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
+     *
      * @return CSurveyGroup
      */
     public function setName($name)
@@ -76,7 +77,7 @@ class CSurveyGroup
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
@@ -86,9 +87,10 @@ class CSurveyGroup
     }
 
     /**
-     * Set description
+     * Set description.
      *
      * @param string $description
+     *
      * @return CSurveyGroup
      */
     public function setDescription($description)
@@ -99,7 +101,7 @@ class CSurveyGroup
     }
 
     /**
-     * Get description
+     * Get description.
      *
      * @return string
      */
@@ -109,9 +111,10 @@ class CSurveyGroup
     }
 
     /**
-     * Set surveyId
+     * Set surveyId.
      *
-     * @param integer $surveyId
+     * @param int $surveyId
+     *
      * @return CSurveyGroup
      */
     public function setSurveyId($surveyId)
@@ -122,9 +125,9 @@ class CSurveyGroup
     }
 
     /**
-     * Get surveyId
+     * Get surveyId.
      *
-     * @return integer
+     * @return int
      */
     public function getSurveyId()
     {
@@ -132,9 +135,10 @@ class CSurveyGroup
     }
 
     /**
-     * Set id
+     * Set id.
      *
-     * @param integer $id
+     * @param int $id
+     *
      * @return CSurveyGroup
      */
     public function setId($id)
@@ -145,9 +149,9 @@ class CSurveyGroup
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -155,9 +159,10 @@ class CSurveyGroup
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return CSurveyGroup
      */
     public function setCId($cId)
@@ -168,9 +173,9 @@ class CSurveyGroup
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {

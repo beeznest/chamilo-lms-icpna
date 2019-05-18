@@ -9,13 +9,22 @@ api_protect_course_script(true);
 
 Event::event_access_tool(TOOL_CHAT);
 
+$logInfo = [
+    'tool' => TOOL_CHAT,
+    'tool_id' => 0,
+    'tool_id_detail' => 0,
+    'action' => 'start',
+    'action_details' => 'start-chat',
+];
+Event::registerLog($logInfo);
+
 // View
 $externalCSS = [
     'jquery-emojiarea/jquery.emojiarea.css',
     'jquery-textcomplete/jquery.textcomplete.css',
     'emojione/css/emojione.min.css',
     'emojione/css/autocomplete.css',
-    'highlight/styles/github.css'
+    'highlight/styles/github.css',
 ];
 
 foreach ($externalCSS as $css) {
@@ -29,7 +38,7 @@ $externalJS = [
     'highlight/highlight.pack.js',
     'jquery-textcomplete/jquery.textcomplete.js',
     'emojione/js/emojione.min.js',
-    'jquery-emojiarea/jquery.emojiarea.js'
+    'jquery-emojiarea/jquery.emojiarea.js',
 ];
 
 foreach ($externalJS as $js) {
@@ -48,7 +57,7 @@ foreach (Emojione\Emojione::$shortcode_replace as $key => $icon) {
 
 $view = new Template(get_lang('Chat'), false, false, false, true, false);
 $view->assign('icons', $iconList);
-$view->assign('emoji_strategy', CourseChatUtils::getEmojiStrategry());
+$view->assign('emoji_strategy', CourseChatUtils::getEmojiStrategy());
 $view->assign('emoji_smile', \Emojione\Emojione::toImage(':smile:'));
 $view->assign('restrict_to_coach', api_get_configuration_value('course_chat_restrict_to_coach'));
 $view->assign(

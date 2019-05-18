@@ -1,16 +1,15 @@
 <?php
-/**
- * UserModel.php
- * avanzu-admin
- * Date: 23.02.14
- */
+/* For licensing terms, see /license.txt */
 
 namespace Chamilo\ThemeBundle\Model;
 
-
+/**
+ * Class UserModel.
+ *
+ * @package Chamilo\ThemeBundle\Model
+ */
 class UserModel implements UserInterface
 {
-
     /**
      * @var string
      */
@@ -31,14 +30,13 @@ class UserModel implements UserInterface
      */
     protected $isOnline = false;
 
-    function __construct($username = '', $avatar = '', $memberSince = null, $isOnline = true)
+    public function __construct($username = '', $avatar = '', $memberSince = null, $isOnline = true)
     {
-        $this->avatar      = $avatar;
-        $this->isOnline    = $isOnline;
+        $this->avatar = $avatar;
+        $this->isOnline = $isOnline;
         $this->memberSince = $memberSince ?: new \DateTime();
-        $this->username    = $username;
+        $this->username = $username;
     }
-
 
     /**
      * @param string $avatar
@@ -48,6 +46,7 @@ class UserModel implements UserInterface
     public function setAvatar($avatar)
     {
         $this->avatar = $avatar;
+
         return $this;
     }
 
@@ -60,18 +59,19 @@ class UserModel implements UserInterface
     }
 
     /**
-     * @param boolean $isOnline
+     * @param bool $isOnline
      *
      * @return $this
      */
     public function setIsOnline($isOnline)
     {
         $this->isOnline = $isOnline;
+
         return $this;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function getIsOnline()
     {
@@ -86,6 +86,7 @@ class UserModel implements UserInterface
     public function setMemberSince(\DateTime $memberSince)
     {
         $this->memberSince = $memberSince;
+
         return $this;
     }
 
@@ -105,6 +106,7 @@ class UserModel implements UserInterface
     public function setUsername($username)
     {
         $this->username = $username;
+
         return $this;
     }
 
@@ -115,7 +117,6 @@ class UserModel implements UserInterface
     {
         return $this->username;
     }
-
 
     /**
      * @return bool

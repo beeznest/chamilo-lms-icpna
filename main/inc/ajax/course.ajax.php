@@ -1,10 +1,11 @@
 <?php
 /* For licensing terms, see /license.txt */
-/**
- * Responses to AJAX calls
- */
+
 use Chamilo\CoreBundle\Component\Utils\ChamiloApi;
 
+/**
+ * Responses to AJAX calls.
+ */
 require_once __DIR__.'/../global.inc.php';
 
 $action = $_REQUEST['a'];
@@ -12,8 +13,8 @@ $user_id = api_get_user_id();
 
 switch ($action) {
     case 'add_course_vote':
-        $course_id = intval($_REQUEST['course_id']);
-        $star = intval($_REQUEST['star']);
+        $course_id = (int) $_REQUEST['course_id'];
+        $star = (int) $_REQUEST['star'];
 
         if (!api_is_anonymous()) {
             CourseManager::add_course_vote($user_id, $star, $course_id, 0);
@@ -37,10 +38,11 @@ switch ($action) {
         }
         break;
     case 'get_user_courses':
+        // Only search my courses
         if (api_is_platform_admin() || api_is_session_admin()) {
-            $user_id = intval($_POST['user_id']);
+            $userId = (int) $_REQUEST['user_id'];
             $list = CourseManager::get_courses_list_by_user_id(
-                $user_id,
+                $userId,
                 false
             );
             if (!empty($list)) {
@@ -50,6 +52,55 @@ switch ($action) {
                 }
             } else {
                 echo get_lang('UserHasNoCourse');
+            }
+        }
+        break;
+    case 'get_my_courses_and_sessions':
+        // Search my courses and sessions allowed for admin, session admin, teachers
+        $currentCourseId = api_get_course_int_id();
+        $currentSessionId = api_get_session_id();
+        if (api_is_platform_admin() || api_is_session_admin() || api_is_allowed_to_edit()) {
+            $list = CourseManager::get_courses_list_by_user_id(
+                api_get_user_id(),
+                true,
+                false,
+                false,
+                [],
+                true,
+                true
+            );
+
+            if (empty($list)) {
+                echo json_encode([]);
+                break;
+            }
+
+            $courseList = [];
+            if (!empty($list)) {
+                foreach ($list as $course) {
+                    $courseInfo = api_get_course_info_by_id($course['real_id']);
+                    $sessionId = 0;
+                    if (isset($course['session_id']) && !empty($course['session_id'])) {
+                        $sessionId = $course['session_id'];
+                    }
+
+                    $sessionName = '';
+                    if (isset($course['session_name']) && !empty($course['session_name'])) {
+                        $sessionName = ' ('.$course['session_name'].')';
+                    }
+
+                    // Skip current course/course session
+                    if ($currentCourseId == $courseInfo['real_id'] && $sessionId == $currentSessionId) {
+                        continue;
+                    }
+
+                    $courseList['items'][] = [
+                        'id' => $courseInfo['real_id'].'_'.$sessionId,
+                        'text' => $courseInfo['title'].$sessionName,
+                    ];
+                }
+
+                echo json_encode($courseList);
             }
         }
         break;
@@ -66,7 +117,7 @@ switch ($action) {
             foreach ($categories as $item) {
                 $list['items'][] = [
                     'id' => $item['code'],
-                    'text' => '('.$item['code'].') '.strip_tags($item['name'])
+                    'text' => '('.$item['code'].') '.strip_tags($item['name']),
                 ];
             }
 
@@ -74,8 +125,8 @@ switch ($action) {
         }
         break;
     case 'search_course':
-        if (api_is_teacher()) {
-            if (!empty($_GET['session_id']) && intval($_GET['session_id'])) {
+        if (api_is_teacher() || api_is_platform_admin()) {
+            if (isset($_GET['session_id']) && !empty($_GET['session_id'])) {
                 //if session is defined, lets find only courses of this session
                 $courseList = SessionManager::get_course_list_by_session_id(
                     $_GET['session_id'],
@@ -100,7 +151,7 @@ switch ($action) {
                 }
             }
 
-            $results = array();
+            $results = [];
 
             if (empty($courseList)) {
                 echo json_encode([]);
@@ -115,10 +166,10 @@ switch ($action) {
                     $title = $parents.$course['title'];
                 }
 
-                $results['items'][] = array(
+                $results['items'][] = [
                     'id' => $course['id'],
-                    'text' => $title
-                );
+                    'text' => $title,
+                ];
             }
 
             echo json_encode($results);
@@ -127,10 +178,10 @@ switch ($action) {
     case 'search_course_by_session':
         if (api_is_platform_admin()) {
             $results = SessionManager::get_course_list_by_session_id($_GET['session_id'], $_GET['q']);
-            $results2 = array();
+            $results2 = [];
             if (is_array($results) && !empty($results)) {
                 foreach ($results as $item) {
-                    $item2 = array();
+                    $item2 = [];
                     foreach ($item as $id => $internal) {
                         if ($id == 'id') {
                             $item2[$id] = $internal;
@@ -143,7 +194,7 @@ switch ($action) {
                 }
                 echo json_encode($results2);
             } else {
-                echo json_encode(array());
+                echo json_encode([]);
             }
         }
         break;
@@ -160,7 +211,7 @@ switch ($action) {
             $results2 = ['items' => []];
             if (!empty($results)) {
                 foreach ($results as $item) {
-                    $item2 = array();
+                    $item2 = [];
                     foreach ($item as $id => $internal) {
                         if ($id == 'id') {
                             $item2[$id] = $internal;
@@ -180,28 +231,42 @@ switch ($action) {
         if (api_is_platform_admin()) {
             $user = Database::get_main_table(TABLE_MAIN_USER);
             $session_course_user = Database::get_main_table(TABLE_MAIN_SESSION_COURSE_USER);
+            $sessionId = $_GET['session_id'];
             $course = api_get_course_info_by_id($_GET['course_id']);
 
             $json = [
-                'items' => []
+                'items' => [],
             ];
 
-            $sql = "SELECT u.user_id as id, u.username, u.lastname, u.firstname
-                    FROM $user u
-                    INNER JOIN $session_course_user r 
-                    ON u.user_id = r.user_id
-                    WHERE session_id = %d AND c_id =  '%s'
-                    AND (u.firstname LIKE '%s' OR u.username LIKE '%s' OR u.lastname LIKE '%s')";
-            $needle = '%'.$_GET['q'].'%';
-            $sql_query = sprintf($sql, $_GET['session_id'], $course['real_id'], $needle, $needle, $needle);
+            $keyword = Database::escape_string($_GET['q']);
+            $status = 0;
+            if (empty($sessionId)) {
+                $status = STUDENT;
+            }
 
-            $result = Database::query($sql_query);
-            while ($user = Database::fetch_assoc($result)) {
+            $userList = CourseManager::get_user_list_from_course_code(
+                $course['code'],
+                $sessionId,
+                null,
+                null,
+                $status,
+                false,
+                false,
+                false,
+                [],
+                [],
+                [],
+                true,
+                [],
+                $_GET['q']
+            );
+
+            foreach ($userList as $user) {
                 $userCompleteName = api_get_person_name($user['firstname'], $user['lastname']);
 
                 $json['items'][] = [
-                    'id' => $user['id'],
-                    'text' => "{$user['username']} ($userCompleteName)"
+                    'id' => $user['user_id'],
+                    'text' => "{$user['username']} ($userCompleteName)",
                 ];
             }
 
@@ -211,7 +276,7 @@ switch ($action) {
     case 'search_exercise_by_course':
         if (api_is_platform_admin()) {
             $course = api_get_course_info_by_id($_GET['course_id']);
-            $session_id = (!empty($_GET['session_id'])) ? intval($_GET['session_id']) : 0;
+            $session_id = (!empty($_GET['session_id'])) ? (int) $_GET['session_id'] : 0;
             $exercises = ExerciseLib::get_all_exercises(
                 $course,
                 $session_id,
@@ -222,13 +287,13 @@ switch ($action) {
             );
 
             foreach ($exercises as $exercise) {
-                $data[] = array('id' => $exercise['id'], 'text' => html_entity_decode($exercise['title']));
+                $data[] = ['id' => $exercise['id'], 'text' => html_entity_decode($exercise['title'])];
             }
             if (!empty($data)) {
-                $data[] = array('id' => 'T', 'text' => 'TODOS');
+                $data[] = ['id' => 'T', 'text' => 'TODOS'];
                 echo json_encode($data);
             } else {
-                echo json_encode(array(array('id' => 'T', 'text' => 'TODOS')));
+                echo json_encode([['id' => 'T', 'text' => 'TODOS']]);
             }
         }
         break;
@@ -245,53 +310,71 @@ switch ($action) {
 
             $sql_query = sprintf(
                 $sql,
-                intval($_GET['course_id']),
-                intval($_GET['session_id']),
+                (int) $_GET['course_id'],
+                (int) $_GET['session_id'],
                 '%'.Database::escape_string($_GET['q']).'%'
             );
             $result = Database::query($sql_query);
             while ($survey = Database::fetch_assoc($result)) {
                 $survey['title'] .= ($survey['anonymous'] == 1) ? ' ('.get_lang('Anonymous').')' : '';
-                $data[] = array(
+                $data[] = [
                     'id' => $survey['id'],
-                    'text' => strip_tags(html_entity_decode($survey['title']))
-                );
+                    'text' => strip_tags(html_entity_decode($survey['title'])),
+                ];
             }
             if (!empty($data)) {
                 echo json_encode($data);
             } else {
-                echo json_encode(array());
+                echo json_encode([]);
             }
         }
         break;
     case 'display_sessions_courses':
-        $sessionId = intval($_GET['session']);
+        $sessionId = (int) $_GET['session'];
         $userTable = Database::get_main_table(TABLE_MAIN_USER);
         $coursesData = SessionManager::get_course_list_by_session_id($sessionId);
 
-        $courses = array();
+        $courses = [];
 
         foreach ($coursesData as $courseId => $course) {
             $coachData = SessionManager::getCoachesByCourseSession($sessionId, $courseId);
             $coachName = '';
             if (!empty($coachData)) {
-                $userResult = Database::select('lastname,firstname', $userTable, array(
-                    'where' => array(
-                        'user_id = ?' => $coachData[0]
-                    )
-                ), 'first');
+                $userResult = Database::select('lastname,firstname', $userTable, [
+                    'where' => [
+                        'user_id = ?' => $coachData[0],
+                    ],
+                ], 'first');
 
                 $coachName = api_get_person_name($userResult['firstname'], $userResult['lastname']);
             }
 
-            $courses[] = array(
+            $courses[] = [
                 'id' => $courseId,
                 'name' => $course['title'],
                 'coachName' => $coachName,
-            );
+            ];
         }
 
         echo json_encode($courses);
+        break;
+    case 'course_logout':
+        $logoutInfo = [
+            'uid' => api_get_user_id(),
+            'cid' => api_get_course_int_id(),
+            'sid' => api_get_session_id(),
+        ];
+
+        $logInfo = [
+            'tool' => 'close-window',
+            'tool_id' => 0,
+            'tool_id_detail' => 0,
+            'action' => 'exit',
+        ];
+        Event::registerLog($logInfo);
+
+        $result = (int) Event::courseLogout($logoutInfo);
+        echo $result;
         break;
     default:
         echo '';

@@ -219,8 +219,16 @@ class BigBlueButtonBN {
 		if (((isset($joinParams['createTime'])) && ($joinParams['createTime'] != ''))) {
 			$params .= '&createTime='.urlencode($joinParams['createTime']);
 		}
+
+		if (isset($joinParams['interface']) && (int) $joinParams['interface'] === BBBPlugin::INTERFACE_HTML5) {
+			$bbbHost = api_remove_trailing_slash(CONFIG_SERVER_URL_WITH_PROTOCOL);
+            $params .= '&redirectClient=true&clientURL='.$bbbHost.'/html5client/join';
+        }
+
 		// Return the URL:
-		return ($joinUrl.$params.'&checksum='.sha1("join".$params.$this->_securitySalt));
+		$url = $joinUrl.$params.'&checksum='.sha1('join'.$params.$this->_securitySalt);
+
+		return $url;
 	}
 
 	public function getEndMeetingURL($endParams) {
@@ -499,6 +507,69 @@ class BigBlueButtonBN {
 		else {
 			return null;
 		}
+	}
+
+	/**
+	 * @param $array recordingParams
+	 *
+	 * @return array|null
+	 */
+	public function getRecordings($recordingParams)
+	{
+		/* USAGE:
+		$recordingParams = array(
+			'meetingId' => '1234',		-- OPTIONAL - comma separate if multiple ids
+		);
+		NOTE: 'duration' DOES work when creating a meeting, so if you set duration
+		when creating a meeting, it will kick users out after the duration. Should
+		probably be required in user code when 'recording' is set to true.
+		*/
+		$xml = $this->_processXmlResponse($this->getRecordingsUrl($recordingParams));
+		if($xml) {
+			// If we don't get a success code or messageKey, find out why:
+			if (($xml->returncode != 'SUCCESS') || ($xml->messageKey == null)) {
+				$result = array(
+					'returncode' => $xml->returncode->__toString(),
+					'messageKey' => $xml->messageKey->__toString(),
+					'message' => $xml->message->__toString()
+				);
+				return $result;
+			}
+			else {
+				// In this case, we have success and recording info:
+				$result = array(
+					'returncode' => $xml->returncode->__toString(),
+					'messageKey' => $xml->messageKey->__toString(),
+					'message' => $xml->message->__toString()
+				);
+				$result['records'] = [];
+				if (!empty($xml->recordings->recording)) {
+					foreach ($xml->recordings->recording as $r) {
+						$result['records'][] = array(
+							'recordId' => $r->recordID->__toString(),
+							'meetingId' => $r->meetingID->__toString(),
+							'name' => $r->name->__toString(),
+							'published' => $r->published->__toString(),
+							'startTime' => $r->startTime->__toString(),
+							'endTime' => $r->endTime->__toString(),
+							'playbackFormatType' => $r->playback->format->type->__toString(),
+							'playbackFormatUrl' => $r->playback->format->url->__toString(),
+							'playbackFormatLength' => $r->playback->format->length->__toString(),
+							'metadataTitle' => $r->metadata->title->__toString(),
+							'metadataSubject' => $r->metadata->subject->__toString(),
+							'metadataDescription' => $r->metadata->description->__toString(),
+							'metadataCreator' => $r->metadata->creator->__toString(),
+							'metadataContributor' => $r->metadata->contributor->__toString(),
+							'metadataLanguage' => $r->metadata->language->__toString(),
+						);
+					}
+				}
+
+				return $result;
+			}
+		}
+
+		return null;
 	}
 
 	public function getPublishRecordingsUrl($recordingParams) {

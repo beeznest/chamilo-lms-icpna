@@ -6,12 +6,12 @@ namespace Chamilo\CoreBundle\Composer;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Class DumpTheme
+ * Class DumpTheme.
  */
 class ScriptHandler
 {
     /**
-     * Dump files to the web/css folder
+     * Dump files to the web/css folder.
      */
     public static function dumpCssFiles()
     {
@@ -19,6 +19,18 @@ class ScriptHandler
         $newPath = __DIR__.'/../../../../web';
         $fs = new Filesystem();
         $fs->mirror($appCss, $newPath, null, ['override' => true]);
+
+        if ($fs->exists(__DIR__.'/../../../../web/build')) {
+            $fs->remove(__DIR__.'/../../../../web/build');
+        }
+
+        if ($fs->exists(__DIR__.'/../../../../app/cache/twig')) {
+            $fs->remove(__DIR__.'/../../../../app/cache/twig');
+        }
+
+        if (function_exists('opcache_reset')) {
+            opcache_reset();
+        }
     }
 
     /**
@@ -71,12 +83,12 @@ class ScriptHandler
             __DIR__.'/../../../../main/inc/lib/javascript/jquery-ui',
             __DIR__.'/../../../../main/inc/lib/fckeditor',
             __DIR__.'/../../../../main/inc/lib/mpdf/',
+            __DIR__.'/../../../../main/inc/lib/nanogong/',
             __DIR__.'/../../../../main/inc/lib/symfony/',
             __DIR__.'/../../../../main/inc/lib/system/media/renderer',
             __DIR__.'/../../../../main/inc/lib/system/io',
             __DIR__.'/../../../../main/inc/lib/system/net',
             __DIR__.'/../../../../main/inc/lib/system/text/',
-            __DIR__.'/../../../../main/inc/lib/system/portfolio/',
             __DIR__.'/../../../../main/inc/lib/icalcreator/',
             __DIR__.'/../../../../main/inc/lib/getid3/',
             __DIR__.'/../../../../main/inc/lib/tools/',
@@ -89,7 +101,16 @@ class ScriptHandler
             __DIR__.'/../../../../plugin/ticket',
             __DIR__.'/../../../../plugin/skype',
             __DIR__.'/../../../../main/newscorm',
-            __DIR__.'/../../../../main/exercice'
+            __DIR__.'/../../../../main/exercice',
+            // js files
+            __DIR__.'/../../../../app/Resources/public/assets/bootstrap/docs',
+            __DIR__.'/../../../../app/Resources/public/assets/bootstrap/nuget',
+            __DIR__.'/../../../../app/Resources/public/assets/bootstrap/grunt',
+            __DIR__.'/../../../../app/Resources/public/assets/bootstrap/test-infra',
+            __DIR__.'/../../../../web/assets/bootstrap/grunt',
+            __DIR__.'/../../../../web/assets/bootstrap/nuget',
+            __DIR__.'/../../../../web/assets/bootstrap/docs',
+            __DIR__.'/../../../../web/assets/bootstrap/test-infra',
         ];
 
         return $paths;
@@ -190,17 +211,56 @@ class ScriptHandler
             __DIR__.'/../../../../src/Chamilo/CoreBundle/Entity/GroupRelGroup.php',
             __DIR__.'/../../../../src/Chamilo/CoreBundle/Entity/GroupRelTag.php',
             __DIR__.'/../../../../src/Chamilo/CoreBundle/Entity/GroupRelUser.php',
-            __DIR__.'/../../../../src/Chamilo/CoreBundle/Entity/Groups.php'
+            __DIR__.'/../../../../src/Chamilo/CoreBundle/Entity/Groups.php',
+            __DIR__.'/../../../../src/Chamilo/UserBundle/Entity/Repository/UserRepository.php',
+            __DIR__.'/../../../../app/Resources/public/assets/bootstrap/Gemfile',
+            __DIR__.'/../../../../app/Resources/public/assets/bootstrap/Gemfile.lock',
+            __DIR__.'/../../../../app/Resources/public/assets/bootstrap/Gruntfile.js',
+            __DIR__.'/../../../../app/Resources/public/assets/bootstrap/package.js',
+            __DIR__.'/../../../../app/Resources/public/assets/bootstrap/package.json',
+            __DIR__.'/../../../../web/assets/bootstrap/Gemfile',
+            __DIR__.'/../../../../web/assets/bootstrap/Gemfile.lock',
+            __DIR__.'/../../../../web/assets/bootstrap/Gruntfile.js',
+            __DIR__.'/../../../../web/assets/bootstrap/package.js',
+            __DIR__.'/../../../../web/assets/bootstrap/package.json',
         ];
 
         return $files;
     }
 
     /**
-     * Copied from chamilo rmdirr function
-     * @param string $dirname
+     * Update the basis css files.
+     * Avoid use the ScriptHandler::dumpCssFiles.
+     */
+    public static function updateCss()
+    {
+        $appCss = __DIR__.'/../../../../app/Resources/public/css/';
+        $newPath = __DIR__.'/../../../../web/css/';
+        $cssFiles = [
+            'base.css',
+            'chat.css',
+            'document.css',
+            'editor_content.css',
+            'markdown.css',
+            'print.css',
+            'responsive.css',
+            'scorm.css',
+        ];
+
+        $fs = new Filesystem();
+
+        foreach ($cssFiles as $file) {
+            $fs->copy($appCss.$file, $newPath.$file, true);
+        }
+    }
+
+    /**
+     * Copied from chamilo rmdirr function.
+     *
+     * @param string     $dirname
      * @param bool|false $delete_only_content_in_folder
      * @param bool|false $strict
+     *
      * @return bool
      */
     private static function rmdirr($dirname, $delete_only_content_in_folder = false, $strict = false)
@@ -252,22 +312,5 @@ class ScriptHandler
         }
 
         return $res;
-    }
-
-    /**
-     * Update the basis css files.
-     * Avoid use the ScriptHandler::dumpCssFiles
-     */
-    public static function updateCss()
-    {
-        $appCss = __DIR__.'/../../../../app/Resources/public/css/';
-        $newPath = __DIR__.'/../../../../web/css/';
-        $cssFiles = ['base.css', 'chat.css', 'editor.css', 'markdown.css', 'print.css', 'responsive.css', 'scorm.css'];
-
-        $fs = new Filesystem();
-
-        foreach ($cssFiles as $file) {
-            $fs->copy($appCss.$file, $newPath.$file, true);
-        }
     }
 }

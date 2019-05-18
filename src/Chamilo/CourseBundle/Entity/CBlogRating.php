@@ -6,7 +6,7 @@ namespace Chamilo\CourseBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CBlogRating
+ * CBlogRating.
  *
  * @ORM\Table(
  *  name="c_blog_rating",
@@ -19,67 +19,68 @@ use Doctrine\ORM\Mapping as ORM;
 class CBlogRating
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="iid", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $iid;
+    protected $iid;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="rating_id", type="integer")
      */
-    private $ratingId;
+    protected $ratingId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer")
      */
-    private $cId;
+    protected $cId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="blog_id", type="integer", nullable=false)
      */
-    private $blogId;
+    protected $blogId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="rating_type", type="string", length=40, nullable=false)
      */
-    private $ratingType;
+    protected $ratingType;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="item_id", type="integer", nullable=false)
      */
-    private $itemId;
+    protected $itemId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="user_id", type="integer", nullable=false)
      */
-    private $userId;
+    protected $userId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="rating", type="integer", nullable=false)
      */
-    private $rating;
+    protected $rating;
 
     /**
-     * Set blogId
+     * Set blogId.
      *
-     * @param integer $blogId
+     * @param int $blogId
+     *
      * @return CBlogRating
      */
     public function setBlogId($blogId)
@@ -90,9 +91,9 @@ class CBlogRating
     }
 
     /**
-     * Get blogId
+     * Get blogId.
      *
-     * @return integer
+     * @return int
      */
     public function getBlogId()
     {
@@ -100,9 +101,10 @@ class CBlogRating
     }
 
     /**
-     * Set ratingType
+     * Set ratingType.
      *
      * @param string $ratingType
+     *
      * @return CBlogRating
      */
     public function setRatingType($ratingType)
@@ -113,7 +115,7 @@ class CBlogRating
     }
 
     /**
-     * Get ratingType
+     * Get ratingType.
      *
      * @return string
      */
@@ -123,9 +125,10 @@ class CBlogRating
     }
 
     /**
-     * Set itemId
+     * Set itemId.
      *
-     * @param integer $itemId
+     * @param int $itemId
+     *
      * @return CBlogRating
      */
     public function setItemId($itemId)
@@ -136,9 +139,9 @@ class CBlogRating
     }
 
     /**
-     * Get itemId
+     * Get itemId.
      *
-     * @return integer
+     * @return int
      */
     public function getItemId()
     {
@@ -146,9 +149,10 @@ class CBlogRating
     }
 
     /**
-     * Set userId
+     * Set userId.
      *
-     * @param integer $userId
+     * @param int $userId
+     *
      * @return CBlogRating
      */
     public function setUserId($userId)
@@ -159,9 +163,9 @@ class CBlogRating
     }
 
     /**
-     * Get userId
+     * Get userId.
      *
-     * @return integer
+     * @return int
      */
     public function getUserId()
     {
@@ -169,9 +173,10 @@ class CBlogRating
     }
 
     /**
-     * Set rating
+     * Set rating.
      *
-     * @param integer $rating
+     * @param int $rating
+     *
      * @return CBlogRating
      */
     public function setRating($rating)
@@ -182,9 +187,9 @@ class CBlogRating
     }
 
     /**
-     * Get rating
+     * Get rating.
      *
-     * @return integer
+     * @return int
      */
     public function getRating()
     {
@@ -192,9 +197,10 @@ class CBlogRating
     }
 
     /**
-     * Set ratingId
+     * Set ratingId.
      *
-     * @param integer $ratingId
+     * @param int $ratingId
+     *
      * @return CBlogRating
      */
     public function setRatingId($ratingId)
@@ -205,9 +211,9 @@ class CBlogRating
     }
 
     /**
-     * Get ratingId
+     * Get ratingId.
      *
-     * @return integer
+     * @return int
      */
     public function getRatingId()
     {
@@ -215,9 +221,10 @@ class CBlogRating
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return CBlogRating
      */
     public function setCId($cId)
@@ -228,9 +235,9 @@ class CBlogRating
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {

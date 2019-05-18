@@ -4,9 +4,8 @@ use ChamiloSession as Session;
 
 // External login module : LDAP
 /**
- *
  * This file is included in main/inc/local.inc.php at user login if the user have 'external_ldap' in
- * his auth_source field instead of platform
+ * his auth_source field instead of platform.
  *
  * Variables that can be used :
  *    - $login : string containing the username posted by the user
@@ -39,7 +38,6 @@ use ChamiloSession as Session;
  *  - index.php?loginFailed=1&error=unrecognize_sso_origin');
  *
  * */
-
 require_once __DIR__.'/ldap.inc.php';
 require_once __DIR__.'/functions.inc.php';
 
@@ -74,7 +72,7 @@ if ($ldap_user !== false) {
     Session::write('_user', $_user);
     $uidReset = true;
     $logging_in = true;
-    Event::event_login($_user['user_id']);
+    Event::eventLogin($_user['user_id']);
 } else {
     if ($debug) {
         error_log('extldap_authenticate error');

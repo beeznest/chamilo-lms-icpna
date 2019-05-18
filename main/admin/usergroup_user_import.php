@@ -1,27 +1,28 @@
 <?php
 /* For licensing terms, see /license.txt */
 /**
- * 	@package chamilo.admin
+ * @package chamilo.admin
  */
 /**
  * Code
  * This tool allows platform admins to update class-user relations by uploading
- * a CSV file
+ * a CSV file.
  */
 
 /**
  * Validates imported data.
  */
-function validate_data($user_classes) {
+function validate_data($user_classes)
+{
     global $purification_option_for_usernames;
-    $errors = array();
-    $classcodes = array();
+    $errors = [];
+    $classcodes = [];
     $usergroup = new UserGroup();
 
     foreach ($user_classes as $index => $user_class) {
         $user_class['line'] = $index + 1;
         // 1. Check whether mandatory fields are set.
-        $mandatory_fields = array('UserName', 'ClassName');
+        $mandatory_fields = ['UserName', 'ClassName'];
 
         foreach ($mandatory_fields as $field) {
             if (!isset($user_class[$field]) || strlen($user_class[$field]) == 0) {
@@ -61,32 +62,27 @@ function validate_data($user_classes) {
             }
         }
     }
+
     return $errors;
 }
 
 /**
  * Saves imported data.
  */
-function save_data($users_classes, $deleteUsersNotInList = false) {
-
+function save_data($users_classes, $deleteUsersNotInList = false)
+{
     global $purification_option_for_usernames;
-
     // Table definitions.
     $user_table = Database::get_main_table(TABLE_MAIN_USER);
-
     $usergroup = new UserGroup();
-
     // Data parsing: purification + conversion (UserName, ClassName) --> (user_is, class_id)
-    $csv_data = array();
+    $csv_data = [];
     if (!empty($users_classes)) {
-
         foreach ($users_classes as $user_class) {
             $sql1 = "SELECT user_id FROM $user_table
                      WHERE username = '".Database::escape_string(UserManager::purify_username($user_class['UserName'], $purification_option_for_usernames))."'";
             $res1 = Database::query($sql1);
             $obj1 = Database::fetch_object($res1);
-
-            $usergroup = new UserGroup();
             $id = $usergroup->get_id_by_name($user_class['ClassName']);
 
             if ($obj1 && $id) {
@@ -105,20 +101,31 @@ function save_data($users_classes, $deleteUsersNotInList = false) {
             $class_name = $user_data['class_name'];
             $user_list_name = $user_data['user_list_name'];
             $usergroup->subscribe_users_to_usergroup($class_id, $user_list, $deleteUsersNotInList);
-            $message .= Display::return_message(get_lang('Class').': '.$class_name.'<br />', 'normal', false);
-            $message .= Display::return_message(get_lang('Users').': '.implode(', ', $user_list_name));
+            $message .= Display::return_message(
+                get_lang('Class').': '.$class_name.'<br />',
+                'normal',
+                false
+            );
+            $message .= Display::return_message(
+                get_lang('Users').': '.implode(', ', $user_list_name)
+            );
         }
     }
+
     return $message;
 }
 
 /**
  * Reads a CSV-file.
+ *
  * @param string $file Path to the CSV-file
+ *
  * @return array All course-information read from the file
  */
-function parse_csv_data($file) {
+function parse_csv_data($file)
+{
     $courses = Import::csvToArray($file);
+
     return $courses;
 }
 $cidReset = true;
@@ -126,12 +133,13 @@ $cidReset = true;
 require_once __DIR__.'/../inc/global.inc.php';
 
 $this_section = SECTION_PLATFORM_ADMIN;
-api_protect_admin_script(true);
+
+$usergroup = new UserGroup();
+$usergroup->protectScript();
 
 $tool_name = get_lang('AddUsersToAClass').' CSV';
 
-$interbreadcrumb[] = array('url' => 'index.php', 'name' => get_lang('PlatformAdmin'));
-$interbreadcrumb[] = array('url' => 'usergroups.php', 'name' => get_lang('Classes'));
+$interbreadcrumb[] = ['url' => 'usergroups.php', 'name' => get_lang('Classes')];
 
 // Set this option to true to enforce strict purification for usenames.
 $purification_option_for_usernames = false;
@@ -145,7 +153,7 @@ $form->addElement('file', 'import_file', get_lang('ImportCSVFileLocation'));
 $form->addElement('checkbox', 'unsubscribe', '', get_lang('UnsubscribeUserIfSubscriptionIsNotInFile'));
 $form->addButtonImport(get_lang('Import'));
 
-$errors = array();
+$errors = [];
 if ($form->validate()) {
     $users_classes = parse_csv_data($_FILES['import_file']['tmp_name']);
     $errors = validate_data($users_classes);
@@ -155,7 +163,7 @@ if ($form->validate()) {
     }
 }
 
-Display :: display_header($tool_name);
+Display::display_header($tool_name);
 
 if (isset($return) && $return) {
     echo $return;
@@ -179,4 +187,4 @@ jdoe;class01
 adam;class01
 </pre>
 <?php
-Display :: display_footer();
+Display::display_footer();

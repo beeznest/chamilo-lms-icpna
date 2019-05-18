@@ -3,12 +3,16 @@
 
 /**
  * HotPotatoes administration.
+ *
  * @package chamilo.exercise
+ *
  * @author Istvan Mandak
-*/
+ */
 require_once __DIR__.'/../inc/global.inc.php';
 
 $this_section = SECTION_COURSES;
+
+api_protect_course_script(true);
 
 $_course = api_get_course_info();
 
@@ -37,19 +41,17 @@ if (!$is_allowedToEdit) {
     api_not_allowed(true);
 }
 
-if (isset($_SESSION['gradebook'])) {
-    $gradebook = $_SESSION['gradebook'];
-}
-
-if (!empty($gradebook) && $gradebook == 'view') {
-    $interbreadcrumb[] = array(
-        'url' => '../gradebook/'.$_SESSION['gradebook_dest'],
+if (api_is_in_gradebook()) {
+    $interbreadcrumb[] = [
+        'url' => Category::getUrl(),
         'name' => get_lang('ToolGradebook'),
-    );
+    ];
 }
 
-$interbreadcrumb[] = array("url" => "exercise.php", "name" => get_lang('Exercises'));
-
+$interbreadcrumb[] = [
+    "url" => "exercise.php",
+    "name" => get_lang('Exercises'),
+];
 $nameTools = get_lang('adminHP');
 
 Display::display_header($nameTools, "Exercise");

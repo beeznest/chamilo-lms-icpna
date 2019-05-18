@@ -1,11 +1,12 @@
 <?php
+/* For licensing terms, see /license.txt */
 
 namespace Chamilo\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * SharedSurvey
+ * SharedSurvey.
  *
  * @ORM\Table(name="shared_survey", uniqueConstraints={@ORM\UniqueConstraint(name="id", columns={"survey_id"})})
  * @ORM\Entity
@@ -17,86 +18,85 @@ class SharedSurvey
      *
      * @ORM\Column(name="code", type="string", length=20, nullable=true)
      */
-    private $code;
+    protected $code;
 
     /**
      * @var string
      *
      * @ORM\Column(name="title", type="text", nullable=true)
      */
-    private $title;
+    protected $title;
 
     /**
      * @var string
      *
      * @ORM\Column(name="subtitle", type="text", nullable=true)
      */
-    private $subtitle;
+    protected $subtitle;
 
     /**
      * @var string
      *
      * @ORM\Column(name="author", type="string", length=250, nullable=true)
      */
-    private $author;
+    protected $author;
 
     /**
      * @var string
      *
      * @ORM\Column(name="lang", type="string", length=20, nullable=true)
      */
-    private $lang;
+    protected $lang;
 
     /**
      * @var string
      *
      * @ORM\Column(name="template", type="string", length=20, nullable=true)
      */
-    private $template;
+    protected $template;
 
     /**
      * @var string
      *
      * @ORM\Column(name="intro", type="text", nullable=true)
      */
-    private $intro;
+    protected $intro;
 
     /**
      * @var string
      *
      * @ORM\Column(name="surveythanks", type="text", nullable=true)
      */
-    private $surveythanks;
+    protected $surveythanks;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="creation_date", type="datetime", nullable=false)
      */
-    private $creationDate;
+    protected $creationDate;
 
     /**
      * @var string
      *
      * @ORM\Column(name="course_code", type="string", length=40, nullable=false)
      */
-    private $courseCode;
+    protected $courseCode;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="survey_id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private $surveyId;
-
-
+    protected $surveyId;
 
     /**
-     * Set code
+     * Set code.
      *
      * @param string $code
+     *
      * @return SharedSurvey
      */
     public function setCode($code)
@@ -107,7 +107,7 @@ class SharedSurvey
     }
 
     /**
-     * Get code
+     * Get code.
      *
      * @return string
      */
@@ -117,9 +117,10 @@ class SharedSurvey
     }
 
     /**
-     * Set title
+     * Set title.
      *
      * @param string $title
+     *
      * @return SharedSurvey
      */
     public function setTitle($title)
@@ -130,7 +131,7 @@ class SharedSurvey
     }
 
     /**
-     * Get title
+     * Get title.
      *
      * @return string
      */
@@ -140,9 +141,10 @@ class SharedSurvey
     }
 
     /**
-     * Set subtitle
+     * Set subtitle.
      *
      * @param string $subtitle
+     *
      * @return SharedSurvey
      */
     public function setSubtitle($subtitle)
@@ -153,7 +155,7 @@ class SharedSurvey
     }
 
     /**
-     * Get subtitle
+     * Get subtitle.
      *
      * @return string
      */
@@ -163,9 +165,10 @@ class SharedSurvey
     }
 
     /**
-     * Set author
+     * Set author.
      *
      * @param string $author
+     *
      * @return SharedSurvey
      */
     public function setAuthor($author)
@@ -176,7 +179,7 @@ class SharedSurvey
     }
 
     /**
-     * Get author
+     * Get author.
      *
      * @return string
      */
@@ -186,9 +189,10 @@ class SharedSurvey
     }
 
     /**
-     * Set lang
+     * Set lang.
      *
      * @param string $lang
+     *
      * @return SharedSurvey
      */
     public function setLang($lang)
@@ -199,7 +203,7 @@ class SharedSurvey
     }
 
     /**
-     * Get lang
+     * Get lang.
      *
      * @return string
      */
@@ -209,9 +213,10 @@ class SharedSurvey
     }
 
     /**
-     * Set template
+     * Set template.
      *
      * @param string $template
+     *
      * @return SharedSurvey
      */
     public function setTemplate($template)
@@ -222,7 +227,7 @@ class SharedSurvey
     }
 
     /**
-     * Get template
+     * Get template.
      *
      * @return string
      */
@@ -232,9 +237,10 @@ class SharedSurvey
     }
 
     /**
-     * Set intro
+     * Set intro.
      *
      * @param string $intro
+     *
      * @return SharedSurvey
      */
     public function setIntro($intro)
@@ -245,7 +251,7 @@ class SharedSurvey
     }
 
     /**
-     * Get intro
+     * Get intro.
      *
      * @return string
      */
@@ -255,9 +261,10 @@ class SharedSurvey
     }
 
     /**
-     * Set surveythanks
+     * Set surveythanks.
      *
      * @param string $surveythanks
+     *
      * @return SharedSurvey
      */
     public function setSurveythanks($surveythanks)
@@ -268,7 +275,7 @@ class SharedSurvey
     }
 
     /**
-     * Get surveythanks
+     * Get surveythanks.
      *
      * @return string
      */
@@ -278,9 +285,10 @@ class SharedSurvey
     }
 
     /**
-     * Set creationDate
+     * Set creationDate.
      *
      * @param \DateTime $creationDate
+     *
      * @return SharedSurvey
      */
     public function setCreationDate($creationDate)
@@ -291,7 +299,7 @@ class SharedSurvey
     }
 
     /**
-     * Get creationDate
+     * Get creationDate.
      *
      * @return \DateTime
      */
@@ -301,9 +309,10 @@ class SharedSurvey
     }
 
     /**
-     * Set courseCode
+     * Set courseCode.
      *
      * @param string $courseCode
+     *
      * @return SharedSurvey
      */
     public function setCourseCode($courseCode)
@@ -314,7 +323,7 @@ class SharedSurvey
     }
 
     /**
-     * Get courseCode
+     * Get courseCode.
      *
      * @return string
      */
@@ -324,9 +333,9 @@ class SharedSurvey
     }
 
     /**
-     * Get surveyId
+     * Get surveyId.
      *
-     * @return integer
+     * @return int
      */
     public function getSurveyId()
     {

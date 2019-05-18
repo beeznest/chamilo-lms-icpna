@@ -7,6 +7,9 @@ use Chamilo\CoreBundle\Entity\Repository\SessionRepository;
 use Chamilo\CoreBundle\Entity\SequenceResource;
 use Chamilo\CoreBundle\Entity\Session;
 use Chamilo\CoreBundle\Entity\SessionRelCourseRelUser;
+use Chamilo\CoreBundle\Entity\Promotion;
+use Doctrine\Common\Collections\Criteria;
+use Chamilo\CoreBundle\Entity\SessionRelUser;
 
 /**
  * @author  Bart Mollet, Julio Montoya lot of fixes

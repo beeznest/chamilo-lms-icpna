@@ -1,25 +1,27 @@
 <?php
 /* For licensing terms, see /license.txt */
 /**
- * This tool allows platform admins to add skills by uploading a CSV or XML file
+ * This tool allows platform admins to add skills by uploading a CSV or XML file.
+ *
  * @package chamilo.admin
  * @documentation Some interesting basic skills can be found in the "Skills"
  * section here: http://en.wikipedia.org/wiki/Personal_knowledge_management
  */
-
 $cidReset = true;
 require_once __DIR__.'/../inc/global.inc.php';
 
 /**
  * Validate the imported data.
+ *
  * @param $skills
+ *
  * @return array
  */
 function validate_data($skills)
 {
-    $errors = array();
+    $errors = [];
     // 1. Check if mandatory fields are set.
-    $mandatory_fields = array('id', 'parent_id', 'name');
+    $mandatory_fields = ['id', 'parent_id', 'name'];
     foreach ($skills as $index => $skill) {
         foreach ($mandatory_fields as $field) {
             if (empty($skill[$field])) {
@@ -48,21 +50,26 @@ function validate_data($skills)
 }
 
 /**
- * Save the imported data
+ * Save the imported data.
+ *
  * @param   array   List of users
- * @return  void
- * @uses global variable $inserted_in_course,
+ *
+ * @uses \global variable $inserted_in_course,
  * which returns the list of courses the user was inserted in
  */
 function save_data($skills)
 {
     if (is_array($skills)) {
-        $parents = array();
+        $parents = [];
+        $urlId = api_get_current_access_url_id();
         foreach ($skills as $index => $skill) {
             if (isset($parents[$skill['parent_id']])) {
                 $skill['parent_id'] = $parents[$skill['parent_id']];
             } else {
                 $skill['parent_id'] = 1;
+            }
+            if (empty($skill['access_url_id'])) {
+                $skill['access_url_id'] = $urlId;
             }
             $skill['a'] = 'add';
             $saved_id = $skill['id'];
@@ -70,109 +77,43 @@ function save_data($skills)
             $oskill = new Skill();
             $skill_id = $oskill->add($skill);
             $parents[$saved_id] = $skill_id;
-		}
+        }
     }
 }
 
 /**
- * Read the CSV-file
+ * Read the CSV-file.
+ *
  * @param string $file Path to the CSV-file
+ *
  * @return array All userinformation read from the file
  */
 function parse_csv_data($file)
 {
-	$skills = Import :: csvToArray($file);
-	foreach ($skills as $index => $skill) {
-		$skills[$index] = $skill;
-	}
-
-	return $skills;
-}
-
-/**
- * XML-parser: handle start of element
- */
-function element_start($parser, $data)
-{
-	$data = api_utf8_decode($data);
-    global $skill;
-    global $current_tag;
-    switch ($data) {
-        case 'Skill':
-            $skill = array();
-            break;
-        default:
-            $current_tag = $data;
+    $skills = Import::csvToArray($file);
+    foreach ($skills as $index => $skill) {
+        $skills[$index] = $skill;
     }
-}
 
-/**
- * XML-parser: handle end of element
- */
-function element_end($parser, $data)
-{
-	$data = api_utf8_decode($data);
-    global $skill;
-    global $skills;
-    global $current_value;
-    switch ($data) {
-        case 'Skill':
-            $skills[] = $skill;
-            break;
-        default:
-            $skill[$data] = $current_value;
-            break;
-    }
-}
-
-/**
- * XML-parser: handle character data
- */
-function character_data($parser, $data)
-{
-	$data = trim(api_utf8_decode($data));
-	global $current_value;
-	$current_value = $data;
-}
-
-/**
- * Read the XML-file
- * @param string $file Path to the XML-file
- * @return array All userinformation read from the file
- */
-function parse_xml_data($file)
-{
-    global $current_tag;
-    global $current_value;
-    global $skill;
-    global $skills;
-    $skills = array();
-    $parser = xml_parser_create('UTF-8');
-    xml_set_element_handler($parser, 'element_start', 'element_end');
-    xml_set_character_data_handler($parser, 'character_data');
-    xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, false);
-    xml_parse($parser, api_utf8_encode_xml(file_get_contents($file)));
-    xml_parser_free($parser);
-
-	return $skills;
+    return $skills;
 }
 
 $this_section = SECTION_PLATFORM_ADMIN;
 api_protect_admin_script(true);
 
 $tool_name = get_lang('ImportSkillsListCSV');
-$interbreadcrumb[] = array("url" => 'index.php', "name" => get_lang('PlatformAdmin'));
+$interbreadcrumb[] = ["url" => 'index.php', "name" => get_lang('PlatformAdmin')];
 
 set_time_limit(0);
 $extra_fields = UserManager::get_extra_fields(0, 0, 5, 'ASC', true);
-$user_id_error = array();
+$user_id_error = [];
 $error_message = '';
 
 if (!empty($_POST['formSent']) && $_FILES['import_file']['size'] !== 0) {
     $file_type = $_POST['file_type'];
     Security::clear_token();
     $tok = Security::get_token();
-    $allowed_file_mimetype = array('csv', 'xml');
+    $allowed_file_mimetype = ['csv'];
     $error_kind_file = false;
     $error_message = '';
 
@@ -180,11 +121,7 @@ if (!empty($_POST['formSent']) && $_FILES['import_file']['size'] !== 0) {
 
     if (in_array($ext_import_file, $allowed_file_mimetype)) {
         if (strcmp($file_type, 'csv') === 0 && $ext_import_file == $allowed_file_mimetype[0]) {
-            $skills	= parse_csv_data($_FILES['import_file']['tmp_name']);
-            $errors = validate_data($skills);
-            $error_kind_file = false;
-        } elseif (strcmp($file_type, 'xml') === 0 && $ext_import_file == $allowed_file_mimetype[1]) {
-            $skills = parse_xml_data($_FILES['import_file']['tmp_name']);
+            $skills = parse_csv_data($_FILES['import_file']['tmp_name']);
             $errors = validate_data($skills);
             $error_kind_file = false;
         } else {
@@ -195,7 +132,7 @@ if (!empty($_POST['formSent']) && $_FILES['import_file']['size'] !== 0) {
     }
 
     // List skill id with error.
-    $skills_to_insert = $skill_id_error = array();
+    $skills_to_insert = $skill_id_error = [];
     if (is_array($errors)) {
         foreach ($errors as $my_errors) {
             $skill_id_error[] = $my_errors['SkillName'];
@@ -210,8 +147,6 @@ if (!empty($_POST['formSent']) && $_FILES['import_file']['size'] !== 0) {
     }
 
     if (strcmp($file_type, 'csv') === 0) {
-        save_data($skills_to_insert);
-    } elseif (strcmp($file_type, 'xml') === 0) {
         save_data($skills_to_insert);
     } else {
         $error_message = get_lang('YouMustImportAFileAccordingToSelectedOption');
@@ -238,7 +173,7 @@ if (!empty($_POST['formSent']) && $_FILES['import_file']['size'] !== 0) {
     }
 }
 
-$interbreadcrumb[] = array("url" => 'skill_list.php', "name" => get_lang('ManageSkills'));
+$interbreadcrumb[] = ["url" => 'skill_list.php', "name" => get_lang('ManageSkills')];
 
 Display :: display_header($tool_name);
 
@@ -249,48 +184,19 @@ if (!empty($see_message_import)) {
     echo Display::return_message($see_message_import, 'normal');
 }
 
-$toolbar = Display::url(
-    Display::return_icon(
-        'list_badges.png',
-        get_lang('ManageSkills'),
-        null,
-        ICON_SIZE_MEDIUM),
-    api_get_path(WEB_CODE_PATH).'admin/skill_list.php'
-    );
-
-$toolbar .= Display::url(
-    Display::return_icon(
-        'wheel_skill.png',
-        get_lang('SkillsWheel'),
-        null,
-        ICON_SIZE_MEDIUM),
-    api_get_path(WEB_CODE_PATH).'admin/skills_wheel.php'
-    );
-
-$toolbar .= Display::url(
-    Display::return_icon(
-        'edit-skill.png',
-        get_lang('BadgesManagement'),
-        null,
-        ICON_SIZE_MEDIUM),
-    api_get_path(WEB_CODE_PATH).'admin/skill_badge_list.php'
-    );
-
-
-$actions = '<div class="actions">'.$toolbar.'</div>';
-
-echo $actions;
+$objSkill = new Skill();
+echo $objSkill->getToolBar();
 
 $form = new FormValidator('user_import', 'post', 'skills_import.php');
 $form->addElement('header', '', $tool_name);
 $form->addElement('hidden', 'formSent');
 $form->addElement('file', 'import_file', get_lang('ImportFileLocation'));
-$group = array();
+$group = [];
 $group[] = $form->createElement(
     'radio',
     'file_type',
     '',
-    'CSV (<a href="skill_example.csv" target="_blank">'.get_lang('ExampleCSVFile').'</a>)',
+    'CSV (<a href="skill_example.csv" target="_blank" download>'.get_lang('ExampleCSVFile').'</a>)',
     'csv'
 );
 $form->addGroup($group, '', get_lang('FileType'));
@@ -301,23 +207,6 @@ $defaults['file_type'] = 'csv';
 $form->setDefaults($defaults);
 $form->display();
 
-$list = array();
-$list_reponse = array();
-$result_xml = '';
-$i = 0;
-$count_fields = count($extra_fields);
-if ($count_fields > 0) {
-    foreach ($extra_fields as $extra) {
-        $list[] = $extra[1];
-        $list_reponse[] = 'xxx';
-        $spaces = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-        $result_xml .= $spaces.'&lt;'.$extra[1].'&gt;xxx&lt;/'.$extra[1].'&gt;';
-        if ($i != $count_fields - 1) {
-            $result_xml .= '<br/>';
-        }
-        $i++;
-    }
-}
 ?>
 <p><?php echo get_lang('CSVMustLookLike').' ('.get_lang('MandatoryFields').')'; ?> :</p>
 

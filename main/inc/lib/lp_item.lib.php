@@ -3,11 +3,10 @@
 
 /**
  * Class lp_item
- *  made to manipulate data of lp_item table
+ *  made to manipulate data of lp_item table.
  *
  * This class is still incomplete
  * You can add lp_item database manipulation function here
- *
  */
 class LpItem
 {
@@ -34,6 +33,12 @@ class LpItem
     public $search_did = 0;
     public $audio = '';
 
+    /**
+     * LpItem constructor.
+     *
+     * @param int $in_c_id
+     * @param int $in_id
+     */
     public function __construct($in_c_id = 0, $in_id = 0)
     {
         if ($in_c_id > 0 && $in_id > 0) {
@@ -41,7 +46,7 @@ class LpItem
             $sql = "SELECT * FROM $item_view_table
                     WHERE
                         c_id=".intval($in_c_id)." AND
-                        id=".intval($in_id);
+                        iid=".intval($in_id);
 
             $res = Database::query($sql);
             $data = Database::fetch_array($res);
@@ -73,13 +78,13 @@ class LpItem
     }
 
     /**
-     * Update in database
+     * Update in database.
      */
-    public function update_in_bdd()
+    public function update()
     {
-        $item_view_table = Database::get_course_table(TABLE_LP_ITEM);
+        $table = Database::get_course_table(TABLE_LP_ITEM);
         if ($this->c_id > 0 && $this->id > 0) {
-            $sql = "UPDATE $item_view_table SET
+            $sql = "UPDATE $table SET
                         lp_id = '".intval($this->lp_id)."' ,
                         item_type = '".Database::escape_string($this->item_type)."' ,
                         ref = '".Database::escape_string($this->ref)."' ,

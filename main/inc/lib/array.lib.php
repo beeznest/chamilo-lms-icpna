@@ -1,19 +1,18 @@
 <?php
 /* For licensing terms, see /license.txt */
 /**
-*	This is the array library for Chamilo.
-*	Include/require it in your code to use its functionality.
-*
-*	@package chamilo.library
-*/
-
+ * This is the array library for Chamilo.
+ * Include/require it in your code to use its functionality.
+ *
+ * @package chamilo.library
+ */
 
 /**
- * Removes duplicate values from a dimensional array
+ * Removes duplicate values from a dimensional array.
  *
  * @param array $array dimensional array
- * @return array an array with unique values
  *
+ * @return array an array with unique values
  */
 function array_unique_dimensional($array)
 {
@@ -28,18 +27,20 @@ function array_unique_dimensional($array)
     $array = array_unique($array);
 
     foreach ($array as &$myvalue) {
-        $myvalue = unserialize($myvalue);
+        $myvalue = UnserializeApi::unserialize('not_allowed_clases', $myvalue);
     }
+
     return $array;
 }
 
 /**
- *
- * Sort multidimensional arrays
+ * Sort multidimensional arrays.
  *
  * @param    array    unsorted multidimensional array
  * @param    string    key to be sorted
- * @return    array    result array
+ *
+ * @return array result array
+ *
  * @author    found in http://php.net/manual/en/function.sort.php
  */
 function msort($array, $id = 'id', $order = 'desc')
@@ -47,7 +48,7 @@ function msort($array, $id = 'id', $order = 'desc')
     if (empty($array)) {
         return $array;
     }
-    $temp_array = array();
+    $temp_array = [];
     while (count($array) > 0) {
         $lowest_id = 0;
         $index = 0;
@@ -69,68 +70,42 @@ function msort($array, $id = 'id', $order = 'desc')
             array_slice($array, $lowest_id + 1)
         );
     }
-    return $temp_array;
-}
 
-function array_walk_recursive_limited(
-    &$array,
-    $function,
-    $apply_to_keys_also = false
-) {
-    static $recursive_counter = 0;
-    if (++$recursive_counter > 1000) {
-        die('possible deep recursion attack');
-    }
-    foreach ($array as $key => $value) {
-        if (is_array($value)) {
-            array_walk_recursive_limited(
-                $array[$key],
-                $function,
-                $apply_to_keys_also
-            );
-        } else {
-            $array[$key] = $function($value);
-        }
-        if ($apply_to_keys_also && is_string($key)) {
-            $new_key = $function($key);
-            if ($new_key != $key) {
-                $array[$new_key] = $array[$key];
-                unset($array[$key]);
-            }
-        }
-    }
-    $recursive_counter--;
+    return $temp_array;
 }
 
 /**
  * @param $array
+ *
  * @return mixed
  */
 function utf8_sort($array)
 {
-	$old_locale = setlocale(LC_ALL, null);
-	$code = api_get_language_isocode();
-	$locale_list = array($code.'.utf8', 'en.utf8', 'en_US.utf8', 'en_GB.utf8');
-	$try_sort = false;
+    $old_locale = setlocale(LC_ALL, null);
+    $code = api_get_language_isocode();
+    $locale_list = [$code.'.utf8', 'en.utf8', 'en_US.utf8', 'en_GB.utf8'];
+    $try_sort = false;
 
-	foreach ($locale_list as $locale) {
-		$my_local = setlocale(LC_COLLATE, $locale);
-		if ($my_local) {
-			$try_sort = true;
-			break;
-		}
-	}
+    foreach ($locale_list as $locale) {
+        $my_local = setlocale(LC_COLLATE, $locale);
+        if ($my_local) {
+            $try_sort = true;
+            break;
+        }
+    }
 
-	if ($try_sort) {
-		uasort($array, 'strcoll');
-	}
-	setlocale(LC_COLLATE, $old_locale);
-	return $array;
+    if ($try_sort) {
+        uasort($array, 'strcoll');
+    }
+    setlocale(LC_COLLATE, $old_locale);
+
+    return $array;
 }
 
 /**
- * @param array $array
+ * @param array  $array
  * @param string $separator
+ *
  * @return string
  */
 function array_to_string($array, $separator = ',')
@@ -144,14 +119,15 @@ function array_to_string($array, $separator = ',')
 
 /**
  * @param array $array
+ *
  * @return array
  */
 function array_flatten(array $array)
 {
-    $flatten = array();
+    $flatten = [];
     array_walk_recursive(
         $array,
-        function($value) use (&$flatten) {
+        function ($value) use (&$flatten) {
             $flatten[] = $value;
         }
     );
@@ -160,18 +136,21 @@ function array_flatten(array $array)
 }
 
 /**
- * Shuffles an array keeping the associations
+ * Shuffles an array keeping the associations.
+ *
  * @param $array
+ *
  * @return bool
  */
 function shuffle_assoc(&$array)
 {
     $keys = array_keys($array);
     shuffle($keys);
-    $new = array();
+    $new = [];
     foreach ($keys as $key) {
         $new[$key] = $array[$key];
     }
     $array = $new;
+
     return true;
 }

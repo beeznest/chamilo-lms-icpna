@@ -7,9 +7,13 @@
 class DateTimePicker extends HTML_QuickForm_text
 {
     /**
-     * Constructor
+     * DateTimePicker constructor.
+     *
+     * @param string       $elementName
+     * @param string|array $elementLabel
+     * @param array        $attributes
      */
-    public function __construct($elementName = null, $elementLabel = null, $attributes = null)
+    public function __construct($elementName, $elementLabel = null, $attributes = null)
     {
         if (!isset($attributes['id'])) {
             $attributes['id'] = $elementName;
@@ -20,7 +24,8 @@ class DateTimePicker extends HTML_QuickForm_text
     }
 
     /**
-     * HTML code to display this datepicker
+     * HTML code to display this datepicker.
+     *
      * @return string
      */
     public function toHtml()
@@ -32,8 +37,9 @@ class DateTimePicker extends HTML_QuickForm_text
         $id = $this->getAttribute('id');
         $value = $this->getValue();
 
+        $formattedValue = '';
         if (!empty($value)) {
-            $value = api_format_date($value, DATE_TIME_FORMAT_LONG_24H);
+            $formattedValue = api_format_date($value, DATE_TIME_FORMAT_LONG_24H);
         }
 
         $label = $this->getLabel();
@@ -44,11 +50,11 @@ class DateTimePicker extends HTML_QuickForm_text
         $resetFieldX = sprintf(get_lang('ResetFieldX'), $label);
 
         return '
-            <div class="input-group">
+            <div class="input-group" id="date_time_wrapper_'.$id.'">
                 <span class="input-group-addon cursor-pointer">
                     <input '.$this->_getAttrString($this->_attributes).'>
                 </span>
-                <p class="form-control disabled" id="'.$id.'_alt_text">'.$value.'</p>
+                <p class="form-control disabled" id="'.$id.'_alt_text">'.$formattedValue.'</p>
                 <input class="form-control" type="hidden" id="'.$id.'_alt" value="'.$value.'">
                 <span class="input-group-btn">
                     <button class="btn btn-default" type="button"
@@ -71,7 +77,59 @@ class DateTimePicker extends HTML_QuickForm_text
     }
 
     /**
-     * Get the necessary javascript for this datepicker
+     * @param string $layout
+     *
+     * @return string
+     */
+    public function getTemplate($layout)
+    {
+        $size = $this->calculateSize();
+
+        switch ($layout) {
+            case FormValidator::LAYOUT_INLINE:
+                return '
+                <div class="form-group {error_class}">
+                    <label {label-for} >
+                        <!-- BEGIN required --><span class="form_required">*</span><!-- END required -->
+                        {label}
+                    </label>
+
+                    {element}
+                </div>';
+            case FormValidator::LAYOUT_HORIZONTAL:
+                return '
+                <div class="form-group {error_class}">
+                    <label {label-for} class="col-sm-'.$size[0].' control-label {extra_label_class}" >
+                        <!-- BEGIN required --><span class="form_required">*</span><!-- END required -->
+                        {label}
+                    </label>
+                    <div class="col-sm-'.$size[1].'">
+                        {icon}
+
+                        {element}
+
+                        <!-- BEGIN label_2 -->
+                            <p class="help-block">{label_2}</p>
+                        <!-- END label_2 -->
+
+                        <!-- BEGIN error -->
+                            <span class="help-inline help-block">{error}</span>
+                        <!-- END error -->
+                    </div>
+                    <div class="col-sm-'.$size[2].'">
+                        <!-- BEGIN label_3 -->
+                            {label_3}
+                        <!-- END label_3 -->
+                    </div>
+                </div>';
+            case FormValidator::LAYOUT_BOX_NO_LABEL:
+                return '{element}';
+        }
+    }
+
+    /**
+     * Get the necessary javascript for this datepicker.
+     *
      * @return string
      */
     private function getElementJS()
@@ -125,83 +183,4 @@ class DateTimePicker extends HTML_QuickForm_text
 
         return $js;
     }
-
-    /**
-     * @param string $layout
-     *
-     * @return string
-     */
-    public function getTemplate($layout)
-    {
-        $size = $this->getColumnsSize();
-        $id = $this->getAttribute('id');
-        $value = $this->getValue();
-
-        if (empty($size)) {
-            $sizeTemp = $this->getInputSize();
-            if (empty($size)) {
-                $sizeTemp = 8;
-            }
-            $size = array(2, $sizeTemp, 2);
-        } else {
-            if (is_array($size)) {
-                if (count($size) != 3) {
-                    $sizeTemp = $this->getInputSize();
-                    if (empty($size)) {
-                        $sizeTemp = 8;
-                    }
-                    $size = array(2, $sizeTemp, 2);
-                }
-                // else just keep the $size array as received
-            } else {
-                $size = array(2, intval($size), 2);
-            }
-        }
-
-        if (!empty($value)) {
-            $value = api_format_date($value, DATE_TIME_FORMAT_LONG_24H);
-        }
-
-        switch ($layout) {
-            case FormValidator::LAYOUT_INLINE:
-                return '
-                <div class="form-group {error_class}">
-                    <label {label-for} >
-                        <!-- BEGIN required --><span class="form_required">*</span><!-- END required -->
-                        {label}
-                    </label>
-
-                    {element}
-                </div>';
-            case FormValidator::LAYOUT_HORIZONTAL:
-                return '
-                <div class="form-group {error_class}">
-                    <label {label-for} class="col-sm-'.$size[0].' control-label {extra_label_class}" >
-                        <!-- BEGIN required --><span class="form_required">*</span><!-- END required -->
-                        {label}
-                    </label>
-                    <div class="col-sm-'.$size[1].'">
-                        {icon}
-
-                        {element}
-
-                        <!-- BEGIN label_2 -->
-                            <p class="help-block">{label_2}</p>
-                        <!-- END label_2 -->
-
-                        <!-- BEGIN error -->
-                            <span class="help-inline">{error}</span>
-                        <!-- END error -->
-                    </div>
-                    <div class="col-sm-'.$size[2].'">
-                        <!-- BEGIN label_3 -->
-                            {label_3}
-                        <!-- END label_3 -->
-                    </div>
-                </div>';
-            case FormValidator::LAYOUT_BOX_NO_LABEL:
-                return '{element}';
-        }
-    }
-
 }

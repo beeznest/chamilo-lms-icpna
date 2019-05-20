@@ -1,11 +1,13 @@
 <?php
-/**
- * This script initiates a video conference session, calling the BigBlueButton API
- * @package chamilo.plugin.bigbluebutton
- */
+/* For license terms, see /license.txt */
 
 use Chamilo\UserBundle\Entity\User;
 
+/**
+ * This script initiates a video conference session, calling the BigBlueButton API.
+ *
+ * @package chamilo.plugin.bigbluebutton
+ */
 $course_plugin = 'bbb'; //needed in order to load the plugin lang variables
 $cidReset = true;
 
@@ -27,7 +29,7 @@ $dateEnd = isset($_REQUEST['search_meeting_end']) ? $_REQUEST['search_meeting_en
 
 $dateRange = [
     'search_meeting_start' => $dateStart,
-    'search_meeting_end' => $dateEnd
+    'search_meeting_end' => $dateEnd,
 ];
 
 $form = new FormValidator(get_lang('Search'));
@@ -43,13 +45,12 @@ if ($form->validate()) {
 $meetings = $bbb->getMeetings(0, 0, 0, true, $dateRange);
 
 foreach ($meetings as &$meeting) {
-    $participants = $bbb->findMeetingParticipants($meeting['id']);
+    $participants = $bbb->findConnectedMeetingParticipants($meeting['id']);
 
     foreach ($participants as $meetingParticipant) {
         /** @var User $participant */
         $participant = $meetingParticipant['participant'];
-        $meeting['participants'][] = $participant->getCompleteName()
-            . ' ('.$participant->getEmail().')';
+        $meeting['participants'][] = $participant->getCompleteName().' ('.$participant->getEmail().')';
     }
 }
 
@@ -66,7 +67,7 @@ if ($action) {
                     get_lang('Course'),
                     get_lang('Session'),
                     get_lang('Participants'),
-                ]
+                ],
             ];
 
             foreach ($meetings as $meeting) {
@@ -76,7 +77,7 @@ if ($action) {
                     $meeting['record'] == 1 ? get_lang('Yes') : get_lang('No'),
                     $meeting['course'] ? $meeting['course']->getTitle() : '-',
                     $meeting['session'] ? $meeting['session']->getName() : '-',
-                    isset($meeting['participants']) ? implode(PHP_EOL, $meeting['participants']) : null
+                    isset($meeting['participants']) ? implode(PHP_EOL, $meeting['participants']) : null,
                 ];
             }
 
@@ -104,7 +105,7 @@ $tpl = new Template($tool_name);
 $tpl->assign('meetings', $meetings);
 $tpl->assign('search_form', $form->returnForm());
 
-$content = $tpl->fetch('bbb/admin.tpl');
+$content = $tpl->fetch('bbb/view/admin.tpl');
 
 if ($meetings) {
     $actions = Display::toolbarButton(
@@ -112,7 +113,7 @@ if ($meetings) {
         api_get_self().'?'.http_build_query([
             'action' => 'export',
             'search_meeting_start' => $dateStart,
-            'search_meeting_end' => $dateEnd
+            'search_meeting_end' => $dateEnd,
         ]),
         'file-excel-o',
         'success'

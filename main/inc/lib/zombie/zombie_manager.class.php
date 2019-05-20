@@ -2,7 +2,7 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * ZombieQuery
+ * ZombieQuery.
  *
  * @copyright (c) 2012 University of Geneva
  * @license GNU General Public License - http://www.gnu.org/copyleft/gpl.html
@@ -10,24 +10,32 @@
  */
 class ZombieManager
 {
-    static function last_year()
+    public static function last_year()
     {
         $today = time();
         $day = date('j', $today);
         $month = date('n', $today);
         $year = date('Y', $today) - 1;
+
         return mktime(0, 0, 0, $month, $day, $year);
     }
 
     /**
-     * Returns users whose last login is prior from $ceiling
+     * Returns users whose last login is prior from $ceiling.
      *
-     * @param int|string $ceiling last login date
-     * @param bool $active_only if true returns only active users. Otherwise returns all users.
+     * @param int|string $ceiling     last login date
+     * @param bool       $active_only if true returns only active users. Otherwise returns all users.
+     *
      * @return ResultSet
      */
-    static function listZombies($ceiling, $active_only = true, $count = 0, $from = 10, $column = 'user.firstname', $direction = 'desc')
-    {
+    public static function listZombies(
+        $ceiling,
+        $active_only = true,
+        $from = 0,
+        $count = 10,
+        $column = 'user.firstname',
+        $direction = 'desc'
+    ) {
         if (empty($column)) {
             $column = 'user.firstname';
         }
@@ -39,6 +47,7 @@ class ZombieManager
 
         $sql = 'SELECT
                     user.user_id,
+                    user.official_code,
                     user.firstname,
                     user.lastname,
                     user.username,
@@ -72,15 +81,17 @@ class ZombieManager
                         access.login_date <= '$ceiling' AND
                         user.user_id = access.login_user_id";
         }
+
         if ($active_only) {
             $sql .= ' AND user.active = 1';
         }
 
-        $count = intval($count);
-        $from = intval($from);
-
         $sql .= " ORDER BY $column $direction";
-        $sql .= " LIMIT $count, $from ";
+        if (!is_null($from) && !is_null($count)) {
+            $count = intval($count);
+            $from = intval($from);
+            $sql .= " LIMIT $from, $count ";
+        }
 
         $result = Database::query($sql);
 
@@ -90,10 +101,10 @@ class ZombieManager
     /**
      * @param $ceiling
      */
-    static function deactivate_zombies($ceiling)
+    public static function deactivate_zombies($ceiling)
     {
-        $zombies = self::list_zombies($ceiling);
-        $ids = array();
+        $zombies = self::listZombies($ceiling);
+        $ids = [];
         foreach ($zombies as $zombie) {
             $ids[] = $zombie['user_id'];
         }

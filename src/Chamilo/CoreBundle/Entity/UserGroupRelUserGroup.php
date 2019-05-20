@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * GroupRelGroup
+ * GroupRelGroup.
  *
  * @ORM\Table(name="usergroup_rel_usergroup")
  * @ORM\Entity
@@ -14,39 +14,39 @@ use Doctrine\ORM\Mapping as ORM;
 class UserGroupRelUserGroup
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $id;
+    protected $id;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="group_id", type="integer", nullable=false)
      */
-    private $groupId;
+    protected $groupId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="subgroup_id", type="integer", nullable=false)
      */
-    private $subgroupId;
+    protected $subgroupId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="relation_type", type="integer", nullable=false)
      */
-    private $relationType;
+    protected $relationType;
 
     /**
-     * Set groupId
+     * Set groupId.
      *
-     * @param integer $groupId
+     * @param int $groupId
      *
      * @return $this
      */
@@ -58,9 +58,9 @@ class UserGroupRelUserGroup
     }
 
     /**
-     * Get groupId
+     * Get groupId.
      *
-     * @return integer
+     * @return int
      */
     public function getGroupId()
     {
@@ -68,9 +68,10 @@ class UserGroupRelUserGroup
     }
 
     /**
-     * Set subgroupId
+     * Set subgroupId.
      *
-     * @param integer $subgroupId
+     * @param int $subgroupId
+     *
      * @return $this
      */
     public function setSubgroupId($subgroupId)
@@ -81,9 +82,9 @@ class UserGroupRelUserGroup
     }
 
     /**
-     * Get subgroupId
+     * Get subgroupId.
      *
-     * @return integer
+     * @return int
      */
     public function getSubgroupId()
     {
@@ -91,9 +92,9 @@ class UserGroupRelUserGroup
     }
 
     /**
-     * Set relationType
+     * Set relationType.
      *
-     * @param integer $relationType
+     * @param int $relationType
      *
      * @return $this
      */
@@ -105,9 +106,9 @@ class UserGroupRelUserGroup
     }
 
     /**
-     * Get relationType
+     * Get relationType.
      *
-     * @return integer
+     * @return int
      */
     public function getRelationType()
     {
@@ -115,9 +116,9 @@ class UserGroupRelUserGroup
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {

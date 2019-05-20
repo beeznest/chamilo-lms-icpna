@@ -1,29 +1,27 @@
 <?php
 /* For license terms, see /license.txt */
 
+use Chamilo\PluginBundle\Entity\ImsLti\ImsLtiTool;
+
 require_once __DIR__.'/../../main/inc/global.inc.php';
-
-$toolId = isset($_GET['id']) ? intval($_GET['id']) : 0;
-
-if (empty($toolId)) {
-    if (api_is_platform_admin()) {
-        header('Location: '.api_get_path(WEB_PLUGIN_PATH).'ims_lti/list.php');
-        exit;
-    }
-
-    api_not_allowed(true);
-    exit;
-}
 
 api_protect_course_script();
 
+$em = Database::getManager();
+
+/** @var ImsLtiTool $tool */
+$tool = isset($_GET['id']) ? $em->find('ChamiloPluginBundle:ImsLti\ImsLtiTool', intval($_GET['id'])) : null;
+
+if (!$tool) {
+    api_not_allowed(true);
+}
+
 $imsLtiPlugin = ImsLtiPlugin::create();
 
-$tool = ImsLtiTool::fetch($toolId);
+$pageTitle = Security::remove_XSS($tool->getName());
 
-$htmlHeadXtra[] = '<link rel="stylesheet" href="../assets/css/style.css" type="text/css">';
-
-$template = new Template($imsLtiPlugin->get_title());
+$template = new Template($pageTitle);
+$template->assign('tool', $tool);
 $template->assign(
     'launch_url',
     api_get_path(WEB_PLUGIN_PATH).'ims_lti/form.php?'.http_build_query(['id' => $tool->getId()])
@@ -31,6 +29,6 @@ $template->assign(
 
 $content = $template->fetch('ims_lti/view/start.tpl');
 
-$template->assign('header', $tool->getName());
+$template->assign('header', $pageTitle);
 $template->assign('content', $content);
 $template->display_one_col_template();

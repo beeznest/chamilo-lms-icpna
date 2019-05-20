@@ -6,7 +6,7 @@ namespace Chamilo\CourseBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CDocument
+ * CDocument.
  *
  * @ORM\Table(
  *  name="c_document",
@@ -21,81 +21,82 @@ class CDocument
     const TYPE_FILE_ENCRYPTED = 'fencrypted';
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="iid", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $iid;
+    protected $iid;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer", nullable=true)
      */
-    private $id;
+    protected $id;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer")
      */
-    private $cId;
+    protected $cId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="path", type="string", length=255, nullable=false)
      */
-    private $path;
+    protected $path;
 
     /**
      * @var string
      *
      * @ORM\Column(name="comment", type="text", nullable=true)
      */
-    private $comment;
+    protected $comment;
 
     /**
      * @var string
      *
      * @ORM\Column(name="title", type="string", length=255, nullable=true)
      */
-    private $title;
+    protected $title;
 
     /**
      * @var string
      *
      * @ORM\Column(name="filetype", type="string", length=10, nullable=false)
      */
-    private $filetype;
+    protected $filetype;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="size", type="integer", nullable=false)
      */
-    private $size;
+    protected $size;
 
     /**
-     * @var boolean
+     * @var bool
      *
      * @ORM\Column(name="readonly", type="boolean", nullable=false)
      */
-    private $readonly;
+    protected $readonly;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="session_id", type="integer", nullable=false)
      */
-    private $sessionId;
+    protected $sessionId;
 
     /**
-     * Set path
+     * Set path.
      *
      * @param string $path
+     *
      * @return CDocument
      */
     public function setPath($path)
@@ -106,7 +107,7 @@ class CDocument
     }
 
     /**
-     * Get path
+     * Get path.
      *
      * @return string
      */
@@ -116,9 +117,10 @@ class CDocument
     }
 
     /**
-     * Set comment
+     * Set comment.
      *
      * @param string $comment
+     *
      * @return CDocument
      */
     public function setComment($comment)
@@ -129,7 +131,7 @@ class CDocument
     }
 
     /**
-     * Get comment
+     * Get comment.
      *
      * @return string
      */
@@ -139,9 +141,10 @@ class CDocument
     }
 
     /**
-     * Set title
+     * Set title.
      *
      * @param string $title
+     *
      * @return CDocument
      */
     public function setTitle($title)
@@ -152,7 +155,7 @@ class CDocument
     }
 
     /**
-     * Get title
+     * Get title.
      *
      * @return string
      */
@@ -162,9 +165,10 @@ class CDocument
     }
 
     /**
-     * Set filetype
+     * Set filetype.
      *
      * @param string $filetype
+     *
      * @return CDocument
      */
     public function setFiletype($filetype)
@@ -175,7 +179,7 @@ class CDocument
     }
 
     /**
-     * Get filetype
+     * Get filetype.
      *
      * @return string
      */
@@ -185,9 +189,10 @@ class CDocument
     }
 
     /**
-     * Set size
+     * Set size.
      *
-     * @param integer $size
+     * @param int $size
+     *
      * @return CDocument
      */
     public function setSize($size)
@@ -198,9 +203,9 @@ class CDocument
     }
 
     /**
-     * Get size
+     * Get size.
      *
-     * @return integer
+     * @return int
      */
     public function getSize()
     {
@@ -208,9 +213,10 @@ class CDocument
     }
 
     /**
-     * Set readonly
+     * Set readonly.
      *
-     * @param boolean $readonly
+     * @param bool $readonly
+     *
      * @return CDocument
      */
     public function setReadonly($readonly)
@@ -221,9 +227,9 @@ class CDocument
     }
 
     /**
-     * Get readonly
+     * Get readonly.
      *
-     * @return boolean
+     * @return bool
      */
     public function getReadonly()
     {
@@ -231,9 +237,10 @@ class CDocument
     }
 
     /**
-     * Set sessionId
+     * Set sessionId.
      *
-     * @param integer $sessionId
+     * @param int $sessionId
+     *
      * @return CDocument
      */
     public function setSessionId($sessionId)
@@ -244,9 +251,9 @@ class CDocument
     }
 
     /**
-     * Get sessionId
+     * Get sessionId.
      *
-     * @return integer
+     * @return int
      */
     public function getSessionId()
     {
@@ -254,9 +261,10 @@ class CDocument
     }
 
     /**
-     * Set id
+     * Set id.
      *
-     * @param integer $id
+     * @param int $id
+     *
      * @return CDocument
      */
     public function setId($id)
@@ -267,9 +275,9 @@ class CDocument
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -277,9 +285,10 @@ class CDocument
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return CDocument
      */
     public function setCId($cId)
@@ -290,12 +299,32 @@ class CDocument
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {
         return $this->cId;
+    }
+
+    /**
+     * @return int
+     */
+    public function getIid()
+    {
+        return $this->iid;
+    }
+
+    /**
+     * @param int $iid
+     *
+     * @return CDocument
+     */
+    public function setIid($iid)
+    {
+        $this->iid = $iid;
+
+        return $this;
     }
 }

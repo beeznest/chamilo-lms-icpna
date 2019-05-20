@@ -42,13 +42,13 @@
 <h1>Chamilo - Server Dependencies</h1>
 
 <h2>Introduction</h2>
-<p>In the ever-evoluting web environment, Chamilo has to rely on
+<p>In the ever-evolving web environment, Chamilo has to rely on
 state-of-the-art third-party software in order to provide you with useful and
 practical features. Some of this third-party software usually come bundled with
 your operating system, but some don't. This means that if that software is
 not installed on your Chamilo server, along with Chamilo, you might not enjoy
 the best possible experience with your Chamilo platform. To avoid this problem,
-most of the sofware we used is bundled into a typical Chamilo installation.</p>
+most of the software we used is bundled into a typical Chamilo installation.</p>
 <p>
 However, if such a third-party software is too big to be included, or if it
 doesn't make sense to include it for whatever reason, you must make sure it is
@@ -62,46 +62,52 @@ We recommend using HTML5-compatible technology.
 <ul>
   <li>PC with a minimum of 512MB or any tablet or smartphone</li>
   <li>We recommend a Pentium-I as a minimum processor capability for PCs</li>
-  <li>Works on Windows XP (SP3 recommended) and later versions, Linux (any version with a graphical interface), Mac OS (any version), FreeBSD, Android, iOS and pretty much any other operating system with a graphical interface you might think about</li>
-  <li>Any modern browser (IE8 and inferior *excluded*).</li>
-  <li>Optional: Flash plugin (only required for a few features like the videoconference plugins)</li>
+  <li>Works on Windows 8 and later versions, Linux (any version with a graphical interface), Mac OSX (any version), FreeBSD, Android, iOS and pretty much any other operating system with a graphical interface you might think about</li>
+  <li>Any modern browser (IE10 and inferior *excluded*).</li>
+  <li>Optional: Flash plugin (only required if WebRTC is not supported by your browser)</li>
   <li>Optional: Java applet capability (only required for some plugins)</li>
 </ul>
 
 <h2>Dependencies - server-side</h2>
 <ul>
   <li>Apache 2+</li>
-  <li> PHP 5.5 or higher with MySQL bindings (mysqlnd is recommended) and php-gd extension to allow Chamilo to resize pictures. Now also supports PHP 7.0</li>
-  <li>MySQL 5.1+ or any version of MariaDB database server</li>
-  <li>php5-intl package (for international behaviour support)</li>
-  <li>php5-mbstring package (for international behaviour support)</li>
-  <li>php5-imagick</li>
-  <li>php5-curl (only required for a feature in the links tool and an optional installer check)</li>
-  <li>php5-mcrypt (only required for a feature in the survey tool)</li>
-  <li>php5-ldap (only required for connection to a LDAP server)</li>
-  <li>php5-xapian (only required for full-text indexing and search)</li>
+  <li>PHP 5.6 with MySQL bindings or PHP 7.1, 7.2 or 7.3. PHP 7.0 is not supported for this version of Chamilo.</li>
+  <li>MySQL 5.6+ or any version of MariaDB database server</li>
+  <li>php-curl</li>
+  <li>php-dom (usually available by default)</li>
+  <li>php-fileinfo (usually available by default)</li>
+  <li>php-gd or php-imagick (for images resizing/cropping)</li>
+  <li>php-intl (for international behaviour support)</li>
+  <li>php-json</li>
+  <li>php-mbstring</li>
+  <li>php-mysql</li>
+  <li>php-soap (for web services)</li>
+  <li>php-xml</li>
+  <li>php-zip</li>
+  <li>php-ldap (only required for connection to a LDAP server)</li>
 </ul><br />
 <a name="included_dependencies"></a>
 <h2>Included Dependencies</h2>
 <ul>
   <li>EZpdf and MPDF</li>
-  <li>FCKEditor (previously HTMLArea) </li>
-  <li>FormValidator </li>
+  <li>CKEditor (previously FCKeditor, previously HTMLArea) </li>
+  <li>FormValidator (own version)</li>
   <li>iCalCreator</li>
-  <li>kSes </li>
-  <li>MIMETex </li>
-  <li>MP3Player </li>
-  <li>PCLZip </li>
-  <li>PEAR::HTML_Common </li>
-  <li>PEAR::HTML_QuickForm </li>
+  <li>kSes</li>
+  <li>mathjax</li>
+  <li>MIMETex</li>
+  <li>MP3Player</li>
+  <li>Mediaplayer</li>
+  <li>PCLZip</li>
+  <li>PEAR::HTML_Common</li>
+  <li>PEAR::HTML_QuickForm</li>
   <li>PEAR::HTML_Table</li>
   <li>PEAR::OLE</li>
   <li>PEAR::Pager</li>
   <li>PEAR::Spreadsheet_Excel_Writer</li>
-  <li>PECL</li>
-  <li>PHPMailer </li>
+  <li>PHPMailer</li>
   <li>WCAG_Rendering</li>
-  <li>xajax </li>
+  <li>xajax</li>
   <li>jQuery</li>
   <li>Others (see composer.json)</li>
 </ul>
@@ -133,6 +139,11 @@ ensure all components are installed by an expert in the field.<br />
     <li>BigBlueButton videoconference
       <ul>
         <li>bigbluebutton</li>
+      </ul>
+    </li>
+    <li>Resources sequencing
+      <ul>
+        <li>graphviz (only required for resources sequencing - for sessions etc)</li>
       </ul>
     </li>
   </ul>

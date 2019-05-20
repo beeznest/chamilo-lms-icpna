@@ -4,28 +4,27 @@
 namespace Chamilo\CoreBundle\Entity\Repository;
 
 use Chamilo\CoreBundle\Entity\Course;
-use Chamilo\CoreBundle\Entity\Group;
 use Chamilo\CoreBundle\Entity\Session;
 use Chamilo\CourseBundle\Entity\CItemProperty;
+use Chamilo\UserBundle\Entity\Group;
+use Chamilo\UserBundle\Entity\User;
 use Doctrine\ORM\EntityRepository;
 
 /**
- * Class ItemPropertyRepository
- *
+ * Class ItemPropertyRepository.
  */
 class ItemPropertyRepository extends EntityRepository
 {
     /**
+     * Get users subscribed to a item LP, Document, etc (item_property).
      *
-     * Get users subscribed to a item LP, Document, etc (item_property)
-     *
-     * @param $tool learnpath | document | etc
-     * @param $itemId
-     * @param Course $course
+     * @param string  $tool    learnpath | document | etc
+     * @param int     $itemId
+     * @param Course  $course
      * @param Session $session
-     * @param Group $group
+     * @param Group   $group
      *
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return array
      */
     public function getUsersSubscribedToItem(
         $tool,
@@ -34,24 +33,26 @@ class ItemPropertyRepository extends EntityRepository
         Session $session = null,
         Group $group = null
     ) {
-        $criteria = array(
+        $criteria = [
             'tool' => $tool,
             'lasteditType' => 'LearnpathSubscription',
             'ref' => $itemId,
             'course' => $course,
             'session' => $session,
             'group' => $group,
-        );
+        ];
 
         return $this->findBy($criteria);
     }
 
     /**
-     * Get Groups subscribed to a item: LP, Doc, etc
-     * @param $tool learnpath | document | etc
-     * @param $itemId
-     * @param Course $course
+     * Get Groups subscribed to a item: LP, Doc, etc.
+     *
+     * @param string  $tool    learnpath | document | etc
+     * @param int     $itemId
+     * @param Course  $course
      * @param Session $session
+     *
      * @return array
      */
     public function getGroupsSubscribedToItem(
@@ -60,26 +61,27 @@ class ItemPropertyRepository extends EntityRepository
         Course $course,
         Session $session = null
     ) {
-        $criteria = array(
+        $criteria = [
             'tool' => $tool,
             'lasteditType' => 'LearnpathSubscription',
             'ref' => $itemId,
             'course' => $course,
             'session' => $session,
             'toUser' => null,
-        );
+        ];
 
         return $this->findBy($criteria);
     }
 
     /**
-     * Subscribe groups to a LP, doc (itemproperty)
-     * @param User $currentUser
-     * @param $tool learnpath | document | etc
-     * @param Course $course
+     * Subscribe groups to a LP, doc (itemproperty).
+     *
+     * @param User    $currentUser
+     * @param string  $tool        learnpath | document | etc
+     * @param Course  $course
      * @param Session $session
-     * @param $itemId
-     * @param array $newList
+     * @param int     $itemId
+     * @param array   $newList
      */
     public function subscribeGroupsToItem(
         $currentUser,
@@ -87,7 +89,7 @@ class ItemPropertyRepository extends EntityRepository
         Course $course,
         Session $session = null,
         $itemId,
-        $newList = array()
+        $newList = []
     ) {
         $em = $this->getEntityManager();
         $groupsSubscribedToItem = $this->getGroupsSubscribedToItem(
@@ -97,7 +99,7 @@ class ItemPropertyRepository extends EntityRepository
             $session
         );
 
-        $alreadyAdded = array();
+        $alreadyAdded = [];
         if ($groupsSubscribedToItem) {
             /** @var CItemProperty $itemProperty */
             foreach ($groupsSubscribedToItem as $itemProperty) {
@@ -138,35 +140,20 @@ class ItemPropertyRepository extends EntityRepository
                 $item->setVisibility('1');
                 $em->persist($item); //$em is an instance of EntityManager
             }
-
-            //Adding users from this group to the item
-            /*$users = \GroupManager::getStudentsAndTutors($groupId);
-            $newUserList = array();
-            if (!empty($users)) {
-                foreach ($users as $user) {
-                    $newUserList[] = $user['user_id'];
-                }
-                $this->subscribeUsersToItem(
-                    $currentUser,
-                    'learnpath',
-                    $course,
-                    $session,
-                    $itemId,
-                    $newUserList
-                );
-            }*/
         }
 
         $em->flush();
     }
 
     /**
-     * Unsubscribe groups to item
-     * @param $tool
-     * @param Course $course
+     * Unsubscribe groups to item.
+     *
+     * @param string  $tool
+     * @param Course  $course
      * @param Session $session
-     * @param $itemId
-     * @param $groups
+     * @param int     $itemId
+     * @param array   $groups
+     * @param bool    $unsubscribeUserToo
      */
     public function unsubscribeGroupsToItem(
         $tool,
@@ -180,12 +167,12 @@ class ItemPropertyRepository extends EntityRepository
             $em = $this->getEntityManager();
 
             foreach ($groups as $groupId) {
-                $item = $this->findOneBy(array(
+                $item = $this->findOneBy([
                     'tool' => $tool,
                     'session' => $session,
                     'ref' => $itemId,
                     'group' => $groupId,
-                ));
+                ]);
                 if ($item) {
                     $em->remove($item);
                 }
@@ -193,7 +180,7 @@ class ItemPropertyRepository extends EntityRepository
                 if ($unsubscribeUserToo) {
                     //Adding users from this group to the item
                     $users = \GroupManager::getStudentsAndTutors($groupId);
-                    $newUserList = array();
+                    $newUserList = [];
                     if (!empty($users)) {
                         foreach ($users as $user) {
                             $newUserList[] = $user['user_id'];
@@ -213,14 +200,14 @@ class ItemPropertyRepository extends EntityRepository
     }
 
     /**
-     * Subscribe users to a LP, doc (itemproperty)
+     * Subscribe users to a LP, doc (itemproperty).
      *
-     * @param User $currentUser
-     * @param $tool
-     * @param Course $course
+     * @param User    $currentUser
+     * @param string  $tool
+     * @param Course  $course
      * @param Session $session
-     * @param $itemId
-     * @param array $newUserList
+     * @param int     $itemId
+     * @param array   $newUserList
      */
     public function subscribeUsersToItem(
         $currentUser,
@@ -228,7 +215,7 @@ class ItemPropertyRepository extends EntityRepository
         Course $course,
         Session $session = null,
         $itemId,
-        $newUserList = array()
+        $newUserList = []
     ) {
         $em = $this->getEntityManager();
         $user = $em->getRepository('ChamiloUserBundle:User');
@@ -240,7 +227,7 @@ class ItemPropertyRepository extends EntityRepository
             $session
         );
 
-        $alreadyAddedUsers = array();
+        $alreadyAddedUsers = [];
         if ($usersSubscribedToItem) {
             /** @var CItemProperty $itemProperty */
             foreach ($usersSubscribedToItem as $itemProperty) {
@@ -288,13 +275,13 @@ class ItemPropertyRepository extends EntityRepository
     }
 
     /**
-     * Unsubscribe users to item
+     * Unsubscribe users to item.
      *
-     * @param $tool
-     * @param Course $course
+     * @param string  $tool
+     * @param Course  $course
      * @param Session $session
-     * @param $itemId
-     * @param $usersToDelete
+     * @param int     $itemId
+     * @param array   $usersToDelete
      */
     public function unsubcribeUsersToItem(
         $tool,
@@ -308,12 +295,12 @@ class ItemPropertyRepository extends EntityRepository
         if (!empty($usersToDelete)) {
             foreach ($usersToDelete as $userId) {
                 $item = $this->findOneBy(
-                    array(
+                    [
                         'tool' => $tool,
                         'session' => $session,
                         'ref' => $itemId,
                         'toUser' => $userId,
-                    )
+                    ]
                 );
                 if ($item) {
                     $em->remove($item);

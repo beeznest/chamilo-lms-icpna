@@ -3,9 +3,9 @@
 
 /**
  * @package chamilo.social
+ *
  * @author Julio Montoya <gugli100@gmail.com>
  */
-
 $cidReset = true;
 require_once __DIR__.'/../inc/global.inc.php';
 
@@ -66,8 +66,8 @@ function hide_icon_delete(element_html)  {
 
 </script>';
 
-$interbreadcrumb[] = array('url' => 'profile.php', 'name' => get_lang('SocialNetwork'));
-$interbreadcrumb[] = array('url' => '#', 'name' => get_lang('Friends'));
+$interbreadcrumb[] = ['url' => 'profile.php', 'name' => get_lang('SocialNetwork')];
+$interbreadcrumb[] = ['url' => '#', 'name' => get_lang('Friends')];
 
 //Block Social Menu
 $social_menu_block = SocialManager::show_social_menu('friends');
@@ -76,9 +76,9 @@ $name_search = isset($_POST['search_name_q']) ? $_POST['search_name_q'] : null;
 $number_friends = 0;
 
 if (isset($name_search) && $name_search != 'undefined') {
-    $friends = SocialManager::get_friends($user_id, null, $name_search);
+    $friends = SocialManager::get_friends($user_id, USER_RELATION_TYPE_FRIEND, $name_search);
 } else {
-    $friends = SocialManager::get_friends($user_id);
+    $friends = SocialManager::get_friends($user_id, USER_RELATION_TYPE_FRIEND);
 }
 
 $social_right_content = '<div class="col-md-12">';
@@ -103,7 +103,7 @@ if (count($friends) == 0) {
         false,
         [
             'onkeyup' => 'search_image_social()',
-            'id' => 'id_search_image'
+            'id' => 'id_search_image',
         ]
     );
 
@@ -119,7 +119,7 @@ if (count($friends) == 0) {
             if (isset($friends[$j])) {
                 $friend = $friends[$j];
                 $toolBar = '<button class="btn btn-danger" onclick="delete_friend(this)" id=img_'.$friend['friend_user_id'].'>
-                    ' . get_lang('Delete').'
+                    '.get_lang('Delete').'
                 </button>';
                 $url = api_get_path(WEB_PATH).'main/social/profile.php?u='.$friend['friend_user_id'];
                 $friend['user_info']['complete_name'] = Display::url($friend['user_info']['complete_name'], $url);

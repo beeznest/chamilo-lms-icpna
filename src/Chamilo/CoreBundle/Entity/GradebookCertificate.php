@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * GradebookCertificate
+ * GradebookCertificate.
  *
  * @ORM\Table(name="gradebook_certificate", indexes={@ORM\Index(name="idx_gradebook_certificate_category_id", columns={"cat_id"}), @ORM\Index(name="idx_gradebook_certificate_user_id", columns={"user_id"}), @ORM\Index(name="idx_gradebook_certificate_category_id_user_id", columns={"cat_id", "user_id"})})
  * @ORM\Entity
@@ -14,53 +14,54 @@ use Doctrine\ORM\Mapping as ORM;
 class GradebookCertificate
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="bigint")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $id;
+    protected $id;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="cat_id", type="integer", nullable=false)
      */
-    private $catId;
+    protected $catId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="user_id", type="integer", nullable=false)
      */
-    private $userId;
+    protected $userId;
 
     /**
      * @var float
      *
      * @ORM\Column(name="score_certificate", type="float", precision=10, scale=0, nullable=false)
      */
-    private $scoreCertificate;
+    protected $scoreCertificate;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=false)
      */
-    private $createdAt;
+    protected $createdAt;
 
     /**
      * @var string
      *
      * @ORM\Column(name="path_certificate", type="text", nullable=true)
      */
-    private $pathCertificate;
+    protected $pathCertificate;
 
     /**
-     * Set catId
+     * Set catId.
      *
-     * @param integer $catId
+     * @param int $catId
+     *
      * @return GradebookCertificate
      */
     public function setCatId($catId)
@@ -71,9 +72,9 @@ class GradebookCertificate
     }
 
     /**
-     * Get catId
+     * Get catId.
      *
-     * @return integer
+     * @return int
      */
     public function getCatId()
     {
@@ -81,9 +82,10 @@ class GradebookCertificate
     }
 
     /**
-     * Set userId
+     * Set userId.
      *
-     * @param integer $userId
+     * @param int $userId
+     *
      * @return GradebookCertificate
      */
     public function setUserId($userId)
@@ -94,9 +96,9 @@ class GradebookCertificate
     }
 
     /**
-     * Get userId
+     * Get userId.
      *
-     * @return integer
+     * @return int
      */
     public function getUserId()
     {
@@ -104,9 +106,10 @@ class GradebookCertificate
     }
 
     /**
-     * Set scoreCertificate
+     * Set scoreCertificate.
      *
      * @param float $scoreCertificate
+     *
      * @return GradebookCertificate
      */
     public function setScoreCertificate($scoreCertificate)
@@ -117,7 +120,7 @@ class GradebookCertificate
     }
 
     /**
-     * Get scoreCertificate
+     * Get scoreCertificate.
      *
      * @return float
      */
@@ -127,9 +130,10 @@ class GradebookCertificate
     }
 
     /**
-     * Set createdAt
+     * Set createdAt.
      *
      * @param \DateTime $createdAt
+     *
      * @return GradebookCertificate
      */
     public function setCreatedAt($createdAt)
@@ -140,7 +144,7 @@ class GradebookCertificate
     }
 
     /**
-     * Get createdAt
+     * Get createdAt.
      *
      * @return \DateTime
      */
@@ -150,9 +154,10 @@ class GradebookCertificate
     }
 
     /**
-     * Set pathCertificate
+     * Set pathCertificate.
      *
      * @param string $pathCertificate
+     *
      * @return GradebookCertificate
      */
     public function setPathCertificate($pathCertificate)
@@ -163,7 +168,7 @@ class GradebookCertificate
     }
 
     /**
-     * Get pathCertificate
+     * Get pathCertificate.
      *
      * @return string
      */
@@ -173,9 +178,9 @@ class GradebookCertificate
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {

@@ -6,7 +6,7 @@ namespace Chamilo\CourseBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CWikiMailcue
+ * CWikiMailcue.
  *
  * @ORM\Table(
  *  name="c_wiki_mailcue",
@@ -21,60 +21,61 @@ use Doctrine\ORM\Mapping as ORM;
 class CWikiMailcue
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="iid", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $iid;
+    protected $iid;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer")
      */
-    private $cId;
+    protected $cId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer", nullable=true)
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
      *
      * @ORM\Column(name="type", type="text", nullable=false)
      */
-    private $type;
+    protected $type;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="group_id", type="integer", nullable=true)
      */
-    private $groupId;
+    protected $groupId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="session_id", type="integer", nullable=true)
      */
-    private $sessionId;
+    protected $sessionId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="user_id", type="integer")
      */
-    private $userId;
+    protected $userId;
 
     /**
-     * Set type
+     * Set type.
      *
      * @param string $type
+     *
      * @return CWikiMailcue
      */
     public function setType($type)
@@ -85,7 +86,7 @@ class CWikiMailcue
     }
 
     /**
-     * Get type
+     * Get type.
      *
      * @return string
      */
@@ -95,9 +96,10 @@ class CWikiMailcue
     }
 
     /**
-     * Set groupId
+     * Set groupId.
      *
-     * @param integer $groupId
+     * @param int $groupId
+     *
      * @return CWikiMailcue
      */
     public function setGroupId($groupId)
@@ -108,9 +110,9 @@ class CWikiMailcue
     }
 
     /**
-     * Get groupId
+     * Get groupId.
      *
-     * @return integer
+     * @return int
      */
     public function getGroupId()
     {
@@ -118,9 +120,10 @@ class CWikiMailcue
     }
 
     /**
-     * Set sessionId
+     * Set sessionId.
      *
-     * @param integer $sessionId
+     * @param int $sessionId
+     *
      * @return CWikiMailcue
      */
     public function setSessionId($sessionId)
@@ -131,9 +134,9 @@ class CWikiMailcue
     }
 
     /**
-     * Get sessionId
+     * Get sessionId.
      *
-     * @return integer
+     * @return int
      */
     public function getSessionId()
     {
@@ -141,9 +144,10 @@ class CWikiMailcue
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return CWikiMailcue
      */
     public function setCId($cId)
@@ -154,9 +158,9 @@ class CWikiMailcue
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {
@@ -164,9 +168,10 @@ class CWikiMailcue
     }
 
     /**
-     * Set id
+     * Set id.
      *
-     * @param integer $id
+     * @param int $id
+     *
      * @return CWikiMailcue
      */
     public function setId($id)
@@ -177,9 +182,9 @@ class CWikiMailcue
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -187,9 +192,10 @@ class CWikiMailcue
     }
 
     /**
-     * Set userId
+     * Set userId.
      *
-     * @param integer $userId
+     * @param int $userId
+     *
      * @return CWikiMailcue
      */
     public function setUserId($userId)
@@ -200,12 +206,32 @@ class CWikiMailcue
     }
 
     /**
-     * Get userId
+     * Get userId.
      *
-     * @return integer
+     * @return int
      */
     public function getUserId()
     {
         return $this->userId;
+    }
+
+    /**
+     * @return int
+     */
+    public function getIid()
+    {
+        return $this->iid;
+    }
+
+    /**
+     * @param int $iid
+     *
+     * @return CWikiMailcue
+     */
+    public function setIid($iid)
+    {
+        $this->iid = $iid;
+
+        return $this;
     }
 }

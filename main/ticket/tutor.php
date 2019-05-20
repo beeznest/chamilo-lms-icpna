@@ -9,12 +9,12 @@ require_once __DIR__.'/../inc/global.inc.php';
 require_once __DIR__.'/tutor_report.lib.php';
 
 $htmlHeadXtra[] = '<script>
-$(document).ready(function (){
+$(function() {
     $(".ajax").click(function() {
         var url     = this.href;
         var dialog  = $("#dialog");
         if ($("#dialog").length == 0) {
-                dialog  = $("' . '<div id="dialog" style="display:hidden"></div>'.'").appendTo("body");
+                dialog  = $("'.'<div id="dialog" style="display:hidden"></div>'.'").appendTo("body");
         }
 
         // load remote content
@@ -52,8 +52,8 @@ function save() {
 	rs_id = $("#rs_id").val();
 	 $.ajax({
 		contentType: "application/x-www-form-urlencoded",
-		beforeSend: function(objeto) {
-		$("div#confirmation").html("<img src=\"' . api_get_path(WEB_LIBRARY_PATH).'javascript/indicator.gif\" />"); },
+		beforeSend: function(myObject) {
+		$("div#confirmation").html("<img src=\"'.api_get_path(WEB_LIBRARY_PATH).'javascript/indicator.gif\" />"); },
 		type: "POST",
 		url: "update_report.php",
 		data: "work_id="+work_id+"&forum_id="+forum_id+"&rs_id="+rs_id,

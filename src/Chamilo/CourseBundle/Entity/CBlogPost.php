@@ -5,7 +5,7 @@ namespace Chamilo\CourseBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CBlogPost
+ * CBlogPost.
  *
  * @ORM\Table(
  *  name="c_blog_post",
@@ -18,67 +18,68 @@ use Doctrine\ORM\Mapping as ORM;
 class CBlogPost
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="iid", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $iid;
+    protected $iid;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="blog_id", type="integer", nullable=false)
      */
-    private $blogId;
+    protected $blogId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer")
      */
-    private $cId;
+    protected $cId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="title", type="string", length=250, nullable=false)
      */
-    private $title;
+    protected $title;
 
     /**
      * @var string
      *
      * @ORM\Column(name="full_text", type="text", nullable=false)
      */
-    private $fullText;
+    protected $fullText;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="date_creation", type="datetime", nullable=false)
      */
-    private $dateCreation;
+    protected $dateCreation;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="author_id", type="integer", nullable=false)
      */
-    private $authorId;
+    protected $authorId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="post_id", type="integer")
      */
-    private $postId;
+    protected $postId;
 
     /**
-     * Set title
+     * Set title.
      *
      * @param string $title
+     *
      * @return CBlogPost
      */
     public function setTitle($title)
@@ -89,7 +90,7 @@ class CBlogPost
     }
 
     /**
-     * Get title
+     * Get title.
      *
      * @return string
      */
@@ -99,9 +100,10 @@ class CBlogPost
     }
 
     /**
-     * Set fullText
+     * Set fullText.
      *
      * @param string $fullText
+     *
      * @return CBlogPost
      */
     public function setFullText($fullText)
@@ -112,7 +114,7 @@ class CBlogPost
     }
 
     /**
-     * Get fullText
+     * Get fullText.
      *
      * @return string
      */
@@ -122,9 +124,10 @@ class CBlogPost
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
+     *
      * @return CBlogPost
      */
     public function setDateCreation($dateCreation)
@@ -135,7 +138,7 @@ class CBlogPost
     }
 
     /**
-     * Get dateCreation
+     * Get dateCreation.
      *
      * @return \DateTime
      */
@@ -145,9 +148,10 @@ class CBlogPost
     }
 
     /**
-     * Set blogId
+     * Set blogId.
      *
-     * @param integer $blogId
+     * @param int $blogId
+     *
      * @return CBlogPost
      */
     public function setBlogId($blogId)
@@ -158,9 +162,9 @@ class CBlogPost
     }
 
     /**
-     * Get blogId
+     * Get blogId.
      *
-     * @return integer
+     * @return int
      */
     public function getBlogId()
     {
@@ -168,9 +172,10 @@ class CBlogPost
     }
 
     /**
-     * Set authorId
+     * Set authorId.
      *
-     * @param integer $authorId
+     * @param int $authorId
+     *
      * @return CBlogPost
      */
     public function setAuthorId($authorId)
@@ -181,9 +186,9 @@ class CBlogPost
     }
 
     /**
-     * Get authorId
+     * Get authorId.
      *
-     * @return integer
+     * @return int
      */
     public function getAuthorId()
     {
@@ -191,9 +196,10 @@ class CBlogPost
     }
 
     /**
-     * Set postId
+     * Set postId.
      *
-     * @param integer $postId
+     * @param int $postId
+     *
      * @return CBlogPost
      */
     public function setPostId($postId)
@@ -204,9 +210,9 @@ class CBlogPost
     }
 
     /**
-     * Get postId
+     * Get postId.
      *
-     * @return integer
+     * @return int
      */
     public function getPostId()
     {
@@ -214,9 +220,10 @@ class CBlogPost
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return CBlogPost
      */
     public function setCId($cId)
@@ -227,9 +234,9 @@ class CBlogPost
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {

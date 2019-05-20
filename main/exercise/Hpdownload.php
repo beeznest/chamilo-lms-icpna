@@ -2,18 +2,24 @@
 /* For licensing terms, see /license.txt */
 /**
  * This script shows the list of exercises for administrators and students.
+ *
  * @package chamilo.exercise
+ *
  * @author Istvan Mandak
+ *
  * @version $Id: Hpdownload.php 22201 2009-07-17 19:57:03Z cfasanando $
-*/
+ */
 session_cache_limiter('public');
 
 require_once __DIR__.'/../inc/global.inc.php';
+
+api_protect_course_script(true);
+
 $this_section = SECTION_COURSES;
 
 $tbl_document = Database::get_course_table(TABLE_DOCUMENT);
 
-$doc_url = str_replace(array('../', '\\..', '\\0', '..\\'), array('', '', '', ''), urldecode($_GET['doc_url']));
+$doc_url = str_replace(['../', '\\..', '\\0', '..\\'], ['', '', '', ''], urldecode($_GET['doc_url']));
 $filename = basename($doc_url);
 
 // launch event
@@ -87,12 +93,11 @@ header('Last-Modified: '.gmdate('D, d M Y H:i:s', time() + 10).' GMT');
 if ($content_type == 'text/html') {
     $directory_name = dirname($full_file_name);
     $coursePath = api_get_path(SYS_COURSE_PATH);
-    $dir = str_replace(array('\\', $coursePath.$_course['path'].'/document'), array('/', ''), $directory_name);
+    $dir = str_replace(['\\', $coursePath.$_course['path'].'/document'], ['/', ''], $directory_name);
 
     if ($dir[strlen($dir) - 1] != '/') {
         $dir .= '/';
     }
-
 
     //Parse whole file at one
     $fp = fopen($full_file_name, "r");
@@ -105,9 +110,8 @@ if ($content_type == 'text/html') {
 
     $content = $file_content;
     $mit = "function Finish(){";
-
-    $js_content = "var SaveScoreVariable = 0; // This variable included by Dokeos System\n".
-        "function mySaveScore() // This function included by Dokeos System\n".
+    $js_content = "var SaveScoreVariable = 0; // This variable included by Chamilo\n".
+        "function mySaveScore() // This function included by Chamilo\n".
 "{\n".
 "   if (SaveScoreVariable==0)\n".
 "		{\n".
@@ -144,4 +148,3 @@ if ($content_type == 'text/html') {
 $fp = fopen($full_file_name, 'rb');
 fpassthru($fp);
 fclose($fp);
-

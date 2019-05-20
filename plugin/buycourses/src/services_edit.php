@@ -2,10 +2,10 @@
 /* For license terms, see /license.txt */
 
 /**
- * Create new Services for the Buy Courses plugin
+ * Create new Services for the Buy Courses plugin.
+ *
  * @package chamilo.plugin.buycourses
  */
-
 $cidReset = true;
 
 require_once '../../../main/inc/global.inc.php';
@@ -19,7 +19,7 @@ if (!$serviceId) {
 $plugin = BuyCoursesPlugin::create();
 $currency = $plugin->getSelectedCurrency();
 $em = Database::getManager();
-$users = $em->getRepository('ChamiloUserBundle:User')->findAll();
+$users = UserManager::getRepository()->findAll();
 $userOptions = [];
 if (!empty($users)) {
     foreach ($users as $user) {
@@ -34,15 +34,17 @@ $htmlHeadXtra[] = api_get_asset('cropper/dist/cropper.min.js');
 //view
 $interbreadcrumb[] = [
     'url' => 'configuration.php',
-    'name' => $plugin->get_lang('Configuration')
+    'name' => $plugin->get_lang('Configuration'),
 ];
 
+$globalSettingsParams = $plugin->getGlobalParameters();
 $service = $plugin->getServices($serviceId);
 
 $formDefaultValues = [
     'name' => $service['name'],
     'description' => $service['description'],
     'price' => $service['price'],
+    'tax_perc' => $service['tax_perc'],
     'duration_days' => $service['duration_days'],
     'owner_id' => intval($service['owner_id']),
     'applies_to' => intval($service['applies_to']),
@@ -51,17 +53,23 @@ $formDefaultValues = [
             ? api_get_path(WEB_PLUGIN_PATH).'buycourses/uploads/services/images/simg-'.$serviceId.'.png'
             : api_get_path(WEB_CODE_PATH).'img/session_default.png',
     'video_url' => $service['video_url'],
-    'service_information' => $service['service_information']
+    'service_information' => $service['service_information'],
 ];
 
 $form = new FormValidator('Services');
 $form->addText('name', $plugin->get_lang('ServiceName'));
-$form->addTextarea('description', $plugin->get_lang('Description'));
+$form->addHtmlEditor('description', $plugin->get_lang('Description'));
 $form->addElement(
     'number',
     'price',
     [$plugin->get_lang('Price'), null, $currency['iso_code']],
     ['step' => 0.01]
+);
+$form->addElement(
+    'number',
+    'tax_perc',
+    [$plugin->get_lang('TaxPerc'), $plugin->get_lang('TaxPercDescription'), '%'],
+    ['step' => 1, 'placeholder' => $globalSettingsParams['global_tax_perc'].'% '.$plugin->get_lang('ByDefault')]
 );
 $form->addElement(
     'number',
@@ -113,7 +121,7 @@ $form->addCheckBox('visibility', $plugin->get_lang('VisibleInCatalog'));
 $form->addFile(
     'picture',
     $formDefaultValues['image'] != '' ? get_lang('UpdateImage') : get_lang('AddImage'),
-    array('id' => 'picture', 'class' => 'picture-form', 'crop_image' => true, 'crop_ratio' => '16 / 9')
+    ['id' => 'picture', 'class' => 'picture-form', 'crop_image' => true, 'crop_ratio' => '16 / 9']
 );
 $form->addText('video_url', get_lang('VideoUrl'), false);
 $form->addHtmlEditor('service_information', $plugin->get_lang('ServiceInformation'), false);

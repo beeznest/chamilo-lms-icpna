@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * BranchTransaction
+ * BranchTransaction.
  *
  * @ORM\Table(name="branch_transaction")
  * @ORM\Entity
@@ -14,98 +14,99 @@ use Doctrine\ORM\Mapping as ORM;
 class BranchTransaction
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="bigint", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $id;
+    protected $id;
 
     /**
      * @var Room
      *
      * @ORM\ManyToOne(targetEntity="BranchTransactionStatus")
      * @ORM\JoinColumn(name="status_id", referencedColumnName="id")
-     **/
-    private $branchTransactionStatus;
+     */
+    protected $branchTransactionStatus;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="transaction_id", type="bigint", nullable=false, unique=false)
      */
-    private $externalTransactionId;
+    protected $externalTransactionId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="action", type="string", length=20, nullable=true, unique=false)
      */
-    private $action;
+    protected $action;
 
     /**
      * @var string
      *
      * @ORM\Column(name="item_id", type="string", length=255, nullable=true, unique=false)
      */
-    private $itemId;
+    protected $itemId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="origin", type="string", length=255, nullable=true, unique=false)
      */
-    private $origin;
+    protected $origin;
 
     /**
      * @var string
      *
      * @ORM\Column(name="dest_id", type="string", length=255, nullable=true, unique=false)
      */
-    private $destId;
+    protected $destId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="external_info", type="string", length=255, nullable=true, unique=false)
      */
-    private $externalInfo;
+    protected $externalInfo;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="time_insert", type="datetime", nullable=false, unique=false)
      */
-    private $timeInsert;
+    protected $timeInsert;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="time_update", type="datetime", nullable=false, unique=false)
      */
-    private $timeUpdate;
+    protected $timeUpdate;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="failed_attempts", type="integer", nullable=false, unique=false)
      */
-    private $failedAttempts;
+    protected $failedAttempts;
 
     /**
      * @var BranchSync
      *
-     **/
-    private $branch;
+     * @ORM\ManyToOne(targetEntity="Chamilo\CoreBundle\Entity\BranchSync")
+     * @ORM\JoinColumn(name="branch_id", referencedColumnName="id")
+     */
+    protected $branch;
 
     /**
-     * Set id
+     * Set id.
      *
-     * @param integer $id
+     * @param int $id
      *
      * @return BranchTransaction
-     *
      */
     public function setId($id)
     {
@@ -115,9 +116,9 @@ class BranchTransaction
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -125,9 +126,9 @@ class BranchTransaction
     }
 
     /**
-     * Set transactionId
+     * Set transactionId.
      *
-     * @param integer $transactionId
+     * @param int $transactionId
      *
      * @return BranchTransaction
      */
@@ -139,9 +140,9 @@ class BranchTransaction
     }
 
     /**
-     * Get transactionId
+     * Get transactionId.
      *
-     * @return integer
+     * @return int
      */
     public function getTransactionId()
     {
@@ -149,9 +150,9 @@ class BranchTransaction
     }
 
     /**
-     * Set branchId
+     * Set branchId.
      *
-     * @param integer $branchId
+     * @param int $branchId
      *
      * @return BranchTransaction
      */
@@ -163,9 +164,9 @@ class BranchTransaction
     }
 
     /**
-     * Get branchId
+     * Get branchId.
      *
-     * @return integer
+     * @return int
      */
     public function getBranchId()
     {
@@ -173,7 +174,7 @@ class BranchTransaction
     }
 
     /**
-     * Set action
+     * Set action.
      *
      * @param string $action
      *
@@ -187,7 +188,7 @@ class BranchTransaction
     }
 
     /**
-     * Get action
+     * Get action.
      *
      * @return string
      */
@@ -197,7 +198,7 @@ class BranchTransaction
     }
 
     /**
-     * Set itemId
+     * Set itemId.
      *
      * @param string $itemId
      *
@@ -211,7 +212,7 @@ class BranchTransaction
     }
 
     /**
-     * Get itemId
+     * Get itemId.
      *
      * @return string
      */
@@ -221,7 +222,7 @@ class BranchTransaction
     }
 
     /**
-     * Set destId
+     * Set destId.
      *
      * @param string $destId
      *
@@ -235,7 +236,7 @@ class BranchTransaction
     }
 
     /**
-     * Get destId
+     * Get destId.
      *
      * @return string
      */
@@ -245,7 +246,7 @@ class BranchTransaction
     }
 
     /**
-     * Set timeInsert
+     * Set timeInsert.
      *
      * @param \DateTime $timeInsert
      *
@@ -259,7 +260,7 @@ class BranchTransaction
     }
 
     /**
-     * Get timeInsert
+     * Get timeInsert.
      *
      * @return \DateTime
      */
@@ -269,7 +270,7 @@ class BranchTransaction
     }
 
     /**
-     * Set timeUpdate
+     * Set timeUpdate.
      *
      * @param \DateTime $timeUpdate
      *
@@ -283,7 +284,7 @@ class BranchTransaction
     }
 
     /**
-     * Get timeUpdate
+     * Get timeUpdate.
      *
      * @return \DateTime
      */
@@ -382,6 +383,7 @@ class BranchTransaction
 
     /**
      * @param Room $branchTransactionStatus
+     *
      * @return BranchTransaction
      */
     public function setBranchTransactionStatus($branchTransactionStatus)
@@ -401,6 +403,7 @@ class BranchTransaction
 
     /**
      * @param int $externalTransactionId
+     *
      * @return BranchTransaction
      */
     public function setExternalTransactionId($externalTransactionId)
@@ -409,8 +412,4 @@ class BranchTransaction
 
         return $this;
     }
-
-
-
-
 }

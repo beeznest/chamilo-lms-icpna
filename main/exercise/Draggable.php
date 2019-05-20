@@ -2,7 +2,7 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * Class Draggable
+ * Class Draggable.
  *
  * @author Angel Fernando Quiroz Campos <angel.quiroz@beeznest.com>
  */
@@ -12,7 +12,7 @@ class Draggable extends Question
     public static $explanationLangVar = 'Draggable';
 
     /**
-     * Class constructor
+     * Class constructor.
      */
     public function __construct()
     {
@@ -22,13 +22,13 @@ class Draggable extends Question
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function createAnswersForm($form)
     {
-        $defaults = array();
+        $defaults = [];
         $nb_matches = $nb_options = 2;
-        $matches = array();
+        $matches = [];
         $answer = null;
         if ($form->isSubmitted()) {
             $nb_matches = $form->getSubmitValue('nb_matches');
@@ -55,7 +55,7 @@ class Draggable extends Question
             $answer = new Answer($this->id);
             $answer->read();
 
-            if (count($answer->nbrAnswers) > 0) {
+            if ($answer->nbrAnswers > 0) {
                 $nb_matches = $nb_options = 0;
                 for ($i = 1; $i <= $answer->nbrAnswers; $i++) {
                     if ($answer->isCorrect($i)) {
@@ -79,7 +79,7 @@ class Draggable extends Question
             $defaults['orientation'] = 'h';
         }
 
-        for ($i = 1; $i <= $nb_matches; ++$i) {
+        for ($i = 1; $i <= $nb_matches; $i++) {
             $matches[$i] = $i;
         }
 
@@ -88,7 +88,7 @@ class Draggable extends Question
 
         $form->addRadio(
             'orientation',
-            get_lang('Orientation'),
+            get_lang('ChooseOrientation'),
             ['h' => get_lang('Horizontal'), 'v' => get_lang('Vertical')]
         );
 
@@ -96,9 +96,9 @@ class Draggable extends Question
         $html = '<table class="table table-striped table-hover">
             <thead>
                 <tr>
-                    <th width="85%">' . get_lang('Answer').'</th>
-                    <th width="15%">' . get_lang('MatchesTo').'</th>
-                    <th width="10">' . get_lang('Weighting').'</th>
+                    <th width="85%">'.get_lang('Answer').'</th>
+                    <th width="15%">'.get_lang('MatchesTo').'</th>
+                    <th width="10">'.get_lang('Weighting').'</th>
                 </tr>
             </thead>
             <tbody>';
@@ -111,7 +111,7 @@ class Draggable extends Question
             echo Display::return_message(get_lang('YouHaveToCreateAtLeastOneAnswer'), 'normal');
         }
 
-        for ($i = 1; $i <= $nb_matches; ++$i) {
+        for ($i = 1; $i <= $nb_matches; $i++) {
             $renderer = &$form->defaultRenderer();
             $renderer->setElementTemplate(
                 '<td><!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->{element}</td>',
@@ -148,7 +148,7 @@ class Draggable extends Question
         $group = [
             $form->addButtonDelete(get_lang('DelElem'), 'lessMatches', true),
             $form->addButtonCreate(get_lang('AddElem'), 'moreMatches', true),
-            $form->addButtonSave($text, 'submitQuestion', true)
+            $form->addButtonSave($text, 'submitQuestion', true),
         ];
 
         $form->addGroup($group);
@@ -166,13 +166,13 @@ class Draggable extends Question
         $form->setConstants(
             [
                 'nb_matches' => $nb_matches,
-                'nb_options' => $nb_options
+                'nb_options' => $nb_options,
             ]
         );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function processAnswersCreation($form, $exercise)
     {
@@ -182,13 +182,13 @@ class Draggable extends Question
         $position = 0;
         $objAnswer = new Answer($this->id);
         // Insert the options
-        for ($i = 1; $i <= $nb_matches; ++$i) {
+        for ($i = 1; $i <= $nb_matches; $i++) {
             $position++;
             $objAnswer->createAnswer($position, 0, '', 0, $position);
         }
 
         // Insert the answers
-        for ($i = 1; $i <= $nb_matches; ++$i) {
+        for ($i = 1; $i <= $nb_matches; $i++) {
             $position++;
             $answer = $form->getSubmitValue('answer['.$i.']');
             $matches = $form->getSubmitValue('matches['.$i.']');
@@ -208,16 +208,21 @@ class Draggable extends Question
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function return_header($exercise, $counter = null, $score = null)
     {
         $header = parent::return_header($exercise, $counter, $score);
-        $header .= '<table class="'.$this->question_table_class.'">
-            <tr>
-                <th>' . get_lang('ElementList').'</th>
-                <th>' . get_lang('Status').'</th>
-            </tr>';
+        $header .= '<table class="'.$this->question_table_class.'"><tr>';
+
+        if ($exercise->showExpectedChoice()) {
+            $header .= '<th>'.get_lang('YourChoice').'</th>';
+            $header .= '<th>'.get_lang('ExpectedChoice').'</th>';
+        } else {
+            $header .= '<th>'.get_lang('ElementList').'</th>';
+        }
+        $header .= '<th>'.get_lang('Status').'</th>';
+        $header .= '</tr>';
 
         return $header;
     }

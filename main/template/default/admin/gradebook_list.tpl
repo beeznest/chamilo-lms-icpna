@@ -1,4 +1,4 @@
-{% extends template ~ "/layout/layout_1_col.tpl" %}
+{% extends 'layout/layout_1_col.tpl'|get_template %}
 
 {% block content %}
     {{ form }}
@@ -15,7 +15,7 @@
         {% for item in gradebook_list %}
             <tr>
                 <td>
-                    {{ item.name }}
+                    {{ item.name | e }}
                 </td>
                 <td>
                     {{ item.courseCode }}

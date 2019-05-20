@@ -2,22 +2,23 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * The only usage of this script is to have a portable way of keeping the list of content makers
+ * The only usage of this script is to have a portable way of keeping the list of content makers.
+ *
  * @package chamilo.learnpath
+ *
  * @author Yannick Warnier <yannick.warnier@beeznest.com>
  */
-
-$content_origins = array(
+$content_origins = [
     '--'.get_lang('GenericScorm').'--',
     '--'.get_lang('Other').'--',
     'Accent',
     'Accenture',
     'ADLNet',
-      'Articulate',
-      'ATutor',
-      'Blackboard',
-      'Calfat',
-      'Captivate',
+    'Articulate',
+    'ATutor',
+    'Blackboard',
+    'Calfat',
+    'Captivate',
     'Chamilo',
     'Chamilo 2',
     'Claroline',
@@ -48,5 +49,5 @@ $content_origins = array(
     'Thomson-NETg',
     'U&I Learning',
     'Udutu',
-    'WebCT'
-);
+    'WebCT',
+];

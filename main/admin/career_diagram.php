@@ -1,7 +1,7 @@
 <?php
 /* For licensing terms, see /license.txt */
 
-use ChamiloSession as Session;
+use Fhaculty\Graph\Graph;
 
 /**
  *  @package chamilo.admin
@@ -25,7 +25,8 @@ if (api_get_configuration_value('allow_career_diagram') == false) {
 
 $this_section = SECTION_PLATFORM_ADMIN;
 
-api_protect_admin_script();
+$allowCareer = api_get_configuration_value('allow_session_admin_read_careers');
+api_protect_admin_script($allowCareer);
 
 $htmlHeadXtra[] = api_get_js('jsplumb2.js');
 
@@ -41,30 +42,30 @@ if (empty($careerInfo)) {
 }
 
 // setting breadcrumbs
-$interbreadcrumb[] = array(
+$interbreadcrumb[] = [
     'url' => 'index.php',
     'name' => get_lang('PlatformAdmin'),
-);
-$interbreadcrumb[] = array(
+];
+$interbreadcrumb[] = [
     'url' => 'career_dashboard.php',
     'name' => get_lang('CareersAndPromotions'),
-);
+];
 
-$interbreadcrumb[] = array(
+$interbreadcrumb[] = [
     'url' => 'careers.php',
     'name' => get_lang('Careers'),
-);
+];
 
-$action = isset($_GET['action']) ? $_GET['action'] : null;
+$action = isset($_GET['action']) ? $_GET['action'] : '';
 $check = Security::check_token('request');
 $token = Security::get_token();
 
 if ($action == 'add') {
-    $interbreadcrumb[] = array('url' => 'careers.php', 'name' => get_lang('Careers'));
+    $interbreadcrumb[] = ['url' => 'careers.php', 'name' => get_lang('Careers')];
     $toolName = get_lang('Add');
 } elseif ($action == 'edit') {
-    $interbreadcrumb[] = array('url' => 'careers.php', 'name' => get_lang('Careers'));
-    $interbreadcrumb[] = array('url' => '#', 'name' => get_lang('Edit'));
+    $interbreadcrumb[] = ['url' => 'careers.php', 'name' => get_lang('Careers')];
+    $interbreadcrumb[] = ['url' => '#', 'name' => get_lang('Edit')];
     $toolName = get_lang('Edit');
 } else {
     $toolName = get_lang('Careers');
@@ -79,11 +80,46 @@ $item = $extraFieldValue->get_values_by_handler_and_field_variable(
     false
 );
 
-if (!empty($item) && isset($item['value']) && !empty($item['value'])) {
-    $graph = unserialize($item['value']);
-    $tpl = new Template(get_lang('Diagram'));
-    $html = Display::page_subheader2($careerInfo['name']);
-    $html .= Career::renderDiagram($careerInfo, $graph);
-    $tpl->assign('content', $html);
-    $tpl->display_one_col_template();
+// Check urls
+$itemUrls = $extraFieldValue->get_values_by_handler_and_field_variable(
+    $careerId,
+    'career_urls',
+    false,
+    false,
+    false
+);
+
+$urlToString = '';
+if (!empty($itemUrls) && !empty($itemUrls['value'])) {
+    $urls = explode(',', $itemUrls['value']);
+    $urlToString = '&nbsp;&nbsp;';
+    if (!empty($urls)) {
+        foreach ($urls as $urlData) {
+            $urlData = explode('@', $urlData);
+            if (isset($urlData[1])) {
+                $urlToString .= Display::url($urlData[0], $urlData[1]).'&nbsp;';
+            } else {
+                $urlToString .= $urlData[0].'&nbsp;';
+            }
+        }
+    }
 }
+
+$tpl = new Template(get_lang('Diagram'));
+$html = Display::page_subheader2($careerInfo['name'].$urlToString);
+if (!empty($item) && isset($item['value']) && !empty($item['value'])) {
+    /** @var Graph $graph */
+    $graph = UnserializeApi::unserialize('career', $item['value']);
+    $html .= Career::renderDiagramByColumn($graph, $tpl);
+} else {
+    Display::addFlash(
+        Display::return_message(
+            sprintf(get_lang('CareerXDoesntHaveADiagram'), $careerInfo['name']),
+            'warning'
+        )
+    );
+}
+
+$tpl->assign('content', $html);
+$layout = $tpl->get_template('career/diagram.tpl');
+$tpl->display($layout);

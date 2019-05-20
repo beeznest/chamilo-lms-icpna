@@ -4,50 +4,53 @@
 namespace Chamilo\CourseBundle\Component\CourseCopy\Resources;
 
 /**
- * Event backup script
+ * Event backup script.
+ *
  * @author Bart Mollet <bart.mollet@hogent.be>
+ *
  * @package chamilo.backup
  */
 class CalendarEvent extends Resource
 {
     /**
-     * The title
+     * The title.
      */
     public $title;
     /**
-     * The content
+     * The content.
      */
     public $content;
     /**
-     * The start date
+     * The start date.
      */
     public $start_date;
     /**
-     * The end date
+     * The end date.
      */
     public $end_date;
     /**
-     * The attachment path
+     * The attachment path.
      */
     public $attachment_path;
 
     /**
-     * The attachment filename
+     * The attachment filename.
      */
     public $attachment_filename;
     /**
-     * The attachment size
+     * The attachment size.
      */
     public $attachment_size;
 
     /**
-     * The attachment comment
+     * The attachment comment.
      */
     public $attachment_comment;
 
     /**
-     * Create a new Event
-     * @param int $id
+     * Create a new Event.
+     *
+     * @param int    $id
      * @param string $title
      * @param string $content
      */
@@ -70,7 +73,6 @@ class CalendarEvent extends Resource
         $this->start_date = $start_date;
         $this->end_date = $end_date;
         $this->all_day = $all_day;
-
         $this->attachment_path = $attachment_path;
         $this->attachment_filename = $attachment_filename;
         $this->attachment_size = $attachment_size;
@@ -78,7 +80,7 @@ class CalendarEvent extends Resource
     }
 
     /**
-     * Show this Event
+     * Show this Event.
      */
     public function show()
     {

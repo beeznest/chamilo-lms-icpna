@@ -2,17 +2,17 @@
 /* For licensing terms, see /license.txt */
 /**
  * @package chamilo.webservices
+ *
  * @author Francis Gonzales
  */
-
 require_once __DIR__.'/../inc/global.inc.php';
-$libpath = api_get_path(LIBRARY_PATH);
 
 /**
  * Function to convert from ppt to png
- * This function is used from Chamilo Rapid Lesson
+ * This function is used from Chamilo Rapid Lesson.
  *
  * @param array $pptData
+ *
  * @return string
  */
 function wsConvertPpt($pptData)
@@ -45,7 +45,7 @@ function wsConvertPpt($pptData)
     //$perms = api_get_permissions_for_new_directories();
     // Set permissions the most permissively possible: these files will
     // be deleted below and we need a parallel process to be able to write them
-    $perms = 0777;
+    $perms = api_get_permissions_for_new_directories();
     pptConverterDirectoriesCreate($tempPath, $tempPathNewFiles, $fileName, $perms);
 
     $file = base64_decode($fileData);
@@ -57,23 +57,23 @@ function wsConvertPpt($pptData)
     //$perms = api_get_permissions_for_new_files();
     chmod($tempPathNewFiles.$fileName, $perms);
 
-    $files = array();
+    $files = [];
     $return = 0;
     $shell = exec($cmd, $files, $return);
     umask($oldumask);
 
     if ($return === 0) {
-        $images = array();
+        $images = [];
         if (is_array($files) && !empty($files)) {
             foreach ($files as $file) {
                 $imageData = explode('||', $file);
                 $images[$imageData[1]] = base64_encode(file_get_contents($tempPathNewFiles.$fileName.'/'.$imageData[1]));
             }
         }
-        $data = array(
+        $data = [
             'files' => $files,
-            'images' => $images
-        );
+            'images' => $images,
+        ];
 
         deleteDirectory($tempPath);
         deleteDirectory($tempPathNewFiles);
@@ -89,11 +89,12 @@ function wsConvertPpt($pptData)
 
 /**
  * @param $directoryPath
+ *
  * @return bool
  */
 function deleteDirectory($directoryPath)
 {
-    $files = array_diff(scandir($directoryPath), array('.', '..'));
+    $files = array_diff(scandir($directoryPath), ['.', '..']);
     foreach ($files as $file) {
         if (is_dir("$directoryPath/$file")) {
             deleteDirectory("$directoryPath/$file");
@@ -106,12 +107,12 @@ function deleteDirectory($directoryPath)
 }
 
 /**
- * Helper function to create the directory structure for the PPT converter
+ * Helper function to create the directory structure for the PPT converter.
+ *
  * @param string $tempPath
  * @param string $tempPathNewFiles
  * @param string $fileName
  * @param string $perms
- * @return void
  */
 function pptConverterDirectoriesCreate($tempPath, $tempPathNewFiles, $fileName, $perms)
 {
@@ -127,7 +128,8 @@ function pptConverterDirectoriesCreate($tempPath, $tempPathNewFiles, $fileName, 
 }
 
 /**
- * Helper function to build the command line parameters for the converter
+ * Helper function to build the command line parameters for the converter.
+ *
  * @return string $cmd
  */
 function pptConverterGetCommandBaseParams()
@@ -143,17 +145,17 @@ function pptConverterGetCommandBaseParams()
     }
 
     $cmd .= ' -p '.api_get_setting('service_ppt2lp', 'port');
+
     return $cmd;
 }
 
-
 $webPath = api_get_path(WEB_PATH);
 $webCodePath = api_get_path(WEB_CODE_PATH);
-$options = array(
+$options = [
     'uri' => $webPath,
-    'location' => $webCodePath.'webservices/additional_webservices.php'
-);
+    'location' => $webCodePath.'webservices/additional_webservices.php',
+];
 
-$soapServer = new SoapServer(NULL, $options);
+$soapServer = new SoapServer(null, $options);
 $soapServer->addFunction('wsConvertPpt');
 $soapServer->handle();

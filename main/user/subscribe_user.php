@@ -1,15 +1,15 @@
 <?php
 /* For licensing terms, see /license.txt*/
 
-use \ExtraField as ExtraFieldModel;
 use Chamilo\CoreBundle\Entity\ExtraField;
+use ExtraField as ExtraFieldModel;
 
 /**
-* This script allows teachers to subscribe existing users
-* to their course.
-* @package chamilo.user
-*/
-
+ * This script allows teachers to subscribe existing users
+ * to their course.
+ *
+ * @package chamilo.user
+ */
 require_once __DIR__.'/../inc/global.inc.php';
 $current_course_tool = TOOL_USER;
 
@@ -30,26 +30,26 @@ if (!api_is_allowed_to_edit()) {
     api_not_allowed(true);
 }
 
-$tool_name = get_lang("SubscribeUserToCourse");
+$tool_name = get_lang('SubscribeUserToCourse');
 $type = isset($_REQUEST['type']) ? intval($_REQUEST['type']) : STUDENT;
 $keyword = isset($_REQUEST['keyword']) ? Security::remove_XSS($_REQUEST['keyword']) : null;
 
 $courseInfo = api_get_course_info();
 
 if ($type == COURSEMANAGER) {
-    $tool_name = get_lang("SubscribeUserToCourseAsTeacher");
+    $tool_name = get_lang('SubscribeUserToCourseAsTeacher');
 }
 
 //extra entries in breadcrumb
-$interbreadcrumb[] = array(
-    "url" => "user.php?".api_get_cidreq(),
-    "name" => get_lang("ToolUser")
-);
+$interbreadcrumb[] = [
+    'url' => 'user.php?'.api_get_cidreq(),
+    'name' => get_lang('ToolUser'),
+];
 if ($keyword) {
-    $interbreadcrumb[] = array(
-        "url" => "subscribe_user.php?type=".$type.'&'.api_get_cidreq(),
-        "name" => $tool_name
-    );
+    $interbreadcrumb[] = [
+        'url' => 'subscribe_user.php?type='.$type.'&'.api_get_cidreq(),
+        'name' => $tool_name,
+    ];
     $tool_name = get_lang('SearchResults');
 }
 
@@ -59,30 +59,29 @@ $list_not_register_user = '';
 
 if (isset($_REQUEST['register'])) {
     $userInfo = api_get_user_info($_REQUEST['user_id']);
-    $message = $userInfo['complete_name'].' '.get_lang('AddedToCourse');
-
-    if ($type === COURSEMANAGER) {
-        if (!empty($sessionId)) {
-            $result_simple_sub = SessionManager::set_coach_to_course_session(
-                $_REQUEST['user_id'],
-                $sessionId,
-                $courseInfo['real_id']
-            );
-            Display::addFlash(Display::return_message($message));
+    if ($userInfo) {
+        if ($type === COURSEMANAGER) {
+            if (!empty($sessionId)) {
+                $message = $userInfo['complete_name_with_username'].' '.get_lang('AddedToCourse');
+                SessionManager::set_coach_to_course_session(
+                    $_REQUEST['user_id'],
+                    $sessionId,
+                    $courseInfo['real_id']
+                );
+                Display::addFlash(Display::return_message($message));
+            } else {
+                CourseManager::subscribeUser(
+                    $_REQUEST['user_id'],
+                    $courseInfo['code'],
+                    COURSEMANAGER
+                );
+            }
         } else {
-            $result_simple_sub = CourseManager:: subscribe_user(
+            CourseManager::subscribeUser(
                 $_REQUEST['user_id'],
-                $courseInfo['code'],
-                COURSEMANAGER
+                $courseInfo['code']
             );
-            Display::addFlash(Display::return_message($message));
         }
-    } else {
-        $result_simple_sub = CourseManager:: subscribe_user(
-            $_REQUEST['user_id'],
-            $courseInfo['code']
-        );
-        Display::addFlash(Display::return_message($message));
     }
     header('Location:'.api_get_path(WEB_CODE_PATH).'user/user.php?'.api_get_cidreq().'&type='.$type);
     exit;
@@ -92,30 +91,34 @@ if (isset($_POST['action'])) {
     switch ($_POST['action']) {
         case 'subscribe':
             if (is_array($_POST['user'])) {
+                $isSuscribe = [];
                 foreach ($_POST['user'] as $index => $user_id) {
                     $userInfo = api_get_user_info($user_id);
-                    if ($type === COURSEMANAGER) {
-                        if (!empty($sessionId)) {
-                            $is_suscribe[] = SessionManager::set_coach_to_course_session(
-                                $user_id,
-                                $sessionId,
-                                $courseInfo['real_id']
-                            );
+                    if ($userInfo) {
+                        if ($type === COURSEMANAGER) {
+                            if (!empty($sessionId)) {
+                                $message = $userInfo['complete_name_with_username'].' '.get_lang('AddedToCourse');
+                                $result = SessionManager::set_coach_to_course_session(
+                                    $user_id,
+                                    $sessionId,
+                                    $courseInfo['real_id']
+                                );
+                                if ($result) {
+                                    $isSuscribe[] = $message;
+                                }
+                            } else {
+                                CourseManager::subscribeUser($user_id, $courseInfo['code'], COURSEMANAGER);
+                            }
                         } else {
-                            $is_suscribe[] = CourseManager::subscribe_user(
-                                $user_id,
-                                $courseInfo['code'],
-                                COURSEMANAGER
-                            );
+                            CourseManager::subscribeUser($user_id, $courseInfo['code']);
                         }
-                    } else {
-                        $is_suscribe[] = CourseManager::subscribe_user(
-                            $user_id,
-                            $courseInfo['code']
-                        );
                     }
-                    $message = $userInfo['complete_name'].' '.get_lang('AddedToCourse');
-                    Display::addFlash(Display::return_message($message));
+                }
+
+                if (!empty($isSuscribe)) {
+                    foreach ($isSuscribe as $info) {
+                        Display::addFlash(Display::return_message($info));
+                    }
                 }
             }
 
@@ -157,17 +160,16 @@ $table->set_header($col++, get_lang('Active'), false);
 $table->set_column_filter($col - 1, 'active_filter');
 $table->set_header($col++, get_lang('Actions'), false);
 $table->set_column_filter($col - 1, 'reg_filter');
-$table->set_form_actions(array('subscribe' => get_lang('reg')), 'user');
+$table->set_form_actions(['subscribe' => get_lang('reg')], 'user');
 
 if (!empty($_POST['keyword'])) {
     $keyword_name = Security::remove_XSS($_POST['keyword']);
     echo '<br/>'.get_lang('SearchResultsFor').' <span style="font-style: italic ;"> '.$keyword_name.' </span><br>';
 }
 
-Display :: display_header($tool_name, "User");
+Display :: display_header($tool_name, 'User');
 
 // Build search-form
-
 switch ($type) {
     case STUDENT:
         $url = api_get_path(WEB_CODE_PATH).'user/user.php?'.api_get_cidreq().'';
@@ -176,7 +178,7 @@ switch ($type) {
         $url = api_get_path(WEB_CODE_PATH).'user/user.php?'.api_get_cidreq().'&type='.COURSEMANAGER;
         break;
 }
-$actionsLeft = '';
+
 $actionsLeft = Display::url(
     Display::return_icon('back.png', get_lang('Back'), '', ICON_SIZE_MEDIUM),
     $url
@@ -480,7 +482,7 @@ function get_user_data($from, $number_of_items, $column, $direction)
             }
             $sql .= " AND access_url_id = $url_access_id";
         } else {
-             // adding a teacher NOT through a session
+            // adding a teacher NOT through a session
             $sql = "SELECT $select_fields
                     FROM $user_table u
                     LEFT JOIN $course_user_table cu
@@ -665,7 +667,7 @@ function get_user_data($from, $number_of_items, $column, $direction)
     $sql .= " LIMIT $from, $number_of_items";
 
     $res = Database::query($sql);
-    $users = array();
+    $users = [];
     while ($user = Database::fetch_row($res)) {
         $users[] = $user;
     }
@@ -673,17 +675,21 @@ function get_user_data($from, $number_of_items, $column, $direction)
     return $users;
 }
 /**
-* Returns a mailto-link
-* @param string $email An email-address
-* @return string HTML-code with a mailto-link
-*/
+ * Returns a mailto-link.
+ *
+ * @param string $email An email-address
+ *
+ * @return string HTML-code with a mailto-link
+ */
 function email_filter($email)
 {
     return Display :: encrypted_mailto_link($email, $email);
 }
 /**
- * Build the reg-column of the table
+ * Build the reg-column of the table.
+ *
  * @param int $user_id The user id
+ *
  * @return string Some HTML-code
  */
 function reg_filter($user_id)
@@ -703,10 +709,13 @@ function reg_filter($user_id)
 
 /**
  * Build the active-column of the table to lock or unlock a certain user
- * lock = the user can no longer use this account
+ * lock = the user can no longer use this account.
+ *
  * @author Patrick Cool <patrick.cool@UGent.be>, Ghent University
- * @param int $active the current state of the account
+ *
+ * @param int    $active     the current state of the account
  * @param string $url_params
+ *
  * @return string Some HTML-code with the lock/unlock button
  */
 function active_filter($active, $url_params, $row)
@@ -722,13 +731,13 @@ function active_filter($active, $url_params, $row)
         $image = 'error';
     }
     $result = '';
-    if ($row['0'] <> $_user['user_id']) {
+    if ($row['0'] != $_user['user_id']) {
         // you cannot lock yourself out otherwise you could disable all the accounts
         // including your own => everybody is locked out and nobody can change it anymore.
         $result = Display::return_icon(
             $image.'.png',
             get_lang(ucfirst($action)),
-            array(),
+            [],
             ICON_SIZE_TINY
         );
     }
@@ -747,6 +756,7 @@ function active_filter($active, $url_params, $row)
  * additional profile fields or have chosen one of the matching predefined options
  *
  * @param string $keyword a keyword we are looking for in the additional profile fields
+ *
  * @return array $additional_users an array with the users who have an additional profile field that matches the keyword
  */
 function search_additional_profile_fields($keyword)
@@ -789,7 +799,7 @@ function search_additional_profile_fields($keyword)
                 e.extra_field_type = $extraFieldType AND
                 (value LIKE '%".$keyword."%'".$profiling_field_options_exact_values_sql.")";
     $result = Database::query($sql);
-    $additional_users = array();
+    $additional_users = [];
     while ($profiled_users = Database::fetch_array($result)) {
         $additional_users[$profiled_users['col0']] = $profiled_users;
     }
@@ -802,7 +812,6 @@ function search_additional_profile_fields($keyword)
  * profile fields defined by the platform administrator in
  * platform administration > profiling.
  * Only the fields that have predefined fields are usefull for such a filter.
- *
  */
 function display_extra_profile_fields_filter()
 {

@@ -4,8 +4,10 @@
 use ChamiloSession as Session;
 
 /**
- * Script that displays a blank page (with later a message saying why)
+ * Script that displays a blank page (with later a message saying why).
+ *
  * @package chamilo.learnpath
+ *
  * @author Yannick Warnier <ywarnier@beeznest.org>
  */
 // Flag to allow for anonymous user - needs to be set before global.inc.php.
@@ -24,7 +26,12 @@ if (isset($_GET['error'])) {
             $message = Display::return_message(get_lang('DocumentHasBeenDeleted'), 'error');
             break;
         case 'prerequisites':
+            $prerequisiteMessage = isset($_GET['prerequisite_message']) ? $_GET['prerequisite_message'] : '';
             $message = Display::return_message(get_lang('LearnpathPrereqNotCompleted'), 'warning');
+            if (!empty($prerequisiteMessage)) {
+                $message = Display::return_message(Security::remove_XSS($prerequisiteMessage), 'warning');
+            }
+
             break;
         case 'document_not_found':
             $message = Display::return_message(get_lang('FileNotFound'), 'warning');
@@ -35,10 +42,13 @@ if (isset($_GET['error'])) {
         case 'x_frames_options':
             $src = Session::read('x_frame_source');
             if (!empty($src)) {
-                $icon = '<em class="icon-play-sign icon-2x" aria-hidden="true"></em> ';
-
+                $icon = '<em class="icon-play-sign icon-2x" aria-hidden="true"></em>';
                 $message = Display::return_message(
-                    Display::url($icon.$src, $src, ['class' => 'btn generated', 'target' => '_blank']),
+                    Display::url(
+                        $icon.$src,
+                        $src,
+                        ['class' => 'btn generated', 'target' => '_blank']
+                    ),
                     'normal',
                     false
                 );

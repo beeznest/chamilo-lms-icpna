@@ -2,23 +2,20 @@
 /* For licensing terms, see /license.txt */
 
 /**
- *
- * Exercise results from Learning paths
+ * Exercise results from Learning paths.
  *
  * @todo implement pagination
+ *
  * @package chamilo.tracking
  */
-
 require_once __DIR__.'/../inc/global.inc.php';
 
 $this_section = SECTION_TRACKING;
 
-$is_allowedToTrack = $is_courseAdmin || $is_platformAdmin || $is_session_general_coach || $is_sessionAdmin;
+$is_allowedToTrack = Tracking::isAllowToTrack(api_get_session_id());
 
 if (!$is_allowedToTrack) {
-    Display :: display_header(null);
-    api_not_allowed();
-    Display :: display_footer();
+    api_not_allowed(true);
 }
 
 $export_to_csv = false;
@@ -26,27 +23,26 @@ if (isset($_GET['export'])) {
     $export_to_csv = true;
 }
 
+$global = false;
 if (api_is_platform_admin()) {
     $global = true;
-} else {
-    $global = false;
 }
 
 if ($global) {
     $temp_course_list = CourseManager :: get_courses_list();
-    foreach ($temp_course_list  as $temp_course_item) {
+    foreach ($temp_course_list as $temp_course_item) {
         $course_item = api_get_course_info($temp_course_item['code']);
-        $course_list[] = array(
+        $course_list[] = [
             'code' => $course_item['code'],
             'title' => $course_item['title'],
-        );
+        ];
     }
 } else {
     $current_course['code'] = $_course['id'];
-    $course_list = array($current_course);
+    $course_list = [$current_course];
 }
 
-$new_course_select = array();
+$new_course_select = [];
 foreach ($course_list as $data) {
     $new_course_select[$data['code']] = $data['title'];
 }
@@ -83,7 +79,7 @@ if (!empty($_REQUEST['course_code'])) {
 }
 if (!empty($selected_course)) {
     $selected_course = api_get_course_info($selected_course);
-    $course_list = array($selected_course);
+    $course_list = [$selected_course];
 }
 
 if (!$export_to_csv) {
@@ -100,7 +96,7 @@ if (!$export_to_csv) {
 
         $menu_items[] = '<a href="'.api_get_path(WEB_CODE_PATH).'mySpace/?view=teacher">'.get_lang('TeacherInterface').'</a>';
         if (api_is_platform_admin()) {
-          $menu_items[] = '<a href="'.api_get_path(WEB_CODE_PATH).'mySpace/?view=admin">'.get_lang('AdminInterface').'</a>';
+            $menu_items[] = '<a href="'.api_get_path(WEB_CODE_PATH).'mySpace/?view=admin">'.get_lang('AdminInterface').'</a>';
         } else {
             $menu_items[] = '<a href="'.api_get_path(WEB_CODE_PATH).'mySpace/?view=coach">'.get_lang('AdminInterface').'</a>';
         }
@@ -123,15 +119,14 @@ if (!$export_to_csv) {
         echo '<a href="'.api_get_self().'?export=1&score='.$filter_score.'&exercise_id='.$exercise_id.'">
             '.Display::return_icon('excel.gif').'
             &nbsp;'.get_lang('ExportAsXLS').'</a><br /><br />';
-
     }
     echo '</div>';
     echo '<br /><br />';
     $form->display();
 }
-$main_result = array();
+$main_result = [];
 $session_id = 0;
-$user_list = array();
+$user_list = [];
 // Getting course list
 foreach ($course_list as $current_course) {
     $course_info = api_get_course_info($current_course['code']);
@@ -142,10 +137,10 @@ foreach ($course_list as $current_course) {
     $lp_list = $list->get_flat_list();
 
     // Looping LPs
-    $lps = array();
+    $lps = [];
     foreach ($lp_list as $lp_id => $lp) {
         $exercise_list = Event::get_all_exercises_from_lp($lp_id, $course_info['real_id']);
-        $attempt_result = array();
+        $attempt_result = [];
         // Looping Chamilo Exercises in LP
         foreach ($exercise_list as $exercise) {
             $exercise_stats = Event::get_all_exercise_event_from_lp(
@@ -160,7 +155,7 @@ foreach ($course_list as $current_course) {
             }
             $exercise_list_name[$exercise['id']] = $exercise['title'];
         }
-        $lps[$lp_id] = array('lp_name' =>$lp['lp_name'], 'exercises' =>$attempt_result);
+        $lps[$lp_id] = ['lp_name' => $lp['lp_name'], 'exercises' => $attempt_result];
         $lp_list_name[$lp_id] = $lp['lp_name'];
     }
     $main_result[$current_course['code']] = $lps;
@@ -175,7 +170,7 @@ if (!empty($user_list)) {
         );
     }
 }
-$export_array = array();
+$export_array = [];
 if (!empty($main_result)) {
     $html_result .= '<table  class="data_table">';
     $html_result .= '<tr><th>'.get_lang('Course').'</th>';
@@ -211,7 +206,7 @@ if (!empty($main_result)) {
                         $html_result .= Display::tag('td', $result);
 
                         $html_result .= '</tr>';
-                        $export_array[] = array(
+                        $export_array[] = [
                             $course_code,
                             $lp_list_name[$lp_id],
                             $exercise_list_name[$exercise_id],
@@ -219,7 +214,7 @@ if (!empty($main_result)) {
                             $attempt,
                             api_get_local_time($attempt_data['exe_date']),
                             $result,
-                        );
+                        ];
                         $attempt++;
                     }
                 }
@@ -240,7 +235,7 @@ if ($export_to_csv) {
 
 function export_complete_report_csv($filename, $array)
 {
-    $header[] = array(
+    $header[] = [
         get_lang('Course'),
         get_lang('LearningPath'),
         get_lang('Exercise'),
@@ -248,12 +243,12 @@ function export_complete_report_csv($filename, $array)
         get_lang('Attempt'),
         get_lang('Date'),
         get_lang('Results'),
-    );
+    ];
     if (!empty($array)) {
         $array = array_merge($header, $array);
         Export :: arrayToCsv($array, $filename);
     }
     exit;
-
 }
+
 Display :: display_footer();

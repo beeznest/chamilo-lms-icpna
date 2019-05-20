@@ -1,10 +1,10 @@
 <?php
 /* For licensing terms, see /license.txt */
-/**
- * Responses to AJAX calls
- */
 
-$type = isset($_REQUEST['type']) && in_array($_REQUEST['type'], array('personal', 'course', 'admin')) ? $_REQUEST['type'] : 'personal';
+/**
+ * Responses to AJAX calls.
+ */
+$type = isset($_REQUEST['type']) && in_array($_REQUEST['type'], ['personal', 'course', 'admin']) ? $_REQUEST['type'] : 'personal';
 
 if ($type == 'personal') {
     $cidReset = true; // fixes #5162
@@ -19,7 +19,18 @@ if ($type == 'course') {
     api_protect_course_script(true);
 }
 
+$logInfo = [
+    'tool' => TOOL_CALENDAR_EVENT,
+    'tool_id' => 0,
+    'tool_id_detail' => 0,
+    'action' => $action,
+    'info' => '',
+];
+Event::registerLog($logInfo);
+
 $agenda = new Agenda($type);
+// get filtered type
+$type = $agenda->getType();
 
 switch ($action) {
     case 'add_event':
@@ -27,19 +38,21 @@ switch ($action) {
             break;
         }
         $add_as_announcement = isset($_REQUEST['add_as_annonuncement']) ? $_REQUEST['add_as_annonuncement'] : null;
+        $title = isset($_REQUEST['title']) ? $_REQUEST['title'] : null;
+        $content = isset($_REQUEST['content']) ? $_REQUEST['content'] : null;
         $comment = isset($_REQUEST['comment']) ? $_REQUEST['comment'] : null;
-        $userToSend = isset($_REQUEST['users_to_send']) ? $_REQUEST['users_to_send'] : array();
+        $userToSend = isset($_REQUEST['users_to_send']) ? $_REQUEST['users_to_send'] : [];
 
         echo $agenda->addEvent(
             $_REQUEST['start'],
             $_REQUEST['end'],
             $_REQUEST['all_day'],
-            $_REQUEST['title'],
-            $_REQUEST['content'],
+            $title,
+            $content,
             $userToSend,
             $add_as_announcement,
             null, //$parentEventId = null,
-            array(), //$attachmentArray = array(),
+            [], //$attachmentArray = array(),
             null, //$attachmentComment = null,
             $comment
         );
@@ -55,8 +68,8 @@ switch ($action) {
             $_REQUEST['start'],
             $_REQUEST['end'],
             $_REQUEST['all_day'],
-            $_REQUEST['title'],
-            $_REQUEST['content']
+            $title,
+            $content
         );
         break;
     case 'delete_event':
@@ -121,11 +134,11 @@ switch ($action) {
             $DaysShort = api_get_week_days_short();
             $MonthsLong = api_get_months_long();
 
-            $user_id = intval($_REQUEST['user_id']);
+            $user_id = (int) $_REQUEST['user_id'];
             $my_course_list = CourseManager::get_courses_list_by_user_id($user_id, true);
             if (!is_array($my_course_list)) {
                 // this is for the special case if the user has no courses (otherwise you get an error)
-                $my_course_list = array();
+                $my_course_list = [];
             }
             $today = getdate();
             $year = (!empty($_GET['year']) ? (int) $_GET['year'] : null);
@@ -174,7 +187,7 @@ switch ($action) {
                 $agendaitems,
                 $month,
                 $year,
-                array(),
+                [],
                 $monthName,
                 false
             );

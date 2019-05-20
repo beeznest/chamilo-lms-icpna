@@ -2,9 +2,10 @@
 /* For licensing terms, see /license.txt */
 
 use ChamiloSession as Session;
+use Fhaculty\Graph\Graph;
 
 /**
- * HOME PAGE FOR EACH COURSE
+ * HOME PAGE FOR EACH COURSE.
  *
  * This page, included in every course's index.php is the home
  * page. To make administration simple, the teacher edits his
@@ -28,29 +29,29 @@ use ChamiloSession as Session;
  *
  * @package chamilo.course_home
  */
-
 $use_anonymous = true;
 require_once __DIR__.'/../inc/global.inc.php';
 
+$js = '<script>'.api_get_language_translate_html().'</script>';
+$htmlHeadXtra[] = $js;
+
 $htmlHeadXtra[] = '<script>
 /* option show/hide thematic-block */
-$(document).ready(function(){
+$(function() {
     $("#thematic-show").click(function(){
         $(".btn-hide-thematic").hide();
         $(".btn-show-thematic").show(); //show using class
         $("#pross").fadeToggle(); //Not working collapse for Chrome
     });
+    
     $("#thematic-hide").click(function(){
         $(".btn-show-thematic").hide(); //show using class
         $(".btn-hide-thematic").show();
         $("#pross").fadeToggle(); //Not working collapse for Chrome
     });
-});
-
-$(document).ready(function() {
+    
 	$(".make_visible_and_invisible").attr("href", "javascript:void(0);");
 	$(".make_visible_and_invisible > img").click(function () {
-
 		make_visible = "visible.gif";
 		make_invisible = "invisible.gif";
 		path_name = $(this).attr("src");
@@ -63,7 +64,7 @@ $(document).ready(function() {
 
 		$.ajax({
 			contentType: "application/x-www-form-urlencoded",
-			beforeSend: function(objeto) {
+			beforeSend: function(myObject) {
 				$(".normal-message").show();
 				$("#id_confirmation_message").hide();
 			},
@@ -135,27 +136,25 @@ $isSpecialCourse = CourseManager::isSpecialCourse($courseId);
 
 if ($isSpecialCourse) {
     if (isset($_GET['autoreg']) && $_GET['autoreg'] == 1) {
-        if (CourseManager::subscribe_user($user_id, $course_code, STUDENT)) {
+        if (CourseManager::subscribeUser($user_id, $course_code, STUDENT)) {
             Session::write('is_allowed_in_course', true);
         }
     }
 }
 
-if (isset($_GET['action']) && $_GET['action'] == 'subscribe') {
+$action = !empty($_GET['action']) ? Security::remove_XSS($_GET['action']) : '';
+
+if ($action == 'subscribe') {
     if (Security::check_token('get')) {
         Security::clear_token();
-        $auth = new Auth();
-        $msg = $auth->subscribe_user($course_code);
-        if (CourseManager::is_user_subscribed_in_course($user_id, $course_code)) {
-            Session::write('is_allowed_in_course', true);
+        $result = CourseManager::autoSubscribeToCourse($course_code);
+        if ($result) {
+            if (CourseManager::is_user_subscribed_in_course($user_id, $course_code)) {
+                Session::write('is_allowed_in_course', true);
+            }
         }
-        if (!empty($msg)) {
-            $show_message .= Display::return_message(
-                get_lang($msg['message']),
-                'info',
-                false
-            );
-        }
+        header('Location: '.api_get_self());
+        exit;
     }
 }
 
@@ -169,14 +168,28 @@ if (!isset($coursesAlreadyVisited[$course_code])) {
     Session::write('coursesAlreadyVisited', $coursesAlreadyVisited);
 }
 
-/*Auto launch code */
-$show_autolaunch_lp_warning = false;
-$auto_launch = api_get_course_setting('enable_lp_auto_launch');
+$logInfo = [
+    'tool' => 'course-main',
+    'tool_id' => 0,
+    'tool_id_detail' => 0,
+    'action' => $action,
+    'info' => '',
+];
+Event::registerLog($logInfo);
+
+/* Auto launch code */
+$autoLaunchWarning = '';
+$showAutoLaunchLpWarning = false;
+$course_id = api_get_course_int_id();
+$lpAutoLaunch = api_get_course_setting('enable_lp_auto_launch');
 $session_id = api_get_session_id();
-if (!empty($auto_launch)) {
-    if ($auto_launch == 2) { //LP list
-        if (api_is_platform_admin() || api_is_allowed_to_edit()) {
-            $show_autolaunch_lp_warning = true;
+$allowAutoLaunchForCourseAdmins = api_is_platform_admin() || api_is_allowed_to_edit(true, true) || api_is_coach();
+
+if (!empty($lpAutoLaunch)) {
+    if ($lpAutoLaunch == 2) {
+        // LP list
+        if ($allowAutoLaunchForCourseAdmins) {
+            $showAutoLaunchLpWarning = true;
         } else {
             $session_key = 'lp_autolaunch_'.$session_id.'_'.api_get_course_int_id().'_'.api_get_user_id();
             if (!isset($_SESSION[$session_key])) {
@@ -189,7 +202,6 @@ if (!empty($auto_launch)) {
         }
     } else {
         $lp_table = Database::get_course_table(TABLE_LP_MAIN);
-        $course_id = api_get_course_int_id();
         $condition = '';
         if (!empty($session_id)) {
             $condition = api_get_session_condition($session_id);
@@ -210,8 +222,8 @@ if (!empty($auto_launch)) {
         if (Database::num_rows($result) > 0) {
             $lp_data = Database::fetch_array($result, 'ASSOC');
             if (!empty($lp_data['id'])) {
-                if (api_is_platform_admin() || api_is_allowed_to_edit()) {
-                    $show_autolaunch_lp_warning = true;
+                if ($allowAutoLaunchForCourseAdmins) {
+                    $showAutoLaunchLpWarning = true;
                 } else {
                     $session_key = 'lp_autolaunch_'.$session_id.'_'.api_get_course_int_id().'_'.api_get_user_id();
                     if (!isset($_SESSION[$session_key])) {
@@ -228,54 +240,118 @@ if (!empty($auto_launch)) {
     }
 }
 
+if ($showAutoLaunchLpWarning) {
+    $autoLaunchWarning = get_lang('TheLPAutoLaunchSettingIsONStudentsWillBeRedirectToAnSpecificLP');
+}
+
 $forumAutoLaunch = api_get_course_setting('enable_forum_auto_launch');
 if ($forumAutoLaunch == 1) {
-    if (api_is_platform_admin() || api_is_allowed_to_edit()) {
-        Display::addFlash(Display::return_message(
-            get_lang('TheForumAutoLaunchSettingIsOnStudentsWillBeRedirectToTheForumTool'),
-            'warning'
-        ));
+    if ($allowAutoLaunchForCourseAdmins) {
+        if (empty($autoLaunchWarning)) {
+            $autoLaunchWarning = get_lang('TheForumAutoLaunchSettingIsOnStudentsWillBeRedirectToTheForumTool');
+        }
     } else {
-        //$forumKey = 'forum_auto_launch_'.$session_id.'_'.api_get_course_int_id().'_'.api_get_user_id();
-        //if (!isset($_SESSION[$forumKey])) {
-            //redirecting to the LP
-            $url = api_get_path(WEB_CODE_PATH).'forum/index.php?'.api_get_cidreq().'&id_session='.$session_id;
-          //  $_SESSION[$forumKey] = true;
-            header("Location: $url");
-            exit;
-        //}
+        $url = api_get_path(WEB_CODE_PATH).'forum/index.php?'.api_get_cidreq().'&id_session='.$session_id;
+        header("Location: $url");
+        exit;
     }
 }
 
+if (api_get_configuration_value('allow_exercise_auto_launch')) {
+    $exerciseAutoLaunch = (int) api_get_course_setting('enable_exercise_auto_launch');
+    if ($exerciseAutoLaunch == 2) {
+        if ($allowAutoLaunchForCourseAdmins) {
+            if (empty($autoLaunchWarning)) {
+                $autoLaunchWarning = get_lang(
+                    'TheExerciseAutoLaunchSettingIsONStudentsWillBeRedirectToTheExerciseList'
+                );
+            }
+        } else {
+            // Redirecting to the document
+            $url = api_get_path(WEB_CODE_PATH).'exercise/exercise.php?'.api_get_cidreq().'&id_session='.$session_id;
+            header("Location: $url");
+            exit;
+        }
+    } elseif ($exerciseAutoLaunch == 1) {
+        if ($allowAutoLaunchForCourseAdmins) {
+            if (empty($autoLaunchWarning)) {
+                $autoLaunchWarning = get_lang(
+                    'TheExerciseAutoLaunchSettingIsONStudentsWillBeRedirectToAnSpecificExercise'
+                );
+            }
+        } else {
+            // Redirecting to an exercise
+            $table = Database::get_course_table(TABLE_QUIZ_TEST);
+            $condition = '';
+            if (!empty($session_id)) {
+                $condition = api_get_session_condition($session_id);
+                $sql = "SELECT iid FROM $table
+                        WHERE c_id = $course_id AND autolaunch = 1 $condition
+                        LIMIT 1";
+                $result = Database::query($sql);
+                // If we found nothing in the session we just called the session_id = 0 autolaunch
+                if (Database::num_rows($result) == 0) {
+                    $condition = '';
+                }
+            }
+
+            $sql = "SELECT iid FROM $table
+                    WHERE c_id = $course_id AND autolaunch = 1 $condition
+                    LIMIT 1";
+            $result = Database::query($sql);
+            if (Database::num_rows($result) > 0) {
+                $row = Database::fetch_array($result, 'ASSOC');
+                $exerciseId = $row['iid'];
+                $url = api_get_path(WEB_CODE_PATH).
+                    'exercise/overview.php?exerciseId='.$exerciseId.'&'.api_get_cidreq().'&id_session='.$session_id;
+                header("Location: $url");
+                exit;
+            }
+        }
+    }
+}
+
+$documentAutoLaunch = api_get_course_setting('enable_document_auto_launch');
+if ($documentAutoLaunch == 1) {
+    if ($allowAutoLaunchForCourseAdmins) {
+        if (empty($autoLaunchWarning)) {
+            $autoLaunchWarning = get_lang('TheDocumentAutoLaunchSettingIsOnStudentsWillBeRedirectToTheDocumentTool');
+        }
+    } else {
+        // Redirecting to the document
+        $url = api_get_path(WEB_CODE_PATH).'document/document.php?'.api_get_cidreq().'&id_session='.$session_id;
+        header("Location: $url");
+        exit;
+    }
+}
 
 $tool_table = Database::get_course_table(TABLE_TOOL_LIST);
 $temps = time();
 $reqdate = "&reqdate=$temps";
 
-/*	MAIN CODE */
-
 /*	Introduction section (editable by course admins) */
 $content = Display::return_introduction_section(
     TOOL_COURSE_HOMEPAGE,
-    array(
+    [
         'CreateDocumentWebDir' => api_get_path(WEB_COURSE_PATH).api_get_course_path().'/document/',
         'CreateDocumentDir' => 'document/',
         'BaseHref' => api_get_path(WEB_COURSE_PATH).api_get_course_path().'/',
-    )
+    ]
 );
 
 /*	SWITCH TO A DIFFERENT HOMEPAGE VIEW
-	the setting homepage_view is adjustable through
-	the platform administration section */
-
-if ($show_autolaunch_lp_warning) {
+    the setting homepage_view is adjustable through
+    the platform administration section */
+if (!empty($autoLaunchWarning)) {
     $show_message .= Display::return_message(
-        get_lang('TheLPAutoLaunchSettingIsONStudentsWillBeRedirectToAnSpecificLP'),
+        $autoLaunchWarning,
         'warning'
     );
 }
 
-if (api_get_setting('homepage_view') === 'activity' || api_get_setting('homepage_view') === 'activity_big') {
+if (api_get_setting('homepage_view') === 'activity' ||
+    api_get_setting('homepage_view') === 'activity_big'
+) {
     require 'activity.php';
 } elseif (api_get_setting('homepage_view') === '2column') {
     require '2column.php';
@@ -322,7 +398,11 @@ if ($allow === true) {
                 );
 
                 if (!empty($item) && isset($item['value']) && !empty($item['value'])) {
-                    $graph = unserialize($item['value']);
+                    /** @var Graph $graph */
+                    $graph = UnserializeApi::unserialize(
+                        'career',
+                        $item['value']
+                    );
                     $diagram = Career::renderDiagram($careerInfo, $graph);
                 }
             }
@@ -333,6 +413,13 @@ if ($allow === true) {
 $content = '<div id="course_tools">'.$diagram.$content.'</div>';
 $content .= SurveyManager::returnSurveyInvitationInModal();
 
+// Deleting the objects
+Session::erase('_gid');
+Session::erase('oLP');
+Session::erase('lpobject');
+api_remove_in_gradebook();
+DocumentManager::removeGeneratedAudioTempFile();
+
 $tpl = new Template(null);
 $tpl->assign('message', $show_message);
 $tpl->assign('content', $content);
@@ -340,10 +427,3 @@ $tpl->assign('content', $content);
 // Direct login to course
 $tpl->assign('course_code', $course_code);
 $tpl->display_one_col_template();
-
-// Deleting the objects
-Session::erase('_gid');
-Session::erase('oLP');
-Session::erase('lpobject');
-api_remove_in_gradebook();
-DocumentManager::removeGeneratedAudioTempFile();

@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class SequenceRule
+ * Class SequenceRule.
  *
  * @ORM\Table(name="sequence_valid")
  * @ORM\Entity
@@ -14,31 +14,30 @@ use Doctrine\ORM\Mapping as ORM;
 class SequenceValid
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue()
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="SequenceVariable")
      * @ORM\JoinColumn(name="sequence_variable_id", referencedColumnName="id")
-     **/
-    private $variable;
+     */
+    protected $variable;
 
     /**
      * @ORM\ManyToOne(targetEntity="SequenceCondition")
      * @ORM\JoinColumn(name="sequence_condition_id", referencedColumnName="id")
-     **/
-    private $condition;
-
+     */
+    protected $condition;
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -84,5 +83,4 @@ class SequenceValid
 
         return $this;
     }
-
 }

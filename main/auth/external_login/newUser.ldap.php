@@ -6,7 +6,7 @@
  * and chamilo does not find his user
  * Variables that can be used :
  *    - $login : string containing the username posted by the user
- *    - $password : string containing the password posted by the user
+ *    - $password : string containing the password posted by the user.
  *
  * Please configure the exldap module in main/auth/external_login/ldap.conf.php
  *
@@ -36,7 +36,6 @@
  *          - index.php?loginFailed=1&error=user_password_incorrect
  *          - index.php?loginFailed=1&error=unrecognize_sso_origin');
  * */
-
 use ChamiloSession as Session;
 
 require_once __DIR__.'/ldap.inc.php';
@@ -44,13 +43,11 @@ require_once __DIR__.'/functions.inc.php';
 
 $ldap_user = extldap_authenticate($login, $password);
 if ($ldap_user !== false) {
-    $em = Database::getManager();
     $chamilo_user = extldap_get_chamilo_user($ldap_user);
     //username is not on the ldap, we have to use $login variable
     $chamilo_user['username'] = $login;
     $chamilo_uid = external_add_user($chamilo_user);
-
-    $chamiloUser = $em->find('ChamiloUserBundle:User', $chamilo_uid);
+    $chamiloUser = api_get_user_entity($chamilo_uid);
 
     if ($chamiloUser) {
         $loginFailed = false;
@@ -64,7 +61,7 @@ if ($ldap_user !== false) {
             $is_platformAdmin = true;
             Database::query("INSERT INTO admin values ('{$chamiloUser->getId()}')");
         }
-        Event::event_login($chamiloUser->getId());
+        Event::eventLogin($chamiloUser->getId());
 
         MessageManager::sendNotificationByRegisteredUser($chamiloUser);
     }

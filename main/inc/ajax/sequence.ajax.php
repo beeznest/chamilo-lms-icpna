@@ -3,12 +3,13 @@
 
 use Chamilo\CoreBundle\Entity\Sequence;
 use Chamilo\CoreBundle\Entity\SequenceResource;
+use ChamiloSession as Session;
 use Fhaculty\Graph\Graph;
 use Fhaculty\Graph\Vertex;
 use Graphp\GraphViz\GraphViz;
 
 /**
- * Responses to AJAX calls
+ * Responses to AJAX calls.
  */
 require_once __DIR__.'/../global.inc.php';
 
@@ -41,12 +42,24 @@ switch ($action) {
                     $graphviz = new GraphViz();
                     $graphImage = '';
                     try {
-                        $graphImage = $graphviz->createImageHtml($graph);
+                        $graphImage = $graphviz->createImageSrc($graph);
+
+                        echo Display::img(
+                            $graphImage,
+                            get_lang('GraphDependencyTree'),
+                            ['class' => 'center-block'],
+                            false
+                        );
                     } catch (UnexpectedValueException $e) {
-                        error_log($e->getMessage().' - Graph could not be rendered in resources sequence because GraphViz command "dot" could not be executed - Make sure graphviz is installed.');
-                        $graphImage = '<p class="text-center"><small>'.get_lang('MissingChartLibraryPleaseCheckLog').'</small></p>';
+                        error_log(
+                            $e->getMessage()
+                            .' - Graph could not be rendered in resources sequence'
+                            .' because GraphViz command "dot" could not be executed '
+                            .'- Make sure graphviz is installed.'
+                        );
+                        echo '<p class="text-center"><small>'.get_lang('MissingChartLibraryPleaseCheckLog')
+                            .'</small></p>';
                     }
-                    echo $graphImage;
                 }
                 break;
         }
@@ -72,7 +85,7 @@ switch ($action) {
                             'default',
                             [
                                 'class' => 'delete_vertex btn btn-block btn-xs',
-                                'data-id' => $id
+                                'data-id' => $id,
                             ]
                         );
 
@@ -84,7 +97,7 @@ switch ($action) {
                             [
                                 'class' => 'undo_delete btn btn-block btn-xs',
                                 'style' => 'display: none;',
-                                'data-id' => $id
+                                'data-id' => $id,
                             ]
                         );
                     }
@@ -93,7 +106,15 @@ switch ($action) {
                     $link .= '<div class="big-icon">';
                     $link .= $image;
                     $link .= '<div class="sequence-course">'.$sessionInfo['name'].'</div>';
-                    $link .= '<a href="#" class="sequence-id">'.$id.'</a>';
+                    $link .= Display::tag(
+                        'button',
+                        $id,
+                        [
+                            'class' => 'sequence-id',
+                            'title' => get_lang('UseAsReference'),
+                            'type' => 'button',
+                        ]
+                    );
                     $link .= $linkDelete;
                     $link .= $linkUndo;
                     $link .= '</div></div>';
@@ -146,7 +167,7 @@ switch ($action) {
                         }
 
                         if ($vertexFromTo && !$vertexToFrom) {
-                            $_SESSION['sr_vertex'] = true;
+                            Session::write('sr_vertex', true);
                             $vertex = $graph->getVertex($id);
                             $vertex->destroy();
                             $em->remove($sequenceResource);
@@ -164,14 +185,14 @@ switch ($action) {
                                 [
                                     'resourceId' => $vertexId,
                                     'type' => $type,
-                                    'sequence' => $sequence
+                                    'sequence' => $sequence,
                                 ]
                             );
                             $em->remove($sequenceResourceToDelete);
                         }
 
                         if (!$vertexToFrom && !$vertexFromTo) {
-                            $_SESSION['sr_vertex'] = true;
+                            Session::write('sr_vertex', true);
                             $vertexTo = $graph->getVertex($id);
                             $vertexFrom = $graph->getVertex($vertexId);
                             if ($vertexTo->getVerticesEdgeFrom()->count() > 1) {
@@ -180,7 +201,7 @@ switch ($action) {
                                     [
                                         'resourceId' => $vertexId,
                                         'type' => $type,
-                                        'sequence' => $sequence
+                                        'sequence' => $sequence,
                                     ]
                                 );
                                 $em->remove($sequenceResourceToDelete);
@@ -191,7 +212,7 @@ switch ($action) {
                                     [
                                         'resourceId' => $vertexId,
                                         'type' => $type,
-                                        'sequence' => $sequence
+                                        'sequence' => $sequence,
                                     ]
                                 );
                                 $em->remove($sequenceResource);
@@ -283,9 +304,9 @@ switch ($action) {
         if (empty($sequence)) {
             exit;
         }
-
-        if (isset($_SESSION['sr_vertex']) && $_SESSION['sr_vertex']) {
-            unset($_SESSION['sr_vertex']);
+        $vertexFromSession = Session::read('sr_vertex');
+        if ($vertexFromSession) {
+            Session::erase('sr_vertex');
             echo Display::return_message(get_lang('Saved'), 'success');
             break;
         }

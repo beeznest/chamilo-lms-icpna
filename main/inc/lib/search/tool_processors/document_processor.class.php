@@ -2,14 +2,8 @@
 /* For licensing terms, see /license.txt */
 
 /**
+ * Process documents before pass it to search listing scripts.
  *
- * @package chamilo.include.search
- */
-include_once __DIR__.'/../../../global.inc.php';
-require_once __DIR__.'/search_processor.class.php';
-
-/**
- * Process documents before pass it to search listing scripts
  * @package chamilo.include.search
  */
 class document_processor extends search_processor
@@ -21,17 +15,17 @@ class document_processor extends search_processor
 
     public function process()
     {
-        $results = array();
+        $results = [];
         foreach ($this->rows as $row_val) {
             $search_show_unlinked_results = (api_get_setting('search_show_unlinked_results') == 'true');
-            $course_visible_for_user = api_is_course_visible_for_user(NULL, $row_val['courseid']);
+            $course_visible_for_user = api_is_course_visible_for_user(null, $row_val['courseid']);
             // can view course?
             if ($course_visible_for_user || $search_show_unlinked_results) {
                 // is visible?
                 $visibility = api_get_item_visibility(api_get_course_info($row_val['courseid']), TOOL_DOCUMENT, $row_val['xapian_data'][SE_DATA]['doc_id']);
                 if ($visibility) {
                     list($thumbnail, $image, $name, $author, $url) = $this->get_information($row_val['courseid'], $row_val['xapian_data'][SE_DATA]['doc_id']);
-                    $result = array(
+                    $result = [
                         'toolid' => TOOL_DOCUMENT,
                         'score' => $row_val['score'],
                         'url' => $url,
@@ -39,7 +33,7 @@ class document_processor extends search_processor
                         'image' => $image,
                         'title' => $name,
                         'author' => $author,
-                    );
+                    ];
                     if ($course_visible_for_user) {
                         $results[] = $result;
                     } else { // course not visible for user
@@ -64,7 +58,7 @@ class document_processor extends search_processor
     }
 
     /**
-     * Get document information
+     * Get document information.
      */
     private function get_information($course_id, $doc_id)
     {
@@ -102,10 +96,10 @@ class document_processor extends search_processor
                     $author = api_get_person_name($user_data['firstName'], $user_data['lastName']);
                 }
             }
-            return array($thumbnail, $image, $name, $author, $url); // FIXME: is it posible to get an author here?
+
+            return [$thumbnail, $image, $name, $author, $url]; // FIXME: is it posible to get an author here?
         } else {
-            return array();
+            return [];
         }
     }
-
 }

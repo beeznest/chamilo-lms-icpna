@@ -7,7 +7,7 @@ use Chamilo\UserBundle\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CLpCategoryUser
+ * CLpCategoryUser.
  *
  * @ORM\Table(name="c_lp_category_user")
  * @ORM\Entity
@@ -15,27 +15,27 @@ use Doctrine\ORM\Mapping as ORM;
 class CLpCategoryUser
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="Chamilo\CourseBundle\Entity\CLpCategory", inversedBy="users")
      * @ORM\JoinColumn(name="category_id", referencedColumnName="iid")
-     **/
-    private $category;
+     */
+    protected $category;
 
     /**
      * @var User
      *
      * @ORM\ManyToOne(targetEntity="Chamilo\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
-     **/
-    private $user;
+     */
+    protected $user;
 
     /**
      * @return string
@@ -55,6 +55,7 @@ class CLpCategoryUser
 
     /**
      * @param int $id
+     *
      * @return CLpCategoryUser
      */
     public function setId($id)
@@ -94,6 +95,7 @@ class CLpCategoryUser
 
     /**
      * @param User $user
+     *
      * @return CLpCategoryUser
      */
     public function setUser($user)

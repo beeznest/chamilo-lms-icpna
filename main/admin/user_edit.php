@@ -3,8 +3,7 @@
 
 /**
  * @package chamilo.admin
-*/
-
+ */
 $cidReset = true;
 require_once __DIR__.'/../inc/global.inc.php';
 
@@ -66,23 +65,12 @@ function confirmation(name) {
 }
 </script>';
 
-$gMapsPlugin = GoogleMapsPlugin::create();
-$geolocalization = $gMapsPlugin->get('enable_api') === 'true';
-
-if ($geolocalization) {
-    $gmapsApiKey = $gMapsPlugin->get('api_key');
-    $htmlHeadXtra[] = '<script type="text/javascript" src="//maps.googleapis.com/maps/api/js?sensor=true&key='.$gmapsApiKey.'" ></script>';
-}
-
 $htmlHeadXtra[] = api_get_css_asset('cropper/dist/cropper.min.css');
 $htmlHeadXtra[] = api_get_asset('cropper/dist/cropper.min.js');
-
-$libpath = api_get_path(LIBRARY_PATH);
-$noPHP_SELF = true;
 $tool_name = get_lang('ModifyUserInfo');
 
-$interbreadcrumb[] = array('url' => 'index.php', "name" => get_lang('PlatformAdmin'));
-$interbreadcrumb[] = array('url' => "user_list.php", "name" => get_lang('UserList'));
+$interbreadcrumb[] = ['url' => 'index.php', 'name' => get_lang('PlatformAdmin')];
+$interbreadcrumb[] = ['url' => 'user_list.php', 'name' => get_lang('UserList')];
 
 $table_user = Database::get_main_table(TABLE_MAIN_USER);
 $table_admin = Database::get_main_table(TABLE_MAIN_ADMIN);
@@ -139,7 +127,7 @@ if (api_is_western_name_order()) {
 }
 
 // Official code
-$form->addElement('text', 'official_code', get_lang('OfficialCode'), array('size' => '40'));
+$form->addElement('text', 'official_code', get_lang('OfficialCode'), ['size' => '40']);
 $form->applyFilter('official_code', 'html_filter');
 $form->applyFilter('official_code', 'trim');
 
@@ -167,7 +155,7 @@ $form->addElement('text', 'phone', get_lang('PhoneNumber'));
 $form->addFile(
     'picture',
     get_lang('AddImage'),
-    array('id' => 'picture', 'class' => 'picture-form', 'crop_image' => true, 'crop_ratio' => '1 / 1')
+    ['id' => 'picture', 'class' => 'picture-form', 'crop_image' => true, 'crop_ratio' => '1 / 1']
 );
 $allowed_picture_types = api_get_supported_image_extensions(false);
 
@@ -183,7 +171,7 @@ if (strlen($user_data['picture_uri']) > 0) {
 
 // Username
 if (api_get_setting('login_is_email') != 'true') {
-    $form->addElement('text', 'username', get_lang('LoginName'), array('maxlength' => USERNAME_MAX_LENGTH));
+    $form->addElement('text', 'username', get_lang('LoginName'), ['maxlength' => USERNAME_MAX_LENGTH]);
     $form->addRule('username', get_lang('ThisFieldIsRequired'), 'required');
     $form->addRule('username', sprintf(get_lang('UsernameMaxXCharacters'), (string) USERNAME_MAX_LENGTH), 'maxlength', USERNAME_MAX_LENGTH);
     $form->addRule('username', get_lang('OnlyLettersAndNumbersAllowed'), 'username');
@@ -201,7 +189,7 @@ if (isset($extAuthSource) && !empty($extAuthSource) && count($extAuthSource) > 0
 $form->addElement('radio', 'reset_password', get_lang('Password'), get_lang('DontResetPassword'), 0);
 $nb_ext_auth_source_added = 0;
 if (isset($extAuthSource) && !empty($extAuthSource) && count($extAuthSource) > 0) {
-    $auth_sources = array();
+    $auth_sources = [];
     foreach ($extAuthSource as $key => $info) {
         // @todo : make uniform external authentication configuration (ex : cas and external_login ldap)
         // Special case for CAS. CAS is activated from Chamilo > Administration > Configuration > CAS
@@ -221,20 +209,20 @@ if (isset($extAuthSource) && !empty($extAuthSource) && count($extAuthSource) > 0
     }
 }
 $form->addElement('radio', 'reset_password', null, get_lang('AutoGeneratePassword'), 1);
-$group = array();
+$group = [];
 $group[] = $form->createElement('radio', 'reset_password', null, get_lang('EnterPassword'), 2);
 $group[] = $form->createElement(
     'password',
     'password',
     null,
-    array('onkeydown' => 'javascript: password_switch_radio_button();')
+    ['onkeydown' => 'javascript: password_switch_radio_button();']
 );
 
 $form->addGroup($group, 'password', null, null, false);
 $form->addPasswordRule('password', 'password');
 
 // Status
-$status = array();
+$status = [];
 $status[COURSEMANAGER] = get_lang('Teacher');
 $status[STUDENT] = get_lang('Learner');
 $status[DRH] = get_lang('Drh');
@@ -247,17 +235,17 @@ $form->addElement(
     'status',
     get_lang('Profile'),
     $status,
-    array(
+    [
         'id' => 'status_select',
-        'onchange' => 'javascript: display_drh_list();'
-    )
+        'onchange' => 'javascript: display_drh_list();',
+    ]
 );
 
 $display = isset($user_data['status']) && ($user_data['status'] == STUDENT || (isset($_POST['status']) && $_POST['status'] == STUDENT)) ? 'block' : 'none';
 
 // Platform admin
 if (api_is_platform_admin()) {
-    $group = array();
+    $group = [];
     $group[] = $form->createElement('radio', 'platform_admin', null, get_lang('Yes'), 1);
     $group[] = $form->createElement('radio', 'platform_admin', null, get_lang('No'), 0);
 
@@ -272,7 +260,7 @@ if (api_is_platform_admin()) {
 $form->addSelectLanguage('language', get_lang('Language'));
 
 // Send email
-$group = array();
+$group = [];
 $group[] = $form->createElement('radio', 'send_mail', null, get_lang('Yes'), 1);
 $group[] = $form->createElement('radio', 'send_mail', null, get_lang('No'), 0);
 $form->addGroup($group, 'mail', get_lang('SendMailToNewUser'), null, false);
@@ -285,9 +273,14 @@ $form->addElement('label', get_lang('RegistrationDate'), $date);
 if (!$user_data['platform_admin']) {
     // Expiration Date
     $form->addElement('radio', 'radio_expiration_date', get_lang('ExpirationDate'), get_lang('NeverExpires'), 0);
-    $group = array();
+    $group = [];
     $group[] = $form->createElement('radio', 'radio_expiration_date', null, get_lang('Enabled'), 1);
-    $group[] = $form->createElement('DateTimePicker', 'expiration_date', null, array('onchange' => 'javascript: enable_expiration_date();'));
+    $group[] = $form->createElement(
+        'DateTimePicker',
+        'expiration_date',
+        null,
+        ['onchange' => 'javascript: enable_expiration_date();']
+    );
     $form->addGroup($group, 'max_member_group', null, null, false);
 
     // Active account or inactive account
@@ -307,7 +300,7 @@ if ($studentBoss) {
     }
 }
 
-if ($studentBossList) {
+if (!empty($studentBossList)) {
     $studentBossList = array_column($studentBossList, 'boss_id');
 }
 
@@ -324,16 +317,38 @@ $returnParams = $extraField->addElements(
     false,
     [],
     [],
+    [],
+    false,
     true
 );
-$jquery_ready_content = $returnParams['jquery_ready_content'];
+$jqueryReadyContent = $returnParams['jquery_ready_content'];
 
-// the $jquery_ready_content variable collects all functions that will be load in the $(document).ready javascript function
+$allowEmailTemplate = api_get_configuration_value('mail_template_system');
+if ($allowEmailTemplate) {
+    $form->addEmailTemplate(['user_edit_content.tpl']);
+}
+
+// the $jqueryReadyContent variable collects all functions that will be load in the
+// $(document).ready javascript function
 $htmlHeadXtra[] = '<script>
 $(document).ready(function(){
-    '.$jquery_ready_content.'
+    '.$jqueryReadyContent.'
 });
 </script>';
+
+// Freeze user conditions, admin cannot updated them
+$extraConditions = api_get_configuration_value('show_conditions_to_user');
+
+if ($extraConditions && isset($extraConditions['conditions'])) {
+    $extraConditions = $extraConditions['conditions'];
+    foreach ($extraConditions as $condition) {
+        /** @var HTML_QuickForm_group $element */
+        $element = $form->getElement('extra_'.$condition['variable']);
+        if ($element) {
+            $element->freeze();
+        }
+    }
+}
 
 // Submit button
 $form->addButtonSave(get_lang('Save'));
@@ -372,7 +387,7 @@ if ($form->validate()) {
 
         $picture_uri = $user_data['picture_uri'];
         if (isset($user['delete_picture']) && $user['delete_picture']) {
-            $picture_uri = UserManager::delete_user_picture($user_id);
+            $picture_uri = UserManager::deleteUserPicture($user_id);
         } elseif (!empty($picture['name'])) {
             $picture_uri = UserManager::update_user_picture(
                 $user_id,
@@ -398,7 +413,7 @@ if ($form->validate()) {
         $language = $user['language'];
         $address = isset($user['address']) ? $user['address'] : null;
 
-        if ($user['radio_expiration_date'] == '1' && !$user_data['platform_admin']) {
+        if (!$user_data['platform_admin'] && $user['radio_expiration_date'] == '1') {
             $expiration_date = $user['expiration_date'];
         } else {
             $expiration_date = null;
@@ -414,6 +429,8 @@ if ($form->validate()) {
         if (api_get_setting('login_is_email') == 'true') {
             $username = $email;
         }
+
+        $template = isset($user['email_template_option']) ? $user['email_template_option'] : [];
 
         UserManager::update_user(
             $user_id,
@@ -436,12 +453,16 @@ if ($form->validate()) {
             null,
             $send_mail,
             $reset_password,
-            $address
+            $address,
+            $template
         );
 
-        if (isset($user['student_boss'])) {
-            UserManager::subscribeUserToBossList($user_id, $user['student_boss']);
-        }
+        $studentBossListSent = isset($user['student_boss']) ? $user['student_boss'] : [];
+        UserManager::subscribeUserToBossList(
+            $user_id,
+            $studentBossListSent,
+            true
+        );
 
         if (api_get_setting('openid_authentication') == 'true' && !empty($user['openid'])) {
             $up = UserManager::update_openid($user_id, $user['openid']);
@@ -463,11 +484,14 @@ if ($form->validate()) {
 
         $extraFieldValue = new ExtraFieldValue('user');
         $extraFieldValue->saveFieldValues($user);
+        $userInfo = api_get_user_info($user_id);
+        $message = get_lang('UserUpdated').': '.Display::url(
+            $userInfo['complete_name_with_username'],
+            api_get_path(WEB_CODE_PATH).'admin/user_edit.php?user_id='.$user_id
+        );
 
-        $tok = Security::get_token();
-
-        Display::addFlash(Display::return_message(get_lang('UserUpdated')));
-        header('Location: user_list.php?sec_token='.$tok);
+        Display::addFlash(Display::return_message($message, 'normal', false));
+        header('Location: user_list.php');
         exit();
     }
 }
@@ -476,7 +500,28 @@ if ($error_drh) {
     Display::addFlash(Display::return_message(get_lang('StatusCanNotBeChangedToHumanResourcesManager'), 'error'));
 }
 
-$content = null;
+$actions = [
+    Display::url(
+        Display::return_icon(
+            'info.png',
+            get_lang('Information'),
+            [],
+            ICON_SIZE_MEDIUM
+        ),
+        api_get_path(WEB_CODE_PATH).'admin/user_information.php?user_id='.$user_id
+    ),
+    Display::url(
+        Display::return_icon(
+            'login_as.png',
+            get_lang('LoginAs'),
+            [],
+            ICON_SIZE_MEDIUM
+        ),
+        api_get_path(WEB_CODE_PATH).'admin/user_list.php?action=login_as&user_id='.$user_id.'&sec_token='.Security::getTokenFromSession()
+    ),
+];
+
+$content = Display::toolbarAction('toolbar-user-information', [implode(PHP_EOL, $actions)]);
 
 $bigImage = UserManager::getUserPicture($user_id, USER_IMAGE_SIZE_BIG);
 $normalImage = UserManager::getUserPicture($user_id, USER_IMAGE_SIZE_ORIGINAL);

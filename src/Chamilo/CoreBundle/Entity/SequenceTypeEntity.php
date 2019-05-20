@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class SequenceTypeEntity
+ * Class SequenceTypeEntity.
  *
  * @ORM\Table(name="sequence_type_entity")
  * @ORM\Entity
@@ -14,39 +14,39 @@ use Doctrine\ORM\Mapping as ORM;
 class SequenceTypeEntity
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue()
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
      */
-    private $name;
+    protected $name;
 
     /**
      * @var string
      *
      * @ORM\Column(name="description", type="text", nullable=false)
      */
-    private $description;
+    protected $description;
 
     /**
      * @var string
      *
      * @ORM\Column(name="ent_table", type="string", length=255, nullable=false)
      */
-    private $entityTable;
+    protected $entityTable;
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -112,5 +112,4 @@ class SequenceTypeEntity
 
         return $this;
     }
-
 }

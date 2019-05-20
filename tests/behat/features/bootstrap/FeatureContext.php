@@ -1,5 +1,6 @@
 <?php
 
+use Behat\Gherkin\Node\TableNode;
 use Behat\MinkExtension\Context\MinkContext;
 
 /**
@@ -20,26 +21,12 @@ class FeatureContext extends MinkContext
      */
     public function iAmAPlatformAdministrator()
     {
-        $this->visit('/index.php?logout=logout');
+        $this->visit('/index.php?logout=logout&uid=1');
         $this->iAmOnHomepage();
         $this->fillField('login', 'admin');
         $this->fillField('password', 'admin');
         $this->pressButton('submitAuth');
         $this->getSession()->back();
-    }
-
-    /**
-     * @Given /^I am a session administrator$/
-     */
-    public function iAmASessionAdministrator()
-    {
-        $this->visit('/index.php?logout=logout');
-        $this->iAmOnHomepage();
-        $this->fillFields(new \Behat\Gherkin\Node\TableNode([
-            ['login', 'amaurichard'],
-            ['password', 'amaurichard']
-        ]));
-        $this->pressButton('submitAuth');
     }
 
     /**
@@ -52,17 +39,6 @@ class FeatureContext extends MinkContext
         $this->fillField('login', 'mmosquera');
         $this->fillField('password', 'mmosquera');
         $this->pressButton('submitAuth');
-    }
-
-    /**
-     * @Given /^I am a teacher in course "([^"]*)"$/
-     * @Todo implement
-     */
-    public function iAmATeacherInCourse($course)
-    {
-        //$sql = "SELECT * FROM course_rel_user WHERE c_id = X AND user_id = ";
-        //$result = ...
-        //if ($result !== false) { ... }
     }
 
     /**
@@ -119,7 +95,7 @@ class FeatureContext extends MinkContext
     public function courseExists($argument)
     {
         $this->iAmAPlatformAdministrator();
-        $this->visit('/main/admin/course_list.php?keyword=' . $argument);
+        $this->visit('/main/admin/course_list.php?keyword='.$argument);
         $this->assertPageContainsText($argument);
     }
 
@@ -129,27 +105,25 @@ class FeatureContext extends MinkContext
     public function courseIsDeleted($argument)
     {
         $this->iAmAPlatformAdministrator();
-        $this->visit('/main/admin/course_list.php?keyword=' . $argument);
+        $this->visit('/main/admin/course_list.php?keyword='.$argument);
         $this->clickLink('Delete');
-    }
-
-    /**
-     * @Given /^I am in course "([^"]*)"$/
-     * @Todo redefine function to be different from I am on course TEMP homepage
-     */
-    public function iAmInCourse($argument)
-    {
-        $this->visit('/main/course_home/course_home.php?cDir=' . $argument);
-        $this->assertElementNotOnPage('.alert-danger');
     }
 
     /**
      * @Given /^I am on course "([^"]*)" homepage$/
      */
-    public function iAmOnCourseXHomepage($argument)
+    public function iAmOnCourseXHomepage($courseCode)
     {
-        $this->visit('/main/course_home/course_home.php?cDir=' . $argument);
+        $this->visit('/courses/'.$courseCode.'/index.php');
         $this->assertElementNotOnPage('.alert-danger');
+    }
+
+    /**
+     * @Given /^I am on course "([^"]*)" homepage in session "([^"]*)"$/
+     */
+    public function iAmOnCourseXHomepageInSessionY($courseCode, $sessionName)
+    {
+        $this->visit('/main/course_home/redirect.php?cidReq='.$courseCode.'&session_name='.$sessionName);
     }
 
     /**
@@ -168,10 +142,14 @@ class FeatureContext extends MinkContext
     {
         $this->visit('/index.php?logout=logout');
         $this->iAmOnHomepage();
-        $this->fillFields(new \Behat\Gherkin\Node\TableNode([
-            ['login', $username],
-            ['password', $username]
-        ]));
+        $this->fillFields(
+            new TableNode(
+                [
+                    ['login', $username],
+                    ['password', $username],
+                ]
+            )
+        );
         $this->pressButton('submitAuth');
     }
 
@@ -184,16 +162,22 @@ class FeatureContext extends MinkContext
         $friendId = $friendId;
         $friendUsername = $friendUsername;
 
-        $sendInvitationURL = '/main/inc/ajax/message.ajax.php?' . http_build_query([
-            'a' => 'send_invitation',
-            'user_id' => $friendId,
-            'content' => 'Add me'
-        ]);
-        $acceptInvitationURL = '/main/inc/ajax/social.ajax.php?' . http_build_query([
-            'a' => 'add_friend',
-            'friend_id' => $adminId,
-            'is_my_friend' => 'friend'
-        ]);
+        $sendInvitationURL = '/main/inc/ajax/message.ajax.php?'.
+            http_build_query(
+                [
+                    'a' => 'send_invitation',
+                    'user_id' => $friendId,
+                    'content' => 'Add me',
+                ]
+            );
+        $acceptInvitationURL = '/main/inc/ajax/social.ajax.php?'.
+            http_build_query(
+                [
+                    'a' => 'add_friend',
+                    'friend_id' => $adminId,
+                    'is_my_friend' => 'friend',
+                ]
+            );
 
         $this->iAmAPlatformAdministrator();
         $this->visit($sendInvitationURL);
@@ -208,13 +192,17 @@ class FeatureContext extends MinkContext
     public function iHaveAPublicPasswordProtectedCourse($code, $password)
     {
         $this->visit('/main/admin/course_add.php');
-        $this->fillFields(new \Behat\Gherkin\Node\TableNode([
-            ['title', 'Password Protected'],
-            ['visual_code', $code],
-            ['visibility', 3]
-        ]));
+        $this->fillFields(
+            new TableNode(
+                [
+                    ['title', 'Password Protected'],
+                    ['visual_code', $code],
+                    ['visibility', 3],
+                ]
+            )
+        );
         $this->pressButton('submit');
-        $this->visit('/main/course_info/infocours.php?cidReq=' . $code);
+        $this->visit('/main/course_info/infocours.php?cidReq='.$code);
         $this->assertPageContainsText('Course registration password');
         $this->fillField('course_registration_password', $password);
         $this->pressButton('submit_save');
@@ -233,9 +221,9 @@ class FeatureContext extends MinkContext
     /**
      * @When /^I invite to a friend with id "([^"]*)" to a social group with id "([^"]*)"$/
      */
-    public function iInviteAFrienToASocialGroup($friendId, $groupId)
+    public function iInviteAFriendToASocialGroup($friendId, $groupId)
     {
-        $this->visit('/main/social/group_invitation.php?id=' . $groupId);
+        $this->visit('/main/social/group_invitation.php?id='.$groupId);
         $this->fillField('invitation[]', $friendId);
         $this->pressButton('submit');
     }
@@ -274,7 +262,7 @@ class FeatureContext extends MinkContext
      */
     public function iAmOnSocialGroupMembersPageWithId($groupId)
     {
-        $this->visit('/main/social/group_view.php?id=' . $groupId);
+        $this->visit('/main/social/group_view.php?id='.$groupId);
     }
 
     /**
@@ -282,11 +270,15 @@ class FeatureContext extends MinkContext
      */
     public function iTryDeleteAFriendFromSocialGroup($friendId, $groupId)
     {
-        $this->visit('/main/social/group_members.php?' . http_build_query([
-            'id' => $groupId,
-            'u' => $friendId,
-            'action' => 'delete'
-        ]));
+        $this->visit(
+            '/main/social/group_members.php?'.http_build_query(
+                [
+                    'id' => $groupId,
+                    'u' => $friendId,
+                    'action' => 'delete',
+                ]
+            )
+        );
     }
 
     /**
@@ -390,12 +382,36 @@ class FeatureContext extends MinkContext
     }
 
     /**
+     * @When /^(?:|I )fill in select bootstrap static by text "(?P<field>(?:[^"]|\\")*)" select "(?P<value>(?:[^"]|\\")*)"$/
+     */
+    public function iFillInSelectStaticBootstrapInputWithAndSelectByText($field, $value)
+    {
+        $this->getSession()->wait(1000);
+        $this->getSession()->executeScript("
+           $('$field > option').each(function(index, option) {
+                if (option.text == '$value') {
+                    $('$field').selectpicker('val', option.value);
+                }                
+            });
+        ");
+    }
+
+
+    /**
      * @When /^wait for the page to be loaded$/
      */
     public function waitForThePageToBeLoaded()
     {
-        //$this->getSession()->wait(10000, "document.readyState === 'complete'");
         $this->getSession()->wait(3000);
+    }
+
+    /**
+     * @When /^wait very long for the page to be loaded$/
+     */
+    public function waitVeryLongForThePageToBeLoaded()
+    {
+        //$this->getSession()->wait(10000, "document.readyState === 'complete'");
+        $this->getSession()->wait(8000);
     }
 
     /**
@@ -456,5 +472,98 @@ class FeatureContext extends MinkContext
         ");
 
         return true;
+    }
+
+    /**
+     * @Then /^I should see an icon with title "([^"]*)"$/
+     */
+    public function iShouldSeeAnIconWithTitle($value)
+    {
+        $el = $this->getSession()->getPage()->find('xpath', "//img[@title='$value']");
+        if (null === $el) {
+            throw new Exception(
+                'Could not find an icon with title: '.$value
+            );
+        }
+        return true;
+    }
+    /**
+     * @Then /^I should not see an icon with title "([^"]*)"$/
+     */
+    public function iShouldNotSeeAnIconWithTitle($value)
+    {
+        $el = $this->getSession()->getPage()->find('xpath', "//img[@title='$value']");
+        if (null === $el) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Example: Then I should see the table "#category_results":
+     *               | Categories    | Absolute score | Relative score |
+     *               | Categoryname2 | 50 / 70        | 71.43%         |
+     *               | Categoryname1 | 60 / 60        | 100%           |
+     *
+     * @Then /^I should see the table "([^"]*)":$/
+     *
+     * @param string    $tableId
+     * @param TableNode $tableData
+     *
+     * @throws Exception
+     */
+    public function assertPageContainsTable($tableId, TableNode $tableData)
+    {
+        $table = $this->getSession()->getPage()->find('css', $tableId);
+        $rows = $tableData->getRowsHash();
+        $i = 1;
+
+        $right = array_keys($rows);
+
+        foreach ($right as $text) {
+            $cell = $table->find('css', 'tr:nth-child('.$i.') :nth-child(1)');
+            $i++;
+
+            if (!$cell) {
+                throw new Exception('Cell not found.');
+            }
+
+            if ($cell->getText() != $text) {
+                throw new Exception('Table text not found.');
+            }
+        }
+
+        $i = 1;
+
+        foreach ($rows as $field => $cols) {
+            if (is_array($cols)) {
+                $j = 2;
+
+                foreach ($cols as $col) {
+                    $cell = $table->find('css', 'tr:nth-child('.$i.') :nth-child('.$j.')');
+                    $j++;
+
+                    if (!$cell) {
+                        throw new Exception('Cell not found.');
+                    }
+
+                    if ($cell->getText() != $col) {
+                        throw new Exception('Table text not found. Found "'.$cell->getText().'" <> "'.$col.'"');
+                    }
+                }
+            } else {
+                $cell = $table->find('css', 'tr:nth-child('.$i.') :nth-child(2)');
+
+                if (!$cell) {
+                    throw new Exception('Cell not found.');
+                }
+
+                if ($cell->getText() != $cols) {
+                    throw new Exception('Table text not found. Found "'.$cell->getText().'" <> "'.$cols.'"');
+                }
+            }
+
+            $i++;
+        }
     }
 }

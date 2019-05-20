@@ -6,7 +6,7 @@ namespace Chamilo\CourseBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CUserinfoContent
+ * CUserinfoContent.
  *
  * @ORM\Table(
  *  name="c_userinfo_content",
@@ -20,67 +20,68 @@ use Doctrine\ORM\Mapping as ORM;
 class CUserinfoContent
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="iid", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $iid;
+    protected $iid;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer")
      */
-    private $cId;
+    protected $cId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer", nullable=true)
      */
-    private $id;
+    protected $id;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="user_id", type="integer", nullable=false)
      */
-    private $userId;
+    protected $userId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="definition_id", type="integer", nullable=false)
      */
-    private $definitionId;
+    protected $definitionId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="editor_ip", type="string", length=39, nullable=true)
      */
-    private $editorIp;
+    protected $editorIp;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="edition_time", type="datetime", nullable=true)
      */
-    private $editionTime;
+    protected $editionTime;
 
     /**
      * @var string
      *
      * @ORM\Column(name="content", type="text", nullable=false)
      */
-    private $content;
+    protected $content;
 
     /**
-     * Set userId
+     * Set userId.
      *
-     * @param integer $userId
+     * @param int $userId
+     *
      * @return CUserinfoContent
      */
     public function setUserId($userId)
@@ -91,9 +92,9 @@ class CUserinfoContent
     }
 
     /**
-     * Get userId
+     * Get userId.
      *
-     * @return integer
+     * @return int
      */
     public function getUserId()
     {
@@ -101,9 +102,10 @@ class CUserinfoContent
     }
 
     /**
-     * Set definitionId
+     * Set definitionId.
      *
-     * @param integer $definitionId
+     * @param int $definitionId
+     *
      * @return CUserinfoContent
      */
     public function setDefinitionId($definitionId)
@@ -114,9 +116,9 @@ class CUserinfoContent
     }
 
     /**
-     * Get definitionId
+     * Get definitionId.
      *
-     * @return integer
+     * @return int
      */
     public function getDefinitionId()
     {
@@ -124,9 +126,10 @@ class CUserinfoContent
     }
 
     /**
-     * Set editorIp
+     * Set editorIp.
      *
      * @param string $editorIp
+     *
      * @return CUserinfoContent
      */
     public function setEditorIp($editorIp)
@@ -137,7 +140,7 @@ class CUserinfoContent
     }
 
     /**
-     * Get editorIp
+     * Get editorIp.
      *
      * @return string
      */
@@ -147,9 +150,10 @@ class CUserinfoContent
     }
 
     /**
-     * Set editionTime
+     * Set editionTime.
      *
      * @param \DateTime $editionTime
+     *
      * @return CUserinfoContent
      */
     public function setEditionTime($editionTime)
@@ -160,7 +164,7 @@ class CUserinfoContent
     }
 
     /**
-     * Get editionTime
+     * Get editionTime.
      *
      * @return \DateTime
      */
@@ -170,9 +174,10 @@ class CUserinfoContent
     }
 
     /**
-     * Set content
+     * Set content.
      *
      * @param string $content
+     *
      * @return CUserinfoContent
      */
     public function setContent($content)
@@ -183,7 +188,7 @@ class CUserinfoContent
     }
 
     /**
-     * Get content
+     * Get content.
      *
      * @return string
      */
@@ -193,9 +198,10 @@ class CUserinfoContent
     }
 
     /**
-     * Set id
+     * Set id.
      *
-     * @param integer $id
+     * @param int $id
+     *
      * @return CUserinfoContent
      */
     public function setId($id)
@@ -206,9 +212,9 @@ class CUserinfoContent
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -216,9 +222,10 @@ class CUserinfoContent
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return CUserinfoContent
      */
     public function setCId($cId)
@@ -229,9 +236,9 @@ class CUserinfoContent
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {

@@ -7,22 +7,25 @@ use Database;
 use TestCategory;
 
 /**
- * Class to delete items from a Chamilo-course
+ * Class to delete items from a Chamilo-course.
+ *
  * @author Bart Mollet <bart.mollet@hogent.be>
+ *
  * @package chamilo.backup
  */
 class CourseRecycler
 {
     /**
-     * A course-object with the items to delete
+     * A course-object with the items to delete.
      */
     public $course;
     public $type;
 
     /**
-     * Create a new CourseRecycler
+     * Create a new CourseRecycler.
+     *
      * @param course $course The course-object which contains the items to
-     * delete
+     *                       delete
      */
     public function __construct($course)
     {
@@ -34,7 +37,8 @@ class CourseRecycler
     /**
      * Delete all items from the course.
      * This deletes all items in the course-object from the current Chamilo-
-     * course
+     * course.
+     *
      * @param string $backupType 'full_backup' or 'select_items'
      *
      * @return bool
@@ -62,6 +66,7 @@ class CourseRecycler
         $this->recycle_test_category();
         $this->recycle_surveys();
         $this->recycle_learnpaths();
+        $this->recycle_learnpath_categories();
         $this->recycle_cours_description();
         $this->recycle_wiki();
         $this->recycle_glossary();
@@ -82,10 +87,14 @@ class CourseRecycler
                 }
             }
         }
+
+        if ($backupType === 'full_backup') {
+            \CourseManager::deleteCoursePicture($this->course_info['code']);
+        }
     }
 
     /**
-     * Delete documents
+     * Delete documents.
      */
     public function recycle_documents()
     {
@@ -121,14 +130,14 @@ class CourseRecycler
     }
 
     /**
-     * Delete wiki
+     * Delete wiki.
      */
     public function recycle_wiki()
     {
         if ($this->course->has_resources(RESOURCE_WIKI)) {
             $table_wiki = Database::get_course_table(TABLE_WIKI);
             $table_wiki_conf = Database::get_course_table(TABLE_WIKI_CONF);
-            $pages = array();
+            $pages = [];
             foreach ($this->course->resources[RESOURCE_WIKI] as $resource) {
                 $pages[] = $resource->page_id;
             }
@@ -149,7 +158,7 @@ class CourseRecycler
     }
 
     /**
-     * Delete glossary
+     * Delete glossary.
      */
     public function recycle_glossary()
     {
@@ -165,7 +174,7 @@ class CourseRecycler
     }
 
     /**
-     * Delete links
+     * Delete links.
      */
     public function recycle_links()
     {
@@ -181,7 +190,7 @@ class CourseRecycler
     }
 
     /**
-     * Delete forums
+     * Delete forums.
      */
     public function recycle_forums()
     {
@@ -297,53 +306,60 @@ class CourseRecycler
     }
 
     /**
-     * Delete forum-categories
-     * Deletes all forum-categories from current course without forums
+     * Deletes all forum-categories without forum from the current course.
+     * Categories with forums in it are dealt with by recycle_forums()
+     * This requires a check on the status of the forum item in c_item_property.
      */
     public function recycle_forum_categories()
     {
-        $table_forum = Database::get_course_table(TABLE_FORUM);
-        $table_forumcat = Database::get_course_table(TABLE_FORUM_CATEGORY);
-        $sql = "SELECT fc.cat_id FROM ".$table_forumcat." fc
-                LEFT JOIN ".$table_forum." f
-                ON
-                    fc.cat_id=f.forum_category AND
-                    fc.c_id = ".$this->course_id." AND
-                    f.c_id = ".$this->course_id."
-        		WHERE f.forum_id IS NULL";
-        $res = Database::query($sql);
-        while ($obj = Database::fetch_object($res)) {
-            $sql = "DELETE FROM ".$table_forumcat."
-                    WHERE c_id = ".$this->course_id." AND cat_id = ".$obj->cat_id;
-            Database::query($sql);
-        }
+        $forumTable = Database::get_course_table(TABLE_FORUM);
+        $forumCategoryTable = Database::get_course_table(TABLE_FORUM_CATEGORY);
+        $itemPropertyTable = Database::get_course_table(TABLE_ITEM_PROPERTY);
+        $courseId = $this->course_id;
+        // c_forum_forum.forum_category points to c_forum_category.cat_id and
+        // has to be queried *with* the c_id to ensure a match
+        $subQuery = "SELECT distinct(f.forum_category) as categoryId
+              FROM $forumTable f, $itemPropertyTable i
+              WHERE
+                  f.c_id = $courseId AND
+                  i.c_id = f.c_id AND
+                  i.tool = 'forum' AND
+        	      f.iid = i.ref AND 
+                  i.visibility = 1";
+        $sql = "DELETE FROM $forumCategoryTable
+                    WHERE c_id = $courseId AND cat_id NOT IN ($subQuery)";
+        Database::query($sql);
     }
 
     /**
-     * Delete link-categories
-     * Deletes all empty link-categories (=without links) from current course
+     * Deletes all empty link-categories (=without links) from current course.
+     * Links are already dealt with by recycle_links() but if recycle is called
+     * on categories and not on link, then non-empty categories will survive
+     * the recycling.
      */
     public function recycle_link_categories()
     {
-        $link_cat_table = Database::get_course_table(TABLE_LINK_CATEGORY);
-        $link_table = Database::get_course_table(TABLE_LINK);
-        $sql = "SELECT lc.id FROM $link_cat_table lc
-                LEFT JOIN ".$link_table." l
-                ON
-                    lc.id=l.category_id AND
-                    lc.c_id = ".$this->course_id." AND
-                    l.c_id = ".$this->course_id."
-        		WHERE l.id IS NULL";
-        $res = Database::query($sql);
-        while ($obj = Database::fetch_object($res)) {
-            $sql = "DELETE FROM ".$link_cat_table."
-                    WHERE c_id = ".$this->course_id." AND id = ".$obj->id;
-            Database::query($sql);
-        }
+        $linkCategoryTable = Database::get_course_table(TABLE_LINK_CATEGORY);
+        $linkTable = Database::get_course_table(TABLE_LINK);
+        $itemPropertyTable = Database::get_course_table(TABLE_ITEM_PROPERTY);
+        $courseId = $this->course_id;
+        // c_link.category_id points to c_link_category.id and
+        // has to be queried *with* the c_id to ensure a match
+        $subQuery = "SELECT distinct(l.category_id) as categoryId
+              FROM $linkTable l, $itemPropertyTable i
+              WHERE
+                  l.c_id = $courseId AND
+                  i.c_id = l.c_id AND
+                  i.tool = 'link' AND
+        	      l.iid = i.ref AND 
+                  i.visibility = 1";
+        $sql = "DELETE FROM $linkCategoryTable
+                    WHERE c_id = $courseId AND id NOT IN ($subQuery)";
+        Database::query($sql);
     }
 
     /**
-     * Delete events
+     * Delete events.
      */
     public function recycle_events()
     {
@@ -365,7 +381,7 @@ class CourseRecycler
     }
 
     /**
-     * Delete announcements
+     * Delete announcements.
      */
     public function recycle_announcements()
     {
@@ -388,7 +404,7 @@ class CourseRecycler
 
     /**
      * Recycle quizzes - doesn't remove the questions and their answers,
-     * as they might still be used later
+     * as they might still be used later.
      */
     public function recycle_quizzes()
     {
@@ -448,7 +464,7 @@ class CourseRecycler
                     )";
                 $db_result = Database::query($sql);
                 if (Database::num_rows($db_result) > 0) {
-                    $orphan_ids = array();
+                    $orphan_ids = [];
                     while ($obj = Database::fetch_object($db_result)) {
                         $orphan_ids[] = $obj->id;
                     }
@@ -480,7 +496,7 @@ class CourseRecycler
     }
 
     /**
-     * Recycle tests categories
+     * Recycle tests categories.
      */
     public function recycle_test_category()
     {
@@ -493,7 +509,7 @@ class CourseRecycler
     }
 
     /**
-     * Recycle surveys - removes everything
+     * Recycle surveys - removes everything.
      */
     public function recycle_surveys()
     {
@@ -529,7 +545,7 @@ class CourseRecycler
     }
 
     /**
-     * Recycle learning paths
+     * Recycle learning paths.
      */
     public function recycle_learnpaths()
     {
@@ -537,7 +553,7 @@ class CourseRecycler
             $table_main = Database::get_course_table(TABLE_LP_MAIN);
             $table_item = Database::get_course_table(TABLE_LP_ITEM);
             $table_view = Database::get_course_table(TABLE_LP_VIEW);
-            $table_iv   = Database::get_course_table(TABLE_LP_ITEM_VIEW);
+            $table_iv = Database::get_course_table(TABLE_LP_ITEM_VIEW);
             $table_iv_int = Database::get_course_table(TABLE_LP_IV_INTERACTION);
             $table_tool = Database::get_course_table(TABLE_TOOL_LIST);
 
@@ -596,7 +612,27 @@ class CourseRecycler
     }
 
     /**
-     * Delete course description
+     * Recycle selected learning path categories and dissociate learning paths
+     * that are associated with it.
+     */
+    public function recycle_learnpath_categories()
+    {
+        $learningPathTable = Database::get_course_table(TABLE_LP_MAIN);
+        $learningPathCategoryTable = Database::get_course_table(TABLE_LP_CATEGORY);
+        if (isset($this->course->resources[RESOURCE_LEARNPATH_CATEGORY])) {
+            foreach ($this->course->resources[RESOURCE_LEARNPATH_CATEGORY] as $id => $learnpathCategory) {
+                $categoryId = $learnpathCategory->object->getId();
+                // Dissociate learning paths from categories that will be deleted
+                $sql = "UPDATE $learningPathTable SET category_id = 0 WHERE category_id = ".$categoryId;
+                Database::query($sql);
+                $sql = "DELETE FROM $learningPathCategoryTable WHERE iid = ".$categoryId;
+                Database::query($sql);
+            }
+        }
+    }
+
+    /**
+     * Delete course description.
      */
     public function recycle_cours_description()
     {
@@ -612,8 +648,8 @@ class CourseRecycler
     }
 
     /**
-    * Recycle Thematics
-    */
+     * Recycle Thematics.
+     */
     public function recycle_thematic($session_id = 0)
     {
         if ($this->course->has_resources(RESOURCE_THEMATIC)) {
@@ -625,12 +661,12 @@ class CourseRecycler
             foreach ($resources[RESOURCE_THEMATIC] as $last_id => $thematic) {
                 if (is_numeric($last_id)) {
                     foreach ($thematic->thematic_advance_list as $thematic_advance) {
-                        $cond = array(
-                            'id = ? AND  c_id = ?' => array(
+                        $cond = [
+                            'id = ? AND  c_id = ?' => [
                                 $thematic_advance['id'],
-                                $this->course_id
-                            )
-                        );
+                                $this->course_id,
+                            ],
+                        ];
                         api_item_property_update(
                             $this->course_info,
                             'thematic_advance',
@@ -642,12 +678,12 @@ class CourseRecycler
                     }
 
                     foreach ($thematic->thematic_plan_list as $thematic_plan) {
-                        $cond = array(
-                            'id = ? AND  c_id = ?' => array(
+                        $cond = [
+                            'id = ? AND  c_id = ?' => [
                                 $thematic_plan['id'],
                                 $this->course_id,
-                            ),
-                        );
+                            ],
+                        ];
                         api_item_property_update(
                             $this->course_info,
                             'thematic_plan',
@@ -657,12 +693,12 @@ class CourseRecycler
                         );
                         Database::delete($table_thematic_plan, $cond);
                     }
-                    $cond = array(
-                        'id = ? AND  c_id = ?' => array(
+                    $cond = [
+                        'id = ? AND  c_id = ?' => [
                             $last_id,
                             $this->course_id,
-                        ),
-                    );
+                        ],
+                    ];
                     api_item_property_update(
                         $this->course_info,
                         'thematic',
@@ -677,8 +713,8 @@ class CourseRecycler
     }
 
     /**
-    * Recycle Attendances
-    */
+     * Recycle Attendances.
+     */
     public function recycle_attendance($session_id = 0)
     {
         if ($this->course->has_resources(RESOURCE_ATTENDANCE)) {
@@ -689,10 +725,10 @@ class CourseRecycler
             foreach ($resources[RESOURCE_ATTENDANCE] as $last_id => $obj) {
                 if (is_numeric($last_id)) {
                     foreach ($obj->attendance_calendar as $attendance_calendar) {
-                        $cond = array('id = ? AND c_id = ? '=>array($attendance_calendar['id'], $this->course_id));
+                        $cond = ['id = ? AND c_id = ? ' => [$attendance_calendar['id'], $this->course_id]];
                         Database::delete($table_attendance_calendar, $cond);
                     }
-                    $cond = array('id = ? AND c_id = ?'=>array($last_id, $this->course_id));
+                    $cond = ['id = ? AND c_id = ?' => [$last_id, $this->course_id]];
                     Database::delete($table_attendance, $cond);
                     api_item_property_update(
                         $this->course_info,
@@ -707,7 +743,7 @@ class CourseRecycler
     }
 
     /**
-     * Recycle Works
+     * Recycle Works.
      */
     public function recycle_work($session_id = 0)
     {
@@ -718,13 +754,13 @@ class CourseRecycler
             $resources = $this->course->resources;
             foreach ($resources[RESOURCE_WORK] as $last_id => $obj) {
                 if (is_numeric($last_id)) {
-                    $cond = array('publication_id = ? AND c_id = ? '=>array($last_id, $this->course_id));
+                    $cond = ['publication_id = ? AND c_id = ? ' => [$last_id, $this->course_id]];
                     Database::delete($table_work_assignment, $cond);
                     // The following also deletes student tasks
-                    $cond = array('parent_id = ? AND c_id = ?'=>array($last_id, $this->course_id));
+                    $cond = ['parent_id = ? AND c_id = ?' => [$last_id, $this->course_id]];
                     Database::delete($table_work, $cond);
                     // Finally, delete the main task registry
-                    $cond = array('id = ? AND c_id = ?'=>array($last_id, $this->course_id));
+                    $cond = ['id = ? AND c_id = ?' => [$last_id, $this->course_id]];
                     Database::delete($table_work, $cond);
                     api_item_property_update(
                         $this->course_info,

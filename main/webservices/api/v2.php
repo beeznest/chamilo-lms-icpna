@@ -1,15 +1,15 @@
 <?php
 /* For licensing terms, see /license.txt */
-
 require_once __DIR__.'/../../inc/global.inc.php';
 
 $hash = isset($_REQUEST['hash']) ? $_REQUEST['hash'] : null;
 
 if ($hash) {
     $hashParams = Rest::decodeParams($hash);
-
-    foreach ($hashParams as $key => $value) {
-        $_REQUEST[$key] = $value;
+    if (!empty($hashParams)) {
+        foreach ($hashParams as $key => $value) {
+            $_REQUEST[$key] = Security::remove_XSS($value);
+        }
     }
 }
 
@@ -43,7 +43,7 @@ try {
             $restResponse->setData([
                 'url' => api_get_path(WEB_PATH),
                 'apiKey' => Rest::findUserApiKey($username, Rest::SERVIVE_NAME),
-                'gcmSenderId' => api_get_setting('messaging_gdc_project_number')
+                'gcmSenderId' => api_get_setting('messaging_gdc_project_number'),
             ]);
             break;
 
@@ -116,8 +116,20 @@ try {
             $restResponse->setData($data);
             break;
         case Rest::GET_COURSE_LEARNPATH:
-            $lpId = isset($_REQUEST['lp_id']) ? intval($_REQUEST['lp_id']) : 0;
+            $lpId = isset($_REQUEST['lp_id']) ? intval($_REQUEST['lp_id']) : 1;
             $restApi->showLearningPath($lpId);
+            break;
+        case Rest::SAVE_COURSE:
+            $data = $restApi->addCourse($_POST);
+            $restResponse->setData($data);
+            break;
+        case Rest::SAVE_USER:
+            $data = $restApi->addUser($_POST);
+            $restResponse->setData($data);
+            break;
+        case Rest::SUBSCRIBE_USER_TO_COURSE:
+            $data = $restApi->subscribeUserToCourse($_POST);
+            $restResponse->setData($data);
             break;
         case Rest::SAVE_FORUM_POST:
             if (
@@ -136,7 +148,7 @@ try {
                 'thread_id' => $_POST['thread'],
                 'forum_id' => $_POST['forum'],
                 'post_notification' => $notify,
-                'post_parent_id' => $parentId
+                'post_parent_id' => $parentId,
             ];
 
             $data = $restApi->saveForumPost($postValues, $forumId);
@@ -182,7 +194,7 @@ try {
                 'post_title' => $_POST['title'],
                 'forum_id' => $_POST['forum'],
                 'post_text' => nl2br($_POST['text']),
-                'post_notification' => $notify
+                'post_notification' => $notify,
             ];
 
             $data = $restApi->saveForumThread($threadInfo, $forumId);
@@ -195,7 +207,6 @@ try {
     $restResponse->setErrorMessage(
         $exeption->getMessage()
     );
-
 }
 
 header('Content-Type: application/json');

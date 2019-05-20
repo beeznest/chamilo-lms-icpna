@@ -1,16 +1,13 @@
 <?php
-/**
- * ShowUserEvent.php
- * avanzu-admin
- * Date: 23.02.14
- */
+/* For licensing terms, see /license.txt */
 
 namespace Chamilo\ThemeBundle\Event;
 
 use Chamilo\ThemeBundle\Model\UserInterface;
 
 /**
- * Class ShowUserEvent
+ * Class ShowUserEvent.
+ *
  * @package Chamilo\ThemeBundle\Event
  */
 class ShowUserEvent extends ThemeEvent

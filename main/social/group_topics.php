@@ -1,17 +1,18 @@
 <?php
 /* For licensing terms, see /license.txt */
+
 /**
  * @package chamilo.social
+ *
  * @author Julio Montoya <gugli100@gmail.com>
  */
-
 $cidReset = true;
 
 require_once __DIR__.'/../inc/global.inc.php';
 
 api_block_anonymous_users();
 if (api_get_setting('allow_social_tool') != 'true') {
-    api_not_allowed();
+    api_not_allowed(true);
 }
 
 $group_id = intval($_GET['id']);
@@ -41,7 +42,7 @@ if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'delete') {
     $group_role = $usergroup->get_user_group_role(api_get_user_id(), $group_id);
 
     if (api_is_platform_admin() ||
-        in_array($group_role, array(GROUP_USER_PERMISSION_ADMIN, GROUP_USER_PERMISSION_MODERATOR))
+        in_array($group_role, [GROUP_USER_PERMISSION_ADMIN, GROUP_USER_PERMISSION_MODERATOR])
     ) {
         $usergroup->delete_topic($group_id, $topic_id);
         Display::addFlash(Display::return_message(get_lang('Deleted')));
@@ -49,6 +50,7 @@ if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'delete') {
         exit;
     }
 }
+
 // My friends
 $friend_html = SocialManager::listMyFriendsBlock(
     $user_id
@@ -82,7 +84,7 @@ if (isset($_POST['action'])) {
         );
     } else {
         if ($_POST['action'] == 'add_message_group' && !$is_member) {
-            api_not_allowed();
+            api_not_allowed(true);
         }
         $res = MessageManager::send_message(
             0,
@@ -99,7 +101,7 @@ if (isset($_POST['action'])) {
 
     // display error messages
     if (!$res) {
-        $social_right_content .= Display::return_message(get_lang('Error'), 'error');
+        Display::addFlash(Display::return_message(get_lang('Error'), 'error'));
     }
     $topic_id = isset($_GET['topic_id']) ? intval($_GET['topic_id']) : null;
     if ($_POST['action'] == 'add_message_group') {
@@ -147,7 +149,7 @@ function add_image_form() {
 	}
 }
 
-$(document).ready(function() {
+$(function() {
 	if ($("#msg_'.$message_id.'").length) {
 		$("html,body").animate({
 			scrollTop: $("#msg_'.$message_id.'").offset().top
@@ -179,9 +181,9 @@ $(document).ready(function() {
 </script>';
 
 $this_section = SECTION_SOCIAL;
-$interbreadcrumb[] = array('url' => 'groups.php', 'name' => get_lang('Groups'));
-$interbreadcrumb[] = array('url' => 'group_view.php?id='.$group_id, 'name' => Security::remove_XSS($group_info['name']));
-$interbreadcrumb[] = array('url' => '#', 'name' => get_lang('Discussions'));
+$interbreadcrumb[] = ['url' => 'groups.php', 'name' => get_lang('Groups')];
+$interbreadcrumb[] = ['url' => 'group_view.php?id='.$group_id, 'name' => Security::remove_XSS($group_info['name'])];
+$interbreadcrumb[] = ['url' => '#', 'name' => get_lang('Discussions')];
 
 $social_left_content = SocialManager::show_social_menu('member_list', $group_id);
 $show_message = null;
@@ -205,6 +207,5 @@ $tpl->assign('social_menu_block', $social_menu_block);
 $tpl->assign('social_friend_block', $friend_html);
 $tpl->assign('group_message', $group_message);
 $tpl->assign('social_right_content', $social_right_content);
-$tpl->assign('content', $content);
 $social_layout = $tpl->get_template('social/groups_topics.tpl');
 $tpl->display($social_layout);

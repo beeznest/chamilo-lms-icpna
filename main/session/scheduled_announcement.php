@@ -25,27 +25,27 @@ if (!$object->allowed()) {
 $sessionUrl = api_get_path(WEB_CODE_PATH).'session/resume_session.php?id_session='.$sessionId;
 
 $htmlHeadXtra[] = api_get_jqgrid_js();
-$interbreadcrumb[] = array(
-    'url' => "session_list.php",
-    "name" => get_lang('SessionList')
-);
-$interbreadcrumb[] = array(
+$interbreadcrumb[] = [
+    'url' => 'session_list.php',
+    'name' => get_lang('SessionList'),
+];
+$interbreadcrumb[] = [
     'url' => $sessionUrl,
-    "name" => get_lang('SessionOverview')
-);
+    'name' => get_lang('SessionOverview'),
+];
 
 if ($action == 'add') {
-    $interbreadcrumb[] = array(
-        'url' => api_get_self()."?session_id=".$sessionId,
-        "name" => get_lang('ScheduledAnnouncements')
-    );
+    $interbreadcrumb[] = [
+        'url' => api_get_self().'?session_id='.$sessionId,
+        'name' => get_lang('ScheduledAnnouncements'),
+    ];
     $tool_name = get_lang('Add');
 } elseif ($action == 'edit') {
     $tool_name = get_lang('Edit');
-    $interbreadcrumb[] = array(
-        'url' => api_get_self()."?session_id=".$sessionId,
-        "name" => get_lang('ScheduledAnnouncements')
-    );
+    $interbreadcrumb[] = [
+        'url' => api_get_self().'?session_id='.$sessionId,
+        'name' => get_lang('ScheduledAnnouncements'),
+    ];
 } else {
     $tool_name = get_lang('ScheduledAnnouncements');
 }
@@ -64,7 +64,7 @@ switch ($action) {
 
         break;
     case 'add':
-        $url  = api_get_self().'?action='.Security::remove_XSS($_GET['action']).'&session_id='.$sessionId;
+        $url = api_get_self().'?action='.Security::remove_XSS($_GET['action']).'&session_id='.$sessionId;
         $form = $object->returnForm($url, 'add', $sessionInfo);
 
         // The validation or display
@@ -100,6 +100,10 @@ switch ($action) {
             $res = $object->save($values);
 
             if ($res) {
+                $extraFieldValue = new ExtraFieldValue('scheduled_announcement');
+                $values['item_id'] = $res;
+                $extraFieldValue->saveFieldValues($values);
+
                 Display::addFlash(
                     Display::return_message(
                         get_lang('ItemAdded'),
@@ -122,8 +126,8 @@ switch ($action) {
         break;
     case 'edit':
         // Action handling: Editing
-        $url  = api_get_self().'?action='.Security::remove_XSS($_GET['action']).'&id='.intval($_GET['id']).'&session_id='.$sessionId;
-        $form = $object->returnSimpleForm($url, 'edit', $sessionInfo);
+        $url = api_get_self().'?action='.Security::remove_XSS($_GET['action']).'&id='.$id.'&session_id='.$sessionId;
+        $form = $object->returnSimpleForm($id, $url, 'edit', $sessionInfo);
         if ($form->validate()) {
             $values = $form->getSubmitValues();
             $values['id'] = $id;
@@ -131,10 +135,16 @@ switch ($action) {
             $values['date'] = api_get_utc_datetime($values['date']);
             $res = $object->update($values);
 
+            $extraFieldValue = new ExtraFieldValue('scheduled_announcement');
+            $values['item_id'] = $id;
+            $extraFieldValue->saveFieldValues($values);
+
             Display::addFlash(Display::return_message(
                 get_lang('Updated'),
                 'confirmation'
             ));
+            header("Location: $url");
+            exit;
         }
         $item = $object->get($id);
         $item['date'] = api_get_local_time($item['date']);
@@ -142,7 +152,7 @@ switch ($action) {
         $content = $form->returnForm();
         break;
     case 'delete':
-        $object->delete($_GET['id']);
+        $object->delete($id);
         $content = $object->getGrid($sessionId);
         break;
     default:
@@ -156,38 +166,38 @@ $columns = [
     get_lang('Subject'),
     get_lang('Date'),
     get_lang('Sent'),
-    get_lang('Actions')
+    get_lang('Actions'),
 ];
 
 $columnModel = [
-    array(
+    [
         'name' => 'subject',
         'index' => 'subject',
         'width' => '250',
         'align' => 'left',
-    ),
-    array(
+    ],
+    [
         'name' => 'date',
         'index' => 'date',
         //'width' => '90',
         //'align' => 'left',
         'sortable' => 'true',
-    ),
-    array(
+    ],
+    [
         'name' => 'sent',
         'index' => 'sent',
         //'width' => '90',
         //'align' => 'left',
         'sortable' => 'true',
-    ),
-    array(
+    ],
+    [
         'name' => 'actions',
         'index' => 'actions',
         'width' => '100',
         'align' => 'left',
         'formatter' => 'action_formatter',
         'sortable' => 'false',
-    )
+    ],
 ];
 
 $actionLinks = 'function action_formatter(cellvalue, options, rowObject) {
@@ -208,7 +218,7 @@ $(function() {
         $columns,
         $columnModel,
         $extraParams,
-        array(),
+        [],
         $actionLinks,
         true
     ).'

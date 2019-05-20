@@ -3,7 +3,9 @@
 
 /**
  * Exercise list: This script shows the list of exercises for administrators and students.
+ *
  * @package chamilo.exercise
+ *
  * @author Olivier Brouckaert, original author
  * @author Denes Nagy, HotPotatoes integration
  * @author Wolfgang Schneider, code/html cleanup
@@ -12,8 +14,7 @@ require_once __DIR__.'/../inc/global.inc.php';
 $this_section = SECTION_COURSES;
 api_protect_course_script(true);
 
-// moved down to fix bug: http://www.dokeos.com/forum/viewtopic.php?p=18609#18609
-$show = (isset($_GET['show']) && $_GET['show'] == 'result') ? 'result' : 'test';
+$show = isset($_GET['show']) && $_GET['show'] === 'result' ? 'result' : 'test';
 
 /* 	Constants and variables */
 $is_allowedToEdit = api_is_allowed_to_edit(null, true);
@@ -24,18 +25,18 @@ if (!$is_allowedToEdit) {
     exit;
 }
 
-$interbreadcrumb[] = array(
+$interbreadcrumb[] = [
     'url' => 'exercise_report.php?'.api_get_cidreq(),
     'name' => get_lang('Exercises'),
-);
-$interbreadcrumb[] = array(
+];
+$interbreadcrumb[] = [
     'url' => 'exercise_report.php?filter=2&'.api_get_cidreq(),
     'name' => get_lang('StudentScore'),
-);
-$interbreadcrumb[] = array(
+];
+$interbreadcrumb[] = [
     'url' => 'exercise_history.php?exe_id='.intval($_GET['exe_id']).'&'.api_get_cidreq(),
     'name' => get_lang('Details'),
-);
+];
 
 $TBL_USER = Database::get_main_table(TABLE_MAIN_USER);
 $TBL_EXERCISES = Database::get_course_table(TABLE_QUIZ_TEST);
@@ -44,7 +45,7 @@ $TBL_TRACK_ATTEMPT_RECORDING = Database::get_main_table(TABLE_STATISTIC_TRACK_E_
 Display::display_header($nameTools, get_lang('Exercise'));
 
 if (isset($_GET['message'])) {
-    if (in_array($_GET['message'], array('ExerciseEdited'))) {
+    if (in_array($_GET['message'], ['ExerciseEdited'])) {
         $my_message_history = Security::remove_XSS($_GET['message']);
         echo Display::return_message(get_lang($my_message_history), 'confirm');
     }

@@ -4,32 +4,33 @@
 use ChamiloSession as Session;
 
 /**
- * Class MultipleAnswerCombination
+ * Class MultipleAnswerCombination.
  *
  *	This class allows to instantiate an object of type
  *  MULTIPLE_ANSWER (MULTIPLE CHOICE, MULTIPLE ANSWER),
  *	extending the class question
  *
  *	@author Eric Marguin
+ *
  *	@package chamilo.exercise
- **/
+ */
 class MultipleAnswerCombination extends Question
 {
     public static $typePicture = 'mcmac.png';
     public static $explanationLangVar = 'MultipleSelectCombination';
 
     /**
-     * Constructor
+     * Constructor.
      */
     public function __construct()
     {
         parent::__construct();
-        $this -> type = MULTIPLE_ANSWER_COMBINATION;
-        $this -> isContent = $this-> getIsContent();
+        $this->type = MULTIPLE_ANSWER_COMBINATION;
+        $this->isContent = $this->getIsContent();
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function createAnswersForm($form)
     {
@@ -51,27 +52,27 @@ class MultipleAnswerCombination extends Question
         $form->addHeader(get_lang('Answers'));
         $form->addHtml($html);
 
-        $defaults = array();
+        $defaults = [];
         $correct = 0;
         $answer = false;
 
         if (!empty($this->id)) {
             $answer = new Answer($this->id);
             $answer->read();
-            if (count($answer->nbrAnswers) > 0 && !$form->isSubmitted()) {
+            if ($answer->nbrAnswers > 0 && !$form->isSubmitted()) {
                 $nb_answers = $answer->nbrAnswers;
             }
         }
 
         $form->addElement('hidden', 'nb_answers');
-        $boxes_names = array();
+        $boxes_names = [];
 
         if ($nb_answers < 1) {
             $nb_answers = 1;
             echo Display::return_message(get_lang('YouHaveToCreateAtLeastOneAnswer'));
         }
 
-        for ($i = 1; $i <= $nb_answers; ++$i) {
+        for ($i = 1; $i <= $nb_answers; $i++) {
             $form->addHtml('<tr>');
 
             if (is_object($answer)) {
@@ -90,7 +91,7 @@ class MultipleAnswerCombination extends Question
                 $defaults['correct[2]'] = false;
             }
 
-            $renderer = & $form->defaultRenderer();
+            $renderer = &$form->defaultRenderer();
 
             $renderer->setElementTemplate(
                 '<td><!-- BEGIN error --><span class="form_error">{error}</span><!-- END error --><br/>{element}</td>',
@@ -125,8 +126,8 @@ class MultipleAnswerCombination extends Question
                 'html_editor',
                 'answer['.$i.']',
                 null,
-                array(),
-                array('ToolbarSet' => 'TestProposedAnswer', 'Width' => '100%', 'Height' => '100')
+                [],
+                ['ToolbarSet' => 'TestProposedAnswer', 'Width' => '100%', 'Height' => '100']
             );
             $form->addRule('answer['.$i.']', get_lang('ThisFieldIsRequired'), 'required');
 
@@ -134,8 +135,8 @@ class MultipleAnswerCombination extends Question
                 'html_editor',
                 'comment['.$i.']',
                 null,
-                array(),
-                array('ToolbarSet' => 'TestProposedAnswer', 'Width' => '100%', 'Height' => '100')
+                [],
+                ['ToolbarSet' => 'TestProposedAnswer', 'Width' => '100%', 'Height' => '100']
             );
 
             $form->addHtml('</tr>');
@@ -152,12 +153,14 @@ class MultipleAnswerCombination extends Question
         $form->addText('weighting[1]', get_lang('Score'), false, ['value' => 10]);
 
         global $text;
-        if ($obj_ex->edit_exercise_in_lp == true) {
+        if ($obj_ex->edit_exercise_in_lp == true ||
+            (empty($this->exerciseList) && empty($obj_ex->id))
+        ) {
             // setting the save button here and not in the question class.php
             $buttonGroup = [
                 $form->addButtonDelete(get_lang('LessAnswer'), 'lessAnswers', true),
                 $form->addButtonCreate(get_lang('PlusAnswer'), 'moreAnswers', true),
-                $form->addButtonSave($text, 'submitQuestion', true)
+                $form->addButtonSave($text, 'submitQuestion', true),
             ];
 
             $form->addGroup($buttonGroup);
@@ -173,15 +176,15 @@ class MultipleAnswerCombination extends Question
             }
         }
 
-        $form->setConstants(array('nb_answers' => $nb_answers));
+        $form->setConstants(['nb_answers' => $nb_answers]);
     }
 
     /**
-	 * @inheritdoc
-	 */
+     * {@inheritdoc}
+     */
     public function processAnswersCreation($form, $exercise)
     {
-        $questionWeighting = $nbrGoodAnswers = 0;
+        $questionWeighting = 0;
         $objAnswer = new Answer($this->id);
         $nb_answers = $form->getSubmitValue('nb_answers');
 
@@ -198,8 +201,8 @@ class MultipleAnswerCombination extends Question
             if ($goodAnswer) {
                 $weighting = abs($weighting);
             } else {
+                // $weighting = -$weighting;
                 $weighting = abs($weighting);
-                //	$weighting = -$weighting;
             }
             if ($weighting > 0) {
                 $questionWeighting += $weighting;
@@ -222,17 +225,23 @@ class MultipleAnswerCombination extends Question
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function return_header($exercise, $counter = null, $score = null)
     {
         $header = parent::return_header($exercise, $counter, $score);
-        $header .= '<table class="'.$this->question_table_class.'">
-            <tr>
-                <th>'.get_lang("Choice").'</th>
-                <th>'. get_lang("ExpectedChoice").'</th>
-                <th>'. get_lang("Answer").'</i></th>';
-        $header .= '<th>'.get_lang("Comment").'</th>';
+        $header .= '<table class="'.$this->question_table_class.'"><tr>';
+
+        if ($exercise->results_disabled != RESULT_DISABLE_SHOW_ONLY_IN_CORRECT_ANSWER) {
+            $header .= '<th>'.get_lang('Choice').'</th>';
+            $header .= '<th>'.get_lang('ExpectedChoice').'</th>';
+        }
+
+        $header .= '<th>'.get_lang('Answer').'</th>';
+        if ($exercise->showExpectedChoice()) {
+            $header .= '<th>'.get_lang('Status').'</th>';
+        }
+        $header .= '<th>'.get_lang('Comment').'</th>';
         $header .= '</tr>';
 
         return $header;

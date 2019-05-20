@@ -6,7 +6,7 @@ namespace Chamilo\CourseBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CCourseSetting
+ * CCourseSetting.
  *
  * @ORM\Table(
  *  name="c_course_setting",
@@ -19,88 +19,89 @@ use Doctrine\ORM\Mapping as ORM;
 class CCourseSetting
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="iid", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $iid;
+    protected $iid;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer", nullable=true)
      */
-    private $id;
+    protected $id;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer")
      */
-    private $cId;
+    protected $cId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="variable", type="string", length=255, nullable=false)
      */
-    private $variable;
+    protected $variable;
 
     /**
      * @var string
      *
      * @ORM\Column(name="subkey", type="string", length=255, nullable=true)
      */
-    private $subkey;
+    protected $subkey;
 
     /**
      * @var string
      *
      * @ORM\Column(name="type", type="string", length=255, nullable=true)
      */
-    private $type;
+    protected $type;
 
     /**
      * @var string
      *
      * @ORM\Column(name="category", type="string", length=255, nullable=true)
      */
-    private $category;
+    protected $category;
 
     /**
      * @var string
      *
      * @ORM\Column(name="value", type="text", nullable=true)
      */
-    private $value;
+    protected $value;
 
     /**
      * @var string
      *
      * @ORM\Column(name="title", type="string", length=255, nullable=false)
      */
-    private $title;
+    protected $title;
 
     /**
      * @var string
      *
      * @ORM\Column(name="comment", type="string", length=255, nullable=true)
      */
-    private $comment;
+    protected $comment;
 
     /**
      * @var string
      *
      * @ORM\Column(name="subkeytext", type="string", length=255, nullable=true)
      */
-    private $subkeytext;
+    protected $subkeytext;
 
     /**
-     * Set variable
+     * Set variable.
      *
      * @param string $variable
+     *
      * @return CCourseSetting
      */
     public function setVariable($variable)
@@ -111,7 +112,7 @@ class CCourseSetting
     }
 
     /**
-     * Get variable
+     * Get variable.
      *
      * @return string
      */
@@ -121,9 +122,10 @@ class CCourseSetting
     }
 
     /**
-     * Set subkey
+     * Set subkey.
      *
      * @param string $subkey
+     *
      * @return CCourseSetting
      */
     public function setSubkey($subkey)
@@ -134,7 +136,7 @@ class CCourseSetting
     }
 
     /**
-     * Get subkey
+     * Get subkey.
      *
      * @return string
      */
@@ -144,9 +146,10 @@ class CCourseSetting
     }
 
     /**
-     * Set type
+     * Set type.
      *
      * @param string $type
+     *
      * @return CCourseSetting
      */
     public function setType($type)
@@ -157,7 +160,7 @@ class CCourseSetting
     }
 
     /**
-     * Get type
+     * Get type.
      *
      * @return string
      */
@@ -167,9 +170,10 @@ class CCourseSetting
     }
 
     /**
-     * Set category
+     * Set category.
      *
      * @param string $category
+     *
      * @return CCourseSetting
      */
     public function setCategory($category)
@@ -180,7 +184,7 @@ class CCourseSetting
     }
 
     /**
-     * Get category
+     * Get category.
      *
      * @return string
      */
@@ -190,9 +194,10 @@ class CCourseSetting
     }
 
     /**
-     * Set value
+     * Set value.
      *
      * @param string $value
+     *
      * @return CCourseSetting
      */
     public function setValue($value)
@@ -203,7 +208,7 @@ class CCourseSetting
     }
 
     /**
-     * Get value
+     * Get value.
      *
      * @return string
      */
@@ -213,9 +218,10 @@ class CCourseSetting
     }
 
     /**
-     * Set title
+     * Set title.
      *
      * @param string $title
+     *
      * @return CCourseSetting
      */
     public function setTitle($title)
@@ -226,7 +232,7 @@ class CCourseSetting
     }
 
     /**
-     * Get title
+     * Get title.
      *
      * @return string
      */
@@ -236,9 +242,10 @@ class CCourseSetting
     }
 
     /**
-     * Set comment
+     * Set comment.
      *
      * @param string $comment
+     *
      * @return CCourseSetting
      */
     public function setComment($comment)
@@ -249,7 +256,7 @@ class CCourseSetting
     }
 
     /**
-     * Get comment
+     * Get comment.
      *
      * @return string
      */
@@ -259,9 +266,10 @@ class CCourseSetting
     }
 
     /**
-     * Set subkeytext
+     * Set subkeytext.
      *
      * @param string $subkeytext
+     *
      * @return CCourseSetting
      */
     public function setSubkeytext($subkeytext)
@@ -272,7 +280,7 @@ class CCourseSetting
     }
 
     /**
-     * Get subkeytext
+     * Get subkeytext.
      *
      * @return string
      */
@@ -282,9 +290,10 @@ class CCourseSetting
     }
 
     /**
-     * Set id
+     * Set id.
      *
-     * @param integer $id
+     * @param int $id
+     *
      * @return CCourseSetting
      */
     public function setId($id)
@@ -295,9 +304,9 @@ class CCourseSetting
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -305,9 +314,10 @@ class CCourseSetting
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return CCourseSetting
      */
     public function setCId($cId)
@@ -318,9 +328,9 @@ class CCourseSetting
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {

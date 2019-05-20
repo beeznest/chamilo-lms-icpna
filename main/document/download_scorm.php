@@ -1,12 +1,13 @@
 <?php
 /* For licensing terms, see /license.txt */
 
+use ChamiloSession as Session;
+
 /**
  * This file is responsible for passing requested documents to the browser.
  *
  * @package chamilo.document
  */
-
 session_cache_limiter('none');
 
 require_once __DIR__.'/../inc/global.inc.php';
@@ -20,10 +21,10 @@ if (!isset($_course)) {
     api_not_allowed(true);
 }
 
+/** @var learnpath $obj */
+$obj = Session::read('oLP');
 // If LP obj exists
-if (isset($_SESSION['oLP'])) {
-    $obj = $_SESSION['oLP'];
-} else {
+if (empty($obj)) {
     api_not_allowed();
 }
 
@@ -37,7 +38,7 @@ $doc_url = isset($_GET['doc_url']) ? $_GET['doc_url'] : null;
 $doc_url = str_replace('///', '&', $doc_url);
 // Still a space present? it must be a '+' (that got replaced by mod_rewrite)
 $doc_url = str_replace(' ', '+', $doc_url);
-$doc_url = str_replace(array('../', '\\..', '\\0', '..\\'), array('', '', '', ''), $doc_url); //echo $doc_url;
+$doc_url = str_replace(['../', '\\..', '\\0', '..\\'], ['', '', '', ''], $doc_url); //echo $doc_url;
 
 if (strpos($doc_url, '../') || strpos($doc_url, '/..')) {
     $doc_url = '';
@@ -57,7 +58,8 @@ if (Security::check_abs_path($sys_course_path.$doc_url, $sys_course_path.'/')) {
     $fixLinks = api_get_configuration_value('lp_replace_http_to_https');
     $result = DocumentManager::file_send_for_download($full_file_name, false, '', $fixLinks);
     if ($result === false) {
-        api_not_allowed(true);
+        api_not_allowed(true, get_lang('FileNotFound'), 404);
     }
+} else {
+    api_not_allowed(true, get_lang('FileNotFound'), 404);
 }
-exit;

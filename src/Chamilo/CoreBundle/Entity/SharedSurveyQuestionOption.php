@@ -1,11 +1,12 @@
 <?php
+/* For licensing terms, see /license.txt */
 
 namespace Chamilo\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * SharedSurveyQuestionOption
+ * SharedSurveyQuestionOption.
  *
  * @ORM\Table(name="shared_survey_question_option")
  * @ORM\Entity
@@ -13,48 +14,47 @@ use Doctrine\ORM\Mapping as ORM;
 class SharedSurveyQuestionOption
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="question_id", type="integer", nullable=false)
      */
-    private $questionId;
+    protected $questionId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="survey_id", type="integer", nullable=false)
      */
-    private $surveyId;
+    protected $surveyId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="option_text", type="text", nullable=false)
      */
-    private $optionText;
+    protected $optionText;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="sort", type="integer", nullable=false)
      */
-    private $sort;
+    protected $sort;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="question_option_id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private $questionOptionId;
-
-
+    protected $questionOptionId;
 
     /**
-     * Set questionId
+     * Set questionId.
      *
-     * @param integer $questionId
+     * @param int $questionId
+     *
      * @return SharedSurveyQuestionOption
      */
     public function setQuestionId($questionId)
@@ -65,9 +65,9 @@ class SharedSurveyQuestionOption
     }
 
     /**
-     * Get questionId
+     * Get questionId.
      *
-     * @return integer
+     * @return int
      */
     public function getQuestionId()
     {
@@ -75,9 +75,10 @@ class SharedSurveyQuestionOption
     }
 
     /**
-     * Set surveyId
+     * Set surveyId.
      *
-     * @param integer $surveyId
+     * @param int $surveyId
+     *
      * @return SharedSurveyQuestionOption
      */
     public function setSurveyId($surveyId)
@@ -88,9 +89,9 @@ class SharedSurveyQuestionOption
     }
 
     /**
-     * Get surveyId
+     * Get surveyId.
      *
-     * @return integer
+     * @return int
      */
     public function getSurveyId()
     {
@@ -98,9 +99,10 @@ class SharedSurveyQuestionOption
     }
 
     /**
-     * Set optionText
+     * Set optionText.
      *
      * @param string $optionText
+     *
      * @return SharedSurveyQuestionOption
      */
     public function setOptionText($optionText)
@@ -111,7 +113,7 @@ class SharedSurveyQuestionOption
     }
 
     /**
-     * Get optionText
+     * Get optionText.
      *
      * @return string
      */
@@ -121,9 +123,10 @@ class SharedSurveyQuestionOption
     }
 
     /**
-     * Set sort
+     * Set sort.
      *
-     * @param integer $sort
+     * @param int $sort
+     *
      * @return SharedSurveyQuestionOption
      */
     public function setSort($sort)
@@ -134,9 +137,9 @@ class SharedSurveyQuestionOption
     }
 
     /**
-     * Get sort
+     * Get sort.
      *
-     * @return integer
+     * @return int
      */
     public function getSort()
     {
@@ -144,9 +147,9 @@ class SharedSurveyQuestionOption
     }
 
     /**
-     * Get questionOptionId
+     * Get questionOptionId.
      *
-     * @return integer
+     * @return int
      */
     public function getQuestionOptionId()
     {

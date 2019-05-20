@@ -5,7 +5,6 @@ namespace Application\Migrations\Schema\V111;
 
 use Application\Migrations\AbstractMigrationChamilo;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
 
 /**
  * Class Version20160907140300
@@ -19,6 +18,7 @@ class Version20160907140300 extends AbstractMigrationChamilo
      */
     public function up(Schema $schema)
     {
+        error_log('Version20160907140300');
         $data = [
             'career' => [
                 'created_at',
@@ -213,6 +213,7 @@ class Version20160907140300 extends AbstractMigrationChamilo
         // to NULL, then change the field back to DATETIME
         foreach ($data as $table => $fields) {
             foreach ($fields as $field) {
+                error_log("$table . $field");
                 $this->addSql("ALTER TABLE $table CHANGE $field $field char(19)");
                 $this->addSql("UPDATE $table SET $field = NULL WHERE $field = '0000-00-00 00:00:00'");
                 $this->addSql("UPDATE $table SET $field = NULL WHERE $field = '0000-00-00 23:59:59'");
@@ -227,17 +228,15 @@ class Version20160907140300 extends AbstractMigrationChamilo
         ];
         foreach ($data as $table => $fields) {
             foreach ($fields as $field) {
+                error_log("$table . $field");
                 $this->addSql("ALTER TABLE $table CHANGE $field $field char(10)");
                 $this->addSql("UPDATE $table SET $field = NULL WHERE $field = '0000-00-00'");
                 $this->addSql("ALTER TABLE $table CHANGE $field $field DATE");
             }
         }
-
-
     }
 
     public function down(Schema $schema)
     {
-
     }
 }

@@ -6,7 +6,7 @@ namespace Chamilo\CourseBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CAttendance
+ * CAttendance.
  *
  * @ORM\Table(
  *  name="c_attendance",
@@ -21,88 +21,89 @@ use Doctrine\ORM\Mapping as ORM;
 class CAttendance
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="iid", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $iid;
+    protected $iid;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer")
      */
-    private $cId;
+    protected $cId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer", nullable=true)
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
      *
      * @ORM\Column(name="name", type="text", nullable=false)
      */
-    private $name;
+    protected $name;
 
     /**
      * @var string
      *
      * @ORM\Column(name="description", type="text", nullable=true)
      */
-    private $description;
+    protected $description;
 
     /**
-     * @var boolean
+     * @var bool
      *
      * @ORM\Column(name="active", type="boolean", nullable=false)
      */
-    private $active;
+    protected $active;
 
     /**
      * @var string
      *
      * @ORM\Column(name="attendance_qualify_title", type="string", length=255, nullable=true)
      */
-    private $attendanceQualifyTitle;
+    protected $attendanceQualifyTitle;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="attendance_qualify_max", type="integer", nullable=false)
      */
-    private $attendanceQualifyMax;
+    protected $attendanceQualifyMax;
 
     /**
      * @var float
      *
      * @ORM\Column(name="attendance_weight", type="float", precision=6, scale=2, nullable=false)
      */
-    private $attendanceWeight;
+    protected $attendanceWeight;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="session_id", type="integer", nullable=false)
      */
-    private $sessionId;
+    protected $sessionId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="locked", type="integer", nullable=false)
      */
-    private $locked;
+    protected $locked;
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
+     *
      * @return CAttendance
      */
     public function setName($name)
@@ -113,7 +114,7 @@ class CAttendance
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
@@ -123,9 +124,10 @@ class CAttendance
     }
 
     /**
-     * Set description
+     * Set description.
      *
      * @param string $description
+     *
      * @return CAttendance
      */
     public function setDescription($description)
@@ -136,7 +138,7 @@ class CAttendance
     }
 
     /**
-     * Get description
+     * Get description.
      *
      * @return string
      */
@@ -146,9 +148,10 @@ class CAttendance
     }
 
     /**
-     * Set active
+     * Set active.
      *
-     * @param boolean $active
+     * @param bool $active
+     *
      * @return CAttendance
      */
     public function setActive($active)
@@ -159,9 +162,9 @@ class CAttendance
     }
 
     /**
-     * Get active
+     * Get active.
      *
-     * @return boolean
+     * @return bool
      */
     public function getActive()
     {
@@ -169,9 +172,10 @@ class CAttendance
     }
 
     /**
-     * Set attendanceQualifyTitle
+     * Set attendanceQualifyTitle.
      *
      * @param string $attendanceQualifyTitle
+     *
      * @return CAttendance
      */
     public function setAttendanceQualifyTitle($attendanceQualifyTitle)
@@ -182,7 +186,7 @@ class CAttendance
     }
 
     /**
-     * Get attendanceQualifyTitle
+     * Get attendanceQualifyTitle.
      *
      * @return string
      */
@@ -192,9 +196,10 @@ class CAttendance
     }
 
     /**
-     * Set attendanceQualifyMax
+     * Set attendanceQualifyMax.
      *
-     * @param integer $attendanceQualifyMax
+     * @param int $attendanceQualifyMax
+     *
      * @return CAttendance
      */
     public function setAttendanceQualifyMax($attendanceQualifyMax)
@@ -205,9 +210,9 @@ class CAttendance
     }
 
     /**
-     * Get attendanceQualifyMax
+     * Get attendanceQualifyMax.
      *
-     * @return integer
+     * @return int
      */
     public function getAttendanceQualifyMax()
     {
@@ -215,9 +220,10 @@ class CAttendance
     }
 
     /**
-     * Set attendanceWeight
+     * Set attendanceWeight.
      *
      * @param float $attendanceWeight
+     *
      * @return CAttendance
      */
     public function setAttendanceWeight($attendanceWeight)
@@ -228,7 +234,7 @@ class CAttendance
     }
 
     /**
-     * Get attendanceWeight
+     * Get attendanceWeight.
      *
      * @return float
      */
@@ -238,9 +244,10 @@ class CAttendance
     }
 
     /**
-     * Set sessionId
+     * Set sessionId.
      *
-     * @param integer $sessionId
+     * @param int $sessionId
+     *
      * @return CAttendance
      */
     public function setSessionId($sessionId)
@@ -251,9 +258,9 @@ class CAttendance
     }
 
     /**
-     * Get sessionId
+     * Get sessionId.
      *
-     * @return integer
+     * @return int
      */
     public function getSessionId()
     {
@@ -261,9 +268,10 @@ class CAttendance
     }
 
     /**
-     * Set locked
+     * Set locked.
      *
-     * @param integer $locked
+     * @param int $locked
+     *
      * @return CAttendance
      */
     public function setLocked($locked)
@@ -274,9 +282,9 @@ class CAttendance
     }
 
     /**
-     * Get locked
+     * Get locked.
      *
-     * @return integer
+     * @return int
      */
     public function getLocked()
     {
@@ -284,9 +292,10 @@ class CAttendance
     }
 
     /**
-     * Set id
+     * Set id.
      *
-     * @param integer $id
+     * @param int $id
+     *
      * @return CAttendance
      */
     public function setId($id)
@@ -297,9 +306,9 @@ class CAttendance
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -307,9 +316,10 @@ class CAttendance
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return CAttendance
      */
     public function setCId($cId)
@@ -320,9 +330,9 @@ class CAttendance
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {

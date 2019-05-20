@@ -17,16 +17,18 @@ class Model
     public $is_course_model = false;
 
     /**
-     * Constructor
+     * Constructor.
      */
     public function __construct()
     {
     }
 
     /**
-     * Useful finder - experimental akelos like only use in notification.lib.php send function
+     * Useful finder - experimental akelos like only use in notification.lib.php send function.
+     *
      * @param string $type
      * @param array  $options
+     *
      * @return array
      */
     public function find($type, $options = null)
@@ -44,21 +46,23 @@ class Model
     }
 
     /**
-     * Deletes an item
+     * Deletes an item.
+     *
      * @param int $id
      *
      * @return bool
      */
     public function delete($id)
     {
-        if (empty($id) or $id != strval(intval($id))) {
+        if (empty($id) || $id != strval(intval($id))) {
             return false;
         }
-        $params = array('id = ?' => $id);
+        $params = ['id = ?' => $id];
         if ($this->is_course_model) {
-            $course_id = api_get_course_int_id();
-            $params = array('id = ? AND c_id = ?' => array($id, $course_id));
+            $courseId = api_get_course_int_id();
+            $params = ['id = ? AND c_id = ?' => [$id, $courseId]];
         }
+
         // Database table definition
         $result = Database::delete($this->table, $params);
         if ($result != 1) {
@@ -69,33 +73,15 @@ class Model
     }
 
     /**
-     * @param array $params
-     *
-     * @return array
-     */
-    private function clean_parameters($params)
-    {
-        $clean_params = array();
-        if (!empty($params)) {
-            foreach ($params as $key => $value) {
-                if (in_array($key, $this->columns)) {
-                    $clean_params[$key] = $value;
-                }
-            }
-        }
-
-        return $clean_params;
-    }
-
-    /**
-     * Displays the title + grid
+     * Displays the title + grid.
      */
     public function display()
     {
     }
 
     /**
-     * Gets an element
+     * Gets an element.
+     *
      * @param int $id
      *
      * @return array|mixed
@@ -103,17 +89,17 @@ class Model
     public function get($id)
     {
         if (empty($id)) {
-            return array();
+            return [];
         }
-        $params = array('id = ?' => intval($id));
+        $params = ['id = ?' => intval($id)];
         if ($this->is_course_model) {
             $course_id = api_get_course_int_id();
-            $params = array('id = ? AND c_id = ?' => array($id, $course_id));
+            $params = ['id = ? AND c_id = ?' => [$id, $course_id]];
         }
         $result = Database::select(
             '*',
             $this->table,
-            array('where' => $params),
+            ['where' => $params],
             'first'
         );
 
@@ -131,17 +117,18 @@ class Model
     }
 
     /**
-     * @param array  $options
+     * @param array $options
      *
      * @return array
      */
-    public function getDataToExport($options = array())
+    public function getDataToExport($options = [])
     {
         return Database::select('name, description', $this->table, $options);
     }
 
     /**
-     * Get the count of elements
+     * Get the count of elements.
+     *
      * @return int
      */
     public function get_count()
@@ -149,7 +136,7 @@ class Model
         $row = Database::select(
             'count(*) as count',
             $this->table,
-            array('where' => array('parent_id = ?' => '0')),
+            ['where' => ['parent_id = ?' => '0']],
             'first'
         );
 
@@ -157,18 +144,19 @@ class Model
     }
 
     /**
-     * a little bit of javascript to display
+     * a little bit of javascript to display.
      */
     public function javascript()
     {
     }
 
     /**
-     * Saves an element into the DB
+     * Saves an element into the DB.
+     *
      * @param array $params
      * @param bool  $show_query Whether to show the query in logs or not (passed to Database::insert())
-     * @return bool
      *
+     * @return bool|int
      */
     public function save($params, $show_query = false)
     {
@@ -212,13 +200,14 @@ class Model
     }
 
     /**
-     * Updates the obj in the database. The $params['id'] must exist in order to update a record
+     * Updates the obj in the database. The $params['id'] must exist in order to update a record.
+     *
      * @param array $params
+     * @param bool  $showQuery
      *
      * @return bool
-     *
      */
-    public function update($params)
+    public function update($params, $showQuery = false)
     {
         $params = $this->clean_parameters($params);
 
@@ -244,7 +233,8 @@ class Model
                 $result = Database::update(
                     $this->table,
                     $params,
-                    array('id = ?' => $id)
+                    ['id = ?' => $id],
+                    $showQuery
                 );
                 if ($result) {
                     return true;
@@ -253,5 +243,24 @@ class Model
         }
 
         return false;
+    }
+
+    /**
+     * @param array $params
+     *
+     * @return array
+     */
+    private function clean_parameters($params)
+    {
+        $clean_params = [];
+        if (!empty($params)) {
+            foreach ($params as $key => $value) {
+                if (in_array($key, $this->columns)) {
+                    $clean_params[$key] = $value;
+                }
+            }
+        }
+
+        return $clean_params;
     }
 }

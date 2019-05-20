@@ -5137,7 +5137,7 @@ $Assignment = "Tarefas";
 $ExpiryDateToSendWorkIs = "Data límite para tarefas";
 $EnableExpiryDate = "Activar data de expiración";
 $EnableEndDate = "Activar data de fin";
-$IsNotPosibleSaveTheDocument = "imposible gardar o documento";
+$ImpossibleToSaveTheDocument = "imposible gardar o documento";
 $EndDateCannotBeBeforeTheExpireDate = "A data de fin non pode ser anterior á data de inicio";
 $SelectAFilter = "Seleccione un filtro";
 $FilterByNotExpired = "Filtrar por non expirados";
@@ -6000,12 +6000,9 @@ $EndDateMustBeMoreThanStartDate = "A data final ten que ser maior que a de inici
 $ToAttend = "Á atención de";
 $AllUsersAreAutomaticallyRegistered = "Todos os usuarios foron rexistrados automáticamente";
 $AssignCoach = "Asignar titor";
-$chamilo = "chamilo";
 $YourAccountOnXHasJustBeenApprovedByOneOfOurAdministrators = "A súa conta en %s foi aprobada por un dos nosos administradores.";
-$php = "php";
 $Off = "Desactivado";
-$webserver = "servidor web";
-$mysql = "MySQL";
+$WebServer = "servidor web";
 $NotInserted = "Non insertado";
 $EnableMathJaxComment = "Activar editor matemático MathJax";
 $YouCanNowLoginAtXUsingTheLoginAndThePasswordYouHaveProvided = "Non pode loguearse en %s usando o nome de usuario e contrasinal que introduceu.";
@@ -6112,7 +6109,8 @@ $CourseRequestLegalNote = "A información desta solicitude de formación conside
 $EnableCourseValidation = "Validación de formación";
 $EnableCourseValidationComment = "Cando a validación de cursos está activada, un profesor non pode crear un curso por el mesmo. El(ela) realiza unha petición de curso. O administrador da plataforma revisa a petición e aprobaa ou rexeitaa. Esta funcionalidade basease ne mensaxes de correo automáticos; non se olvide de asegurarse que o seu Chamilo usa un servidor de correos e que use unha conta de correo dedicada e funcional.";
 $CourseRequestAskInfoEmailSubject = "%s Solicitude de información %s";
-$CourseRequestAskInfoEmailText = "Recibimos a súa solicitude para a creación dun curso con código%. Antes de considerar a súa aprobación necesitamos alguna información adicional. \N\nPor facor, realice unha breve descrición do contido do curso, os obxectivos e os alumnos ou outro tipo de usuarios que vaian participar. Se é o seu caso, mencione o nome da institución ou órgano da cal vostede fixo a solicitude.";
+$CourseRequestAskInfoEmailText = "Recibimos a súa solicitude para a creación dun curso con código %s. Antes de considerar a súa aprobación necesitamos alguna información adicional.\n\n
+Por facor, realice unha breve descrición do contido do curso, os obxectivos e os alumnos ou outro tipo de usuarios que vaian participar. Se é o seu caso, mencione o nome da institución ou órgano da cal vostede fixo a solicitude.";
 $CourseRequestAcceptedEmailSubject = "%s A petición do curso %s foi aprobada";
 $CourseRequestAcceptedEmailText = "A súa solicitude do curso %s foi aprobada. Un novo curso %s foi creado e vostede quedou inscrito nel como profesor. \n\nPoderá acceder ao curso creado dende: %s";
 $CourseRequestRejectedEmailSubject = "%s A solicitude do curso %s foi rexeitada";
@@ -7005,10 +7003,24 @@ $GradebookEnableLockingTitle = "Activar bloqueo de Avaliacións para os profesor
 $GradebookEnableLockingComment = "Unha vez activada, esta opción permitirá aos profesores bloquear calquera avaliación dentro do seu curso. Isto prohibirá ao profesor calquera modificación posterior dos resultados dos seus alumnos nos recursos usados para esta avaliación: exames, leccións, tarefas, etc. O único rol autorizado a desbloquear unha avaliación é o administrador. O profesor estará informado desta posibilidade ao intentar desbloquear a avaliación. Tanto o bloqueo como o desbloqueo estarán gardados no rexistro de actividades importantes do sistema.";
 $LdapDescriptionComment = "<div class='normal-message'> <br /><ul><li>Autentificación LDAP : <br />Ver I. embaixo para configurar LDAP <br />Ver II. embaixo para activar a autentificación LDAP </li><br /><br /><li> Actualizar atributos de usuario, con datos LDAP, despois de autentificación CAS (ver <a href='settings.php?category=CAS'>CAS configuration </a>) : <br />Ver I. embaixo para configurar LDAP <br />Para autentificación con manexo de usuarios CAS, a activación de LDAP non é requerida. </li><br /></ul></div><br /><h4>I. Configuración LDAP</h4><h5>Editar arquivo main/auth/external_login/ldap.conf.php </h5>-&gt; Editar valores do array <code>&#36;extldap_config</code> <br /><br />Os parámetros son <br /><ul><li>cadea do dominio base (ex : 'base_dn' =&gt; 'DC=cblue,DC=be') </li><li>nome distinguido do admin (ex : 'admin_dn' =&gt;'CN=admin,dc=cblue,dc=be') </li><li>contrasinal de aministrador (ex : 'admin_password' =&gt; '123456') </li><li>host ldap (ex : 'host' =&gt; array('1.2.3.4', '2.3.4.5', '3.4.5.6')) </li><li>filtro (ex : 'filter' =&gt; '') </li><li>porto (ex : 'port' =&gt; 389) </li><li>versión do protocolo (2 ou 3) (ex : 'protocol_version' =&gt; 3) </li><li>user_search (ex : 'user_search' =&gt; 'sAMAccountName=%username%') </li><li>codificación (ex : 'encoding' =&gt; 'UTF-8') </li><li>update_userinfo (ex : 'update_userinfo' =&gt; true) </li></ul>-&gt; Para actualizar as correspondencias entre usuario e atributos LDAP, editar o array <code>&#36;extldap_user_correspondance</code> <br />Os valores do array son &lt;chamilo_field&gt; =&gt; &gt;ldap_field&gt; <br />A estrutura do array está explciada no arquivo main/auth/external_login/ldap.conf.php<br /><br /><br /><h4>II. Activar autenticación LDAP </h4><h5>Editar arquivo main/inc/conf/configuration.php </h5>-&gt; Descomentar as liñas <br />&#36;extAuthSource[&quot;extldap&quot;][&quot;login&quot;] =&#36;_configuration['root_sys'].&#36;_configuration['code_append'].&quot;auth/external_login/login.ldap.php&quot;;<br />&#36;extAuthSource[&quot;extldap&quot;][&quot;newUser&quot;] =&#36;_configuration['root_sys'].&#36;_configuration['code_append'].&quot;auth/external_login/newUser.ldap.php&quot;;<br /><br />N.B. : Os usuarios LDAP empregan os mesmos campos ca os usuarios da plataforma para facer login. <br />N.B. : A activación LDAP engade un menú Autentificación externa [LDAP] nas páxinas de usuario &quot;engadir ou modificar&quot;.";
 $ShibbolethMainActivateTitle = "Autenticación Shibboleth";
-$ShibbolethMainActivateComment = "En primeiro lugar, ten que configurar Shibboleth para o seu servidor web. Para configuralo en Chamilo: editar o arquivo main/auth/shibboleth/config/aai.class.php Modificar valores de \$result co nome dos atributos de Shibboleth \$result->unique_id = 'mail'; \$result->firstname = 'cn'; \$result->lastname = 'uid'; \$result->email = 'mail'; \$result->language = '-'; \$result->gender = '-'; \$result->address = '-'; \$result->staff_category = '-'; \$result->home_organization_type = '-'; \$result->home_organization = '-'; \$result->affiliation = '-'; \$result->persistent_id = '-'; ... Ir a Plug-in para engadir o botón 'Shibboleth Login' no seu campus de Chamilo.";
+$ShibbolethMainActivateComment = "En primeiro lugar, ten que configurar Shibboleth para o seu servidor web. Para configuralo en Chamilo: editar o arquivo main/auth/shibboleth/config/aai.class.php Modificar valores de &#36;result co nome dos atributos de Shibboleth 
+<ul>
+<li>&#36;result-&gt;unique_id = 'mail';</li>
+<li>&#36;result-&gt;firstname = 'cn';</li>
+<li>&#36;result-&gt;lastname = 'uid';</li>
+<li>&#36;result-&gt;email = 'mail';</li>
+<li>&#36;result-&gt;language = '-';</li>
+<li>&#36;result-&gt;gender = '-';</li>
+<li>&#36;result-&gt;address = '-';</li>
+<li>&#36;result-&gt;staff_category = '-';</li><li>&#36;result-&gt;home_organization_type = '-';</li><li>&#36;result-&gt;home_organization = '-';</li>
+<li>&#36;result-&gt;affiliation = '-';</li>
+<li>&#36;result-&gt;persistent_id = '-';</li>
+</ul>
+...
+Ir a Plug-in para engadir o botón 'Shibboleth Login' no seu campus de Chamilo.";
 $LdapDescriptionTitle = "Autenticación LDAP";
 $FacebookMainActivateTitle = "Autenticación Facebook";
-$FacebookMainActivateComment = "En primeiro lugar, tense que crear unha aplicación de Facebook (ver https://developers.facebook.com/apps) cunha conta de Facebook. Nos parámetros de aplicacións de Facebook, o valor de dirección URL do sitio debe tener \"unha acción = fbconnect\" un parámetro GET (http://mychamilo.com/?action=fbconnect, por ejemplo). Entón, editar o arquivo main/auth/external_login/facebook.conf.php e ingresar en \"appId\" e \"secret\" os valores de \$facebook_config. Ir a Plug-in para engadir un botón configurable \"Facebook Login\" para o campus de Chamilo.";
+$FacebookMainActivateComment = "En primeiro lugar, tense que crear unha aplicación de Facebook (ver https://developers.facebook.com/apps) cunha conta de Facebook. Nos parámetros de aplicacións de Facebook, o valor de dirección URL do sitio debe tener \"unha acción = fbconnect\" un parámetro GET (http://mychamilo.com/?action=fbconnect, por ejemplo). Entón, editar o arquivo main/auth/external_login/facebook.conf.php e ingresar en \"appId\" e \"secret\" os valores de &#36;facebook_config. Ir a Plug-in para engadir un botón configurable \"Facebook Login\" para o campus de Chamilo.";
 $AnnouncementForGroup = "Anuncio para un grupo";
 $AllGroups = "Todos os grupos";
 $LanguagePriority1Title = "Prioridade do idioma 1";
@@ -7298,4 +7310,15 @@ $CourseImagesInCoursesListTitle = "Iconas de cursos personalizados";
 $CourseImagesInCoursesListComment = "Usar as imaxes de cursos como iconas nas listas de cursos (no canto da icona verde por defecto)";
 $StudentPublicationSelectionForGradebookTitle = "Tarefas consideradas para avaliación";
 $StudentPublicationSelectionForGradebookComment = "Na ferramenta de tarefas, os estudantes poden subir máis dun arquivo. No caso de haber máis dun arquivo do mesmo estudante para unha soa tarefa, cal destes debe ser considerado para a nota nas avaluacións? Isto depende da súa metodoloxía. Seleccione 'primeiro' para poñer o acento sobre a atención ao detalle (como entregar a tempo e o traballo finalizado a primeira vez). Use 'último' para poner o acento sobre o traballo colaborativo e a adaptabilidade.";
+$FilterCertificateByOfficialCodeTitle = "Certificados: filtro por código oficial";
+$FilterCertificateByOfficialCodeComment = "Engadir un filtro para os códigos oficiais dos estudantes para a lista de certificados";
+$MaxCKeditorsOnExerciseResultsPageTitle = "Max editores na pantalla de resultados de exercicios";
+$MaxCKeditorsOnExerciseResultsPageComment = "Debido á alta cantidade de preguntas que poden aparecer nun exercicio, a pantalla de corrección, que permite ao profesor deixar comentarios en cada resposta, pode demorar bastante en cargar. Configure este número a 5 para pedir á plataforma mostrar a edición de só exercicios que conteñen ata 5 preguntas. Isto reducirá considerablemente o tempo de carga da páxina de correccións (non afecta aos alumnos), pero eliminará os editores WYSIWYG na páxina e deixará só campos de comentarios en texto plano.";
+$DocumentDefaultOptionIfFileExistsTitle = "Modo de subida de documentos por defecto";
+$DocumentDefaultOptionIfFileExistsComment = "Método de subida de documentos por defecto. Este parámetro pode ser cambiado no momento de subir documentos por calquer usuario. Só representa o valor por defecto desta configuración.";
+$GradebookCronTaskGenerationTitle = "Auto-xeneración de certificados por webservicio.";
+$GradebookCronTaskGenerationComment = "Cando esta opción se atopa habilitada, e cando se usa o web service WSCertificatesList, o sistema verificará que todos os certificados pendentes foron xenerados para os usuarios que obtiveron os resultados suficientes en todos os elementos definidos nas avaliacións de todos os cursos sesións. Aínda que esta opción quede moi práctica, pode xerar unha sobrecarga notable en portais con miles de usuarios. A usar coa debida precaución.";
+$OpenBadgesBackpackUrlTitle = "OpenBadges: URL de backpack";
+$OpenBadgesBackpackUrlComment = "A URL de servidor de mochilas de OpenBadges que será usada para todos os usuarios que desexen exportar os seus distintivos. Por defecto, úsase o repositorio aberto da Fundación Mozilla: https://backpack.openbadges.org/";
+$CookieWarningTitle = "Cookies: Notificación de privacidade";
 ?>

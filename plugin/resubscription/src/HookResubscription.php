@@ -2,36 +2,37 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * Hook to limit session resubscriptions
+ * Hook to limit session resubscriptions.
  *
  * @author Imanol Losada Oriol <imanol.losada@beeznest.com>
+ *
  * @package chamilo.plugin.resubscription
  */
 class HookResubscription extends HookObserver implements HookResubscribeObserverInterface
 {
-
     /**
-     * Class constructor
+     * Class constructor.
      */
     public function __construct()
     {
         parent::__construct(
-            'plugin/resubscription/src/Resubscription.php', 'resubscription'
+            'plugin/resubscription/src/Resubscription.php',
+            'resubscription'
         );
     }
 
     /**
-     * Limit session resubscription when a Chamilo user is resubscribed to a session
+     * Limit session resubscription when a Chamilo user is resubscribed to a session.
+     *
      * @param HookCreateUserEventInterface $hook The hook
      */
     public function hookResubscribe(HookResubscribeEventInterface $hook)
     {
         $data = $hook->getEventData();
         if ($data['type'] === HOOK_EVENT_TYPE_PRE) {
-
             $resubscriptionLimit = Resubscription::create()->get('resubscription_limit');
 
-             // Initialize variables as a calendar year by default
+            // Initialize variables as a calendar year by default
             $limitDateFormat = 'Y-01-01';
             $limitDate = gmdate($limitDateFormat);
             $resubscriptionOffset = "1 year";
@@ -50,34 +51,33 @@ class HookResubscription extends HookObserver implements HookResubscribeObserver
             $userSessions = Database::select(
                 'session_id, date_end',
                 Database::get_main_table(TABLE_MAIN_SESSION_USER).$join,
-                array(
-                    'where' => array(
-                        'user_id = ? AND date_end >= ?' => array(
+                [
+                    'where' => [
+                        'user_id = ? AND date_end >= ?' => [
                             api_get_user_id(),
-                            $limitDate
-                        )
-                    ),
-                    'order' => 'date_end DESC'
-                )
+                            $limitDate,
+                        ],
+                    ],
+                    'order' => 'date_end DESC',
+                ]
             );
-            $userSessionCourses = array();
+            $userSessionCourses = [];
             foreach ($userSessions as $userSession) {
                 $userSessionCourseResult = Database::select(
                     'c_id',
                     Database::get_main_table(TABLE_MAIN_SESSION_COURSE),
-                    array(
-                        'where' => array(
-                            'session_id = ?' => array(
-                                $userSession['session_id']
-                            )
-                        )
-                    )
+                    [
+                        'where' => [
+                            'session_id = ?' => [
+                                $userSession['session_id'],
+                            ],
+                        ],
+                    ]
                 );
                 foreach ($userSessionCourseResult as $userSessionCourse) {
                     if (!isset($userSessionCourses[$userSessionCourse['c_id']])) {
                         $userSessionCourses[$userSessionCourse['c_id']] = $userSession['date_end'];
                     }
-
                 }
             }
 
@@ -85,13 +85,13 @@ class HookResubscription extends HookObserver implements HookResubscribeObserver
             $currentSessionCourseResult = Database::select(
                 'c_id',
                 Database::get_main_table(TABLE_MAIN_SESSION_COURSE),
-                array(
-                    'where' => array(
-                        'session_id = ?' => array(
-                            $data['session_id']
-                        )
-                    )
-                )
+                [
+                    'where' => [
+                        'session_id = ?' => [
+                            $data['session_id'],
+                        ],
+                    ],
+                ]
             );
 
             // Check if current course code matches with one of the users
@@ -100,7 +100,10 @@ class HookResubscription extends HookObserver implements HookResubscribeObserver
                     $endDate = $userSessionCourses[$currentSessionCourse['c_id']];
                     $resubscriptionDate = gmdate($limitDateFormat, strtotime($endDate." +$resubscriptionOffset"));
                     $icon = Display::return_icon('students.gif', get_lang('Student'));
-                    $canResubscribeFrom = sprintf(get_plugin_lang('CanResubscribeFromX', 'resubscription'), $resubscriptionDate);
+                    $canResubscribeFrom = sprintf(
+                        get_plugin_lang('CanResubscribeFromX', 'resubscription'),
+                        $resubscriptionDate
+                    );
                     throw new Exception(Display::label($icon.' '.$canResubscribeFrom, "info"));
                 }
             }

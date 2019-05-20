@@ -1,28 +1,22 @@
 <?php
-/**
- * SidebarMenuEvent.php
- * avanzu-admin
- * Date: 23.02.14
- */
+/* For licensing terms, see /license.txt */
 
 namespace Chamilo\ThemeBundle\Event;
-
 
 use Chamilo\ThemeBundle\Model\MenuItemInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class SidebarMenuEvent
+ * Class SidebarMenuEvent.
  *
  * @package Chamilo\ThemeBundle\Event
  */
 class SidebarMenuEvent extends ThemeEvent
 {
-
     /**
      * @var array
      */
-    protected $menuRootItems = array();
+    protected $menuRootItems = [];
 
     /**
      * @var Request
@@ -42,7 +36,6 @@ class SidebarMenuEvent extends ThemeEvent
         return $this->request;
     }
 
-
     /**
      * @return array
      */
@@ -61,8 +54,6 @@ class SidebarMenuEvent extends ThemeEvent
 
     /**
      * @param $id
-     *
-     * @return null
      */
     public function getRootItem($id)
     {
@@ -72,13 +63,15 @@ class SidebarMenuEvent extends ThemeEvent
     /**
      * @return MenuItemInterface|null
      */
-    public function getActive() {
-
+    public function getActive()
+    {
         foreach ($this->getItems() as $item) {
             /** @var $item MenuItemInterface */
-            if ($item->isActive()) return $item;
+            if ($item->isActive()) {
+                return $item;
+            }
         }
+
         return null;
     }
-
 }

@@ -2,15 +2,16 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * Class HotSpot
+ * Class HotSpot.
  *
  * This class allows to instantiate an object of
  * type HotSpot (MULTIPLE CHOICE, UNIQUE ANSWER)
  * extending the class question
  *
  * @author Eric Marguin
+ *
  * @package chamilo.exercise
- **/
+ */
 class HotSpot extends Question
 {
     public static $typePicture = 'hotspot.png';
@@ -30,8 +31,8 @@ class HotSpot extends Question
     }
 
     /**
-    * @inheritdoc
-    */
+     * {@inheritdoc}
+     */
     public function createForm(&$form, $exercise)
     {
         parent::createForm($form, $exercise);
@@ -48,57 +49,56 @@ class HotSpot extends Question
             $form->addElement(
                 'file',
                 'imageUpload',
-                array(
+                [
                     '<img src="'.$icon.'" />',
                     get_lang('UploadJpgPicture'),
-                )
+                ]
             );
 
             // setting the save button here and not in the question class.php
             // Saving a question
             $form->addButtonSave(get_lang('GoToQuestion'), 'submitQuestion');
-            //$form->addButtonSave(get_lang('GoToQuestion'), 'submitQuestion');
             $form->addRule(
                 'imageUpload',
                 get_lang('OnlyImagesAllowed'),
                 'filetype',
-                array('jpg', 'jpeg', 'png', 'gif')
+                ['jpg', 'jpeg', 'png', 'gif']
             );
             $form->addRule('imageUpload', get_lang('NoImage'), 'uploadedfile');
         } else {
             // setting the save button here and not in the question class.php
             // Editing a question
-            $form->addButtonUpdate(get_lang('ModifyExercise'), 'submitQuestion');
+            $form->addButtonUpdate(get_lang('ModifyQuestion'), 'submitQuestion');
         }
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function processCreation($form, $exercise)
     {
-        $file_info = $form->getSubmitValue('imageUpload');
+        $fileInfo = $form->getSubmitValue('imageUpload');
         parent::processCreation($form, $exercise);
 
-        if (!empty($file_info['tmp_name'])) {
-            $result = $this->uploadPicture($file_info['tmp_name']);
+        if (!empty($fileInfo['tmp_name'])) {
+            $result = $this->uploadPicture($fileInfo['tmp_name']);
             if ($result) {
                 $this->save($exercise);
+
                 return true;
-            } else {
-                return false;
             }
         }
+
         return false;
     }
 
-    function createAnswersForm($form)
+    public function createAnswersForm($form)
     {
         // nothing
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function processAnswersCreation($form, $exercise)
     {
@@ -107,7 +107,7 @@ class HotSpot extends Question
 }
 
 /**
- * Class HotSpotDelineation
+ * Class HotSpotDelineation.
  */
 class HotSpotDelineation extends HotSpot
 {
@@ -124,19 +124,18 @@ class HotSpotDelineation extends HotSpot
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function createForm(&$form, $exercise)
     {
-        parent::createForm($form);
+        parent::createForm($form, $exercise);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function processCreation($form, $exercise)
     {
-        $file_info = $form->getSubmitValue('imageUpload');
         parent::processCreation($form, $exercise);
     }
 
@@ -146,7 +145,7 @@ class HotSpotDelineation extends HotSpot
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function processAnswersCreation($form, $exercise)
     {

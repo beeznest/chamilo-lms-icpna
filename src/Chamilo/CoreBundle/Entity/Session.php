@@ -8,14 +8,14 @@ use Chamilo\UserBundle\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
-use Chamilo\CoreBundle\Entity\SessionCategory;
 
 //use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 //use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Session
- * UniqueEntity("name")
+ * UniqueEntity("name").
+ *
  * @ORM\Table(
  *      name="session",
  *      uniqueConstraints={@ORM\UniqueConstraint(name="name", columns={"name"})},
@@ -38,187 +38,195 @@ class Session
     const COACH = 2;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer", nullable=false, unique=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    protected $id;
+
+    /**
+     * @var ArrayCollection
+     * @ORM\OneToMany(targetEntity="SessionRelCourse", mappedBy="session", cascade={"persist"}, orphanRemoval=true)
+     */
+    protected $courses;
+
+    /**
+     * @var ArrayCollection
+     * @ORM\OneToMany(targetEntity="SessionRelUser", mappedBy="session", cascade={"persist"}, orphanRemoval=true)
+     */
+    protected $users;
+
+    /**
+     * @var ArrayCollection
+     * @ORM\OneToMany(targetEntity="SessionRelCourseRelUser", mappedBy="session", cascade={"persist"}, orphanRemoval=true)
+     */
+    protected $userCourseSubscriptions;
+
+    /**
+     * @var Course
+     */
+    protected $currentCourse;
 
     /**
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=150, nullable=false, unique=false)
      */
-    private $name;
+    protected $name;
 
     /**
      * @var string
      *
      * @ORM\Column(name="description", type="text", nullable=true, unique=false)
      */
-    private $description;
+    protected $description;
 
     /**
      * @var bool
      *
      * @ORM\Column(name="show_description", type="boolean", nullable=true)
      */
-    private $showDescription;
+    protected $showDescription;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="duration", type="integer", nullable=true)
      */
-    private $duration;
+    protected $duration;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="nbr_courses", type="smallint", nullable=true, unique=false)
      */
-    private $nbrCourses;
+    protected $nbrCourses;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="nbr_users", type="integer", nullable=true, unique=false)
      */
-    private $nbrUsers;
+    protected $nbrUsers;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="nbr_classes", type="integer", nullable=true, unique=false)
      */
-    private $nbrClasses;
+    protected $nbrClasses;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="session_admin_id", type="integer", nullable=true, unique=false)
      */
-    private $sessionAdminId;
+    protected $sessionAdminId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="visibility", type="integer", nullable=false, unique=false)
      */
-    private $visibility;
+    protected $visibility;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="promotion_id", type="integer", nullable=true, unique=false)
      */
-    private $promotionId;
+    protected $promotionId;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="display_start_date", type="datetime", nullable=true, unique=false)
      */
-    private $displayStartDate;
+    protected $displayStartDate;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="display_end_date", type="datetime", nullable=true, unique=false)
      */
-    private $displayEndDate;
+    protected $displayEndDate;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="access_start_date", type="datetime", nullable=true, unique=false)
      */
-    private $accessStartDate;
+    protected $accessStartDate;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="access_end_date", type="datetime", nullable=true, unique=false)
      */
-    private $accessEndDate;
+    protected $accessEndDate;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="coach_access_start_date", type="datetime", nullable=true, unique=false)
      */
-    private $coachAccessStartDate;
+    protected $coachAccessStartDate;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="coach_access_end_date", type="datetime", nullable=true, unique=false)
      */
-    private $coachAccessEndDate;
+    protected $coachAccessEndDate;
+
+    /**
+     * Only available when "session_list_order" setting is on.
+     *
+     * @var int
+     *
+     * @ORM\Column(name="position", type="integer", nullable=false)
+     */
+    //protected $position;
 
     /**
      * @ORM\OneToMany(targetEntity="Chamilo\CourseBundle\Entity\CItemProperty", mappedBy="session")
-     **/
-    //private $items;
+     */
+    //protected $items;
 
     /**
      * @ORM\ManyToOne(targetEntity="Chamilo\UserBundle\Entity\User", inversedBy="sessionAsGeneralCoach")
      * @ORM\JoinColumn(name="id_coach", referencedColumnName="id")
-     **/
-    private $generalCoach;
+     */
+    protected $generalCoach;
 
     /**
      * @ORM\ManyToOne(targetEntity="Chamilo\CoreBundle\Entity\SessionCategory", inversedBy="session")
      * @ORM\JoinColumn(name="session_category_id", referencedColumnName="id")
-     **/
-    private $category;
+     */
+    protected $category;
 
     /**
-     * @var ArrayCollection
-     * @ORM\OneToMany(targetEntity="SessionRelCourse", mappedBy="session", cascade={"persist"}, orphanRemoval=true)
-     **/
-    protected $courses;
-
-    /**
-     * @var ArrayCollection
-     * @ORM\OneToMany(targetEntity="SessionRelUser", mappedBy="session", cascade={"persist"}, orphanRemoval=true)
-     **/
-    protected $users;
-
-    /**
-     * @var ArrayCollection
-     * @ORM\OneToMany(targetEntity="SessionRelCourseRelUser", mappedBy="session", cascade={"persist"}, orphanRemoval=true)
-     **/
-    protected $userCourseSubscriptions;
-
-    /**
-     * @var Course
-     **/
-    protected $currentCourse;
-
-    /**
-     * @var boolean
+     * @var bool
      * @ORM\Column(name="send_subscription_notification", type="boolean", nullable=false, options={"default":false})
      */
-    private $sendSubscriptionNotification;
+    protected $sendSubscriptionNotification;
 
     /**
      * @var ArrayCollection
      * @ORM\OneToMany(targetEntity="Chamilo\CourseBundle\Entity\CStudentPublication", mappedBy="session", cascade={"persist"}, orphanRemoval=true)
      */
-    private $studentPublications;
+    protected $studentPublications;
 
     /**
-     * Constructor
+     * Constructor.
      */
     public function __construct()
     {
         $this->items = new ArrayCollection();
 
         $this->nbrClasses = 0;
-        $this->nbrUsers = 0;
         $this->nbrUsers = 0;
 
         $this->displayStartDate = new \DateTime();
@@ -235,6 +243,14 @@ class Session
         $this->showDescription = false;
         $this->category = null;
         $this->studentPublications = new ArrayCollection();
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string) $this->getName();
     }
 
     /**
@@ -270,17 +286,9 @@ class Session
     }
 
     /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return (string) $this->getName();
-    }
-
-    /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -328,7 +336,7 @@ class Session
     }
 
     /**
-     * @param int $status
+     * @param int  $status
      * @param User $user
      */
     public function addUserInSession($status, User $user)
@@ -343,17 +351,18 @@ class Session
 
     /**
      * @param SessionRelUser $subscription
+     *
      * @return bool
      */
     public function hasUser(SessionRelUser $subscription)
     {
         if ($this->getUsers()->count()) {
             $criteria = Criteria::create()->where(
-                Criteria::expr()->eq("user", $subscription->getUser())
+                Criteria::expr()->eq('user', $subscription->getUser())
             )->andWhere(
-                Criteria::expr()->eq("session", $subscription->getSession())
+                Criteria::expr()->eq('session', $subscription->getSession())
             )->andWhere(
-                Criteria::expr()->eq("relationType", $subscription->getRelationType())
+                Criteria::expr()->eq('relationType', $subscription->getRelationType())
             );
 
             $relation = $this->getUsers()->matching($criteria);
@@ -402,7 +411,7 @@ class Session
     {
         if ($this->getCourses()->count()) {
             $criteria = Criteria::create()->where(
-                Criteria::expr()->eq("course", $course)
+                Criteria::expr()->eq('course', $course)
             );
             $relation = $this->getCourses()->matching($criteria);
 
@@ -412,9 +421,8 @@ class Session
         return false;
     }
 
-
     /**
-     * Remove $course
+     * Remove $course.
      *
      * @param SessionRelCourse $course
      */
@@ -428,10 +436,36 @@ class Session
     }
 
     /**
-     * @param User $user
+     * Remove course subscription for a user.
+     * If user status in session is student, then decrease number of course users.
+     *
+     * @param User   $user
      * @param Course $course
-     * @param int $status if not set it will check if the user is registered
-     * with any status
+     */
+    public function removeUserCourseSubscription(User $user, Course $course)
+    {
+        /** @var SessionRelCourseRelUser $courseSubscription */
+        foreach ($this->userCourseSubscriptions as $i => $courseSubscription) {
+            if ($courseSubscription->getCourse()->getId() === $course->getId() &&
+                $courseSubscription->getUser()->getId() === $user->getId()) {
+                if ($this->userCourseSubscriptions[$i]->getStatus() === self::STUDENT) {
+                    $sessionCourse = $this->getCourseSubscription($course);
+
+                    $sessionCourse->setNbrUsers(
+                        $sessionCourse->getNbrUsers() - 1
+                    );
+                }
+
+                unset($this->userCourseSubscriptions[$i]);
+            }
+        }
+    }
+
+    /**
+     * @param User   $user
+     * @param Course $course
+     * @param int    $status if not set it will check if the user is registered
+     *                       with any status
      *
      * @return bool
      */
@@ -443,7 +477,7 @@ class Session
     }
 
     /**
-     * @param User $user
+     * @param User   $user
      * @param Course $course
      *
      * @return bool
@@ -454,7 +488,7 @@ class Session
     }
 
     /**
-     * @param User $user
+     * @param User   $user
      * @param Course $course
      *
      * @return bool
@@ -465,7 +499,7 @@ class Session
     }
 
     /**
-     * @param User $user
+     * @param User   $user
      * @param Course $course
      * @param string $status
      *
@@ -474,14 +508,14 @@ class Session
     public function getUserInCourse(User $user, Course $course, $status = null)
     {
         $criteria = Criteria::create()->where(
-            Criteria::expr()->eq("course", $course)
+            Criteria::expr()->eq('course', $course)
         )->andWhere(
-            Criteria::expr()->eq("user", $user)
+            Criteria::expr()->eq('user', $user)
         );
 
         if (!is_null($status)) {
             $criteria->andWhere(
-                Criteria::expr()->eq("status", $status)
+                Criteria::expr()->eq('status', $status)
             );
         }
 
@@ -489,10 +523,11 @@ class Session
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
-     * @return Session
+     *
+     * @return $this
      */
     public function setName($name)
     {
@@ -502,7 +537,7 @@ class Session
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
@@ -512,10 +547,11 @@ class Session
     }
 
     /**
-     * Set description
+     * Set description.
      *
      * @param string $description
-     * @return Groups
+     *
+     * @return $this
      */
     public function setDescription($description)
     {
@@ -525,7 +561,7 @@ class Session
     }
 
     /**
-     * Get description
+     * Get description.
      *
      * @return string
      */
@@ -535,9 +571,10 @@ class Session
     }
 
     /**
-     * Set nbrCourses
+     * Set nbrCourses.
      *
-     * @param integer $nbrCourses
+     * @param int $nbrCourses
+     *
      * @return Session
      */
     public function setNbrCourses($nbrCourses)
@@ -548,19 +585,20 @@ class Session
     }
 
     /**
-     * Get nbrCourses
+     * Get nbrCourses.
      *
-     * @return integer
+     * @return int
      */
     public function getNbrCourses()
     {
-        return $this->nbrCourses;
+        return (int) $this->nbrCourses;
     }
 
     /**
-     * Set nbrUsers
+     * Set nbrUsers.
      *
-     * @param integer $nbrUsers
+     * @param int $nbrUsers
+     *
      * @return Session
      */
     public function setNbrUsers($nbrUsers)
@@ -571,9 +609,9 @@ class Session
     }
 
     /**
-     * Get nbrUsers
+     * Get nbrUsers.
      *
-     * @return integer
+     * @return int
      */
     public function getNbrUsers()
     {
@@ -581,9 +619,10 @@ class Session
     }
 
     /**
-     * Set nbrClasses
+     * Set nbrClasses.
      *
-     * @param integer $nbrClasses
+     * @param int $nbrClasses
+     *
      * @return Session
      */
     public function setNbrClasses($nbrClasses)
@@ -594,9 +633,9 @@ class Session
     }
 
     /**
-     * Get nbrClasses
+     * Get nbrClasses.
      *
-     * @return integer
+     * @return int
      */
     public function getNbrClasses()
     {
@@ -604,9 +643,10 @@ class Session
     }
 
     /**
-     * Set sessionAdminId
+     * Set sessionAdminId.
      *
-     * @param integer $sessionAdminId
+     * @param int $sessionAdminId
+     *
      * @return Session
      */
     public function setSessionAdminId($sessionAdminId)
@@ -617,9 +657,9 @@ class Session
     }
 
     /**
-     * Get sessionAdminId
+     * Get sessionAdminId.
      *
-     * @return integer
+     * @return int
      */
     public function getSessionAdminId()
     {
@@ -627,9 +667,10 @@ class Session
     }
 
     /**
-     * Set visibility
+     * Set visibility.
      *
-     * @param integer $visibility
+     * @param int $visibility
+     *
      * @return Session
      */
     public function setVisibility($visibility)
@@ -640,9 +681,9 @@ class Session
     }
 
     /**
-     * Get visibility
+     * Get visibility.
      *
-     * @return integer
+     * @return int
      */
     public function getVisibility()
     {
@@ -650,9 +691,10 @@ class Session
     }
 
     /**
-     * Set promotionId
+     * Set promotionId.
      *
-     * @param integer $promotionId
+     * @param int $promotionId
+     *
      * @return Session
      */
     public function setPromotionId($promotionId)
@@ -663,9 +705,9 @@ class Session
     }
 
     /**
-     * Get promotionId
+     * Get promotionId.
      *
-     * @return integer
+     * @return int
      */
     public function getPromotionId()
     {
@@ -673,9 +715,10 @@ class Session
     }
 
     /**
-     * Set displayStartDate
+     * Set displayStartDate.
      *
      * @param \DateTime $displayStartDate
+     *
      * @return Session
      */
     public function setDisplayStartDate($displayStartDate)
@@ -686,7 +729,7 @@ class Session
     }
 
     /**
-     * Get displayStartDate
+     * Get displayStartDate.
      *
      * @return \DateTime
      */
@@ -696,9 +739,10 @@ class Session
     }
 
     /**
-     * Set displayEndDate
+     * Set displayEndDate.
      *
      * @param \DateTime $displayEndDate
+     *
      * @return Session
      */
     public function setDisplayEndDate($displayEndDate)
@@ -709,7 +753,7 @@ class Session
     }
 
     /**
-     * Get displayEndDate
+     * Get displayEndDate.
      *
      * @return \DateTime
      */
@@ -719,9 +763,10 @@ class Session
     }
 
     /**
-     * Set accessStartDate
+     * Set accessStartDate.
      *
      * @param \DateTime $accessStartDate
+     *
      * @return Session
      */
     public function setAccessStartDate($accessStartDate)
@@ -732,7 +777,7 @@ class Session
     }
 
     /**
-     * Get accessStartDate
+     * Get accessStartDate.
      *
      * @return \DateTime
      */
@@ -742,9 +787,10 @@ class Session
     }
 
     /**
-     * Set accessEndDate
+     * Set accessEndDate.
      *
      * @param \DateTime $accessEndDate
+     *
      * @return Session
      */
     public function setAccessEndDate($accessEndDate)
@@ -755,7 +801,7 @@ class Session
     }
 
     /**
-     * Get accessEndDate
+     * Get accessEndDate.
      *
      * @return \DateTime
      */
@@ -765,9 +811,10 @@ class Session
     }
 
     /**
-     * Set coachAccessStartDate
+     * Set coachAccessStartDate.
      *
      * @param \DateTime $coachAccessStartDate
+     *
      * @return Session
      */
     public function setCoachAccessStartDate($coachAccessStartDate)
@@ -778,7 +825,7 @@ class Session
     }
 
     /**
-     * Get coachAccessStartDate
+     * Get coachAccessStartDate.
      *
      * @return \DateTime
      */
@@ -788,9 +835,10 @@ class Session
     }
 
     /**
-     * Set coachAccessEndDate
+     * Set coachAccessEndDate.
      *
      * @param \DateTime $coachAccessEndDate
+     *
      * @return Session
      */
     public function setCoachAccessEndDate($coachAccessEndDate)
@@ -801,7 +849,7 @@ class Session
     }
 
     /**
-     * Get coachAccessEndDate
+     * Get coachAccessEndDate.
      *
      * @return \DateTime
      */
@@ -811,7 +859,8 @@ class Session
     }
 
     /**
-     * Get id
+     * Get id.
+     *
      * @return User
      */
     public function getGeneralCoach()
@@ -838,6 +887,7 @@ class Session
 
     /**
      * @param $category
+     *
      * @return $this
      */
     public function setCategory($category)
@@ -852,27 +902,24 @@ class Session
      */
     public static function getStatusList()
     {
-        return array(
+        return [
             self::VISIBLE => 'status_visible',
             self::READ_ONLY => 'status_read_only',
             self::INVISIBLE => 'status_invisible',
             self::AVAILABLE => 'status_available',
-        );
+        ];
     }
 
     /**
-     * Check if session is visible
+     * Check if session is visible.
+     *
      * @return bool
      */
     public function isActive()
     {
         $now = new \Datetime('now');
 
-        if ($now > $this->getAccessStartDate()) {
-            return true;
-        }
-
-        return false;
+        return $now > $this->getAccessStartDate();
     }
 
     /**
@@ -917,8 +964,30 @@ class Session
     }
 
     /**
-     * @param int $status
-     * @param User $user
+     * @param Course $course
+     *
+     * @return SessionRelCourse
+     */
+    public function getCourseSubscription(Course $course)
+    {
+        $criteria = Criteria::create()->where(
+            Criteria::expr()->eq('course', $course)
+        );
+
+        /** @var SessionRelCourse $sessionCourse */
+        $sessionCourse = $this->courses
+            ->matching($criteria)
+            ->current();
+
+        return $sessionCourse;
+    }
+
+    /**
+     * Add a user course subscription.
+     * If user status in session is student, then increase number of course users.
+     *
+     * @param int    $status
+     * @param User   $user
      * @param Course $course
      */
     public function addUserInCourse($status, User $user, Course $course)
@@ -929,21 +998,30 @@ class Session
         $userRelCourseRelSession->setSession($this);
         $userRelCourseRelSession->setStatus($status);
         $this->addUserCourseSubscription($userRelCourseRelSession);
+
+        if ($status === self::STUDENT) {
+            $sessionCourse = $this->getCourseSubscription($course);
+
+            $sessionCourse->setNbrUsers(
+                $sessionCourse->getNbrUsers() + 1
+            );
+        }
     }
 
     /**
      * @param SessionRelCourseRelUser $subscription
+     *
      * @return bool
      */
     public function hasUserCourseSubscription(SessionRelCourseRelUser $subscription)
     {
         if ($this->getUserCourseSubscriptions()->count()) {
             $criteria = Criteria::create()->where(
-                Criteria::expr()->eq("user", $subscription->getUser())
+                Criteria::expr()->eq('user', $subscription->getUser())
             )->andWhere(
-                Criteria::expr()->eq("course", $subscription->getCourse())
+                Criteria::expr()->eq('course', $subscription->getCourse())
             )->andWhere(
-                Criteria::expr()->eq("session", $subscription->getSession())
+                Criteria::expr()->eq('session', $subscription->getSession())
             );
             $relation = $this->getUserCourseSubscriptions()->matching($criteria);
 
@@ -963,6 +1041,7 @@ class Session
 
     /**
      * @param Course $course
+     *
      * @return $this
      */
     public function setCurrentCourse(Course $course)
@@ -971,12 +1050,15 @@ class Session
         if ($this->getCourses()->contains($course->getId())) {
             $this->currentCourse = $course;
         }
+
         return $this;
     }
 
     /**
-     * Set $sendSubscriptionNotification
-     * @param boolean $sendNotification
+     * Set $sendSubscriptionNotification.
+     *
+     * @param bool $sendNotification
+     *
      * @return \Chamilo\CoreBundle\Entity\Session
      */
     public function setSendSubscriptionNotification($sendNotification)
@@ -987,8 +1069,9 @@ class Session
     }
 
     /**
-     * Get $sendSubscriptionNotification
-     * @return boolean
+     * Get $sendSubscriptionNotification.
+     *
+     * @return bool
      */
     public function getSendSubscriptionNotification()
     {
@@ -996,46 +1079,29 @@ class Session
     }
 
     /**
-     * Get user from course by status
-     * @param \Chamilo\CoreBundle\Entity\Course $course
-     * @param int $status
+     * Get user from course by status.
+     *
+     * @param Course $course
+     * @param int    $status
+     *
      * @return \Doctrine\Common\Collections\ArrayCollection|\Doctrine\Common\Collections\Collection
      */
     public function getUserCourseSubscriptionsByStatus(Course $course, $status)
     {
         $criteria = Criteria::create()
             ->where(
-                Criteria::expr()->eq("course", $course)
+                Criteria::expr()->eq('course', $course)
             )
             ->andWhere(
-                Criteria::expr()->eq("status", $status)
+                Criteria::expr()->eq('status', $status)
             );
 
         return $this->userCourseSubscriptions->matching($criteria);
     }
 
-    public function getBuyCoursePluginPrice()
-    {
-        // start buycourse validation
-        // display the course price and buy button if the buycourses plugin is enabled and this course is configured
-        $plugin = \BuyCoursesPlugin::create();
-        $isThisCourseInSale = $plugin->buyCoursesForGridCatalogValidator($this->id, \BuyCoursesPlugin::PRODUCT_TYPE_SESSION);
-        $return = [];
-
-        if ($isThisCourseInSale) {
-            // set the Price label
-            $return['html'] = $isThisCourseInSale['html'];
-            // set the Buy button instead register.
-            if ($isThisCourseInSale['verificator']) {
-                $return['buy_button'] = $plugin->returnBuyCourseButton($this->id, \BuyCoursesPlugin::PRODUCT_TYPE_SESSION);
-            }
-        }
-        // end buycourse validation
-        return $return;
-    }
-
     /**
      * @param ArrayCollection $studentPublications
+     *
      * @return Session
      */
     public function setStudentPublications(ArrayCollection $studentPublications)
@@ -1051,6 +1117,7 @@ class Session
 
     /**
      * @param CStudentPublication $studentPublication
+     *
      * @return Session
      */
     public function addStudentPublication(CStudentPublication $studentPublication)
@@ -1061,11 +1128,32 @@ class Session
     }
 
     /**
-     * Get studentPublications
+     * Get studentPublications.
+     *
      * @return ArrayCollection
      */
     public function getStudentPublications()
     {
         return $this->studentPublications;
     }
+
+    /**
+     * @return int
+     */
+    /*public function getPosition()
+    {
+        return $this->position;
+    }*/
+
+    /**
+     * @param int $position
+     *
+     * @return Session
+     */
+    /*public function setPosition($position)
+    {
+        $this->position = $position;
+
+        return $this;
+    }*/
 }

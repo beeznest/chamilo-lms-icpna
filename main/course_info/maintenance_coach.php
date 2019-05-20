@@ -1,12 +1,13 @@
 <?php
 /* For licensing terms, see /license.txt */
 /**
- * Maintenance for session coach
+ * Maintenance for session coach.
+ *
  * @author Julio Montoya <julio.montoya@beeznest.com>
  * @author Angel Fernando Quiroz Campos <angel.quiroz@beeznest.com>
+ *
  * @package chamilo.course_info
  */
-
 require_once __DIR__.'/../inc/global.inc.php';
 
 $current_course_tool = TOOL_COURSE_MAINTENANCE;
@@ -22,7 +23,7 @@ if ($sessionsCopy !== 'true') {
     api_not_allowed(true);
 }
 
-Display :: display_header($nameTools);
+Display::display_header($nameTools);
 
 echo Display::page_subheader(
     Display::return_icon(

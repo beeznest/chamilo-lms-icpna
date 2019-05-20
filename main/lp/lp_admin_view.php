@@ -1,21 +1,26 @@
 <?php
 /* For licensing terms, see /license.txt */
 
+use ChamiloSession as Session;
+
 /**
- * This is a learning path creation and player tool in Chamilo - previously learnpath_handler.php
+ * This is a learning path creation and player tool in Chamilo - previously learnpath_handler.php.
  *
  * @author Patrick Cool
  * @author Denes Nagy
  * @author Roan Embrechts, refactoring and code cleaning
  * @author Yannick Warnier <ywarnier@beeznest.org> - cleaning and update for new SCORM tool
+ *
  * @package chamilo.learnpath
-*/
-
+ */
 $this_section = SECTION_COURSES;
 
 api_protect_course_script();
 
 $is_allowed_to_edit = api_is_allowed_to_edit(null, true);
+
+/** @var learnpath $learnPath */
+$learnPath = Session::read('oLP');
 
 $tbl_lp = Database::get_course_table(TABLE_LP_MAIN);
 $tbl_lp_item = Database::get_course_table(TABLE_LP_ITEM);
@@ -25,71 +30,60 @@ $learnpath_id = (int) $_REQUEST['lp_id'];
 $submit = isset($_POST['submit_button']) ? $_POST['submit_button'] : null;
 $_course = api_get_course_info();
 
-if ((!$is_allowed_to_edit) || ($isStudentView)) {
-    error_log('New LP - User not authorized in lp_admin_view.php');
+if (!$is_allowed_to_edit || $isStudentView) {
     header('location:lp_controller.php?action=view&lp_id='.$learnpath_id);
-}
-// From here on, we are admin because of the previous condition, so don't check anymore.
-
-$course_id = api_get_course_int_id();
-
-$sql_query = "SELECT * FROM $tbl_lp WHERE c_id = $course_id AND id = $learnpath_id";
-$result = Database::query($sql_query);
-$therow = Database::fetch_array($result);
-
-/* SHOWING THE ADMIN TOOLS */
-
-if (isset($_SESSION['gradebook'])) {
-    $gradebook = $_SESSION['gradebook'];
+    exit;
 }
 
-if (!empty($gradebook) && $gradebook == 'view') {
-    $interbreadcrumb[] = array(
-        'url' => '../gradebook/'.$_SESSION['gradebook_dest'],
-        'name' => get_lang('ToolGradebook')
-    );
+if (api_is_in_gradebook()) {
+    $interbreadcrumb[] = [
+        'url' => Category::getUrl(),
+        'name' => get_lang('ToolGradebook'),
+    ];
 }
 
-$interbreadcrumb[] = array(
+$interbreadcrumb[] = [
     'url' => 'lp_controller.php?action=list&'.api_get_cidreq(),
-    'name' => get_lang('LearningPaths')
-);
-$interbreadcrumb[] = array(
+    'name' => get_lang('LearningPaths'),
+];
+$interbreadcrumb[] = [
     'url' => api_get_self()."?action=build&lp_id=$learnpath_id&".api_get_cidreq(),
-    "name" => stripslashes("{$therow['name']}"),
-);
-$interbreadcrumb[] = array(
+    "name" => Security::remove_XSS($learnPath->get_name()),
+];
+$interbreadcrumb[] = [
     'url' => api_get_self()."?action=add_item&type=step&lp_id=$learnpath_id&".api_get_cidreq(),
     'name' => get_lang('NewStep'),
-);
+];
 
 if (isset($_REQUEST['updateaudio'])) {
-    $interbreadcrumb[] = array('url' => '#', 'name' => get_lang('UpdateAllAudioFragments'));
+    $interbreadcrumb[] = ['url' => '#', 'name' => get_lang('UpdateAllAudioFragments')];
 } else {
-    $interbreadcrumb[] = array('url' => '#', 'name' => get_lang('BasicOverview'));
+    $interbreadcrumb[] = ['url' => '#', 'name' => get_lang('BasicOverview')];
 }
 
+$htmlHeadXtra[] = '<script>'.$learnPath->get_js_dropdown_array().'</script>';
 // Theme calls.
 $show_learn_path = true;
-$lp_theme_css = $_SESSION['oLP']->get_theme();
+$lp_theme_css = $learnPath->get_theme();
 
 // POST action handling (uploading mp3, deleting mp3)
 if (isset($_POST['save_audio'])) {
     //Updating the lp.modified_on
-    $_SESSION['oLP']->set_modified_on();
+    $learnPath->set_modified_on();
 
+    $lp_items_to_remove_audio = [];
+    $tbl_lp_item = Database::get_course_table(TABLE_LP_ITEM);
     // Deleting the audio fragments.
     foreach ($_POST as $key => $value) {
         if (substr($key, 0, 9) == 'removemp3') {
             $lp_items_to_remove_audio[] = str_ireplace('removemp3', '', $key);
             // Removing the audio from the learning path item.
-            $tbl_lp_item = Database::get_course_table(TABLE_LP_ITEM);
             $in = implode(',', $lp_items_to_remove_audio);
         }
     }
     if (count($lp_items_to_remove_audio) > 0) {
         $sql = "UPDATE $tbl_lp_item SET audio = '' 
-                WHERE c_id = $course_id AND id IN (".$in.")";
+                WHERE iid IN (".$in.")";
         $result = Database::query($sql);
     }
 
@@ -147,15 +141,14 @@ if (isset($_POST['save_audio'])) {
             $file = $file_components[count($file_components) - 1];
 
             // Store the mp3 file in the lp_item table.
-            $tbl_lp_item = Database::get_course_table(TABLE_LP_ITEM);
             $sql = "UPDATE $tbl_lp_item 
                     SET audio = '".Database::escape_string($file)."'
-                    WHERE c_id = $course_id AND id = '".Database::escape_string($lp_item_id)."'";
+                    WHERE iid = ".(int) $lp_item_id;
             Database::query($sql);
         }
     }
     //echo Display::return_message(get_lang('ItemUpdated'), 'confirm');
-    $url = api_get_self().'?action=add_item&type=step&lp_id='.intval($_SESSION['oLP']->lp_id).'&'.api_get_cidreq();
+    $url = api_get_self().'?action=add_item&type=step&lp_id='.$learnPath->get_id().'&'.api_get_cidreq();
     header('Location: '.$url);
     exit;
 }
@@ -167,11 +160,10 @@ $suredel = trim(get_lang('AreYouSureToDeleteJS'));
 <script>
 var newOrderData= "";
 //source code found in http://www.swartzfager.org/blog/dspNestedList.cfm
-
 $(function() {
     <?php
     if (!isset($_REQUEST['updateaudio'])) {
-    ?>
+        ?>
     $("#lp_item_list").sortable({
         items: "li",
         handle: ".moved", //only the class "moved"
@@ -211,7 +203,7 @@ $(function() {
         //Write the newOrderData string out to the listResults form element
         //$("#listResults").val(newOrderData);
         var order = "new_order="+ newOrderData + "&a=update_lp_item_order";
-        $.post("<?php echo api_get_path(WEB_AJAX_PATH)?>lp.ajax.php", order, function(reponse) {
+        $.post("<?php echo api_get_path(WEB_AJAX_PATH); ?>lp.ajax.php", order, function(reponse) {
             $("#message").html(reponse);
         });
 
@@ -222,7 +214,8 @@ $(function() {
         return false;
 
     }); //end of lp_item_list event assignment
-    <?php } ?>
+    <?php
+    } ?>
 
     function processChildren(parentId) {
         //Loop through the children of the UL element defined by the parentId
@@ -268,11 +261,11 @@ function confirmation(name) {
 </script>
 <?php
 
-echo $_SESSION['oLP']->build_action_menu();
+echo $learnPath->build_action_menu();
 
 echo '<div class="row">';
 echo '<div class="col-md-4">';
-echo $_SESSION['oLP']->return_new_tree(null, true);
+echo $learnPath->return_new_tree(null, true);
 echo '</div>';
 
 echo '<div class="col-md-8">';
@@ -284,7 +277,7 @@ switch ($_GET['action']) {
                 'confirm'
             );
         } else {
-            echo $_SESSION['oLP']->display_edit_item($_GET['id']);
+            echo $learnPath->display_edit_item($_GET['id']);
         }
         break;
     case 'delete_item':
@@ -298,7 +291,7 @@ switch ($_GET['action']) {
 }
 if (!empty($_GET['updateaudio'])) {
     // list of items to add audio files
-    echo $_SESSION['oLP']->overview();
+    echo $learnPath->overview();
 }
 
 echo '</div>';

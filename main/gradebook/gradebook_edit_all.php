@@ -2,79 +2,88 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * Script
+ * Script.
+ *
  * @package chamilo.gradebook
+ *
  * @author Julio Montoya - fixes in order to use gradebook models + some code cleaning
  */
-
-$cidReset = true;
 require_once __DIR__.'/../inc/global.inc.php';
 $this_section = SECTION_COURSES;
 $current_course_tool = TOOL_GRADEBOOK;
 
 api_protect_course_script(true);
 api_block_anonymous_users();
+GradebookUtils::block_students();
 
-if (!api_is_allowed_to_edit()) {
-    header('Location: /index.php');
-    exit;
-}
-
-$my_selectcat = isset($_GET['selectcat']) ? intval($_GET['selectcat']) : '';
+$my_selectcat = isset($_GET['selectcat']) ? (int) $_GET['selectcat'] : 0;
 
 if (empty($my_selectcat)) {
-    api_not_allowed();
+    api_not_allowed(true);
 }
 
-$course_id = GradebookUtils::get_course_id_by_link_id($my_selectcat);
+$action_details = '';
+if (isset($_GET['selectcat'])) {
+    $action_details = 'selectcat';
+}
 
+$logInfo = [
+    'tool' => TOOL_GRADEBOOK,
+    'tool_id' => 0,
+    'tool_id_detail' => 0,
+    'action' => 'edit-weight',
+    'action_details' => $action_details,
+];
+Event::registerLog($logInfo);
+
+$course_id = GradebookUtils::get_course_id_by_link_id($my_selectcat);
 $table_link = Database::get_main_table(TABLE_MAIN_GRADEBOOK_LINK);
 $table_evaluation = Database::get_main_table(TABLE_MAIN_GRADEBOOK_EVALUATION);
 $tbl_forum_thread = Database::get_course_table(TABLE_FORUM_THREAD);
 $tbl_attendance = Database::get_course_table(TABLE_ATTENDANCE);
 
-$table_evaluated[LINK_EXERCISE] = array(
+$table_evaluated[LINK_EXERCISE] = [
     TABLE_QUIZ_TEST,
     'title',
     'id',
     get_lang('Exercise'),
-);
-$table_evaluated[LINK_DROPBOX] = array(
+];
+$table_evaluated[LINK_DROPBOX] = [
     TABLE_DROPBOX_FILE,
     'name',
     'id',
     get_lang('Dropbox'),
-);
-$table_evaluated[LINK_STUDENTPUBLICATION] = array(
+];
+$table_evaluated[LINK_STUDENTPUBLICATION] = [
     TABLE_STUDENT_PUBLICATION,
     'url',
     'id',
     get_lang('Student_publication'),
-);
-$table_evaluated[LINK_LEARNPATH] = array(
+];
+$table_evaluated[LINK_LEARNPATH] = [
     TABLE_LP_MAIN,
     'name',
     'id',
     get_lang('Learnpath'),
-);
-$table_evaluated[LINK_FORUM_THREAD] = array(
+];
+$table_evaluated[LINK_FORUM_THREAD] = [
     TABLE_FORUM_THREAD,
     'thread_title_qualify',
     'thread_id',
     get_lang('Forum'),
-);
-$table_evaluated[LINK_ATTENDANCE] = array(
+];
+$table_evaluated[LINK_ATTENDANCE] = [
     TABLE_ATTENDANCE,
     'attendance_title_qualify',
     'id',
     get_lang('Attendance'),
-);
-$table_evaluated[LINK_SURVEY] = array(
+];
+$table_evaluated[LINK_SURVEY] = [
     TABLE_SURVEY,
     'code',
     'survey_id',
     get_lang('Survey'),
-);
+];
 
 $submitted = isset($_POST['submitted']) ? $_POST['submitted'] : '';
 if ($submitted == 1) {
@@ -91,7 +100,7 @@ $my_cat = $my_cat[0];
 $parent_id = $my_cat->get_parent_id();
 $parent_cat = Category::load($parent_id);
 
-$my_category = array();
+$my_category = [];
 $cat = new Category();
 $my_category = $cat->showAllCategoryInfo($my_selectcat);
 
@@ -106,14 +115,23 @@ foreach ($links as &$row) {
     $item_weight = $row['weight'];
     $sql = 'SELECT * FROM '.GradebookUtils::get_table_type_course($row['type']).'
             WHERE c_id = '.$course_id.' AND '.$table_evaluated[$row['type']][2].' = '.$row['ref_id'];
+
     $result = Database::query($sql);
     $resource_name = Database::fetch_array($result);
 
     if (isset($resource_name['lp_type'])) {
         $resource_name = $resource_name[4];
     } else {
-        $resource_name = $resource_name[3];
+        switch ($row['type']) {
+            case LINK_EXERCISE:
+                $resource_name = $resource_name['title'];
+                break;
+            default:
+                $resource_name = $resource_name[3];
+                break;
+        }
     }
+
     $row['resource_name'] = $resource_name;
 
     // Update only if value changed
@@ -128,12 +146,13 @@ foreach ($links as &$row) {
     }
 
     $output .= '<tr><td>'.GradebookUtils::build_type_icon_tag($row['type']).'</td>
-               <td> '.$resource_name.' '.Display::label(
+               <td> '.$resource_name.' '.
+        Display::label(
             $table_evaluated[$row['type']][3],
             'info'
         ).' </td>';
     $output .= '<td>
-                    <input type="hidden" name="link_'.$row['id'].'" value="'.$resource_name.'" />
+                    <input type="hidden" name="link_'.$row['id'].'" value="1" />
                     <input size="10" type="text" name="link['.$row['id'].']" value="'.$item_weight.'"/>
                </td></tr>';
 }
@@ -156,16 +175,13 @@ foreach ($evaluations as $evaluationRow) {
 
     $output .= '<tr>
                 <td>'.GradebookUtils::build_type_icon_tag('evalnotempty').'</td>
-                <td>'.$evaluationRow['name'].' '.Display::label(
-            get_lang('Evaluation')
-        ).'</td>';
+                <td>'.$evaluationRow['name'].' '.Display::label(get_lang('Evaluation')).'</td>';
     $output .= '<td>
-                    <input type="hidden" name="eval_'.$evaluationRow['id'].'" value="'.$evaluationRow['name'].'" />
+                    <input type="hidden" name="eval_'.$evaluationRow['id'].'" value="1" />
                     <input type="text" size="10" name="evaluation['.$evaluationRow['id'].']" value="'.$item_weight.'"/>
                 </td></tr>';
 }
 
-$my_api_cidreq = api_get_cidreq();
 $currentUrl = api_get_self().'?'.api_get_cidreq().'&selectcat='.$my_selectcat;
 
 $form = new FormValidator('auto_weight', 'post', $currentUrl);
@@ -216,49 +232,41 @@ if ($form->validate()) {
             $weightToApply
         );
     }
+    Display::addFlash(Display::return_message(get_lang('GradebookWeightUpdated')));
 
-    header('Location:'.$currentUrl);
+    header('Location: '.$currentUrl);
     exit;
 }
 
-
 // 	DISPLAY HEADERS AND MESSAGES
 if (!isset($_GET['exportpdf']) and !isset($_GET['export_certificate'])) {
-    if (isset ($_GET['studentoverview'])) {
-        $interbreadcrumb[] = array(
-            'url' => Security::remove_XSS(
-                    $_SESSION['gradebook_dest']
-                ).'?selectcat='.$my_selectcat,
+    if (isset($_GET['studentoverview'])) {
+        $interbreadcrumb[] = [
+            'url' => Category::getUrl().'selectcat='.$my_selectcat,
             'name' => get_lang('Gradebook'),
-        );
+        ];
         Display:: display_header(get_lang('FlatView'));
-    } elseif (isset ($_GET['search'])) {
-        $interbreadcrumb[] = array(
-            'url' => Security::remove_XSS(
-                    $_SESSION['gradebook_dest']
-                ).'?selectcat='.$my_selectcat,
+    } elseif (isset($_GET['search'])) {
+        $interbreadcrumb[] = [
+            'url' => Category::getUrl().'selectcat='.$my_selectcat,
             'name' => get_lang('Gradebook'),
-        );
+        ];
         Display:: display_header(get_lang('SearchResults'));
     } else {
-        $interbreadcrumb[] = array(
-            'url' => Security::remove_XSS(
-                    $_SESSION['gradebook_dest']
-                ).'?selectcat=1',
+        $interbreadcrumb[] = [
+            'url' => Category::getUrl().'selectcat=1',
             'name' => get_lang('Gradebook'),
-        );
-        $interbreadcrumb[] = array(
+        ];
+        $interbreadcrumb[] = [
             'url' => '#',
             'name' => get_lang('EditAllWeights'),
-        );
+        ];
         Display:: display_header('');
     }
 }
 ?>
     <div class="actions">
-        <a href="<?php echo Security::remove_XSS(
-                $_SESSION['gradebook_dest']
-            ).'?'.$my_api_cidreq ?>&selectcat=<?php echo $my_selectcat ?>">
+        <a href="<?php echo Category::getUrl(); ?>selectcat=<?php echo $my_selectcat; ?>">
             <?php echo Display::return_icon(
                 'back.png',
                 get_lang('FolderView'),
@@ -279,8 +287,7 @@ $warning_message = sprintf(get_lang('TotalWeightMustBeX'), $original_total);
 echo Display::return_message($warning_message, 'warning', false);
 
 ?>
-<form method="post"
-      action="gradebook_edit_all.php?<?php echo $my_api_cidreq ?>&selectcat=<?php echo $my_selectcat ?>">
+<form method="post" action="<?php echo $currentUrl; ?>">
     <table class="data_table">
         <tr class="row_odd">
             <th style="width: 35px;"><?php echo get_lang('Type'); ?></th>
@@ -292,8 +299,8 @@ echo Display::return_message($warning_message, 'warning', false);
     <input type="hidden" name="submitted" value="1"/>
     <br/>
     <button class="btn btn-primary" type="submit" name="name"
-            value="<?php echo get_lang('Save') ?>">
-        <?php echo get_lang('SaveScoringRules') ?>
+            value="<?php echo get_lang('Save'); ?>">
+        <?php echo get_lang('SaveScoringRules'); ?>
     </button>
 </form>
 <?php

@@ -4,34 +4,40 @@
 /**
  * @package chamilo.messages
  */
-
 $cidReset = true;
 
 require_once __DIR__.'/../inc/global.inc.php';
 
 api_block_anonymous_users();
+
+if (api_get_setting('allow_message_tool') != 'true') {
+    api_not_allowed(true);
+}
+
+$logInfo = [
+    'tool' => 'Messages',
+    'tool_id' => 0,
+    'tool_id_detail' => 0,
+    'action' => isset($_GET['action']) ? $_GET['action'] : 'inbox',
+    'action_details' => '',
+];
+Event::registerLog($logInfo);
+
+$allowSocial = api_get_setting('allow_social_tool') == 'true';
+$allowMessage = api_get_setting('allow_message_tool') == 'true';
+
 if (isset($_GET['messages_page_nr'])) {
-    $social_link = '';
-    if ($_REQUEST['f'] == 'social') {
-        $social_link = '?f=social';
-    }
-    if (api_get_setting('allow_social_tool') == 'true' &&
-        api_get_setting('allow_message_tool') == 'true'
-    ) {
-        header('Location:inbox.php'.$social_link);
+    if ($allowSocial && $allowMessage) {
+        header('Location:inbox.php');
         exit;
     }
 }
-if (api_get_setting('allow_message_tool') != 'true') {
-    api_not_allowed();
-}
 
 $nameTools = get_lang('Messages');
-$request = api_is_xml_http_request();
 $show_message = null;
 if (isset($_GET['form_reply']) || isset($_GET['form_delete'])) {
-    $info_reply = array();
-    $info_delete = array();
+    $info_reply = [];
+    $info_delete = [];
 
     if (isset($_GET['form_reply'])) {
         //allow to insert messages
@@ -88,61 +94,53 @@ if (isset($_GET['form_reply']) || isset($_GET['form_delete'])) {
     }
 }
 
-if (isset($_GET['f']) && $_GET['f'] == 'social') {
+if ($allowSocial) {
     $this_section = SECTION_SOCIAL;
-    $interbreadcrumb[] = array(
+    $interbreadcrumb[] = [
         'url' => api_get_path(WEB_PATH).'main/social/home.php',
-        'name' => get_lang('SocialNetwork')
-    );
-    $interbreadcrumb[] = array('url' => '#', 'name' => get_lang('Inbox'));
+        'name' => get_lang('SocialNetwork'),
+    ];
 } else {
     $this_section = SECTION_MYPROFILE;
-    $interbreadcrumb[] = array(
+    $interbreadcrumb[] = [
         'url' => api_get_path(WEB_PATH).'main/auth/profile.php',
-        'name' => get_lang('Profile')
-    );
+        'name' => get_lang('Profile'),
+    ];
 }
 
-$social_parameter = '';
-$actions = '';
-if ((isset($_GET['f']) && $_GET['f'] === 'social') ||
-    api_get_setting('allow_social_tool') === 'true'
-) {
-    $social_parameter = '?f=social';
-} else {
-    //Comes from normal profile
-    if (api_get_setting('allow_social_tool') === 'true' &&
-        api_get_setting('allow_message_tool') === 'true'
-    ) {
-        $actions .= '<a href="'.api_get_path(WEB_PATH).'main/social/profile.php">'.
-            Display::return_icon('shared_profile.png', get_lang('ViewSharedProfile')).'</a>';
-    }
+$interbreadcrumb[] = [
+    'url' => api_get_path(WEB_PATH).'main/messages/inbox.php',
+    'name' => get_lang('Messages'),
+];
+$interbreadcrumb[] = ['url' => '#', 'name' => get_lang('Inbox')];
 
-    if (api_get_setting('allow_message_tool') == 'true') {
-        $actions .= '<a href="'.api_get_path(WEB_PATH).'main/messages/new_message.php">'.
-            Display::return_icon('message_new.png', get_lang('ComposeMessage')).'</a>';
-        $actions .= '<a href="'.api_get_path(WEB_PATH).'main/messages/inbox.php">'.
-            Display::return_icon('inbox.png', get_lang('Inbox')).'</a>';
-        $actions .= '<a href="'.api_get_path(WEB_PATH).'main/messages/outbox.php">'.
-            Display::return_icon('outbox.png', get_lang('Outbox')).'</a>';
-    }
+$actions = '';
+
+// Comes from normal profile
+if ($allowSocial === false && $allowMessage) {
+    $actions .= '<a href="'.api_get_path(WEB_PATH).'main/messages/new_message.php">'.
+        Display::return_icon('message_new.png', get_lang('ComposeMessage')).'</a>';
+    $actions .= '<a href="'.api_get_path(WEB_PATH).'main/messages/inbox.php">'.
+        Display::return_icon('inbox.png', get_lang('Inbox')).'</a>';
+    $actions .= '<a href="'.api_get_path(WEB_PATH).'main/messages/outbox.php">'.
+        Display::return_icon('outbox.png', get_lang('Outbox')).'</a>';
 }
 
 // LEFT CONTENT
 $social_menu_block = '';
-if (api_get_setting('allow_social_tool') === 'true') {
+if ($allowSocial) {
     // Block Social Menu
     $social_menu_block = SocialManager::show_social_menu('messages');
 }
 
-//Right content
-$social_right_content = null;
+// Right content
+$social_right_content = '';
 $keyword = '';
-if (api_get_setting('allow_social_tool') === 'true') {
-    $actionsLeft = '<a href="'.api_get_path(WEB_PATH).'main/messages/new_message.php?f=social">'.
-        Display::return_icon('new-message.png', get_lang('ComposeMessage'), array(), 32).'</a>';
-    $actionsLeft .= '<a href="'.api_get_path(WEB_PATH).'main/messages/outbox.php?f=social">'.
-        Display::return_icon('outbox.png', get_lang('Outbox'), array(), 32).'</a>';
+if ($allowSocial) {
+    $actionsLeft = '<a href="'.api_get_path(WEB_PATH).'main/messages/new_message.php">'.
+        Display::return_icon('new-message.png', get_lang('ComposeMessage'), [], 32).'</a>';
+    $actionsLeft .= '<a href="'.api_get_path(WEB_PATH).'main/messages/outbox.php">'.
+        Display::return_icon('outbox.png', get_lang('Outbox'), [], 32).'</a>';
 
     $form = MessageManager::getSearchForm(api_get_path(WEB_PATH).'main/messages/inbox.php');
     if ($form->validate()) {
@@ -152,15 +150,14 @@ if (api_get_setting('allow_social_tool') === 'true') {
     $actionsRight = $form->returnForm();
     $social_right_content .= Display::toolbarAction('toolbar', [$actionsLeft, $actionsRight]);
 }
-//MAIN CONTENT
 
 if (!isset($_GET['del_msg'])) {
     $social_right_content .= MessageManager::inbox_display($keyword);
 } else {
-    $num_msg = intval($_POST['total']);
+    $num_msg = (int) $_POST['total'];
     for ($i = 0; $i < $num_msg; $i++) {
         if ($_POST[$i]) {
-            //the user_id was necessary to delete a message??
+            // The user_id was necessary to delete a message??
             $show_message .= MessageManager::delete_message_by_user_receiver(
                 api_get_user_id(),
                 $_POST['_'.$i]

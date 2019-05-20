@@ -6,7 +6,7 @@ namespace Chamilo\CourseBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CForumThreadQualify
+ * CForumThreadQualify.
  *
  * @ORM\Table(
  *  name="c_forum_thread_qualify",
@@ -20,74 +20,75 @@ use Doctrine\ORM\Mapping as ORM;
 class CForumThreadQualify
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="iid", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $iid;
+    protected $iid;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer")
      */
-    private $cId;
+    protected $cId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer", nullable=true)
      */
-    private $id;
+    protected $id;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="user_id", type="integer", nullable=false)
      */
-    private $userId;
+    protected $userId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="thread_id", type="integer", nullable=false)
      */
-    private $threadId;
+    protected $threadId;
 
     /**
      * @var float
      *
      * @ORM\Column(name="qualify", type="float", precision=6, scale=2, nullable=false)
      */
-    private $qualify;
+    protected $qualify;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="qualify_user_id", type="integer", nullable=true)
      */
-    private $qualifyUserId;
+    protected $qualifyUserId;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="qualify_time", type="datetime", nullable=true)
      */
-    private $qualifyTime;
+    protected $qualifyTime;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="session_id", type="integer", nullable=true)
      */
-    private $sessionId;
+    protected $sessionId;
 
     /**
-     * Set userId
+     * Set userId.
      *
-     * @param integer $userId
+     * @param int $userId
+     *
      * @return CForumThreadQualify
      */
     public function setUserId($userId)
@@ -98,9 +99,9 @@ class CForumThreadQualify
     }
 
     /**
-     * Get userId
+     * Get userId.
      *
-     * @return integer
+     * @return int
      */
     public function getUserId()
     {
@@ -108,9 +109,10 @@ class CForumThreadQualify
     }
 
     /**
-     * Set threadId
+     * Set threadId.
      *
-     * @param integer $threadId
+     * @param int $threadId
+     *
      * @return CForumThreadQualify
      */
     public function setThreadId($threadId)
@@ -121,9 +123,9 @@ class CForumThreadQualify
     }
 
     /**
-     * Get threadId
+     * Get threadId.
      *
-     * @return integer
+     * @return int
      */
     public function getThreadId()
     {
@@ -131,9 +133,10 @@ class CForumThreadQualify
     }
 
     /**
-     * Set qualify
+     * Set qualify.
      *
      * @param float $qualify
+     *
      * @return CForumThreadQualify
      */
     public function setQualify($qualify)
@@ -144,7 +147,7 @@ class CForumThreadQualify
     }
 
     /**
-     * Get qualify
+     * Get qualify.
      *
      * @return float
      */
@@ -154,9 +157,10 @@ class CForumThreadQualify
     }
 
     /**
-     * Set qualifyUserId
+     * Set qualifyUserId.
      *
-     * @param integer $qualifyUserId
+     * @param int $qualifyUserId
+     *
      * @return CForumThreadQualify
      */
     public function setQualifyUserId($qualifyUserId)
@@ -167,9 +171,9 @@ class CForumThreadQualify
     }
 
     /**
-     * Get qualifyUserId
+     * Get qualifyUserId.
      *
-     * @return integer
+     * @return int
      */
     public function getQualifyUserId()
     {
@@ -177,9 +181,10 @@ class CForumThreadQualify
     }
 
     /**
-     * Set qualifyTime
+     * Set qualifyTime.
      *
      * @param \DateTime $qualifyTime
+     *
      * @return CForumThreadQualify
      */
     public function setQualifyTime($qualifyTime)
@@ -190,7 +195,7 @@ class CForumThreadQualify
     }
 
     /**
-     * Get qualifyTime
+     * Get qualifyTime.
      *
      * @return \DateTime
      */
@@ -200,9 +205,10 @@ class CForumThreadQualify
     }
 
     /**
-     * Set sessionId
+     * Set sessionId.
      *
-     * @param integer $sessionId
+     * @param int $sessionId
+     *
      * @return CForumThreadQualify
      */
     public function setSessionId($sessionId)
@@ -213,9 +219,9 @@ class CForumThreadQualify
     }
 
     /**
-     * Get sessionId
+     * Get sessionId.
      *
-     * @return integer
+     * @return int
      */
     public function getSessionId()
     {
@@ -223,9 +229,10 @@ class CForumThreadQualify
     }
 
     /**
-     * Set id
+     * Set id.
      *
-     * @param integer $id
+     * @param int $id
+     *
      * @return CForumThreadQualify
      */
     public function setId($id)
@@ -236,9 +243,9 @@ class CForumThreadQualify
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -246,9 +253,10 @@ class CForumThreadQualify
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return CForumThreadQualify
      */
     public function setCId($cId)
@@ -259,9 +267,9 @@ class CForumThreadQualify
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {

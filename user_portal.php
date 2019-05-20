@@ -2,7 +2,6 @@
 /* For licensing terms, see /license.txt */
 
 use ChamiloSession as Session;
-use Doctrine\Common\Collections\Criteria;
 
 /**
  * This is the index file displayed when a user is logged in on Chamilo.
@@ -11,7 +10,9 @@ use Doctrine\Common\Collections\Criteria;
  * - personal course list
  * - menu bar
  * Search for CONFIGURATION parameters to modify settings
+ *
  * @package chamilo.main
+ *
  * @todo Shouldn't the CONFVAL_ constant be moved to the config page? Has anybody any idea what the are used for?
  *       If these are really configuration settings then we can add those to the dokeos config settings.
  * @todo check for duplication of functions with index.php (user_portal.php is orginally a copy of index.php)
@@ -33,12 +34,44 @@ $this_section = SECTION_COURSES;
 
 api_block_anonymous_users(); // Only users who are logged in can proceed.
 
+$logInfo = [
+    'tool' => SECTION_COURSES,
+    'tool_id' => 0,
+    'tool_id_detail' => 0,
+    'action' => '',
+    'info' => '',
+];
+Event::registerLog($logInfo);
+
 $userId = api_get_user_id();
+
+$collapsable = api_get_configuration_value('allow_user_session_collapsable');
+if ($collapsable) {
+    $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
+    $sessionId = isset($_REQUEST['session_id']) ? $_REQUEST['session_id'] : '';
+    $value = isset($_REQUEST['value']) ? (int) $_REQUEST['value'] : '';
+    switch ($action) {
+        case 'collapse_session':
+            if (!empty($sessionId)) {
+                $userRelSession = SessionManager::getUserSession($userId, $sessionId);
+                if ($userRelSession) {
+                    $table = Database::get_main_table(TABLE_MAIN_SESSION_USER);
+                    $sql = "UPDATE $table SET collapsed = $value WHERE id = ".$userRelSession['id'];
+                    Database::query($sql);
+                    Display::addFlash(Display::return_message(get_lang('Updated')));
+                }
+                header('Location: user_portal.php');
+                exit;
+            }
+            break;
+    }
+}
 
 /* Constants and CONFIGURATION parameters */
 $load_dirs = api_get_setting('show_documents_preview');
 $displayMyCourseViewBySessionLink = api_get_setting('my_courses_view_by_session') === 'true';
 $nameTools = get_lang('MyCourses');
+$loadHistory = isset($_GET['history']) && intval($_GET['history']) == 1 ? true : false;
 
 // Load course notification by ajax
 $loadNotificationsByAjax = api_get_configuration_value('user_portal_load_notification_by_ajax');
@@ -139,12 +172,11 @@ if (!$myCourseListAsCategory) {
         $courseAndSessions = $controller->returnCoursesAndSessionsViewBySession($userId);
         IndexManager::setDefaultMyCourseView(IndexManager::VIEW_BY_SESSION, $userId);
     } else {
-        $courseAndSessions = $controller->returnCoursesAndSessions($userId);
+        $courseAndSessions = $controller->returnCoursesAndSessions($userId, true, null, true, $loadHistory);
         IndexManager::setDefaultMyCourseView(IndexManager::VIEW_BY_DEFAULT, $userId);
     }
 
     // if teacher, session coach or admin, display the button to change te course view
-
     if ($displayMyCourseViewBySessionLink &&
         (
             api_is_drh() ||
@@ -179,7 +211,9 @@ if (!$myCourseListAsCategory) {
         $courseAndSessions = $controller->returnCoursesAndSessions(
             $userId,
             false,
-            $categoryCode
+            $categoryCode,
+            true,
+            $loadHistory
         );
         $getCategory = CourseCategory::getCategory($categoryCode);
         $controller->tpl->assign('category', $getCategory);
@@ -209,7 +243,7 @@ if (api_get_setting('go_to_course_after_login') == 'true') {
 
             // Session has many courses.
             if (isset($sessionInfo['session_id'])) {
-                $url = api_get_path(WEB_CODE_PATH).'session/?session_id='.$sessionInfo['session_id'];
+                $url = api_get_path(WEB_CODE_PATH).'session/index.php?session_id='.$sessionInfo['session_id'];
 
                 header('Location:'.$url);
                 exit;
@@ -222,10 +256,7 @@ if (api_get_setting('go_to_course_after_login') == 'true') {
         $count_of_sessions == 0 &&
         $count_of_courses_no_sessions == 1
     ) {
-        $courses = CourseManager::get_courses_list_by_user_id(
-            $userId
-        );
-
+        $courses = CourseManager::get_courses_list_by_user_id($userId);
         if (!empty($courses) && isset($courses[0]) && isset($courses[0]['code'])) {
             $courseInfo = api_get_course_info_by_id($courses[0]['real_id']);
             if (!empty($courseInfo)) {
@@ -282,7 +313,8 @@ $controller->tpl->assign('user_image_block', $controller->return_user_image_bloc
 $controller->tpl->assign('course_block', $controller->return_course_block());
 $controller->tpl->assign('navigation_course_links', $controller->return_navigation_links());
 $controller->tpl->assign('search_block', $controller->return_search_block());
-$controller->tpl->assign('classes_block', $controller->return_classes_block());
+$controller->tpl->assign('notice_block', $controller->return_notice());
+$controller->tpl->assign('classes_block', $controller->returnClassesBlock());
 $controller->tpl->assign('skills_block', $controller->returnSkillLinks());
 
 $historyClass = '';
@@ -294,138 +326,11 @@ if ($myCourseListAsCategory) {
     $controller->tpl->assign('header', get_lang('MyCourses'));
 }
 
-$allow = api_get_configuration_value('gradebook_dependency');
-
-if ($allow) {
-    $courseAndSessions = $controller->returnCoursesAndSessions(
-        $userId,
-        false,
-        '',
-        false
-    );
-
-    $courseList = api_get_configuration_value('gradebook_dependency_mandatory_courses');
-    $courseList = isset($courseList['courses']) ? $courseList['courses'] : [];
-    $mandatoryCourse = [];
-    if (!empty($courseList)) {
-        foreach ($courseList as $courseId) {
-            $courseInfo = api_get_course_info_by_id($courseId);
-            $mandatoryCourse[] = $courseInfo['code'];
-        }
-    }
-
-     // @todo improve calls of course info
-    $subscribedCourses = !empty($courseAndSessions['courses']) ? $courseAndSessions['courses'] : [];
-    $mainCategoryList = [];
-    foreach ($subscribedCourses as $courseInfo) {
-        $courseCode = $courseInfo['code'];
-        $categories = Category::load(null, null, $courseCode);
-        /** @var Category $category */
-        $category = !empty($categories[0]) ? $categories[0] : [];
-        if (!empty($category)) {
-            $mainCategoryList[] = $category;
-        }
-    }
-
-    $result = [];
-    $result20 = 0;
-    $result80 = 0;
-    $countCoursesPassedNoDependency = 0;
-    /** @var Category $category */
-    foreach ($mainCategoryList as $category) {
-        $userFinished = Category::userFinishedCourse(
-            $userId,
-            $category,
-            true
-        );
-
-        if ($userFinished) {
-            if (in_array($category->get_course_code(), $mandatoryCourse)) {
-                if ($result20 < 20) {
-                    $result20 += 10;
-                }
-            } else {
-                $countCoursesPassedNoDependency++;
-                if ($result80 < 80) {
-                    $result80 += 10;
-                }
-            }
-        }
-    }
-
-    $finalResult = $result20 + $result80;
-
-    $gradeBookList = api_get_configuration_value('gradebook_badge_sidebar');
-    $gradeBookList = isset($gradeBookList['gradebooks']) ? $gradeBookList['gradebooks'] : [];
-    $badgeList = [];
-    foreach ($gradeBookList as $id) {
-        $categories = Category::load($id);
-        /** @var Category $category */
-        $category = !empty($categories[0]) ? $categories[0] : [];
-        $badgeList[$id]['name'] = $category->get_name();
-        $badgeList[$id]['finished'] = false;
-        $badgeList[$id]['skills'] = [];
-        if (!empty($category)) {
-            $minToValidate = $category->getMinimumToValidate();
-            $dependencies = $category->getCourseListDependency();
-            $countDependenciesPassed = 0;
-            foreach ($dependencies as $courseId) {
-                $courseInfo = api_get_course_info_by_id($courseId);
-                $courseCode = $courseInfo['code'];
-                $categories = Category::load(null, null, $courseCode);
-                $subCategory = !empty($categories[0]) ? $categories[0] : null;
-                if (!empty($subCategory)) {
-                    $score = Category::userFinishedCourse(
-                        $userId,
-                        $subCategory,
-                        true
-                    );
-                    if ($score) {
-                        $countDependenciesPassed++;
-                    }
-                }
-            }
-
-            $userFinished =
-                $countDependenciesPassed == count($dependencies) &&
-                $countCoursesPassedNoDependency >= $minToValidate
-            ;
-
-            if ($userFinished) {
-                $badgeList[$id]['finished'] = true;
-            }
-
-            $objSkill = new Skill();
-            $skills = $category->get_skills();
-            $skillList = [];
-            foreach ($skills as $skill) {
-                $skillList[] = $objSkill->get($skill['id']);
-            }
-            $badgeList[$id]['skills'] = $skillList;
-        }
-    }
-
-    $controller->tpl->assign(
-        'grade_book_sidebar',
-        true
-    );
-
-    $controller->tpl->assign(
-        'grade_book_progress',
-        $finalResult
-    );
-    $controller->tpl->assign('grade_book_badge_list', $badgeList);
-    /*if ($finalScore > 0) {
-        $finalScore = (int) $finalScore / count($total);
-        if ($finalScore == 100) {
-            $completed = true;
-        }
-    }*/
-}
-
+$controller->setGradeBookDependencyBar($userId);
 $controller->tpl->display_two_col_template();
 
 // Deleting the session_id.
 Session::erase('session_id');
+Session::erase('id_session');
 Session::erase('studentview');
 api_remove_in_gradebook();

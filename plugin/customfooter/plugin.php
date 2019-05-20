@@ -1,15 +1,15 @@
 <?php
 /**
- * This script is a configuration file for the delivery tools plugin.
- * You can use it as a master for other platform plugins (course plugins are slightly different).
- * These settings will be used in the administration interface for plugins (Chamilo configuration settings->Plugins)
+ * This plugin allows you to configure a footer note to plug some additional features. In a way, it works a bit like
+ * any block plugin to be added in a region.
+ *
  * @package chamilo.plugin
+ *
  * @author Julio Montoya <gugli100@gmail.com>
  */
 
-
 /**
- * Plugin details (must be present)
+ * Plugin details (must be present).
  */
 
 /* Plugin config */
@@ -24,7 +24,6 @@ $plugin_info['version'] = '1.0';
 //the plugin author
 $plugin_info['author'] = 'Valery Fremaux, Julio Montoya';
 
-
 /* Plugin optional settings */
 
 /*
@@ -37,13 +36,13 @@ $form = new FormValidator('customfooter_form');
 $plugininstance = CustomFooterPlugin::create();
 
 $config = api_get_settings_params(
-    array('subkey = ? ' => 'customfooter', ' AND category = ? ' => 'Plugins')
+    ['subkey = ? ' => 'customfooter', ' AND category = ? ' => 'Plugins']
 );
 $form_settings = [];
 
 foreach ($config as $fooid => $configrecord) {
     $canonic = preg_replace('/^customfooter_/', '', $configrecord['variable']);
-    if (in_array($canonic, array('footer_left', 'footer_right'))) {
+    if (in_array($canonic, ['footer_left', 'footer_right'])) {
         $form_settings[$canonic] = $configrecord['selected_value'];
     }
 }

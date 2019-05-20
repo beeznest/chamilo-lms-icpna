@@ -24,6 +24,7 @@
   <li><a href="#4.Moving-config-file">Moving your configuration file out of the web directory</a></li>
   <li><a href="#5.Files-permissions">Restricting files permissions</a></li>
   <li><a href="#6.HSTS">HTTP Headers Security</a></li>
+  <li><a href="#7.Direct-web-access">Direct web access to files</a></li>
 </ol>
 
 <h2><a name="1.Disclosing-server-info"></a>1. Disclosing server info</h2>
@@ -85,8 +86,76 @@ This will prevent direct access to your settings and make it seem totally the sa
     <p>Don't hesitate to hire an experienced administrator to do that,
         it might be a bit more expensive now, but you'll be happy not to have to loose
         all of your data to a hacker who attacked your site.</p>
+    <p>Only the following directories have required (or optional) write 
+        permissions from the web server:<br />
+        <ul>
+          <li>app/cache/</li>
+          <li>app/courses/</li>
+          <li>app/home/</li>
+          <li>app/logs/</li>
+          <li>app/upload/</li>
+          <li>main/default_course_document/images/</li>
+          <li>main/lang/ (optional, only for sublanguages)</li>
+          <li>web/css/ (optional, only for switching CSS through the web)</li>
+        </ul>
+        <br />
+        Because these directories have "write by the web server" permissions,
+        it is important to prevent the execution of PHP scripts from those
+        directories (because a specially-crafted attack could end up allowing
+        the upload of a PHP script to one of these). To do that, taking into
+        account we authorize overrides through .htaccess, we need to set
+        something that a .htaccess file cannot revert, and we need to set it
+        for each of those directories. This can be done as follows inside
+        your VirtualHost definition in Apache, where "/var/www/URL/" is the path of your VirtualHost web root:<br />
+        <pre>
+  &lt;Directory /var/www/URL/app/cache&gt;
+    php_admin_value engine Off
+  &lt;/Directory&gt;
+  &lt;Directory /var/www/URL/app/courses&gt;
+    php_admin_value engine Off
+  &lt;/Directory&gt;
+  &lt;Directory /var/www/URL/app/home&gt;
+    php_admin_value engine Off
+  &lt;/Directory&gt;
+  &lt;Directory /var/www/URL/app/logs&gt;
+    php_admin_value engine Off
+  &lt;/Directory&gt;
+  &lt;Directory /var/www/URL/app/upload&gt;
+    php_admin_value engine Off
+  &lt;/Directory&gt;
+  &lt;Directory /var/www/URL/app/Resources/public/css>
+    php_admin_value engine Off
+  &lt;/Directory&gt;
+  &lt;Directory /var/www/URL/main/default_course_document/images&gt;
+    php_admin_value engine Off
+  &lt;/Directory&gt;
+  &lt;Directory /var/www/URL/main/lang&gt;
+    php_admin_value engine Off
+  &lt;/Directory&gt;
+  &lt;Directory /var/www/URL/web/css&gt;
+    php_admin_value engine Off
+  &lt;/Directory&gt;
+        </pre>
 
-
+        For Nginx, this would look like the following rules. However, do
+        remember that Nginx interprets rules in order of appearance, so these
+        rules would have to be at the top of your location rules to take the
+        highest priority:
+        <pre>
+  location ~ ^/app/(cache|courses|home|logs|upload|Resources/public/css)/.*\.ph(p[3457]?|t|tml|ar)$ {
+    deny all;
+  }
+  location ~ ^/main/default_course_document/images/.*\.ph(p[3457]?|t|tml|ar)$ {
+    deny all;
+  }
+  location ~ ^/main/lang/.*\.ph(p[3457]?|t|tml|ar)$ {
+    deny all;
+  }
+  location ~ ^/web/css/.*\.ph(p[3457]?|t|tml|ar)$ {
+    deny all;
+  }
+        </pre>
+    <br />
 <hr />
 <h2><a name="6.HSTS">HTTP Headers Security</a></h2>
     <p>A relatively recent development in web security, HTTP headers can be modified either
@@ -103,6 +172,31 @@ This will prevent direct access to your settings and make it seem totally the sa
         we highly recommend the <a href="https://securityheaders.io/">securityheaders.io</a>
         website. If you want to read more about CSP and all related headers
         security techniques, check <a href="https://scotthelme.co.uk/">Scott Helme's blog</a>.
+    <br />
+<hr />
+<h2><a name="7.Direct-web-access">Direct web access to files</a></h2>
+    <p>If .htaccess is enabled or the .htaccess rules are translated into the
+    web server vhost configuration (see installation guide for that), Chamilo
+    will do some natural files access protection.<br />
+    <br />
+    This protection is executed through redirections of some URLs to make the
+    request go through some kind of permissions validation script. For
+    documents, this means going through the main/document/download.php script,
+    but there are some more specific rules (see .htaccess for details).<br />
+    <br />
+    While this does a great job to avoid access by unprivileged users, this
+    also creates an efficiency issue, whereby some files, in version 1.11, can
+    take up to 5 times the load time when it goes through the permissions
+    validation.<br />
+    <br />
+    Because of that, we have taken some decisions to reduce the impact in a
+    reasonable way. For example, static files in SCORM content
+    (in courses/[code]/scorm/) like CSS, JS, PNG, JPG and GIF are *not* scanned
+    this way (there is an exception for that). We believe that these resources
+    do not contain confidential information. If you *DO* have confidential
+    information in images, CSS or JavaScript files, you will need to update
+    these rules to suit your needs.
+    </p>
 <h2>Authors</h2>
 <ul>
 <li>Yannick Warnier, Zend Certified PHP Engineer, BeezNest Belgium SPRL,

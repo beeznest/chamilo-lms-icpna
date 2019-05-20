@@ -8,7 +8,6 @@ use Chamilo\CoreBundle\Entity\Skill;
  *
  * @package chamilo.skill
  */
-
 $cidReset = true;
 require_once __DIR__.'/../inc/global.inc.php';
 api_protect_admin_script();
@@ -54,8 +53,8 @@ if (!empty($item)) {
 }
 $formToDisplay = $form->returnForm();
 
-$interbreadcrumb[] = array('url' => 'index.php', 'name' => get_lang('PlatformAdmin'));
-$interbreadcrumb[] = array('url' => api_get_self(), 'name' => get_lang('ManageSkillsLevels'));
+$interbreadcrumb[] = ['url' => 'index.php', 'name' => get_lang('PlatformAdmin')];
+$interbreadcrumb[] = ['url' => api_get_self(), 'name' => get_lang('ManageSkillsLevels')];
 
 $tpl = new Template($action);
 switch ($action) {
@@ -65,16 +64,16 @@ switch ($action) {
 
         if ($form->validate()) {
             $values = $form->exportValues();
-
             $profile = $em->getRepository('ChamiloSkillBundle:Profile')->find($values['profile_id']);
-            $item->setProfile($profile);
-
-            $em->persist($item);
-            $em->flush();
+            if ($profile) {
+                $item->setProfile($profile);
+                $em->persist($item);
+                $em->flush();
+                Display::addFlash(Display::return_message(get_lang('Updated')));
+            }
             header('Location: '.$listAction);
             exit;
         }
-
         break;
     case 'delete':
         $toolbarAction = Display::toolbarAction('toolbar', [Display::url(get_lang('List'), $listAction)]);

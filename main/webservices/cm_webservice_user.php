@@ -7,13 +7,12 @@ require_once __DIR__.'/../inc/global.inc.php';
 require_once __DIR__.'/cm_webservice.php';
 
 /**
- * Description of cm_soap_user
+ * Description of cm_soap_user.
  *
  * @author marcosousa
  */
 class WSCMUser extends WSCM
 {
-
     public function find_id_user($username, $password, $name)
     {
         if ($this->verifyUserPass($username, $password) == "valid") {
@@ -23,24 +22,24 @@ class WSCMUser extends WSCM
             $listArray = [];
 
             $list = $this->get_user_list_like_start(
-                array('firstname' => $name),
-                array('firstname')
+                ['firstname' => $name],
+                ['firstname']
             );
             foreach ($list as $userData) {
                 $listArray[] = $userData['user_id'];
             }
 
             $list = $this->get_user_list_like_start(
-                array('lastname' => $name),
-                array('firstname')
+                ['lastname' => $name],
+                ['firstname']
             );
             foreach ($list as $userData) {
                 $listArray[] = $userData['user_id'];
             }
 
             $list = $this->get_user_list_like_start(
-                array('email' => $name),
-                array('firstname')
+                ['email' => $name],
+                ['firstname']
             );
             foreach ($list as $userData) {
                 $listArray[] = $userData['user_id'];
@@ -61,7 +60,7 @@ class WSCMUser extends WSCM
     {
         if ($this->verifyUserPass($username, $password) == "valid") {
             $userPic = UserManager::getUserPicture($id);
-            if (empty ($userPic)) {
+            if (empty($userPic)) {
                 return "0";
             }
 
@@ -98,13 +97,22 @@ class WSCMUser extends WSCM
         return "0";
     }
 
-    public function send_invitation($username, $password, $userfriend_id, $content_message = '')
-    {
+    public function send_invitation(
+        $username,
+        $password,
+        $userfriend_id,
+        $content_message = ''
+    ) {
         global $charset;
         if ($this->verifyUserPass($username, $password) == "valid") {
-		    $user_id = UserManager::get_user_id_from_username($username);
+            $user_id = UserManager::get_user_id_from_username($username);
             $message_title = get_lang('Invitation');
-            $count_is_true = SocialManager::send_invitation_friend($user_id, $userfriend_id, $message_title, $content_message);
+            $count_is_true = SocialManager::send_invitation_friend(
+                $user_id,
+                $userfriend_id,
+                $message_title,
+                $content_message
+            );
 
             if ($count_is_true) {
                 return Display::return_message(
@@ -128,6 +136,7 @@ class WSCMUser extends WSCM
                 );
             }
         }
+
         return get_lang('InvalidId');
     }
 
@@ -135,7 +144,11 @@ class WSCMUser extends WSCM
     {
         if ($this->verifyUserPass($username, $password) == "valid") {
             $user_id = UserManager::get_user_id_from_username($username);
-            UserManager::relate_users($userfriend_id, $user_id, USER_RELATION_TYPE_FRIEND);
+            UserManager::relate_users(
+                $userfriend_id,
+                $user_id,
+                USER_RELATION_TYPE_FRIEND
+            );
             SocialManager::invitation_accepted($userfriend_id, $user_id);
 
             return get_lang('AddedContactToList');
@@ -156,16 +169,18 @@ class WSCMUser extends WSCM
         return get_lang('InvalidId');
     }
 
-
     /**
-    * Get a list of users of which the given conditions match with a LIKE '%cond%'
-    * @param array $conditions a list of condition (exemple : status=>STUDENT)
-    * @param array $order_by a list of fields on which sort
-    * @return array An array with all users of the platform.
-    * @todo optional course code parameter, optional sorting parameters...
+     * Get a list of users of which the given conditions match with a LIKE '%cond%'.
+     *
+     * @param array $conditions a list of condition (exemple : status=>STUDENT)
+     * @param array $order_by   a list of fields on which sort
+     *
+     * @return array an array with all users of the platform
+     *
+     * @todo optional course code parameter, optional sorting parameters...
      *@todo Use the UserManager class
      * @todo security filter order by
-    */
+     */
     private static function get_user_list_like_start($conditions = [], $order_by = [])
     {
         $user_table = Database::get_main_table(TABLE_MAIN_USER);
@@ -192,6 +207,7 @@ class WSCMUser extends WSCM
         while ($result = Database::fetch_array($sql_result)) {
             $return_array[] = $result;
         }
+
         return $return_array;
     }
 }

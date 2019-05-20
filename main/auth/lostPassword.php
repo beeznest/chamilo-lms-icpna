@@ -2,7 +2,7 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * SCRIPT PURPOSE :
+ * SCRIPT PURPOSE :.
  *
  * This script allows users to retrieve the password of their profile(s)
  * on the basis of their e-mail address. The password is send via email
@@ -15,7 +15,6 @@
  *
  * @package chamilo.auth
  */
-
 require_once __DIR__.'/../inc/global.inc.php';
 
 // Custom pages
@@ -54,7 +53,8 @@ if ($reset && $userId) {
 
 $form = new FormValidator('lost_password');
 $form->addHeader($tool_name);
-$form->addText('user',
+$form->addText(
+    'user',
     [
         get_lang('LoginOrEmailAddress'),
         get_lang('EnterEmailUserAndWellSendYouPassword'),
@@ -67,19 +67,19 @@ $allowCaptcha = $captcha === 'true';
 
 if ($allowCaptcha) {
     $ajax = api_get_path(WEB_AJAX_PATH).'form.ajax.php?a=get_captcha';
-    $options = array(
+    $options = [
         'width' => 220,
         'height' => 90,
         'callback' => $ajax.'&var='.basename(__FILE__, '.php'),
         'sessionVar' => basename(__FILE__, '.php'),
-        'imageOptions' => array(
+        'imageOptions' => [
             'font_size' => 20,
             'font_path' => api_get_path(SYS_FONTS_PATH).'opensans/',
             'font_file' => 'OpenSans-Regular.ttf',
             //'output' => 'gif'
-        )
-    );
-    
+        ],
+    ];
+
     $captcha_question = $form->addElement(
         'CAPTCHA_Image',
         'captcha_question',
@@ -87,10 +87,10 @@ if ($allowCaptcha) {
         $options
     );
     $form->addElement('static', null, null, get_lang('ClickOnTheImageForANewOne'));
-    
-    $form->addElement('text', 'captcha', get_lang('EnterTheLettersYouSee'), array('size' => 40));
+
+    $form->addElement('text', 'captcha', get_lang('EnterTheLettersYouSee'), ['size' => 40]);
     $form->addRule('captcha', get_lang('EnterTheCharactersYouReadInTheImage'), 'required', null, 'client');
-    
+
     $form->addRule('captcha', get_lang('TheTextYouEnteredDoesNotMatchThePicture'), 'CAPTCHA', $captcha_question);
 }
 
@@ -149,9 +149,8 @@ if ($form->validate()) {
     $userResetPasswordSetting = api_get_setting('user_reset_password');
 
     if ($userResetPasswordSetting === 'true') {
-        $userObj = Database::getManager()->getRepository('ChamiloUserBundle:User')->find($user['uid']);
-
-        Login::sendResetEmail($userObj, true);
+        $userObj = api_get_user_entity($user['uid']);
+        Login::sendResetEmail($userObj);
 
         if (CustomPages::enabled() && CustomPages::exists(CustomPages::INDEX_UNLOGGED)) {
             CustomPages::display(
@@ -190,8 +189,6 @@ if (CustomPages::enabled() && CustomPages::exists(CustomPages::LOST_PASSWORD)) {
     exit;
 }
 
-$controller = new IndexManager($tool_name);
-$controller->set_login_form();
-$controller->tpl->assign('form', $form->returnForm());
-$template = $controller->tpl->get_template('auth/lost_password.tpl');
-$controller->tpl->display($template);
+$tpl = new Template(null);
+$tpl->assign('content', $form->toHtml());
+$tpl->display_one_col_template();

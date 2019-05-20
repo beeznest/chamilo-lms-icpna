@@ -1,22 +1,17 @@
 <?php
 /**
- * CLAROLINE
+ * CLAROLINE.
  *
  * @version 1.7 $Revision: 1.12 $
  *
  * @copyright 2001-2005 Universite catholique de Louvain (UCL)
- *
  * @license http://www.gnu.org/copyleft/gpl.html (GPL) GENERAL PUBLIC LICENSE
  * This program is under the terms of the GENERAL PUBLIC LICENSE (GPL)
  * as published by the FREE SOFTWARE FOUNDATION. The GPL is available
  * through the world-wide-web at http://www.gnu.org/copyleft/gpl.html
- *
  * @author Frederic Minne <zefredz@gmail.com>
  *
  * @package Wiki
- */
-/**
- * Code
  */
 define("DIFF_EQUAL", "=");
 define("DIFF_ADDED", "+");
@@ -24,13 +19,15 @@ define("DIFF_DELETED", "-");
 define("DIFF_MOVED", "M");
 
 /**
- * Get difference between two strings
+ * Get difference between two strings.
+ *
  * @param string old first string
  * @param string new second string
- * @param boolean show_equals set to true to see line that are equal between
+ * @param bool show_equals set to true to see line that are equal between
  *      the two strings (default true)
  * @param string format_line_function callback function to format line
  *      (default 'format_line')
+ *
  * @return string formated diff output
  */
 function diff(
@@ -52,7 +49,7 @@ function diff(
     $deleted = array_diff_assoc($oldArr, $newArr);
     $added = array_diff_assoc($newArr, $oldArr);
 
-    $moved = array();
+    $moved = [];
 
     foreach ($added as $key => $candidate) {
         foreach ($deleted as $index => $content) {
@@ -69,28 +66,21 @@ function diff(
 
     for ($i = 0; $i < $max; $i++) {
         // line changed
-        if (isset ($deleted[$i]) && isset($added[$i])) {
+        if (isset($deleted[$i]) && isset($added[$i])) {
             $output .= $format_line_function($i, DIFF_DELETED, $deleted[$i]);
             $output .= $format_line_function($i, DIFF_ADDED, $added[$i]);
-
-        } // line deleted
-        elseif (isset ($deleted[$i]) && !isset ($added[$i])) {
+        } elseif (isset($deleted[$i]) && !isset($added[$i])) {
+            // line deleted
             $output .= $format_line_function($i, DIFF_DELETED, $deleted[$i]);
-
-        } // line added
-        elseif (isset ($added[$i]) && !isset ($deleted[$i])) {
+        } elseif (isset($added[$i]) && !isset($deleted[$i])) {
+            // line added
             $output .= $format_line_function($i, DIFF_ADDED, $added[$i]);
-
-        } // line moved
-        elseif (isset ($moved[$i])) {
+        } elseif (isset($moved[$i])) {
+            // line moved
             $output .= $format_line_function($i, DIFF_MOVED, $newArr[$i]);
-
-        } // line unchanged
-        elseif ($show_equals) {
+        } elseif ($show_equals) {
+            // line unchanged
             $output .= $format_line_function($i, DIFF_EQUAL, $newArr[$i]);
-
-        } else {
-            // skip
         }
     }
 
@@ -98,11 +88,11 @@ function diff(
 }
 
 /**
- * Split strings on new line
+ * Split strings on new line.
  */
 function str_split_on_new_line($str)
 {
-    $content = array();
+    $content = [];
 
     if (api_strpos($str, "\r\n") !== false) {
         $content = explode("\r\n", $str);
@@ -118,12 +108,14 @@ function str_split_on_new_line($str)
 }
 
 /**
- * Default and prototype format line function
+ * Default and prototype format line function.
+ *
  * @param int line line number
  * @param mixed type line type, must be one of the following :
  *      DIFF_EQUAL, DIFF_MOVED, DIFF_ADDED, DIFF_DELETED
  * @param string value line content
- * @param boolean skip_empty skip empty lines (default false)
+ * @param bool skip_empty skip empty lines (default false)
+ *
  * @return string formated diff line
  */
 function format_line($line, $type, $value, $skip_empty = false)
@@ -155,7 +147,8 @@ function format_line($line, $type, $value, $skip_empty = false)
 }
 
 /**
- * Table format line function
+ * Table format line function.
+ *
  * @see format_line
  */
 function format_table_line($line, $type, $value, $skip_empty = false)
@@ -168,20 +161,37 @@ function format_table_line($line, $type, $value, $skip_empty = false)
 
     switch ($type) {
         case DIFF_EQUAL:
-            //return '<tr><td>' . $line. '&nbsp;:&nbsp;' . '&nbsp;=</td><td><span class="diffEqual" >'                    . $value . '</span></td></tr>' . "\n"; //juan carlos comentado
-            return '<tr><td></td><td bgcolor="#FFFFFF">'.$value.'</td></tr>'."\n"; //juan carlos muestra solo color (no tambi�n la l�nea). Adem�s EN IEXPLORER VA BIEN PERO EN FIREFOX 3 la etiqueta span no muestra el color de fondo que est� definido en la hoja de estilos como background-color, aceptando s�lo la propiedad color pero esta solo da color al texto con lo cual los cambios quedan poco resaltados, adem�s los cambios de otros objetos que no sean texto no se indican por ej. a�adir una imagen, por esta raz�n doy el color de fondo al td directamente.
+            return '<tr><td></td><td bgcolor="#FFFFFF">'.$value.'</td></tr>'."\n";
+            //juan carlos muestra solo color (no tambi�n la l�nea).
+            // Adem�s EN IEXPLORER VA BIEN PERO EN FIREFOX 3 la etiqueta span no muestra el color de fondo que
+            // est� definido en la hoja de estilos como background-color, aceptando s�lo la propiedad color
+            // pero esta solo da color al texto con lo cual los cambios quedan poco resaltados, adem�s
+            // los cambios de otros objetos que no sean texto no se indican por ej. a�adir una imagen,
+            // por esta raz�n doy el color de fondo al td directamente.
             break;
         case DIFF_MOVED:
-            // return '<tr><td>' . $line. '&nbsp;:&nbsp;' . '&nbsp;M</td><td><span class="diffMoved" >'                    . $value . '</span></td></tr>' . "\n" //juan carlos comenta
-
-            return '<tr><td></td><td bgcolor="#FFFFAA">'.$value.'</td></tr>'."\n"; //juan carlos muestra solo color (no tambi�n la l�nea). Adem�s EN IEXPLORER VA BIEN PERO EN FIREFOX 3 la etiqueta span no muestra el color de fondo que est� definido en la hoja de estilos como background-color, aceptando s�lo la propiedad color pero esta solo da color al texto con lo cual los cambios quedan poco resaltados, adem�s los cambios de otros objetos que no sean texto no se indican por ej. a�adir una imagen, por esta raz�n doy el color de fondo al td directamente.
+            return '<tr><td></td><td bgcolor="#FFFFAA">'.$value.'</td></tr>'."\n";
+            //juan carlos muestra solo color (no tambi�n la l�nea). Adem�s EN IEXPLORER VA BIEN PERO EN FIREFOX 3
+            // la etiqueta span no muestra el color de fondo que est� definido en la hoja de estilos como
+            // background-color, aceptando s�lo la propiedad color pero esta solo da color al texto con lo cual
+            // los cambios quedan poco resaltados, adem�s los cambios de otros objetos que no sean texto no se indican
+            // por ej. a�adir una imagen, por esta raz�n doy el color de fondo al td directamente.
             break;
         case DIFF_ADDED:
-            // return '<tr><td>' . $line. '&nbsp;:&nbsp;' . '&nbsp;+</td><td><span class="diffAdded" >'                    . $value . '</span></td></tr>' . "\n" ; //juan carlos comentado
-            return '<tr><td></td><td bgcolor="#CCFFCC">'.$value.'</td></tr>'."\n"; //juan carlos muestra solo color (no tambi�n la l�nea). Adem�s EN IEXPLORER VA BIEN PERO EN FIREFOX 3 la etiqueta span no muestra el color de fondo que est� definido en la hoja de estilos como background-color, aceptando s�lo la propiedad color pero esta solo da color al texto con lo cual los cambios quedan poco resaltados, adem�s los cambios de otros objetos que no sean texto no se indican por ej. a�adir una imagen, por esta raz�n doy el color de fondo al td directamente.
+            return '<tr><td></td><td bgcolor="#CCFFCC">'.$value.'</td></tr>'."\n";
+            //juan carlos muestra solo color (no tambi�n la l�nea). Adem�s EN IEXPLORER VA BIEN
+            // PERO EN FIREFOX 3 la etiqueta span no muestra el color de fondo que est� definido en la
+            // hoja de estilos como background-color, aceptando s�lo la propiedad color pero esta solo
+            // da color al texto con lo cual los cambios quedan poco resaltados, adem�s los cambios de
+            // otros objetos que no sean texto no se indican por ej. a�adir una imagen, por esta raz�n
+            // doy el color de fondo al td directamente.
             break;
         case DIFF_DELETED:
-            // return '<tr><td>' . $line. '&nbsp;:&nbsp;' . '&nbsp;-</td><td><span class="diffDeleted" >'                    . $value . '</span></td></tr>' . "\n" ; //juan carlos comentado
-            return '<tr><td></td><td bgcolor="#FFAAAA">'.$value.'</td></tr>'."\n"; //juan carlos muestra solo color (no tambi�n la l�nea). Adem�s EN IEXPLORER VA BIEN PERO EN FIREFOX 3 la etiqueta span no muestra el color de fondo que est� definido en la hoja de estilos como background-color, aceptando s�lo la propiedad color pero esta solo da color al texto con lo cual los cambios quedan poco resaltados, adem�s los cambios de otros objetos que no sean texto no se indican por ej. a�adir una imagen, por esta raz�n doy el color de fondo al td directamente.
+            return '<tr><td></td><td bgcolor="#FFAAAA">'.$value.'</td></tr>'."\n";
+            //juan carlos muestra solo color (no tambi�n la l�nea). Adem�s EN IEXPLORER VA BIEN PERO EN FIREFOX 3
+        // la etiqueta span no muestra el color de fondo que est� definido en la hoja de estilos como background-color,
+        // aceptando s�lo la propiedad color pero esta solo da color al texto con lo cual los cambios quedan poco
+        // resaltados, adem�s los cambios de otros objetos que no sean texto no se indican por ej. a�adir una imagen,
+        // por esta raz�n doy el color de fondo al td directamente.
     }
 }

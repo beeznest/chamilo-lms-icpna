@@ -1,18 +1,25 @@
 <?php
 /* For licensing terms, see /license.txt */
+
+use ChamiloSession as Session;
+
 /**
  * @author Patrick Cool patrick.cool@UGent.be Ghent University Mai 2004
  * @author Julio Montoya Lots of improvements, cleaning, adding security
  * @author Juan Carlos Raña Trabado herodoto@telefonica.net	January 2008
+ *
  * @package chamilo.document
  */
 require_once __DIR__.'/../inc/global.inc.php';
+
 api_protect_course_script();
 
-$noPHP_SELF = true;
-$path = Security::remove_XSS($_GET['curdirpath']);
+$curdirpath = $path = isset($_GET['curdirpath']) ? Security::remove_XSS($_GET['curdirpath']) : null;
+$courseInfo = api_get_course_info();
 $pathurl = urlencode($path);
 $slide_id = isset($_GET['slide_id']) ? Security::remove_XSS($_GET['slide_id']) : null;
+$document_id = isset($_REQUEST['id']) ? (int) $_REQUEST['id'] : null;
+$isAllowedToEdit = api_is_allowed_to_edit(null, true);
 
 if (empty($slide_id)) {
     $edit_slide_id = 1;
@@ -27,22 +34,39 @@ if ($path != '/') {
 }
 $sys_course_path = api_get_path(SYS_COURSE_PATH);
 
-// Including the functions for the slideshow
-require_once 'slideshow.inc.php';
-
 // Breadcrumb navigation
-$url = 'document.php?curdirpath='.$pathurl;
+$url = 'document.php?curdirpath='.$pathurl.'&'.api_get_cidreq();
 $originaltoolname = get_lang('Documents');
 $_course = api_get_course_info();
-$interbreadcrumb[] = array('url' => Security::remove_XSS($url), 'name' => $originaltoolname);
+$interbreadcrumb[] = ['url' => Security::remove_XSS($url), 'name' => $originaltoolname];
 $originaltoolname = get_lang('SlideShow');
+$sessionId = api_get_session_id();
 
-Display :: display_header($originaltoolname, 'Doc');
-
-// Loading the slides from the session
-if (isset($_SESSION['image_files_only'])) {
-    $image_files_only = $_SESSION['image_files_only'];
+$groupIid = 0;
+$groupMemberWithEditRights = false;
+// Setting group variables.
+if (!empty($groupId)) {
+    $group_properties = GroupManager::get_group_properties($groupId);
+    $groupIid = isset($group_properties['iid']) ? $group_properties['iid'] : 0;
 }
+
+Display::display_header($originaltoolname, 'Doc');
+
+$slideshowKey = 'slideshow_'.api_get_course_id().api_get_session_id().$curdirpath;
+$documentAndFolders = Session::read($slideshowKey);
+if (empty($documentAndFolders)) {
+    $documentAndFolders = DocumentManager::getAllDocumentData(
+        $courseInfo,
+        $curdirpath,
+        $groupIid,
+        null,
+        $isAllowedToEdit,
+        false
+    );
+    Session::write($slideshowKey, $documentAndFolders);
+}
+
+require 'document_slideshow.inc.php';
 
 // Calculating the current slide, next slide, previous slide and the number of slides
 $slide = null;
@@ -52,14 +76,8 @@ if ($slide_id != 'all') {
     $next_slide = $slide + 1;
 }
 $total_slides = count($image_files_only);
-?>
-<script>
-function MM_openBrWindow(theURL,winName,features) { //v2.0
-  window.open(theURL,winName,features);
-}
-</script>
-<div class="actions">
-<?php
+
+echo '<div class="actions">';
 
 if ($slide_id != 'all') {
     $image = null;
@@ -68,14 +86,13 @@ if ($slide_id != 'all') {
     }
     if (file_exists($image)) {
         echo '<div class="actions-pagination">';
-
         // Back forward buttons
         if ($slide == 0) {
             $imgp = 'action_prev_na.png';
             $first = Display::return_icon('action_first_na.png');
         } else {
             $imgp = 'action_prev.png';
-            $first = '<a href="slideshow.php?slide_id=0&curdirpath='.$pathurl.'">
+            $first = '<a href="slideshow.php?slide_id=0&curdirpath='.$pathurl.'&'.api_get_cidreq().'">
                       '.Display::return_icon('action_first.png', get_lang('FirstSlide')).'
                       </a>';
         }
@@ -85,10 +102,11 @@ if ($slide_id != 'all') {
 
         // Previous slide
         if ($slide > 0) {
-            echo '<a href="slideshow.php?slide_id='.$previous_slide.'&curdirpath='.$pathurl.'">';
+            echo '<a href="slideshow.php?slide_id='.$previous_slide.'&curdirpath='.$pathurl.'&'.api_get_cidreq().'">';
         }
 
         echo Display::return_icon($imgp, get_lang('Previous'));
+
         if ($slide > 0) {
             echo '</a>';
         }
@@ -98,14 +116,14 @@ if ($slide_id != 'all') {
 
         // Next slide
         if ($slide < $total_slides - 1) {
-            echo '<a href="slideshow.php?slide_id='.$next_slide.'&curdirpath='.$pathurl.'">';
+            echo '<a href="slideshow.php?slide_id='.$next_slide.'&curdirpath='.$pathurl.'&'.api_get_cidreq().'">';
         }
         if ($slide == $total_slides - 1) {
             $imgn = 'action_next_na.png';
             $last = Display::return_icon('action_last_na.png', get_lang('LastSlide'));
         } else {
             $imgn = 'action_next.png';
-            $last = '<a href="slideshow.php?slide_id='.($total_slides - 1).'&curdirpath='.$pathurl.'">
+            $last = '<a href="slideshow.php?slide_id='.($total_slides - 1).'&curdirpath='.$pathurl.'&'.api_get_cidreq().'">
                     '.Display::return_icon('action_last.png', get_lang('LastSlide')).'
                 </a>';
         }
@@ -120,9 +138,10 @@ if ($slide_id != 'all') {
     }
 }
 
-// Exit the slideshow
-echo '<a href="document.php?action=exit_slideshow&curdirpath='.$pathurl.'&'.api_get_cidreq().'">'.
-    Display::return_icon('back.png', get_lang('BackTo').' '.get_lang('DocumentsOverview'), '', ICON_SIZE_MEDIUM).'</a>';
+echo Display::url(
+    Display::return_icon('folder_up.png', get_lang('Up'), '', ICON_SIZE_MEDIUM),
+    api_get_path(WEB_CODE_PATH).'document/document.php?'.api_get_cidreq().'&id='.$document_id
+);
 
 // Show thumbnails
 if ($slide_id != 'all') {
@@ -134,49 +153,43 @@ if ($slide_id != 'all') {
 // Slideshow options
 echo '<a href="slideshowoptions.php?curdirpath='.$pathurl.'&'.api_get_cidreq().'">'.
     Display::return_icon('settings.png', get_lang('SetSlideshowOptions'), '', ICON_SIZE_MEDIUM).'</a>';
-
 echo '</div>';
 echo '<br />';
 
 /*	TREATING THE POST DATA FROM SLIDESHOW OPTIONS */
-
 // If we come from slideshowoptions.php we sessionize (new word !!! ;-) the options
 if (isset($_POST['Submit'])) {
     // We come from slideshowoptions.php
-    //$_SESSION["auto_image_resizing"]=Security::remove_XSS($_POST['auto_radio_resizing']);
-    $_SESSION["image_resizing"] = Security::remove_XSS($_POST['radio_resizing']);
-    if ($_POST['radio_resizing'] == "resizing" && $_POST['width'] != '' && $_POST['height'] != '') {
-        //echo "resizing";
-        $_SESSION["image_resizing_width"] = Security::remove_XSS($_POST['width']);
-        $_SESSION["image_resizing_height"] = Security::remove_XSS($_POST['height']);
+    Session::write('image_resizing', Security::remove_XSS($_POST['radio_resizing']));
+    if ($_POST['radio_resizing'] == 'resizing' && $_POST['width'] != '' && $_POST['height'] != '') {
+        Session::write('image_resizing_width', Security::remove_XSS($_POST['width']));
+        Session::write('image_resizing_height', Security::remove_XSS($_POST['height']));
     } else {
-        //echo "unsetting the session heighte and width";
-        $_SESSION["image_resizing_width"] = null;
-        $_SESSION["image_resizing_height"] = null;
+        Session::write('image_resizing_width', null);
+        Session::write('image_resizing_height', null);
     }
 }
+
 $target_width = $target_height = null;
+$imageResize = Session::read('image_resizing');
 // The target height and width depends if we choose resizing or no resizing
-if (isset($_SESSION["image_resizing"]) && $_SESSION["image_resizing"] == "resizing") {
-    $target_width = $_SESSION["image_resizing_width"];
-    $target_height = $_SESSION["image_resizing_height"];
+if ($imageResize == 'resizing') {
+    $target_width = Session::read('image_resizing_width');
+    $target_height = Session::read('image_resizing_height');
 }
 
 /*	THUMBNAIL VIEW */
-
 // This is for viewing all the images in the slideshow as thumbnails.
-$image_tag = array();
+$image_tag = [];
 $html = '';
 if ($slide_id == 'all') {
     // Config for make thumbnails
-    $allowed_thumbnail_types = array('jpg', 'jpeg', 'gif', 'png');
-    $max_thumbnail_width     = 250;
-    $max_thumbnail_height    = 250;
-    $png_compression	     = 0; //0(none)-9
+    $allowed_thumbnail_types = ['jpg', 'jpeg', 'gif', 'png'];
+    $max_thumbnail_width = 250;
+    $max_thumbnail_height = 250;
+    $png_compression = 0; //0(none)-9
     $jpg_quality = 75; //from 0 to 100 (default is 75). More quality less compression
-
     $directory_thumbnails = $sys_course_path.$_course['path'].'/document'.$folder.'.thumbs/';
-
     //Other parameters only for show tumbnails
     $row_items = 4; //only in slideshow.php
     $number_image = 7; //num icons cols to show
@@ -184,7 +197,6 @@ if ($slide_id == 'all') {
     $thumbnail_height_frame = $max_thumbnail_height;
 
     // Create the template_thumbnails folder (if no exist)
-
     if (!file_exists($directory_thumbnails)) {
         @mkdir($directory_thumbnails, api_get_permissions_for_new_directories());
     }
@@ -240,25 +252,31 @@ if ($slide_id == 'all') {
                         $crop = imagecreatetruecolor($new_thumbnail_size['width'], $new_thumbnail_size['height']);
 
                         // preserve transparency
-                        if ($imagetype == "png") {
+                        if ($imagetype == 'png') {
                             imagesavealpha($crop, true);
                             $color = imagecolorallocatealpha($crop, 0x00, 0x00, 0x00, 127);
                             imagefill($crop, 0, 0, $color);
                         }
 
-                        if ($imagetype == "gif") {
+                        if ($imagetype == 'gif') {
                             $transindex = imagecolortransparent($source_img);
                             $palletsize = imagecolorstotal($source_img);
-                             //GIF89a for transparent and anim (first clip), either GIF87a
+                            //GIF89a for transparent and anim (first clip), either GIF87a
                             if ($transindex >= 0 && $transindex < $palletsize) {
-                                 $transcol = imagecolorsforindex($source_img, $transindex);
-                                 $transindex = imagecolorallocatealpha($crop, $transcol['red'], $transcol['green'], $transcol['blue'], 127);
-                                 imagefill($crop, 0, 0, $transindex);
-                                 imagecolortransparent($crop, $transindex);
+                                $transcol = imagecolorsforindex($source_img, $transindex);
+                                $transindex = imagecolorallocatealpha(
+                                    $crop,
+                                    $transcol['red'],
+                                    $transcol['green'],
+                                    $transcol['blue'],
+                                    127
+                                );
+                                imagefill($crop, 0, 0, $transindex);
+                                imagecolortransparent($crop, $transindex);
                             }
                         }
 
-                        //resampled image
+                        // Resampled image
                         imagecopyresampled(
                             $crop,
                             $source_img,
@@ -295,34 +313,46 @@ if ($slide_id == 'all') {
                     $doc_url = ($path && $path !== '/') ? $path.'/'.$one_image_thumbnail_file : $path.$one_image_thumbnail_file;
                     $image_tag[] = '<img class="img-gallery" src="download.php?doc_url='.$doc_url.'" border="0" title="'.$one_image_file.'">';
                 } else {
-                    //if images aren't support by gd (not gif, jpg, jpeg, png)
-                    if ($imagetype == "bmp") {
-                        // use getimagesize instead api_getimagesize($image); becasuse api_getimagesize doesn't support bmp files. Put here for each show, only for a few bmp files isn't heavy
+                    // If images aren't support by gd (not gif, jpg, jpeg, png)
+                    if ($imagetype == 'bmp') {
+                        // use getimagesize instead api_getimagesize($image);
+                        // because api_getimagesize doesn't support bmp files.
+                        // Put here for each show, only for a few bmp files isn't heavy
                         $original_image_size = getimagesize($image);
-                        if ($max_thumbnail_width < $original_image_size[0] || $max_thumbnail_height < $original_image_size[1]) {
-                            $thumbnail_size = api_calculate_image_size($original_image_size[0], $original_image_size[1], $max_thumbnail_width, $max_thumbnail_height); //don't use resize_image because doesn't run with bmp files
+                        if ($max_thumbnail_width < $original_image_size[0] ||
+                            $max_thumbnail_height < $original_image_size[1]
+                        ) {
+                            //don't use resize_image because doesn't run with bmp files
+                            $thumbnail_size = api_calculate_image_size(
+                                $original_image_size[0],
+                                $original_image_size[1],
+                                $max_thumbnail_width,
+                                $max_thumbnail_height
+                            );
                             $image_height = $thumbnail_size['height'];
-                            $image_width  = $thumbnail_size['width'];
+                            $image_width = $thumbnail_size['width'];
                         } else {
                             $image_height = $original_image_size[0];
                             $image_width = $original_image_size[1];
                         }
                     } else {
-                        //example for svg files,...
+                        // Example for svg files,...
                         $image_width = $max_thumbnail_width;
                         $image_height = $max_thumbnail_height;
                     }
 
                     $doc_url = ($path && $path !== '/') ? $path.'/'.$one_image_file : $path.$one_image_file;
-                    $image_tag[] = '<img src="download.php?doc_url='.$doc_url.'" border="0" width="'.$image_width.'" height="'.$image_height.'" title="'.$one_image_file.'">';
-                }//end allowed image types
-            }//end if exist file image
-        }//end foreach
-    }//end image files only
+                    $image_tag[] = '<img 
+                            src="download.php?doc_url='.$doc_url.'"
+                            border="0" 
+                            width="'.$image_width.'" height="'.$image_height.'" title="'.$one_image_file.'">';
+                }
+            }
+        }
+    }
 
     // Creating the table
     $html_table = '';
-
     $i = 0;
     $count_image = count($image_tag);
     $number_iteration = ceil($count_image / $number_image);
@@ -348,23 +378,21 @@ if ($slide_id == 'all') {
         }
     }
     $html .= '</div>';
+}
 
-}//end slide==all
 echo $html;
+
 /*	ONE AT A TIME VIEW */
 $course_id = api_get_course_int_id();
 
 // This is for viewing all the images in the slideshow one at a time.
-
 if ($slide_id != 'all' && !empty($image_files_only)) {
     if (file_exists($image) && is_file($image)) {
-        $image_height_width = resize_image($image, $target_width, $target_height);
-
+        $image_height_width = DocumentManager::resizeImageSlideShow($image, $target_width, $target_height);
         $image_height = $image_height_width[0];
         $image_width = $image_height_width[1];
-
         $height_width_tags = null;
-        if (isset($_SESSION['image_resizing']) && $_SESSION['image_resizing'] == 'resizing') {
+        if ($imageResize == 'resizing') {
             $height_width_tags = 'width="'.$image_width.'" height="'.$image_height.'"';
         }
 
@@ -376,7 +404,9 @@ if ($slide_id != 'all' && !empty($image_files_only)) {
             $pathpart = $path.'/';
         }
         $sql = "SELECT * FROM $tbl_documents
-                WHERE c_id = $course_id AND path='".Database::escape_string($pathpart.$image_files_only[$slide])."'";
+                WHERE 
+                  c_id = $course_id AND 
+                  path = '".Database::escape_string($pathpart.$image_files_only[$slide])."'";
         $result = Database::query($sql);
         $row = Database::fetch_array($result);
 
@@ -386,14 +416,15 @@ if ($slide_id != 'all' && !empty($image_files_only)) {
         } else {
             echo "<a href='slideshow.php?slide_id=0&curdirpath=$pathurl'>";
         }
+
         if ($path == '/') {
             $path = '';
         }
 
         list($width, $height) = getimagesize($image);
         // Auto resize
-        if (isset($_SESSION["image_resizing"]) && $_SESSION["image_resizing"] == 'resizing') {
-        ?>
+        if ($imageResize == 'resizing') {
+            ?>
         <script>
             var initial_width='<?php echo $width; ?>';
             var initial_height='<?php echo $height; ?>';
@@ -401,13 +432,13 @@ if ($slide_id != 'all' && !empty($image_files_only)) {
             var width = window.innerWidth -360;
 
             if (initial_height>height || initial_width>width) {
-                start_width=width;
-                start_height=height;
+                start_width = width;
+                start_height= height;
             } else {
-                start_width=initial_width;
-                start_height=initial_height;
+                start_width = initial_width;
+                start_height = initial_height;
             }
-            document.write('<img id="image"  src="<?php echo  'download.php?doc_url='.$path.'/'.$image_files_only[$slide]; ?>" width="'+start_width+'" height="'+start_height+'"  border="0"  alt="<?php echo $image_files_only[$slide]; ?>">');
+            document.write('<img id="image" src="<?php echo 'download.php?doc_url='.$path.'/'.$image_files_only[$slide]; ?>" width="'+start_width+'" height="'+start_height+'"  border="0"  alt="<?php echo $image_files_only[$slide]; ?>">');
 
             function resizeImage() {
                 var resize_factor_width = width / initial_width;
@@ -418,12 +449,10 @@ if ($slide_id != 'all' && !empty($image_files_only)) {
                 if (delta_width > delta_height) {
                     width = Math.ceil(initial_width * resize_factor_height);
                     height= Math.ceil(initial_height * resize_factor_height);
-                }
-                else if(delta_width < delta_height) {
+                } else if(delta_width < delta_height) {
                     width = Math.ceil(initial_width * resize_factor_width);
                     height = Math.ceil(initial_height * resize_factor_width);
-                }
-                else {
+                } else {
                     width = Math.ceil(width);
                     height = Math.ceil(height);
                 }
@@ -432,19 +461,21 @@ if ($slide_id != 'all' && !empty($image_files_only)) {
                 document.getElementById('image').style.width = width +"px";
                 document.getElementById('td_image').style.background='none';
                 document.getElementById('image').style.visibility='visible';
-            };
+            }
 
-             if (initial_height>height || initial_width>width) {
+            if (initial_height > height || initial_width > width) {
                 document.getElementById('image').style.visibility='hidden';
                 document.getElementById('td_image').style.background='url(<?php echo Display::returnIconPath('loadingAnimation.gif'); ?>) center no-repeat';
                 document.getElementById('image').onload = resizeImage;
                 window.onresize = resizeImage;
             }
-
-        </script>
+            </script>
     <?php
         } else {
-            echo "<img class=\"img-responsive\" src='download.php?doc_url=$path/".$image_files_only[$slide]."' alt='".$image_files_only[$slide]."' border='0'".$height_width_tags.">";
+            echo "<img 
+                class=\"img-responsive\" 
+                src='download.php?doc_url=$path/".$image_files_only[$slide]."' alt='".$image_files_only[$slide]."' 
+                border='0'".$height_width_tags.'>';
         }
 
         echo '</a>';
@@ -458,12 +489,11 @@ if ($slide_id != 'all' && !empty($image_files_only)) {
             echo '<ul class="list-unstyled">';
             $aux = explode('.', htmlspecialchars($image_files_only[$slide]));
             $ext = $aux[count($aux) - 1];
-
-            if (isset($_SESSION['image_resizing']) && $_SESSION['image_resizing'] == 'resizing') {
+            if ($imageResize == 'resizing') {
                 $resize_info = get_lang('Resizing').'<br />';
-                $resize_width = $_SESSION["image_resizing_width"].' x ';
-                $resize_height = $_SESSION['image_resizing_height'];
-            } elseif (isset($_SESSION['image_resizing']) && $_SESSION['image_resizing'] != 'noresizing') {
+                $resize_width = Session::read('image_resizing_width').' x ';
+                $resize_height = Session::read('image_resizing_height');
+            } elseif ($imageResize != 'noresizing') {
                 $resize_info = get_lang('Resizing').'<br />';
                 $resize_width = get_lang('Auto').' x ';
                 $resize_height = get_lang('Auto');
@@ -481,7 +511,7 @@ if ($slide_id != 'all' && !empty($image_files_only)) {
                     'id' => $row['id'],
                     'origin' => 'slideshow',
                     'origin_opt' => $edit_slide_id,
-                    'curdirpath' => $pathurl
+                    'curdirpath' => $pathurl,
                 ]),
                 'edit',
                 'link',
@@ -505,4 +535,4 @@ if ($slide_id != 'all' && !empty($image_files_only)) {
     }
 }
 
-Display :: display_footer();
+Display::display_footer();

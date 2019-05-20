@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * GradebookEvaluation
+ * GradebookEvaluation.
  *
  * @ORM\Table(name="gradebook_evaluation")
  * @ORM\Entity
@@ -14,95 +14,124 @@ use Doctrine\ORM\Mapping as ORM;
 class GradebookEvaluation
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
      *
      * @ORM\Column(name="name", type="text", nullable=false)
      */
-    private $name;
+    protected $name;
 
     /**
      * @var string
      *
      * @ORM\Column(name="description", type="text", nullable=true)
      */
-    private $description;
+    protected $description;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="user_id", type="integer", nullable=false)
      */
-    private $userId;
+    protected $userId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="course_code", type="string", length=40, nullable=true)
      */
-    private $courseCode;
+    protected $courseCode;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="category_id", type="integer", nullable=true)
      */
-    private $categoryId;
+    protected $categoryId;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=false)
      */
-    private $createdAt;
+    protected $createdAt;
 
     /**
      * @var float
      *
      * @ORM\Column(name="weight", type="float", precision=10, scale=0, nullable=false)
      */
-    private $weight;
+    protected $weight;
 
     /**
      * @var float
      *
      * @ORM\Column(name="max", type="float", precision=10, scale=0, nullable=false)
      */
-    private $max;
+    protected $max;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="visible", type="integer", nullable=false)
      */
-    private $visible;
+    protected $visible;
 
     /**
      * @var string
      *
      * @ORM\Column(name="type", type="string", length=40, nullable=false)
      */
-    private $type;
+    protected $type;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="locked", type="integer", nullable=false)
      */
-    private $locked;
+    protected $locked;
 
     /**
-     * Set name
+     * @var float
+     *
+     * ORM\Column(name="best_score", type="float", precision=6, scale=2, nullable=true)
+     */
+    protected $bestScore;
+
+    /**
+     * @var float
+     *
+     * ORM\Column(name="average_score", type="float", precision=6, scale=2, nullable=true)
+     */
+    protected $averageScore;
+
+    /**
+     * @var float
+     *
+     * ORM\Column(name="score_weight", type="float", precision=6, scale=2, nullable=true)
+     */
+    protected $scoreWeight;
+
+    /**
+     * @var array
+     *
+     * ORM\Column(name="user_score_list", type="array", nullable=true)
+     */
+    protected $userScoreList;
+
+    /**
+     * Set name.
      *
      * @param string $name
+     *
      * @return GradebookEvaluation
      */
     public function setName($name)
@@ -113,7 +142,7 @@ class GradebookEvaluation
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
@@ -123,9 +152,10 @@ class GradebookEvaluation
     }
 
     /**
-     * Set description
+     * Set description.
      *
      * @param string $description
+     *
      * @return GradebookEvaluation
      */
     public function setDescription($description)
@@ -136,7 +166,7 @@ class GradebookEvaluation
     }
 
     /**
-     * Get description
+     * Get description.
      *
      * @return string
      */
@@ -146,9 +176,10 @@ class GradebookEvaluation
     }
 
     /**
-     * Set userId
+     * Set userId.
      *
-     * @param integer $userId
+     * @param int $userId
+     *
      * @return GradebookEvaluation
      */
     public function setUserId($userId)
@@ -159,9 +190,9 @@ class GradebookEvaluation
     }
 
     /**
-     * Get userId
+     * Get userId.
      *
-     * @return integer
+     * @return int
      */
     public function getUserId()
     {
@@ -169,9 +200,10 @@ class GradebookEvaluation
     }
 
     /**
-     * Set courseCode
+     * Set courseCode.
      *
      * @param string $courseCode
+     *
      * @return GradebookEvaluation
      */
     public function setCourseCode($courseCode)
@@ -182,7 +214,7 @@ class GradebookEvaluation
     }
 
     /**
-     * Get courseCode
+     * Get courseCode.
      *
      * @return string
      */
@@ -192,9 +224,10 @@ class GradebookEvaluation
     }
 
     /**
-     * Set categoryId
+     * Set categoryId.
      *
-     * @param integer $categoryId
+     * @param int $categoryId
+     *
      * @return GradebookEvaluation
      */
     public function setCategoryId($categoryId)
@@ -205,9 +238,9 @@ class GradebookEvaluation
     }
 
     /**
-     * Get categoryId
+     * Get categoryId.
      *
-     * @return integer
+     * @return int
      */
     public function getCategoryId()
     {
@@ -215,9 +248,10 @@ class GradebookEvaluation
     }
 
     /**
-     * Set createdAt
+     * Set createdAt.
      *
      * @param \DateTime $createdAt
+     *
      * @return GradebookEvaluation
      */
     public function setCreatedAt($createdAt)
@@ -228,7 +262,7 @@ class GradebookEvaluation
     }
 
     /**
-     * Get createdAt
+     * Get createdAt.
      *
      * @return \DateTime
      */
@@ -238,9 +272,10 @@ class GradebookEvaluation
     }
 
     /**
-     * Set weight
+     * Set weight.
      *
      * @param float $weight
+     *
      * @return GradebookEvaluation
      */
     public function setWeight($weight)
@@ -251,7 +286,7 @@ class GradebookEvaluation
     }
 
     /**
-     * Get weight
+     * Get weight.
      *
      * @return float
      */
@@ -261,9 +296,10 @@ class GradebookEvaluation
     }
 
     /**
-     * Set max
+     * Set max.
      *
      * @param float $max
+     *
      * @return GradebookEvaluation
      */
     public function setMax($max)
@@ -274,7 +310,7 @@ class GradebookEvaluation
     }
 
     /**
-     * Get max
+     * Get max.
      *
      * @return float
      */
@@ -284,9 +320,10 @@ class GradebookEvaluation
     }
 
     /**
-     * Set visible
+     * Set visible.
      *
-     * @param integer $visible
+     * @param int $visible
+     *
      * @return GradebookEvaluation
      */
     public function setVisible($visible)
@@ -297,9 +334,9 @@ class GradebookEvaluation
     }
 
     /**
-     * Get visible
+     * Get visible.
      *
-     * @return integer
+     * @return int
      */
     public function getVisible()
     {
@@ -307,9 +344,10 @@ class GradebookEvaluation
     }
 
     /**
-     * Set type
+     * Set type.
      *
      * @param string $type
+     *
      * @return GradebookEvaluation
      */
     public function setType($type)
@@ -320,7 +358,7 @@ class GradebookEvaluation
     }
 
     /**
-     * Get type
+     * Get type.
      *
      * @return string
      */
@@ -330,9 +368,10 @@ class GradebookEvaluation
     }
 
     /**
-     * Set locked
+     * Set locked.
      *
-     * @param integer $locked
+     * @param int $locked
+     *
      * @return GradebookEvaluation
      */
     public function setLocked($locked)
@@ -343,9 +382,9 @@ class GradebookEvaluation
     }
 
     /**
-     * Get locked
+     * Get locked.
      *
-     * @return integer
+     * @return int
      */
     public function getLocked()
     {
@@ -353,12 +392,96 @@ class GradebookEvaluation
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return float
+     */
+    public function getBestScore()
+    {
+        return $this->bestScore;
+    }
+
+    /**
+     * @param float $bestScore
+     *
+     * @return GradebookEvaluation
+     */
+    public function setBestScore($bestScore)
+    {
+        $this->bestScore = $bestScore;
+
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getAverageScore()
+    {
+        return $this->averageScore;
+    }
+
+    /**
+     * @param float $averageScore
+     *
+     * @return GradebookEvaluation
+     */
+    public function setAverageScore($averageScore)
+    {
+        $this->averageScore = $averageScore;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUserScoreList()
+    {
+        if (empty($this->userScoreList)) {
+            return [];
+        }
+
+        return $this->userScoreList;
+    }
+
+    /**
+     * @param array $userScoreList
+     *
+     * @return GradebookEvaluation
+     */
+    public function setUserScoreList($userScoreList)
+    {
+        $this->userScoreList = $userScoreList;
+
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getScoreWeight()
+    {
+        return $this->scoreWeight;
+    }
+
+    /**
+     * @param float $scoreWeight
+     *
+     * @return GradebookEvaluation
+     */
+    public function setScoreWeight($scoreWeight)
+    {
+        $this->scoreWeight = $scoreWeight;
+
+        return $this;
     }
 }

@@ -6,63 +6,63 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Legal
+ * Legal.
  *
  * @ORM\Table(name="legal")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Chamilo\CoreBundle\Entity\Repository\LegalRepository")
  */
 class Legal
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $id;
+    protected $id;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="date", type="integer", nullable=false)
      */
-    private $date;
+    protected $date;
 
     /**
      * @var string
      *
      * @ORM\Column(name="content", type="text", nullable=true)
      */
-    private $content;
+    protected $content;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="type", type="integer", nullable=false)
      */
-    private $type;
+    protected $type;
 
     /**
      * @var string
      *
      * @ORM\Column(name="changes", type="text", nullable=false)
      */
-    private $changes;
+    protected $changes;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="version", type="integer", nullable=true)
      */
-    private $version;
+    protected $version;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="language_id", type="integer")
      */
-    private $languageId;
+    protected $languageId;
 
     /**
      * @return int
@@ -74,6 +74,7 @@ class Legal
 
     /**
      * @param int $id
+     *
      * @return Legal
      */
     public function setId($id)
@@ -83,11 +84,11 @@ class Legal
         return $this;
     }
 
-
     /**
-     * Set date
+     * Set date.
      *
-     * @param integer $date
+     * @param int $date
+     *
      * @return Legal
      */
     public function setDate($date)
@@ -98,9 +99,9 @@ class Legal
     }
 
     /**
-     * Get date
+     * Get date.
      *
-     * @return integer
+     * @return int
      */
     public function getDate()
     {
@@ -108,9 +109,10 @@ class Legal
     }
 
     /**
-     * Set content
+     * Set content.
      *
      * @param string $content
+     *
      * @return Legal
      */
     public function setContent($content)
@@ -121,7 +123,7 @@ class Legal
     }
 
     /**
-     * Get content
+     * Get content.
      *
      * @return string
      */
@@ -131,9 +133,10 @@ class Legal
     }
 
     /**
-     * Set type
+     * Set type.
      *
-     * @param integer $type
+     * @param int $type
+     *
      * @return Legal
      */
     public function setType($type)
@@ -144,9 +147,9 @@ class Legal
     }
 
     /**
-     * Get type
+     * Get type.
      *
-     * @return integer
+     * @return int
      */
     public function getType()
     {
@@ -154,9 +157,10 @@ class Legal
     }
 
     /**
-     * Set changes
+     * Set changes.
      *
      * @param string $changes
+     *
      * @return Legal
      */
     public function setChanges($changes)
@@ -167,7 +171,7 @@ class Legal
     }
 
     /**
-     * Get changes
+     * Get changes.
      *
      * @return string
      */
@@ -177,9 +181,10 @@ class Legal
     }
 
     /**
-     * Set version
+     * Set version.
      *
-     * @param integer $version
+     * @param int $version
+     *
      * @return Legal
      */
     public function setVersion($version)
@@ -190,9 +195,9 @@ class Legal
     }
 
     /**
-     * Get version
+     * Get version.
      *
-     * @return integer
+     * @return int
      */
     public function getVersion()
     {
@@ -200,9 +205,10 @@ class Legal
     }
 
     /**
-     * Set languageId
+     * Set languageId.
      *
-     * @param integer $languageId
+     * @param int $languageId
+     *
      * @return Legal
      */
     public function setLanguageId($languageId)
@@ -213,9 +219,9 @@ class Legal
     }
 
     /**
-     * Get languageId
+     * Get languageId.
      *
-     * @return integer
+     * @return int
      */
     public function getLanguageId()
     {

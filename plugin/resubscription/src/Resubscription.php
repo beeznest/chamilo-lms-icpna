@@ -2,38 +2,40 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * Limit session resubscriptions
+ * Limit session resubscriptions.
  *
  * @author Imanol Losada Oriol <imanol.losada@beeznest.com>
+ *
  * @package chamilo.plugin.resubscription
  */
 class Resubscription extends Plugin implements HookPluginInterface
 {
-
     /**
-     * Class constructor
+     * Class constructor.
      */
     protected function __construct()
     {
-        $options = array(
+        $options = [
             'calendar_year' => get_lang('CalendarYear'),
-            'natural_year' => get_lang('NaturalYear')
-        );
-        $parameters = array(
-            'resubscription_limit' => array(
+            'natural_year' => get_lang('NaturalYear'),
+        ];
+        $parameters = [
+            'resubscription_limit' => [
                 'type' => 'select',
-                'options' => $options
-            )
-        );
+                'options' => $options,
+            ],
+        ];
         parent::__construct('0.1', 'Imanol Losada Oriol', $parameters);
     }
 
     /**
-     * Instance the plugin
+     * Instance the plugin.
+     *
      * @staticvar null $result
+     *
      * @return Resubscription
      */
-    static function create()
+    public static function create()
     {
         static $result = null;
 
@@ -41,7 +43,7 @@ class Resubscription extends Plugin implements HookPluginInterface
     }
 
     /**
-     * Install the plugin
+     * Install the plugin.
      */
     public function install()
     {
@@ -49,8 +51,7 @@ class Resubscription extends Plugin implements HookPluginInterface
     }
 
     /**
-     * Uninstall the plugin
-     * @return void
+     * Uninstall the plugin.
      */
     public function uninstall()
     {
@@ -58,7 +59,7 @@ class Resubscription extends Plugin implements HookPluginInterface
     }
 
     /**
-     * Install the Resubscription hook
+     * Install the Resubscription hook.
      */
     public function installHook()
     {
@@ -67,12 +68,11 @@ class Resubscription extends Plugin implements HookPluginInterface
     }
 
     /**
-     * Uninstall the Resubscription hook
+     * Uninstall the Resubscription hook.
      */
     public function uninstallHook()
     {
         $hook = HookResubscription::create();
         HookResubscribe::create()->detach($hook);
     }
-
 }

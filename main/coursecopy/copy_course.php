@@ -1,12 +1,13 @@
 <?php
 /* For licensing terms, see /license.txt */
 
-use Chamilo\CourseBundle\Component\CourseCopy\CourseSelectForm;
 use Chamilo\CourseBundle\Component\CourseCopy\CourseBuilder;
 use Chamilo\CourseBundle\Component\CourseCopy\CourseRestorer;
+use Chamilo\CourseBundle\Component\CourseCopy\CourseSelectForm;
 
 /**
  * @todo rework file in order to use addFlash
+ *
  * @package chamilo.backup
  */
 
@@ -19,18 +20,13 @@ if (!api_is_allowed_to_edit()) {
     api_not_allowed(true);
 }
 
-// Remove memory and time limits as much as possible as this might be a long process...
-if (function_exists('ini_set')) {
-    api_set_memory_limit('256M');
-    ini_set('max_execution_time', 1800);
-    //ini_set('post_max_size', "512M");
-}
+api_set_more_memory_and_time_limits();
 
 // Breadcrumbs
-$interbreadcrumb[] = array(
+$interbreadcrumb[] = [
     'url' => api_get_path(WEB_CODE_PATH).'course_info/maintenance.php?'.api_get_cidreq(),
-    'name' => get_lang('Maintenance')
-);
+    'name' => get_lang('Maintenance'),
+];
 
 // The section (for the tabs)
 $this_section = SECTION_COURSES;
@@ -39,17 +35,17 @@ $this_section = SECTION_COURSES;
 Display::display_header(get_lang('CopyCourse'));
 echo Display::page_header(get_lang('CopyCourse'));
 
-/* MAIN CODE */
+$action = isset($_POST['action']) ? $_POST['action'] : '';
 
 // If a CourseSelectForm is posted or we should copy all resources, then copy them
 if (Security::check_token('post') && (
-    (isset($_POST['action']) && $_POST['action'] == 'course_select_form') ||
-    (isset($_POST['copy_option']) && $_POST['copy_option'] == 'full_copy')
+    ($action === 'course_select_form') ||
+    (isset($_POST['copy_option']) && $_POST['copy_option'] === 'full_copy')
     )
 ) {
     // Clear token
     Security::clear_token();
-    if (isset($_POST['action']) && $_POST['action'] == 'course_select_form') {
+    if ($action === 'course_select_form') {
         $course = CourseSelectForm::get_posted_course('copy_course');
     } else {
         $cb = new CourseBuilder();
@@ -67,7 +63,7 @@ if (Security::check_token('post') && (
     );
 } elseif (Security::check_token('post') && (
         isset($_POST['copy_option']) &&
-        $_POST['copy_option'] == 'select_items'
+        $_POST['copy_option'] === 'select_items'
     )
 ) {
     // Clear token
@@ -75,7 +71,7 @@ if (Security::check_token('post') && (
 
     $cb = new CourseBuilder();
     $course = $cb->build();
-    $hiddenFields = array();
+    $hiddenFields = [];
     $hiddenFields['same_file_name_option'] = $_POST['same_file_name_option'];
     $hiddenFields['destination_course'] = $_POST['destination_course'];
     // Add token to Course select form
@@ -98,7 +94,7 @@ if (Security::check_token('post') && (
     if (empty($courseList)) {
         echo Display::return_message(get_lang('NoDestinationCoursesAvailable'), 'normal');
     } else {
-        $options = array();
+        $options = [];
         foreach ($courseList as $courseItem) {
             $courseInfo = api_get_course_info_by_id($courseItem['real_id']);
             $options[$courseInfo['code']] = $courseInfo['title'].' ('.$courseInfo['code'].')';
@@ -111,24 +107,42 @@ if (Security::check_token('post') && (
         );
         $form->addElement('select', 'destination_course', get_lang('SelectDestinationCourse'), $options);
 
-        $group = array();
+        $group = [];
         $group[] = $form->createElement('radio', 'copy_option', null, get_lang('FullCopy'), 'full_copy');
         $group[] = $form->createElement('radio', 'copy_option', null, get_lang('LetMeSelectItems'), 'select_items');
         $form->addGroup($group, '', get_lang('SelectOptionForBackup'));
 
-        $group = array();
-        $group[] = $form->createElement('radio', 'same_file_name_option', null, get_lang('SameFilenameSkip'), FILE_SKIP);
-        $group[] = $form->createElement('radio', 'same_file_name_option', null, get_lang('SameFilenameRename'), FILE_RENAME);
-        $group[] = $form->createElement('radio', 'same_file_name_option', null, get_lang('SameFilenameOverwrite'), FILE_OVERWRITE);
+        $group = [];
+        $group[] = $form->createElement(
+            'radio',
+            'same_file_name_option',
+            null,
+            get_lang('SameFilenameSkip'),
+            FILE_SKIP
+        );
+        $group[] = $form->createElement(
+            'radio',
+            'same_file_name_option',
+            null,
+            get_lang('SameFilenameRename'),
+            FILE_RENAME
+        );
+        $group[] = $form->createElement(
+            'radio',
+            'same_file_name_option',
+            null,
+            get_lang('SameFilenameOverwrite'),
+            FILE_OVERWRITE
+        );
         $form->addGroup($group, '', get_lang('SameFilename'));
         $form->addProgress();
         $form->addButtonSave(get_lang('CopyCourse'));
-        $form->setDefaults(array('copy_option' =>'select_items', 'same_file_name_option' => FILE_OVERWRITE));
+        $form->setDefaults(['copy_option' => 'select_items', 'same_file_name_option' => FILE_OVERWRITE]);
 
         // Add Security token
         $token = Security::get_token();
         $form->addElement('hidden', 'sec_token');
-        $form->setConstants(array('sec_token' => $token));
+        $form->setConstants(['sec_token' => $token]);
         $form->display();
     }
 }

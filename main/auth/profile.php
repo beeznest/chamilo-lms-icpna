@@ -5,14 +5,13 @@ use Chamilo\UserBundle\Entity\User;
 use ChamiloSession as Session;
 
 /**
-* This file displays the user's profile,
-* optionally it allows users to modify their profile as well.
-*
-* See inc/conf/profile.conf.php to modify settings
-*
-* @package chamilo.auth
-*/
-
+ * This file displays the user's profile,
+ * optionally it allows users to modify their profile as well.
+ *
+ * See inc/conf/profile.conf.php to modify settings
+ *
+ * @package chamilo.auth
+ */
 $cidReset = true;
 require_once __DIR__.'/../inc/global.inc.php';
 
@@ -23,11 +22,20 @@ if (!api_is_student()) {
     );
 }
 
-if (api_get_setting('allow_social_tool') == 'true') {
+$this_section = SECTION_MYPROFILE;
+$allowSocialTool = api_get_setting('allow_social_tool') == 'true';
+if ($allowSocialTool) {
     $this_section = SECTION_SOCIAL;
-} else {
-    $this_section = SECTION_MYPROFILE;
 }
+
+$logInfo = [
+    'tool' => 'profile',
+    'tool_id' => 0,
+    'tool_id_detail' => 0,
+    'action' => $this_section,
+    'info' => '',
+];
+Event::registerLog($logInfo);
 
 $_SESSION['this_section'] = $this_section;
 
@@ -35,19 +43,11 @@ if (!(isset($_user['user_id']) && $_user['user_id']) || api_is_anonymous($_user[
     api_not_allowed(true);
 }
 
-$gMapsPlugin = GoogleMapsPlugin::create();
-$geolocalization = $gMapsPlugin->get('enable_api') === 'true';
-
-if ($geolocalization) {
-    $gmapsApiKey = $gMapsPlugin->get('api_key');
-    $htmlHeadXtra[] = '<script type="text/javascript" src="//maps.googleapis.com/maps/api/js?sensor=true&key='.$gmapsApiKey.'" ></script>';
-}
-
 $htmlHeadXtra[] = api_get_password_checker_js('#username', '#password1');
 $htmlHeadXtra[] = api_get_css_asset('cropper/dist/cropper.min.css');
 $htmlHeadXtra[] = api_get_asset('cropper/dist/cropper.min.js');
 $htmlHeadXtra[] = '<script>
-$(document).ready(function() {
+$(function() {
     $("#id_generate_api_key").on("click", function (e) {
         e.preventDefault();
 
@@ -124,19 +124,19 @@ $form = new FormValidator('profile');
 
 if (api_is_western_name_order()) {
     //    FIRST NAME and LAST NAME
-    $form->addElement('text', 'firstname', get_lang('FirstName'), array('size' => 40));
-    $form->addElement('text', 'lastname', get_lang('LastName'), array('size' => 40));
+    $form->addElement('text', 'firstname', get_lang('FirstName'), ['size' => 40]);
+    $form->addElement('text', 'lastname', get_lang('LastName'), ['size' => 40]);
 } else {
     //    LAST NAME and FIRST NAME
-    $form->addElement('text', 'lastname', get_lang('LastName'), array('size' => 40));
-    $form->addElement('text', 'firstname', get_lang('FirstName'), array('size' => 40));
+    $form->addElement('text', 'lastname', get_lang('LastName'), ['size' => 40]);
+    $form->addElement('text', 'firstname', get_lang('FirstName'), ['size' => 40]);
 }
 if (api_get_setting('profile', 'name') !== 'true') {
-    $form->freeze(array('lastname', 'firstname'));
+    $form->freeze(['lastname', 'firstname']);
 }
-$form->applyFilter(array('lastname', 'firstname'), 'stripslashes');
-$form->applyFilter(array('lastname', 'firstname'), 'trim');
-$form->applyFilter(array('lastname', 'firstname'), 'html_filter');
+$form->applyFilter(['lastname', 'firstname'], 'stripslashes');
+$form->applyFilter(['lastname', 'firstname'], 'trim');
+$form->applyFilter(['lastname', 'firstname'], 'html_filter');
 $form->addRule('lastname', get_lang('ThisFieldIsRequired'), 'required');
 $form->addRule('firstname', get_lang('ThisFieldIsRequired'), 'required');
 
@@ -145,11 +145,11 @@ $form->addElement(
     'text',
     'username',
     get_lang('UserName'),
-    array(
+    [
         'id' => 'username',
         'maxlength' => USERNAME_MAX_LENGTH,
         'size' => USERNAME_MAX_LENGTH,
-    )
+    ]
 );
 if (api_get_setting('profile', 'login') !== 'true' || api_get_setting('login_is_email') == 'true') {
     $form->freeze('username');
@@ -163,7 +163,7 @@ if (api_get_setting('profile', 'login') !== 'true' || api_get_setting('login_is_
 
 //    OFFICIAL CODE
 if (defined('CONFVAL_ASK_FOR_OFFICIAL_CODE') && CONFVAL_ASK_FOR_OFFICIAL_CODE === true) {
-    $form->addElement('text', 'official_code', get_lang('OfficialCode'), array('size' => 40));
+    $form->addElement('text', 'official_code', get_lang('OfficialCode'), ['size' => 40]);
     if (api_get_setting('profile', 'officialcode') !== 'true') {
         $form->freeze('official_code');
     }
@@ -178,7 +178,7 @@ if (defined('CONFVAL_ASK_FOR_OFFICIAL_CODE') && CONFVAL_ASK_FOR_OFFICIAL_CODE ==
 }
 
 //    EMAIL
-$form->addElement('email', 'email', get_lang('Email'), array('size' => 40));
+$form->addElement('email', 'email', get_lang('Email'), ['size' => 40]);
 if (api_get_setting('profile', 'email') !== 'true') {
     $form->freeze('email');
 }
@@ -192,7 +192,7 @@ if (api_get_setting('registration', 'email') == 'true' && api_get_setting('profi
 
 // OPENID URL
 if (is_profile_editable() && api_get_setting('openid_authentication') == 'true') {
-    $form->addElement('text', 'openid', get_lang('OpenIDURL'), array('size' => 40));
+    $form->addElement('text', 'openid', get_lang('OpenIDURL'), ['size' => 40]);
     if (api_get_setting('profile', 'openid') !== 'true') {
         $form->freeze('openid');
     }
@@ -200,7 +200,7 @@ if (is_profile_editable() && api_get_setting('openid_authentication') == 'true')
 }
 
 //    PHONE
-$form->addElement('text', 'phone', get_lang('Phone'), array('size' => 20));
+$form->addElement('text', 'phone', get_lang('Phone'), ['size' => 20]);
 if (api_get_setting('profile', 'phone') !== 'true') {
     $form->freeze('phone');
 }
@@ -214,14 +214,14 @@ if (is_profile_editable() && api_get_setting('profile', 'picture') == 'true') {
         'picture',
         [
             $user_data['picture_uri'] != '' ? get_lang('UpdateImage') : get_lang('AddImage'),
-            get_lang('OnlyImagesAllowed')
+            get_lang('OnlyImagesAllowed'),
         ],
         [
             'id' => 'picture',
             'class' => 'picture-form',
             'crop_image' => true,
             'crop_ratio' => '1 / 1',
-            'accept' => 'image/*'
+            'accept' => 'image/*',
         ]
     );
 
@@ -262,11 +262,11 @@ if (api_get_setting('extended_profile') === 'true') {
         get_lang('MyCompetences'),
         false,
         false,
-        array(
+        [
             'ToolbarSet' => 'Profile',
             'Width' => $width_extended_profile,
             'Height' => '130',
-        )
+        ]
     );
     //    MY DIPLOMAS
     $form->addHtmlEditor(
@@ -274,11 +274,11 @@ if (api_get_setting('extended_profile') === 'true') {
         get_lang('MyDiplomas'),
         false,
         false,
-        array(
+        [
             'ToolbarSet' => 'Profile',
             'Width' => $width_extended_profile,
             'Height' => '130',
-        )
+        ]
     );
     // WHAT I AM ABLE TO TEACH
     $form->addHtmlEditor(
@@ -286,11 +286,11 @@ if (api_get_setting('extended_profile') === 'true') {
         get_lang('MyTeach'),
         false,
         false,
-        array(
+        [
             'ToolbarSet' => 'Profile',
             'Width' => $width_extended_profile,
             'Height' => '130',
-        )
+        ]
     );
 
     //    MY PRODUCTIONS
@@ -304,15 +304,15 @@ if (api_get_setting('extended_profile') === 'true') {
         get_lang('MyPersonalOpenArea'),
         false,
         false,
-        array(
+        [
             'ToolbarSet' => 'Profile',
             'Width' => $width_extended_profile,
             'Height' => '350',
-        )
+        ]
     );
     // openarea is untrimmed for maximum openness
-    $form->applyFilter(array('competences', 'diplomas', 'teach', 'openarea'), 'stripslashes');
-    $form->applyFilter(array('competences', 'diplomas', 'teach'), 'trim');
+    $form->applyFilter(['competences', 'diplomas', 'teach', 'openarea'], 'stripslashes');
+    $form->applyFilter(['competences', 'diplomas', 'teach'], 'trim');
 }
 
 //    PASSWORD, if auth_source is platform
@@ -320,16 +320,12 @@ if (is_platform_authentication() &&
     is_profile_editable() &&
     api_get_setting('profile', 'password') == 'true'
 ) {
-    $form->addElement('password', 'password0', array(get_lang('Pass'), get_lang('Enter2passToChange')), array('size' => 40));
-    $form->addElement('password', 'password1', get_lang('NewPass'), array('id'=> 'password1', 'size' => 40));
+    $form->addElement('password', 'password0', [get_lang('Pass'), get_lang('Enter2passToChange')], ['size' => 40]);
+    $form->addElement('password', 'password1', get_lang('NewPass'), ['id' => 'password1', 'size' => 40]);
 
-    $checkPass = api_get_setting('allow_strength_pass_checker');
-    if ($checkPass == 'true') {
-        $form->addElement('label', null, '<div id="password_progress"></div>');
-    }
-    $form->addElement('password', 'password2', get_lang('Confirmation'), array('size' => 40));
+    $form->addElement('password', 'password2', get_lang('Confirmation'), ['size' => 40]);
     //    user must enter identical password twice so we can prevent some user errors
-    $form->addRule(array('password1', 'password2'), get_lang('PassTwo'), 'compare');
+    $form->addRule(['password1', 'password2'], get_lang('PassTwo'), 'compare');
     $form->addPasswordRule('password1');
 }
 
@@ -344,7 +340,7 @@ $jquery_ready_content = $return['jquery_ready_content'];
 // the $jquery_ready_content variable collects all functions that
 // will be load in the $(document).ready javascript function
 $htmlHeadXtra[] = '<script>
-$(document).ready(function(){
+$(function() {
     '.$jquery_ready_content.'
 });
 </script>';
@@ -355,7 +351,7 @@ if (api_get_setting('profile', 'apikeys') == 'true') {
         'text',
         'api_key_generate',
         get_lang('MyApiKey'),
-        array('size' => 40, 'id' => 'id_api_key_generate')
+        ['size' => 40, 'id' => 'id_api_key_generate']
     );
     $form->addElement('html', '</div>');
     $form->addButton(
@@ -374,80 +370,20 @@ if (is_profile_editable()) {
 } else {
     $form->freeze();
 }
-$form->setDefaults($user_data);
 
-/**
- * Is user auth_source is platform ?
- *
- * @return  boolean if auth_source is platform
- */
-function is_platform_authentication()
-{
-    $tab_user_info = api_get_user_info();
-    return $tab_user_info['auth_source'] == PLATFORM_AUTH_SOURCE;
-}
-
-/**
- * Can a user edit his/her profile?
- *
- * @return    boolean    Editability of the profile
- */
-function is_profile_editable()
-{
-    if (isset($GLOBALS['profileIsEditable'])) {
-        return (bool) $GLOBALS['profileIsEditable'];
-    }
-
-    return true;
-}
-
-/*
-    PRODUCTIONS FUNCTIONS
-*/
-
-/**
- * Upload a submitted user production.
- *
- * @param    $user_id    User id
- * @return    The filename of the new production or FALSE if the upload has failed
- */
-function upload_user_production($user_id)
-{
-    $production_repository = UserManager::getUserPathById($user_id, 'system');
-
-    if (!file_exists($production_repository)) {
-        @mkdir($production_repository, api_get_permissions_for_new_directories(), true);
-    }
-    $filename = api_replace_dangerous_char($_FILES['production']['name']);
-    $filename = disable_dangerous_file($filename);
-
-    if (filter_extension($filename)) {
-        if (@move_uploaded_file($_FILES['production']['tmp_name'], $production_repository.$filename)) {
-            return $filename;
+// Student cannot modified their user conditions
+$extraConditions = api_get_configuration_value('show_conditions_to_user');
+if ($extraConditions && isset($extraConditions['conditions'])) {
+    $extraConditions = $extraConditions['conditions'];
+    foreach ($extraConditions as $condition) {
+        $element = $form->getElement('extra_'.$condition['variable']);
+        if ($element) {
+            $element->freeze();
         }
     }
-    return false; // this should be returned if anything went wrong with the upload
 }
 
-/**
- * Check current user's current password
- * @param    char    email
- * @return    bool true o false
- * @uses Gets user ID from global variable
- */
-function check_user_email($email)
-{
-    $user_id = api_get_user_id();
-    if ($user_id != strval(intval($user_id)) || empty($email)) {
-        return false;
-    }
-    $table_user = Database::get_main_table(TABLE_MAIN_USER);
-    $email = Database::escape_string($email);
-    $sql = "SELECT * FROM $table_user
-            WHERE user_id='".$user_id."' AND email='".$email."'";
-    $result = Database::query($sql);
-    return Database::num_rows($result) != 0;
-}
+$form->setDefaults($user_data);
 
 $filtered_extension = false;
 
@@ -546,7 +482,7 @@ if ($form->validate()) {
         }
     } elseif (!empty($user_data['remove_picture'])) {
         // remove existing picture if asked
-        UserManager::delete_user_picture(api_get_user_id());
+        UserManager::deleteUserPicture(api_get_user_id());
         $user_data['picture_uri'] = '';
     }
 
@@ -605,7 +541,7 @@ if ($form->validate()) {
         //ensure there is at least a http:// scheme in the URI provided
         $user_data['openid'] = 'http://'.$my_user_openid;
     }
-    $extras = array();
+    $extras = [];
 
     //Checking the user language
     $languages = api_get_languages();
@@ -618,7 +554,7 @@ if ($form->validate()) {
     $profile_list = api_get_setting('profile');
     //Adding missing variables
 
-    $available_values_to_modify = array();
+    $available_values_to_modify = [];
     foreach ($profile_list as $key => $status) {
         if ($status == 'true') {
             switch ($key) {
@@ -642,7 +578,7 @@ if ($form->validate()) {
     //Fixing missing variables
     $available_values_to_modify = array_merge(
         $available_values_to_modify,
-        array('competences', 'diplomas', 'openarea', 'teach', 'openid', 'address')
+        ['competences', 'diplomas', 'openarea', 'teach', 'openid', 'address']
     );
 
     // build SQL query
@@ -651,7 +587,7 @@ if ($form->validate()) {
 
     foreach ($user_data as $key => $value) {
         if (substr($key, 0, 6) === 'extra_') { //an extra field
-           continue;
+            continue;
         } elseif (strpos($key, 'remove_extra_') !== false) {
         } else {
             if (in_array($key, $available_values_to_modify)) {
@@ -693,7 +629,7 @@ if ($form->validate()) {
         $sql .= ", official_code = '".Database::escape_string($user_data['official_code'])."'";
     }
 
-    $sql .= " WHERE user_id  = '".api_get_user_id()."'";
+    $sql .= " WHERE id  = '".api_get_user_id()."'";
     Database::query($sql);
 
     if ($passwordWasChecked == false) {
@@ -739,7 +675,7 @@ if ($form->validate()) {
 // the header
 
 $actions = '';
-if (api_get_setting('allow_social_tool') !== 'true') {
+if ($allowSocialTool) {
     if (api_get_setting('extended_profile') === 'true') {
         if (api_get_setting('allow_message_tool') === 'true') {
             $actions .= '<a href="'.api_get_path(WEB_PATH).'main/social/profile.php">'.
@@ -773,7 +709,7 @@ if ($actions) {
 $customPagesEnabled = CustomPages::enabled();
 $customPageExists = CustomPages::exists(CustomPages::PROFILE);
 
-if (api_get_setting('allow_social_tool') === 'true') {
+if ($allowSocialTool) {
     SocialManager::setSocialUserBlock($tpl, api_get_user_id(), 'home');
     $socialUserBlock = SocialManager::setSocialUserBlock($tpl, api_get_user_id(), 'messages', 0, true, true);
 
@@ -818,10 +754,85 @@ if ($customPagesEnabled && $customPageExists) {
 }
 
 $imageToShow = '<div id="image-message-container">';
-$imageToShow .= '<a class="expand-image" href="'.$bigImage.'" /><img src="'.$normalImage.'"></a>';
+$imageToShow .= '<a class="expand-image pull-right" href="'.$bigImage.'" /><img src="'.$normalImage.'"></a>';
 $imageToShow .= '</div>';
 
 $content = $imageToShow.$form->returnForm();
 
 $tpl->assign('content', $content);
 $tpl->display_one_col_template();
+
+// Helper functions defined below this point
+
+/**
+ * Is user auth_source is platform ?
+ *
+ * @return bool Whether auth_source is 'platform' or not
+ */
+function is_platform_authentication()
+{
+    $tabUserInfo = api_get_user_info();
+
+    return $tabUserInfo['auth_source'] == PLATFORM_AUTH_SOURCE;
+}
+
+/**
+ * Can a user edit his/her profile?
+ *
+ * @return bool Whether the profile can be edited by the user or not
+ */
+function is_profile_editable()
+{
+    if (isset($GLOBALS['profileIsEditable'])) {
+        return (bool) $GLOBALS['profileIsEditable'];
+    }
+
+    return true;
+}
+
+/**
+ * Upload a submitted user production.
+ *
+ * @param int $userId User id
+ *
+ * @return mixed The filename of the new production or FALSE if the upload has failed
+ */
+function upload_user_production($userId)
+{
+    $productionRepository = UserManager::getUserPathById($userId, 'system');
+
+    if (!file_exists($productionRepository)) {
+        @mkdir($productionRepository, api_get_permissions_for_new_directories(), true);
+    }
+    $filename = api_replace_dangerous_char($_FILES['production']['name']);
+    $filename = disable_dangerous_file($filename);
+
+    if (filter_extension($filename)) {
+        if (@move_uploaded_file($_FILES['production']['tmp_name'], $productionRepository.$filename)) {
+            return $filename;
+        }
+    }
+
+    return false; // this should be returned if anything went wrong with the upload
+}
+
+/**
+ * Check current user's current password.
+ *
+ * @param string $email E-mail
+ *
+ * @return bool Whether this e-mail is already in use or not
+ */
+function check_user_email($email)
+{
+    $userId = api_get_user_id();
+    if ($userId != strval(intval($userId)) || empty($email)) {
+        return false;
+    }
+    $tableUser = Database::get_main_table(TABLE_MAIN_USER);
+    $email = Database::escape_string($email);
+    $sql = "SELECT * FROM $tableUser WHERE user_id = $userId AND email = '$email'";
+    $result = Database::query($sql);
+
+    return Database::num_rows($result) != 0;
+}

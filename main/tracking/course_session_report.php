@@ -2,16 +2,16 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * Report
+ * Report.
+ *
  * @package chamilo.tracking
  */
-
 $cidReset = true;
 require_once __DIR__.'/../inc/global.inc.php';
 
-$this_section = "session_my_space";
-
-$is_allowedToTrack = $is_courseAdmin || $is_platformAdmin || $is_session_general_coach || $is_sessionAdmin;
+$session_id = isset($_GET['session_id']) ? intval($_GET['session_id']) : null;
+$this_section = 'session_my_space';
+$is_allowedToTrack = Tracking::isAllowToTrack($session_id);
 
 if (!$is_allowedToTrack) {
     api_not_allowed(true);
@@ -28,7 +28,6 @@ if (api_is_platform_admin()) {
 }
 $global = true;
 
-$session_id = isset($_GET['session_id']) ? intval($_GET['session_id']) : null;
 if (empty($session_id)) {
     $session_id = 1;
 }
@@ -36,8 +35,8 @@ if (empty($session_id)) {
 $form = new FormValidator('search_simple', 'POST', '', '', null, false);
 
 //Get session list
-$session_list = SessionManager::get_sessions_list(array(), array('name'));
-$my_session_list = array();
+$session_list = SessionManager::get_sessions_list([], ['name']);
+$my_session_list = [];
 foreach ($session_list as $sesion_item) {
     $my_session_list[$sesion_item['id']] = $sesion_item['name'];
 }
@@ -61,7 +60,7 @@ if (!empty($_REQUEST['session_id'])) {
 if (empty($session_id)) {
     $session_id = key($my_session_list);
 }
-$form->setDefaults(array('session_id'=>$session_id));
+$form->setDefaults(['session_id' => $session_id]);
 $course_list = SessionManager::get_course_list_by_session_id($session_id);
 
 if (!$export_to_xls) {
@@ -88,17 +87,17 @@ if (!$export_to_xls) {
 }
 
 $users = SessionManager::get_users_by_session($session_id);
-$course_average = $course_average_counter = array();
+$course_average = $course_average_counter = [];
 
 $counter = 0;
-$main_result = array();
-//Getting course list
+$main_result = [];
+// Getting course list
 foreach ($course_list as $current_course) {
     $course_info = api_get_course_info($current_course['code']);
     $_course = $course_info;
-    $attempt_result = array();
+    $attempt_result = [];
 
-    //Getting LP list
+    // Getting LP list
     $list = new LearnpathList('', $current_course['code'], $session_id);
     $lp_list = $list->get_flat_list();
 
@@ -147,7 +146,6 @@ if (!empty($users) && is_array($users)) {
         $html_result .= "</td>";
 
         // Getting course list
-
         $counter = 0;
         $total_result_by_user = 0;
         foreach ($course_list as $current_course) {
@@ -180,7 +178,7 @@ if (!empty($users) && is_array($users)) {
             $total_average_score += $total_student;
             $total_average_score_count++;
         }
-        $string_date = Tracking :: get_last_connection_date($user['user_id'], true);
+        $string_date = Tracking::get_last_connection_date($user['user_id'], true);
         $html_result .= "<td>$total_student</td><td>$string_date</td></tr>";
     }
 
@@ -194,7 +192,7 @@ if (!empty($users) && is_array($users)) {
                 2
             );
         } else {
-            $average_per_course = '-';
+            $average_per_course = 0;
         }
         if (!empty($average_per_course)) {
             $counter++;
@@ -220,4 +218,4 @@ if (!$export_to_xls) {
     echo $html_result;
 }
 
-Display :: display_footer();
+Display::display_footer();

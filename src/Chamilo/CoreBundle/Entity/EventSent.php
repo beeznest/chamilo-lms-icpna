@@ -1,11 +1,12 @@
 <?php
+/* For licensing terms, see /license.txt */
 
 namespace Chamilo\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * EventSent
+ * EventSent.
  *
  * @ORM\Table(name="event_sent", indexes={@ORM\Index(name="event_name_index", columns={"event_type_name"})})
  * @ORM\Entity
@@ -15,41 +16,40 @@ class EventSent
     const TYPE_COURSE_CHAT_NOTIFICACTION = 'course_chat_notification';
 
     /**
-     * @var integer
+     * @var int
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    protected $id;
+
+    /**
+     * @var int
      *
      * @ORM\Column(name="user_from", type="integer", nullable=false)
      */
-    private $userFrom;
+    protected $userFrom;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="user_to", type="integer", nullable=true)
      */
-    private $userTo;
+    protected $userTo;
 
     /**
      * @var string
      *
      * @ORM\Column(name="event_type_name", type="string", length=100, nullable=true)
      */
-    private $eventTypeName;
+    protected $eventTypeName;
 
     /**
-     * @var integer
+     * Set userFrom.
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $id;
-
-
-
-    /**
-     * Set userFrom
+     * @param int $userFrom
      *
-     * @param integer $userFrom
      * @return EventSent
      */
     public function setUserFrom($userFrom)
@@ -60,9 +60,9 @@ class EventSent
     }
 
     /**
-     * Get userFrom
+     * Get userFrom.
      *
-     * @return integer
+     * @return int
      */
     public function getUserFrom()
     {
@@ -70,9 +70,10 @@ class EventSent
     }
 
     /**
-     * Set userTo
+     * Set userTo.
      *
-     * @param integer $userTo
+     * @param int $userTo
+     *
      * @return EventSent
      */
     public function setUserTo($userTo)
@@ -83,9 +84,9 @@ class EventSent
     }
 
     /**
-     * Get userTo
+     * Get userTo.
      *
-     * @return integer
+     * @return int
      */
     public function getUserTo()
     {
@@ -93,9 +94,10 @@ class EventSent
     }
 
     /**
-     * Set eventTypeName
+     * Set eventTypeName.
      *
      * @param string $eventTypeName
+     *
      * @return EventSent
      */
     public function setEventTypeName($eventTypeName)
@@ -106,7 +108,7 @@ class EventSent
     }
 
     /**
-     * Get eventTypeName
+     * Get eventTypeName.
      *
      * @return string
      */
@@ -116,9 +118,9 @@ class EventSent
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {

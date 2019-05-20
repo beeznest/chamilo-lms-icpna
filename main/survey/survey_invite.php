@@ -3,16 +3,17 @@
 
 /**
  * @package chamilo.survey
+ *
  * @author unknown, the initial survey that did not make it in 1.8 because of bad code
  * @author Patrick Cool <patrick.cool@UGent.be>, Ghent University: cleanup, refactoring and rewriting large parts of the code
  * @author Julio Montoya Chamilo: cleanup, refactoring, security improvements
+ *
  * @version $Id: survey_invite.php 10680 2007-01-11 21:26:23Z pcool $
  *
  * @todo checking if the additional emails are valid (or add a rule for this)
  * @todo check if the mailtext contains the **link** part, if not, add the link to the end
  * @todo add rules: title and text cannot be empty
  */
-
 require_once __DIR__.'/../inc/global.inc.php';
 
 $this_section = SECTION_COURSES;
@@ -22,9 +23,10 @@ if (!api_is_allowed_to_edit(false, true)) {
 }
 
 $course_id = api_get_course_int_id();
+$_course = api_get_course_info();
 
 // Getting the survey information
-$survey_id = Security::remove_XSS($_GET['survey_id']);
+$survey_id = (int) $_GET['survey_id'];
 $survey_data = SurveyManager::get_survey($survey_id);
 if (empty($survey_data)) {
     api_not_allowed(true);
@@ -43,20 +45,27 @@ if (api_strlen(strip_tags($survey_data['title'])) > 40) {
 }
 
 // Breadcrumbs
-$interbreadcrumb[] = array(
-    'url' => api_get_path(WEB_CODE_PATH).'survey/survey_list.php',
-    'name' => get_lang('SurveyList')
-);
+$interbreadcrumb[] = [
+    'url' => api_get_path(WEB_CODE_PATH).'survey/survey_list.php?'.api_get_cidreq(),
+    'name' => get_lang('SurveyList'),
+];
 if (api_is_course_admin()) {
-    $interbreadcrumb[] = array(
-        'url' => api_get_path(WEB_CODE_PATH).'survey/survey.php?survey_id='.$survey_id.'&'.api_get_cidreq(),
-        'name' => $urlname,
-    );
+    if ($survey_data['survey_type'] == 3) {
+        $interbreadcrumb[] = [
+            'url' => api_get_path(WEB_CODE_PATH).'survey/meeting.php?survey_id='.$survey_id.'&'.api_get_cidreq(),
+            'name' => $urlname,
+        ];
+    } else {
+        $interbreadcrumb[] = [
+            'url' => api_get_path(WEB_CODE_PATH).'survey/survey.php?survey_id='.$survey_id.'&'.api_get_cidreq(),
+            'name' => $urlname,
+        ];
+    }
 } else {
-    $interbreadcrumb[] = array(
+    $interbreadcrumb[] = [
         'url' => api_get_path(WEB_CODE_PATH).'survey/survey_invite.php?survey_id='.$survey_id.'&'.api_get_cidreq(),
         'name' => $urlname,
-    );
+    ];
 }
 $tool_name = get_lang('SurveyPublication');
 
@@ -82,10 +91,15 @@ if (Database::num_rows($result) > 1) {
 
 // Invited / answered message
 if ($survey_data['invited'] > 0 && !isset($_POST['submit'])) {
-    $message  = '<a href="'.api_get_path(WEB_CODE_PATH).'survey/survey_invitation.php?view=answered&survey_id='.$survey_data['survey_id'].'">'.$survey_data['answered'].'</a> ';
-    $message .= get_lang('HaveAnswered').' ';
-    $message .= '<a href="'.api_get_path(WEB_CODE_PATH).'survey/survey_invitation.php?view=invited&survey_id='.$survey_data['survey_id'].'">'.$survey_data['invited'].'</a> ';
-    $message .= get_lang('WereInvited');
+    $message = Display::url(
+        $survey_data['answered'],
+        api_get_path(WEB_CODE_PATH).'survey/survey_invitation.php?view=answered&survey_id='.$survey_data['survey_id'].'&'.api_get_cidreq()
+    );
+    $message .= ' '.get_lang('HaveAnswered').' ';
+    $message .= Display::url(
+        $survey_data['invited'],
+        api_get_path(WEB_CODE_PATH).'survey/survey_invitation.php?view=invited&survey_id='.$survey_data['survey_id'].'&'.api_get_cidreq());
+    $message .= ' '.get_lang('WereInvited');
     echo Display::return_message($message, 'normal', false);
 }
 
@@ -104,30 +118,22 @@ $complete_user_list = CourseManager::get_user_list_from_course_code(
     '',
     api_sort_by_first_name() ? 'ORDER BY firstname' : 'ORDER BY lastname'
 );
-$possible_users = array();
-foreach ($complete_user_list as & $user) {
+$possible_users = [];
+foreach ($complete_user_list as &$user) {
     $possible_users[$user['user_id']] = api_get_person_name(
         $user['firstname'],
         $user['lastname']
     );
 }
 
-CourseManager::addUserGroupMultiSelect($form, array());
-
-/*$form->addElement(
-    'advmultiselect',
-    'course_users',
-    get_lang('CourseUsers'),
-    $possible_users,
-    'style="width: 250px; height: 200px;"'
-);*/
+CourseManager::addUserGroupMultiSelect($form, []);
 
 // Additional users
 $form->addElement(
     'textarea',
     'additional_users',
-    array(get_lang('AdditonalUsers'), get_lang('AdditonalUsersComment')),
-    array('rows' => 5)
+    [get_lang('AdditonalUsers'), get_lang('AdditonalUsersComment')],
+    ['rows' => 5]
 );
 
 $form->addElement('html', '<div id="check_mail">');
@@ -140,25 +146,21 @@ $form->addText('mail_title', get_lang('MailTitle'), false);
 // The text of the mail
 $form->addHtmlEditor(
     'mail_text',
-    array(get_lang('MailText'), get_lang('UseLinkSyntax')),
+    [get_lang('MailText'), get_lang('UseLinkSyntax')],
     false,
-    array('ToolbarSet' => 'Survey', 'Height' => '150')
+    ['ToolbarSet' => 'Survey', 'Height' => '150']
 );
 $form->addElement('html', '</div>');
 // You cab send a reminder to unanswered people if the survey is not anonymous
-if ($survey_data['anonymous'] != 1) {
+if ($survey_data['anonymous'] != 1 || api_get_configuration_value('survey_anonymous_show_answered')) {
     $form->addElement('checkbox', 'remindUnAnswered', '', get_lang('RemindUnanswered'));
 }
 // Allow resending to all selected users
 $form->addElement('checkbox', 'resend_to_all', '', get_lang('ReminderResendToAllUsers'));
+$form->addElement('checkbox', 'hide_link', '', get_lang('HideSurveyInvitationLink'));
 
 // Submit button
 $form->addButtonSave(get_lang('PublishSurvey'));
-// The rules (required fields)
-/*if ($survey_data['send_mail'] == 0) {
-    $form->addRule('mail_title', get_lang('ThisFieldIsRequired'), 'required');
-    $form->addRule('mail_text', get_lang('ThisFieldIsRequired'), 'required');
-}*/
 $portal_url = api_get_path(WEB_PATH);
 if (api_is_multiple_url_enabled()) {
     $access_url_id = api_get_current_access_url_id();
@@ -169,7 +171,12 @@ if (api_is_multiple_url_enabled()) {
 }
 
 // Show the URL that can be used by users to fill a survey without invitation
-$auto_survey_link = $portal_url.'main/survey/fillsurvey.php?course='.$_course['sysCode'].'&invitationcode=auto&scode='.$survey_data['survey_code'];
+$auto_survey_link = SurveyUtil::generateFillSurveyLink(
+    'auto',
+    $_course,
+    $survey_data['session_id'],
+    $survey_data['survey_code']
+);
 
 $form->addElement('label', null, get_lang('AutoInviteLink'));
 $form->addElement('label', null, $auto_survey_link);
@@ -180,6 +187,8 @@ if ($form->validate()) {
     $resendAll = isset($values['resend_to_all']) ? $values['resend_to_all'] : '';
     $sendMail = isset($values['send_mail']) ? $values['send_mail'] : '';
     $remindUnAnswered = isset($values['remindUnAnswered']) ? $values['remindUnAnswered'] : '';
+    $users = isset($values['users']) ? $values['users'] : [];
+    $hideLink = isset($values['hide_link']) && $values['hide_link'] ? true : false;
 
     if ($sendMail) {
         if (empty($values['mail_title']) || empty($values['mail_text'])) {
@@ -197,9 +206,11 @@ if ($form->validate()) {
             $defaults['send_mail'] = 1;
             $form->setDefaults($defaults);
             $form->display();
+
             return;
         }
     }
+
     // Save the invitation mail
     SurveyUtil::save_invite_mail(
         $values['mail_text'],
@@ -209,12 +220,14 @@ if ($form->validate()) {
 
     // Saving the invitations for the course users
     $count_course_users = SurveyUtil::saveInvitations(
-        $values['users'],
+        $users,
         $values['mail_title'],
         $values['mail_text'],
         $resendAll,
         $sendMail,
-        $remindUnAnswered
+        $remindUnAnswered,
+        false,
+        $hideLink
     );
 
     // Saving the invitations for the additional users
@@ -231,18 +244,20 @@ if ($form->validate()) {
         $values['mail_text'],
         $resendAll,
         $sendMail,
-        $remindUnAnswered
+        $remindUnAnswered,
+        true
     );
 
     // Updating the invited field in the survey table
     // Counting the number of people that are invited
     $total_invited = SurveyUtil::update_count_invited($survey_data['code']);
     $total_count = $count_course_users + $counter_additional_users;
+    $invitationUrl = api_get_path(WEB_CODE_PATH).'survey/survey_invitation.php?survey_id='.$survey_data['survey_id'].'&'.api_get_cidreq();
     if ($total_invited > 0) {
-        $message  = '<a href="'.api_get_path(WEB_CODE_PATH).'survey/survey_invitation.php?view=answered&survey_id='.$survey_data['survey_id'].'">'.
+        $message = '<a href="'.$invitationUrl.'&view=answered">'.
             $survey_data['answered'].'</a> ';
         $message .= get_lang('HaveAnswered').' ';
-        $message .= '<a href="'.api_get_path(WEB_CODE_PATH).'survey/survey_invitation.php?view=invited&survey_id='.$survey_data['survey_id'].'">'.
+        $message .= '<a href="'.$invitationUrl.'&view=invited">'.
             $total_invited.'</a> ';
         $message .= get_lang('WereInvited');
         echo Display::return_message($message, 'normal', false);
@@ -265,4 +280,4 @@ if ($form->validate()) {
     $form->setDefaults($defaults);
     $form->display();
 }
-Display :: display_footer();
+Display::display_footer();

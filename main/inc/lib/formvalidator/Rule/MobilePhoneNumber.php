@@ -1,24 +1,24 @@
 <?php
+/* For licensing terms, see /license.txt */
 
 /**
- * Abstract base class for QuickForm validation rules
+ * Abstract base class for QuickForm validation rules.
  */
 
 /**
- * Validate telephones
- *
+ * Validate telephones.
  */
 class HTML_QuickForm_Rule_Mobile_Phone_Number extends HTML_QuickForm_Rule
 {
-
     /**
-     * Validates mobile phone number
+     * Validates mobile phone number.
      *
      * @param string Mobile phone number to be validated
      * @param string Not using it. Just to respect the declaration
-     * @return boolean Returns true if valid, false otherwise.
+     *
+     * @return bool returns true if valid, false otherwise
      */
-    function validate($mobilePhoneNumber, $options = null)
+    public function validate($mobilePhoneNumber, $options = null)
     {
         $rule = "/^\d{9,15}$/";
         return preg_match($rule, $mobilePhoneNumber);

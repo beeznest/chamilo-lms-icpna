@@ -2,15 +2,16 @@
 /* For licensing terms, see /license.txt */
 
 /**
- *	This script displays an area where teachers can edit the group properties and member list.
- *	Groups are also often called "teams" in the Dokeos code.
+ * This script displays an area where teachers can edit the group properties and member list.
+ * Groups are also often called "teams" in the Dokeos code.
  *
- *	@author various contributors
- *	@author Roan Embrechts (VUB), partial code cleanup, initial virtual course support
- *	@package chamilo.group
- *	@todo course admin functionality to create groups based on who is in which course (or class).
+ * @author various contributors
+ * @author Roan Embrechts (VUB), partial code cleanup, initial virtual course support
+ *
+ * @package chamilo.group
+ *
+ * @todo course admin functionality to create groups based on who is in which course (or class).
  */
-
 require_once __DIR__.'/../inc/global.inc.php';
 $this_section = SECTION_COURSES;
 $current_course_tool = TOOL_GROUP;
@@ -22,8 +23,8 @@ $group_id = api_get_group_id();
 $current_group = GroupManager::get_group_properties($group_id);
 
 $nameTools = get_lang('EditGroup');
-$interbreadcrumb[] = array('url' => 'group.php?'.api_get_cidreq(), 'name' => get_lang('Groups'));
-$interbreadcrumb[] = array('url' => 'group_space.php?'.api_get_cidreq(), 'name' => $current_group['name']);
+$interbreadcrumb[] = ['url' => 'group.php?'.api_get_cidreq(), 'name' => get_lang('Groups')];
+$interbreadcrumb[] = ['url' => 'group_space.php?'.api_get_cidreq(), 'name' => $current_group['name']];
 
 $is_group_member = GroupManager::is_tutor_of_group(api_get_user_id(), $current_group);
 
@@ -34,7 +35,7 @@ if (!api_is_allowed_to_edit(false, true) && !$is_group_member) {
 /*	FUNCTIONS */
 
 /**
- *  List all users registered to the course
+ *  List all users registered to the course.
  */
 function search_members_keyword($firstname, $lastname, $username, $official_code, $keyword)
 {
@@ -51,7 +52,7 @@ function search_members_keyword($firstname, $lastname, $username, $official_code
 
 /**
  * Function to sort users after getting the list in the DB.
- * Necessary because there are 2 or 3 queries. Called by usort()
+ * Necessary because there are 2 or 3 queries. Called by usort().
  */
 function sort_users($user_a, $user_b)
 {
@@ -98,7 +99,7 @@ function sort_users($user_a, $user_b)
 }
 
 $htmlHeadXtra[] = '<script>
-$(document).ready( function() {
+$(function() {
     $("#max_member").on("focus", function() {
         $("#max_member_selected").attr("checked", true);
     });
@@ -112,13 +113,17 @@ $form->addElement('hidden', 'action');
 // Group tutors
 $group_tutor_list = GroupManager::get_subscribed_tutors($current_group);
 
-$selected_tutors = array();
+$selected_tutors = [];
 foreach ($group_tutor_list as $index => $user) {
     $selected_tutors[] = $user['user_id'];
 }
 
-$complete_user_list = GroupManager::fill_groups_list($current_group);
-$possible_users = array();
+$complete_user_list = CourseManager::get_user_list_from_course_code(
+    api_get_course_id(),
+    api_get_session_id()
+);
+
+$possible_users = [];
 $userGroup = new UserGroup();
 
 $subscribedUsers = GroupManager::get_subscribed_users($current_group);
@@ -146,16 +151,16 @@ if (!empty($complete_user_list)) {
             }
 
             $name = api_get_person_name(
-                    $user['firstname'],
-                    $user['lastname']
-                ).' ('.$user['username'].')'.$officialCode;
+                $user['firstname'],
+                $user['lastname']
+            ).' ('.$user['username'].')'.$officialCode;
 
             if ($orderUserListByOfficialCode === 'true') {
                 $officialCode = !empty($user['official_code']) ? $user['official_code']." - " : '? - ';
                 $name = $officialCode.' '.api_get_person_name(
-                        $user['firstname'],
-                        $user['lastname']
-                    ).' ('.$user['username'].')';
+                    $user['firstname'],
+                    $user['lastname']
+                ).' ('.$user['username'].')';
             }
 
             $possible_users[$user['user_id']] = $name.$groupNameListToString;

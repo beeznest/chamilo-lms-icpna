@@ -5,10 +5,11 @@ use Chamilo\CourseBundle\Component\CourseCopy\CourseBuilder;
 use Chamilo\CourseBundle\Component\CourseCopy\CourseSelectForm;
 
 /**
- * Special exports
+ * Special exports.
  *
  * @author Jhon Hinojosa
  * @author Julio Montoya Fixing pclzip folder + some clean <gugli100@gmail.com>
+ *
  * @package chamilo.include.export
  */
 
@@ -17,18 +18,14 @@ $cidReset = true;
 require_once __DIR__.'/../inc/global.inc.php';
 
 $this_section = SECTION_PLATFORM_ADMIN;
-$interbreadcrumb[] = array("url" => 'index.php', "name" => get_lang('PlatformAdmin'));
+$interbreadcrumb[] = ["url" => 'index.php', "name" => get_lang('PlatformAdmin')];
 // Access restrictions
 api_protect_admin_script(true);
 $nameTools = get_lang('SpecialExports');
 $export = '';
 $querypath = '';
 
-// include additional libraries
-if (function_exists('ini_set')) {
-    api_set_memory_limit('256M');
-    ini_set('max_execution_time', 0);
-}
+api_set_more_memory_and_time_limits();
 
 // Displaying the header
 Display::display_header($nameTools);
@@ -52,7 +49,7 @@ if ((isset($_POST['action']) && $_POST['action'] == 'course_select_form') ||
         $to_group_id = 0;
         $sql_session = "SELECT id, name FROM $tbl_session ";
         $query_session = Database::query($sql_session);
-        $ListSession = array();
+        $ListSession = [];
         while ($rows_session = Database::fetch_assoc($query_session)) {
             $ListSession[$rows_session['id']] = $rows_session['name'];
         }
@@ -192,13 +189,13 @@ function create_zip()
         closedir($handle);
     }
     $temp_zip_file = $temp_zip_dir."/".md5(time()).".zip"; //create zipfile of given directory
-    return array(
+    return [
         'PATH' => $path,
         'PATH_TEMP_ARCHIVE' => $temp_zip_dir,
         'PATH_COURSE' => $sys_course_path,
         'TEMP_FILE_ZIP' => $temp_zip_file,
-        'PATH_REMOVE' => $remove_dir
-    );
+        'PATH_REMOVE' => $remove_dir,
+    ];
 }
 
 function rename_zip($FileZip)
@@ -218,7 +215,6 @@ function rename_zip($FileZip)
     } else {
         return false;
     }
-
 }
 
 function fullexportspecial()
@@ -228,7 +224,6 @@ function fullexportspecial()
     $to_group_id = 0;
     $zip_folder = new PclZip($FileZip['TEMP_FILE_ZIP']);
     $list_course = CourseManager::get_course_list();
-
     $tbl_document = Database::get_course_table(TABLE_DOCUMENT);
     $tbl_property = Database::get_course_table(TABLE_ITEM_PROPERTY);
 
@@ -263,7 +258,8 @@ function fullexportspecial()
                     $FileZip['PATH_COURSE'].$_course['directory']."/document".$rows_course_file['path'],
                     PCLZIP_OPT_ADD_PATH,
                     $_course['directory'],
-                    PCLZIP_OPT_REMOVE_PATH, $FileZip['PATH_COURSE'].$_course['directory']."/document".$FileZip['PATH_REMOVE']
+                    PCLZIP_OPT_REMOVE_PATH,
+                    $FileZip['PATH_COURSE'].$_course['directory']."/document".$FileZip['PATH_REMOVE']
                 );
             }
 
@@ -276,7 +272,8 @@ function fullexportspecial()
             $query_session = Database::query($sql);
             while ($rows_session = Database::fetch_assoc($query_session)) {
                 $session_id = $rows_session['id'];
-                $sql_session_doc = "SELECT path FROM $tbl_document AS docs, $tbl_property AS props
+                $sql_session_doc = "SELECT path 
+                    FROM $tbl_document AS docs, $tbl_property AS props
                     WHERE props.tool='".TOOL_DOCUMENT."'
                         AND docs.id=props.ref
                         AND docs.path LIKE '".$querypath."/%'
@@ -312,6 +309,7 @@ function fullexportspecial()
     } else {
         echo Display::return_message(get_lang('ErrorMsgSpecialExport'), 'error'); //main API
         $export = false;
+
         return false;
     }
 }

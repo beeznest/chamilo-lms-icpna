@@ -7,7 +7,9 @@ use ChamiloSession as Session;
  * This script contains the server part of the xajax interaction process. The client part is located
  * in lp_api.php or other api's.
  * This is a first attempt at using xajax and AJAX in general, so the code might be a bit unsettling.
+ *
  * @package chamilo.learnpath
+ *
  * @author Yannick Warnier <ywarnier@beeznest.org>
  */
 
@@ -16,16 +18,17 @@ $use_anonymous = true;
 require_once __DIR__.'/../inc/global.inc.php';
 
 /**
- * Get one item's details
- * @param   integer LP ID
- * @param   integer user ID
- * @param   integer View ID
- * @param   integer Current item ID
- * @param   integer New item ID
+ * Get one item's details.
+ *
+ * @param   int LP ID
+ * @param   int user ID
+ * @param   int View ID
+ * @param   int Current item ID
+ * @param   int New item ID
  */
 function switch_item_details($lp_id, $user_id, $view_id, $current_item, $next_item)
 {
-    $debug  = 0;
+    $debug = 0;
     $return = '';
     if ($debug > 0) {
         error_log(
@@ -49,7 +52,7 @@ function switch_item_details($lp_id, $user_id, $view_id, $current_item, $next_it
             $mylp->next();
             $new_item_id = $mylp->get_current_item_id();
             if ($debug > 1) {
-                error_log('In {next} - next item is '.$new_item_id.'(current: '.$current_item.')', 0);
+                error_log('In {next} - next item is '.$new_item_id.'(current: '.$current_item.')');
             }
             break;
         case 'previous':
@@ -57,7 +60,7 @@ function switch_item_details($lp_id, $user_id, $view_id, $current_item, $next_it
             $mylp->previous();
             $new_item_id = $mylp->get_current_item_id();
             if ($debug > 1) {
-                error_log('In {previous} - next item is '.$new_item_id.'(current: '.$current_item.')', 0);
+                error_log('In {previous} - next item is '.$new_item_id.'(current: '.$current_item.')');
             }
             break;
         case 'first':
@@ -65,7 +68,7 @@ function switch_item_details($lp_id, $user_id, $view_id, $current_item, $next_it
             $mylp->first();
             $new_item_id = $mylp->get_current_item_id();
             if ($debug > 1) {
-                error_log('In {first} - next item is '.$new_item_id.'(current: '.$current_item.')', 0);
+                error_log('In {first} - next item is '.$new_item_id.'(current: '.$current_item.')');
             }
             break;
         case 'last':
@@ -79,7 +82,7 @@ function switch_item_details($lp_id, $user_id, $view_id, $current_item, $next_it
             $new_item_id = $next_item;
             $mylp->set_current_item($new_item_id);
             if ($debug > 1) {
-                error_log('In {default} - next item is '.$new_item_id.'(current: '.$current_item.')', 0);
+                error_log('In {default} - next item is '.$new_item_id.'(current: '.$current_item.')');
             }
             break;
     }
@@ -107,30 +110,32 @@ function switch_item_details($lp_id, $user_id, $view_id, $current_item, $next_it
      * -suspend_data
      */
     $myscore = $mylpi->get_score();
-    $mymax   = $mylpi->get_max();
+    $mymax = $mylpi->get_max();
     if ($mymax === '') {
         $mymax = "''";
     }
-    $mymin              = $mylpi->get_min();
-    $mylesson_status    = $mylpi->get_status();
-    $mylesson_location  = $mylpi->get_lesson_location();
-    $mytotal_time       = $mylpi->get_scorm_time('js');
-    $mymastery_score    = $mylpi->get_mastery_score();
+    $mymin = $mylpi->get_min();
+    $mylesson_status = $mylpi->get_status();
+    $mylesson_location = $mylpi->get_lesson_location();
+    $mytotal_time = $mylpi->get_scorm_time('js');
+    $mymastery_score = $mylpi->get_mastery_score();
     $mymax_time_allowed = $mylpi->get_max_time_allowed();
-    $mylaunch_data      = $mylpi->get_launch_data();
+    $mylaunch_data = $mylpi->get_launch_data();
     /*
     if ($mylpi->get_type() == 'asset') {
-        // Temporary measure to save completion of an asset. Later on, Chamilo should trigger something on unload, maybe... (even though that would mean the last item cannot be completed)
+        // Temporary measure to save completion of an asset. Later on,
+        // Chamilo should trigger something on unload, maybe...
+        // (even though that would mean the last item cannot be completed)
         $mylesson_status = 'completed';
         $mylpi->set_status('completed');
         $mylpi->save();
     }
     */
-    $mysession_time    = $mylpi->get_total_time();
-    $mysuspend_data    = $mylpi->get_suspend_data();
+    $mysession_time = $mylpi->get_total_time();
+    $mysuspend_data = $mylpi->get_suspend_data();
     $mylesson_location = $mylpi->get_lesson_location();
-    $myic              = $mylpi->get_interactions_count();
-    $myistring         = '';
+    $myic = $mylpi->get_interactions_count();
+    $myistring = '';
     for ($i = 0; $i < $myic; $i++) {
         $myistring .= ",[".$i.",'','','','','','','']";
     }
@@ -185,7 +190,7 @@ function switch_item_details($lp_id, $user_id, $view_id, $current_item, $next_it
     $mycredit = $mylpi->get_credit();
     $mylaunch_data = $mylpi->get_launch_data();
     $myinteractions_count = $mylpi->get_interactions_count();
-    $myobjectives_count = $mylpi->get_objectives_count();
+    //$myobjectives_count = $mylpi->get_objectives_count();
     $mycore_exit = $mylpi->get_core_exit();
 
     $return .=
@@ -212,10 +217,66 @@ function switch_item_details($lp_id, $user_id, $view_id, $current_item, $next_it
         "olms.lms_item_core_exit = '".$mycore_exit."';".
         "olms.asset_timer = 0;";
 
-    $return .= "update_toc('unhighlight','".$current_item."');".
+    $updateMinTime = '';
+    if (Tracking::minimunTimeAvailable(api_get_session_id(), api_get_course_int_id())) {
+        $timeLp = $mylp->getAccumulateWorkTime();
+        $timeTotalCourse = $mylp->getAccumulateWorkTimeTotalCourse();
+        // Minimum connection percentage
+        $perc = 100;
+        // Time from the course
+        $tc = $timeTotalCourse;
+        $sessionId = api_get_session_id();
+        if (!empty($sessionId) && $sessionId != 0) {
+            /*$sql = "SELECT hours, perc FROM plugin_licences_course_session WHERE session_id = $sessionId";
+            $res = Database::query($sql);
+            if (Database::num_rows($res) > 0) {
+                $aux = Database::fetch_assoc($res);
+                $perc = $aux['perc'];
+                $tc = $aux['hours'] * 60;
+            }*/
+        }
+
+        // Percentage of the learning paths
+        $pl = 0;
+        if (!empty($timeTotalCourse)) {
+            $pl = $timeLp / $timeTotalCourse;
+        }
+
+        // Minimum time for each learning path
+        $time_total = intval($pl * $tc * $perc / 100) * 60;
+
+        //$time_total = $mylp->getAccumulateWorkTime() * 60;
+        /*$lpTime = Tracking::get_time_spent_in_lp(
+            $user_id,
+            api_get_course_id(),
+            [$lp_id],
+            api_get_session_id()
+        );*/
+
+        $lpTimeList = Tracking::getCalculateTime($user_id, api_get_course_int_id(), api_get_session_id());
+        $lpTime = isset($lpTimeList[TOOL_LEARNPATH][$lp_id]) ? $lpTimeList[TOOL_LEARNPATH][$lp_id] : 0;
+
+        if ($lpTime >= $time_total) {
+            $time_spent = $time_total;
+        } else {
+            $time_spent = $lpTime;
+        }
+
+        $hour = (intval($lpTime / 3600)) < 10 ? '0'.intval($lpTime / 3600) : intval($lpTime / 3600);
+        $minute = date('i', $lpTime);
+        $second = date('s', $lpTime);
+        $updateMinTime = "update_time_bar('$time_spent','$time_total','%');".
+                         "update_chronometer('$hour','$minute','$second');";
+    }
+
+    $return .=
+        "update_toc('unhighlight','".$current_item."');".
         "update_toc('highlight','".$new_item_id."');".
         "update_toc('$mylesson_status','".$new_item_id."');".
-        "update_progress_bar('$mycomplete','$mytotal','$myprogress_mode');";
+        "update_progress_bar('$mycomplete','$mytotal','$myprogress_mode');".
+        $updateMinTime
+    ;
+
     $return .= 'updateGamificationValues(); ';
 
     $mylp->set_error_msg('');
@@ -226,6 +287,7 @@ function switch_item_details($lp_id, $user_id, $view_id, $current_item, $next_it
     // Save the new item ID for the exercise tool to use.
     Session::write('scorm_item_id', $new_item_id);
     Session::write('lpobject', serialize($mylp));
+    Session::write('oLP', $mylp);
 
     return $return;
 }

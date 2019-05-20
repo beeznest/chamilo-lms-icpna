@@ -6,7 +6,7 @@ namespace Chamilo\CourseBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CQuizQuestion
+ * CQuizQuestion.
  *
  * @ORM\Table(
  *  name="c_quiz_question",
@@ -20,90 +20,90 @@ use Doctrine\ORM\Mapping as ORM;
 class CQuizQuestion
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="iid", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $iid;
+    protected $iid;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer")
      */
-    private $cId;
+    protected $cId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer", nullable=true)
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
      *
      * @ORM\Column(name="question", type="text", nullable=false)
      */
-    private $question;
+    protected $question;
 
     /**
      * @var string
      *
      * @ORM\Column(name="description", type="text", nullable=true)
      */
-    private $description;
+    protected $description;
 
     /**
      * @var float
      *
      * @ORM\Column(name="ponderation", type="float", precision=6, scale=2, nullable=false, options={"default": 0})
      */
-    private $ponderation;
+    protected $ponderation;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="position", type="integer", nullable=false)
      */
-    private $position;
+    protected $position;
 
     /**
      * @var int
      *
      * @ORM\Column(name="type", type="integer", nullable=false)
      */
-    private $type;
+    protected $type;
 
     /**
      * @var string
      *
      * @ORM\Column(name="picture", type="string", length=50, nullable=true)
      */
-    private $picture;
+    protected $picture;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="level", type="integer", nullable=false)
      */
-    private $level;
+    protected $level;
 
     /**
      * @var string
      *
      * @ORM\Column(name="extra", type="string", length=255, nullable=true)
      */
-    private $extra;
+    protected $extra;
 
     /**
      * @var string
      *
      * @ORM\Column(name="question_code", type="string", length=10, nullable=true)
      */
-    private $questionCode;
+    protected $questionCode;
 
     /**
      * @var int
@@ -121,9 +121,10 @@ class CQuizQuestion
     }
 
     /**
-     * Set question
+     * Set question.
      *
      * @param string $question
+     *
      * @return CQuizQuestion
      */
     public function setQuestion($question)
@@ -134,7 +135,7 @@ class CQuizQuestion
     }
 
     /**
-     * Get question
+     * Get question.
      *
      * @return string
      */
@@ -144,9 +145,10 @@ class CQuizQuestion
     }
 
     /**
-     * Set description
+     * Set description.
      *
      * @param string $description
+     *
      * @return CQuizQuestion
      */
     public function setDescription($description)
@@ -157,7 +159,7 @@ class CQuizQuestion
     }
 
     /**
-     * Get description
+     * Get description.
      *
      * @return string
      */
@@ -167,9 +169,10 @@ class CQuizQuestion
     }
 
     /**
-     * Set ponderation
+     * Set ponderation.
      *
      * @param float $ponderation
+     *
      * @return CQuizQuestion
      */
     public function setPonderation($ponderation)
@@ -180,7 +183,7 @@ class CQuizQuestion
     }
 
     /**
-     * Get ponderation
+     * Get ponderation.
      *
      * @return float
      */
@@ -190,9 +193,10 @@ class CQuizQuestion
     }
 
     /**
-     * Set position
+     * Set position.
      *
-     * @param integer $position
+     * @param int $position
+     *
      * @return CQuizQuestion
      */
     public function setPosition($position)
@@ -203,9 +207,9 @@ class CQuizQuestion
     }
 
     /**
-     * Get position
+     * Get position.
      *
-     * @return integer
+     * @return int
      */
     public function getPosition()
     {
@@ -213,9 +217,10 @@ class CQuizQuestion
     }
 
     /**
-     * Set type
+     * Set type.
      *
      * @param int $type
+     *
      * @return CQuizQuestion
      */
     public function setType($type)
@@ -226,7 +231,7 @@ class CQuizQuestion
     }
 
     /**
-     * Get type
+     * Get type.
      *
      * @return int
      */
@@ -236,9 +241,10 @@ class CQuizQuestion
     }
 
     /**
-     * Set picture
+     * Set picture.
      *
      * @param string $picture
+     *
      * @return CQuizQuestion
      */
     public function setPicture($picture)
@@ -249,7 +255,7 @@ class CQuizQuestion
     }
 
     /**
-     * Get picture
+     * Get picture.
      *
      * @return string
      */
@@ -259,9 +265,10 @@ class CQuizQuestion
     }
 
     /**
-     * Set level
+     * Set level.
      *
-     * @param integer $level
+     * @param int $level
+     *
      * @return CQuizQuestion
      */
     public function setLevel($level)
@@ -272,9 +279,9 @@ class CQuizQuestion
     }
 
     /**
-     * Get level
+     * Get level.
      *
-     * @return integer
+     * @return int
      */
     public function getLevel()
     {
@@ -282,9 +289,10 @@ class CQuizQuestion
     }
 
     /**
-     * Set extra
+     * Set extra.
      *
      * @param string $extra
+     *
      * @return CQuizQuestion
      */
     public function setExtra($extra)
@@ -295,7 +303,7 @@ class CQuizQuestion
     }
 
     /**
-     * Get extra
+     * Get extra.
      *
      * @return string
      */
@@ -305,9 +313,10 @@ class CQuizQuestion
     }
 
     /**
-     * Set questionCode
+     * Set questionCode.
      *
      * @param string $questionCode
+     *
      * @return CQuizQuestion
      */
     public function setQuestionCode($questionCode)
@@ -318,7 +327,7 @@ class CQuizQuestion
     }
 
     /**
-     * Get questionCode
+     * Get questionCode.
      *
      * @return string
      */
@@ -328,9 +337,10 @@ class CQuizQuestion
     }
 
     /**
-     * Set id
+     * Set id.
      *
-     * @param integer $id
+     * @param int $id
+     *
      * @return CQuizQuestion
      */
     public function setId($id)
@@ -341,9 +351,9 @@ class CQuizQuestion
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -351,9 +361,10 @@ class CQuizQuestion
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return CQuizQuestion
      */
     public function setCId($cId)
@@ -364,9 +375,9 @@ class CQuizQuestion
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {
@@ -374,7 +385,8 @@ class CQuizQuestion
     }
 
     /**
-     * Get iid
+     * Get iid.
+     *
      * @return int
      */
     public function getIid()

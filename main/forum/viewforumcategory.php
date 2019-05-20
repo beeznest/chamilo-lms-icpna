@@ -2,6 +2,7 @@
 /* For licensing terms, see /license.txt */
 
 use Chamilo\CourseBundle\Entity\CForumPost;
+use ChamiloSession as Session;
 
 /**
  * These files are a complete rework of the forum. The database structure is
@@ -15,7 +16,7 @@ use Chamilo\CourseBundle\Entity\CForumPost;
  *                      multiple forums per group
  * - sticky messages
  * - new view option: nested view
- * - quoting a message
+ * - quoting a message.
  *
  * @Author Patrick Cool <patrick.cool@UGent.be>, Ghent University
  * @Copyright Ghent University
@@ -23,11 +24,15 @@ use Chamilo\CourseBundle\Entity\CForumPost;
  *
  * @package chamilo.forum
  */
-
 require_once __DIR__.'/../inc/global.inc.php';
 
+Session::erase('_gid');
+
+// Notification for unauthorized people.
+api_protect_course_script(true);
+
 $htmlHeadXtra[] = '<script>
-$(document).ready(function(){
+$(function() {
     $(\'.hide-me\').slideUp()
 });
 
@@ -39,59 +44,51 @@ function hidecontent(content){
 // The section (tabs)
 $this_section = SECTION_COURSES;
 
-// Notification for unauthorized people.
-api_protect_course_script(true);
-
 // Including additional library scripts.
 $nameTools = get_lang('ToolForum');
 
 $_user = api_get_user_info();
+$_course = api_get_course_info();
 
-// Including necessary files
-require 'forumconfig.inc.php';
+$action = isset($_GET['action']) ? $_GET['action'] : '';
+$hideNotifications = api_get_course_setting('hide_forum_notifications');
+$hideNotifications = $hideNotifications == 1;
+
 require_once 'forumfunction.inc.php';
 
 // Are we in a lp ?
 $origin = api_get_origin();
 
-/* Header and Breadcrumbs */
-$gradebook = null;
-if (isset($_SESSION['gradebook'])) {
-    $gradebook = $_SESSION['gradebook'];
-}
-
-if (!empty($gradebook) && $gradebook == 'view') {
-    $interbreadcrumb[] = array(
-        'url' => '../gradebook/'.$_SESSION['gradebook_dest'],
-        'name' => get_lang('ToolGradebook')
-    );
+if (api_is_in_gradebook()) {
+    $interbreadcrumb[] = [
+        'url' => Category::getUrl(),
+        'name' => get_lang('ToolGradebook'),
+    ];
 }
 
 $sessionId = api_get_session_id();
-
 $current_forum_category = get_forum_categories($_GET['forumcategory']);
-$interbreadcrumb[] = array(
-    'url' => 'index.php?gradebook='.$gradebook.'&search='
-        . Security::remove_XSS(urlencode(isset($_GET['search']) ? $_GET['search'] : '')),
-    'name' => get_lang('Forum')
-);
+$interbreadcrumb[] = [
+    'url' => 'index.php?'.api_get_cidreq().'&search='.Security::remove_XSS(urlencode(isset($_GET['search']) ? $_GET['search'] : '')),
+    'name' => get_lang('Forum'),
+];
 
-if (!empty($_GET['action']) && !empty($_GET['content'])) {
-    if ($_GET['action'] == 'add' && $_GET['content'] == 'forum') {
-        $interbreadcrumb[] = array(
+if (!empty($action) && !empty($_GET['content'])) {
+    if ($action == 'add' && $_GET['content'] == 'forum') {
+        $interbreadcrumb[] = [
             'url' => 'viewforumcategory.php?'.api_get_cidreq().'&forumcategory='.$current_forum_category['cat_id'],
-            'name' => $current_forum_category['cat_title']
-        );
-        $interbreadcrumb[] = array(
-            'url' =>'#',
-            'name' => get_lang('AddForum')
-        );
+            'name' => $current_forum_category['cat_title'],
+        ];
+        $interbreadcrumb[] = [
+            'url' => '#',
+            'name' => get_lang('AddForum'),
+        ];
     }
 } else {
-    $interbreadcrumb[] = array(
+    $interbreadcrumb[] = [
         'url' => '#',
-        'name' => $current_forum_category['cat_title']
-    );
+        'name' => $current_forum_category['cat_title'],
+    ];
 }
 
 if ($origin == 'learnpath') {
@@ -115,38 +112,45 @@ if (!api_is_allowed_to_edit(false, true) &&
 
 /* Action Links */
 $html = '<div class="actions">';
-$html .= '<a href="index.php?gradebook='.$gradebook.'&'.api_get_cidreq().'">'.
+$html .= '<a href="index.php?'.api_get_cidreq().'">'.
     Display::return_icon('back.png', get_lang('BackToForumOverview'), '', ICON_SIZE_MEDIUM).'</a>';
 if (api_is_allowed_to_edit(false, true)) {
     $html .= '<a href="'.api_get_path(WEB_CODE_PATH).'forum/index.php?'.api_get_cidreq().'&forumcategory='
-        . $current_forum_category['cat_id'].'&action=add&content=forum"> '
-        . Display::return_icon('new_forum.png', get_lang('AddForum'), '', ICON_SIZE_MEDIUM).'</a>';
+        .$current_forum_category['cat_id'].'&action=add&content=forum"> '
+        .Display::return_icon('new_forum.png', get_lang('AddForum'), '', ICON_SIZE_MEDIUM).'</a>';
 }
 $html .= search_link();
 $html .= '</div>';
 
-/* ACTIONS */
 echo $html;
 
-$action_forums = isset($_GET['action']) ? $_GET['action'] : '';
+$logInfo = [
+    'tool' => TOOL_FORUM,
+    'tool_id' => 0,
+    'tool_id_detail' => 0,
+    'action' => $action,
+    'info' => isset($_GET['content']) ? $_GET['content'] : '',
+];
+Event::registerLog($logInfo);
+
 if (api_is_allowed_to_edit(false, true)) {
     handle_forum_and_forumcategories();
 }
 
 // Notification
-if ($action_forums == 'notify' && isset($_GET['content']) && isset($_GET['id'])) {
+if ($action == 'notify' && isset($_GET['content']) && isset($_GET['id'])) {
     $return_message = set_notification($_GET['content'], $_GET['id']);
     echo Display::return_message($return_message, 'confirm', false);
 }
 
-if ($action_forums != 'add') {
+if ($action != 'add') {
     /*
     RETRIEVING ALL THE FORUM CATEGORIES AND FORUMS
     Note: We do this here just after het handling of the actions to be sure that we already incorporate the
     latest changes.
     */
     // Step 1: We store all the forum categories in an array $forum_categories.
-    $forum_categories = array();
+    $forum_categories = [];
     $forum_category = get_forum_categories($_GET['forumcategory']);
 
     // Step 2: We find all the forums.
@@ -155,7 +159,6 @@ if ($action_forums != 'add') {
     /* RETRIEVING ALL GROUPS AND THOSE OF THE USER */
 
     // The groups of the user.
-    $groups_of_user = array();
     $groups_of_user = GroupManager::get_group_ids($_course['real_id'], $_user['user_id']);
     // All groups in the course (and sorting them as the id of the group = the key of the array.
     $all_groups = GroupManager::get_group_list();
@@ -169,14 +172,14 @@ if ($action_forums != 'add') {
     $html = '';
     $html .= '<div class="category-forum">';
 
+    $session_displayed = '';
     if ((!isset($sessionId) || $sessionId == 0) &&
         !empty($forum_category['session_name'])
     ) {
         $session_displayed = ' ('.Security::remove_XSS($forum_category['session_name']).')';
-    } else {
-        $session_displayed = '';
     }
-    $forum_categories_list = '';
+
+    $forum_categories_list = [];
     $forumId = $forum_category['cat_id'];
     $forumTitle = $forum_category['cat_title'];
     $linkForumCategory = 'viewforumcategory.php?'.api_get_cidreq().'&forumcategory='.strval(intval($forumId));
@@ -184,7 +187,7 @@ if ($action_forums != 'add') {
     $icoCategory = Display::return_icon(
         'forum_blue.png',
         get_lang($forum_category['cat_title']),
-        array('class' => ''),
+        ['class' => ''],
         ICON_SIZE_MEDIUM
     );
 
@@ -192,27 +195,27 @@ if ($action_forums != 'add') {
         !($forum_category['session_id'] == 0 && $sessionId != 0)
     ) {
         $iconsEdit = '<a href="'.api_get_self().'?'.api_get_cidreq().'&forumcategory='
-            . Security::remove_XSS($_GET['forumcategory']).'&action=edit&content=forumcategory&id='
-            . ''.$forumId.'">'
-            . Display::return_icon('edit.png', get_lang('Edit'), array(), ICON_SIZE_SMALL).'</a>';
+            .Security::remove_XSS($_GET['forumcategory']).'&action=edit&content=forumcategory&id='
+            .''.$forumId.'">'
+            .Display::return_icon('edit.png', get_lang('Edit'), [], ICON_SIZE_SMALL).'</a>';
         $iconsEdit .= '<a href="'.api_get_self().'?'.api_get_cidreq().'&forumcategory='
-            . Security::remove_XSS($_GET['forumcategory'])
-            . '&action=delete&content=forumcategory&id='.$forumId
-            . "\" onclick=\"javascript:if(!confirm('"
-            . addslashes(api_htmlentities(get_lang('DeleteForumCategory'), ENT_QUOTES))
-            . "')) return false;\">".Display::return_icon('delete.png', get_lang('Delete'), array(), ICON_SIZE_SMALL)
-            . '</a>';
+            .Security::remove_XSS($_GET['forumcategory'])
+            .'&action=delete&content=forumcategory&id='.$forumId
+            ."\" onclick=\"javascript:if(!confirm('"
+            .addslashes(api_htmlentities(get_lang('DeleteForumCategory'), ENT_QUOTES))
+            ."')) return false;\">".Display::return_icon('delete.png', get_lang('Delete'), [], ICON_SIZE_SMALL)
+            .'</a>';
         $iconsEdit .= return_visible_invisible_icon(
             'forumcategory',
             $forum_category['cat_id'],
             $forum_category['visibility'],
-            array('forumcategory' => $_GET['forumcategory'])
+            ['forumcategory' => $_GET['forumcategory']]
         );
         $iconsEdit .= return_lock_unlock_icon(
             'forumcategory',
             $forum_category['cat_id'],
             $forum_category['locked'],
-            array('forumcategory' => $_GET['forumcategory'])
+            ['forumcategory' => $_GET['forumcategory']]
         );
         $iconsEdit .= return_up_down_icon(
             'forumcategory',
@@ -222,7 +225,7 @@ if ($action_forums != 'add') {
         $html .= Display::tag(
             'div',
             $iconsEdit,
-            array('class' => 'pull-right')
+            ['class' => 'pull-right']
         );
     }
 
@@ -234,10 +237,10 @@ if ($action_forums != 'add') {
         Display::tag(
             'a',
             $forumTitle,
-            array(
-                'href'=>$linkForumCategory,
-                'class' => empty($forum_category['visibility']) ? 'text-muted' : null
-            )
+            [
+                'href' => $linkForumCategory,
+                'class' => empty($forum_category['visibility']) ? 'text-muted' : null,
+            ]
         ).$session_displayed.$session_img,
         null
     );
@@ -261,8 +264,8 @@ if ($action_forums != 'add') {
                 // 1.v it is a not a group forum (teacher and student)
                 // 2.v it is a group forum and it is public (teacher and student)
                 // 3. it is a group forum and it is private (always for teachers only if the user is member of the forum
-                // if the forum is private and it is a group forum and the user is not a member of the group forum then it cannot be displayed
-                //if (!($forum['forum_group_public_private']=='private' AND !is_null($forum['forum_of_group']) AND !in_array($forum['forum_of_group'], $groups_of_user))) {
+                // if the forum is private and it is a group forum and the user
+                // is not a member of the group forum then it cannot be displayed
                 $show_forum = false;
                 // SHOULD WE SHOW THIS PARTICULAR FORUM
                 // you are teacher => show forum
@@ -273,7 +276,8 @@ if ($action_forums != 'add') {
                 } else {
                     // you are not a teacher
                     //echo 'student';
-                    // it is not a group forum => show forum (invisible forums are already left out see get_forums function)
+                    // it is not a group forum => show forum
+                    // (invisible forums are already left out see get_forums function)
                     if ($forum['forum_of_group'] == '0') {
                         //echo '-gewoon forum';
                         $show_forum = true;
@@ -283,7 +287,7 @@ if ($action_forums != 'add') {
                         // it is a group forum but it is public => show
                         if ($forum['forum_group_public_private'] == 'public') {
                             $show_forum = true;
-                            //echo '-publiek';
+                        //echo '-publiek';
                         } else {
                             // it is a group forum and it is private
                             //echo '-prive';
@@ -330,8 +334,8 @@ if ($action_forums != 'add') {
                             : null;
                         $group_title = api_substr($my_all_groups_forum_name, 0, 30);
                         $forum_title_group_addition = ' (<a href="../group/group_space.php?'.api_get_cidreq()
-                            . '&gidReq='.$my_all_groups_forum_id.'" class="forum_group_link">'
-                            . get_lang('GoTo').' '.$group_title.'</a>)';
+                            .'&gidReq='.$my_all_groups_forum_id.'" class="forum_group_link">'
+                            .get_lang('GoTo').' '.$group_title.'</a>)';
                     } else {
                         $forum_title_group_addition = '';
                     }
@@ -349,7 +353,8 @@ if ($action_forums != 'add') {
                     $html .= '<div class="row">';
                     $html .= '<div class="col-md-6">';
                     $html .= '<div class="col-md-3">';
-                    $html .= '<div class="number-post">'.$forum_image.'<p>'.$my_number_threads.' '.get_lang('ForumThreads').'</p></div>';
+                    $html .= '<div class="number-post">'.$forum_image.
+                        '<p>'.$my_number_threads.' '.get_lang('ForumThreads').'</p></div>';
                     $html .= '</div>';
 
                     $html .= '<div class="col-md-9">';
@@ -359,30 +364,28 @@ if ($action_forums != 'add') {
                         null,
                         ICON_SIZE_MEDIUM
                     );
-                    $linkForum = '';
-                    $linkForum .= Display::tag(
+
+                    $linkForum = Display::tag(
                         'a',
                         $forum['forum_title'].$session_displayed,
-                        array(
-                            'href' => 'viewforum.php?'.api_get_cidreq()
-                                . "&gidReq={$forum['forum_of_group']}&forum={$forum['forum_id']}&search="
-                                . Security::remove_XSS(urlencode(isset($_GET['search']) ? $_GET['search'] : '')),
-                            'class' => empty($forum['visibility']) ? 'text-muted' : null
-                        )
+                        [
+                            'href' => 'viewforum.php?'.api_get_cidreq(true, false)."&gidReq={$forum['forum_of_group']}&forum={$forum['forum_id']}&search=".Security::remove_XSS(urlencode(isset($_GET['search']) ? $_GET['search'] : '')),
+                            'class' => empty($forum['visibility']) ? 'text-muted' : null,
+                        ]
                     );
                     $html .= Display::tag(
                         'h3',
                         $linkForum.' '.$forum_title_group_addition,
-                        array(
-                            'class' => 'title'
-                        )
+                        [
+                            'class' => 'title',
+                        ]
                     );
                     $html .= Display::tag(
                         'p',
                         strip_tags($forum['forum_comment']),
-                        array(
-                            'class' => 'description'
-                        )
+                        [
+                            'class' => 'description',
+                        ]
                     );
 
                     if ($forum['moderated'] == 1 && api_is_allowed_to_edit(false, true)) {
@@ -401,22 +404,17 @@ if ($action_forums != 'add') {
                     $html .= '</div>';
                     $html .= '</div>';
                     $html .= '<div class="col-md-6">';
-
                     $iconEmpty = '';
-
                     // The number of topics and posts.
                     if ($forum['forum_of_group'] !== '0') {
-                        $newPost = '';
+                        $newPost = $iconEmpty;
                         if (is_array($my_whatsnew_post_info) && !empty($my_whatsnew_post_info)) {
                             $newPost = ' '.Display::return_icon('alert.png', get_lang('Forum'), null, ICON_SIZE_SMALL);
-                        } else {
-                            $newPost = $iconEmpty;
                         }
                     } else {
+                        $newPost = $iconEmpty;
                         if (is_array($my_whatsnew_post_info) && !empty($my_whatsnew_post_info)) {
                             $newPost = ' '.Display::return_icon('alert.png', get_lang('Forum'), null, ICON_SIZE_SMALL);
-                        } else {
-                            $newPost = $iconEmpty;
                         }
                     }
 
@@ -438,41 +436,44 @@ if ($action_forums != 'add') {
                     $html .= '<div class="col-md-6">';
                     if (!empty($forum['last_post_id'])) {
                         $html .= Display::return_icon('post-item.png', null, null, ICON_SIZE_TINY).' ';
-                        $html .= api_convert_and_format_date($forum['last_post_date'])
-                            . ' '.get_lang('By').' '
-                            . display_user_link($poster_id, $name);
+                        $html .= Display::dateToStringAgoAndLongDate($forum['last_post_date'])
+                            .' '.get_lang('By').' '
+                            .display_user_link($poster_id, $name);
                     }
                     $html .= '</div>';
                     $html .= '<div class="col-md-4">';
 
+                    $url = api_get_path(WEB_CODE_PATH).'forum/index.php';
+                    $forumCategoryId = (int) $_GET['forumcategory'];
+
                     if (api_is_allowed_to_edit(false, true) &&
                         !($forum['session_id'] == 0 && $sessionId != 0)
                     ) {
-                        $html .= '<a href="'.api_get_self().'?'.api_get_cidreq().'&forumcategory='
-                            . Security::remove_XSS($_GET['forumcategory'])
-                            . '&action=edit&content=forum&id='.$forum['forum_id'].'">'
-                            . Display::return_icon('edit.png', get_lang('Edit'), array(), ICON_SIZE_SMALL).'</a>';
-                        $html .= '<a href="'.api_get_self().'?'.api_get_cidreq().'&forumcategory='
-                            . Security::remove_XSS($_GET['forumcategory'])
-                            . '&action=delete&content=forum&id='.$forum['forum_id']
-                            . "\" onclick=\"javascript:if(!confirm('"
-                            . addslashes(api_htmlentities(get_lang('DeleteForum'), ENT_QUOTES))
-                            . "')) return false;\">"
-                            . Display::return_icon('delete.png', get_lang('Delete'), array(), ICON_SIZE_SMALL)
-                            . '</a>';
+                        $html .= '<a href="'.$url.'?'.api_get_cidreq().'&forumcategory='.$forumCategoryId.'&action=edit&content=forum&id='.$forum['forum_id'].'">'
+                            .Display::return_icon('edit.png', get_lang('Edit'), [], ICON_SIZE_SMALL).'</a>';
+                        $html .= '<a href="'.$url.'?'.api_get_cidreq().'&forumcategory='.$forumCategoryId.'&action=delete&content=forum&id='.$forum['forum_id']
+                            ."\" onclick=\"javascript:if(!confirm('"
+                            .addslashes(api_htmlentities(get_lang('DeleteForum'), ENT_QUOTES))
+                            ."')) return false;\">"
+                            .Display::return_icon('delete.png', get_lang('Delete'), [], ICON_SIZE_SMALL)
+                            .'</a>';
                         $html .= return_visible_invisible_icon(
                             'forum',
                             $forum['forum_id'],
                             $forum['visibility'],
-                            array('forumcategory' => $_GET['forumcategory'])
+                            ['forumcategory' => $_GET['forumcategory']]
                         );
                         $html .= return_lock_unlock_icon(
                             'forum',
                             $forum['forum_id'],
                             $forum['locked'],
-                            array('forumcategory' => $_GET['forumcategory'])
+                            ['forumcategory' => $_GET['forumcategory']]
                         );
-                        $html .= return_up_down_icon('forum', $forum['forum_id'], $forums_in_category);
+                        $html .= return_up_down_icon(
+                            'forum',
+                            $forum['forum_id'],
+                            $forums_in_category
+                        );
                     }
 
                     $iconnotify = 'notification_mail_na.png';
@@ -482,10 +483,10 @@ if ($action_forums != 'add') {
                         }
                     }
 
-                    if (!api_is_anonymous()) {
-                        $html .= '<a href="'.api_get_self().'?'.api_get_cidreq().'&forumcategory='
-                            . Security::remove_XSS($_GET['forumcategory']).'&action=notify&content=forum&id='
-                            . $forum['forum_id'].'">'.Display::return_icon($iconnotify, get_lang('NotifyMe')).'</a>';
+                    if (!api_is_anonymous() && $hideNotifications == false) {
+                        $html .= '<a href="'.$url.'?'.api_get_cidreq().'&forumcategory='.$forumCategoryId.'&action=notify&content=forum&id='.$forum['forum_id'].'">'.
+                            Display::return_icon($iconnotify, get_lang('NotifyMe')).
+                        '</a>';
                     }
                     $html .= '</div>';
                     $html .= '</div>';

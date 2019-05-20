@@ -6,7 +6,6 @@ namespace Application\Migrations\Schema\V111;
 use Application\Migrations\AbstractMigrationChamilo;
 use Doctrine\DBAL\Schema\Schema;
 
-
 /**
  * Class Version111
  * Migrate file to updated to Chamilo 1.11
@@ -370,7 +369,13 @@ class Version111 extends AbstractMigrationChamilo
         $this->addSql("INSERT INTO settings_current (variable, subkey, type, category, selected_value, title, comment, scope, subkeytext, access_url_changeable) VALUES ('load_term_conditions_section', NULL, 'radio','Platform', 'login','LoadTermConditionsSectionTitle','LoadTermConditionsSectionDescription',NULL,NULL, 0)");
         $this->addSql("INSERT INTO settings_current (variable, subkey, type, category, selected_value, title, comment, scope, subkeytext, access_url_changeable) VALUES ('show_terms_if_profile_completed', NULL, 'radio','Ticket', 'false','ShowTermsIfProfileCompletedTitle','ShowTermsIfProfileCompletedComment',NULL,NULL, 0)");
         $this->addSql("INSERT INTO settings_current (variable, subkey, type, category, selected_value, title, comment, scope, subkeytext, access_url_changeable) VALUES ('show_link_ticket_notification', NULL, 'radio', 'Platform', 'false', 'ShowLinkTicketNotificationTitle', 'ShowLinkTicketNotificationComment', NULL, NULL, 0)");
-        $this->addSql("INSERT INTO settings_current (variable, subkey, type, category, selected_value, title, comment, access_url) VALUES ('sso_authentication_subclass', NULL, 'textfield', 'Security', '', 'SSOSubclassTitle', 'SSOSubclassComment', 1)");
+
+        // Make sure there isn't already an sso_authentication_subclass before adding an empty one
+        $stmt = $this->connection->query('SELECT id FROM settings_current WHERE variable = "sso_authentication_subclass" AND access_url = 1');
+        $results = $stmt->fetchAll();
+        if (empty($results)) {
+            $this->addSql("INSERT INTO settings_current (variable, subkey, type, category, selected_value, title, comment, access_url) VALUES ('sso_authentication_subclass', NULL, 'textfield', 'Security', '', 'SSOSubclassTitle', 'SSOSubclassComment', 1)");
+        }
 
         $this->addSql("INSERT INTO settings_options (variable, value, display_text) VALUES ('ticket_allow_student_add', 'true', 'Yes'), ('ticket_allow_student_add', 'false', 'No')");
         $this->addSql("INSERT INTO settings_options (variable, value, display_text) VALUES ('ticket_allow_category_edition', 'true', 'Yes'), ('ticket_allow_category_edition', 'false', 'No')");
@@ -427,7 +432,7 @@ class Version111 extends AbstractMigrationChamilo
 
         $this->addSql("INSERT INTO settings_options (variable, value, display_text) VALUES ('show_glossary_in_extra_tools', 'none', 'None')");
         $this->addSql("INSERT INTO settings_options (variable, value, display_text) VALUES ('show_glossary_in_extra_tools', 'exercise', 'Exercise')");
-        $this->addSql("INSERT INTO settings_options (variable, value, display_text) VALUES ('show_glossary_in_extra_tools', 'lp', 'LearningPath')");
+        $this->addSql("INSERT INTO settings_options (variable, value, display_text) VALUES ('show_glossary_in_extra_tools', 'lp', 'LearningPaths')");
         $this->addSql("INSERT INTO settings_options (variable, value, display_text) VALUES ('show_glossary_in_extra_tools', 'exercise_and_lp', 'ExerciseAndLearningPath')");
 
         // Fixes from 1.10.x
@@ -499,6 +504,10 @@ class Version111 extends AbstractMigrationChamilo
                 );
             }
         }
+
+        $this->addSql(
+             'CREATE TABLE IF NOT EXISTS course_rel_user_catalogue (id int NOT NULL AUTO_INCREMENT, user_id int DEFAULT NULL, c_id int DEFAULT NULL, visible int NOT NULL, PRIMARY KEY (id), KEY (user_id), KEY (c_id), CONSTRAINT FOREIGN KEY (c_id) REFERENCES course (id) ON DELETE CASCADE, CONSTRAINT FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci'
+         );
 
         if ($schema->hasTable('course_rel_user_catalogue')) {
             $table = $schema->getTable('course_rel_user_catalogue');

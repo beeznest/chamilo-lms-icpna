@@ -1,9 +1,13 @@
 <?php
 /* For licensing terms, see /license.txt */
-/**
- * Responses to AJAX calls
- */
 
+use Chamilo\CoreBundle\Entity\BranchSync;
+use Chamilo\CoreBundle\Entity\Repository\BranchSyncRepository;
+use GuzzleHttp\Client;
+
+/**
+ * Responses to AJAX calls.
+ */
 require_once __DIR__.'/../global.inc.php';
 
 api_protect_admin_script();
@@ -16,11 +20,11 @@ switch ($action) {
 
         if (api_is_global_platform_admin() && $url_id == 1) {
             if (isset($_GET['id']) && !empty($_GET['id'])) {
-                $params = array('variable = ? ' =>  array($_GET['id']));
+                $params = ['variable = ? ' => [$_GET['id']]];
                 $data = api_get_settings_params($params);
                 if (!empty($data)) {
                     foreach ($data as $item) {
-                        $params = array('id' =>$item['id'], 'access_url_changeable' => $_GET['changeable']);
+                        $params = ['id' => $item['id'], 'access_url_changeable' => $_GET['changeable']];
                         api_set_setting_simple($params);
                     }
                 }
@@ -29,6 +33,8 @@ switch ($action) {
         }
         break;
     case 'version':
+        // Fix session block when loading admin/index.php and changing page
+        session_write_close();
         echo version_check();
         break;
     case 'get_extra_content':
@@ -67,15 +73,31 @@ switch ($action) {
 
         echo file_get_contents("{$newUrlDir}{$blockName}_extra.html");
         break;
+    case 'get_latest_news':
+        if (api_get_configuration_value('admin_chamilo_announcements_disable') === true) {
+            break;
+        }
+
+        try {
+            $latestNews = getLatestNews();
+            $latestNews = json_decode($latestNews, true);
+
+            echo Security::remove_XSS($latestNews['text'], COURSEMANAGER);
+            break;
+        } catch (Exception $e) {
+            break;
+        }
 }
 
-
 /**
- * Displays either the text for the registration or the message that the installation is (not) up to date
+ * Displays either the text for the registration or the message that the installation is (not) up to date.
  *
  * @return string html code
+ *
  * @author Patrick Cool <patrick.cool@UGent.be>, Ghent University
+ *
  * @version august 2006
+ *
  * @todo have a 6 monthly re-registration
  */
 function version_check()
@@ -98,16 +120,17 @@ function version_check()
         // site not registered. Call anyway
         $return .= check_system_version();
     }
+
     return $return;
 }
 
 /**
  * Check if the current installation is up to date
- * The code is borrowed from phpBB and slighlty modified
- * @author The phpBB Group <support@phpbb.com> (the code)
- * @author Patrick Cool <patrick.cool@UGent.be>, Ghent University (the modifications)
- * @author Yannick Warnier <ywarnier@beeznest.org> for the move to HTTP request
- * @copyright (C) 2001 The phpBB Group
+ * The code is borrowed from phpBB and slighlty modified.
+ *
+ * @throws \Exception
+ * @throws \InvalidArgumentException
+ *
  * @return string language string with some layout (color)
  */
 function check_system_version()
@@ -119,15 +142,20 @@ function check_system_version()
 
     $url = 'https://version.chamilo.org';
     $options = [
-        'verify' => false
+        'verify' => false,
     ];
 
-    $client = new GuzzleHttp\Client();
-    $res = $client->request('GET', $url, $options);
     $urlValidated = false;
-    if ($res->getStatusCode() == '200' || $res->getStatusCode() == '301') {
-        $urlValidated = true;
+
+    try {
+        $client = new GuzzleHttp\Client();
+        $res = $client->request('GET', $url, $options);
+        if ($res->getStatusCode() == '200' || $res->getStatusCode() == '301') {
+            $urlValidated = true;
+        }
+    } catch (Exception $e) {
     }
+
     // the chamilo version of your installation
     $system_version = trim(api_get_configuration_value('system_version'));
 
@@ -145,13 +173,23 @@ function check_system_version()
         );
 
         // The number of sessions
-        $number_of_sessions = Statistics::countSessions();
+        $number_of_sessions = SessionManager::count_sessions(api_get_current_access_url_id());
         $packager = api_get_configuration_value('packager');
         if (empty($packager)) {
             $packager = 'chamilo';
         }
 
-        $data = array(
+        $uniqueId = '';
+        $entityManager = Database::getManager();
+        /** @var BranchSyncRepository $branch */
+        $repository = $entityManager->getRepository('ChamiloCoreBundle:BranchSync');
+        /** @var BranchSync $branch */
+        $branch = $repository->getTopBranch();
+        if (is_a($branch, '\Chamilo\CoreBundle\Entity\BranchSync')) {
+            $uniqueId = $branch->getUniqueId();
+        }
+
+        $data = [
             'url' => api_get_path(WEB_PATH),
             'campus' => api_get_setting('siteName'),
             'contact' => api_get_setting('emailAdministrator'), // the admin's e-mail, with the only purpose of being able to contact admins to inform about critical security issues
@@ -172,7 +210,8 @@ function check_system_version()
             // the default config file (main/install/configuration.dist.php)
             // or in the installed config file. The default value is 'chamilo'
             'packager' => $packager,
-        );
+            'unique_id' => $uniqueId,
+        ];
 
         $version = null;
         $client = new GuzzleHttp\Client();
@@ -200,4 +239,34 @@ function check_system_version()
     }
 
     return '<span style="color:red">'.get_lang('ImpossibleToContactVersionServerPleaseTryAgain').'</span>';
+}
+
+/**
+ * Display the latest news from the Chamilo Association for admins.
+ *
+ * @throws \GuzzleHttp\Exception\GuzzleException
+ * @throws Exception
+ *
+ * @return string|void
+ */
+function getLatestNews()
+{
+    $url = 'https://version.chamilo.org/news/latest.php';
+
+    $client = new Client();
+    $response = $client->request(
+        'GET',
+        $url,
+        [
+            'query' => [
+                'language' => api_get_interface_language(),
+            ],
+        ]
+    );
+
+    if ($response->getStatusCode() !== 200) {
+        throw new Exception(get_lang('DenyEntry'));
+    }
+
+    return $response->getBody()->getContents();
 }

@@ -6,75 +6,81 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * TrackEAttemptRecording
+ * TrackEAttemptRecording.
  *
- * @ORM\Table(name="track_e_attempt_recording", indexes={@ORM\Index(name="exe_id", columns={"exe_id"}), @ORM\Index(name="question_id", columns={"question_id"}), @ORM\Index(name="session_id", columns={"session_id"})})
+ * @ORM\Table(name="track_e_attempt_recording",
+ *     indexes={
+ *          @ORM\Index(name="exe_id", columns={"exe_id"}),
+ *          @ORM\Index(name="question_id", columns={"question_id"}),
+ *          @ORM\Index(name="session_id", columns={"session_id"})
+ * })
  * @ORM\Entity
  */
 class TrackEAttemptRecording
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $id;
+    protected $id;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="exe_id", type="integer", nullable=false)
      */
-    private $exeId;
+    protected $exeId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="question_id", type="integer", nullable=false)
      */
-    private $questionId;
+    protected $questionId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="marks", type="integer", nullable=false)
      */
-    private $marks;
+    protected $marks;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="insert_date", type="datetime", nullable=false)
      */
-    private $insertDate;
+    protected $insertDate;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="author", type="integer", nullable=false)
      */
-    private $author;
+    protected $author;
 
     /**
      * @var string
      *
      * @ORM\Column(name="teacher_comment", type="text", nullable=false)
      */
-    private $teacherComment;
+    protected $teacherComment;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="session_id", type="integer", nullable=false)
      */
-    private $sessionId;
+    protected $sessionId;
 
     /**
-     * Set exeId
+     * Set exeId.
      *
-     * @param integer $exeId
+     * @param int $exeId
+     *
      * @return TrackEAttemptRecording
      */
     public function setExeId($exeId)
@@ -85,9 +91,9 @@ class TrackEAttemptRecording
     }
 
     /**
-     * Get exeId
+     * Get exeId.
      *
-     * @return integer
+     * @return int
      */
     public function getExeId()
     {
@@ -95,9 +101,10 @@ class TrackEAttemptRecording
     }
 
     /**
-     * Set questionId
+     * Set questionId.
      *
-     * @param integer $questionId
+     * @param int $questionId
+     *
      * @return TrackEAttemptRecording
      */
     public function setQuestionId($questionId)
@@ -108,9 +115,9 @@ class TrackEAttemptRecording
     }
 
     /**
-     * Get questionId
+     * Get questionId.
      *
-     * @return integer
+     * @return int
      */
     public function getQuestionId()
     {
@@ -118,9 +125,10 @@ class TrackEAttemptRecording
     }
 
     /**
-     * Set marks
+     * Set marks.
      *
-     * @param integer $marks
+     * @param int $marks
+     *
      * @return TrackEAttemptRecording
      */
     public function setMarks($marks)
@@ -131,9 +139,9 @@ class TrackEAttemptRecording
     }
 
     /**
-     * Get marks
+     * Get marks.
      *
-     * @return integer
+     * @return int
      */
     public function getMarks()
     {
@@ -141,9 +149,10 @@ class TrackEAttemptRecording
     }
 
     /**
-     * Set insertDate
+     * Set insertDate.
      *
      * @param \DateTime $insertDate
+     *
      * @return TrackEAttemptRecording
      */
     public function setInsertDate($insertDate)
@@ -154,7 +163,7 @@ class TrackEAttemptRecording
     }
 
     /**
-     * Get insertDate
+     * Get insertDate.
      *
      * @return \DateTime
      */
@@ -164,9 +173,10 @@ class TrackEAttemptRecording
     }
 
     /**
-     * Set author
+     * Set author.
      *
-     * @param integer $author
+     * @param int $author
+     *
      * @return TrackEAttemptRecording
      */
     public function setAuthor($author)
@@ -177,9 +187,9 @@ class TrackEAttemptRecording
     }
 
     /**
-     * Get author
+     * Get author.
      *
-     * @return integer
+     * @return int
      */
     public function getAuthor()
     {
@@ -187,9 +197,10 @@ class TrackEAttemptRecording
     }
 
     /**
-     * Set teacherComment
+     * Set teacherComment.
      *
      * @param string $teacherComment
+     *
      * @return TrackEAttemptRecording
      */
     public function setTeacherComment($teacherComment)
@@ -200,7 +211,7 @@ class TrackEAttemptRecording
     }
 
     /**
-     * Get teacherComment
+     * Get teacherComment.
      *
      * @return string
      */
@@ -210,9 +221,10 @@ class TrackEAttemptRecording
     }
 
     /**
-     * Set sessionId
+     * Set sessionId.
      *
-     * @param integer $sessionId
+     * @param int $sessionId
+     *
      * @return TrackEAttemptRecording
      */
     public function setSessionId($sessionId)
@@ -223,9 +235,9 @@ class TrackEAttemptRecording
     }
 
     /**
-     * Get sessionId
+     * Get sessionId.
      *
-     * @return integer
+     * @return int
      */
     public function getSessionId()
     {
@@ -233,9 +245,9 @@ class TrackEAttemptRecording
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {

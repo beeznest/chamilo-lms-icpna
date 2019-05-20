@@ -2,7 +2,7 @@
 /* For licensing terms, see /license.txt */
 
 /**
- *  HOME PAGE FOR EACH COURSE (BASIC TOOLS FIXED)
+ *  HOME PAGE FOR EACH COURSE (BASIC TOOLS FIXED).
  *
  *  This page, included in every course's index.php is the home
  *  page.To make administration simple, the professor edits his
@@ -12,12 +12,14 @@
  *
  * @package chamilo.course_home
  */
-
 $hide = isset($_GET['hide']) && $_GET['hide'] === 'yes' ? 'yes' : null;
 $restore = isset($_GET['restore']) && $_GET['restore'] === 'yes' ? 'yes' : null;
 $id = isset($_GET['id']) ? intval($_GET['id']) : null;
 $TBL_ACCUEIL = Database::get_course_table(TABLE_TOOL_LIST);
 $course_id = api_get_course_int_id();
+$remove = isset($remove) ? $remove : false;
+$destroy = isset($destroy) ? $destroy : false;
+$askDelete = isset($askDelete) ? $askDelete : false;
 
 // WORK with data post askable by admin of course
 if (api_is_allowed_to_edit(null, true)) {
@@ -56,7 +58,11 @@ if (api_is_allowed_to_edit(null, true)) {
         $sql = "SELECT * FROM $TBL_ACCUEIL WHERE c_id = $course_id AND id=$id";
         $result = Database::query($sql);
         $tool = Database::fetch_array($result);
-        $tool_name = @htmlspecialchars($tool['name'] != '' ? $tool['name'] : $tool['link'], ENT_QUOTES, api_get_system_encoding());
+        $tool_name = @htmlspecialchars(
+            $tool['name'] != '' ? $tool['name'] : $tool['link'],
+            ENT_QUOTES,
+            api_get_system_encoding()
+        );
         if ($tool['img'] != 'external.gif') {
             $tool['link'] = api_get_path(WEB_CODE_PATH).$tool['link'];
         }
@@ -169,7 +175,7 @@ if (api_is_platform_admin() && api_is_allowed_to_edit(null, true) && !api_is_coa
             </tr>
             </table>\n";
     } elseif (isset($delete) && $delete) {
-         // if remove
+        // if remove
         /*
          * Process hiding a tools from aivailable tools.
          * visibility=2 are only viewed by Dokeos Administrator visibility 0,1->2
@@ -186,7 +192,6 @@ $content .= "<tr>\n<td colspan=\"6\">";
 $content .= CourseHome::show_tool_3column('Basic');
 $content .= CourseHome::show_tool_3column('External');
 $content .= "</td>\n</tr>\n";
-
 
 /*	PROF ONLY VIEW */
 

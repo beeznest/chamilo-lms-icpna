@@ -6,7 +6,7 @@ namespace Chamilo\CourseBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CAttendanceResult
+ * CAttendanceResult.
  *
  * @ORM\Table(
  *  name="c_attendance_result",
@@ -21,53 +21,54 @@ use Doctrine\ORM\Mapping as ORM;
 class CAttendanceResult
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="iid", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $iid;
+    protected $iid;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer", nullable=true)
      */
-    private $id;
+    protected $id;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer")
      */
-    private $cId;
+    protected $cId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="user_id", type="integer", nullable=false)
      */
-    private $userId;
+    protected $userId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="attendance_id", type="integer", nullable=false)
      */
-    private $attendanceId;
+    protected $attendanceId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="score", type="integer", nullable=false)
      */
-    private $score;
+    protected $score;
 
     /**
-     * Set userId
+     * Set userId.
      *
-     * @param integer $userId
+     * @param int $userId
+     *
      * @return CAttendanceResult
      */
     public function setUserId($userId)
@@ -78,9 +79,9 @@ class CAttendanceResult
     }
 
     /**
-     * Get userId
+     * Get userId.
      *
-     * @return integer
+     * @return int
      */
     public function getUserId()
     {
@@ -88,9 +89,10 @@ class CAttendanceResult
     }
 
     /**
-     * Set attendanceId
+     * Set attendanceId.
      *
-     * @param integer $attendanceId
+     * @param int $attendanceId
+     *
      * @return CAttendanceResult
      */
     public function setAttendanceId($attendanceId)
@@ -101,9 +103,9 @@ class CAttendanceResult
     }
 
     /**
-     * Get attendanceId
+     * Get attendanceId.
      *
-     * @return integer
+     * @return int
      */
     public function getAttendanceId()
     {
@@ -111,9 +113,10 @@ class CAttendanceResult
     }
 
     /**
-     * Set score
+     * Set score.
      *
-     * @param integer $score
+     * @param int $score
+     *
      * @return CAttendanceResult
      */
     public function setScore($score)
@@ -124,9 +127,9 @@ class CAttendanceResult
     }
 
     /**
-     * Get score
+     * Get score.
      *
-     * @return integer
+     * @return int
      */
     public function getScore()
     {
@@ -134,9 +137,10 @@ class CAttendanceResult
     }
 
     /**
-     * Set id
+     * Set id.
      *
-     * @param integer $id
+     * @param int $id
+     *
      * @return CAttendanceResult
      */
     public function setId($id)
@@ -147,9 +151,9 @@ class CAttendanceResult
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -157,9 +161,10 @@ class CAttendanceResult
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return CAttendanceResult
      */
     public function setCId($cId)
@@ -170,9 +175,9 @@ class CAttendanceResult
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {

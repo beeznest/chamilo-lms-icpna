@@ -1,25 +1,63 @@
 <?php
 /* For licensing terms, see /license.txt */
 
-use Chamilo\CourseBundle\Entity\CQuizAnswer;
 use Chamilo\CoreBundle\Entity\TrackEHotspot;
+use Chamilo\CourseBundle\Entity\CQuizAnswer;
 
 /**
- * This file generates the ActionScript variables code used by the
- * HotSpot .swf
+ * This file generates a json answer to the question preview.
+ *
  * @package chamilo.exercise
+ *
  * @author Toon Keppens, Julio Montoya adding hotspot "medical" support
  */
 require_once __DIR__.'/../inc/global.inc.php';
 
-// Set vars
-$questionId = intval($_GET['modifyAnswers']);
-$exe_id = intval($_GET['exe_id']);
+api_protect_course_script();
 
-$objQuestion = Question::read($questionId);
-$trackExerciseInfo = ExerciseLib::get_exercise_track_exercise_info($exe_id);
-$objExercise = new Exercise(api_get_course_int_id());
-$objExercise->read($trackExerciseInfo['exe_exo_id']);
+$_course = api_get_course_info();
+$questionId = isset($_GET['modifyAnswers']) ? (int) $_GET['modifyAnswers'] : 0;
+$exerciseId = isset($_GET['exerciseId']) ? (int) $_GET['exerciseId'] : 0;
+$exeId = isset($_GET['exeId']) ? (int) $_GET['exeId'] : 0;
+$userId = api_get_user_id();
+$courseId = api_get_course_int_id();
+$objExercise = new Exercise($courseId);
+$debug = false;
+
+if ($debug) {
+    error_log("Call to hotspot_answers.as.php");
+}
+
+$trackExerciseInfo = $objExercise->get_stat_track_exercise_info_by_exe_id($exeId);
+
+// Check if student has access to the hotspot answers
+if (!api_is_allowed_to_edit(null, true)) {
+    if (empty($exeId)) {
+        api_not_allowed();
+    }
+
+    if (empty($trackExerciseInfo)) {
+        api_not_allowed();
+    }
+
+    // Different exercise
+    if ($exerciseId != $trackExerciseInfo['exe_exo_id']) {
+        api_not_allowed();
+    }
+
+    // Different user
+    if ($trackExerciseInfo['exe_user_id'] != $userId) {
+        api_not_allowed();
+    }
+}
+
+$objQuestion = Question::read($questionId, $objExercise->course);
+$objExercise->read($exerciseId);
+
+if (empty($objQuestion) || empty($objExercise)) {
+    exit;
+}
+
 $em = Database::getManager();
 $documentPath = api_get_path(SYS_COURSE_PATH).$_course['path'].'/document';
 $picturePath = $documentPath.'/images';
@@ -27,7 +65,6 @@ $pictureName = $objQuestion->getPictureFilename();
 $pictureSize = getimagesize($picturePath.'/'.$pictureName);
 $pictureWidth = $pictureSize[0];
 $pictureHeight = $pictureSize[1];
-$course_id = api_get_course_int_id();
 
 $data = [];
 $data['type'] = 'solution';
@@ -48,7 +85,7 @@ $data['lang'] = [
     'CloseDelineation' => get_lang('CloseDelineation'),
     'Oar' => get_lang('Oar'),
     'ClosePolygon' => get_lang('ClosePolygon'),
-    'DelineationStatus1' => get_lang('DelineationStatus1')
+    'DelineationStatus1' => get_lang('DelineationStatus1'),
 ];
 $data['image'] = $objQuestion->selectPicturePath();
 $data['image_width'] = $pictureWidth;
@@ -57,22 +94,28 @@ $data['courseCode'] = $_course['path'];
 $data['hotspots'] = [];
 
 $showTotalScoreAndUserChoicesInLastAttempt = true;
-
-if ($objExercise->selectResultsDisabled() == RESULT_DISABLE_SHOW_SCORE_ATTEMPT_SHOW_ANSWERS_LAST_ATTEMPT) {
+if (in_array(
+    $objExercise->selectResultsDisabled(), [
+        RESULT_DISABLE_SHOW_SCORE_ATTEMPT_SHOW_ANSWERS_LAST_ATTEMPT,
+        RESULT_DISABLE_DONT_SHOW_SCORE_ONLY_IF_USER_FINISHES_ATTEMPTS_SHOW_ALWAYS_FEEDBACK,
+    ]
+)
+) {
     $showOnlyScore = true;
     $showResults = true;
+    $lpId = isset($trackExerciseInfo['orig_lp_id']) ? $trackExerciseInfo['orig_lp_id'] : 0;
+    $lpItemId = isset($trackExerciseInfo['orig_lp_item_id']) ? $trackExerciseInfo['orig_lp_item_id'] : 0;
     if ($objExercise->attempts > 0) {
         $attempts = Event::getExerciseResultsByUser(
             api_get_user_id(),
             $objExercise->id,
-            api_get_course_int_id(),
+            $courseId,
             api_get_session_id(),
-            $trackExerciseInfo['orig_lp_id'],
-            $trackExerciseInfo['orig_lp_item_id'],
+            $lpId,
+            $lpItemId,
             'desc'
         );
         $numberAttempts = count($attempts);
-
         $showTotalScoreAndUserChoicesInLastAttempt = false;
 
         if ($numberAttempts >= $objExercise->attempts) {
@@ -84,12 +127,19 @@ if ($objExercise->selectResultsDisabled() == RESULT_DISABLE_SHOW_SCORE_ATTEMPT_S
 }
 
 $hideExpectedAnswer = false;
-
-if ($objExercise->selectFeedbackType() == 0 && $objExercise->selectResultsDisabled() == 2) {
+if ($objExercise->selectFeedbackType() == 0 &&
+    $objExercise->selectResultsDisabled() == RESULT_DISABLE_SHOW_SCORE_ONLY
+) {
     $hideExpectedAnswer = true;
 }
 
-if ($objExercise->selectResultsDisabled() == RESULT_DISABLE_SHOW_SCORE_ATTEMPT_SHOW_ANSWERS_LAST_ATTEMPT) {
+if (in_array(
+    $objExercise->selectResultsDisabled(), [
+        RESULT_DISABLE_SHOW_SCORE_ATTEMPT_SHOW_ANSWERS_LAST_ATTEMPT,
+        RESULT_DISABLE_DONT_SHOW_SCORE_ONLY_IF_USER_FINISHES_ATTEMPTS_SHOW_ALWAYS_FEEDBACK,
+    ]
+)
+) {
     $hideExpectedAnswer = $showTotalScoreAndUserChoicesInLastAttempt ? false : true;
 }
 
@@ -101,14 +151,14 @@ if (!$hideExpectedAnswer) {
 
     if ($objQuestion->selectType() == HOT_SPOT_DELINEATION) {
         $qb
-            ->where($qb->expr()->eq('a.cId', $course_id))
-            ->andWhere($qb->expr()->eq('a.questionId', intval($questionId)))
+            ->where($qb->expr()->eq('a.cId', $courseId))
+            ->andWhere($qb->expr()->eq('a.questionId', $questionId))
             ->andWhere($qb->expr()->neq('a.hotspotType', 'noerror'))
             ->orderBy('a.id', 'ASC');
     } else {
         $qb
-            ->where($qb->expr()->eq('a.cId', $course_id))
-            ->andWhere($qb->expr()->eq('a.questionId', intval($questionId)))
+            ->where($qb->expr()->eq('a.cId', $courseId))
+            ->andWhere($qb->expr()->eq('a.questionId', $questionId))
             ->orderBy('a.position', 'ASC');
     }
 
@@ -116,8 +166,37 @@ if (!$hideExpectedAnswer) {
 
     /** @var CQuizAnswer $hotSpotAnswer */
     foreach ($result as $hotSpotAnswer) {
+        $hotSpotAnswerId = $hotSpotAnswer->getIid();
+
+        // Show only correct hotspots
+        /*
+        if ($objExercise->selectResultsDisabled() == RESULT_DISABLE_SHOW_ONLY_IN_CORRECT_ANSWER) {
+            $TBL_TRACK_HOTSPOT = Database::get_main_table(TABLE_STATISTIC_TRACK_E_HOTSPOT);
+            // Check auto id
+            $sql = "SELECT hotspot_correct
+                    FROM $TBL_TRACK_HOTSPOT
+                    WHERE
+                        hotspot_exe_id = $exeId AND
+                        hotspot_question_id= $questionId AND
+                        hotspot_answer_id = ".$hotSpotAnswerId."
+                    ORDER BY hotspot_id ASC";
+            $result = Database::query($sql);
+            $studentChoice = false;
+            if (Database::num_rows($result)) {
+                $studentChoice = Database::result(
+                    $result,
+                    0,
+                    'hotspot_correct'
+                );
+            }
+
+            if (!$studentChoice) {
+                continue;
+            }
+        }*/
+
         $hotSpot = [];
-        $hotSpot['id'] = $hotSpotAnswer->getIid();
+        $hotSpot['id'] = $hotSpotAnswerId;
         $hotSpot['answer'] = $hotSpotAnswer->getAnswer();
 
         switch ($hotSpotAnswer->getHotspotType()) {
@@ -137,7 +216,6 @@ if (!$hideExpectedAnswer) {
                 $hotSpot['type'] = 'delineation';
                 break;
         }
-
         $hotSpot['coord'] = $hotSpotAnswer->getHotspotCoordinates();
         $data['hotspots'][] = $hotSpot;
     }
@@ -150,8 +228,8 @@ $rs = $em
     ->findBy(
         [
             'hotspotQuestionId' => $questionId,
-            'cId' => $course_id,
-            'hotspotExeId' => $exe_id
+            'cId' => $courseId,
+            'hotspotExeId' => $exeId,
         ],
         ['hotspotAnswerId' => 'ASC']
     );
@@ -162,7 +240,10 @@ foreach ($rs as $row) {
 }
 
 $data['done'] = 'done';
-
 header('Content-Type: application/json');
 
 echo json_encode($data);
+
+if ($debug) {
+    error_log("---------- End call to hotspot_answers.as.php------------");
+}

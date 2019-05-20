@@ -2,20 +2,13 @@
 /* For licensing terms, see /license.txt */
 
 /**
+ * Process learning paths before pass it to search listing scripts.
  *
- * @package chamilo.include.search
- */
-include_once __DIR__.'/../../../global.inc.php';
-require_once __DIR__.'/search_processor.class.php';
-require_once __DIR__.'/../IndexableChunk.class.php';
-
-/**
- * Process learning paths before pass it to search listing scripts
  * @package chamilo.include.search
  */
 class learnpath_processor extends search_processor
 {
-    public $learnpaths = array();
+    public $learnpaths = [];
 
     public function __construct($rows)
     {
@@ -26,12 +19,12 @@ class learnpath_processor extends search_processor
             $lp_item = $row_val['xapian_data'][SE_DATA]['lp_item'];
             $document_id = $row_val['xapian_data'][SE_DATA]['document_id'];
             $courseid = $row_val['courseid'];
-            $item = array(
+            $item = [
                 'courseid' => $courseid,
                 'lp_item' => $lp_item,
                 'score' => $row_val['score'],
                 'row_id' => $row_id,
-            );
+            ];
             $this->learnpaths[$courseid][$lp_id][] = $item;
             $this->learnpaths[$courseid][$lp_id]['total_score'] += $row_val['score'];
             $this->learnpaths[$courseid][$lp_id]['has_document_id'] = is_numeric($document_id);
@@ -43,7 +36,7 @@ class learnpath_processor extends search_processor
      */
     public function process()
     {
-        $results = array();
+        $results = [];
         foreach ($this->learnpaths as $courseid => $learnpaths) {
             $search_show_unlinked_results = api_get_setting('search_show_unlinked_results') == 'true';
             $course_visible_for_user = api_is_course_visible_for_user(null, $courseid);
@@ -60,7 +53,7 @@ class learnpath_processor extends search_processor
                         list($thumbnail, $image, $name, $author) = $this->get_information($courseid, $lp_id, $lp['has_document_id']);
                         $url = api_get_path(WEB_CODE_PATH).'lp/lp_controller.php?cidReq=%s&action=view&lp_id=%s';
                         $url = sprintf($url, $courseid, $lp_id);
-                        $result = array(
+                        $result = [
                             'toolid' => TOOL_LEARNPATH,
                             'score' => $lp['total_score'] / (count($lp) - 1), // not count total_score array item
                             'url' => $url,
@@ -68,7 +61,7 @@ class learnpath_processor extends search_processor
                             'image' => $image,
                             'title' => $name,
                             'author' => $author,
-                        );
+                        ];
                         if ($course_visible_for_user) {
                             $results[] = $result;
                         } else { // course not visible for user
@@ -88,11 +81,12 @@ class learnpath_processor extends search_processor
         }
         // Sort results with score descending
         array_multisort($score, SORT_DESC, $results);
+
         return $results;
     }
 
     /**
-     * Get learning path information
+     * Get learning path information.
      */
     private function get_information($course_id, $lp_id, $has_document_id = true)
     {
@@ -148,10 +142,10 @@ class learnpath_processor extends search_processor
                 }
                 $name = $row['name'];
             }
-            return array($thumbnail, $image, $name, $row['author']);
+
+            return [$thumbnail, $image, $name, $row['author']];
         } else {
-            return array();
+            return [];
         }
     }
-
 }

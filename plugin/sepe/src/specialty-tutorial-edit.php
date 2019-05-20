@@ -4,8 +4,6 @@
 /**
  *    This script displays a specialty tutorial edit form.
  */
-
-use \ChamiloSession as Session;
 require_once '../config.php';
 
 $course_plugin = 'sepe';
@@ -62,6 +60,7 @@ if (!empty($_POST)) {
         session_write_close();
         $participantId = getParticipantId($specialtyId);
         header("Location: participant-specialty-edit.php?new_specialty=0&participant_id=".$participantId."&specialty_id=".$specialtyId."&action_id=".$actionId);
+        exit;
     } else {
         $tutorialId = intval($_POST['tutorial_id']);
         $actionId = intval($_POST['action_id']);
@@ -72,6 +71,7 @@ if (!empty($_POST)) {
         $_SESSION['sepe_message_error'] = $plugin->get_lang('ProblemToken');
         session_write_close();
         header("Location: specialty-tutorial-edit.php?new_tutorial=".$newTutorial."&specialty_id=".$specialtyId."&tutorial_id=".$tutorialId."&action_id=".$actionId);
+        exit;
     }
 } else {
     $token = Security::get_token();
@@ -80,16 +80,16 @@ if (!empty($_POST)) {
 if (api_is_platform_admin()) {
     $courseId = getCourse(intval($_GET['action_id']));
     $participantId = getParticipantId(intval($_GET['specialty_id']));
-    $interbreadcrumb[] = array("url" => "/plugin/sepe/src/sepe-administration-menu.php", "name" => $plugin->get_lang('MenuSepe'));
-    $interbreadcrumb[] = array("url" => "formative-actions-list.php", "name" => $plugin->get_lang('FormativesActionsList'));
-    $interbreadcrumb[] = array("url" => "formative-action.php?cid=".$courseId, "name" => $plugin->get_lang('FormativeAction'));
-    $interbreadcrumb[] = array("url" => "participant-specialty-edit.php?new_specialty=0&participant_id=".$participantId."&specialty_id=".intval($_GET['specialty_id'])."&action_id=".intval($_GET['action_id']), "name" => $plugin->get_lang('SpecialtyFormativeParcipant'));
+    $interbreadcrumb[] = ["url" => "/plugin/sepe/src/sepe-administration-menu.php", "name" => $plugin->get_lang('MenuSepe')];
+    $interbreadcrumb[] = ["url" => "formative-actions-list.php", "name" => $plugin->get_lang('FormativesActionsList')];
+    $interbreadcrumb[] = ["url" => "formative-action.php?cid=".$courseId, "name" => $plugin->get_lang('FormativeAction')];
+    $interbreadcrumb[] = ["url" => "participant-specialty-edit.php?new_specialty=0&participant_id=".$participantId."&specialty_id=".intval($_GET['specialty_id'])."&action_id=".intval($_GET['action_id']), "name" => $plugin->get_lang('SpecialtyFormativeParcipant')];
     if (isset($_GET['new_tutorial']) && intval($_GET['new_tutorial']) == 1) {
         $templateName = $plugin->get_lang('new_tutorial');
         $tpl = new Template($templateName);
         $tpl->assign('action_id', intval($_GET['action_id']));
         $tpl->assign('specialty_id', intval($_GET['specialty_id']));
-        $info = array();
+        $info = [];
         $tpl->assign('info', $info);
         $tpl->assign('new_tutorial', '1');
         $startYear = $endYear = date("Y");
@@ -102,7 +102,7 @@ if (api_is_platform_admin()) {
         $info = getInfoSpecialtyTutorial(intval($_GET['tutorial_id']));
         $tpl->assign('info', $info);
         $tpl->assign('new_tutorial', '0');
-        if ($info['start_date'] != '0000-00-00' && $info['start_date'] != NULL) {
+        if ($info['start_date'] != '0000-00-00' && $info['start_date'] != null) {
             $tpl->assign('day_start', date("j", strtotime($info['start_date'])));
             $tpl->assign('month_start', date("n", strtotime($info['start_date'])));
             $tpl->assign('year_start', date("Y", strtotime($info['start_date'])));
@@ -112,7 +112,7 @@ if (api_is_platform_admin()) {
         } else {
             $startYear = date("Y");
         }
-        if ($info['end_date'] != '0000-00-00' && $info['end_date'] != NULL) {
+        if ($info['end_date'] != '0000-00-00' && $info['end_date'] != null) {
             $tpl->assign('day_end', date("j", strtotime($info['end_date'])));
             $tpl->assign('month_end', date("n", strtotime($info['end_date'])));
             $tpl->assign('year_end', date("Y", strtotime($info['end_date'])));
@@ -123,7 +123,7 @@ if (api_is_platform_admin()) {
             $endYear = date("Y");
         }
     }
-    $listYears = array();
+    $listYears = [];
     if ($startYear > $endYear) {
         $tmp = $startYear;
         $startYear = $endYear;
@@ -154,4 +154,5 @@ if (api_is_platform_admin()) {
     $tpl->display_one_col_template();
 } else {
     header('Location:'.api_get_path(WEB_PATH));
+    exit;
 }

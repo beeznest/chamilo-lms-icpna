@@ -6,7 +6,7 @@ namespace Chamilo\CourseBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CChatConnected
+ * CChatConnected.
  *
  * @ORM\Table(
  *  name="c_chat_connected",
@@ -21,60 +21,61 @@ use Doctrine\ORM\Mapping as ORM;
 class CChatConnected
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="iid", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $iid;
+    protected $iid;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer", nullable=true)
      */
-    private $id;
+    protected $id;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer")
      */
-    private $cId;
+    protected $cId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="session_id", type="integer", nullable=false)
      */
-    private $sessionId;
+    protected $sessionId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="to_group_id", type="integer", nullable=false)
      */
-    private $toGroupId;
+    protected $toGroupId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="user_id", type="integer")
      */
-    private $userId;
+    protected $userId;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="last_connection", type="datetime")
      */
-    private $lastConnection;
+    protected $lastConnection;
 
     /**
-     * Set sessionId
+     * Set sessionId.
      *
-     * @param integer $sessionId
+     * @param int $sessionId
+     *
      * @return CChatConnected
      */
     public function setSessionId($sessionId)
@@ -85,9 +86,9 @@ class CChatConnected
     }
 
     /**
-     * Get sessionId
+     * Get sessionId.
      *
-     * @return integer
+     * @return int
      */
     public function getSessionId()
     {
@@ -95,9 +96,10 @@ class CChatConnected
     }
 
     /**
-     * Set toGroupId
+     * Set toGroupId.
      *
-     * @param integer $toGroupId
+     * @param int $toGroupId
+     *
      * @return CChatConnected
      */
     public function setToGroupId($toGroupId)
@@ -108,9 +110,9 @@ class CChatConnected
     }
 
     /**
-     * Get toGroupId
+     * Get toGroupId.
      *
-     * @return integer
+     * @return int
      */
     public function getToGroupId()
     {
@@ -118,9 +120,10 @@ class CChatConnected
     }
 
     /**
-     * Set id
+     * Set id.
      *
-     * @param integer $id
+     * @param int $id
+     *
      * @return CChatConnected
      */
     public function setId($id)
@@ -131,9 +134,9 @@ class CChatConnected
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -141,9 +144,10 @@ class CChatConnected
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return CChatConnected
      */
     public function setCId($cId)
@@ -154,9 +158,9 @@ class CChatConnected
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {
@@ -164,9 +168,10 @@ class CChatConnected
     }
 
     /**
-     * Set userId
+     * Set userId.
      *
-     * @param integer $userId
+     * @param int $userId
+     *
      * @return CChatConnected
      */
     public function setUserId($userId)
@@ -177,9 +182,9 @@ class CChatConnected
     }
 
     /**
-     * Get userId
+     * Get userId.
      *
-     * @return integer
+     * @return int
      */
     public function getUserId()
     {
@@ -187,9 +192,10 @@ class CChatConnected
     }
 
     /**
-     * Set lastConnection
+     * Set lastConnection.
      *
      * @param \DateTime $lastConnection
+     *
      * @return CChatConnected
      */
     public function setLastConnection($lastConnection)
@@ -200,7 +206,7 @@ class CChatConnected
     }
 
     /**
-     * Get lastConnection
+     * Get lastConnection.
      *
      * @return \DateTime
      */

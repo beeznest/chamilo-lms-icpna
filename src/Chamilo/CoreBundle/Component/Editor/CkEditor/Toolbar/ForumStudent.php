@@ -4,15 +4,15 @@
 namespace Chamilo\CoreBundle\Component\Editor\CkEditor\Toolbar;
 
 /**
- * ForumStudent toolbar configuration
+ * ForumStudent toolbar configuration.
  *
  * @package Chamilo\CoreBundle\Component\Editor\CkEditor\Toolbar *
  */
 class ForumStudent extends Basic
 {
-
     /**
-     * Get the toolbar config
+     * Get the toolbar config.
+     *
      * @return array
      */
     public function getConfig()
@@ -29,7 +29,8 @@ class ForumStudent extends Basic
     }
 
     /**
-     * Get the toolbar configuration when CKEditor is maximized
+     * Get the toolbar configuration when CKEditor is maximized.
+     *
      * @return array
      */
     protected function getMaximizedToolbar()
@@ -51,7 +52,7 @@ class ForumStudent extends Basic
                 'Smiley',
                 'SpecialChar',
                 'Asciimath',
-                'Asciisvg'
+                'Asciisvg',
             ],
             '/',
             ['Table', '-', 'CreateDiv'],
@@ -66,7 +67,8 @@ class ForumStudent extends Basic
     }
 
     /**
-     * Get the default toolbar configuration when the setting more_buttons_maximized_mode is false
+     * Get the default toolbar configuration when the setting more_buttons_maximized_mode is false.
+     *
      * @return array
      */
     protected function getNormalToolbar()
@@ -81,12 +83,13 @@ class ForumStudent extends Basic
             ['Styles', 'Format', 'Font', 'FontSize'],
             ['Bold', 'Italic', 'Underline'],
             ['JustifyLeft', 'JustifyCenter', 'JustifyRight'],
-            ['ShowBlocks']
+            ['ShowBlocks'],
         ];
     }
 
     /**
-     * Get the toolbar configuration when CKEditor is minimized
+     * Get the toolbar configuration when CKEditor is minimized.
+     *
      * @return array
      */
     protected function getMinimizedToolbar()
@@ -96,10 +99,9 @@ class ForumStudent extends Basic
             ['Undo', 'Redo'],
             ['Link', 'Image', 'Video', 'Oembed', 'Flash', 'Youtube', 'Audio', 'Table', 'Asciimath', 'Asciisvg'],
             ['BulletedList', 'NumberedList', 'HorizontalRule'],
-            ['JustifyLeft', 'JustifyCenter'],
+            ['JustifyLeft', 'JustifyCenter', 'JustifyRight'],
             ['Format', 'Font', 'FontSize', 'Bold', 'Italic', 'Underline', 'TextColor', 'BGColor'],
-            ['Toolbarswitch']
+            ['Toolbarswitch'],
         ];
     }
-
 }

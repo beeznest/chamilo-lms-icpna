@@ -29,11 +29,10 @@ use Chamilo\CourseBundle\Entity\CToolIntro;
  *
  * @package chamilo.include
  */
-
 $em = Database::getManager();
-$TBL_INTRODUCTION = Database::get_course_table(TABLE_TOOL_INTRO);
-$intro_editAllowed = $is_allowed_to_edit;
+$intro_editAllowed = $is_allowed_to_edit = api_is_allowed_to_edit();
 $session_id = api_get_session_id();
+$blogParam = isset($_GET['blog_id']) ? ('&blog_id='.(int) $_GET['blog_id']) : '';
 
 $introduction_section = '';
 
@@ -48,19 +47,19 @@ if (!empty($courseId)) {
     $form = new FormValidator(
         'introduction_text',
         'post',
-        api_get_self().'?'.api_get_cidreq()
+        api_get_self().'?'.api_get_cidreq().$blogParam
     );
 } else {
     $form = new FormValidator('introduction_text');
 }
 
-$config = array(
-    'ToolbarSet' => 'IntroductionTool',
+$config = [
+    'ToolbarSet' => 'IntroductionSection',
     'Width' => '100%',
-    'Height' => '300'
-);
+    'Height' => '300',
+];
 
-$form->addHtmlEditor('intro_content', null, false, false, $config, true);
+$form->addHtmlEditor('intro_content', null, false, false, $config);
 $form->addButtonSave(get_lang('SaveIntroText'), 'intro_cmdUpdate');
 
 /* INTRODUCTION MICRO MODULE - COMMANDS SECTION (IF ALLOWED) */
@@ -120,7 +119,6 @@ $toolIntro = $em
     ->findOneBy(['cId' => $course_id, 'id' => $moduleId, 'sessionId' => 0]);
 
 $intro_content = $toolIntro ? $toolIntro->getIntroText() : '';
-
 if ($session_id) {
     /** @var CToolIntro $toolIntro */
     $toolIntro = $em
@@ -128,7 +126,6 @@ if ($session_id) {
         ->findOneBy(['cId' => $course_id, 'id' => $moduleId, 'sessionId' => $session_id]);
 
     $introSessionContent = $toolIntro && $toolIntro->getIntroText() ? $toolIntro->getIntroText() : '';
-
     $intro_content = $introSessionContent ?: $intro_content;
 }
 
@@ -141,6 +138,13 @@ if (api_get_configuration_value('course_introduction_html_strict_filtering')) {
     $userStatus = COURSEMANAGER;
 }
 
+// Ignore editor.css
+$cssEditor = api_get_path(WEB_CSS_PATH).'editor.css';
+$linkToReplace = [
+    '<link href="'.$cssEditor.'" rel="stylesheet" type="text/css" />',
+    '<link href="'.$cssEditor.'" media="screen" rel="stylesheet" type="text/css" />',
+];
+$intro_content = str_replace($linkToReplace, '', $intro_content);
 $intro_content = Security::remove_XSS($intro_content, $userStatus);
 
 /* Determines the correct display */
@@ -226,7 +230,7 @@ if ($tool == TOOL_COURSE_HOMEPAGE && !isset($_GET['intro_cmdEdit'])) {
 
         $infoUser = '<div class="thematic-avatar"><img src="'.$userInfo['avatar'].'" class="img-circle img-responsive"></div>';
         $infoUser .= '<div class="progress">
-                        <div class="progress-bar progress-bar-danger" role="progressbar" style="width: ' . $thematicScore.';">
+                        <div class="progress-bar progress-bar-primary" role="progressbar" style="width: '.$thematicScore.';">
                         '.$thematicScore.'
                         </div>
                     </div>';
@@ -234,11 +238,11 @@ if ($tool == TOOL_COURSE_HOMEPAGE && !isset($_GET['intro_cmdEdit'])) {
         $thematicItemOne = '
         <div class="col-md-6 items-progress">
             <div class="thematic-cont '.$class1.'">
-            <div class="topics">' . $subTitle1.'</div>
+            <div class="topics">'.$subTitle1.'</div>
             <h4 class="title-topics">'.Display::returnFontAwesomeIcon('book').strip_tags($thematic_info['title']).'</h4>
-            <p class="date">' .  Display::returnFontAwesomeIcon('calendar-o').$thematic_advance_info['start_date'].'</p>
-            <div class="views">' . Display::returnFontAwesomeIcon('file-text-o').strip_tags($thematic_advance_info['content']).'</div>
-            <p class="time">'. Display::returnFontAwesomeIcon('clock-o').get_lang('DurationInHours').' : '.$thematic_advance_info['duration'].' - <a href="'.$thematicUrl.'">'.get_lang('SeeDetail').'</a></p>
+            <p class="date">'.Display::returnFontAwesomeIcon('calendar-o').$thematic_advance_info['start_date'].'</p>
+            <div class="views">'.Display::returnFontAwesomeIcon('file-text-o').strip_tags($thematic_advance_info['content']).'</div>
+            <p class="time">'.Display::returnFontAwesomeIcon('clock-o').get_lang('DurationInHours').' : '.$thematic_advance_info['duration'].' - <a href="'.$thematicUrl.'">'.get_lang('SeeDetail').'</a></p>
             </div>
         </div>';
 
@@ -251,10 +255,10 @@ if ($tool == TOOL_COURSE_HOMEPAGE && !isset($_GET['intro_cmdEdit'])) {
                 <div class="col-md-6 items-progress">
                     <div class="thematic-cont">
                     <div class="topics">'.$subTitle2.'</div>
-                    <h4 class="title-topics">'. Display::returnFontAwesomeIcon('book').$thematic_info2['title'].'</h4>
-                    <p class="date">' . Display::returnFontAwesomeIcon('calendar-o').$thematic_advance_info2['start_date'].'</p>
-                    <div class="views">' . Display::returnFontAwesomeIcon('file-text-o').strip_tags($thematic_advance_info2['content']).'</div>
-                    <p class="time">'. Display::returnFontAwesomeIcon('clock-o').get_lang('DurationInHours').' : '.$thematic_advance_info2['duration'].' - <a href="'.$thematicUrl.'">'.get_lang('SeeDetail').'</a></p>
+                    <h4 class="title-topics">'.Display::returnFontAwesomeIcon('book').$thematic_info2['title'].'</h4>
+                    <p class="date">'.Display::returnFontAwesomeIcon('calendar-o').$thematic_advance_info2['start_date'].'</p>
+                    <div class="views">'.Display::returnFontAwesomeIcon('file-text-o').strip_tags($thematic_advance_info2['content']).'</div>
+                    <p class="time">'.Display::returnFontAwesomeIcon('clock-o').get_lang('DurationInHours').' : '.$thematic_advance_info2['duration'].' - <a href="'.$thematicUrl.'">'.get_lang('SeeDetail').'</a></p>
                     </div>
                 </div>';
         }
@@ -263,9 +267,18 @@ if ($tool == TOOL_COURSE_HOMEPAGE && !isset($_GET['intro_cmdEdit'])) {
         $thematicPanel .= '<div class="col-md-10"><div class="row">'.$thematicItemOne.$thematicItemTwo.'</div></div>';
         $thematicPanel .= '</div>';
         $thematicPanel .= '<div class="separate">
-                        <a href="' . $thematicUrl.'" class="btn btn-default btn-block">'.get_lang('ShowFullCourseAdvance').'</a>
+                        <a href="'.$thematicUrl.'" class="btn btn-default btn-block">'.get_lang('ShowFullCourseAdvance').'</a>
                     </div>';
-        $thematicProgress = Display::panelCollapse($titleThematic, $thematicPanel, 'thematic', null, 'accordion-thematic', 'collapse-thematic', false);
+
+        $thematicProgress = Display::panelCollapse(
+            $titleThematic,
+            $thematicPanel,
+            'thematic',
+            null,
+            'accordion-thematic',
+            'collapse-thematic',
+            false
+        );
     }
 }
 $introduction_section .= '<div class="row">';
@@ -292,7 +305,7 @@ if ($intro_dispCommand) {
         $toolbar .= '<div class="toolbar-edit">';
         $toolbar .= '<div class="btn-group pull-right" role="group">';
         if (!empty($courseId)) {
-            $textIntro  = '<a class="btn btn-default" title="'.addslashes(get_lang('AddIntro')).'" href="'.api_get_self().'?'.api_get_cidreq().'&intro_cmdAdd=1">';
+            $textIntro = '<a class="btn btn-default" title="'.addslashes(get_lang('AddIntro')).'" href="'.api_get_self().'?'.api_get_cidreq().$blogParam.'&intro_cmdAdd=1">';
             $textIntro .= '<em class="fa fa-file-text"></em> ';
             $textIntro .= "</a>";
             $toolbar .= $textIntro.$editIconButton;
@@ -301,20 +314,18 @@ if ($intro_dispCommand) {
             $toolbar .= $editIconButton;
         }
         $toolbar .= '</div></div>';
-
     } else {
         // Displays "edit intro && delete intro" commands
         $toolbar .= '<div class="toolbar-edit">';
         $toolbar .= '<div class="btn-group pull-right" rol="group">';
         if (!empty($courseId)) {
             $toolbar .=
-                '<a  class="btn btn-default" href="'.api_get_self().'?'.api_get_cidreq().'&intro_cmdEdit=1" title="'.get_lang('Modify').'">
+                '<a class="btn btn-default" href="'.api_get_self().'?'.api_get_cidreq().$blogParam.'&intro_cmdEdit=1" title="'.get_lang('Modify').'">
                 <em class="fa fa-pencil"></em></a>';
             $toolbar .= $editIconButton;
-            $toolbar .= "<a class=\"btn btn-default\" href=\"".api_get_self()."?".api_get_cidreq()."&intro_cmdDel=1\" onclick=\"javascript:
+            $toolbar .= "<a class=\"btn btn-default\" href=\"".api_get_self()."?".api_get_cidreq().$blogParam."&intro_cmdDel=1\" onclick=\"javascript:
                 if(!confirm('".addslashes(api_htmlentities(get_lang('ConfirmYourChoice'), ENT_QUOTES, $charset)).
                 "')) return false;\"><em class=\"fa fa-trash-o\"></em></a>";
-
         } else {
             $toolbar .=
                 '<a class="btn btn-default" href="'.api_get_self().'?intro_cmdEdit=1" title="'.get_lang('Modify').'">
@@ -334,8 +345,12 @@ if ($intro_dispCommand) {
     }
 }
 
-$introduction_section .= '<div class="col-md-12">';
+$nameSection = get_lang('AddCustomCourseIntro');
+if ($moduleId != 'course_homepage') {
+    $nameSection = get_lang('AddCustomToolsIntro');
+}
 
+$introduction_section .= '<div class="col-md-12">';
 if ($intro_dispDefault) {
     if (!empty($intro_content)) {
         $introduction_section .= '<div class="page-course">';
@@ -344,7 +359,7 @@ if ($intro_dispDefault) {
     } else {
         if (api_is_allowed_to_edit()) {
             $introduction_section .= '<div class="help-course">';
-            $introduction_section .= get_lang('AddCustomCourseIntro').' '.$textIntro;
+            $introduction_section .= $nameSection.' '.$textIntro;
             $introduction_section .= '</div>';
         }
     }

@@ -2,14 +2,14 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * This tool allows platform admins to add users by uploading a CSV or XML file
+ * This tool allows platform admins to add users by uploading a CSV or XML file.
+ *
  * @package chamilo.admin
  */
 
 /**
  * Validate the imported data.
  */
-
 $cidReset = true;
 require_once __DIR__.'/../inc/global.inc.php';
 
@@ -19,16 +19,16 @@ $purification_option_for_usernames = false;
 function validate_data($users)
 {
     global $defined_auth_sources;
-    $errors = array();
-    $usernames = array();
+    $errors = [];
+    $usernames = [];
 
     // 1. Check if mandatory fields are set.
-    $mandatory_fields = array('LastName', 'FirstName');
+    $mandatory_fields = ['LastName', 'FirstName'];
 
     if (api_get_setting('registration', 'email') == 'true') {
         $mandatory_fields[] = 'Email';
     }
-    $classExistList = array();
+    $classExistList = [];
     $usergroup = new UserGroup();
 
     foreach ($users as $user) {
@@ -95,6 +95,7 @@ function validate_data($users)
             }
         }
     }
+
     return $errors;
 }
 
@@ -122,22 +123,25 @@ function complete_missing_data($user)
     if (empty($user['AuthSource'])) {
         $user['AuthSource'] = PLATFORM_AUTH_SOURCE;
     }
+
     return $user;
 }
 
 /**
- * Update users from the imported data
- * @param   array   $users List of users
- * @return  false|null
- * @uses global variable $inserted_in_course, which returns the list of courses the user was inserted in
+ * Update users from the imported data.
+ *
+ * @param array $users List of users
+ *
+ * @return false|null
+ *
+ * @uses \global variable $inserted_in_course, which returns the list of courses the user was inserted in
  */
-
 function updateUsers($users)
 {
     global $insertedIn_course;
     // Not all scripts declare the $inserted_in_course array (although they should).
     if (!isset($inserted_in_course)) {
-        $inserted_in_course = array();
+        $inserted_in_course = [];
     }
     $usergroup = new UserGroup();
     $send_mail = $_POST['sendMail'] ? true : false;
@@ -188,15 +192,14 @@ function updateUsers($users)
                 '',
                 '',
                 ''
-
             );
             if (!is_array($user['Courses']) && !empty($user['Courses'])) {
-                $user['Courses'] = array($user['Courses']);
+                $user['Courses'] = [$user['Courses']];
             }
             if (is_array($user['Courses'])) {
                 foreach ($user['Courses'] as $course) {
                     if (CourseManager::course_exists($course)) {
-                        CourseManager::subscribe_user($user_id, $course, $user['Status']);
+                        CourseManager::subscribeUser($user_id, $course, $user['Status']);
                         $course_info = CourseManager::get_course_information($course);
                         $inserted_in_course[$course] = $course_info['title'];
                     }
@@ -207,7 +210,7 @@ function updateUsers($users)
                 foreach ($classId as $id) {
                     $usergroup->subscribe_users_to_usergroup(
                         $id,
-                        array($user_id),
+                        [$user_id],
                         false
                     );
                 }
@@ -232,103 +235,49 @@ function updateUsers($users)
     }
 }
 
-
 /**
- * Read the CSV-file
+ * Read the CSV-file.
+ *
  * @param string $file Path to the CSV-file
+ *
  * @return array All userinformation read from the file
  */
 function parse_csv_data($file)
 {
     $users = Import :: csvToArray($file);
     foreach ($users as $index => $user) {
-        if (isset ($user['Courses'])) {
+        if (isset($user['Courses'])) {
             $user['Courses'] = explode('|', trim($user['Courses']));
         }
         $users[$index] = $user;
     }
+
     return $users;
 }
-/**
- * XML-parser: handle start of element
- * @param   string  $parser Deprecated?
- * @param   string  $data The data to be parsed
- */
-function element_start($parser, $data)
-{
-    $data = api_utf8_decode($data);
-    global $user;
-    global $current_tag;
-    switch ($data) {
-        case 'Contact':
-            $user = array();
-            break;
-        default:
-            $current_tag = $data;
-    }
-}
 
-/**
- * XML-parser: handle end of element
- * @param   string  $parser Deprecated?
- * @param   string  $data   The data to be parsed
- */
-function element_end($parser, $data)
-{
-    $data = api_utf8_decode($data);
-    global $user;
-    global $users;
-    global $current_value;
-    switch ($data) {
-        case 'Contact':
-            if ($user['Status'] == '5') {
-                $user['Status'] = STUDENT;
-            }
-            if ($user['Status'] == '1') {
-                $user['Status'] = COURSEMANAGER;
-            }
-            $users[] = $user;
-            break;
-        default:
-            $user[$data] = $current_value;
-            break;
-    }
-}
-
-/**
- * XML-parser: handle character data
- * @param   string  $parser Parser (deprecated?)
- * @param   string  $data The data to be parsed
- * @return  void
- */
-function character_data($parser, $data)
-{
-    $data = trim(api_utf8_decode($data));
-    global $current_value;
-    $current_value = $data;
-}
-
-/**
- * Read the XML-file
- * @param string $file Path to the XML-file
- * @return array All user information read from the file
- */
 function parse_xml_data($file)
 {
-    global $users;
-    $users = array();
-    $parser = xml_parser_create('UTF-8');
-    xml_set_element_handler($parser, 'element_start', 'element_end');
-    xml_set_character_data_handler($parser, 'character_data');
-    xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, false);
-    xml_parse($parser, api_utf8_encode_xml(file_get_contents($file)));
-    xml_parser_free($parser);
-    return $users;
+    $crawler = new \Symfony\Component\DomCrawler\Crawler();
+    $crawler->addXmlContent(file_get_contents($file));
+    $crawler = $crawler->filter('Contacts > Contact ');
+    $array = [];
+    foreach ($crawler as $domElement) {
+        $row = [];
+        foreach ($domElement->childNodes as $node) {
+            if ($node->nodeName != '#text') {
+                $row[$node->nodeName] = $node->nodeValue;
+            }
+        }
+        if (!empty($row)) {
+            $array[] = $row;
+        }
+    }
+
+    return $array;
 }
 
 $this_section = SECTION_PLATFORM_ADMIN;
-api_protect_admin_script(true, null, 'login');
-
+api_protect_admin_script(true, null);
 
 $defined_auth_sources[] = PLATFORM_AUTH_SOURCE;
 
@@ -337,18 +286,18 @@ if (isset($extAuthSource) && is_array($extAuthSource)) {
 }
 
 $tool_name = get_lang('ImportUserListXMLCSV');
-$interbreadcrumb[] = array("url" => 'index.php', "name" => get_lang('PlatformAdmin'));
+$interbreadcrumb[] = ["url" => 'index.php', "name" => get_lang('PlatformAdmin')];
 
 set_time_limit(0);
 $extra_fields = UserManager::get_extra_fields(0, 0, 5, 'ASC', true);
-$user_id_error = array();
+$user_id_error = [];
 $error_message = '';
 
 if (isset($_POST['formSent']) && $_POST['formSent'] && $_FILES['import_file']['size'] !== 0) {
     $file_type = 'csv';
     Security::clear_token();
     $tok = Security::get_token();
-    $allowed_file_mimetype = array('csv', 'xml');
+    $allowed_file_mimetype = ['csv', 'xml'];
     $error_kind_file = false;
 
     $uploadInfo = pathinfo($_FILES['import_file']['name']);
@@ -371,7 +320,7 @@ if (isset($_POST['formSent']) && $_POST['formSent'] && $_FILES['import_file']['s
     }
 
     // List user id with error.
-    $users_to_insert = $user_id_error = array();
+    $users_to_insert = $user_id_error = [];
 
     if (is_array($errors)) {
         foreach ($errors as $my_errors) {
@@ -387,7 +336,7 @@ if (isset($_POST['formSent']) && $_POST['formSent'] && $_FILES['import_file']['s
         }
     }
 
-    $inserted_in_course = array();
+    $inserted_in_course = [];
     if (strcmp($file_type, 'csv') === 0) {
         updateUsers($users_to_insert);
     }
@@ -419,9 +368,8 @@ if (isset($_POST['formSent']) && $_POST['formSent'] && $_FILES['import_file']['s
         header('Location: '.api_get_path(WEB_CODE_PATH).'admin/user_list.php?sec_token='.$tok);
         exit;
     }
-
 }
-Display :: display_header($tool_name);
+Display::display_header($tool_name);
 
 if (!empty($error_message)) {
     echo Display::return_message($error_message, 'error');
@@ -432,7 +380,7 @@ $form->addElement('header', $tool_name);
 $form->addElement('hidden', 'formSent');
 $form->addElement('file', 'import_file', get_lang('ImportFileLocation'));
 
-$group = array();
+$group = [];
 
 $form->addButtonImport(get_lang('Import'));
 $defaults['formSent'] = 1;
@@ -441,8 +389,8 @@ $defaults['file_type'] = 'csv';
 $form->setDefaults($defaults);
 $form->display();
 
-$list = array();
-$list_reponse = array();
+$list = [];
+$list_reponse = [];
 $result_xml = '';
 $i = 0;
 $count_fields = count($extra_fields);
@@ -464,7 +412,9 @@ if ($count_fields > 0) {
 <blockquote>
     <pre>
         <b>UserName</b>;LastName;FirstName;Email;NewUserName;Password;AuthSource;OfficialCode;PhoneNumber;Status;ExpiryDate;Active;Language;Courses;ClassId;
-        xxx;xxx;xxx;xxx;xxx;xxx;xxx;xxx;xxx;user/teacher/drh;YYYY-MM-DD 00:00:00;0/1;xxx;<span style="color:red;"><?php if (count($list_reponse) > 0) echo implode(';', $list_reponse).';'; ?></span>xxx1|xxx2|xxx3;1;<br />
+        xxx;xxx;xxx;xxx;xxx;xxx;xxx;xxx;xxx;user/teacher/drh;YYYY-MM-DD 00:00:00;0/1;xxx;<span style="color:red;"><?php if (count($list_reponse) > 0) {
+    echo implode(';', $list_reponse).';';
+} ?></span>xxx1|xxx2|xxx3;1;<br />
     </pre>
 </blockquote>
 <p><?php

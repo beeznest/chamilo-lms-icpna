@@ -2,8 +2,10 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * View (MVC patter) for adding a attendance
+ * View (MVC patter) for adding a attendance.
+ *
  * @author Christian Fasanando <christian1827@gmail.com>
+ *
  * @package chamilo.attendance
  */
 
@@ -34,7 +36,7 @@ $form->addHtmlEditor(
     get_lang('Description'),
     false,
     false,
-    array('ToolbarSet' => 'TrainingDescription', 'Width' => '100%', 'Height' => '150')
+    ['ToolbarSet' => 'Basic', 'Width' => '100%', 'Height' => '150']
 );
 
 // Advanced Parameters
@@ -65,6 +67,9 @@ if ((api_get_session_id() != 0 && Gradebook::is_active()) || api_get_session_id(
     );
     $form->applyFilter('attendance_weight', 'html_filter');
     $form->addElement('html', '</div>');
+
+    $skillList = Skill::addSkillsToForm($form, ITEM_TYPE_ATTENDANCE, 0);
+
     $form->addElement('html', '</div>');
 }
 $form->addButtonCreate(get_lang('Save'));

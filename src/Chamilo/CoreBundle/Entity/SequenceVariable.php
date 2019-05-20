@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class SequenceVariable
+ * Class SequenceVariable.
  *
  * @ORM\Table(name="sequence_variable")
  * @ORM\Entity
@@ -14,39 +14,39 @@ use Doctrine\ORM\Mapping as ORM;
 class SequenceVariable
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue()
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
      *
      * @ORM\Column(name="name", type="string", nullable=true)
      */
-    private $name;
+    protected $name;
 
     /**
      * @var string
      *
      * @ORM\Column(name="description", type="text", nullable=true)
      */
-    private $description;
+    protected $description;
 
     /**
      * @var string
      *
      * @ORM\Column(name="default_val", type="string", nullable=true)
      */
-    private $defaultValue;
+    protected $defaultValue;
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -112,5 +112,4 @@ class SequenceVariable
 
         return $this;
     }
-
 }

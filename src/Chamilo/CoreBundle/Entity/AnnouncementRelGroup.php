@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * AnnouncementRelGroup
+ * AnnouncementRelGroup.
  *
  * @ORM\Table(name="announcement_rel_group")
  * @ORM\Entity
@@ -14,27 +14,28 @@ use Doctrine\ORM\Mapping as ORM;
 class AnnouncementRelGroup
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="group_id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="NONE")
      */
-    private $groupId;
+    protected $groupId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="announcement_id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="NONE")
      */
-    private $announcementId;
+    protected $announcementId;
 
     /**
-     * Set groupId
+     * Set groupId.
      *
-     * @param integer $groupId
+     * @param int $groupId
+     *
      * @return AnnouncementRelGroup
      */
     public function setGroupId($groupId)
@@ -45,9 +46,9 @@ class AnnouncementRelGroup
     }
 
     /**
-     * Get groupId
+     * Get groupId.
      *
-     * @return integer
+     * @return int
      */
     public function getGroupId()
     {
@@ -55,9 +56,10 @@ class AnnouncementRelGroup
     }
 
     /**
-     * Set announcementId
+     * Set announcementId.
      *
-     * @param integer $announcementId
+     * @param int $announcementId
+     *
      * @return AnnouncementRelGroup
      */
     public function setAnnouncementId($announcementId)
@@ -68,9 +70,9 @@ class AnnouncementRelGroup
     }
 
     /**
-     * Get announcementId
+     * Get announcementId.
      *
-     * @return integer
+     * @return int
      */
     public function getAnnouncementId()
     {

@@ -1,51 +1,28 @@
 <?php
 /* For licensing terms, see /license.txt */
 
+use ChamiloSession as Session;
+
 /**
- * This is a learning path creation and player tool in Chamilo - previously learnpath_handler.php
+ * This is a learning path creation and player tool in Chamilo - previously learnpath_handler.php.
  *
  * @author Patrick Cool
  * @author Denes Nagy
  * @author Roan Embrechts, refactoring and code cleaning
  * @author Yannick Warnier <ywarnier@beeznest.org> - cleaning and update for new SCORM tool
  * @author Julio Montoya  - Improving the list of templates
+ *
  * @package chamilo.learnpath
-*/
-
+ */
 $this_section = SECTION_COURSES;
 api_protect_course_script();
 
+/** @var learnpath $learnPath */
+$learnPath = Session::read('oLP');
+
 /* Header and action code */
-$htmlHeadXtra[] = '
-<script>'.$_SESSION['oLP']->get_js_dropdown_array().
-"
-    function load_cbo(id) {
-        if (!id) {
-            return false;
-        }
-
-        var cbo = document.getElementById('previous');
-
-        for(var i = cbo.length - 1; i > 0; i--) {
-            cbo.options[i] = null;
-        }
-
-        var k=0;
-
-        for(var i = 1; i <= child_name[id].length; i++){
-            var option = new Option(child_name[id][i - 1], child_value[id][i - 1]);
-            option.style.paddingLeft = '20px';
-
-            cbo.options[i] = option;
-            k = i;
-        }
-
-        cbo.options[k].selected = true;
-        $('#previous').selectpicker('refresh');
-    }
-" .
-'
-$(document).on("ready", function() {
+$htmlHeadXtra[] = '<script>'.$learnPath->get_js_dropdown_array().'
+$(function() {
     CKEDITOR.on("instanceReady", function (e) {
         showTemplates("content_lp");
     });
@@ -53,7 +30,6 @@ $(document).on("ready", function() {
 </script>';
 
 /* Constants and variables */
-
 $is_allowed_to_edit = api_is_allowed_to_edit(null, true);
 $tbl_lp = Database::get_course_table(TABLE_LP_MAIN);
 
@@ -61,11 +37,8 @@ $isStudentView = isset($_REQUEST['isStudentView']) ? intval($_REQUEST['isStudent
 $learnpath_id = (int) $_REQUEST['lp_id'];
 $submit = isset($_POST['submit_button']) ? $_POST['submit_button'] : null;
 
-/* MAIN CODE */
-
-if ((!$is_allowed_to_edit) || ($isStudentView)) {
-    error_log('New LP - User not authorized in lp_edit_item.php');
-    header('location:lp_controller.php?action=view&lp_id='.$learnpath_id);
+if (!$is_allowed_to_edit || $isStudentView) {
+    header('location:lp_controller.php?action=view&lp_id='.$learnpath_id.'&'.api_get_cidreq());
     exit;
 }
 // From here on, we are admin because of the previous condition, so don't check anymore.
@@ -80,35 +53,28 @@ $therow = Database::fetch_array($result);
     Course admin section
     - all the functions not available for students - always available in this case (page only shown to admin)
 */
-
-/* SHOWING THE ADMIN TOOLS */
-
-if (isset($_SESSION['gradebook'])) {
-    $gradebook = $_SESSION['gradebook'];
+if (api_is_in_gradebook()) {
+    $interbreadcrumb[] = [
+        'url' => Category::getUrl(),
+        'name' => get_lang('ToolGradebook'),
+    ];
 }
-
-if (!empty($gradebook) && $gradebook == 'view') {
-    $interbreadcrumb[] = array(
-        'url' => '../gradebook/'.$_SESSION['gradebook_dest'],
-        'name' => get_lang('ToolGradebook')
-    );
-}
-$interbreadcrumb[] = array(
+$interbreadcrumb[] = [
     'url' => 'lp_controller.php?action=list&'.api_get_cidreq(),
-    'name' => get_lang('LearningPaths')
-);
-$interbreadcrumb[] = array(
+    'name' => get_lang('LearningPaths'),
+];
+$interbreadcrumb[] = [
     'url' => api_get_self()."?action=build&lp_id=$learnpath_id&".api_get_cidreq(),
-    'name' => Security::remove_XSS($therow['name'])
-);
-$interbreadcrumb[] = array(
+    'name' => Security::remove_XSS($therow['name']),
+];
+$interbreadcrumb[] = [
     'url' => api_get_self()."?action=add_item&type=step&lp_id=$learnpath_id&".api_get_cidreq(),
-    'name' => get_lang('NewStep')
-);
+    'name' => get_lang('NewStep'),
+];
 
 // Theme calls.
 $show_learn_path = true;
-$lp_theme_css = $_SESSION['oLP']->get_theme();
+$lp_theme_css = $learnPath->get_theme();
 
 Display::display_header(get_lang('Edit'), 'Path');
 $suredel = trim(get_lang('AreYouSureToDeleteJS'));
@@ -129,11 +95,9 @@ function confirmation(name) {
         return false;
     }
 }
-jQuery(document).ready(function(){
-    jQuery('.scrollbar-inner').scrollbar();
-});
 
-$(document).ready(function() {
+$(function() {
+    jQuery('.scrollbar-inner').scrollbar();
     expandColumnToogle('#hide_bar_template', {
         selector: '#lp_sidebar'
     }, {
@@ -141,7 +105,7 @@ $(document).ready(function() {
     });
 
     $('.lp-btn-associate-forum').on('click', function (e) {
-        var associate = confirm('<?php echo get_lang('ConfirmAssociateForumToLPItem') ?>');
+        var associate = confirm('<?php echo get_lang('ConfirmAssociateForumToLPItem'); ?>');
 
         if (!associate) {
             e.preventDefault();
@@ -149,7 +113,7 @@ $(document).ready(function() {
     });
 
     $('.lp-btn-dissociate-forum').on('click', function (e) {
-        var dissociate = confirm('<?php echo get_lang('ConfirmDissociateForumToLPItem') ?>');
+        var dissociate = confirm('<?php echo get_lang('ConfirmDissociateForumToLPItem'); ?>');
 
         if (!dissociate) {
             e.preventDefault();
@@ -159,29 +123,32 @@ $(document).ready(function() {
 </script>
 <?php
 
-echo $_SESSION['oLP']->build_action_menu();
+echo $learnPath->build_action_menu();
 
 echo '<div class="row">';
 echo '<div id="lp_sidebar" class="col-md-4">';
-$path_item = isset($_GET['path_item']) ? $_GET['path_item'] : 0;
-$path_item = Database::escape_string($path_item);
-$tbl_doc = Database::get_course_table(TABLE_DOCUMENT);
-$sql_doc = "SELECT path FROM ".$tbl_doc."
-            WHERE c_id = $course_id AND id = '".$path_item."' ";
+$documentId = isset($_GET['path_item']) ? (int) $_GET['path_item'] : 0;
+$documentInfo = DocumentManager::get_document_data_by_id($documentId, api_get_course_id(), false, null, true);
+if (empty($documentInfo)) {
+    // Try with iid
+    $table = Database::get_course_table(TABLE_DOCUMENT);
+    $sql = "SELECT path FROM $table
+            WHERE c_id = $course_id AND iid = $documentId AND path NOT LIKE '%_DELETED_%'";
+    $res_doc = Database::query($sql);
+    $path_file = Database::result($res_doc, 0, 0);
+} else {
+    $path_file = $documentInfo['path'];
+}
 
-$res_doc = Database::query($sql_doc);
-$path_file = Database::result($res_doc, 0, 0);
 $path_parts = pathinfo($path_file);
 
-if (Database::num_rows($res_doc) > 0 && $path_parts['extension'] == 'html') {
-    echo $_SESSION['oLP']->return_new_tree();
-
+if (!empty($path_file) && isset($path_parts['extension']) && $path_parts['extension'] == 'html') {
+    echo $learnPath->return_new_tree();
     // Show the template list
     echo '<div id="frmModel" class="scrollbar-inner lp-add-item"></div>';
 } else {
-    echo $_SESSION['oLP']->return_new_tree();
+    echo $learnPath->return_new_tree();
 }
-
 echo '</div>';
 echo '<div id="doc_form" class="col-md-8">';
 
@@ -189,17 +156,18 @@ if (isset($is_success) && $is_success === true) {
     $msg = '<div class="lp_message" style="margin-bottom:10px;">';
     $msg .= 'The item has been edited.';
     $msg .= '</div>';
-    echo $_SESSION['oLP']->display_item($_GET['id'], $msg);
+    echo $learnPath->display_item($_GET['id'], $msg);
 } else {
-    echo $_SESSION['oLP']->display_edit_item($_GET['id']);
-    if (isset($_SESSION['finalItem'])) {
+    $item = $learnPath->getItem($_GET['id']);
+    echo $learnPath->display_edit_item($item->getIid());
+    $finalItem = Session::read('finalItem');
+    if ($finalItem) {
         echo '<script>$("#frmModel").remove()</script>';
     }
-    unset($_SESSION['finalItem']);
+    Session::erase('finalItem');
 }
 
 echo '</div>';
 echo '</div>';
 
-/* FOOTER */
 Display::display_footer();

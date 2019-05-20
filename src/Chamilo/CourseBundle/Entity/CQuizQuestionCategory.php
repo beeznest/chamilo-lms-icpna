@@ -6,7 +6,7 @@ namespace Chamilo\CourseBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CQuizQuestionCategory
+ * CQuizQuestionCategory.
  *
  * @ORM\Table(
  *  name="c_quiz_question_category",
@@ -19,46 +19,47 @@ use Doctrine\ORM\Mapping as ORM;
 class CQuizQuestionCategory
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="iid", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue
      */
-    private $iid;
+    protected $iid;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="c_id", type="integer")
      */
-    private $cId;
+    protected $cId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer", nullable=true)
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
      *
      * @ORM\Column(name="title", type="string", length=255, nullable=false)
      */
-    private $title;
+    protected $title;
 
     /**
      * @var string
      *
      * @ORM\Column(name="description", type="text", nullable=false)
      */
-    private $description;
+    protected $description;
 
     /**
-     * Set title
+     * Set title.
      *
      * @param string $title
+     *
      * @return CQuizQuestionCategory
      */
     public function setTitle($title)
@@ -69,7 +70,7 @@ class CQuizQuestionCategory
     }
 
     /**
-     * Get title
+     * Get title.
      *
      * @return string
      */
@@ -79,9 +80,10 @@ class CQuizQuestionCategory
     }
 
     /**
-     * Set description
+     * Set description.
      *
      * @param string $description
+     *
      * @return CQuizQuestionCategory
      */
     public function setDescription($description)
@@ -92,7 +94,7 @@ class CQuizQuestionCategory
     }
 
     /**
-     * Get description
+     * Get description.
      *
      * @return string
      */
@@ -102,9 +104,10 @@ class CQuizQuestionCategory
     }
 
     /**
-     * Set id
+     * Set id.
      *
-     * @param integer $id
+     * @param int $id
+     *
      * @return CQuizQuestionCategory
      */
     public function setId($id)
@@ -115,9 +118,9 @@ class CQuizQuestionCategory
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -125,9 +128,10 @@ class CQuizQuestionCategory
     }
 
     /**
-     * Set cId
+     * Set cId.
      *
-     * @param integer $cId
+     * @param int $cId
+     *
      * @return CQuizQuestionCategory
      */
     public function setCId($cId)
@@ -138,9 +142,9 @@ class CQuizQuestionCategory
     }
 
     /**
-     * Get cId
+     * Get cId.
      *
-     * @return integer
+     * @return int
      */
     public function getCId()
     {

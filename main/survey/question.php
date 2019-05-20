@@ -3,15 +3,15 @@
 
 /**
  * @package chamilo.survey
+ *
  * @author unknown, the initial survey that did not make it in 1.8 because of bad code
- * @author Patrick Cool <patrick.cool@UGent.be>, Ghent University: cleanup, refactoring and rewriting large parts of the code
- * @version $Id: question.php 21734 2009-07-02 17:12:41Z cvargas1 $
+ * @author Patrick Cool <patrick.cool@UGent.be>, Ghent University: cleanup,
+ * refactoring and rewriting large parts of the code
  */
-
 require_once __DIR__.'/../inc/global.inc.php';
 
 $htmlHeadXtra[] = '<script>
-$(document).ready( function() {
+$(function() {
     $("button").click(function() {
         $("#is_executable").attr("value",$(this).attr("name"));
     });
@@ -59,14 +59,14 @@ if ($surveyData['survey_type'] == 1) {
 }
 
 // Breadcrumbs
-$interbreadcrumb[] = array(
+$interbreadcrumb[] = [
     'url' => api_get_path(WEB_CODE_PATH).'survey/survey_list.php',
     'name' => get_lang('SurveyList'),
-);
-$interbreadcrumb[] = array(
+];
+$interbreadcrumb[] = [
     'url' => api_get_path(WEB_CODE_PATH).'survey/survey.php?survey_id='.intval($_GET['survey_id']),
     'name' => strip_tags($urlname),
-);
+];
 
 // Tool name
 if ($_GET['action'] == 'add') {
@@ -77,7 +77,7 @@ if ($_GET['action'] == 'edit') {
 }
 
 // The possible question types
-$possible_types = array(
+$possible_types = [
     'personality',
     'yesno',
     'multiplechoice',
@@ -87,8 +87,8 @@ $possible_types = array(
     'comment',
     'pagebreak',
     'percentage',
-    'score'
-);
+    'score',
+];
 
 // Actions
 $actions = '<div class="actions">';
@@ -100,7 +100,7 @@ if (!in_array($_GET['type'], $possible_types)) {
     Display :: display_header($tool_name, 'Survey');
     echo $actions;
     echo Display::return_message(get_lang('TypeDoesNotExist'), 'error', false);
-    Display :: display_footer();
+    Display::display_footer();
 }
 
 $error_message = '';
@@ -109,29 +109,33 @@ $error_message = '';
 
 $ch_type = 'ch_'.$_GET['type'];
 /** @var survey_question $surveyQuestion */
-$surveyQuestion = new $ch_type;
+$surveyQuestion = new $ch_type();
 
 // The defaults values for the form
-$formData = array();
-$formData['answers'] = array('', '');
+$formData = [];
+$formData['answers'] = ['', ''];
 
-if ($_GET['type'] == 'yesno') {
-    $formData['answers'][0] = get_lang('Yes');
-    $formData['answers'][1] = get_lang('No');
-}
+switch ($_GET['type']) {
+    case 'yesno':
+        $formData['answers'][0] = get_lang('Yes');
+        $formData['answers'][1] = get_lang('No');
+        break;
+    case 'personality':
+        $formData['answers'][0] = 1;
+        $formData['answers'][1] = 2;
+        $formData['answers'][2] = 3;
+        $formData['answers'][3] = 4;
+        $formData['answers'][4] = 5;
 
-if ($_GET['type'] == 'personality') {
-    $formData['answers'][0] = 1;
-    $formData['answers'][1] = 2;
-    $formData['answers'][2] = 3;
-    $formData['answers'][3] = 4;
-    $formData['answers'][4] = 5;
-
-    $formData['values'][0] = 0;
-    $formData['values'][1] = 0;
-    $formData['values'][2] = 1;
-    $formData['values'][3] = 2;
-    $formData['values'][4] = 3;
+        $formData['values'][0] = 0;
+        $formData['values'][1] = 0;
+        $formData['values'][2] = 1;
+        $formData['values'][3] = 2;
+        $formData['values'][4] = 3;
+        break;
+    case 'open':
+        Display::addFlash(Display::return_message(get_lang('QuestionTags')));
+        break;
 }
 
 // We are editing a question
@@ -150,7 +154,5 @@ if ($surveyQuestion->getForm()->validate()) {
 }
 
 Display::display_header($tool_name, 'Survey');
-
 echo $surveyQuestion->getForm()->returnForm();
-
-Display :: display_footer();
+Display::display_footer();

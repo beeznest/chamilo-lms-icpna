@@ -2,7 +2,8 @@
 
 /* For licensing terms, see /license.txt */
 /**
- * Script
+ * Script.
+ *
  * @package chamilo.gradebook
  */
 
@@ -14,15 +15,15 @@ $this_section = SECTION_MYGRADEBOOK;
 api_block_anonymous_users();
 GradebookUtils::block_students();
 
-$evaluation = Evaluation :: load($_GET['selecteval']);
+$evaluation = Evaluation::load($_GET['selecteval']);
 $newstudents = $evaluation[0]->get_not_subscribed_students();
 
 if (count($newstudents) == '0') {
-	header('Location: gradebook_view_result.php?nouser=&selecteval='.Security::remove_XSS($_GET['selecteval']).'&'.api_get_cidreq());
-	exit;
+    header('Location: gradebook_view_result.php?nouser=&selecteval='.intval($_GET['selecteval']).'&'.api_get_cidreq());
+    exit;
 }
 $add_user_form = new EvalForm(
-    EvalForm :: TYPE_ADD_USERS_TO_EVAL,
+    EvalForm::TYPE_ADD_USERS_TO_EVAL,
     $evaluation[0],
     null,
     'add_users_to_evaluation',
@@ -33,7 +34,7 @@ $add_user_form = new EvalForm(
 );
 
 if (isset($_POST['submit_button'])) {
-    $users = is_array($_POST['add_users']) ? $_POST['add_users'] : array();
+    $users = is_array($_POST['add_users']) ? $_POST['add_users'] : [];
     foreach ($users as $key => $value) {
         $users[$key] = intval($value);
     }
@@ -55,7 +56,7 @@ if (isset($_POST['submit_button'])) {
     exit;
 } elseif ($_POST['firstLetterUser']) {
     $firstletter = $_POST['firstLetterUser'];
-    if (!empty ($firstletter)) {
+    if (!empty($firstletter)) {
         header(
             'Location: '.api_get_self().'?firstletter='.Security::remove_XSS(
                 $firstletter
@@ -65,14 +66,14 @@ if (isset($_POST['submit_button'])) {
     }
 }
 
-$interbreadcrumb[] = array('url' => Security::remove_XSS($_SESSION['gradebook_dest']), 'name' => get_lang('Gradebook'));
-$interbreadcrumb[] = array(
-	'url' => 'gradebook_view_result.php?selecteval='.Security::remove_XSS($_GET['selecteval']).'&'.api_get_cidreq(),
-	'name' => get_lang('ViewResult')
-);
+$interbreadcrumb[] = ['url' => Category::getUrl(), 'name' => get_lang('Gradebook')];
+$interbreadcrumb[] = [
+    'url' => 'gradebook_view_result.php?selecteval='.Security::remove_XSS($_GET['selecteval']).'&'.api_get_cidreq(),
+    'name' => get_lang('ViewResult'),
+];
 Display :: display_header(get_lang('AddUserToEval'));
-if (isset ($_GET['erroroneuser'])) {
-	echo Display::return_message(get_lang('AtLeastOneUser'), 'warning', false);
+if (isset($_GET['erroroneuser'])) {
+    echo Display::return_message(get_lang('AtLeastOneUser'), 'warning', false);
 }
 DisplayGradebook :: display_header_result($evaluation[0], null, 0, 0);
 echo '<div class="main">';

@@ -15,7 +15,7 @@ if (!empty($course_info)) {
     api_protect_course_script(true);
 }
 
-$action = isset($_GET['action']) ? $_GET['action'] : null;
+$action = isset($_GET['action']) ? Security::remove_XSS($_GET['action']) : null;
 
 $this_section = SECTION_COURSES;
 $url = null;
@@ -28,6 +28,15 @@ if (empty($action)) {
     header("Location: $url");
     exit;
 }
+
+$logInfo = [
+    'tool' => TOOL_CALENDAR_EVENT,
+    'tool_id' => 0,
+    'tool_id_detail' => 0,
+    'action' => $action,
+    'info' => '',
+];
+Event::registerLog($logInfo);
 
 $group_id = api_get_group_id();
 $groupInfo = GroupManager::get_group_properties($group_id);
@@ -49,7 +58,6 @@ function plus_repeated_event() {
         }
     });
 </script>";
-
 
 $htmlHeadXtra[] = '<script>
 var counter_image = 1;
@@ -82,7 +90,12 @@ $nameTools = get_lang('Agenda');
 Event::event_access_tool(TOOL_CALENDAR_EVENT);
 
 if ($type === 'fromjs') {
-    $id_list = explode('_', $eventId);
+    // split the "id" parameter only if string and there are _ separators
+    if (preg_match('/_/', $eventId)) {
+        $id_list = explode('_', $eventId);
+    } else {
+        $id_list = $eventId;
+    }
     $eventId = $id_list[1];
     $event_type = $id_list[0];
     $event_type = $event_type === 'platform' ? 'admin' : $event_type;
@@ -108,20 +121,18 @@ if ($allowToEdit) {
     switch ($action) {
         case 'add':
             $actionName = get_lang('Add');
-            $form = $agenda->getForm(array('action' => 'add'));
+            $form = $agenda->getForm(['action' => 'add']);
 
             if ($form->validate()) {
                 $values = $form->getSubmitValues();
 
                 $sendEmail = isset($values['add_announcement']) ? true : false;
                 $allDay = isset($values['all_day']) ? 'true' : 'false';
-
                 $sendAttachment = isset($_FILES) && !empty($_FILES) ? true : false;
                 $attachmentList = $sendAttachment ? $_FILES : null;
                 $attachmentCommentList = isset($values['legend']) ? $values['legend'] : null;
                 $comment = isset($values['comment']) ? $values['comment'] : null;
                 $usersToSend = isset($values['users_to_send']) ? $values['users_to_send'] : '';
-
                 $startDate = $values['date_range_start'];
                 $endDate = $values['date_range_end'];
 
@@ -160,7 +171,7 @@ if ($allowToEdit) {
                 header("Location: $agendaUrl");
                 exit;
             } else {
-                $content = $form->return_form();
+                $content = $form->returnForm();
             }
             break;
         case 'edit':
@@ -186,12 +197,10 @@ if ($allowToEdit) {
 
                 $sendAttachment = isset($_FILES) && !empty($_FILES) ? true : false;
                 $attachmentList = $sendAttachment ? $_FILES : null;
-                $attachmentCommentList = isset($values['legend']) ? $values['legend'] : null;
-
-                $comment = isset($values['comment']) ? $values['comment'] : null;
+                $attachmentCommentList = isset($values['legend']) ? $values['legend'] : '';
+                $comment = isset($values['comment']) ? $values['comment'] : '';
 
                 // This is a sub event. Delete the current and create another BT#7803
-
                 if (!empty($event['parent_event_id'])) {
                     $agenda->deleteEvent($eventId);
 
@@ -244,7 +253,7 @@ if ($allowToEdit) {
                     );
                 }
 
-                $deleteAttachmentList = isset($values['delete_attachment']) ? $values['delete_attachment'] : array();
+                $deleteAttachmentList = isset($values['delete_attachment']) ? $values['delete_attachment'] : [];
 
                 if (!empty($deleteAttachmentList)) {
                     foreach ($deleteAttachmentList as $deleteAttachmentId => $value) {
@@ -285,7 +294,9 @@ if ($allowToEdit) {
             $content = $form->returnForm();
             break;
         case "delete":
-            if (!(api_is_session_general_coach() && !api_is_element_in_the_session(TOOL_AGENDA, $eventId))) {
+            if (!(api_is_session_general_coach() &&
+                !api_is_element_in_the_session(TOOL_AGENDA, $eventId))
+            ) {
                 // a coach can only delete an element belonging to his session
                 $content = $agenda->deleteEvent($eventId);
             }
@@ -295,20 +306,22 @@ if ($allowToEdit) {
 
 if (!empty($group_id)) {
     $group_properties = GroupManager :: get_group_properties($group_id);
-    $interbreadcrumb[] = array(
+    $interbreadcrumb[] = [
         "url" => api_get_path(WEB_CODE_PATH)."group/group.php?".api_get_cidreq(),
-        "name" => get_lang('Groups')
-    );
-    $interbreadcrumb[] = array(
+        "name" => get_lang('Groups'),
+    ];
+    $interbreadcrumb[] = [
         "url" => api_get_path(WEB_CODE_PATH)."group/group_space.php?".api_get_cidreq(),
-        "name" => get_lang('GroupSpace').' '.$group_properties['name']
-    );
+        "name" => get_lang('GroupSpace').' '.$group_properties['name'],
+    ];
 }
 if (!empty($actionName)) {
-    $interbreadcrumb[] = array(
+    $interbreadcrumb[] = [
         "url" => $url,
-        "name" => get_lang('Agenda')
-    );
+        "name" => get_lang('Agenda'),
+    ];
+} else {
+    $actionName = '';
 }
 
 // Tool introduction
@@ -318,5 +331,4 @@ $tpl = new Template($actionName);
 $tpl->assign('content', $content);
 $tpl->assign('actions', $actions);
 
-// Loading main Chamilo 1 col template
 $tpl->display_one_col_template();

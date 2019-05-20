@@ -5,24 +5,28 @@ namespace Chamilo\CourseBundle\Component\CourseCopy\Resources;
 
 /**
  * An Quiz
- * Exercises backup script
+ * Exercises backup script.
+ *
  * @author Bart Mollet <bart.mollet@hogent.be>
+ *
  * @package chamilo.backup
  */
 class Quiz extends Resource
 {
     /**
-     * Create a new Quiz
+     * Create a new Quiz.
+     *
      * @param string $title
      * @param string $description
-     * @param int $random
-     * @param int $type
-     * @param int $active
+     * @param int    $random
+     * @param int    $type
+     * @param int    $active
      */
     public $obj; //question
 
     /**
      * Quiz constructor.
+     *
      * @param int $obj
      */
     public function __construct($obj)
@@ -33,16 +37,19 @@ class Quiz extends Resource
     }
 
     /**
-     * Add a question to this Quiz
+     * Add a question to this Quiz.
+     *
+     * @param int $id
+     * @param int $questionOrder
      */
-    public function add_question($id, $question_order)
+    public function add_question($id, $questionOrder)
     {
         $this->obj->question_ids[] = $id;
-        $this->obj->question_orders[] = $question_order;
+        $this->obj->question_orders[] = $questionOrder;
     }
 
     /**
-     * Show this question
+     * Show this question.
      */
     public function show()
     {

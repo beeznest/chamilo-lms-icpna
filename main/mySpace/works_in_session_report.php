@@ -1,15 +1,15 @@
 <?php
 /* For licensing terms, see /license.txt */
 
+use Chamilo\CoreBundle\Entity\Course;
 use Chamilo\CoreBundle\Entity\Session;
 use Chamilo\UserBundle\Entity\User;
-use Chamilo\CoreBundle\Entity\Course;
 
 /**
- * Courses reporting
+ * Courses reporting.
+ *
  * @package chamilo.reporting
  */
-
 require_once __DIR__.'/../inc/global.inc.php';
 
 api_block_anonymous_users(true);
@@ -49,7 +49,6 @@ $usersInfo = [];
 
 if ($session) {
     $sessionCourses = $session->getCourses();
-
     foreach ($sessionCourses as $sessionCourse) {
         /** @var Course $course */
         $course = $sessionCourse->getCourse();
@@ -68,7 +67,7 @@ if ($session) {
                         Tracking::get_time_spent_on_the_platform($user->getId(), 'ever')
                     ),
                     'first_connection' => Tracking::get_first_connection_date($user->getId()),
-                    'last_connection' => Tracking::get_last_connection_date($user->getId())
+                    'last_connection' => Tracking::get_last_connection_date($user->getId()),
                 ];
             }
 
@@ -83,17 +82,16 @@ if ($session) {
             $usersInfo[$user->getId()][$course->getId().'_score'] = Tracking::get_avg_student_score(
                 $user->getId(),
                 $course->getCode(),
-                null,
+                [],
                 $session->getId(),
                 false,
                 false,
                 true
-
             );
             $usersInfo[$user->getId()][$course->getId().'_progress'] = Tracking::get_avg_student_progress(
                 $user->getId(),
                 $course->getCode(),
-                null,
+                [],
                 $session->getId()
             );
 
@@ -109,7 +107,8 @@ if ($session) {
             }
 
             $usersInfo[$user->getId()][$course->getId().'_last_sent_date'] = api_get_local_time(
-                $lastPublication->getSentDate()->getTimestamp());
+                $lastPublication->getSentDate()->getTimestamp()
+            );
         }
     }
 }
@@ -143,13 +142,12 @@ if (isset($_GET['export']) && $session && ($coursesInfo && $usersInfo)) {
             Export::arrayToCsv($dataToExport, $fileName);
             break;
     }
-
     exit;
 }
 
 $interbreadcrumb[] = [
     'url' => api_get_path(WEB_CODE_PATH).'mySpace/index.php',
-    'name' => get_lang('MySpace')
+    'name' => get_lang('MySpace'),
 ];
 
 $actions = null;

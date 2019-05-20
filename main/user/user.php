@@ -9,9 +9,9 @@
  *
  * @author Roan Embrechts
  * @author Julio Montoya, Several fixes
+ *
  * @package chamilo.user
  */
-
 $use_anonymous = true;
 require_once __DIR__.'/../inc/global.inc.php';
 $current_course_tool = TOOL_USER;
@@ -54,7 +54,7 @@ if (api_is_allowed_to_edit(null, true)) {
             case 'unsubscribe':
                 // Make sure we don't unsubscribe current user from the course
                 if (is_array($_POST['user'])) {
-                    $user_ids = array_diff($_POST['user'], array($user_id));
+                    $user_ids = array_diff($_POST['user'], [$user_id]);
                     if (count($user_ids) > 0) {
                         CourseManager::unsubscribe_user($user_ids, $courseCode);
                         Display::addFlash(
@@ -68,7 +68,7 @@ if (api_is_allowed_to_edit(null, true)) {
 
 // Getting extra fields that have the filter option "on"
 $extraField = new ExtraField('user');
-$extraFields = $extraField->get_all(array('filter = ?' => 1));
+$extraFields = $extraField->get_all(['filter = ?' => 1]);
 $user_image_pdf_size = 80;
 
 if (api_is_allowed_to_edit(null, true)) {
@@ -106,8 +106,8 @@ if (api_is_allowed_to_edit(null, true)) {
                 $table_users = Database::get_main_table(TABLE_MAIN_USER);
                 $is_western_name_order = api_is_western_name_order();
 
-                $data = array();
-                $a_users = array();
+                $data = [];
+                $a_users = [];
                 $current_access_url_id = api_get_current_access_url_id();
                 $extra_fields = UserManager::get_extra_user_data(
                     api_get_user_id(),
@@ -123,7 +123,7 @@ if (api_is_allowed_to_edit(null, true)) {
                 if (api_get_setting('show_email_addresses') == 'true') {
                     $select_email_condition = ' user.email, ';
                     if ($sort_by_first_name) {
-                        $a_users[0] = array(
+                        $a_users[0] = [
                             'id',
                             get_lang('FirstName'),
                             get_lang('LastName'),
@@ -131,10 +131,10 @@ if (api_is_allowed_to_edit(null, true)) {
                             get_lang('Email'),
                             get_lang('Phone'),
                             get_lang('OfficialCode'),
-                            get_lang('Active')
-                        );
+                            get_lang('Active'),
+                        ];
                     } else {
-                        $a_users[0] = array(
+                        $a_users[0] = [
                             'id',
                             get_lang('LastName'),
                             get_lang('FirstName'),
@@ -142,30 +142,30 @@ if (api_is_allowed_to_edit(null, true)) {
                             get_lang('Email'),
                             get_lang('Phone'),
                             get_lang('OfficialCode'),
-                            get_lang('Active')
-                        );
+                            get_lang('Active'),
+                        ];
                     }
                 } else {
                     if ($sort_by_first_name) {
-                        $a_users[0] = array(
+                        $a_users[0] = [
                             'id',
                             get_lang('FirstName'),
                             get_lang('LastName'),
                             get_lang('Username'),
                             get_lang('Phone'),
                             get_lang('OfficialCode'),
-                            get_lang('Active')
-                        );
+                            get_lang('Active'),
+                        ];
                     } else {
-                        $a_users[0] = array(
+                        $a_users[0] = [
                             'id',
                             get_lang('LastName'),
                             get_lang('FirstName'),
                             get_lang('Username'),
                             get_lang('Phone'),
                             get_lang('OfficialCode'),
-                            get_lang('Active')
-                        );
+                            get_lang('Active'),
+                        ];
                     }
                 }
 
@@ -179,23 +179,23 @@ if (api_is_allowed_to_edit(null, true)) {
                 if ($_GET['format'] == 'pdf') {
                     $select_email_condition = ' user.email, ';
                     if ($is_western_name_order) {
-                        $a_users[0] = array(
+                        $a_users[0] = [
                             '#',
                             get_lang('UserPicture'),
                             get_lang('OfficialCode'),
                             get_lang('FirstName').', '.get_lang('LastName'),
                             get_lang('Email'),
-                            get_lang('Phone')
-                        );
+                            get_lang('Phone'),
+                        ];
                     } else {
-                        $a_users[0] = array(
+                        $a_users[0] = [
                             '#',
                             get_lang('UserPicture'),
                             get_lang('OfficialCode'),
                             get_lang('LastName').', '.get_lang('FirstName'),
                             get_lang('Email'),
-                            get_lang('Phone')
-                        );
+                            get_lang('Phone'),
+                        ];
                     }
                 }
 
@@ -274,23 +274,23 @@ if (api_is_allowed_to_edit(null, true)) {
                             $user_image = '<img src="'.$user_info['avatar'].'" width ="'.$user_image_pdf_size.'px" />';
 
                             if ($is_western_name_order) {
-                                $user_pdf = array(
+                                $user_pdf = [
                                     $counter,
                                     $user_image,
                                     $user['official_code'],
                                     $user['firstname'].', '.$user['lastname'],
                                     $user['email'],
-                                    $user['phone']
-                                );
+                                    $user['phone'],
+                                ];
                             } else {
-                                $user_pdf = array(
+                                $user_pdf = [
                                     $counter,
                                     $user_image,
                                     $user['official_code'],
                                     $user['lastname'].', '.$user['firstname'],
                                     $user['email'],
-                                    $user['phone']
-                                );
+                                    $user['phone'],
+                                ];
                             }
 
                             $a_users[] = $user_pdf;
@@ -362,23 +362,23 @@ if (api_is_allowed_to_edit(null, true)) {
                             $user_image = '<img src="'.$user_info['avatar'].'" width ="'.$user_image_pdf_size.'px" />';
 
                             if ($is_western_name_order) {
-                                $user_pdf = array(
+                                $user_pdf = [
                                     $counter,
                                     $user_image,
                                     $user['official_code'],
                                     $user['firstname'].', '.$user['lastname'],
                                     $user['email'],
-                                    $user['phone']
-                                );
+                                    $user['phone'],
+                                ];
                             } else {
-                                $user_pdf = array(
+                                $user_pdf = [
                                     $counter,
                                     $user_image,
                                     $user['official_code'],
                                     $user['lastname'].', '.$user['firstname'],
                                     $user['email'],
-                                    $user['phone']
-                                );
+                                    $user['phone'],
+                                ];
                             }
 
                             $a_users[] = $user_pdf;
@@ -406,17 +406,17 @@ if (api_is_allowed_to_edit(null, true)) {
                         Export::arrayToXls($a_users, $fileName);
                         exit;
                     case 'pdf':
-                        $header_attributes = array(
-                            array('style' => 'width:10px'),
-                            array('style' => 'width:30px'),
-                            array('style' => 'width:50px'),
-                            array('style' => 'width:500px')
-                        );
-                        $params = array(
+                        $header_attributes = [
+                            ['style' => 'width:10px'],
+                            ['style' => 'width:30px'],
+                            ['style' => 'width:50px'],
+                            ['style' => 'width:500px'],
+                        ];
+                        $params = [
                             'filename' => $fileName,
                             'pdf_title' => $pdfTitle,
-                            'header_attributes' => $header_attributes
-                        );
+                            'header_attributes' => $header_attributes,
+                        ];
 
                         Export::export_table_pdf($a_users, $params);
                         exit;
@@ -497,7 +497,7 @@ $parameters['type'] = $type;
 
 $table->set_additional_parameters($parameters);
 $header_nr = 0;
-$indexList = array();
+$indexList = [];
 $table->set_header($header_nr++, '', false);
 
 $indexList['photo'] = $header_nr;
@@ -553,7 +553,7 @@ if (api_is_allowed_to_edit(null, true)) {
     $table->set_column_filter($header_nr - 1, 'modify_filter');
 
     if ($canEditUsers) {
-        $table->set_form_actions(array('unsubscribe' => get_lang('Unreg')), 'user');
+        $table->set_form_actions(['unsubscribe' => get_lang('Unreg')], 'user');
     }
 } else {
     if ($course_info['unsubscribe'] == 1) {
@@ -567,10 +567,10 @@ if (isset($origin) && $origin == 'learnpath') {
     Display::display_reduced_header();
 } else {
     if (isset($_GET['keyword']) && !empty($_GET['keyword'])) {
-        $interbreadcrumb[] = array(
+        $interbreadcrumb[] = [
             "url" => "user.php?".api_get_cidreq(),
             "name" => get_lang("Users"),
-        );
+        ];
         $tool_name = get_lang('SearchResults');
     } else {
         $tool_name = get_lang('Users');
@@ -614,7 +614,7 @@ if (api_is_allowed_to_edit(null, true)) {
         Display::return_icon('export_excel.png', get_lang('ExportAsXLS'), [], ICON_SIZE_MEDIUM).'</a> ';
 
     if ($canEditUsers) {
-        $actions .= '<a href="user_import.php?'.api_get_cidreq().'&action=import">'.
+        $actions .= '<a href="user_import.php?'.api_get_cidreq().'&action=import&type='.$type.'">'.
             Display::return_icon('import_csv.png', get_lang('ImportUsersToACourse'), [], ICON_SIZE_MEDIUM).'</a> ';
     }
 
@@ -718,7 +718,8 @@ function get_number_of_users()
     }
 
     foreach ($a_course_users as $o_course_user) {
-        if ((isset($_GET['keyword']) &&
+        if ((
+            isset($_GET['keyword']) &&
                 searchUserKeyword(
                     $o_course_user['firstname'],
                     $o_course_user['lastname'],
@@ -741,6 +742,7 @@ function get_number_of_users()
  * @param string $username
  * @param string $official_code
  * @param $keyword
+ *
  * @return bool
  */
 function searchUserKeyword($firstname, $lastname, $username, $official_code, $keyword)
@@ -758,11 +760,13 @@ function searchUserKeyword($firstname, $lastname, $username, $official_code, $ke
 
 /**
  * Get the users to display on the current page.
- * @param   int $from Offset
- * @param   int $number_of_items
- * @param   int $column The column on which to sort
- * @param   string $direction ASC or DESC, for the sort order of the query results
- * @return  array
+ *
+ * @param int    $from            Offset
+ * @param int    $number_of_items
+ * @param int    $column          The column on which to sort
+ * @param string $direction       ASC or DESC, for the sort order of the query results
+ *
+ * @return array
  */
 function get_user_data($from, $number_of_items, $column, $direction)
 {
@@ -773,7 +777,7 @@ function get_user_data($from, $number_of_items, $column, $direction)
     $course_info = api_get_course_info();
     $sessionId = api_get_session_id();
     $course_code = $course_info['code'];
-    $a_users = array();
+    $a_users = [];
     $limit = null;
 
     // limit
@@ -781,7 +785,7 @@ function get_user_data($from, $number_of_items, $column, $direction)
         $limit = 'LIMIT '.intval($from).','.intval($number_of_items);
     }
 
-    if (!in_array($direction, array('ASC', 'DESC'))) {
+    if (!in_array($direction, ['ASC', 'DESC'])) {
         $direction = 'ASC';
     }
 
@@ -837,13 +841,14 @@ function get_user_data($from, $number_of_items, $column, $direction)
         false,
         false,
         null,
-        array(),
-        array(),
+        [],
+        [],
         $active
     );
 
     foreach ($a_course_users as $user_id => $o_course_user) {
-        if ((isset($_GET['keyword']) &&
+        if ((
+            isset($_GET['keyword']) &&
                 searchUserKeyword(
                     $o_course_user['firstname'],
                     $o_course_user['lastname'],
@@ -859,7 +864,7 @@ function get_user_data($from, $number_of_items, $column, $direction)
                 $groupsNameListParsed = array_column($groupsNameList, 'name');
             }
 
-            $temp = array();
+            $temp = [];
             if (api_is_allowed_to_edit(null, true)) {
                 $userInfo = api_get_user_info($user_id);
                 $photo = Display::img($userInfo['avatar_small'], $userInfo['complete_name'], [], false);
@@ -894,15 +899,26 @@ function get_user_data($from, $number_of_items, $column, $direction)
 
                 // Active
                 $temp[] = $o_course_user['active'];
+                $extraFieldOption = new ExtraFieldOption('user');
+                $extraFieldValue = new ExtraFieldValue('user');
 
                 if (!empty($extraFields)) {
                     foreach ($extraFields as $extraField) {
-                        $extraFieldValue = new ExtraFieldValue('user');
                         $data = $extraFieldValue->get_values_by_handler_and_field_id(
                             $user_id,
                             $extraField['id']
                         );
-                        $temp[] = $data['value'];
+
+                        $optionList = $extraFieldOption->get_field_option_by_field_and_option(
+                            $extraField['id'],
+                            $data['value']
+                        );
+                        if (!empty($optionList)) {
+                            $options = implode(', ', array_column($optionList, 'display_text'));
+                            $temp[] = $options;
+                        } else {
+                            $temp[] = $data['value'];
+                        }
                     }
                 }
 
@@ -944,12 +960,13 @@ function get_user_data($from, $number_of_items, $column, $direction)
     return $a_users;
 }
 
-
 /**
  * Build the active-column of the table to lock or unlock a certain user
- * lock = the user can no longer use this account
+ * lock = the user can no longer use this account.
+ *
  * @author Patrick Cool <patrick.cool@UGent.be>, Ghent University
- * @param int $active the current state of the account
+ *
+ * @param int    $active    the current state of the account
  * @param string $urlParams
  *
  * @return string Some HTML-code with the lock/unlock button
@@ -971,7 +988,7 @@ function active_filter($active, $urlParams, $row)
 
     /* you cannot lock yourself out otherwise you could disable all the accounts including your own => everybody is
         locked out and nobody can change it anymore.*/
-    if ($row[0] <> $userId) {
+    if ($row[0] != $userId) {
         $result = '<center><img src="'.Display::returnIconPath($image.'.png', 16).'" border="0" alt="'.get_lang(ucfirst($action)).'" title="'.get_lang(ucfirst($action)).'"/></center>';
     }
 
@@ -979,8 +996,10 @@ function active_filter($active, $urlParams, $row)
 }
 
 /**
- * Build the modify-column of the table
+ * Build the modify-column of the table.
+ *
  * @param int $user_id The user id
+ *
  * @return string Some HTML-code
  */
 function modify_filter($user_id, $row, $data)
@@ -1001,14 +1020,14 @@ function modify_filter($user_id, $row, $data)
     $result = '';
     if ($is_allowed_to_track) {
         $result .= '<a href="../mySpace/myStudents.php?'.api_get_cidreq().'&student='.$user_id.'&details=true&course='.$_course['id'].'&origin=user_course&id_session='.api_get_session_id().'" title="'.get_lang('Tracking').'">
-            '.Display::return_icon('stats.png', get_lang('Tracking')).'
+            '.Display::return_icon('statistics.png', get_lang('Tracking')).'
         </a>';
     }
 
     // If platform admin, show the login_as icon (this drastically shortens
     // time taken by support to test things out)
     if (api_is_platform_admin()) {
-        $result .= ' <a href="'.api_get_path(WEB_CODE_PATH).'admin/user_list.php?action=login_as&user_id='.$user_id.'&sec_token='.$_SESSION['sec_token'].'">'.
+        $result .= ' <a href="'.api_get_path(WEB_CODE_PATH).'admin/user_list.php?action=login_as&user_id='.$user_id.'&sec_token='.Security::getTokenFromSession().'">'.
             Display::return_icon('login_as.gif', get_lang('LoginAs')).'</a>&nbsp;&nbsp;';
     }
 
@@ -1028,11 +1047,19 @@ function modify_filter($user_id, $row, $data)
                 $disabled = '';
             }
 
+            $allow = api_get_configuration_value('extra');
+            if ($allow) {
+                $result .= '<a href="'.
+                    api_get_path(WEB_CODE_PATH).'extra/userInfo.php?'.api_get_cidreq().'&editMainUserInfo='.$user_id.'" title="'.get_lang('Edit').'" >'.
+                    Display::return_icon('edit.png', get_lang('Edit'), '', ICON_SIZE_SMALL).
+                    '</a>&nbsp;';
+            }
+
             if ($data['user_status_in_course'] == STUDENT) {
                 $result .= Display::url(
                     $text,
                     'user.php?'.api_get_cidreq().'&action=set_tutor&is_tutor='.$isTutor.'&user_id='.$user_id.'&type='.$type,
-                    array('class' => 'btn btn-default '.$disabled)
+                    ['class' => 'btn btn-default '.$disabled]
                 ).'&nbsp;';
             }
         }

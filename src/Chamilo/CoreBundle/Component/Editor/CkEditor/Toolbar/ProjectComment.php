@@ -4,15 +4,15 @@
 namespace Chamilo\CoreBundle\Component\Editor\CkEditor\Toolbar;
 
 /**
- * ProjectComment toolbar configuration
+ * ProjectComment toolbar configuration.
  *
  * @package Chamilo\CoreBundle\Component\Editor\CkEditor\Toolbar
  */
 class ProjectComment extends Basic
 {
-
     /**
-     * Get the toolbar config
+     * Get the toolbar config.
+     *
      * @return array
      */
     public function getConfig()
@@ -28,7 +28,8 @@ class ProjectComment extends Basic
     }
 
     /**
-     * Get the toolbar configuration when CKEditor is maximized
+     * Get the toolbar configuration when CKEditor is maximized.
+     *
      * @return array
      */
     protected function getMaximizedToolbar()
@@ -49,7 +50,7 @@ class ProjectComment extends Basic
                 'leaflet',
                 'Smiley',
                 'SpecialChar',
-                'Asciimath'
+                'Asciimath',
             ],
             '/',
             ['Table', '-', 'CreateDiv'],
@@ -59,12 +60,13 @@ class ProjectComment extends Basic
             [api_get_setting('allow_spellcheck') == 'true' ? 'Scayt' : ''],
             ['Styles', 'Format', 'Font', 'FontSize'],
             ['PageBreak', 'ShowBlocks', 'Source'],
-            ['Toolbarswitch']
+            ['Toolbarswitch'],
         ];
     }
 
     /**
-     * Get the default toolbar configuration when the setting more_buttons_maximized_mode is false
+     * Get the default toolbar configuration when the setting more_buttons_maximized_mode is false.
+     *
      * @return array
      */
     protected function getNormalToolbar()
@@ -75,13 +77,14 @@ class ProjectComment extends Basic
             ['Image', 'Video', 'Flash', 'Oembed', 'Youtube', 'Audio'],
             ['Table', 'leaflet'],
             ['Bold', 'Italic', 'Underline'],
-            ['JustifyLeft', 'JustifyCenter', '-', 'NumberedList', 'BulletedList', '-', 'TextColor', 'BGColor'],
-            ['Source']
+            ['JustifyLeft', 'JustifyCenter', 'JustifyRight', '-', 'NumberedList', 'BulletedList', '-', 'TextColor', 'BGColor'],
+            ['Source'],
         ];
     }
 
     /**
-     * Get the toolbar configuration when CKEditor is minimized
+     * Get the toolbar configuration when CKEditor is minimized.
+     *
      * @return array
      */
     protected function getMinimizedToolbar()
@@ -91,10 +94,9 @@ class ProjectComment extends Basic
             ['Undo', 'Redo'],
             ['Link', 'Image', 'Video', 'Flash', 'Audio', 'Table', 'Asciimath'],
             ['BulletedList', 'NumberedList', 'HorizontalRule'],
-            ['JustifyLeft', 'JustifyCenter', 'JustifyBlock'],
+            ['JustifyLeft', 'JustifyCenter', 'JustifyRight'],
             ['Format', 'Font', 'FontSize', 'Bold', 'Italic', 'TextColor'],
-            ['Toolbarswitch']
+            ['Toolbarswitch'],
         ];
     }
-
 }

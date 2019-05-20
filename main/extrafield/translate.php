@@ -1,7 +1,7 @@
 <?php
 /* For licensing terms, see /license.txt */
 
-use \Chamilo\CoreBundle\Entity\ExtraField;
+use Chamilo\CoreBundle\Entity\ExtraField;
 
 $cidReset = true;
 
@@ -31,7 +31,7 @@ if (!$extraField || empty($variableLanguage) || empty($originalName)) {
     api_not_allowed(true);
 }
 
-$languageId = isset($_GET['sub_language']) ? intval($_GET['sub_language']) : 0;
+$languageId = isset($_GET['sub_language']) ? (int) $_GET['sub_language'] : 0;
 
 $languages = $em
     ->getRepository('ChamiloCoreBundle:Language')
@@ -49,12 +49,18 @@ $form = new FormValidator('new_lang_variable', 'POST', $translateUrl);
 $form->addHeader(get_lang('AddWordForTheSubLanguage'));
 $form->addText('variable_language', get_lang('LanguageVariable'), false);
 $form->addText('original_name', get_lang('OriginalName'), false);
-$form->addSelect('sub_language', [get_lang('SubLanguage'), get_lang('OnlyActiveSubLanguagesAreListed')], $languagesOptions);
+$form->addSelect(
+    'sub_language',
+    [get_lang('SubLanguage'), get_lang('OnlyActiveSubLanguagesAreListed')],
+    $languagesOptions
+);
 
 if ($languageId) {
     $languageInfo = api_get_language_info($languageId);
-
-    $form->addText('new_language', [get_lang('Translation'), get_lang('IfThisTranslationExistsThisWillReplaceTheTerm')]);
+    $form->addText(
+        'new_language',
+        [get_lang('Translation'), get_lang('IfThisTranslationExistsThisWillReplaceTheTerm')]
+    );
     $form->addHidden('file_id', 0);
     $form->addHidden('id', $languageInfo['parent_id']);
     $form->addHidden('sub', $languageInfo['id']);
@@ -67,7 +73,7 @@ if ($languageId) {
 $form->setDefaults([
     'variable_language' => $variableLanguage,
     'original_name' => $originalName,
-    'sub_language' => $languageId
+    'sub_language' => $languageId,
 ]);
 $form->addRule('sub_language', get_lang('Required'), 'required');
 $form->freeze(['variable_language', 'original_name']);
@@ -78,19 +84,19 @@ switch ($extraField->getExtraFieldType()) {
     case ExtraField::USER_FIELD_TYPE:
         $interbreadcrumb[] = [
             'url' => api_get_path(WEB_CODE_PATH).'admin/extra_fields.php?type=user',
-            'name' => get_lang('UserFields')
+            'name' => get_lang('UserFields'),
         ];
         break;
     case ExtraField::COURSE_FIELD_TYPE:
         $interbreadcrumb[] = [
             'url' => api_get_path(WEB_CODE_PATH).'admin/extra_fields.php?type=course',
-            'name' => get_lang('CourseFields')
+            'name' => get_lang('CourseFields'),
         ];
         break;
     case ExtraField::SESSION_FIELD_TYPE:
         $interbreadcrumb[] = [
             'url' => api_get_path(WEB_CODE_PATH).'admin/extra_fields.php?type=session',
-            'name' => get_lang('SessionFields')
+            'name' => get_lang('SessionFields'),
         ];
         break;
 }

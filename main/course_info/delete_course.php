@@ -6,11 +6,10 @@ use ChamiloSession as Session;
 /**
  * This script is about deleting a course.
  * It displays a message box ('are you sure you wish to delete this course')
- * and deletes the course if the user answers affirmatively
+ * and deletes the course if the user answers affirmatively.
  *
  * @package chamilo.course_info
  */
-
 require_once __DIR__.'/../inc/global.inc.php';
 $this_section = SECTION_COURSES;
 $current_course_tool = TOOL_COURSE_MAINTENANCE;
@@ -29,26 +28,24 @@ $tool_name = get_lang('DelCourse');
 
 if (isset($_GET['delete']) && $_GET['delete'] === 'yes') {
     CourseManager::delete_course($_course['sysCode']);
-    $obj_cat = new Category();
-    $obj_cat->update_category_delete($_course['sysCode']);
 
     // DELETE CONFIRMATION MESSAGE
     Session::erase('_cid');
     Session::erase('_real_cid');
-    $noPHP_SELF = true;
     $message = '<h2>'.get_lang('Course').' : '.$current_course_name.' ('.$current_course_code.') </h2>';
     $message .= get_lang('HasDel');
     $message .= '<br /><br /><a href="../../index.php">'.get_lang('BackHome').'</a>';
 } else {
     $message = '<h3>'.get_lang('Course').' : '.$current_course_name.' ('.$current_course_code.') </h3>';
     $message .= '<p>'.get_lang('ByDel').'</p>';
-    $message .= '<p><a class="btn btn-primary" href="'.api_get_path(WEB_CODE_PATH).'course_info/maintenance.php?'.api_get_cidreq().'">'.
+    $message .= '<p><a class="btn btn-primary" 
+        href="'.api_get_path(WEB_CODE_PATH).'course_info/maintenance.php?'.api_get_cidreq().'">'.
         get_lang('No').'</a>&nbsp;<a class="btn btn-danger" href="'.api_get_self().'?delete=yes&'.api_get_cidreq().'">'.
         get_lang('Yes').'</a></p>';
-    $interbreadcrumb[] = array(
+    $interbreadcrumb[] = [
         'url' => 'maintenance.php',
-        'name' => get_lang('Maintenance')
-    );
+        'name' => get_lang('Maintenance'),
+    ];
 }
 
 $tpl = new Template($tool_name);

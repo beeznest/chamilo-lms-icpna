@@ -6,81 +6,81 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * AccessUrl
+ * AccessUrl.
  *
  * @ORM\Table(name="access_url")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Chamilo\CoreBundle\Entity\Repository\AccessUrlRepository")
  */
 class AccessUrl
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer", precision=0, scale=0, nullable=false, unique=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    protected $id;
+
+    /**
+     * @ORM\OneToMany(targetEntity="AccessUrlRelCourse", mappedBy="url", cascade={"persist"}, orphanRemoval=true)
+     */
+    protected $course;
 
     /**
      * @var string
      *
      * @ORM\Column(name="url", type="string", length=255, nullable=false, unique=false)
      */
-    private $url;
+    protected $url;
 
     /**
      * @var string
      *
      * @ORM\Column(name="description", type="text", unique=false)
      */
-    private $description;
+    protected $description;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="active", type="integer", nullable=false, unique=false)
      */
-    private $active;
+    protected $active;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="created_by", type="integer", nullable=false, unique=false)
      */
-    private $createdBy;
+    protected $createdBy;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="tms", type="datetime", nullable=true)
      */
-    private $tms;
+    protected $tms;
 
     /**
-     * @var boolean
+     * @var bool
      *
      * @ORM\Column(name="url_type", type="boolean", nullable=true)
      */
-    private $urlType;
-
-    /**
-     * @ORM\OneToMany(targetEntity="AccessUrlRelCourse", mappedBy="url", cascade={"persist"}, orphanRemoval=true)
-     **/
-    protected $course;
+    protected $urlType;
 
     /**
      * @ORM\OneToMany(targetEntity="Chamilo\CoreBundle\Entity\SettingsCurrent", mappedBy="url", cascade={"persist"}, orphanRemoval=true)
-     **/
+     */
     //protected $settings;
 
     /**
      * @ORM\OneToMany(targetEntity="Chamilo\CoreBundle\Entity\SessionCategory", mappedBy="url", cascade={"persist"}, orphanRemoval=true)
-     **/
-    private $sessionCategory;
+     */
+    protected $sessionCategory;
 
     /**
-     *
+     * AccessUrl constructor.
      */
     public function __construct()
     {
@@ -97,9 +97,9 @@ class AccessUrl
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -107,9 +107,10 @@ class AccessUrl
     }
 
     /**
-     * Set url
+     * Set url.
      *
      * @param string $url
+     *
      * @return AccessUrl
      */
     public function setUrl($url)
@@ -120,7 +121,7 @@ class AccessUrl
     }
 
     /**
-     * Get url
+     * Get url.
      *
      * @return string
      */
@@ -130,9 +131,10 @@ class AccessUrl
     }
 
     /**
-     * Set description
+     * Set description.
      *
      * @param string $description
+     *
      * @return AccessUrl
      */
     public function setDescription($description)
@@ -143,7 +145,7 @@ class AccessUrl
     }
 
     /**
-     * Get description
+     * Get description.
      *
      * @return string
      */
@@ -153,9 +155,10 @@ class AccessUrl
     }
 
     /**
-     * Set active
+     * Set active.
      *
-     * @param integer $active
+     * @param int $active
+     *
      * @return AccessUrl
      */
     public function setActive($active)
@@ -166,9 +169,9 @@ class AccessUrl
     }
 
     /**
-     * Get active
+     * Get active.
      *
-     * @return integer
+     * @return int
      */
     public function getActive()
     {
@@ -176,9 +179,10 @@ class AccessUrl
     }
 
     /**
-     * Set createdBy
+     * Set createdBy.
      *
-     * @param integer $createdBy
+     * @param int $createdBy
+     *
      * @return AccessUrl
      */
     public function setCreatedBy($createdBy)
@@ -189,9 +193,9 @@ class AccessUrl
     }
 
     /**
-     * Get createdBy
+     * Get createdBy.
      *
-     * @return integer
+     * @return int
      */
     public function getCreatedBy()
     {
@@ -199,9 +203,10 @@ class AccessUrl
     }
 
     /**
-     * Set tms
+     * Set tms.
      *
      * @param \DateTime $tms
+     *
      * @return AccessUrl
      */
     public function setTms($tms)
@@ -212,7 +217,7 @@ class AccessUrl
     }
 
     /**
-     * Get tms
+     * Get tms.
      *
      * @return \DateTime
      */
@@ -222,9 +227,10 @@ class AccessUrl
     }
 
     /**
-     * Set urlType
+     * Set urlType.
      *
-     * @param boolean $urlType
+     * @param bool $urlType
+     *
      * @return AccessUrl
      */
     public function setUrlType($urlType)
@@ -235,9 +241,9 @@ class AccessUrl
     }
 
     /**
-     * Get urlType
+     * Get urlType.
      *
-     * @return boolean
+     * @return bool
      */
     public function getUrlType()
     {

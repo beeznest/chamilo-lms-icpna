@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class SequenceMethod
+ * Class SequenceMethod.
  *
  * @ORM\Table(name="sequence_method")
  * @ORM\Entity
@@ -14,53 +14,53 @@ use Doctrine\ORM\Mapping as ORM;
 class SequenceMethod
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue()
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
      *
      * @ORM\Column(name="description", type="text", nullable=false)
      */
-    private $description;
+    protected $description;
 
     /**
      * @var string
      *
      * @ORM\Column(name="formula", type="text")
      */
-    private $formula;
+    protected $formula;
 
     /**
      * @var string
      *
      * @ORM\Column(name="assign", type="integer")
      */
-    private $assign;
+    protected $assign;
 
     /**
      * @var string
      *
      * @ORM\Column(name="met_type", type="string")
      */
-    private $metType;
+    protected $metType;
 
     /**
      * @var string
      *
      * @ORM\Column(name="act_false", type="string")
      */
-    private $actFalse;
+    protected $actFalse;
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -77,6 +77,7 @@ class SequenceMethod
 
     /**
      * @param string $description
+     *
      * @return SequenceMethod
      */
     public function setDescription($description)
@@ -96,6 +97,7 @@ class SequenceMethod
 
     /**
      * @param string $formula
+     *
      * @return SequenceMethod
      */
     public function setFormula($formula)
@@ -115,6 +117,7 @@ class SequenceMethod
 
     /**
      * @param string $assign
+     *
      * @return SequenceMethod
      */
     public function setAssign($assign)
@@ -134,6 +137,7 @@ class SequenceMethod
 
     /**
      * @param string $metType
+     *
      * @return SequenceMethod
      */
     public function setMetType($metType)
@@ -153,6 +157,7 @@ class SequenceMethod
 
     /**
      * @param string $actFalse
+     *
      * @return SequenceMethod
      */
     public function setActFalse($actFalse)
@@ -161,6 +166,4 @@ class SequenceMethod
 
         return $this;
     }
-
-
 }

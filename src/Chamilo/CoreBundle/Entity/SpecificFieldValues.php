@@ -6,7 +6,7 @@ namespace Chamilo\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * SpecificFieldValues
+ * SpecificFieldValues.
  *
  * @ORM\Table(name="specific_field_values")
  * @ORM\Entity
@@ -18,51 +18,50 @@ class SpecificFieldValues
      *
      * @ORM\Column(name="course_code", type="string", length=40, nullable=false)
      */
-    private $courseCode;
+    protected $courseCode;
 
     /**
      * @var string
      *
      * @ORM\Column(name="tool_id", type="string", length=100, nullable=false)
      */
-    private $toolId;
+    protected $toolId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="ref_id", type="integer", nullable=false)
      */
-    private $refId;
+    protected $refId;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="field_id", type="integer", nullable=false)
      */
-    private $fieldId;
+    protected $fieldId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="value", type="string", length=200, nullable=false)
      */
-    private $value;
+    protected $value;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private $id;
-
-
+    protected $id;
 
     /**
-     * Set courseCode
+     * Set courseCode.
      *
      * @param string $courseCode
+     *
      * @return SpecificFieldValues
      */
     public function setCourseCode($courseCode)
@@ -73,7 +72,7 @@ class SpecificFieldValues
     }
 
     /**
-     * Get courseCode
+     * Get courseCode.
      *
      * @return string
      */
@@ -83,9 +82,10 @@ class SpecificFieldValues
     }
 
     /**
-     * Set toolId
+     * Set toolId.
      *
      * @param string $toolId
+     *
      * @return SpecificFieldValues
      */
     public function setToolId($toolId)
@@ -96,7 +96,7 @@ class SpecificFieldValues
     }
 
     /**
-     * Get toolId
+     * Get toolId.
      *
      * @return string
      */
@@ -106,9 +106,10 @@ class SpecificFieldValues
     }
 
     /**
-     * Set refId
+     * Set refId.
      *
-     * @param integer $refId
+     * @param int $refId
+     *
      * @return SpecificFieldValues
      */
     public function setRefId($refId)
@@ -119,9 +120,9 @@ class SpecificFieldValues
     }
 
     /**
-     * Get refId
+     * Get refId.
      *
-     * @return integer
+     * @return int
      */
     public function getRefId()
     {
@@ -129,9 +130,10 @@ class SpecificFieldValues
     }
 
     /**
-     * Set fieldId
+     * Set fieldId.
      *
-     * @param integer $fieldId
+     * @param int $fieldId
+     *
      * @return SpecificFieldValues
      */
     public function setFieldId($fieldId)
@@ -142,9 +144,9 @@ class SpecificFieldValues
     }
 
     /**
-     * Get fieldId
+     * Get fieldId.
      *
-     * @return integer
+     * @return int
      */
     public function getFieldId()
     {
@@ -152,9 +154,10 @@ class SpecificFieldValues
     }
 
     /**
-     * Set value
+     * Set value.
      *
      * @param string $value
+     *
      * @return SpecificFieldValues
      */
     public function setValue($value)
@@ -165,7 +168,7 @@ class SpecificFieldValues
     }
 
     /**
-     * Get value
+     * Get value.
      *
      * @return string
      */
@@ -175,9 +178,9 @@ class SpecificFieldValues
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {

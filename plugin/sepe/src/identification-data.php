@@ -4,9 +4,6 @@
 /**
  * This script displays a basic info about data center.
  */
-
-use \ChamiloSession as Session;
-
 require_once '../config.php';
 
 $plugin = SepePlugin::create();
@@ -15,7 +12,10 @@ $_cid = 0;
 if (api_is_platform_admin()) {
     $info = getInfoIdentificationData();
     $templateName = $plugin->get_lang('DataCenter');
-    $interbreadcrumb[] = array("url" => "/plugin/sepe/src/sepe-administration-menu.php", "name" => $plugin->get_lang('MenuSepe'));
+    $interbreadcrumb[] = [
+        "url" => "/plugin/sepe/src/sepe-administration-menu.php",
+        "name" => $plugin->get_lang('MenuSepe'),
+    ];
     $tpl = new Template($templateName);
 
     if (isset($_SESSION['sepe_message_info'])) {

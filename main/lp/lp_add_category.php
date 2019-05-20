@@ -16,10 +16,10 @@ if (!$is_allowed_to_edit) {
     exit;
 }
 
-$interbreadcrumb[] = array(
+$interbreadcrumb[] = [
     'url' => 'lp_controller.php?action=list&'.api_get_cidreq(),
     'name' => get_lang('LearningPaths'),
-);
+];
 
 $form = new FormValidator(
     'lp_add_category',
@@ -69,10 +69,10 @@ if ($form->validate()) {
 
     if ($id) {
         $item = learnpath::getCategory($id);
-        $defaults = array(
+        $defaults = [
             'id' => $item->getId(),
-            'name' => $item->getName()
-        );
+            'name' => $item->getName(),
+        ];
         $form->setDefaults($defaults);
     }
 }
@@ -81,7 +81,13 @@ Display::display_header(get_lang('LearnpathAddLearnpath'), 'Path');
 
 echo '<div class="actions">';
 echo '<a href="lp_controller.php?'.api_get_cidreq().'">'.
-    Display::return_icon('back.png', get_lang('ReturnToLearningPaths'), '', ICON_SIZE_MEDIUM).'</a>';
+    Display::return_icon(
+        'back.png',
+        get_lang('ReturnToLearningPaths'),
+        '',
+        ICON_SIZE_MEDIUM
+    ).
+    '</a>';
 echo '</div>';
 
 $form->display();

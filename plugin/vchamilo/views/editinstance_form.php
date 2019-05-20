@@ -1,18 +1,20 @@
 <?php
+/* For licensing terms, see /license.txt */
 
 /**
- * Class ChamiloForm
+ * Class ChamiloForm.
  */
 abstract class ChamiloForm
 {
+    public $_definition_finalized;
     protected $_form;
     protected $_mode;
     protected $_cancelurl;
     protected $_customdata;
-    public $_definition_finalized;
 
     /**
      * ChamiloForm constructor.
+     *
      * @param $mode
      * @param $returnurl
      * @param $cancelurl
@@ -25,17 +27,22 @@ abstract class ChamiloForm
         $this->_cancelurl = $cancelurl;
         $this->_customdata = $customdata;
 
-        $attributes = array('style' => 'width: 60%; float: '.($text_dir == 'rtl' ? 'right;' : 'left;'));
-        // $this->_form = new FormValidator($mode.'_instance', 'post', $returnurl, '', $attributes, true);
-        $this->_form = new FormValidator($mode.'_instance', 'post', $returnurl, '', $attributes);
+        $attributes = ['style' => 'width: 60%; float: '.($text_dir == 'rtl' ? 'right;' : 'left;')];
+        $this->_form = new FormValidator(
+            $mode.'_instance',
+            'post',
+            $returnurl,
+            '',
+            $attributes
+        );
     }
 
-    public abstract function definition();
-    public abstract function validation($data, $files = null);
+    abstract public function definition();
 
-    public function validate(
+    abstract public function validation($data, $files = null);
 
-    ) {
+    public function validate()
+    {
         return $this->_form->validate();
     }
 
@@ -44,7 +51,8 @@ abstract class ChamiloForm
         return $this->_form->display();
     }
 
-    public function definition_after_data() {
+    public function definition_after_data()
+    {
     }
 
     public function return_form()
@@ -62,11 +70,12 @@ abstract class ChamiloForm
      * if there is no submitted data.
      *
      * @param bool $slashed true means return data with addslashes applied
+     *
      * @return object submitted data; NULL if not valid or not submitted
      */
     public function get_data($slashed = true)
     {
-        $cform = & $this->_form;
+        $cform = &$this->_form;
 
         if ($this->is_submitted() and $this->is_validated()) {
             $data = $cform->exportValues(null, $slashed);
@@ -85,11 +94,12 @@ abstract class ChamiloForm
      * Return submitted data without validation or NULL if there is no submitted data.
      *
      * @param bool $slashed true means return data with addslashes applied
+     *
      * @return object submitted data; NULL if not submitted
      */
     public function get_submitted_data($slashed = true)
     {
-        $cform = & $this->_form;
+        $cform = &$this->_form;
 
         if ($this->is_submitted()) {
             $data = $cform->exportValues(null, $slashed);
@@ -121,7 +131,7 @@ abstract class ChamiloForm
      */
     public function is_cancelled()
     {
-        $cform = & $this->_form;
+        $cform = &$this->_form;
         if ($cform->isSubmitted()) {
             foreach ($cform->_cancelButtons as $cancelbutton) {
                 if (optional_param($cancelbutton, 0, PARAM_RAW)) {
@@ -135,7 +145,7 @@ abstract class ChamiloForm
 
     /**
      * Check that form data is valid.
-     * You should almost always use this, rather than {@see validate_defined_fields}
+     * You should almost always use this, rather than {@see validate_defined_fields}.
      *
      * @return bool true if form data valid
      */
@@ -162,23 +172,23 @@ abstract class ChamiloForm
      * for example, to selectively add new elements depending on a no_submit_button press,
      * but only when the form is valid when the no_submit_button is pressed,
      *
-     * @param boolean $validateonnosubmit optional, defaults to false.  The default behaviour
-     *                is NOT to validate the form when a no submit button has been pressed.
-     *                pass true here to override this behaviour
+     * @param bool $validateonnosubmit optional, defaults to false.  The default behaviour
+     *                                 is NOT to validate the form when a no submit button has been pressed.
+     *                                 pass true here to override this behaviour
      *
      * @return bool true if form data valid
      */
     public function validate_defined_fields($validateonnosubmit = false)
     {
         static $validated = null; // one validation is enough
-        $cform = & $this->_form;
+        $cform = &$this->_form;
 
         if ($this->no_submit_button_pressed() && empty($validateonnosubmit)) {
             return false;
         } elseif ($validated === null) {
             $internal_val = $cform->validate();
 
-            $files = array();
+            $files = [];
             $file_val = $this->_validate_files($files);
             if ($file_val !== true) {
                 if (!empty($file_val)) {
@@ -197,13 +207,12 @@ abstract class ChamiloForm
                     $cform->setElementError($element, $msg);
                 }
                 $chamilo_val = false;
-
             } else {
                 // anything else means validation ok
                 $chamilo_val = true;
             }
 
-            $validated = ($internal_val and $chamilo_val and $file_val);
+            $validated = ($internal_val && $chamilo_val && $file_val);
         }
 
         return $validated;
@@ -217,7 +226,7 @@ abstract class ChamiloForm
             return $nosubmit;
         }
 
-        $cform = & $this->_form;
+        $cform = &$this->_form;
         $nosubmit = false;
         if (!$this->is_submitted()) {
             return false;
@@ -241,14 +250,14 @@ abstract class ChamiloForm
      * already exist and data is being edited (edit entry form).
      *
      * @param mixed $default_values object or array of default values
-     * @param bool $slashed true if magic quotes applied to data values
+     * @param bool  $slashed        true if magic quotes applied to data values
      */
     public function set_data($default_values, $slashed = false)
     {
         if (is_object($default_values)) {
             $default_values = (array) $default_values;
         }
-        $filter = $slashed ? 'stripslashes' : NULL;
+        $filter = $slashed ? 'stripslashes' : null;
         $this->_form->setDefaults($default_values, $filter);
     }
 
@@ -257,7 +266,7 @@ abstract class ChamiloForm
      */
     public function _validate_files(&$files)
     {
-        $files = array();
+        $files = [];
 
         if (empty($_FILES)) {
             // we do not need to do any checks because no files were submitted
@@ -265,8 +274,8 @@ abstract class ChamiloForm
             return true;
         }
 
-        $errors = array();
-        $mform = & $this->_form;
+        $errors = [];
+        $mform = &$this->_form;
 
         // check the files
         $status = $this->_upload_manager->preprocess_files();
@@ -283,8 +292,7 @@ abstract class ChamiloForm
                         continue;
                     }
                     $errors[$elname] = $this->_upload_manager->files[$elname]['uploadlog'];
-
-                } else if (!empty($this->_upload_manager->files[$elname]['clear'])) {
+                } elseif (!empty($this->_upload_manager->files[$elname]['clear'])) {
                     $files[$elname] = $this->_upload_manager->files[$elname]['tmp_name'];
                 }
             } else {
@@ -296,7 +304,7 @@ abstract class ChamiloForm
         if ($status && 0 == count($errors)) {
             return true;
         } else {
-            $files = array();
+            $files = [];
 
             return $errors;
         }
@@ -304,16 +312,17 @@ abstract class ChamiloForm
 }
 
 /**
- * Class InstanceForm
+ * Class InstanceForm.
  */
 class InstanceForm extends ChamiloForm
 {
-    /** @var  Plugin */
+    /** @var Plugin */
     public $_plugin;
     public $instance;
 
     /**
      * InstanceForm constructor.
+     *
      * @param $plugin
      * @param string $mode
      */
@@ -333,9 +342,6 @@ class InstanceForm extends ChamiloForm
         $this->definition();
     }
 
-    /**
-     *
-     */
     public function definition()
     {
         global $_configuration;
@@ -348,9 +354,21 @@ class InstanceForm extends ChamiloForm
         $form->addElement('hidden', 'registeronly');
 
         $form->addHeader($plugin->get_lang('hostdefinition'));
-        $form->addText('sitename', [$plugin->get_lang('sitename'), $plugin->get_lang('SiteNameExample')]);
+        $form->addText(
+            'sitename',
+            [
+                $plugin->get_lang('sitename'),
+                $plugin->get_lang('SiteNameExample'),
+            ]
+        );
         $form->applyFilter('sitename', 'trim');
-        $form->addText('institution', [$plugin->get_lang('institution'), $plugin->get_lang('InstitutionExample')]);
+        $form->addText(
+            'institution',
+            [
+                $plugin->get_lang('institution'),
+                $plugin->get_lang('InstitutionExample'),
+            ]
+        );
         $form->applyFilter('institution', 'trim');
 
         // Host's name.
@@ -385,11 +403,21 @@ class InstanceForm extends ChamiloForm
         $form->addElement('header', $plugin->get_lang('dbgroup'));
 
         // Database host.
-        $form->addElement('text', 'db_host', $this->_plugin->get_lang('dbhost'), array('id' => 'id_vdbhost'));
+        $form->addElement(
+            'text',
+            'db_host',
+            $this->_plugin->get_lang('dbhost'),
+            ['id' => 'id_vdbhost']
+        );
         $form->applyFilter('db_host', 'trim');
 
         // Database login.
-        $form->addElement('text', 'db_user', $this->_plugin->get_lang('dbuser'), array('id' => 'id_vdbuser'));
+        $form->addElement(
+            'text',
+            'db_user',
+            $this->_plugin->get_lang('dbuser'),
+            ['id' => 'id_vdbuser']
+        );
         $form->applyFilter('db_user', 'trim');
 
         // Database password.
@@ -397,11 +425,17 @@ class InstanceForm extends ChamiloForm
             'password',
             'db_password',
             $this->_plugin->get_lang('dbpassword'),
-            array('id' => 'id_vdbpassword')
+            ['id' => 'id_vdbpassword']
         );
 
         // Database name.
-        $form->addText('main_database', [$plugin->get_lang('maindatabase'), $plugin->get_lang('DatabaseDescription')]);
+        $form->addText(
+            'main_database',
+            [
+                $plugin->get_lang('maindatabase'),
+                $plugin->get_lang('DatabaseDescription'),
+            ]
+        );
 
         // Button for testing database connection.
         $form->addElement(
@@ -478,10 +512,19 @@ class InstanceForm extends ChamiloForm
             }
         }
 
-        $form->addButtonSave($this->_plugin->get_lang('savechanges'), 'submitbutton');
+        $form->addButtonSave(
+            $this->_plugin->get_lang('savechanges'),
+            'submitbutton'
+        );
 
         // Rules
-        $form->addRule('sitename', $this->_plugin->get_lang('sitenameinputerror'), 'required', null, 'client');
+        $form->addRule(
+            'sitename',
+            $this->_plugin->get_lang('sitenameinputerror'),
+            'required',
+            null,
+            'client'
+        );
         $form->addRule(
             'institution',
             $this->_plugin->get_lang('institutioninputerror'),
@@ -490,7 +533,13 @@ class InstanceForm extends ChamiloForm
             'client'
         );
 
-        $form->addRule('root_web', $this->_plugin->get_lang('rootwebinputerror'), 'required', null, 'client');
+        $form->addRule(
+            'root_web',
+            $this->_plugin->get_lang('rootwebinputerror'),
+            'required',
+            null,
+            'client'
+        );
         $form->addRule(
             'main_database',
             $this->_plugin->get_lang('databaseinputerror'),
@@ -502,20 +551,20 @@ class InstanceForm extends ChamiloForm
 
     /**
      * @param array $data
-     * @param null $files
+     * @param null  $files
+     *
      * @return array
      */
     public function validation($data, $files = null)
     {
         global $plugin;
 
-        $errors = array();
-
+        $errors = [];
         $tablename = Database::get_main_table('vchamilo');
         $vchamilo = Database::select(
             '*',
             $tablename,
-            array('where' => array(' root_web = ? ' => array($data['root_web']))),
+            ['where' => [' root_web = ? ' => [$data['root_web']]]],
             'first'
         );
 

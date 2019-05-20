@@ -3,12 +3,9 @@
 
 namespace Chamilo\CourseBundle\Component\CourseCopy;
 
-use Chamilo\CourseBundle\Component\CourseCopy\Resources\Asset;
-use Database;
-use TestCategory;
 use Category;
-use CourseManager;
 use Chamilo\CourseBundle\Component\CourseCopy\Resources\Announcement;
+use Chamilo\CourseBundle\Component\CourseCopy\Resources\Asset;
 use Chamilo\CourseBundle\Component\CourseCopy\Resources\Attendance;
 use Chamilo\CourseBundle\Component\CourseCopy\Resources\CalendarEvent;
 use Chamilo\CourseBundle\Component\CourseCopy\Resources\CourseCopyLearnpath;
@@ -22,6 +19,7 @@ use Chamilo\CourseBundle\Component\CourseCopy\Resources\ForumPost;
 use Chamilo\CourseBundle\Component\CourseCopy\Resources\ForumTopic;
 use Chamilo\CourseBundle\Component\CourseCopy\Resources\Glossary;
 use Chamilo\CourseBundle\Component\CourseCopy\Resources\GradeBookBackup;
+use Chamilo\CourseBundle\Component\CourseCopy\Resources\LearnPathCategory;
 use Chamilo\CourseBundle\Component\CourseCopy\Resources\Link;
 use Chamilo\CourseBundle\Component\CourseCopy\Resources\LinkCategory;
 use Chamilo\CourseBundle\Component\CourseCopy\Resources\Quiz;
@@ -29,19 +27,23 @@ use Chamilo\CourseBundle\Component\CourseCopy\Resources\QuizQuestion;
 use Chamilo\CourseBundle\Component\CourseCopy\Resources\QuizQuestionOption;
 use Chamilo\CourseBundle\Component\CourseCopy\Resources\ScormDocument;
 use Chamilo\CourseBundle\Component\CourseCopy\Resources\Survey;
-use Chamilo\CourseBundle\Component\CourseCopy\Resources\SurveyInvitation;
 use Chamilo\CourseBundle\Component\CourseCopy\Resources\SurveyQuestion;
 use Chamilo\CourseBundle\Component\CourseCopy\Resources\Thematic;
 use Chamilo\CourseBundle\Component\CourseCopy\Resources\ToolIntro;
 use Chamilo\CourseBundle\Component\CourseCopy\Resources\Wiki;
 use Chamilo\CourseBundle\Component\CourseCopy\Resources\Work;
-
-use \Link as LinkManager;
+use Chamilo\CourseBundle\Entity\CLpCategory;
+use CourseManager;
+use Database;
+use Link as LinkManager;
+use TestCategory;
 
 /**
  * Class CourseBuilder
  * Builds a course-object from a Chamilo-course.
+ *
  * @author Bart Mollet <bart.mollet@hogent.be>
+ *
  * @package chamilo.backup
  */
 class CourseBuilder
@@ -51,7 +53,7 @@ class CourseBuilder
 
     /* With this array you can filter the tools you want to be parsed by
     default all tools are included */
-    public $tools_to_build = array(
+    public $tools_to_build = [
         'announcements',
         'attendance',
         'course_descriptions',
@@ -63,6 +65,7 @@ class CourseBuilder
         'glossary',
         'quizzes',
         'test_category',
+        'learnpath_category',
         'learnpaths',
         'links',
         'surveys',
@@ -71,16 +74,41 @@ class CourseBuilder
         'wiki',
         'works',
         'gradebook',
-    );
+    ];
+
+    public $toolToName = [
+        'announcements' => RESOURCE_ANNOUNCEMENT,
+        'attendance' => RESOURCE_ATTENDANCE,
+        'course_descriptions' => RESOURCE_COURSEDESCRIPTION,
+        'documents' => RESOURCE_DOCUMENT,
+        'events' => RESOURCE_EVENT,
+        'forum_category' => RESOURCE_FORUMCATEGORY,
+        'forums' => RESOURCE_FORUM,
+        'forum_topics' => RESOURCE_FORUMTOPIC,
+        'glossary' => RESOURCE_GLOSSARY,
+        'quizzes' => RESOURCE_QUIZ,
+        'test_category' => RESOURCE_TEST_CATEGORY,
+        'learnpath_category' => RESOURCE_LEARNPATH_CATEGORY,
+        'learnpaths' => RESOURCE_LEARNPATH,
+        'links' => RESOURCE_LINK,
+        'surveys' => RESOURCE_SURVEY,
+        'tool_intro' => RESOURCE_TOOL_INTRO,
+        'thematic' => RESOURCE_THEMATIC,
+        'wiki' => RESOURCE_WIKI,
+        'works' => RESOURCE_WORK,
+        'gradebook' => RESOURCE_GRADEBOOK,
+    ];
 
     /* With this array you can filter wich elements of the tools are going
     to be added in the course obj (only works with LPs) */
-    public $specific_id_list = array();
+    public $specific_id_list = [];
+    public $documentsAddedInText = [];
 
     /**
-     * Create a new CourseBuilder
+     * Create a new CourseBuilder.
+     *
      * @param string $type
-     * @param null $course
+     * @param null   $course
      */
     public function __construct($type = '', $course = null)
     {
@@ -100,6 +128,68 @@ class CourseBuilder
     }
 
     /**
+     * @param array $list
+     */
+    public function addDocumentList($list)
+    {
+        foreach ($list as $item) {
+            if (!in_array($item[0], $this->documentsAddedInText)) {
+                $this->documentsAddedInText[$item[0]] = $item;
+            }
+        }
+    }
+
+    /**
+     * @param string $text
+     */
+    public function findAndSetDocumentsInText($text)
+    {
+        $documentList = \DocumentManager::get_resources_from_source_html($text);
+        $this->addDocumentList($documentList);
+    }
+
+    /**
+     * Parse documents added in the documentsAddedInText variable.
+     */
+    public function restoreDocumentsFromList()
+    {
+        if (!empty($this->documentsAddedInText)) {
+            $list = [];
+            $courseInfo = api_get_course_info();
+            foreach ($this->documentsAddedInText as $item) {
+                // Get information about source url
+                $url = $item[0]; // url
+                $scope = $item[1]; // scope (local, remote)
+                $type = $item[2]; // type (rel, abs, url)
+
+                $origParseUrl = parse_url($url);
+                $realOrigPath = isset($origParseUrl['path']) ? $origParseUrl['path'] : null;
+
+                if ($scope == 'local') {
+                    if ($type == 'abs' || $type == 'rel') {
+                        $documentFile = strstr($realOrigPath, 'document');
+                        if (strpos($realOrigPath, $documentFile) !== false) {
+                            $documentFile = str_replace('document', '', $documentFile);
+                            $itemDocumentId = \DocumentManager::get_document_id($courseInfo, $documentFile);
+                            // Document found! Add it to the list
+                            if ($itemDocumentId) {
+                                $list[] = $itemDocumentId;
+                            }
+                        }
+                    }
+                }
+            }
+
+            $this->build_documents(
+                api_get_session_id(),
+                api_get_course_int_id(),
+                true,
+                $list
+            );
+        }
+    }
+
+    /**
      * @param array $array
      */
     public function set_tools_to_build($array)
@@ -108,7 +198,6 @@ class CourseBuilder
     }
 
     /**
-     *
      * @param array $array
      */
     public function set_tools_specific_id_list($array)
@@ -117,7 +206,8 @@ class CourseBuilder
     }
 
     /**
-     * Get the created course
+     * Get the created course.
+     *
      * @return course The course
      */
     public function get_course()
@@ -126,37 +216,62 @@ class CourseBuilder
     }
 
     /**
-     * Build the course-object
+     * Build the course-object.
      *
-     * @param int      $session_id
-     * @param string   $courseCode
-     * @param bool     true if you want to get the elements that exists in the course and
-     *                 in the session, (session_id = 0 or session_id = X)
+     * @param int    $session_id
+     * @param string $courseCode
+     * @param bool   $withBaseContent   true if you want to get the elements that exists in the course and
+     *                                  in the session, (session_id = 0 or session_id = X)
+     * @param array  $parseOnlyToolList
+     * @param array  $toolsFromPost
+     *
      * @return Course The course object structure
      */
     public function build(
         $session_id = 0,
         $courseCode = '',
-        $with_base_content = false
+        $withBaseContent = false,
+        $parseOnlyToolList = [],
+        $toolsFromPost = []
     ) {
-        $table_properties = Database::get_course_table(TABLE_ITEM_PROPERTY);
         $course = api_get_course_info($courseCode);
         $courseId = $course['real_id'];
-
         foreach ($this->tools_to_build as $tool) {
+            if (!empty($parseOnlyToolList) && !in_array($this->toolToName[$tool], $parseOnlyToolList)) {
+                continue;
+            }
             $function_build = 'build_'.$tool;
             $specificIdList = isset($this->specific_id_list[$tool]) ? $this->specific_id_list[$tool] : null;
+            $buildOrphanQuestions = true;
+            if ($tool === 'quizzes') {
+                if (!isset($toolsFromPost[RESOURCE_QUIZ][-1])) {
+                    $buildOrphanQuestions = false;
+                }
 
-            $this->$function_build(
-                $session_id,
-                $courseId,
-                $with_base_content,
-                $specificIdList
-            );
+                // Force orphan load
+                if ($this->course->type === 'complete') {
+                    $buildOrphanQuestions = true;
+                }
+
+                $this->build_quizzes(
+                    $session_id,
+                    $courseId,
+                    $withBaseContent,
+                    $specificIdList,
+                    $buildOrphanQuestions
+                );
+            } else {
+                $this->$function_build(
+                    $session_id,
+                    $courseId,
+                    $withBaseContent,
+                    $specificIdList
+                );
+            }
         }
 
         // Add asset
-        if ($course['course_image_source'] && basename($course['course_image_source']) != 'course.png') {
+        if ($course['course_image_source'] && basename($course['course_image_source']) !== 'course.png') {
             // Add course image courses/XXX/course-pic85x85.png
             $asset = new Asset(
                 $course['course_image_source'],
@@ -174,22 +289,28 @@ class CourseBuilder
         }
 
         // Once we've built the resources array a bit more, try to get items
-        //  from the item_property table and order them in the "resources" array
+        // from the item_property table and order them in the "resources" array
+        $table = Database::get_course_table(TABLE_ITEM_PROPERTY);
         foreach ($this->course->resources as $type => $resources) {
+            if (!empty($parseOnlyToolList) && !in_array($this->toolToName[$tool], $parseOnlyToolList)) {
+                continue;
+            }
             foreach ($resources as $id => $resource) {
-                $tool = $resource->get_tool();
-                if ($tool != null) {
-                    $sql = "SELECT * FROM $table_properties
-                            WHERE
-                                c_id = $courseId AND
-                                tool = '".$tool."' AND
-                                ref = '".$resource->get_id()."'";
-                    $res = Database::query($sql);
-                    $all_properties = array();
-                    while ($item_property = Database::fetch_array($res)) {
-                        $all_properties[] = $item_property;
+                if ($resource) {
+                    $tool = $resource->get_tool();
+                    if ($tool != null) {
+                        $sql = "SELECT * FROM $table
+                                WHERE
+                                    c_id = $courseId AND
+                                    tool = '".$tool."' AND
+                                    ref = '".$resource->get_id()."'";
+                        $res = Database::query($sql);
+                        $properties = [];
+                        while ($property = Database::fetch_array($res)) {
+                            $properties[] = $property;
+                        }
+                        $this->course->resources[$type][$id]->item_properties = $properties;
                     }
-                    $this->course->resources[$type][$id]->item_properties = $all_properties;
                 }
             }
         }
@@ -198,17 +319,18 @@ class CourseBuilder
     }
 
     /**
-     * Build the documents
-     * @param int $session_id
-     * @param int $courseId
-     * @param bool $with_base_content
-     * @param array $id_list
+     * Build the documents.
+     *
+     * @param int   $session_id
+     * @param int   $courseId
+     * @param bool  $withBaseContent
+     * @param array $idList
      */
     public function build_documents(
         $session_id = 0,
         $courseId = 0,
-        $with_base_content = false,
-        $id_list = array()
+        $withBaseContent = false,
+        $idList = []
     ) {
         $table_doc = Database::get_course_table(TABLE_DOCUMENT);
         $table_prop = Database::get_course_table(TABLE_ITEM_PROPERTY);
@@ -217,9 +339,16 @@ class CourseBuilder
         $avoid_paths = " path NOT LIKE '/shared_folder%' AND
                          path NOT LIKE '/chat_files%' ";
 
+        $documentCondition = '';
+        if (!empty($idList)) {
+            $idList = array_unique($idList);
+            $idList = array_map('intval', $idList);
+            $documentCondition = ' d.iid IN ("'.implode('","', $idList).'") AND ';
+        }
+
         if (!empty($courseId) && !empty($session_id)) {
-            $session_id = intval($session_id);
-            if ($with_base_content) {
+            $session_id = (int) $session_id;
+            if ($withBaseContent) {
                 $session_condition = api_get_session_condition(
                     $session_id,
                     true,
@@ -236,7 +365,7 @@ class CourseBuilder
             }
 
             if (!empty($this->course->type) && $this->course->type == 'partial') {
-                $sql = "SELECT d.id, d.path, d.comment, d.title, d.filetype, d.size
+                $sql = "SELECT d.iid, d.path, d.comment, d.title, d.filetype, d.size
                         FROM $table_doc d 
                         INNER JOIN $table_prop p
                         ON (p.ref = d.id AND d.c_id = p.c_id)
@@ -244,13 +373,14 @@ class CourseBuilder
                             d.c_id = $courseId AND
                             p.c_id = $courseId AND
                             tool = '".TOOL_DOCUMENT."' AND
+                            $documentCondition
                             p.visibility != 2 AND
                             path NOT LIKE '/images/gallery%' AND
                             $avoid_paths
                             $session_condition
                         ORDER BY path";
             } else {
-                $sql = "SELECT d.id, d.path, d.comment, d.title, d.filetype, d.size
+                $sql = "SELECT d.iid, d.path, d.comment, d.title, d.filetype, d.size
                         FROM $table_doc d 
                         INNER JOIN $table_prop p
                         ON (p.ref = d.id AND d.c_id = p.c_id)
@@ -258,6 +388,7 @@ class CourseBuilder
                             d.c_id = $courseId AND
                             p.c_id = $courseId AND
                             tool = '".TOOL_DOCUMENT."' AND
+                            $documentCondition
                             $avoid_paths AND
                             p.visibility != 2 $session_condition
                         ORDER BY path";
@@ -266,7 +397,7 @@ class CourseBuilder
             $db_result = Database::query($sql);
             while ($obj = Database::fetch_object($db_result)) {
                 $doc = new Document(
-                    $obj->id,
+                    $obj->iid,
                     $obj->path,
                     $obj->comment,
                     $obj->title,
@@ -277,7 +408,7 @@ class CourseBuilder
             }
         } else {
             if (!empty($this->course->type) && $this->course->type == 'partial') {
-                $sql = "SELECT d.id, d.path, d.comment, d.title, d.filetype, d.size
+                $sql = "SELECT d.iid, d.path, d.comment, d.title, d.filetype, d.size
                         FROM $table_doc d 
                         INNER JOIN $table_prop p
                         ON (p.ref = d.id AND d.c_id = p.c_id)
@@ -285,13 +416,14 @@ class CourseBuilder
                             d.c_id = $courseId AND
                             p.c_id = $courseId AND
                             tool = '".TOOL_DOCUMENT."' AND
+                            $documentCondition
                             p.visibility != 2 AND
                             path NOT LIKE '/images/gallery%' AND
                             $avoid_paths AND
                             (d.session_id = 0 OR d.session_id IS NULL)
                         ORDER BY path";
             } else {
-                $sql = "SELECT d.id, d.path, d.comment, d.title, d.filetype, d.size
+                $sql = "SELECT d.iid, d.path, d.comment, d.title, d.filetype, d.size
                         FROM $table_doc d 
                         INNER JOIN $table_prop p
                         ON (p.ref = d.id AND d.c_id = p.c_id)
@@ -299,16 +431,17 @@ class CourseBuilder
                             d.c_id = $courseId AND
                             p.c_id = $courseId AND
                             tool = '".TOOL_DOCUMENT."' AND
+                            $documentCondition
                             p.visibility != 2 AND
                             $avoid_paths AND
                             (d.session_id = 0 OR d.session_id IS NULL)
                         ORDER BY path";
             }
 
-            $db_result = Database::query($sql);
-            while ($obj = Database::fetch_object($db_result)) {
+            $result = Database::query($sql);
+            while ($obj = Database::fetch_object($result)) {
                 $doc = new Document(
-                    $obj->id,
+                    $obj->iid,
                     $obj->path,
                     $obj->comment,
                     $obj->title,
@@ -321,28 +454,34 @@ class CourseBuilder
     }
 
     /**
-     * Build the forums
-     * @param int $session_id Internal session ID
-     * @param int $courseId Internal course ID
-     * @param bool $with_base_content Whether to include content from the course without session or not
-     * @param array $id_list If you want to restrict the structure to only the given IDs
-     * @return void
+     * Build the forums.
+     *
+     * @param int   $session_id      Internal session ID
+     * @param int   $courseId        Internal course ID
+     * @param bool  $withBaseContent Whether to include content from the course without session or not
+     * @param array $idList          If you want to restrict the structure to only the given IDs
      */
     public function build_forums(
         $session_id = 0,
         $courseId = 0,
-        $with_base_content = false,
-        $id_list = array()
+        $withBaseContent = false,
+        $idList = []
     ) {
         $table = Database::get_course_table(TABLE_FORUM);
-
         $sessionCondition = api_get_session_condition(
             $session_id,
             true,
-            $with_base_content
+            $withBaseContent
         );
 
-        $sql = "SELECT * FROM $table WHERE c_id = $courseId $sessionCondition";
+        $idCondition = '';
+        if (!empty($idList)) {
+            $idList = array_unique($idList);
+            $idList = array_map('intval', $idList);
+            $idCondition = ' AND iid IN ("'.implode('","', $idList).'") ';
+        }
+
+        $sql = "SELECT * FROM $table WHERE c_id = $courseId $sessionCondition $idCondition";
         $sql .= " ORDER BY forum_title, forum_category";
         $db_result = Database::query($sql);
         while ($obj = Database::fetch_object($db_result)) {
@@ -352,29 +491,36 @@ class CourseBuilder
     }
 
     /**
-     * Build a forum-category
-     * @param int $session_id Internal session ID
-     * @param int $courseId Internal course ID
-     * @param bool $with_base_content Whether to include content from the course without session or not
-     * @param array $id_list If you want to restrict the structure to only the given IDs
-     * @return void
+     * Build a forum-category.
+     *
+     * @param int   $session_id      Internal session ID
+     * @param int   $courseId        Internal course ID
+     * @param bool  $withBaseContent Whether to include content from the course without session or not
+     * @param array $idList          If you want to restrict the structure to only the given IDs
      */
     public function build_forum_category(
         $session_id = 0,
         $courseId = 0,
-        $with_base_content = false,
-        $id_list = array()
+        $withBaseContent = false,
+        $idList = []
     ) {
         $table = Database::get_course_table(TABLE_FORUM_CATEGORY);
 
         $sessionCondition = api_get_session_condition(
             $session_id,
             true,
-            $with_base_content
+            $withBaseContent
         );
 
+        $idCondition = '';
+        if (!empty($idList)) {
+            $idList = array_unique($idList);
+            $idList = array_map('intval', $idList);
+            $idCondition = ' AND iid IN ("'.implode('","', $idList).'") ';
+        }
+
         $sql = "SELECT * FROM $table
-                WHERE c_id = $courseId $sessionCondition
+                WHERE c_id = $courseId $sessionCondition $idCondition
                 ORDER BY cat_title";
 
         $result = Database::query($sql);
@@ -385,60 +531,75 @@ class CourseBuilder
     }
 
     /**
-     * Build the forum-topics
-     * @param int $session_id Internal session ID
-     * @param int $courseId Internal course ID
-     * @param bool $with_base_content Whether to include content from the course without session or not
-     * @param array $id_list If you want to restrict the structure to only the given IDs
-     * @return void
+     * Build the forum-topics.
+     *
+     * @param int   $session_id      Internal session ID
+     * @param int   $courseId        Internal course ID
+     * @param bool  $withBaseContent Whether to include content from the course without session or not
+     * @param array $idList          If you want to restrict the structure to only the given IDs
      */
     public function build_forum_topics(
         $session_id = 0,
         $courseId = 0,
-        $with_base_content = false,
-        $id_list = array()
+        $withBaseContent = false,
+        $idList = []
     ) {
         $table = Database::get_course_table(TABLE_FORUM_THREAD);
 
         $sessionCondition = api_get_session_condition(
             $session_id,
             true,
-            $with_base_content
+            $withBaseContent
         );
+
+        $idCondition = '';
+        if (!empty($idList)) {
+            $idList = array_map('intval', $idList);
+            $idCondition = ' AND iid IN ("'.implode('","', $idList).'") ';
+        }
 
         $sql = "SELECT * FROM $table WHERE c_id = $courseId
                 $sessionCondition
+                $idCondition
                 ORDER BY thread_title ";
         $result = Database::query($sql);
 
         while ($obj = Database::fetch_object($result)) {
-            $forum_topic = new ForumTopic($obj);
-            $this->course->add_resource($forum_topic);
-            $this->build_forum_posts($courseId, $obj->thread_id, $obj->forum_id, true);
+            $forumTopic = new ForumTopic($obj);
+            $this->course->add_resource($forumTopic);
+            $this->build_forum_posts($courseId, $obj->thread_id, $obj->forum_id);
         }
     }
 
     /**
      * Build the forum-posts
      * TODO: All tree structure of posts should be built, attachments for example.
-     * @param int $courseId Internal course ID
-     * @param int $thread_id Internal thread ID
-     * @param int $forum_id Internal forum ID
-     * @param bool $only_first_post Whether to only copy the first post or not
+     *
+     * @param int   $courseId  Internal course ID
+     * @param int   $thread_id Internal thread ID
+     * @param int   $forum_id  Internal forum ID
+     * @param array $idList
      */
     public function build_forum_posts(
         $courseId = 0,
         $thread_id = null,
         $forum_id = null,
-        $only_first_post = false
+        $idList = []
     ) {
         $table = Database::get_course_table(TABLE_FORUM_POST);
+        $courseId = (int) $courseId;
         $sql = "SELECT * FROM $table WHERE c_id = $courseId ";
         if (!empty($thread_id) && !empty($forum_id)) {
             $forum_id = intval($forum_id);
             $thread_id = intval($thread_id);
             $sql .= " AND thread_id = $thread_id AND forum_id = $forum_id ";
         }
+
+        if (!empty($idList)) {
+            $idList = array_map('intval', $idList);
+            $sql .= ' AND iid IN ("'.implode('","', $idList).'") ';
+        }
+
         $sql .= " ORDER BY post_id ASC LIMIT 1";
         $db_result = Database::query($sql);
         while ($obj = Database::fetch_object($db_result)) {
@@ -448,22 +609,23 @@ class CourseBuilder
     }
 
     /**
-     * Build the links
-     * @param int $session_id Internal session ID
-     * @param int $courseId Internal course ID
-     * @param bool $with_base_content Whether to include content from the course without session or not
-     * @param array $id_list If you want to restrict the structure to only the given IDs
+     * Build the links.
+     *
+     * @param int   $session_id      Internal session ID
+     * @param int   $courseId        Internal course ID
+     * @param bool  $withBaseContent Whether to include content from the course without session or not
+     * @param array $idList          If you want to restrict the structure to only the given IDs
      */
     public function build_links(
         $session_id = 0,
         $courseId = 0,
-        $with_base_content = false,
-        $id_list = array()
+        $withBaseContent = false,
+        $idList = []
     ) {
         $categories = LinkManager::getLinkCategories(
             $courseId,
             $session_id,
-            $with_base_content
+            $withBaseContent
         );
 
         // Adding empty category
@@ -476,10 +638,16 @@ class CourseBuilder
                 $category['id'],
                 $courseId,
                 $session_id,
-                $with_base_content
+                $withBaseContent
             );
 
             foreach ($links as $item) {
+                if (!empty($idList)) {
+                    if (!in_array($item['id'], $idList)) {
+                        continue;
+                    }
+                }
+
                 $link = new Link(
                     $item['id'],
                     $item['title'],
@@ -499,25 +667,28 @@ class CourseBuilder
     }
 
     /**
-     * Build tool intro
-     * @param int $session_id Internal session ID
-     * @param int $courseId Internal course ID
-     * @param bool $with_base_content Whether to include content from the course without session or not
-     * @param array $id_list If you want to restrict the structure to only the given IDs
+     * Build tool intro.
+     *
+     * @param int   $session_id      Internal session ID
+     * @param int   $courseId        Internal course ID
+     * @param bool  $withBaseContent Whether to include content from the course without session or not
+     * @param array $idList          If you want to restrict the structure to only the given IDs
      */
     public function build_tool_intro(
         $session_id = 0,
         $courseId = 0,
-        $with_base_content = false,
-        $id_list = array()
+        $withBaseContent = false,
+        $idList = []
     ) {
         $table = Database::get_course_table(TABLE_TOOL_INTRO);
 
         $sessionCondition = api_get_session_condition(
             $session_id,
             true,
-            $with_base_content
+            $withBaseContent
         );
+
+        $courseId = (int) $courseId;
 
         $sql = "SELECT * FROM $table
                 WHERE c_id = $courseId $sessionCondition";
@@ -530,9 +701,11 @@ class CourseBuilder
     }
 
     /**
-     * Build a link category
-     * @param int $id Internal link ID
+     * Build a link category.
+     *
+     * @param int $id       Internal link ID
      * @param int $courseId Internal course ID
+     *
      * @return int
      */
     public function build_link_category($category)
@@ -553,48 +726,67 @@ class CourseBuilder
     }
 
     /**
-     * Build the Quizzes
-     * @param int $session_id Internal session ID
-     * @param int $courseId Internal course ID
-     * @param bool $with_base_content Whether to include content from the course without session or not
-     * @param array $idList If you want to restrict the structure to only the given IDs
+     * Build the Quizzes.
+     *
+     * @param int   $session_id           Internal session ID
+     * @param int   $courseId             Internal course ID
+     * @param bool  $withBaseContent      Whether to include content from the course without session or not
+     * @param array $idList               If you want to restrict the structure to only the given IDs
+     * @param bool  $buildOrphanQuestions
      */
     public function build_quizzes(
         $session_id = 0,
         $courseId = 0,
-        $with_base_content = false,
-        $idList = array()
+        $withBaseContent = false,
+        $idList = [],
+        $buildOrphanQuestions = true
     ) {
         $table_qui = Database::get_course_table(TABLE_QUIZ_TEST);
         $table_rel = Database::get_course_table(TABLE_QUIZ_TEST_QUESTION);
         $table_doc = Database::get_course_table(TABLE_DOCUMENT);
 
+        $courseId = (int) $courseId;
+        $idCondition = '';
+        if (!empty($idList)) {
+            $idList = array_map('intval', $idList);
+            $idCondition = ' iid IN ("'.implode('","', $idList).'") AND ';
+        }
+
         if (!empty($courseId) && !empty($session_id)) {
-            $session_id = intval($session_id);
-            if ($with_base_content) {
-                $session_condition = api_get_session_condition(
+            $session_id = (int) $session_id;
+            if ($withBaseContent) {
+                $sessionCondition = api_get_session_condition(
                     $session_id,
                     true,
                     true
                 );
             } else {
-                $session_condition = api_get_session_condition(
+                $sessionCondition = api_get_session_condition(
                     $session_id,
                     true
                 );
             }
+
+            // Select only quizzes with active = 0 or 1 (not -1 which is for deleted quizzes)
             $sql = "SELECT * FROM $table_qui
-                    WHERE c_id = $courseId AND active >=0 $session_condition";
-            //select only quizzes with active = 0 or 1 (not -1 which is for deleted quizzes)
+                    WHERE 
+                      c_id = $courseId AND 
+                      $idCondition
+                      active >=0 
+                      $sessionCondition ";
         } else {
+            // Select only quizzes with active = 0 or 1 (not -1 which is for deleted quizzes)
             $sql = "SELECT * FROM $table_qui
-                    WHERE c_id = $courseId AND active >=0 AND (session_id = 0 OR session_id IS NULL)";
-            //select only quizzes with active = 0 or 1 (not -1 which is for deleted quizzes)
+                    WHERE 
+                      c_id = $courseId AND 
+                      $idCondition
+                      active >=0 AND 
+                      (session_id = 0 OR session_id IS NULL)";
         }
 
-        $sql .= 'ORDER BY title';
-
+        $sql .= ' ORDER BY title';
         $db_result = Database::query($sql);
+        $questionList = [];
         while ($obj = Database::fetch_object($db_result)) {
             if (strlen($obj->sound) > 0) {
                 $sql = "SELECT id FROM $table_doc
@@ -603,38 +795,45 @@ class CourseBuilder
                 $doc = Database::fetch_object($res);
                 $obj->sound = $doc->id;
             }
-            $quiz = new Quiz($obj);
+            $this->findAndSetDocumentsInText($obj->description);
 
+            $quiz = new Quiz($obj);
             $sql = 'SELECT * FROM '.$table_rel.'
                     WHERE c_id = '.$courseId.' AND exercice_id = '.$obj->id;
             $db_result2 = Database::query($sql);
             while ($obj2 = Database::fetch_object($db_result2)) {
                 $quiz->add_question($obj2->question_id, $obj2->question_order);
+                $questionList[] = $obj2->question_id;
             }
             $this->course->add_resource($quiz);
         }
 
         if (!empty($courseId)) {
-            $this->build_quiz_questions($courseId);
+            $this->build_quiz_questions($courseId, $questionList, $buildOrphanQuestions);
         } else {
-            $this->build_quiz_questions();
+            $this->build_quiz_questions(0, $questionList, $buildOrphanQuestions);
         }
     }
 
     /**
-     * Build the Quiz-Questions
-     * @param int $courseId Internal course ID
+     * Build the Quiz-Questions.
+     *
+     * @param int   $courseId             Internal course ID
+     * @param array $questionList
+     * @param bool  $buildOrphanQuestions
      */
-    public function build_quiz_questions($courseId = 0)
+    public function build_quiz_questions($courseId = 0, $questionList = [], $buildOrphanQuestions = true)
     {
         $table_qui = Database::get_course_table(TABLE_QUIZ_TEST);
         $table_rel = Database::get_course_table(TABLE_QUIZ_TEST_QUESTION);
         $table_que = Database::get_course_table(TABLE_QUIZ_QUESTION);
         $table_ans = Database::get_course_table(TABLE_QUIZ_ANSWER);
+        $courseId = (int) $courseId;
+        $questionListToString = implode("','", $questionList);
 
-        // Building normal tests.
+        // Building normal tests (many queries)
         $sql = "SELECT * FROM $table_que
-                WHERE c_id = $courseId ";
+                WHERE c_id = $courseId AND id IN ('$questionListToString')";
         $result = Database::query($sql);
 
         while ($obj = Database::fetch_object($result)) {
@@ -644,6 +843,8 @@ class CourseBuilder
                 $obj->id,
                 $courseId
             );
+
+            $this->findAndSetDocumentsInText($obj->description);
 
             // build the backup resource question object
             $question = new QuizQuestion(
@@ -658,11 +859,11 @@ class CourseBuilder
                 $obj->extra,
                 $question_category_id
             );
+            $question->addPicture($this);
 
             $sql = 'SELECT * FROM '.$table_ans.'
                     WHERE c_id = '.$courseId.' AND question_id = '.$obj->id;
             $db_result2 = Database::query($sql);
-
             while ($obj2 = Database::fetch_object($db_result2)) {
                 $question->add_answer(
                     $obj2->id,
@@ -674,10 +875,12 @@ class CourseBuilder
                     $obj2->hotspot_coordinates,
                     $obj2->hotspot_type
                 );
+
+                $this->findAndSetDocumentsInText($obj2->answer);
+                $this->findAndSetDocumentsInText($obj2->comment);
+
                 if ($obj->type == MULTIPLE_ANSWER_TRUE_FALSE) {
-                    $table_options = Database::get_course_table(
-                        TABLE_QUIZ_QUESTION_OPTION
-                    );
+                    $table_options = Database::get_course_table(TABLE_QUIZ_QUESTION_OPTION);
                     $sql = 'SELECT * FROM '.$table_options.'
                             WHERE c_id = '.$courseId.' AND question_id = '.$obj->id;
                     $db_result3 = Database::query($sql);
@@ -690,108 +893,105 @@ class CourseBuilder
             $this->course->add_resource($question);
         }
 
-        // Building a fictional test for collecting orphan questions.
-        // When a course is emptied this option should be activated (true).
-        $build_orphan_questions = !empty($_POST['recycle_option']);
+        if ($buildOrphanQuestions) {
+            // Building a fictional test for collecting orphan questions.
+            // When a course is emptied this option should be activated (true).
+            //$build_orphan_questions = !empty($_POST['recycle_option']);
 
-        // 1st union gets the orphan questions from deleted exercises
-        // 2nd union gets the orphan questions from question that were deleted in a exercise.
+            // 1st union gets the orphan questions from deleted exercises
+            // 2nd union gets the orphan questions from question that were deleted in a exercise.
+            $sql = " (
+                        SELECT question_id, q.* FROM $table_que q
+                        INNER JOIN $table_rel r
+                        ON (q.c_id = r.c_id AND q.id = r.question_id)
+                        INNER JOIN $table_qui ex
+                        ON (ex.id = r.exercice_id AND ex.c_id = r.c_id)
+                        WHERE ex.c_id = $courseId AND ex.active = '-1'
+                    )
+                    UNION
+                     (
+                        SELECT question_id, q.* FROM $table_que q
+                        left OUTER JOIN $table_rel r
+                        ON (q.c_id = r.c_id AND q.id = r.question_id)
+                        WHERE q.c_id = $courseId AND r.question_id is null
+                     )
+                     UNION
+                     (
+                        SELECT question_id, q.* FROM $table_que q
+                        INNER JOIN $table_rel r
+                        ON (q.c_id = r.c_id AND q.id = r.question_id)
+                        WHERE r.c_id = $courseId AND (r.exercice_id = '-1' OR r.exercice_id = '0')
+                     )
+                 ";
 
-        $sql = " (
-                    SELECT question_id, q.* FROM $table_que q 
-                    INNER JOIN $table_rel r
-                    ON (q.c_id = r.c_id AND q.id = r.question_id)
-                    INNER JOIN $table_qui ex
-                    ON (ex.id = r.exercice_id AND ex.c_id = r.c_id )
-                    WHERE ex.c_id = $courseId AND ex.active = '-1'
-                 )
-                 UNION
-                 (
-                    SELECT question_id, q.* FROM $table_que q 
-                    left OUTER JOIN $table_rel r
-                    ON (q.c_id = r.c_id AND q.id = r.question_id)
-                    WHERE q.c_id = $courseId AND r.question_id is null
-                 )
-                 UNION
-                 (
-                    SELECT question_id, q.* FROM $table_que q
-                    INNER JOIN $table_rel r
-                    ON (q.c_id = r.c_id AND q.id = r.question_id)
-                    WHERE r.c_id = $courseId AND (r.exercice_id = '-1' OR r.exercice_id = '0')
-                 )
-        ";
-
-        $result = Database::query($sql);
-        if (Database::num_rows($result) > 0) {
-            $build_orphan_questions = true;
-            $orphanQuestionIds = array();
-            while ($obj = Database::fetch_object($result)) {
-                // Orphan questions
-                if (!empty($obj->question_id)) {
-                    $obj->id = $obj->question_id;
-                }
-
-                // Avoid adding the same question twice
-                if (!isset($this->course->resources[$obj->id])) {
-                    // find the question category
-                    // @todo : need to be adapted for multi category questions in 1.10
-                    $question_category_id = TestCategory::getCategoryForQuestion(
-                        $obj->id,
-                        $courseId
-                    );
-                    $question = new QuizQuestion(
-                        $obj->id,
-                        $obj->question,
-                        $obj->description,
-                        $obj->ponderation,
-                        $obj->type,
-                        $obj->position,
-                        $obj->picture,
-                        $obj->level,
-                        $obj->extra,
-                        $question_category_id
-                    );
-                    $sql = "SELECT * FROM $table_ans
-                            WHERE c_id = $courseId AND question_id = ".$obj->id;
-                    $db_result2 = Database::query($sql);
-                    if (Database::num_rows($db_result2)) {
-                        while ($obj2 = Database::fetch_object($db_result2)) {
-                            $question->add_answer(
-                                $obj2->id,
-                                $obj2->answer,
-                                $obj2->correct,
-                                $obj2->comment,
-                                $obj2->ponderation,
-                                $obj2->position,
-                                $obj2->hotspot_coordinates,
-                                $obj2->hotspot_type
-                            );
-                        }
-                        $orphanQuestionIds[] = $obj->id;
+            $result = Database::query($sql);
+            if (Database::num_rows($result) > 0) {
+                $orphanQuestionIds = [];
+                while ($obj = Database::fetch_object($result)) {
+                    // Orphan questions
+                    if (!empty($obj->question_id)) {
+                        $obj->id = $obj->question_id;
                     }
-                    $this->course->add_resource($question);
+
+                    // Avoid adding the same question twice
+                    if (!isset($this->course->resources[$obj->id])) {
+                        // find the question category
+                        // @todo : need to be adapted for multi category questions in 1.10
+                        $question_category_id = TestCategory::getCategoryForQuestion($obj->id, $courseId);
+                        $question = new QuizQuestion(
+                            $obj->id,
+                            $obj->question,
+                            $obj->description,
+                            $obj->ponderation,
+                            $obj->type,
+                            $obj->position,
+                            $obj->picture,
+                            $obj->level,
+                            $obj->extra,
+                            $question_category_id
+                        );
+                        $question->addPicture($this);
+                        $sql = "SELECT * FROM $table_ans
+                                WHERE c_id = $courseId AND question_id = ".$obj->id;
+                        $db_result2 = Database::query($sql);
+                        if (Database::num_rows($db_result2)) {
+                            while ($obj2 = Database::fetch_object($db_result2)) {
+                                $question->add_answer(
+                                    $obj2->id,
+                                    $obj2->answer,
+                                    $obj2->correct,
+                                    $obj2->comment,
+                                    $obj2->ponderation,
+                                    $obj2->position,
+                                    $obj2->hotspot_coordinates,
+                                    $obj2->hotspot_type
+                                );
+                            }
+                            $orphanQuestionIds[] = $obj->id;
+                        }
+                        $this->course->add_resource($question);
+                    }
                 }
             }
         }
 
-        if ($build_orphan_questions) {
-            $obj = array(
-                'id' => -1,
-                'title' => get_lang('OrphanQuestions', ''),
-                'type' => 2,
-            );
-            $newQuiz = new Quiz((object) $obj);
-            if (!empty($orphanQuestionIds)) {
-                foreach ($orphanQuestionIds as $index => $orphanId) {
-                    $order = $index + 1;
-                    $newQuiz->add_question($orphanId, $order);
-                }
+        $obj = [
+            'id' => -1,
+            'title' => get_lang('OrphanQuestions'),
+            'type' => 2,
+        ];
+        $newQuiz = new Quiz((object) $obj);
+        if (!empty($orphanQuestionIds)) {
+            foreach ($orphanQuestionIds as $index => $orphanId) {
+                $order = $index + 1;
+                $newQuiz->add_question($orphanId, $order);
             }
-            $this->course->add_resource($newQuiz);
         }
+        $this->course->add_resource($newQuiz);
     }
 
     /**
+     * @deprecated
      * Build the orphan questions
      */
     public function build_quiz_orphan_questions()
@@ -843,6 +1043,8 @@ class CourseBuilder
                     $obj->level,
                     $obj->extra
                 );
+                $question->addPicture($this);
+
                 $sql = 'SELECT * FROM '.$table_ans.' WHERE question_id = '.$obj->id;
                 $db_result2 = Database::query($sql);
                 while ($obj2 = Database::fetch_object($db_result2)) {
@@ -863,22 +1065,26 @@ class CourseBuilder
     }
 
     /**
-     * Build the test category
-     * @param int $sessionId Internal session ID
-     * @param int $courseId Internal course ID
-     * @param bool $withBaseContent Whether to include content from the course without session or not
-     * @param array $idList If you want to restrict the structure to only the given IDs
+     * Build the test category.
+     *
+     * @param int   $sessionId       Internal session ID
+     * @param int   $courseId        Internal course ID
+     * @param bool  $withBaseContent Whether to include content from the course without session or not
+     * @param array $idList          If you want to restrict the structure to only the given IDs
+     *
      * @todo add course session
      */
     public function build_test_category(
         $sessionId = 0,
         $courseId = 0,
         $withBaseContent = false,
-        $idList = array()
+        $idList = []
     ) {
         // get all test category in course
         $categories = TestCategory::getCategoryListInfo('', $courseId);
         foreach ($categories as $category) {
+            $this->findAndSetDocumentsInText($category->description);
+
             /** @var TestCategory $category */
             $courseCopyTestCategory = new CourseCopyTestCategory(
                 $category->id,
@@ -890,25 +1096,28 @@ class CourseBuilder
     }
 
     /**
-     * Build the Surveys
-     * @param int $session_id Internal session ID
-     * @param int $courseId Internal course ID
-     * @param bool $with_base_content Whether to include content from the course without session or not
-     * @param array $id_list If you want to restrict the structure to only the given IDs
+     * Build the Surveys.
+     *
+     * @param int   $session_id      Internal session ID
+     * @param int   $courseId        Internal course ID
+     * @param bool  $withBaseContent Whether to include content from the course without session or not
+     * @param array $id_list         If you want to restrict the structure to only the given IDs
      */
     public function build_surveys(
         $session_id = 0,
         $courseId = 0,
-        $with_base_content = false,
-        $id_list = array()
+        $withBaseContent = false,
+        $id_list = []
     ) {
         $table_survey = Database::get_course_table(TABLE_SURVEY);
         $table_question = Database::get_course_table(TABLE_SURVEY_QUESTION);
 
+        $courseId = (int) $courseId;
+
         $sessionCondition = api_get_session_condition(
             $session_id,
             true,
-            $with_base_content
+            $withBaseContent
         );
 
         $sql = 'SELECT * FROM '.$table_survey.'
@@ -919,12 +1128,25 @@ class CourseBuilder
         $db_result = Database::query($sql);
         while ($obj = Database::fetch_object($db_result)) {
             $survey = new Survey(
-                $obj->survey_id, $obj->code, $obj->title,
-                $obj->subtitle, $obj->author, $obj->lang,
-                $obj->avail_from, $obj->avail_till, $obj->is_shared,
-                $obj->template, $obj->intro, $obj->surveythanks,
-                $obj->creation_date, $obj->invited, $obj->answered,
-                $obj->invite_mail, $obj->reminder_mail
+                $obj->survey_id,
+                $obj->code,
+                $obj->title,
+                $obj->subtitle,
+                $obj->author,
+                $obj->lang,
+                $obj->avail_from,
+                $obj->avail_till,
+                $obj->is_shared,
+                $obj->template,
+                $obj->intro,
+                $obj->surveythanks,
+                $obj->creation_date,
+                $obj->invited,
+                $obj->answered,
+                $obj->invite_mail,
+                $obj->reminder_mail,
+                $obj->one_question_per_page,
+                $obj->shuffle
             );
             $sql = 'SELECT * FROM '.$table_question.'
                     WHERE c_id = '.$courseId.' AND survey_id = '.$obj->survey_id;
@@ -938,7 +1160,7 @@ class CourseBuilder
     }
 
     /**
-     * Build the Survey Questions
+     * Build the Survey Questions.
      *
      * @param int $courseId Internal course ID
      *
@@ -989,25 +1211,28 @@ class CourseBuilder
     }
 
     /**
-     * Build the announcements
-     * @param int $session_id Internal session ID
-     * @param int $courseId Internal course ID
-     * @param bool $with_base_content Whether to include content from the course without session or not
-     * @param array $id_list If you want to restrict the structure to only the given IDs
+     * Build the announcements.
+     *
+     * @param int   $session_id      Internal session ID
+     * @param int   $courseId        Internal course ID
+     * @param bool  $withBaseContent Whether to include content from the course without session or not
+     * @param array $id_list         If you want to restrict the structure to only the given IDs
      */
     public function build_announcements(
         $session_id = 0,
         $courseId = 0,
-        $with_base_content = false,
-        $id_list = array()
+        $withBaseContent = false,
+        $id_list = []
     ) {
         $table = Database::get_course_table(TABLE_ANNOUNCEMENT);
 
         $sessionCondition = api_get_session_condition(
             $session_id,
             true,
-            $with_base_content
+            $withBaseContent
         );
+
+        $courseId = (int) $courseId;
 
         $sql = 'SELECT * FROM '.$table.'
                 WHERE c_id = '.$courseId.' '.$sessionCondition;
@@ -1050,25 +1275,28 @@ class CourseBuilder
     }
 
     /**
-     * Build the events
-     * @param int $session_id Internal session ID
-     * @param int $courseId Internal course ID
-     * @param bool $with_base_content Whether to include content from the course without session or not
-     * @param array $id_list If you want to restrict the structure to only the given IDs
+     * Build the events.
+     *
+     * @param int   $session_id      Internal session ID
+     * @param int   $courseId        Internal course ID
+     * @param bool  $withBaseContent Whether to include content from the course without session or not
+     * @param array $id_list         If you want to restrict the structure to only the given IDs
      */
     public function build_events(
         $session_id = 0,
         $courseId = 0,
-        $with_base_content = false,
-        $id_list = array()
+        $withBaseContent = false,
+        $id_list = []
     ) {
         $table = Database::get_course_table(TABLE_AGENDA);
 
         $sessionCondition = api_get_session_condition(
             $session_id,
             true,
-            $with_base_content
+            $withBaseContent
         );
+
+        $courseId = (int) $courseId;
 
         $sql = 'SELECT * FROM '.$table.'
                 WHERE c_id = '.$courseId.' '.$sessionCondition;
@@ -1107,36 +1335,38 @@ class CourseBuilder
     }
 
     /**
-     * Build the course-descriptions
-     * @param int $session_id Internal session ID
-     * @param int $courseId Internal course ID
-     * @param bool $with_base_content Whether to include content from the course without session or not
-     * @param array $id_list If you want to restrict the structure to only the given IDs
+     * Build the course-descriptions.
+     *
+     * @param int   $session_id      Internal session ID
+     * @param int   $courseId        Internal course ID
+     * @param bool  $withBaseContent Whether to include content from the course without session or not
+     * @param array $id_list         If you want to restrict the structure to only the given IDs
      */
     public function build_course_descriptions(
         $session_id = 0,
         $courseId = 0,
-        $with_base_content = false,
-        $id_list = array()
+        $withBaseContent = false,
+        $id_list = []
     ) {
         $table = Database::get_course_table(TABLE_COURSE_DESCRIPTION);
+        $courseId = (int) $courseId;
 
         if (!empty($session_id) && !empty($courseId)) {
             $session_id = intval($session_id);
-            if ($with_base_content) {
-                $session_condition = api_get_session_condition(
+            if ($withBaseContent) {
+                $sessionCondition = api_get_session_condition(
                     $session_id,
                     true,
                     true
                 );
             } else {
-                $session_condition = api_get_session_condition(
+                $sessionCondition = api_get_session_condition(
                     $session_id,
                     true
                 );
             }
             $sql = 'SELECT * FROM '.$table.'
-                    WHERE c_id = '.$courseId.' '.$session_condition;
+                    WHERE c_id = '.$courseId.' '.$sessionCondition;
         } else {
             $table = Database::get_course_table(TABLE_COURSE_DESCRIPTION);
             $sql = 'SELECT * FROM '.$table.'
@@ -1156,38 +1386,66 @@ class CourseBuilder
     }
 
     /**
-     * Build the learnpaths
-     * @param int $session_id Internal session ID
-     * @param int $courseId Internal course ID
-     * @param bool $with_base_content Whether to include content from the course without session or not
-     * @param array $id_list If you want to restrict the structure to only the given IDs
+     * @param int   $session_id
+     * @param int   $courseId
+     * @param bool  $withBaseContent
+     * @param array $idList
+     */
+    public function build_learnpath_category($session_id = 0, $courseId = 0, $withBaseContent = false, $idList = [])
+    {
+        $categories = \learnpath::getCategories($courseId);
+
+        /** @var CLpCategory $item */
+        foreach ($categories as $item) {
+            $categoryId = $item->getId();
+            if (!empty($idList)) {
+                if (!in_array($categoryId, $idList)) {
+                    continue;
+                }
+            }
+            $category = new LearnPathCategory($categoryId, $item);
+            $this->course->add_resource($category);
+        }
+    }
+
+    /**
+     * Build the learnpaths.
+     *
+     * @param int   $session_id      Internal session ID
+     * @param int   $courseId        Internal course ID
+     * @param bool  $withBaseContent Whether to include content from the course without session or not
+     * @param array $id_list         If you want to restrict the structure to only the given IDs
+     * @param bool  $addScormFolder
      */
     public function build_learnpaths(
         $session_id = 0,
         $courseId = 0,
-        $with_base_content = false,
-        $id_list = array()
+        $withBaseContent = false,
+        $id_list = [],
+        $addScormFolder = true
     ) {
         $table_main = Database::get_course_table(TABLE_LP_MAIN);
         $table_item = Database::get_course_table(TABLE_LP_ITEM);
         $table_tool = Database::get_course_table(TABLE_TOOL_LIST);
 
+        $courseId = (int) $courseId;
+
         if (!empty($session_id) && !empty($courseId)) {
             $session_id = intval($session_id);
-            if ($with_base_content) {
-                $session_condition = api_get_session_condition(
+            if ($withBaseContent) {
+                $sessionCondition = api_get_session_condition(
                     $session_id,
                     true,
                     true
                 );
             } else {
-                $session_condition = api_get_session_condition(
+                $sessionCondition = api_get_session_condition(
                     $session_id,
                     true
                 );
             }
             $sql = 'SELECT * FROM '.$table_main.'
-                    WHERE c_id = '.$courseId.'  '.$session_condition;
+                    WHERE c_id = '.$courseId.'  '.$sessionCondition;
         } else {
             $sql = 'SELECT * FROM '.$table_main.'
                     WHERE c_id = '.$courseId.' AND (session_id = 0 OR session_id IS NULL)';
@@ -1198,15 +1456,15 @@ class CourseBuilder
             $sql .= " AND id IN (".implode(', ', $id_list).") ";
         }
 
-        $db_result = Database::query($sql);
-        if ($db_result) {
-            while ($obj = Database::fetch_object($db_result)) {
-                $items = array();
-                $sql = "SELECT * FROM ".$table_item."
+        $result = Database::query($sql);
+        if ($result) {
+            while ($obj = Database::fetch_object($result)) {
+                $items = [];
+                $sql = "SELECT * FROM $table_item
                         WHERE c_id = '$courseId' AND lp_id = ".$obj->id;
-                $db_items = Database::query($sql);
-                while ($obj_item = Database::fetch_object($db_items)) {
-                    $item['id'] = $obj_item->id;
+                $resultItem = Database::query($sql);
+                while ($obj_item = Database::fetch_object($resultItem)) {
+                    $item['id'] = $obj_item->iid;
                     $item['item_type'] = $obj_item->item_type;
                     $item['ref'] = $obj_item->ref;
                     $item['title'] = $obj_item->title;
@@ -1232,11 +1490,9 @@ class CourseBuilder
                             (link LIKE '%lp_controller.php%lp_id=".$obj->id."%' AND image='scormbuilder.gif') AND
                             visibility = '1' ";
                 $db_tool = Database::query($sql);
-
+                $visibility = '0';
                 if (Database::num_rows($db_tool)) {
                     $visibility = '1';
-                } else {
-                    $visibility = '0';
                 }
 
                 $lp = new CourseCopyLearnpath(
@@ -1266,63 +1522,81 @@ class CourseBuilder
                     $obj->publicated_on,
                     $obj->expired_on,
                     $obj->session_id,
+                    $obj->category_id,
                     $items
                 );
+
                 $this->course->add_resource($lp);
+
+                if (!empty($obj->preview_image)) {
+                    // Add LP teacher image
+                    $asset = new Asset(
+                        $obj->preview_image,
+                        '/upload/learning_path/images/'.$obj->preview_image,
+                        '/upload/learning_path/images/'.$obj->preview_image
+                    );
+                    $this->course->add_resource($asset);
+                }
             }
         }
 
         // Save scorm directory (previously build_scorm_documents())
-        $i = 1;
-        if ($dir = @opendir($this->course->backup_path.'/scorm')) {
-            while ($file = readdir($dir)) {
-                if (is_dir($this->course->backup_path.'/scorm/'.$file) &&
-                    !in_array($file, array('.', '..'))
-                ) {
-                    $doc = new ScormDocument($i++, '/'.$file, $file);
-                    $this->course->add_resource($doc);
+        if ($addScormFolder) {
+            $i = 1;
+            if ($dir = @opendir($this->course->backup_path.'/scorm')) {
+                while ($file = readdir($dir)) {
+                    if (is_dir($this->course->backup_path.'/scorm/'.$file) &&
+                        !in_array($file, ['.', '..'])
+                    ) {
+                        $doc = new ScormDocument($i++, '/'.$file, $file);
+                        $this->course->add_resource($doc);
+                    }
                 }
+                closedir($dir);
             }
-            closedir($dir);
         }
     }
 
     /**
-     * Build the glossaries
-     * @param int $session_id Internal session ID
-     * @param int $courseId Internal course ID
-     * @param bool $with_base_content Whether to include content from the course without session or not
-     * @param array $id_list If you want to restrict the structure to only the given IDs
+     * Build the glossaries.
+     *
+     * @param int   $session_id      Internal session ID
+     * @param int   $courseId        Internal course ID
+     * @param bool  $withBaseContent Whether to include content from the course without session or not
+     * @param array $id_list         If you want to restrict the structure to only the given IDs
      */
     public function build_glossary(
         $session_id = 0,
         $courseId = 0,
-        $with_base_content = false,
-        $id_list = array()
+        $withBaseContent = false,
+        $id_list = []
     ) {
         $table_glossary = Database::get_course_table(TABLE_GLOSSARY);
 
+        $courseId = (int) $courseId;
+
         if (!empty($session_id) && !empty($courseId)) {
             $session_id = intval($session_id);
-            if ($with_base_content) {
-                $session_condition = api_get_session_condition(
+            if ($withBaseContent) {
+                $sessionCondition = api_get_session_condition(
                     $session_id,
                     true,
                     true
                 );
             } else {
-                $session_condition = api_get_session_condition(
+                $sessionCondition = api_get_session_condition(
                     $session_id,
                     true
                 );
             }
+
             //@todo check this queries are the same ...
             if (!empty($this->course->type) && $this->course->type == 'partial') {
                 $sql = 'SELECT * FROM '.$table_glossary.' g
-                        WHERE g.c_id = '.$courseId.' '.$session_condition;
+                        WHERE g.c_id = '.$courseId.' '.$sessionCondition;
             } else {
                 $sql = 'SELECT * FROM '.$table_glossary.' g
-                        WHERE g.c_id = '.$courseId.' '.$session_condition;
+                        WHERE g.c_id = '.$courseId.' '.$sessionCondition;
             }
         } else {
             $table_glossary = Database::get_course_table(TABLE_GLOSSARY);
@@ -1355,7 +1629,7 @@ class CourseBuilder
         $tbl_session = Database::get_main_table(TABLE_MAIN_SESSION);
         $tbl_session_course = Database::get_main_table(TABLE_MAIN_SESSION_COURSE);
         $list_course = CourseManager::get_course_list();
-        $list = array();
+        $list = [];
         foreach ($list_course as $_course) {
             $this->course = new Course();
             $this->course->code = $_course['code'];
@@ -1384,35 +1658,36 @@ class CourseBuilder
     }
 
     /**
-     * @param int $session_id Internal session ID
-     * @param int $courseId Internal course ID
-     * @param bool $with_base_content Whether to include content from the course without session or not
-     * @param array $id_list If you want to restrict the structure to only the given IDs
+     * @param int   $session_id      Internal session ID
+     * @param int   $courseId        Internal course ID
+     * @param bool  $withBaseContent Whether to include content from the course without session or not
+     * @param array $id_list         If you want to restrict the structure to only the given IDs
      */
     public function build_wiki(
         $session_id = 0,
         $courseId = 0,
-        $with_base_content = false,
-        $id_list = array()
+        $withBaseContent = false,
+        $id_list = []
     ) {
         $tbl_wiki = Database::get_course_table(TABLE_WIKI);
+        $courseId = (int) $courseId;
 
         if (!empty($session_id) && !empty($courseId)) {
             $session_id = intval($session_id);
-            if ($with_base_content) {
-                $session_condition = api_get_session_condition(
+            if ($withBaseContent) {
+                $sessionCondition = api_get_session_condition(
                     $session_id,
                     true,
                     true
                 );
             } else {
-                $session_condition = api_get_session_condition(
+                $sessionCondition = api_get_session_condition(
                     $session_id,
                     true
                 );
             }
             $sql = 'SELECT * FROM '.$tbl_wiki.'
-                    WHERE c_id = '.$courseId.' '.$session_condition;
+                    WHERE c_id = '.$courseId.' '.$sessionCondition;
         } else {
             $tbl_wiki = Database::get_course_table(TABLE_WIKI);
             $sql = 'SELECT * FROM '.$tbl_wiki.'
@@ -1437,36 +1712,38 @@ class CourseBuilder
     }
 
     /**
-     * Build the Surveys
-     * @param int $session_id Internal session ID
-     * @param int $courseId Internal course ID
-     * @param bool $with_base_content Whether to include content from the course without session or not
-     * @param array $id_list If you want to restrict the structure to only the given IDs
+     * Build the Surveys.
+     *
+     * @param int   $session_id      Internal session ID
+     * @param int   $courseId        Internal course ID
+     * @param bool  $withBaseContent Whether to include content from the course without session or not
+     * @param array $id_list         If you want to restrict the structure to only the given IDs
      */
     public function build_thematic(
         $session_id = 0,
         $courseId = 0,
-        $with_base_content = false,
-        $id_list = array()
+        $withBaseContent = false,
+        $id_list = []
     ) {
         $table_thematic = Database::get_course_table(TABLE_THEMATIC);
         $table_thematic_advance = Database::get_course_table(TABLE_THEMATIC_ADVANCE);
         $table_thematic_plan = Database::get_course_table(TABLE_THEMATIC_PLAN);
+        $courseId = (int) $courseId;
 
         $courseInfo = api_get_course_info_by_id($courseId);
         $session_id = intval($session_id);
-        if ($with_base_content) {
-            $session_condition = api_get_session_condition(
+        if ($withBaseContent) {
+            $sessionCondition = api_get_session_condition(
                 $session_id,
                 true,
                 true
             );
         } else {
-            $session_condition = api_get_session_condition($session_id, true);
+            $sessionCondition = api_get_session_condition($session_id, true);
         }
 
         $sql = "SELECT * FROM $table_thematic
-                WHERE c_id = $courseId $session_condition ";
+                WHERE c_id = $courseId $sessionCondition ";
         $db_result = Database::query($sql);
         while ($row = Database::fetch_array($db_result, 'ASSOC')) {
             $thematic = new Thematic($row);
@@ -1475,7 +1752,7 @@ class CourseBuilder
 
             $result = Database::query($sql);
             while ($sub_row = Database::fetch_array($result, 'ASSOC')) {
-                $thematic->add_thematic_advance($sub_row);
+                $thematic->addThematicAdvance($sub_row);
             }
 
             $items = api_get_item_property_by_tool(
@@ -1484,11 +1761,10 @@ class CourseBuilder
                 $session_id
             );
 
-            $thematic_plan_id_list = array();
+            $thematic_plan_id_list = [];
             if (!empty($items)) {
                 foreach ($items as $item) {
                     $thematic_plan_id_list[] = $item['ref'];
-                    //$thematic_plan_complete_list[$item['ref']] = $item;
                 }
             }
             if (count($thematic_plan_id_list) > 0) {
@@ -1503,7 +1779,7 @@ class CourseBuilder
 
                 $result = Database::query($sql);
                 while ($sub_row = Database::fetch_array($result, 'ASSOC')) {
-                    $thematic->add_thematic_plan($sub_row);
+                    $thematic->addThematicPlan($sub_row);
                 }
             }
             $this->course->add_resource($thematic);
@@ -1511,22 +1787,23 @@ class CourseBuilder
     }
 
     /**
-     * Build the attendances
-     * @param int $session_id Internal session ID
-     * @param int $courseId Internal course ID
-     * @param bool $with_base_content Whether to include content from the course without session or not
-     * @param array $id_list If you want to restrict the structure to only the given IDs
+     * Build the attendances.
+     *
+     * @param int   $session_id      Internal session ID
+     * @param int   $courseId        Internal course ID
+     * @param bool  $withBaseContent Whether to include content from the course without session or not
+     * @param array $id_list         If you want to restrict the structure to only the given IDs
      */
     public function build_attendance(
         $session_id = 0,
         $courseId = 0,
-        $with_base_content = false,
-        $id_list = array()
+        $withBaseContent = false,
+        $id_list = []
     ) {
         $table_attendance = Database::get_course_table(TABLE_ATTENDANCE);
         $table_attendance_calendar = Database::get_course_table(TABLE_ATTENDANCE_CALENDAR);
-
-        $sessionCondition = api_get_session_condition($session_id, true, $with_base_content);
+        $sessionCondition = api_get_session_condition($session_id, true, $withBaseContent);
+        $courseId = (int) $courseId;
 
         $sql = 'SELECT * FROM '.$table_attendance.'
                 WHERE c_id = '.$courseId.' '.$sessionCondition;
@@ -1545,48 +1822,58 @@ class CourseBuilder
     }
 
     /**
-     * Build the works (or "student publications", or "assignments")
-     * @param int $session_id Internal session ID
-     * @param int $courseId Internal course ID
-     * @param bool $with_base_content Whether to include content from the course without session or not
-     * @param array $id_list If you want to restrict the structure to only the given IDs
+     * Build the works (or "student publications", or "assignments").
+     *
+     * @param int   $session_id      Internal session ID
+     * @param int   $courseId        Internal course ID
+     * @param bool  $withBaseContent Whether to include content from the course without session or not
+     * @param array $idList          If you want to restrict the structure to only the given IDs
      */
     public function build_works(
         $session_id = 0,
         $courseId = 0,
-        $with_base_content = false,
-        $id_list = array()
+        $withBaseContent = false,
+        $idList = []
     ) {
         $table_work = Database::get_course_table(TABLE_STUDENT_PUBLICATION);
         $sessionCondition = api_get_session_condition(
             $session_id,
             true,
-            $with_base_content
+            $withBaseContent
         );
+        $courseId = (int) $courseId;
+
+        $idCondition = '';
+        if (!empty($idList)) {
+            $idList = array_map('intval', $idList);
+            $idCondition = ' AND iid IN ("'.implode('","', $idList).'") ';
+        }
 
         $sql = "SELECT * FROM $table_work
                 WHERE
-                    c_id = $courseId
-                    $sessionCondition AND
+                    c_id = $courseId                    
+                    $sessionCondition AND                    
                     filetype = 'folder' AND
                     parent_id = 0 AND
-                    active = 1";
-        $db_result = Database::query($sql);
-        while ($row = Database::fetch_array($db_result, 'ASSOC')) {
+                    active = 1
+                    $idCondition
+                ";
+        $result = Database::query($sql);
+        while ($row = Database::fetch_array($result, 'ASSOC')) {
             $obj = new Work($row);
             $this->course->add_resource($obj);
         }
     }
 
     /**
-     * @param int $session_id
-     * @param int $courseId
-     * @param bool $with_base_content
+     * @param int  $session_id
+     * @param int  $courseId
+     * @param bool $withBaseContent
      */
     public function build_gradebook(
         $session_id = 0,
         $courseId = 0,
-        $with_base_content = false
+        $withBaseContent = false
     ) {
         $courseInfo = api_get_course_info_by_id($courseId);
         $courseCode = $courseInfo['code'];

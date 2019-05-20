@@ -1,17 +1,18 @@
 <?php
-/**
- * WidgetHelper.php
- * avanzu-admin
- * Date: 16.03.14
- */
+/* For licensing terms, see /license.txt */
 
 namespace Chamilo\ThemeBundle\Helper;
 
-
-class WidgetHelper extends \Twig_Extension {
-
+/**
+ * Class WidgetHelper.
+ *
+ * @package Chamilo\ThemeBundle\Helper
+ */
+class WidgetHelper extends \Twig_Extension
+{
     /**
-     * Get widget helper name
+     * Get widget helper name.
+     *
      * @return string
      */
     public function getName()

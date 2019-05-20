@@ -1,18 +1,18 @@
 <?php
-/**
- * TaskListEvent.php
- * avanzu-admin
- * Date: 23.02.14
- */
+/* For licensing terms, see /license.txt */
 
 namespace Chamilo\ThemeBundle\Event;
 
-
 use Chamilo\ThemeBundle\Model\TaskInterface;
 
+/**
+ * Class TaskListEvent.
+ *
+ * @package Chamilo\ThemeBundle\Event
+ */
 class TaskListEvent extends ThemeEvent
 {
-    protected $tasks = array();
+    protected $tasks = [];
     protected $total = 0;
 
     /**
@@ -31,6 +31,7 @@ class TaskListEvent extends ThemeEvent
     public function addTask(TaskInterface $taskInterface)
     {
         $this->tasks[] = $taskInterface;
+
         return $this;
     }
 
@@ -42,6 +43,7 @@ class TaskListEvent extends ThemeEvent
     public function setTotal($total)
     {
         $this->total = $total;
+
         return $this;
     }
 

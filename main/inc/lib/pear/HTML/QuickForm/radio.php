@@ -1,5 +1,4 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
  * HTML class for a radio type element
@@ -127,8 +126,12 @@ class HTML_QuickForm_radio extends HTML_QuickForm_input
     {
         if (0 == strlen($this->_text)) {
             $label = '';
-        } elseif ($this->_flagFrozen) {
+        } elseif ($this->isFrozen()) {
             $label = $this->_text;
+            if ($this->freezeSeeOnlySelected) {
+                $invisible = $this->getChecked() ? '' : ' style="display:none"';
+                return "<div $invisible>".HTML_QuickForm_input::toHtml().$this->_text."</div>";
+            }
         } else {
             $labelClass = $this->labelClass;
             $radioClass = $this->radioClass;
@@ -138,13 +141,12 @@ class HTML_QuickForm_radio extends HTML_QuickForm_input
                 HTML_QuickForm_input::toHtml().
                 ''.
                 $this->_text .
-                '</label>&nbsp;&nbsp;
+                '</label>
             </div>';
-
-            return  $label;
+            return $label;
         }
 
-        return HTML_QuickForm_input::toHtml() . $label;
+        return HTML_QuickForm_input::toHtml().$label;
     }
 
     /**

@@ -2,14 +2,14 @@
 /* For licensing terms, see /license.txt */
 
 /**
- * Script
+ * Script.
+ *
  * @package chamilo.gradebook
  */
 require_once __DIR__.'/../inc/global.inc.php';
 
 api_block_anonymous_users();
 GradebookUtils::block_students();
-
 $edit_cat = isset($_REQUEST['editcat']) ? intval($_REQUEST['editcat']) : '';
 
 $catedit = Category::load($edit_cat);
@@ -80,14 +80,31 @@ if ($form->validate()) {
         $cat->setIsRequirement(false);
     }
     $cat->save();
-    header('Location: '.Security::remove_XSS($_SESSION['gradebook_dest']).'?editcat=&selectcat='.$cat->get_parent_id().'&'.api_get_cidreq());
+    header('Location: '.Category::getUrl().'editcat=&selectcat='.$cat->get_parent_id());
     exit;
 }
-$selectcat = isset($_GET['selectcat']) ? (int) $_GET['selectcat'] : '';
-$interbreadcrumb[] = array(
-    'url' => Security::remove_XSS($_SESSION['gradebook_dest']).'?selectcat='.$selectcat.'&'.api_get_cidreq(),
-    'name' => get_lang('Gradebook')
-);
+$selectcat = isset($_GET['selectcat']) ? (int) $_GET['selectcat'] : 0;
+
+$action_details = '';
+$current_id = 0;
+if (isset($_GET['editcat'])) {
+    $action_details = 'editcat';
+    $current_id = (int) $_GET['editcat'];
+}
+
+$logInfo = [
+    'tool' => TOOL_GRADEBOOK,
+    'tool_id' => 0,
+    'tool_id_detail' => 0,
+    'action' => 'edit-cat',
+    'action_details' => $action_details,
+];
+Event::registerLog($logInfo);
+
+$interbreadcrumb[] = [
+    'url' => Category::getUrl().'selectcat='.$selectcat,
+    'name' => get_lang('Gradebook'),
+];
 $this_section = SECTION_COURSES;
 Display :: display_header(get_lang('EditCategory'));
 $form->display();

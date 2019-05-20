@@ -5,7 +5,6 @@
   hubert.borderiou
   Manage tests category page
  */
-
 $htmlHeadXtra[] = '
 <script>
 	function confirmDelete(in_txt, in_id) {
@@ -26,18 +25,21 @@ require_once __DIR__.'/../inc/global.inc.php';
 
 $this_section = SECTION_COURSES;
 
+api_protect_course_script(true);
+
 if (!api_is_allowed_to_edit()) {
     api_not_allowed(true);
 }
+
 $category = new TestCategory();
 $courseId = api_get_course_int_id();
 $sessionId = api_get_session_id();
 
 // breadcrumbs
-$interbreadcrumb[] = array(
+$interbreadcrumb[] = [
     "url" => "exercise.php?".api_get_cidreq(),
     "name" => get_lang('Exercises'),
-);
+];
 
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 $content = '';
@@ -105,8 +107,10 @@ function importCategoryForm()
 }
 
 /**
- * Form to edit a category
+ * Form to edit a category.
+ *
  * @todo move to TestCategory.class.php
+ *
  * @param string $action
  */
 function edit_category_form($action)
@@ -125,21 +129,21 @@ function edit_category_form($action)
         // Setting the form elements
         $form->addElement('header', get_lang('EditCategory'));
         $form->addElement('hidden', 'category_id');
-        $form->addElement('text', 'category_name', get_lang('CategoryName'), array('size' => '95'));
+        $form->addElement('text', 'category_name', get_lang('CategoryName'), ['size' => '95']);
         $form->addHtmlEditor(
             'category_description',
             get_lang('CategoryDescription'),
             false,
             false,
-            array('ToolbarSet' => 'test_category', 'Height' => '200')
+            ['ToolbarSet' => 'TestQuestionDescription', 'Height' => '200']
         );
         $form->addButtonSave(get_lang('ModifyCategory'), 'SubmitNote');
 
         // setting the defaults
-        $defaults = array();
-        $defaults["category_id"] = $objcat->id;
-        $defaults["category_name"] = $objcat->name;
-        $defaults["category_description"] = $objcat->description;
+        $defaults = [];
+        $defaults['category_id'] = $objcat->id;
+        $defaults['category_name'] = $objcat->name;
+        $defaults['category_description'] = $objcat->description;
         $form->setDefaults($defaults);
 
         // setting the rules
@@ -166,7 +170,7 @@ function edit_category_form($action)
         } else {
             $token = Security::get_token();
             $form->addElement('hidden', 'sec_token');
-            $form->setConstants(array('sec_token' => $token));
+            $form->setConstants(['sec_token' => $token]);
 
             return $form->returnForm();
         }
@@ -193,8 +197,10 @@ function delete_category_form()
 }
 
 /**
- * form to add a category
+ * form to add a category.
+ *
  * @todo move to TestCategory.class.php
+ *
  * @param string $action
  */
 function add_category_form($action)
@@ -204,13 +210,13 @@ function add_category_form($action)
     $form = new FormValidator('note', 'post', api_get_self().'?action='.$action.'&'.api_get_cidreq());
     // Setting the form elements
     $form->addElement('header', get_lang('AddACategory'));
-    $form->addElement('text', 'category_name', get_lang('CategoryName'), array('size' => '95'));
+    $form->addElement('text', 'category_name', get_lang('CategoryName'), ['size' => '95']);
     $form->addHtmlEditor(
         'category_description',
         get_lang('CategoryDescription'),
         false,
         false,
-        array('ToolbarSet' => 'test_category', 'Height' => '200')
+        ['ToolbarSet' => 'TestQuestionDescription', 'Height' => '200']
     );
     $form->addButtonCreate(get_lang('AddTestCategory'), 'SubmitNote');
     // setting the rules
@@ -233,7 +239,7 @@ function add_category_form($action)
     } else {
         $token = Security::get_token();
         $form->addElement('hidden', 'sec_token');
-        $form->setConstants(array('sec_token' => $token));
+        $form->setConstants(['sec_token' => $token]);
 
         return $form->returnForm();
     }

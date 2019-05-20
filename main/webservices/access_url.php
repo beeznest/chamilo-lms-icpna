@@ -1,15 +1,12 @@
 <?php
 /* For licensing terms, see /license.txt */
 
-use Chamilo\CoreBundle\Entity\ExtraField as EntityExtraField;
 use Chamilo\UserBundle\Entity\User;
 
 /**
  * @package chamilo.webservices
  */
 require_once __DIR__.'/../inc/global.inc.php';
-$libpath = api_get_path(LIBRARY_PATH);
-
 $debug = true;
 
 define('WS_ERROR_SECRET_KEY', 1);
@@ -18,30 +15,48 @@ define('WS_ERROR_INVALID_INPUT', 3);
 define('WS_ERROR_SETTING', 4);
 
 /**
- * @param integer $code
+ * @param int $code
  */
 function return_error($code)
 {
     $fault = null;
     switch ($code) {
         case WS_ERROR_SECRET_KEY:
-            $fault = new soap_fault('Server', '', 'Secret key is not correct or params are not correctly set');
+            $fault = new soap_fault(
+                'Server',
+                '',
+                'Secret key is not correct or params are not correctly set'
+            );
             break;
         case WS_ERROR_NOT_FOUND_RESULT:
-            $fault = new soap_fault('Server', '', 'No result was found for this query');
+            $fault = new soap_fault(
+                'Server',
+                '',
+                'No result was found for this query'
+            );
             break;
         case WS_ERROR_INVALID_INPUT:
-            $fault = new soap_fault('Server', '', 'The input variables are invalid o are not correctly set');
+            $fault = new soap_fault(
+                'Server',
+                '',
+                'The input variables are invalid o are not correctly set'
+            );
             break;
         case WS_ERROR_SETTING:
-            $fault = new soap_fault('Server', '', 'Please check the configuration for this webservice');
+            $fault = new soap_fault(
+                'Server',
+                '',
+                'Please check the configuration for this webservice'
+            );
             break;
     }
+
     return $fault;
 }
 
 /**
  * @param array $params
+ *
  * @return bool
  */
 function WSHelperVerifyKey($params)
@@ -97,6 +112,7 @@ function WSHelperVerifyKey($params)
     if ($debug) {
         error_log('WSHelperVerifyKey result: '.intval($result));
     }
+
     return $result;
 }
 
@@ -106,7 +122,7 @@ $server = new soap_server();
 /** @var HookWSRegistration $hook */
 $hook = HookWSRegistration::create();
 if (!empty($hook)) {
-    $hook->setEventData(array('server' => $server));
+    $hook->setEventData(['server' => $server]);
     $res = $hook->notifyWSRegistration(HOOK_EVENT_TYPE_PRE);
     if (!empty($res['server'])) {
         $server = $res['server'];
@@ -124,10 +140,10 @@ $server->wsdl->addComplexType(
     'struct',
     'all',
     '',
-    array(
-        'id'   => array('name' => 'id', 'type' => 'xsd:string'),
-        'url' => array('name' => 'url', 'type' => 'xsd:string')
-    )
+    [
+        'id' => ['name' => 'id', 'type' => 'xsd:string'],
+        'url' => ['name' => 'url', 'type' => 'xsd:string'],
+    ]
 );
 
 $server->wsdl->addComplexType(
@@ -136,13 +152,13 @@ $server->wsdl->addComplexType(
     'array',
     '',
     'SOAP-ENC:Array',
-    array(),
-    array(
-        array(
+    [],
+    [
+        [
             'ref' => 'SOAP-ENC:arrayType',
             'wsdl:arrayType' => 'tns:portalItem[]',
-        ),
-    ),
+        ],
+    ],
     'tns:portalItem'
 );
 
@@ -152,15 +168,16 @@ $server->wsdl->addComplexType(
     'struct',
     'all',
     '',
-    array(
-        'secret_key'   => array('name' => 'secret_key', 'type' => 'xsd:string')
-    )
+    [
+        'secret_key' => ['name' => 'secret_key', 'type' => 'xsd:string'],
+    ]
 );
 
 // Register the method to expose
-$server->register('WSGetPortals', // method name
-    array('getPortals' => 'tns:getPortals'), // input parameters
-    array('return' => 'tns:portalList'), // output parameters
+$server->register(
+    'WSGetPortals', // method name
+    ['getPortals' => 'tns:getPortals'], // input parameters
+    ['return' => 'tns:portalList'], // output parameters
     'urn:WSAccessUrl', // namespace
     'urn:WSAccessUrl#WSGetPortals', // soapaction
     'rpc', // style
@@ -197,18 +214,18 @@ $server->wsdl->addComplexType(
     'struct',
     'all',
     '',
-    array(
-        'secret_key'   => array('name' => 'secret_key', 'type' => 'xsd:string'),
-        'user_id' => array('name' => 'user_id', 'type' => 'xsd:string'),
-        'portal_id' => array('name' => 'portal_id', 'type' => 'xsd:string')
-    )
+    [
+        'secret_key' => ['name' => 'secret_key', 'type' => 'xsd:string'],
+        'user_id' => ['name' => 'user_id', 'type' => 'xsd:string'],
+        'portal_id' => ['name' => 'portal_id', 'type' => 'xsd:string'],
+    ]
 );
 
 // Register the method to expose
 $server->register(
     'WSAddUserToPortal', // method name
-    array('addUserToPortal' => 'tns:AddUserToPortal'), // input parameters
-    array('return' => 'xsd:string'), // output parameters
+    ['addUserToPortal' => 'tns:AddUserToPortal'], // input parameters
+    ['return' => 'xsd:string'], // output parameters
     'urn:WSAccessUrl', // namespace
     'urn:WSAccessUrl#WSAddUserToPortal', // soapaction
     'rpc', // style
@@ -239,8 +256,8 @@ function WSAddUserToPortal($params)
 // Register the method to expose
 $server->register(
     'WSRemoveUserFromPortal', // method name
-    array('removeUserFromPortal' => 'tns:AddUserToPortal'), // input parameters
-    array('return' => 'xsd:string'), // output parameters
+    ['removeUserFromPortal' => 'tns:AddUserToPortal'], // input parameters
+    ['return' => 'xsd:string'], // output parameters
     'urn:WSAccessUrl', // namespace
     'urn:WSAccessUrl#WSRemoveUserFromPortal', // soapaction
     'rpc', // style
@@ -274,17 +291,17 @@ $server->wsdl->addComplexType(
     'struct',
     'all',
     '',
-    array(
-        'secret_key'   => array('name' => 'secret_key', 'type' => 'xsd:string'),
-        'user_id' => array('name' => 'user_id', 'type' => 'xsd:string'),
-    )
+    [
+        'secret_key' => ['name' => 'secret_key', 'type' => 'xsd:string'],
+        'user_id' => ['name' => 'user_id', 'type' => 'xsd:string'],
+    ]
 );
 
 // Register the method to expose
 $server->register(
     'WSGetPortalListFromUser', // method name
-    array('getPortalListFromUser' => 'tns:getPortalListFromUser'), // input parameters
-    array('return' => 'tns:portalList'), // output parameters
+    ['getPortalListFromUser' => 'tns:getPortalListFromUser'], // input parameters
+    ['return' => 'tns:portalList'], // output parameters
     'urn:WSAccessUrl', // namespace
     'urn:WSAccessUrl#WSGetPortalListFromUser', // soapaction
     'rpc', // style
@@ -318,18 +335,18 @@ $server->wsdl->addComplexType(
     'struct',
     'all',
     '',
-    array(
-        'secret_key'   => array('name' => 'secret_key', 'type' => 'xsd:string'),
-        'original_course_id_name' => array('name' => 'original_course_id_name', 'type' => 'xsd:string'),
-        'original_course_id_value' => array('name' => 'original_course_id_value', 'type' => 'xsd:string')
-    )
+    [
+        'secret_key' => ['name' => 'secret_key', 'type' => 'xsd:string'],
+        'original_course_id_name' => ['name' => 'original_course_id_name', 'type' => 'xsd:string'],
+        'original_course_id_value' => ['name' => 'original_course_id_value', 'type' => 'xsd:string'],
+    ]
 );
 
 // Register the method to expose
 $server->register(
     'WSGetPortalListFromCourse', // method name
-    array('getPortalListFromCourse' => 'tns:getPortalListFromCourse'), // input parameters
-    array('return' => 'tns:portalList'), // output parameters
+    ['getPortalListFromCourse' => 'tns:getPortalListFromCourse'], // input parameters
+    ['return' => 'tns:portalList'], // output parameters
     'urn:WSAccessUrl', // namespace
     'urn:WSAccessUrl#getPortalListFromCourse', // soapaction
     'rpc', // style
@@ -368,18 +385,19 @@ $server->wsdl->addComplexType(
     'struct',
     'all',
     '',
-    array(
-        'secret_key'   => array('name' => 'secret_key', 'type' => 'xsd:string'),
-        'portal_id' => array('name' => 'portal_id', 'type' => 'xsd:string'),
-        'original_course_id_name' => array('name' => 'original_course_id_name', 'type' => 'xsd:string'),
-        'original_course_id_value' => array('name' => 'original_course_id_value', 'type' => 'xsd:string')
-    )
+    [
+        'secret_key' => ['name' => 'secret_key', 'type' => 'xsd:string'],
+        'portal_id' => ['name' => 'portal_id', 'type' => 'xsd:string'],
+        'original_course_id_name' => ['name' => 'original_course_id_name', 'type' => 'xsd:string'],
+        'original_course_id_value' => ['name' => 'original_course_id_value', 'type' => 'xsd:string'],
+    ]
 );
 
 // Register the method to expose
-$server->register('WSAddCourseToPortal', // method name
-    array('addCourseToPortal' => 'tns:addCourseToPortal'), // input parameters
-    array('return' => 'xsd:string'), // output parameters
+$server->register(
+    'WSAddCourseToPortal', // method name
+    ['addCourseToPortal' => 'tns:addCourseToPortal'], // input parameters
+    ['return' => 'xsd:string'], // output parameters
     'urn:WSAccessUrl', // namespace
     'urn:WSAccessUrl#WSAddCourseToPortal', // soapaction
     'rpc', // style
@@ -410,9 +428,10 @@ function WSAddCourseToPortal($params)
 }
 
 // Register the method to expose
-$server->register('WSRemoveCourseFromPortal', // method name
-    array('removeCourseFromPortal' => 'tns:addCourseToPortal'), // input parameters
-    array('return' => 'xsd:string'), // output parameters
+$server->register(
+    'WSRemoveCourseFromPortal', // method name
+    ['removeCourseFromPortal' => 'tns:addCourseToPortal'], // input parameters
+    ['return' => 'xsd:string'], // output parameters
     'urn:WSAccessUrl', // namespace
     'urn:WSAccessUrl#WSRemoveCourseFromPortal', // soapaction
     'rpc', // style
@@ -441,15 +460,15 @@ function WSRemoveCourseFromPortal($params)
     if (empty($result)) {
         return true;
     }
+
     return false;
 }
-
 
 /* Delete user from group Web Service end */
 
 // Add more webservices through hooks from plugins
 if (!empty($hook)) {
-    $hook->setEventData(array('server' => $server));
+    $hook->setEventData(['server' => $server]);
     $res = $hook->notifyWSRegistration(HOOK_EVENT_TYPE_POST);
     if (!empty($res['server'])) {
         $server = $res['server'];

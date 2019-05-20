@@ -628,7 +628,7 @@ class MigrationCustom
 
         if (!empty($session_id) && !empty($user_id)) {
             //error_log('Called: addUserToSession - Subscribing: session_id: '.$session_id. '  user_id: '.$user_id);
-            SessionManager::subscribe_users_to_session($session_id, array($user_id), SESSION_VISIBLE_READ_ONLY, false);
+            SessionManager::subscribeUsersToSession($session_id, array($user_id), SESSION_VISIBLE_READ_ONLY, false);
             //exit;
         } else {
             //error_log('Called: addUserToSession - No idPrograma: '.$data['uidIdPrograma'].' - No uididpersona: '.$data['uididpersona']);
@@ -1398,7 +1398,7 @@ class MigrationCustom
                         );
                     }
                 } else {
-                    SessionManager::subscribe_users_to_session(
+                    SessionManager::subscribeUsersToSession(
                         $session_id,
                         array($user_id),
                         SESSION_VISIBLE_READ_ONLY,

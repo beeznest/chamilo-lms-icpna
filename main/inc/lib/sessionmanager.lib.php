@@ -8953,7 +8953,7 @@ SQL;
                 //no break
             case self::SESSION_CHANGE_USER_REASON_LOCATION:
                 //Adding to the new session
-                self::subscribe_users_to_session($newSessionId, array($userId), null, false);
+                self::subscribeUsersToSession($newSessionId, array($userId), null, false);
 
                 //Setting move_to if session was provided
                 $em

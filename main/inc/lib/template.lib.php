@@ -610,6 +610,12 @@ class Template
             }
         }
 
+        $cssVersion = api_get_configuration_value('css_version_number');
+
+        if (false !== $cssVersion) {
+            $cssVersion = "?v=$cssVersion";
+        }
+
         foreach ($bowerCSSFiles as $file) {
             $css[] = api_get_cdn_path(api_get_path(WEB_PUBLIC_PATH).'assets/'.$file);
         }
@@ -621,7 +627,7 @@ class Template
         }
         $css_file_to_string = '';
         foreach ($css as $file) {
-            $css_file_to_string .= api_get_css($file);
+            $css_file_to_string .= api_get_css($file.$cssVersion);
         }
 
         if (!$disable_js_and_css_files) {
@@ -640,6 +646,12 @@ class Template
     public function setCssCustomFiles()
     {
         global $disable_js_and_css_files;
+        $cssVersion = api_get_configuration_value('css_version_number');
+
+        if (false !== $cssVersion) {
+            $cssVersion = "?v=$cssVersion";
+        }
+
         // Base CSS
         $css[] = api_get_cdn_path(api_get_path(WEB_CSS_PATH).'base.css');
 
@@ -655,7 +667,7 @@ class Template
 
         $css_file_to_string = null;
         foreach ($css as $file) {
-            $css_file_to_string .= api_get_css($file);
+            $css_file_to_string .= api_get_css($file.$cssVersion);
         }
         // @todo move this somewhere else. Special fix when using tablets in order to see the text near icons
         if (SHOW_TEXT_NEAR_ICONS == true) {

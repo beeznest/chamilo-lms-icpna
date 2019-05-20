@@ -1222,6 +1222,9 @@ $_configuration['required_extra_fields_in_profile'] = [
 // Validate the download for encrypted files to users with this ip (string) or ip range (array)
 //$_configuration['document_download_encrypted_valid_ip'] = '127.0.0.1/1';
 
+// Add a version number to css files to avoid browser cache after upgrade.
+// $_configuration['css_version_number'] = 2019 + 20 + 5;
+
 // KEEP THIS AT THE END
 // -------- Custom DB changes
 // Add user activation by confirmation email

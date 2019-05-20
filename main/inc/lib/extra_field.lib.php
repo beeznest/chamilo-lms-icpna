@@ -3118,7 +3118,7 @@ JAVASCRIPT;
             'select',
             'extra_'.$fieldDetails['variable'],
             $fieldDetails['display_text'],
-            $options,
+            [],
             ['id' => 'extra_'.$fieldDetails['variable']]
         );
 

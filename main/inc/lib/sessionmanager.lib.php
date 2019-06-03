@@ -1875,6 +1875,10 @@ class SessionManager
 
         $session = api_get_session_entity($sessionId);
 
+        if (empty($session)) {
+            return false;
+        }
+
         // from function parameter
         if (empty($session_visibility)) {
             $session_visibility = $session->getVisibility();

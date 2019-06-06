@@ -302,9 +302,7 @@ if (!empty($attempts)) {
 
         $attempt_url = api_get_path(WEB_CODE_PATH).'exercise/result.php?';
         $attempt_url .= api_get_cidreq().'&show_headers=1&';
-        $attempt_url .= http_build_query([
-            'id' => $attempt_result['exe_id'],
-        ]);
+        $attempt_url .= http_build_query(['id' => $attempt_result['exe_id']]);
         $attempt_url .= $url_suffix;
 
         $attempt_link = Display::url(
@@ -373,6 +371,10 @@ if (!empty($attempts)) {
                     unset($row['result']);
                 }
             }
+            if (!$objExercise->hasResultsAccess($attempt_result)) {
+                $attempt_link = '';
+            }
+
             $row['attempt_link'] = $attempt_link;
         }
         $my_attempt_array[] = $row;

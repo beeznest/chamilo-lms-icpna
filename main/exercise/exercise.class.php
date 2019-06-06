@@ -2402,6 +2402,17 @@ class Exercise
 
             $skillList = Skill::addSkillsToForm($form, ITEM_TYPE_EXERCISE, $this->iId);
 
+            $extraField = new ExtraField('exercise');
+            $extraField->addElements(
+                $form,
+                $this->iId,
+                [], //exclude
+                false, // filter
+                false, // tag as select
+                [], //show only fields
+                [], // order fields
+                [] // extra data
+            );
             $form->addElement('html', '</div>'); //End advanced setting
         }
 
@@ -2613,6 +2624,11 @@ class Exercise
 
         $iId = $this->save($type);
         if (!empty($iId)) {
+            $values = $form->getSubmitValues();
+            $values['item_id'] = $iId;
+            $extraFieldValue = new ExtraFieldValue('exercise');
+            $extraFieldValue->saveFieldValues($values);
+
             Skill::saveSkills($form, ITEM_TYPE_EXERCISE, $iId);
         }
     }
@@ -3254,7 +3270,7 @@ class Exercise
         ) {
             $script = "
                 var button = $('button[name=\"save_category_now\"]');
-            
+
                 if (button.length) {
                     button.trigger('click');
                 }
@@ -9637,5 +9653,50 @@ class Exercise
             'max_score' => 0,
             'session_id' => 0,
         ];
+    }
+
+    /**
+     * @param array $exerciseResultInfo
+     *
+     * @return bool
+     */
+    public function hasResultsAccess($exerciseResultInfo)
+    {
+        $extraFieldValue = new ExtraFieldValue('exercise');
+        $value = $extraFieldValue->get_values_by_handler_and_field_variable(
+            $this->iId,
+            'results_available_for_x_minutes'
+        );
+
+        if (!empty($value)) {
+            $value = (int) $value;
+            $endDate = new DateTime($exerciseResultInfo['exe_date']);
+            $endDate->add(new DateInterval('PT'.$value.'M'));
+
+            if (time() > $endDate->getTimestamp()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @return int
+     */
+    public function getResultsAccess()
+    {
+        $extraFieldValue = new ExtraFieldValue('exercise');
+        $value = $extraFieldValue->get_values_by_handler_and_field_variable(
+            $this->iId,
+            'results_available_for_x_minutes'
+        );
+
+        if (!empty($value)) {
+
+            return (int) $value;
+        }
+
+        return 0;
     }
 }

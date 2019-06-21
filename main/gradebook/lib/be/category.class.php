@@ -2778,4 +2778,32 @@ class Category implements GradebookItem
             </div>
         ";
     }
+
+    /**
+     * Find a gradebook category by the certificate ID.
+     *
+     * @param int $id
+     *
+     * @return Category|null
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public static function findByCertificate($id)
+    {
+        $categoryId = Database::getManager()
+            ->createQuery("SELECT c.catId FROM ChamiloCoreBundle:GradebookCertificate c WHERE c.id = :id")
+            ->setParameters(['id' => $id])
+            ->getOneOrNullResult();
+
+        if (empty($categoryId)) {
+            return null;
+        }
+
+        $category = self::load($categoryId['catId']);
+
+        if (empty($category)) {
+            return $category;
+        }
+
+        return $category[0];
+    }
 }

@@ -835,23 +835,24 @@ $form->freeze(['extra_id_document_type', 'extra_id_document_number', 'extra_midd
                             '<h3>DECLARACION DE PROTECCION DE DATOS PERSONALES MAYOR DE 18 AÑOS DE EDAD</h3>'
                         );
                         $modalText.html(
-                            'En aplicación a lo dispuesto por la Ley 29733 Ley de Protección de ' +
-                            'Datos Personales, y el D.S. 003-2013-JUS,el suscrito titular de los datos personales, ' +
-                            'mediante el llenado y/o firma del presente formulario, autorizo de forma expresa e ' +
-                            'inequívoca y por tiempo indefinido que mis datos personales, sean tratados, ' +
-                            'almacenados, sistematizados y utilizados por el INSTITUTO CULTURAL PERUANO ' +
-                            'NORTEAMERICANO para fines estadísticos, administrativos y de gestión comercial, ' +
-                            'incluyendo pero sin estar limitado a: invitaciones a cursos, talleres, charlas y otros ' +
-                            'eventos que el ICPNA organice, auspicie o participe, siendo que los datos, serán ' +
+                            'En aplicación a lo dispuesto por la Ley 29733 Ley de Protección de Datos Personales, y ' +
+                            'el D.S. 003-2013-JUS, el suscrito titular de los datos personales, mediante el llenado ' +
+                            'y/o firma del presente formulario, autorizo de forma expresa e inequívoca y por tiempo ' +
+                            'indefinido que mis datos personales, sean tratados, almacenados, sistematizados y ' +
+                            'utilizados por el INSTITUTO CULTURAL PERUANO NORTEAMERICANO - ICPNA, los que serán ' +
                             'conservados en un banco de datos cuyo titular es el ICPNA, autorizando incluso su ' +
-                            'tratamiento internacional si fuera el caso. Asimismo, declaro que estoy informado que ' +
-                            'ante alguna solicitud de datos personales sensibles, es mi facultad responder o no ' +
-                            'sobre los mismos e igualmente declaro conocer los efectos y/o consecuencias de ' +
-                            'proporcionar mis datos personales o de negarme a brindarlos. Igualmente declaro conocer ' +
-                            'que para ejercer mis derechos como acceso, rectificación, cancelación y oposición y ' +
-                            'otros derechos, sobre mis datos puedo dirigirme a las oficinas, ubicadas en Av. Angamos ' +
-                            'Oeste 120, Miraflores. Declaro conocer los alcances de la Ley 29733 y su reglamento, ' +
-                            'para ejercer mis derechos conforme a Ley.'
+                            'tratamiento internacional si fuera el caso, para fines estadísticos, administrativos y ' +
+                            'de gestión comercial, incluyendo pero sin estar limitado a: invitaciones a cursos, ' +
+                            'talleres, charlas y otros eventos que el ICPNA organice, auspicie o participe, los que ' +
+                            'podrán ser comunicados a través de llamadas telefónicas, envío de correos electrónicos, ' +
+                            'mensaje de texto o WhatsApp. Asimismo, declaro que estoy informado que ante alguna ' +
+                            'solicitud de datos personales sensibles, es mi facultad responder o no sobre los mismos ' +
+                            'e igualmente declaro conocer los efectos y/o consecuencias de proporcionar mis datos ' +
+                            'personales o de negarme a brindarlos. Igualmente declaro conocer que para ejercer mis ' +
+                            'derechos como acceso, rectificación, cancelación y oposición y otros derechos, sobre ' +
+                            'mis datos puedo ejecutarlos a través del e-mail: icpna@icpna.edu.pe y/o dirigirme a las ' +
+                            'oficinas ubicadas en Av. Angamos Oeste 120, Miraflores. Declaro conocer los alcances de ' +
+                            'la Ley 29733 y su reglamento, para ejercer mis derechos conforme a Ley.'
                         );
 
                         return;
@@ -868,29 +869,31 @@ $form->freeze(['extra_id_document_type', 'extra_id_document_number', 'extra_midd
                             '<h3>DECLARACION DE PROTECCION DE DATOS PERSONALES MAYOR DE 14 Y MENOR A 18 AÑOS</h3>'
                         );
                         $modalText.html(
-                            'En aplicación a lo dispuesto por la Ley 29733 Ley de Protección de Datos Personales, ' +
-                            'y el D.S. 003-2013-JUS, y en especial en el artículo 28 del D.S.003-2013-JUS, el ' +
-                            'suscrito menor de edad, titular de mis datos personales, mediante el llenado y/o firma ' +
-                            'del presente formulario, autorizo de forma expresa e inequívoca y por tiempo indefinido ' +
-                            'que mis datos personales, sean tratados, almacenados, sistematizados y utilizados por ' +
-                            'el INSTITUTO CULTURAL PERUANO NORTEAMERICANO para fines estadísticos, administrativos y ' +
-                            'de gestión comercial, incluyendo pero sin estar limitado a: invitaciones a cursos, ' +
-                            'talleres, charlas y otros eventos que el ICPNA organice, auspicie o participe, siendo ' +
-                            'que los datos, serán conservados en un banco de datos cuyo titular es el ICPNA, ' +
-                            'autorizando incluso su tratamiento internacional si fuera el caso. Asimismo, declaro ' +
-                            'que estoy informado que ante alguna solicitud de datos personales sensibles, es mi ' +
-                            'facultad responder o no sobre los mismos e igualmente declaro conocer los efectos y/o ' +
-                            'consecuencias de proporcionar mis datos personales o de negarme a brindarlos. ' +
-                            'Igualmente declaro conocer que para ejercer mis derechos como acceso, rectificación, ' +
-                            'cancelación y oposición y otros derechos, sobre mis datos puedo dirigirme a las ' +
-                            'oficinas, ubicadas en Av. Angamos Oeste 120, Miraflores. Señalo también, que al ser yo ' +
-                            'menor de edad, el ICPNA no me está solicitando datos relativos a la actividad ' +
-                            'profesional o laboral de mis padres, ni su información económica, datos sociológicos o ' +
-                            'de cualquier otro sobre los demás miembros de mi familia. Asimismo, declaro que estoy ' +
-                            'informando al ICPNA de la identidad y dirección de mis padres, a fin de que ellos ' +
-                            'puedan autorizar el tratamiento de mis datos personales, en aquellos casos en que mi ' +
-                            'propia autorización no fuera suficiente y que estén referidas al acceso a actividades, ' +
-                            'vinculadas con bienes o servicios que estén restringidos para mayores de edad.'
+                            'En aplicación a lo dispuesto por la Ley 29733 Ley de Protección de Datos Personales, y ' +
+                            'el D.S. 003-2013-JUS, y en especial en el artículo 28 del D.S.003-2013-JUS, el suscrito ' +
+                            'menor de edad, titular de mis datos personales, mediante el llenado y/o firma del ' +
+                            'presente formulario, autorizo de forma expresa e inequívoca y por tiempo indefinido que ' +
+                            'mis datos personales, sean tratados, almacenados, sistematizados y utilizados por el ' +
+                            'INSTITUTO CULTURAL PERUANO NORTEAMERICANO - ICPNA, los que serán conservados en un ' +
+                            'banco de datos cuyo titular es el ICPNA, autorizando incluso su tratamiento ' +
+                            'internacional si fuera el caso,  para fines estadísticos, administrativos y de gestión ' +
+                            'comercial, incluyendo pero sin estar limitado a: invitaciones a cursos, talleres, ' +
+                            'charlas y otros eventos que el ICPNA organice, auspicie o participe, los que podrán ser ' +
+                            'comunicados a través de llamadas telefónicas, envío de correos electrónicos, mensaje de ' +
+                            'texto o WhatsApp. Asimismo, declaro que estoy informado que ante alguna solicitud de ' +
+                            'datos personales sensibles, es mi facultad responder o no sobre los mismos e igualmente ' +
+                            'declaro conocer los efectos y/o consecuencias de proporcionar mis datos personales o de ' +
+                            'negarme a brindarlos. Igualmente declaro conocer que para ejercer mis derechos como ' +
+                            'acceso, rectificación, cancelación y oposición y otros derechos, sobre mis datos puedo ' +
+                            'ejecutarlos a través del e-mail: icpna@icpna.edu.pe y/o dirigirme a las oficinas ' +
+                            'ubicadas en Av. Angamos Oeste 120, Miraflores. Señalo también, que al ser yo menor de ' +
+                            'edad, el ICPNA no me está solicitando datos relativos a la actividad profesional o ' +
+                            'laboral de mis padres, ni su información económica, datos sociológicos o de cualquier ' +
+                            'otro sobre los demás miembros de mi familia. Asimismo, declaro que estoy informando al ' +
+                            'ICPNA de la identidad y dirección de mis padres, a fin de que ellos puedan autorizar el ' +
+                            'tratamiento de mis datos personales, en aquellos casos en que mi propia autorización no ' +
+                            'fuera suficiente y que estén referidas al acceso a actividades, vinculadas con bienes o ' +
+                            'servicios que estén restringidos para mayores de edad.'
                         );
 
                         $divGuardian.show();
@@ -903,24 +906,26 @@ $form->freeze(['extra_id_document_type', 'extra_id_document_number', 'extra_midd
                     );
                     $modalText.html(
                         'En aplicación a lo dispuesto por la Ley 29733 Ley de Protección de Datos Personales, y el ' +
-                        'D.S. 003-2013-JUS,el suscrito titular de los datos personales, mediante el llenado y/o ' +
+                        'D.S. 003-2013-JUS, el suscrito titular de los datos personales, mediante el llenado y/o ' +
                         'firma del presente formulario, autorizo de forma expresa e inequívoca y por tiempo ' +
                         'indefinido que mis datos personales, sean tratados, almacenados, sistematizados y ' +
-                        'utilizados por el INSTITUTO CULTURAL PERUANO NORTEAMERICANO para fines estadísticos, ' +
-                        'administrativos y de gestión comercial, incluyendo pero sin estar limitado a: invitaciones ' +
-                        'a cursos, talleres, charlas y otros eventos que el ICPNA organice, auspicie o participe, ' +
-                        'siendo que los datos, serán conservados en un banco de datos cuyo titular es el ICPNA, ' +
-                        'autorizando incluso su tratamiento internacional si fuera el caso. Asimismo, declaro que ' +
-                        'estoy informado que ante alguna solicitud de datos personales sensibles, es mi facultad ' +
-                        'responder o no sobre los mismos e igualmente declaro conocer los efectos y/o consecuencias ' +
-                        'de proporcionar mis datos personales o de negarme a brindarlos. Igualmente declaro conocer ' +
-                        'que para ejercer mis derechos como acceso, rectificación, cancelación y oposición y otros ' +
-                        'derechos, sobre mis datos puedo dirigirme a las oficinas, ubicadas en Av. Angamos Oeste ' +
-                        '120, Miraflores. Declaro conocer los alcances de la Ley 29733 y su reglamento, para ejercer ' +
-                        'mis derechos conforme a Ley y declaro además, que parte integrante de esta declaración y ' +
-                        'autorización explícita en todos los términos expuestos, incluyen también el tratamiento de ' +
-                        'datos personales del menor de edad sujeto a mi patria potestad, y cuyos datos se encuentran ' +
-                        'en el banco de datos del ICPNA.'
+                        'utilizados por el INSTITUTO CULTURAL PERUANO NORTEAMERICANO - ICPNA, los que serán ' +
+                        'conservados en un banco de datos cuyo titular es el ICPNA, autorizando incluso su ' +
+                        'tratamiento internacional si fuera el caso, para fines estadísticos, administrativos y de ' +
+                        'gestión comercial, incluyendo pero sin estar limitado a: invitaciones a cursos, talleres, ' +
+                        'charlas y otros eventos que el ICPNA organice, auspicie o participe, los que podrán ser ' +
+                        'comunicados a través de llamadas telefónicas, envío de correos electrónicos, mensaje de ' +
+                        'texto o WhatsApp. Asimismo, declaro que estoy informado que ante alguna solicitud de datos ' +
+                        'personales sensibles, es mi facultad responder o no sobre los mismos e igualmente declaro ' +
+                        'conocer los efectos y/o consecuencias de proporcionar mis datos personales o de negarme a ' +
+                        'brindarlos. Igualmente declaro conocer que para ejercer mis derechos como acceso, ' +
+                        'rectificación, cancelación y oposición y otros derechos, sobre mis datos puedo ejecutarlos ' +
+                        'a través del e-mail: icpna@icpna.edu.pe y/o dirigirme a las oficinas ubicadas en Av. ' +
+                        'Angamos Oeste 120, Miraflores. Declaro conocer los alcances de la Ley 29733 y su ' +
+                        'reglamento, para ejercer mis derechos conforme a Ley y declaro además, que parte integrante ' +
+                        'de esta declaración y autorización explícita en todos los términos expuestos, incluyen ' +
+                        'también el tratamiento de datos personales del menor de edad sujeto a mi patria potestad ' +
+                        'o tutoría, y cuyos datos autorizo ingresen al banco de datos del ICPNA.'
                     );
 
                     $divGuardian.show();

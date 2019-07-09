@@ -117,16 +117,6 @@ class IcpnaUpdateUserPluginHook extends HookObserver implements HookUpdateUserOb
         $this->updateUserExtraInfo($user, $extraData, $wsUserInfo);
         $this->updateSessionUserInfo($user);
 
-        $studyCenter = $extraData['extra_occupation_center_name_1'];
-
-        if ($extraData['extra_occupation_center_name_2']) {
-            $studyCenter = $extraData['extra_occupation_center_name_2'];
-        }
-
-        if ($extraData['extra_occupation_center_name_3']) {
-            $studyCenter = $extraData['extra_occupation_center_name_3'];
-        }
-
         try {
             $client = new SoapClient($wsUrl);
             $result = $client
@@ -148,13 +138,6 @@ class IcpnaUpdateUserPluginHook extends HookObserver implements HookUpdateUserOb
                     'p_vchEmailPersona' => $user->getEmail(),
                     'p_vchTelefonoPersona' => $user->getPhone(),
                     'p_vchcelularPersona' => $extraData['extra_mobile_phone_number'],
-                    'p_uidIdOcupacion' => strtoupper($extraData['extra_occupation']),
-                    'p_uididdepartamentocentroestudios' => strtoupper($extraData['extra_occupation_department']),
-                    'p_uididprovinciacentroestudios' => strtoupper($extraData['extra_occupation_province']),
-                    'p_uididdistritocentroestudios' => strtoupper($extraData['extra_occupation_district']),
-                    'p_uidIdCentroEstudios' => strtoupper($studyCenter),
-                    'p_vchcentrolaboral' => $extraData['extra_occupation_center_name_4'],
-                    'p_uididcarrerauniversitaria' => strtoupper($extraData['extra_university_career']),
                     'p_strNombrePadre' => $extraData['extra_guardian_name'],
                     'p_vchEmailApoderado' => $extraData['extra_guardian_email'],
                     'p_uidIdDocumentoIdentidadPadre' => strtoupper($extraData['extra_guardian_id_document_type']),

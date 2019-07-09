@@ -35,15 +35,6 @@ if (!$form->elementExists('extra_id_document_type') || !$form->elementExists('ex
     || !$form->elementExists('extra_door_number')
     || !$form->elementExists('extra_indoor_number')
     || !$form->elementExists('extra_mobile_phone_number')
-    || !$form->elementExists('extra_occupation')
-    || !$form->elementExists('extra_occupation_department')
-    || !$form->elementExists('extra_occupation_province')
-    || !$form->elementExists('extra_occupation_district')
-    || !$form->elementExists('extra_occupation_center_name_1')
-    || !$form->elementExists('extra_occupation_center_name_2')
-    || !$form->elementExists('extra_occupation_center_name_3')
-    || !$form->elementExists('extra_occupation_center_name_4')
-    || !$form->elementExists('extra_university_career')
     || !$form->elementExists('extra_guardian_id_document_type')
     || !$form->elementExists('extra_guardian_id_document_number')
     || !$form->elementExists('extra_guardian_name')
@@ -147,39 +138,6 @@ $formRenderer->setElementTemplate(
 
 $formRenderer->setElementTemplate(
     '
-        <div class="form-group {error_class}">
-            <label {label-for} class="col-sm-2 control-label {extra_label_class}" >{label}</label>
-            <div class="col-sm-8">
-                <p>
-                    {element}
-                    <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
-                </p>
-    ',
-    'extra_occupation_department'
-);
-$formRenderer->setElementTemplate(
-    '
-                <p>
-                    {element}
-                    <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
-                </p>
-    ',
-    'extra_occupation_province'
-);
-$formRenderer->setElementTemplate(
-    '
-                <p>
-                    {element}
-                    <!-- BEGIN error --><span class="form_error">{error}</span><!-- END error -->
-                </p>
-            </div>
-        </div>
-    ',
-    'extra_occupation_district'
-);
-
-$formRenderer->setElementTemplate(
-    '
         <fieldset id="guardian_div">
             <legend>Actualizar datos personales - Padre de familia</legend>
             <div class="row">
@@ -279,70 +237,6 @@ $form->addSelect(
     ['id' => 'extra_type_of_road']
 );
 
-$form->removeElement('extra_occupation');
-$form->addSelect(
-    'extra_occupation',
-    'Ocupación',
-    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
-    ['id' => 'extra_occupation']
-);
-
-$form->removeElement('extra_occupation_department');
-$form->addSelect(
-    'extra_occupation_department',
-    'Dirección del centro de estudios/laboral (Departamento / Provincia / Distrito)',
-    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
-    ['id' => 'extra_occupation_department']
-);
-
-$form->removeElement('extra_occupation_province');
-$form->addSelect(
-    'extra_occupation_province',
-    '',
-    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
-    ['id' => 'extra_occupation_province']
-);
-
-$form->removeElement('extra_occupation_district');
-$form->addSelect(
-    'extra_occupation_district',
-    '',
-    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
-    ['id' => 'extra_occupation_district']
-);
-
-$form->removeElement('extra_occupation_center_name_1');
-$form->addSelect(
-    'extra_occupation_center_name_1',
-    'Centro de estudios (escolar)',
-    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
-    ['id' => 'extra_occupation_center_name_1']
-);
-
-$form->removeElement('extra_occupation_center_name_2');
-$form->addSelect(
-    'extra_occupation_center_name_2',
-    'Centro de estudios (técnico)',
-    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
-    ['id' => 'extra_occupation_center_name_2']
-);
-
-$form->removeElement('extra_occupation_center_name_3');
-$form->addSelect(
-    'extra_occupation_center_name_3',
-    'Universidad',
-    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
-    ['id' => 'extra_occupation_center_name_3']
-);
-
-$form->removeElement('extra_university_career');
-$form->addSelect(
-    'extra_university_career',
-    'Carrera universitaria',
-    ['' => get_lang('SelectAnOption', null, 'spanish', true)],
-    ['id' => 'extra_university_career']
-);
-
 $form->removeElement('extra_guardian_id_document_type');
 $form->addSelect(
     'extra_guardian_id_document_type',
@@ -422,46 +316,6 @@ $form->insertElementBefore(
 $form->insertElementBefore(
     $form->removeElement('extra_guardian_email', false),
     'extra_guardian_id_document_type'
-);
-$form->insertElementBefore(
-    $form->removeElement('extra_university_career', false),
-    'extra_guardian_name'
-);
-$form->insertElementBefore(
-    $form->removeElement('extra_occupation_center_name_4', false),
-    'extra_university_career'
-);
-$form->insertElementBefore(
-    $form->removeElement('extra_occupation_center_name_3', false),
-    'extra_occupation_center_name_4'
-);
-$form->insertElementBefore(
-    $form->removeElement('extra_occupation_center_name_2', false),
-    'extra_occupation_center_name_3'
-);
-$form->insertElementBefore(
-    $form->removeElement('extra_occupation_center_name_1', false),
-    'extra_occupation_center_name_2'
-);
-$form->insertElementBefore(
-    $form->removeElement('extra_occupation_district', false),
-    'extra_occupation_center_name_1'
-);
-$form->insertElementBefore(
-    $form->removeElement('extra_occupation_province', false),
-    'extra_occupation_district'
-);
-$form->insertElementBefore(
-    $form->removeElement('extra_occupation_department', false),
-    'extra_occupation_province'
-);
-$form->insertElementBefore(
-    $form->removeElement('extra_occupation', false),
-    'extra_occupation_department'
-);
-$form->insertElementBefore(
-    $form->removeElement('extra_mobile_phone_number', false),
-    'extra_occupation'
 );
 $form->insertElementBefore(
     $form->removeElement('phone', false),
@@ -656,15 +510,6 @@ $form->freeze(['extra_id_document_type', 'extra_id_document_number', 'extra_midd
                     $divGuardian = $('#guardian_div'),
                     $modalTitle = $('#title-modal'),
                     $modalText = $('#text-modal'),
-                    $slctOccupation = $('#extra_occupation'),
-                    $slctOccupationDepartment = $('#extra_occupation_department'),
-                    $slctOccupationProvince = $('#extra_occupation_province'),
-                    $slctOccupationDistrict = $('#extra_occupation_district'),
-                    $slctOccupationName1 = $('#extra_occupation_center_name_1'),
-                    $slctOccupationName2 = $('#extra_occupation_center_name_2'),
-                    $slctOccupationName3 = $('#extra_occupation_center_name_3'),
-                    $txtOccupationName4 = $('#extra_occupation_center_name_4'),
-                    $slctUniCarrers = $('#extra_university_career'),
                     $txtGuardianName = $('#profile_extra_guardian_name'),
                     $txtGuardianEmail = $('#profile_extra_guardian_email'),
                     $slctGuardianDocument = $('#extra_guardian_id_document_type'),
@@ -701,10 +546,6 @@ $form->freeze(['extra_id_document_type', 'extra_id_document_number', 'extra_midd
                         $txtAddress
                     ];
 
-                    if ($slctOccupation.get(0).selectedIndex === 4) {
-                        texts.push($txtOccupationName4);
-                    }
-
                     for (var i = 0; i < texts.length; i++) {
                         var $el = texts[i],
                             isValid = validateTexts($el.get(0));
@@ -716,39 +557,6 @@ $form->freeze(['extra_id_document_type', 'extra_id_document_number', 'extra_midd
 
                             return;
                         }
-                    }
-
-                    switch ($slctOccupation.get(0).selectedIndex) {
-                        case 0:
-                            $slctOccupationName1.selectpicker('val', '');
-                            $slctOccupationName2.selectpicker('val', '');
-                            $slctOccupationName3.selectpicker('val', '');
-                            $txtOccupationName4.val('');
-                            $slctUniCarrers.selectpicker('val', '');
-                            break;
-                        case 1:
-                            $slctOccupationName2.selectpicker('val', '');
-                            $slctOccupationName3.selectpicker('val', '');
-                            $txtOccupationName4.val('');
-                            $slctUniCarrers.selectpicker('val', '');
-                            break;
-                        case 2:
-                            $slctOccupationName1.selectpicker('val', '');
-                            $slctOccupationName3.selectpicker('val', '');
-                            $txtOccupationName4.val('');
-                            $slctUniCarrers.selectpicker('val', '');
-                            break;
-                        case 3:
-                            $slctOccupationName1.selectpicker('val', '');
-                            $slctOccupationName2.selectpicker('val', '');
-                            $txtOccupationName4.val('');
-                            break;
-                        case 4:
-                            $slctOccupationName1.selectpicker('val', '');
-                            $slctOccupationName2.selectpicker('val', '');
-                            $slctOccupationName3.selectpicker('val', '');
-                            $slctUniCarrers.selectpicker('val', '');
-                            break;
                     }
 
                     addProgress('profile');
@@ -803,26 +611,9 @@ $form->freeze(['extra_id_document_type', 'extra_id_document_number', 'extra_midd
                     $slctGuardianDocument.required(false);
                     $txtGuardianDocument.required(false);
                 */
-                    var age = checkAge(),
-                        occupationOptions = $slctOccupation.find('option').hide();
+                    var age = checkAge();
 
                     currentAge = age;
-
-                    if (/*age >= 4 &&*/ !age || age < 17) {
-                        occupationOptions
-                            .filter(function (i) {
-                                return i <= 1;
-                            })
-                            .show();
-                    } else if (age >= 17) {
-                        occupationOptions
-                            .filter(function (i) {
-                                return i > 1;
-                            })
-                            .show();
-                    }
-
-                    $slctOccupation.selectpicker('refresh');
 
                     if (age >= 18) {
                         //$txtGuardianName.val('');
@@ -943,75 +734,6 @@ $form->freeze(['extra_id_document_type', 'extra_id_document_number', 'extra_midd
                     });
                 }
 
-                function onOccupationSelected(selectedIndex) {
-                    $slctOccupationName1.parents('.form-group').hide();
-                    $slctOccupationName2.parents('.form-group').hide();
-                    $slctOccupationName3.parents('.form-group').hide();
-                    $txtOccupationName4.parents('.form-group').hide();
-                    $slctUniCarrers.parents('.form-group').hide();
-
-                    $slctOccupationName1.required(false).empty();
-                    $slctOccupationName2.required(false).empty();
-                    $slctOccupationName3.required(false).empty();
-                    $txtOccupationName4.required(false);
-                    $slctUniCarrers.required(false);
-
-                    var type = $slctOccupation.find('option:selected').data('type') || '';
-
-                    return $.getJSON(url, {
-                        a: 'get_centroestudios',
-                        type: type,
-                        district: $slctOccupationDistrict.val()
-                    }, function (response) {
-                        switch (selectedIndex) {
-                            case 1:
-                                addOptions(response, $slctOccupationName1);
-
-                                if (defaultValues.extra_occupation_center_name_1) {
-                                    $slctOccupationName1
-                                        .selectpicker('val', defaultValues.extra_occupation_center_name_1);
-                                }
-
-                                $slctOccupationName1.required(true).parents('.form-group').show();
-                                break;
-                            case 2:
-                                addOptions(response, $slctOccupationName2);
-
-                                if (defaultValues.extra_occupation_center_name_2) {
-                                    $slctOccupationName2
-                                        .selectpicker('val', defaultValues.extra_occupation_center_name_2);
-                                }
-
-                                $slctOccupationName2.required(true).parents('.form-group').show();
-                                break;
-                            case 3:
-                                addOptions(response, $slctOccupationName3);
-
-                                if (defaultValues.extra_occupation_center_name_3) {
-                                    $slctOccupationName3
-                                        .selectpicker('val', defaultValues.extra_occupation_center_name_3);
-                                }
-
-                                if (defaultValues.extra_university_career) {
-                                    $slctUniCarrers.selectpicker('val', defaultValues.extra_university_career);
-                                }
-
-                                $slctOccupationName3.required(true).parents('.form-group').show();
-                                $slctUniCarrers.required(true).parents('.form-group').show();
-                                break;
-                            case 4:
-                            //no break
-                            case 5:
-                                if (defaultValues.extra_occupation_center_name_4) {
-                                    $txtOccupationName4.val(defaultValues.extra_occupation_center_name_4);
-                                }
-
-                                $txtOccupationName4.required(true).parents('.form-group').show();
-                                break;
-                        }
-                    });
-                }
-
                 function addOptions(options, $el) {
                     $el.empty();
 
@@ -1096,9 +818,7 @@ $form->freeze(['extra_id_document_type', 'extra_id_document_number', 'extra_midd
                     var xhrDocumentIdType = $.getJSON(url, {a: 'get_tipodocumento'}),
                         xhrNationality = $.getJSON(url, {a: 'get_nacionalidad'}),
                         xhrDepartment = $.getJSON(url, {a: 'get_departamento'}),
-                        xhrAddressTypeRoad = $.getJSON(url, {a: 'get_tipo_via'}),
-                        xhrOccupation = $.getJSON(url, {a: 'get_ocupacion'}),
-                        xhrUniCareers = $.getJSON(url, {a: 'get_carrerauniversitaria'});
+                        xhrAddressTypeRoad = $.getJSON(url, {a: 'get_tipo_via'});
 
                     $
                         .when
@@ -1106,26 +826,19 @@ $form->freeze(['extra_id_document_type', 'extra_id_document_number', 'extra_midd
                             xhrDocumentIdType,
                             xhrNationality,
                             xhrDepartment,
-                            xhrAddressTypeRoad,
-                            xhrOccupation,
-                            xhrUniCareers
+                            xhrAddressTypeRoad
                         ])
                         .then(function (
                             docTypeResponse,
                             nationalityResponse,
                             departmentResponse,
-                            xhrAddressTypeRoad,
-                            xhrOccupationResponse,
-                            xhrUniCareersResponse
+                            xhrAddressTypeRoad
                         ) {
                             // addOptions(docTypeResponse[0], $slctDocument);
                             addOptions(docTypeResponse[0], $slctGuardianDocument);
                             addOptions(nationalityResponse[0], $slctNationality);
                             addOptions(departmentResponse[0], $slctAddressDepartment);
                             addOptions(xhrAddressTypeRoad[0], $slctAddressTypeRoad);
-                            addOptions(departmentResponse[0], $slctOccupationDepartment);
-                            addOptions(xhrOccupationResponse[0], $slctOccupation);
-                            addOptions(xhrUniCareersResponse[0], $slctUniCarrers);
 
                             $(docTypeResponse[0]).each(function (i, option) {
                                 if (defaultValues.extra_id_document_type === option.value) {
@@ -1142,9 +855,6 @@ $form->freeze(['extra_id_document_type', 'extra_id_document_number', 'extra_midd
                             $slctNationality.selectpicker('val', defaultValues.extra_nationality);
                             $slctAddressDepartment.selectpicker('val', defaultValues.extra_address_department);
                             $slctAddressTypeRoad.selectpicker('val', defaultValues.extra_type_of_road);
-                            $slctOccupation.selectpicker('val', defaultValues.extra_occupation);
-                            $slctOccupationDepartment.selectpicker('val', defaultValues.extra_occupation_department);
-                            $slctUniCarrers.selectpicker('val', defaultValues.extra_university_career);
 
                             onDocumentIdTypeSelected($slctDocument.prop('selectedIndex'), $txtDocument);
                             onDocumentIdTypeSelected($slctGuardianDocument.prop('selectedIndex'), $txtGuardianDocument);
@@ -1159,27 +869,6 @@ $form->freeze(['extra_id_document_type', 'extra_id_document_number', 'extra_midd
                                             $slctAddressDistrict
                                                 .selectpicker('val', defaultValues.extra_address_district);
                                         });
-                                });
-                            onDepartmentSelected(defaultValues.extra_occupation_department, $slctOccupationProvince)
-                                .done(function () {
-                                    $slctOccupationProvince
-                                        .selectpicker('val', defaultValues.extra_occupation_province);
-
-                                    onProvinceSelected(defaultValues.extra_occupation_province, $slctOccupationDistrict)
-                                        .done(function () {
-                                            $slctOccupationDistrict
-                                                .selectpicker('val', defaultValues.extra_occupation_district);
-
-                                            onOccupationSelected($slctOccupation.prop('selectedIndex'))
-                                                .done(function () {
-                                                    $slctOccupationName1
-                                                        .selectpicker('val', defaultValues.extra_occupation_center_name_1);
-                                                    $slctOccupationName2
-                                                        .selectpicker('val', defaultValues.extra_occupation_center_name_2);
-                                                    $slctOccupationName3
-                                                        .selectpicker('val', defaultValues.extra_occupation_center_name_3);
-                                                });
-                                        })
                                 });
 
                             $('span.form_required + small')
@@ -1222,13 +911,6 @@ $form->freeze(['extra_id_document_type', 'extra_id_document_number', 'extra_midd
                     var age = checkAge(),
                         txtField = this;
 
-                    //if (defaultValues.extra_birthdate == this.value) {
-                    //    $slctOccupation.selectpicker('val', defaultValues.extra_occupation).setError(false, null);
-                    //    onOccupationSelected($slctOccupation.prop('selectedIndex'));
-                    //
-                    //    return;
-                    //}
-
                     if (!age || age < 4) {
                         txtField.value = '';
                         $('#extra_birthdate_alt_text').text('');
@@ -1243,14 +925,6 @@ $form->freeze(['extra_id_document_type', 'extra_id_document_number', 'extra_midd
                     }
 
                     $txtBirthdate.setError(false, null);
-                    $slctOccupation
-                        .selectpicker('val', '')
-                        .setError(true, 'Por favor es necesario actualizar su ocupación');
-                    $slctOccupationName1.parents('.form-group').hide();
-                    $slctOccupationName2.parents('.form-group').hide();
-                    $slctOccupationName3.parents('.form-group').hide();
-                    $txtOccupationName4.parents('.form-group').hide();
-                    $slctUniCarrers.parents('.form-group').hide();
 
                     onStudentBirthday();
                 });//.datepicker('option', 'maxDate', '+0d -4y');
@@ -1274,34 +948,6 @@ $form->freeze(['extra_id_document_type', 'extra_id_document_number', 'extra_midd
                 });
                 $txtPhone.on('change', function () {
                     validatePhone(this);
-                });
-                $slctOccupation.required(true).on('change', function () {
-                    onOccupationSelected(this.selectedIndex);
-
-                    $slctOccupationName1.empty().selectpicker('refresh');
-                    $slctOccupationName2.empty().selectpicker('refresh');
-                    $slctOccupationName3.empty().selectpicker('refresh');
-                    $txtOccupationName4.val('');
-
-                    $slctOccupation.setError(false, null);
-                });
-                $slctOccupationDepartment.required(true).on('change', function () {
-                    $slctOccupationDistrict.empty().selectpicker('refresh');
-                    $slctOccupationName1.empty().selectpicker('refresh');
-                    $slctOccupationName2.empty().selectpicker('refresh');
-                    $slctOccupationName3.empty().selectpicker('refresh');
-
-                    onDepartmentSelected(this.value, $slctOccupationProvince);
-                });
-                $slctOccupationProvince.required(true).on('change', function () {
-                    $slctOccupationName1.empty().selectpicker('refresh');
-                    $slctOccupationName2.empty().selectpicker('refresh');
-                    $slctOccupationName3.empty().selectpicker('refresh');
-
-                    onProvinceSelected(this.value, $slctOccupationDistrict);
-                });
-                $slctOccupationDistrict.required(true).on('change', function () {
-                    onOccupationSelected($slctOccupation.prop('selectedIndex'));
                 });
                 $slctGuardianDocument.on('change', function () {
                     $txtGuardianDocument.val('');

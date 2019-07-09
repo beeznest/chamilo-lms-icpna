@@ -12,11 +12,6 @@ class IcpnaUpdateUserPlugin extends Plugin
     const DOCID_TYPE_CE = 'f86e0340-eb26-4b5d-8686-f24550fd8b49';
     const DOCID_TYPE_PP = '6f03e7df-13d1-4076-a3f0-b69fd1b3551a';
 
-    const OCCUPATION_TYPE_SCH = '528c79fa-a924-4091-b25b-3f870650cf93';
-    const OCCUPATION_TYPE_TEC = 'd4730b5f-e080-406d-846e-2f80c77f999c';
-    const OCCUPATION_TYPE_UNI = '41ce5c66-1884-4a0d-8f7d-062a1ecb9b79';
-    const OCCUPATION_TYPE_TRA = '30080101-15fa-46de-ac6e-a9d9a3c3d26e';
-
     /**
      * IcpnaUpdateUserPlugin constructor.
      */
@@ -218,69 +213,6 @@ class IcpnaUpdateUserPlugin extends Plugin
     }
 
     /**
-     * Call to ocupacion function
-     * @return array
-     */
-    public function getOcupacion()
-    {
-        $return = [];
-        $tableResult = $this->getTableResult('ocupacion');
-
-        foreach ($tableResult as $item) {
-            $return[] = [
-                'value' => (string) $item->uididocupacion,
-                'text' => (string) $item->vchDescripcionOcupacion,
-                'data-type' => (string) $item->chrTipoOcupacion
-            ];
-        }
-
-        return $return;
-    }
-
-    /**
-     * Call to centroestudios function
-     * @param string $type
-     * @param string $district
-     * @return array
-     */
-    public function getCentroestudios($type, $district)
-    {
-        $return = [];
-        $tableResult = $this->getTableResult(
-            'centroestudios',
-            ['chrTipoOcupacion' => $type, 'uididdistritocentroestudios' => $district]
-        );
-
-        foreach ($tableResult as $item) {
-            $return[] = [
-                'value' => (string) $item->uidIdCentroEstudios,
-                'text' => (string) $item->vchDescripcionCentroEstudios
-            ];
-        }
-
-        return $return;
-    }
-
-    /**
-     * Call to centroestudios function
-     * @return array
-     */
-    public function getCarrerauniversitaria()
-    {
-        $return = [];
-        $tableResult = $this->getTableResult('carrerauniversitaria');
-
-        foreach ($tableResult as $item) {
-            $return[] = [
-                'value' => (string) $item->uididcarrerauniversitaria,
-                'text' => (string) $item->vchcarrerauniversitaria
-            ];
-        }
-
-        return $return;
-    }
-
-    /**
      * Convert SOAP result values to string
      * @param \SimpleXMLElement $objResult
      * @return array
@@ -331,13 +263,6 @@ class IcpnaUpdateUserPlugin extends Plugin
             'vchEmailPersona' => '',
             'vchTelefonoPersona' => '',
             'vchcelularPersona' => '',
-            'uidIdOcupacion' => '',
-            'uididdepartamentocentroestudios' => '',
-            'uididprovinciacentroestudios' => '',
-            'uididdistritocentroestudios' => '',
-            'uidIdCentroEstudios' => '',
-            'vchcentrolaboral' => '',
-            'uididcarrerauniversitaria' => '',
             'strNombrePadre' => '',
             'uidIdDocumentoIdentidadPadre' => '',
             'vchEmailApoderado' => '',
@@ -389,23 +314,6 @@ class IcpnaUpdateUserPlugin extends Plugin
             'email' => self::filterEmail($tableResult['vchEmailPersona']),
             'phone' => $tableResult['vchTelefonoPersona'],
             'extra_mobile_phone_number' => $tableResult['vchcelularPersona'],
-            'extra_occupation' => $tableResult['uidIdOcupacion'],
-            'extra_occupation_department' => $tableResult['uididdepartamentocentroestudios'],
-            'extra_occupation_province' => $tableResult['uididprovinciacentroestudios'],
-            'extra_occupation_district' => $tableResult['uididdistritocentroestudios'],
-            'extra_occupation_center_name_1' => self::OCCUPATION_TYPE_SCH === $tableResult['uidIdOcupacion']
-                ? $tableResult['uidIdCentroEstudios']
-                : '',
-            'extra_occupation_center_name_2' => self::OCCUPATION_TYPE_TEC === $tableResult['uidIdOcupacion']
-                ? $tableResult['uidIdCentroEstudios']
-                : '',
-            'extra_occupation_center_name_3' => self::OCCUPATION_TYPE_UNI === $tableResult['uidIdOcupacion']
-                ? $tableResult['uidIdCentroEstudios']
-                : '',
-            'extra_occupation_center_name_4' => self::OCCUPATION_TYPE_TRA === $tableResult['uidIdOcupacion']
-                ? $tableResult['vchcentrolaboral']
-                : '',
-            'extra_university_career' => $tableResult['uididcarrerauniversitaria'],
         ];
 
         $return['extra_guardian_name'] = self::filterPersonaName($tableResult['strNombrePadre']);

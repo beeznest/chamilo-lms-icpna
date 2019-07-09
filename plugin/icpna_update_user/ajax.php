@@ -37,22 +37,6 @@ switch ($action) {
 
         $return = $plugin->getDistrito($uidid);
         break;
-    case 'get_ocupacion':
-        $return = $plugin->getOcupacion();
-        break;
-    case 'get_centroestudios':
-        $type = isset($_REQUEST['type']) ? $_REQUEST['type'] : null;
-        $district = isset($_REQUEST['district']) ? $_REQUEST['district'] : null;
-
-        if (!$type || !$district) {
-            break;
-        }
-
-        $return = $plugin->getCentroestudios($type, $district);
-        break;
-    case 'get_carrerauniversitaria':
-        $return = $plugin->getCarrerauniversitaria();
-        break;
     case 'validate_id_document':
         $uididPersona = isset($_REQUEST['uididpersona']) ? $_REQUEST['uididpersona'] : null;
         $uididType = isset($_REQUEST['uididtipo']) ? $_REQUEST['uididtipo'] : null;

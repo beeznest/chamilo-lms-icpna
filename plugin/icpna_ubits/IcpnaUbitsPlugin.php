@@ -87,7 +87,7 @@ class IcpnaUbitsPlugin extends Plugin
             ->getResult();
 
         foreach ($result as $courseInfo) {
-            $tool = $this->createLinkToCourseTool($this->get_lang('UBITS'), $courseInfo['id']);
+            $tool = $this->createLinkToCourseTool($this->get_lang('UBITS'), $courseInfo['id'], 'ubits.png');
             $tool->setTarget('_blank');
 
             $em->persist($tool);

@@ -37,7 +37,15 @@ if (empty($uuid)) {
 
 $userInfo = api_get_user_info();
 
-$ubits = new UbitsEncryption();
+try {
+    $ubits = new UbitsEncryption();
+} catch (Exception $exception) {
+    api_not_allowed(
+        true,
+        Display::return_message($exception->getMessage(), 'error')
+    );
+}
+
 $token = $ubits->encrypt(
     $plugin->get('uuid'),
     $userInfo['email']

@@ -1,11 +1,53 @@
 <?php
 /* For licensing terms, see /license.txt */
 
+/**
+ * Class UbitsEncryption.
+ *
+ * Manage the encryption process for UBITS.
+ */
 class UbitsEncryption
 {
+    /**
+     * @var string Private key.
+     */
     private $privateKey;
+    /**
+     * @var string Public key.
+     */
     private $publicKey;
+    /**
+     * @var string Message nonce.
+     */
     private $messageNonce;
+
+    /**
+     * UbitsEncryption constructor.
+     *
+     * @throws Exception
+     */
+    public function __construct()
+    {
+        $privateKey = $this->getFileContent(__DIR__.'/keys/private_key.key');
+        $publicKey = $this->getFileContent(__DIR__.'/keys/u_public_key.key');
+        $messageNonce = $this->getFileContent(__DIR__.'/keys/message_nonce.key');
+
+        if (!$publicKey) {
+            throw new Exception("The public key is empty.");
+        }
+
+        if (!$privateKey) {
+            throw new Exception("The private key is empty.");
+        }
+
+        if (!$messageNonce) {
+            throw new Exception("The message nonce is empty.");
+        }
+
+        $this->privateKey = $privateKey;
+        $this->publicKey = $publicKey;
+        $this->messageNonce = $messageNonce;
+    }
 
     /**
      * @param string $timeserver
@@ -78,27 +120,18 @@ class UbitsEncryption
      * @return string
      */
     public function encrypt($uuid, $username) {
-        $privateKey = $this->getFileContent(__DIR__.'/keys/private_key.key');     // path to private key.
-        $publicKey = $this->getFileContent(__DIR__.'/keys/u_public_key.key');     // path to ubits public key.
-        $messageNonce = $this->getFileContent(__DIR__.'/keys/message_nonce.key'); // path to message_nonce.
-
         $text = "$uuid|$username|".$this->getCurrentTimeFromServer();
 
-        if (!$publicKey) {
-            throw new Exception("The public key is empty.");
-        }
+        $kp = sodium_crypto_box_keypair_from_secretkey_and_publickey(
+            $this->privateKey,
+            $this->publicKey
+        );
 
-        if (!$privateKey) {
-            throw new Exception("The private key is empty.");
-        }
-
-        if (!$messageNonce) {
-            throw new Exception("The message nonce is empty.");
-        }
-
-        $kp = sodium_crypto_box_keypair_from_secretkey_and_publickey($privateKey, $publicKey);
-
-        $ciphertext = sodium_crypto_box($text, $messageNonce, $kp);
+        $ciphertext = sodium_crypto_box(
+            $text,
+            $this->messageNonce,
+            $kp
+        );
 
         $result = rawurlencode(base64_encode($ciphertext));
 

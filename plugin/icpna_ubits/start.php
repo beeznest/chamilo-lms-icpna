@@ -48,7 +48,7 @@ try {
 
 $token = $ubits->encrypt(
     $plugin->get('uuid'),
-    $userInfo['email']
+    $userInfo['username']
 );
 
 header("Location: $loginUrl?cu=$uuid&ct=$token");

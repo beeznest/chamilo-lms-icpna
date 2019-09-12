@@ -8999,15 +8999,15 @@ class Exercise
     }
 
     /**
-     * @param string $destinationStr
+     * @param CQuizCategory $category
      *
      * @return array
      */
-    public function decodeCategoryDestination($destinationStr)
+    public function decodeCategoryDestination(CQuizCategory $category)
     {
         $result = [];
 
-        $parts = explode('@@', $destinationStr);
+        $parts = explode('@@', $category->getDestinations());
 
         foreach ($parts as $part) {
             list($percentage, $categoryId) = explode(':', $part);
@@ -9033,7 +9033,7 @@ class Exercise
             ->getRepository('ChamiloCourseBundle:CQuizCategory')
             ->findOneBy(['exerciseId' => $this->iId, 'categoryId' => $refCategoryId]);
 
-        $destinations = $this->decodeCategoryDestination($quizCategory->getDestinations());
+        $destinations = $this->decodeCategoryDestination($quizCategory);
         $destinationCategoryId = 0;
 
         foreach ($destinations as $percentage => $categoryId) {
@@ -9049,6 +9049,24 @@ class Exercise
         }
 
         return $destinationCategoryId;
+    }
+
+    /**
+     * @param $sourceCategoryId
+     * @param $destinationCategoryId
+     *
+     * @return bool
+     */
+    public function isDestinationInLastRange($sourceCategoryId, $destinationCategoryId)
+    {
+        $sourceCategory = Database::getManager()
+            ->getRepository('ChamiloCourseBundle:CQuizCategory')
+            ->findOneBy(['exerciseId' => $this->iId, 'categoryId' => $sourceCategoryId]);
+
+        $destinations = $this->decodeCategoryDestination($sourceCategory);
+        $destinationInLastRange = array_pop($destinations);
+
+        return (int) $destinationCategoryId === (int) $destinationInLastRange;
     }
 
     /**

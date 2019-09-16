@@ -601,7 +601,7 @@ switch ($action) {
                     // Getting old attempt in order to decrees the total score.
                     $old_result = $objExercise->manage_answer(
                         $exeId,
-                        $my_question_id,
+                        $objQuestionTmp,
                         null,
                         'exercise_show',
                         [],
@@ -652,7 +652,7 @@ switch ($action) {
                     $myChoiceTmp['choiceDegreeCertainty'] = $myChoiceDegreeCertainty;
                     $result = $objExercise->manage_answer(
                         $exeId,
-                        $my_question_id,
+                        $objQuestionTmp,
                         $myChoiceTmp,
                         'exercise_result',
                         $hot_spot_coordinates,
@@ -665,7 +665,7 @@ switch ($action) {
                 } else {
                     $result = $objExercise->manage_answer(
                         $exeId,
-                        $my_question_id,
+                        $objQuestionTmp,
                         $my_choice,
                         'exercise_result',
                         $hot_spot_coordinates,

@@ -533,6 +533,7 @@ switch ($action) {
             });
 
             // Getting the total weight if the request is simple
+            $total_score = 0;
             $total_weight = 0;
             if ($type == 'simple') {
                 foreach ($question_list as $my_question_id) {
@@ -716,20 +717,6 @@ switch ($action) {
                 }
 
                 Session::write('duration_time', [$key => $now]);
-                Event::updateEventExercise(
-                    $exeId,
-                    $objExercise->selectId(),
-                    $total_score,
-                    $total_weight,
-                    $session_id,
-                    $exercise_stat_info['orig_lp_id'],
-                    $exercise_stat_info['orig_lp_item_id'],
-                    $exercise_stat_info['orig_lp_item_view_id'],
-                    $duration,
-                    $question_list,
-                    'incomplete',
-                    $remind_list
-                );
 
                 // Destruction of the Question object
                 unset($objQuestionTmp);
@@ -737,6 +724,21 @@ switch ($action) {
                     error_log("---------- end question ------------");
                 }
             }
+
+            Event::updateEventExercise(
+                $exeId,
+                $objExercise->selectId(),
+                $total_score,
+                $total_weight,
+                $session_id,
+                $exercise_stat_info['orig_lp_id'],
+                $exercise_stat_info['orig_lp_item_id'],
+                $exercise_stat_info['orig_lp_item_view_id'],
+                $duration,
+                Session::read('questionList'),
+                'incomplete',
+                $remind_list
+            );
         }
 
         if ($type == 'all') {

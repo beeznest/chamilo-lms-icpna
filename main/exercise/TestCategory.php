@@ -1091,16 +1091,18 @@ class TestCategory
             }
 
             $return .= $warning;
-            $return .= '<table class="data_table">';
+            $return .= '<table class="table table-bordered table-hover table-striped">';
+            $return .= '<thead>';
             $return .= '<tr>';
             $return .= '<th height="24">'.get_lang('Categories').'</th>';
-            $return .= '<th width="70" height="24">'.get_lang('Number').'</th>';
+            $return .= '<th width="100" height="24">'.get_lang('Number').'</th>';
 
             if ($allowTimeControlPerCategory) {
-                $return .= Display::tag('th', get_lang('QuizCategoryDurationInMinutes'), ['width' => '50']);
+                $return .= Display::tag('th', get_lang('QuizCategoryDurationInMinutes'), ['width' => '100']);
             }
 
             $return .= '</tr>';
+            $return .= '</thead>';
 
             $emptyCategory = [
                 'id' => '0',
@@ -1120,7 +1122,12 @@ class TestCategory
                 $return .= '</td>';
                 $return .= '<td>';
                 $value = isset($saved_categories) && isset($saved_categories[$cat_id]) ? $saved_categories[$cat_id]['count_questions'] : -1;
-                $return .= '<input name="category['.$cat_id.']" value="'.$value.'" />';
+                $return .= Display::input(
+                    'number',
+                    "category[$cat_id]",
+                    $value,
+                    ['class' => 'form-control', 'min' => -1, 'step' => 1]
+                );
                 $return .= '</td>';
 
                 if ($allowTimeControlPerCategory) {

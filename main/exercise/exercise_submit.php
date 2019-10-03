@@ -220,27 +220,6 @@ $allowTimeControlPerCategory = $time_control &&
     $objExercise->type == ONE_CATEGORY_PER_PAGE &&
     api_get_configuration_value('quiz_allow_time_control_per_category');
 
-if ($time_control) {
-    // Get the expired time of the current exercise in track_e_exercises
-    $total_seconds = $objExercise->expired_time * 60;
-
-    if ($allowTimeControlPerCategory) {
-        $sessionCategoryToStart = Session::read('category_to_start', []);
-
-        if (!empty($sessionCategoryToStart[$current_expired_time_key])) {
-            $categoryToStart = $sessionCategoryToStart[$current_expired_time_key];
-
-            try {
-                $categoryExpiredTime = TestCategory::getExpiredTime($categoryToStart, $objExercise);
-
-                $total_seconds = $categoryExpiredTime * 60;
-            } catch (Exception $exception) {
-                $total_seconds = 0;
-            }
-        }
-    }
-}
-
 $show_clock = true;
 $user_id = api_get_user_id();
 if ($objExercise->selectAttempts() > 0) {
@@ -390,6 +369,23 @@ if (empty($exercise_stat_info)) {
     }
 
     if ($time_control) {
+        // Get the expired time of the current exercise in track_e_exercises
+        $total_seconds = $objExercise->expired_time * 60;
+
+        $sessionCategoryToStart = Session::read('category_to_start', []);
+        Session::erase('category_to_start');
+
+        if ($allowTimeControlPerCategory && !empty($sessionCategoryToStart[$current_expired_time_key])) {
+            $categoryToStart = $sessionCategoryToStart[$current_expired_time_key];
+
+            try {
+                $categoryExpiredTime = TestCategory::getExpiredTime($categoryToStart, $objExercise);
+                $total_seconds = $categoryExpiredTime * 60;
+            } catch (Exception $exception) {
+                $total_seconds = 0;
+            }
+        }
+
         $expected_time = $current_timestamp + $total_seconds;
         if ($debug) {
             error_log('5.1. $current_timestamp '.$current_timestamp);

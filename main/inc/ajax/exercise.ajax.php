@@ -818,7 +818,10 @@ switch ($action) {
                     $destinationQuestionId
                 );
 
-                $categoryList[] = $currentCategoryId;
+                if (!in_array($currentCategoryId, $categoryList)) {
+                    $categoryList[] = $currentCategoryId;
+                }
+
                 Session::write('track_e_adaptive', $categoryList);
 
                 echo "exercise_submit.php?$params&num=".($destinationPosition - 1);

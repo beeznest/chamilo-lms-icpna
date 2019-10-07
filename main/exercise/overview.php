@@ -175,7 +175,7 @@ if (isset($exercise_stat_info['exe_id'])) {
 
             if ($latestQuestion && $latestQuestion->category) {
                 // Flag category as taken
-                Session::write('track_e_adaptive', [$latestQuestion->category => true]);
+                Session::write('track_e_adaptive', [$latestQuestion->category]);
             }
 
             $questionNumToStart = array_search($latestQuestionId, $questionListInAttempt);

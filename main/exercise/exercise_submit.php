@@ -804,7 +804,7 @@ if ($question_count != 0) {
                 $previousCategoryId = $objPreviousQuestion->category;
 
                 // Check if category of current question has not been taken.
-                if (!empty($categoryList[$previousCategoryId])) {
+                if (in_array($previousCategoryId, $categoryList)) {
                     $previousQuestionIsLastInCategory = $objExercise->isLastQuestionInCategory(
                         $previousCategoryId,
                         $previousQuestionId
@@ -817,7 +817,7 @@ if ($question_count != 0) {
                         );
 
                         if ($currentCategoryId !== $destinationCategory) {
-                            if (0 === $destinationCategory || !empty($categoryList[$destinationCategory])) {
+                            if (0 === $destinationCategory || in_array($destinationCategory, $categoryList)) {
                                 $category = $objExercise->categoryWithQuestionList[$previousCategoryId]['category'];
 
                                 Session::write('adaptive_quiz_level', $category['name']);
@@ -836,7 +836,7 @@ if ($question_count != 0) {
                         }
 
                         // If go to end quiz or user have already done this category
-                        if (0 === $destinationCategory || !empty($categoryList[$destinationCategory])) {
+                        if (0 === $destinationCategory || in_array($destinationCategory, $categoryList)) {
                             $category = $objExercise->categoryWithQuestionList[$currentCategoryId]['category'];
 
                             Session::write('adaptive_quiz_level', $category['name']);
@@ -846,10 +846,13 @@ if ($question_count != 0) {
                         }
 
                         // Category of current question is the next category. Then let it continue.
-                        $categoryList[$currentCategoryId] = true;
+                        if (!in_array($currentCategoryId, $categoryList)) {
+                            $categoryList[] = $currentCategoryId;
+                        }
+
                         Session::write('track_e_adaptive', $categoryList);
                     } else {
-                        if (!$categoryList[$currentCategoryId]) {
+                        if (!in_array($currentCategoryId, $categoryList)) {
                             Session::write('track_e_adaptive', []);
 
                             header('Location: '.api_get_self().'?'.$params.'&num=0');
@@ -870,11 +873,17 @@ if ($question_count != 0) {
                         exit;
                     }
 
-                    $categoryList[$currentCategoryId] = true;
+                    if (!in_array($currentCategoryId, $categoryList)) {
+                        $categoryList[] = $currentCategoryId;
+                    }
+
                     Session::write('track_e_adaptive', $categoryList);
                 }
             } else { // Questions is the first one in quiz. Then let it continue.
-                $categoryList[$currentCategoryId] = true;
+                if (!in_array($currentCategoryId, $categoryList)) {
+                    $categoryList[] = $currentCategoryId;
+                }
+
                 Session::write('track_e_adaptive', $categoryList);
             }
         } else { // Current question is the last one in quiz
@@ -884,7 +893,7 @@ if ($question_count != 0) {
 
             $destinationCategory = $objExercise->findCategoryDestination($exe_id, $currentCategoryId);
 
-            if (0 !== $destinationCategory && empty($categoryList[$destinationCategory])) {
+            if (0 !== $destinationCategory && !in_array($destinationCategory, $categoryList)) {
                 $destinationQuestionId = $objExercise->getFirstQuestionInCategory($destinationCategory);
                 $destinationPosition = $objExercise->getPositionInCompressedQuestionList($destinationQuestionId);
 

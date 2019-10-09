@@ -153,6 +153,14 @@ class TrackEExercises
     protected $exeId;
 
     /**
+     * @var int
+     *
+     * Add @ to the next line if $_configuration['quiz_allow_time_control_per_category'] is true
+     * ORM\Column(name="category_to_start", type="integer", nullable=false, options={"default": 0})
+     */
+    protected $categoryToStart = 0;
+
+    /**
      * Set exeUserId.
      *
      * @param int $exeUserId
@@ -592,5 +600,25 @@ class TrackEExercises
     public function getExeId()
     {
         return $this->exeId;
+    }
+
+    /**
+     * @param int $categoryToStart
+     *
+     * @return TrackEExercises
+     */
+    public function setCategoryToStart($categoryToStart)
+    {
+        $this->categoryToStart = $categoryToStart;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCategoryToStart()
+    {
+        return $this->categoryToStart;
     }
 }

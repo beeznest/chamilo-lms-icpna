@@ -618,10 +618,13 @@ $_configuration['quiz_adaptive_show_extrafields'] = [
 ];
 */
 // Allow set time control for each category when ONE_CATEGORY_PER_PAGE mode is enabled in the quiz.
-// Requires DB changes:
+// 1. Add "@" in the ORM phpdoc block for CQuizCategory::$expiredTime property.
+// 2. Add "@" in the ORM phpdoc block for TrackEExercises::$categoryToStart property
+// 3. Run this query in database
 /*
 ALTER TABLE c_quiz_rel_category ADD expired_time INT DEFAULT 0 NOT NULL;
 CREATE INDEX idx_course_category_exercise ON c_quiz_rel_category (c_id, category_id, exercise_id);
+ALTER TABLE track_e_exercises ADD category_to_start INT DEFAULT 0 NOT NULL;
 */
 //$_configuration['quiz_allow_time_control_per_category'] = false;
 

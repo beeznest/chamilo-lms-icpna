@@ -71,7 +71,15 @@ class CQuizCategory
      * Add @ to the next line if $_configuration['quiz_allow_time_control_per_category'] is true
      * ORM\Column(name="expired_time", type="integer", nullable=false, options={"default": 0})
      */
-    protected $expiredTime;
+    protected $expiredTime = 0;
+
+    /**
+     * CQuizCategory constructor.
+     */
+    public function __construct()
+    {
+        $this->expiredTime = 0;
+    }
 
     /**
      * @return int

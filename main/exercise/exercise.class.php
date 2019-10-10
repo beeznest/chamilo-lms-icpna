@@ -2986,6 +2986,7 @@ class Exercise
      * @param int  int lp item_view id
      * @param array $questionList
      * @param float $weight
+     * @param int  $categoryToStart Optional. When quiz_allow_time_control_per_category is enabled.
      *
      * @return int
      */
@@ -2995,7 +2996,8 @@ class Exercise
         $safe_lp_item_id = 0,
         $safe_lp_item_view_id = 0,
         $questionList = [],
-        $weight = 0
+        $weight = 0,
+        $categoryToStart = 0
     ) {
         $track_exercises = Database::get_main_table(TABLE_STATISTIC_TRACK_E_EXERCISES);
         $safe_lp_id = intval($safe_lp_id);
@@ -3034,6 +3036,10 @@ class Exercise
             'expired_time_control' => $clock_expired_time,
             'questions_to_check' => '',
         ];
+
+        if (api_get_configuration_value('quiz_allow_time_control_per_category') && $categoryToStart) {
+            $params['category_to_start'] = (int) $categoryToStart;
+        }
 
         $id = Database::insert($track_exercises, $params);
 

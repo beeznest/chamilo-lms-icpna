@@ -368,6 +368,8 @@ if (empty($exercise_stat_info)) {
         $total_weight += floatval($objQuestionTmp->weighting);
     }
 
+    $categoryToStart = 0;
+
     if ($time_control) {
         // Get the expired time of the current exercise in track_e_exercises
         $total_seconds = $objExercise->expired_time * 60;
@@ -414,7 +416,8 @@ if (empty($exercise_stat_info)) {
         $learnpath_item_id,
         $learnpath_item_view_id,
         $questionList,
-        $total_weight
+        $total_weight,
+        $categoryToStart
     );
     $exercise_stat_info = $objExercise->get_stat_track_exercise_info(
         $learnpath_id,
@@ -457,6 +460,13 @@ if (empty($exercise_stat_info)) {
             }
             $currentQuestion = $count;
         }
+    }
+
+    if ($isFirstTime && $exerciseIsProgressiveAdaptive && $objExercise->type == ONE_CATEGORY_PER_PAGE && api_get_configuration_value('quiz_allow_time_control_per_category')) {
+        $currentQuestion = array_search(
+            $objExercise->getFirstQuestionInCategory($exercise_stat_info['category_to_start']),
+            explode(',', $exercise_stat_info['data_tracking'])
+        );
     }
 
     if ($debug) {

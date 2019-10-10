@@ -150,6 +150,10 @@ $exercise_stat_info = $objExercise->get_stat_track_exercise_info(
 $questionListInAttempt = $objExercise->questionList;
 
 if (!empty($exercise_stat_info)) {
+    if (!empty($exercise_stat_info['category_to_start'])) {
+        $categoryIdToStart = (int) $exercise_stat_info['category_to_start'];
+    }
+
     $questionListInAttempt = explode(',', $exercise_stat_info['data_tracking']);
 }
 
@@ -186,11 +190,8 @@ if (isset($exercise_stat_info['exe_id'])) {
         $questionIdToStart = $objExercise->getFirstQuestionInCategory($categoryIdToStart);
         $questionNumToStart = array_search($questionIdToStart, $questionListInAttempt);
 
-        if ($objExercise->expired_time != 0 && empty($clock_expired_time) && $categoryIdToStart) {
-            $timeControlKey = ExerciseLib::get_time_control_key($objExercise->id, $learnpath_id, $learnpath_item_id);
-
-            Session::write('category_to_start', [$timeControlKey => $categoryIdToStart]);
-        }
+        $timeControlKey = ExerciseLib::get_time_control_key($objExercise->id, $learnpath_id, $learnpath_item_id);
+        Session::write('category_to_start', [$timeControlKey => $categoryIdToStart]);
     }
 }
 

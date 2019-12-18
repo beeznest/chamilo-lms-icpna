@@ -116,8 +116,7 @@
         "symfony/dom-crawler": "~3.4",
         "brumann/polyfill-unserialize": "^1.0",
         "yuloh/bccomp-polyfill":  "dev-master",
-        "defuse/php-encryption": "^2.1",
-        "imsglobal/lti-1p3-tool": "dev-master"
+        "defuse/php-encryption": "^2.1"
     },
     "require-dev": {
         "behat/behat": "@stable",
@@ -126,12 +125,6 @@
         "behat/mink-goutte-driver": "*",
         "behat/mink-selenium2-driver": "*"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/IMSGlobal/lti-1-3-php-library"
-        }
-    ],
     "scripts": {
         "pre-install-cmd": [
             "Chamilo\\CoreBundle\\Composer\\ScriptHandler::deleteOldFilesFrom19x"

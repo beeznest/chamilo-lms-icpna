@@ -6117,6 +6117,8 @@ class Exercise
 
         if (api_get_configuration_value('save_titles_as_html')) {
             $data['title'] = $this->get_formated_title().get_lang('Result');
+	} else if (EXERCISE_FEEDBACK_TYPE_PROGRESSIVE_ADAPTIVE == $this->feedback_type) {
+            $data['title'] = get_lang('QuizResult');
         } else {
             $data['title'] = PHP_EOL.$this->exercise.' : '.get_lang('Result');
         }

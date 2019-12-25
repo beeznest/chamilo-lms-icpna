@@ -755,7 +755,7 @@ class Category implements GradebookItem
     public function update_category_delete($course_id)
     {
         $table = Database::get_main_table(TABLE_MAIN_GRADEBOOK_CATEGORY);
-        $sql = 'UPDATE '.$table.' SET 
+        $sql = 'UPDATE '.$table.' SET
                     visible = 3
                 WHERE course_code ="'.Database::escape_string($course_id).'"';
         Database::query($sql);
@@ -802,7 +802,7 @@ class Category implements GradebookItem
     public function show_message_resource_delete($course_id)
     {
         $table = Database::get_main_table(TABLE_MAIN_GRADEBOOK_CATEGORY);
-        $sql = 'SELECT count(*) AS num 
+        $sql = 'SELECT count(*) AS num
                 FROM '.$table.'
                 WHERE
                     course_code = "'.Database::escape_string($course_id).'" AND
@@ -1549,8 +1549,8 @@ class Category implements GradebookItem
 
         $sql = 'SELECT DISTINCT(code), title
                 FROM '.$tbl_main_courses.' cc, '.$tbl_main_course_user.' cu
-                WHERE 
-                    cc.id = cu.c_id AND 
+                WHERE
+                    cc.id = cu.c_id AND
                     cu.status = '.COURSEMANAGER;
 
         if (!api_is_platform_admin()) {
@@ -2805,5 +2805,24 @@ class Category implements GradebookItem
         }
 
         return $category[0];
+    }
+
+    /**
+     * Get the remaining weight in root category.
+     *
+     * @return int
+     */
+    public function getRemainingWeight()
+    {
+        $subCategories = $this->get_subcategories();
+
+        $subWeight = 0;
+
+        /** @var Category $subCategory */
+        foreach ($subCategories as $subCategory) {
+            $subWeight += $subCategory->get_weight();
+        }
+
+        return $this->weight - $subWeight;
     }
 }

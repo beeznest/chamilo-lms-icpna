@@ -105,7 +105,9 @@ foreach ($branches as $id => $branch) {
         //Load transactions saved before
         $params = array('branch_id' => $branch_id, 'number_of_transactions' => '500');
         $count_total_transactions += $migration->get_transactions_from_webservice($params);
+        error_log('WS:   Returned to transaction.cron.php after getting tx from branch '.$branch_id.'. Calling execute...');
         $count_transactions += $migration->execute_transactions($params);
+        error_log('WS/Local:   Done executing branch transactions (process)');
         // $trans_id = $migration->get_latest_transaction_id_by_branch($branch_id);
         // error_log("Last transaction was $trans_id for branch $branch_id");
         // $params = array(
@@ -119,6 +121,7 @@ foreach ($branches as $id => $branch) {
         error_log('Fixing transactions');
         $params = array('branch_id' => $branch_id, 'number_of_transactions' => '2000', 'check_attend' => false);
         $migration->execute_transactions($params);
+        error_log('Local:   Done processing branch transactions (fix)');
     }
     //$result = $migration->load_transaction_by_third_party_id($trans_id, $branch_id);
     //$response .= $result['message'];

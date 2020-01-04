@@ -953,7 +953,7 @@ class Migration
      */
     function get_transactions_from_webservice($params = array())
     {
-        error_log("get_transactions_from_webservice() function called");
+        error_log("WS: get_transactions_from_webservice() function called");
 
         $branch_id = isset($params['branch_id']) ? $params['branch_id'] : null;
         $transaction_id = isset($params['transaction_id']) ? $params['transaction_id'] : null;
@@ -965,11 +965,11 @@ class Migration
 
         if (empty($branch_id)) {
             $branches = self::get_branches();
+            error_log(count($branches)." branch(es) found");
         } else {
             $branches = array('branch_id' => $branch_id);
         }
 
-        error_log(count($branches)." branch(es) found");
         if (isset($branches['branch_id'])) {
             // the value is not where we want it
             $branches = array(0 => $branches);
@@ -1045,7 +1045,7 @@ class Migration
      */
     function execute_transactions($params = array())
     {
-        error_log("load_transactions() function called \n");
+        error_log("Local: load_transactions() function called \n");
         $branch_id = isset($params['branch_id']) ? $params['branch_id'] : null;
         //$transaction_id = isset($params['transaction_id']) ? $params['transaction_id'] : null;
         //$number_of_transactions = isset($params['number_of_transactions']) ? $params['number_of_transactions'] : 2;
@@ -1060,7 +1060,7 @@ class Migration
 
         if (!empty($branches)) {
 
-            error_log(count($branches)." branch(es) found \n");
+            error_log('Local:   '.count($branches)." branch(es) found \n");
 
             foreach ($branches as $branch_info) {
                 //Get uncompleted transactions
@@ -1095,7 +1095,7 @@ class Migration
                 $item = 1;//counter
                 if (!empty($transactions)) {
 
-                    error_log("B#".$branch_info['branch_id'].": $count transaction(s) found starting from transaction #$latest_id_attempt \n");
+                    error_log("Local:   B#".$branch_info['branch_id'].": $count transaction(s) found starting from transaction #$latest_id_attempt \n");
 
                     //Looping transactions
                     if (!empty($transactions)) {
@@ -1123,11 +1123,11 @@ class Migration
                         }
                     }
                 } else {
-                    error_log("Branch #".$branch_info['branch_id']." - No transactions to load");
+                    error_log("Local:   Branch #".$branch_info['branch_id']." - No transactions to load (checked for tx after #$latest_id_attempt in local DB)");
                 }
             }
         } else {
-            error_log('No branch found');
+            error_log('Local:   No branch found');
         }
 
         $actions = array(); //load actions from Mysql

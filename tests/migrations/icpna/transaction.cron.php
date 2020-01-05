@@ -119,7 +119,15 @@ foreach ($branches as $id => $branch) {
     } else {
         //if mode==fix
         error_log('Fixing transactions');
-        $params = array('branch_id' => $branch_id, 'number_of_transactions' => '2000', 'check_attend' => false);
+        $params = array(
+            'branch_id' => $branch_id,
+            'number_of_transactions' => '2000',
+            'check_attend' => false,
+            // Make sure we only treat transactions that have been there
+            // for at least 5 minutes, as this is the "fix" process and
+            // we don't want to disturb the "process" process
+            'time_threshold' => 300,
+        );
         $migration->execute_transactions($params);
         error_log('Local:   Done processing branch transactions (fix)');
     }

@@ -3301,9 +3301,9 @@ class MigrationCustom
      */
     static function processTransactions($params, $web_service_details, $check_duplicates_in_db = false)
     {
-	error_log('WS: Query last '.$params['cantidad'].' tx from tx '.$params['ultimo'].' in branch '.$params['intIdSede']);
+        error_log('WS: Query last '.$params['cantidad'].' tx from tx '.$params['ultimo'].' in branch '.$params['intIdSede']);
         $transactions = Migration::soap_call($web_service_details, 'transacciones', $params);
-	error_log('WS:   WS called, answer received');
+        error_log('WS:   WS called, answer received');
         $transaction_status_list = self::getTransactionStatusList();
         $counter = 0;
 
@@ -4238,7 +4238,7 @@ class MigrationCustom
             return false;
         }
 
-	try {
+        try {
             $userId = Database::insert($t_user, [
                 'username' => $loginName,
                 'username_canonical' => mb_convert_case($loginName, MB_CASE_LOWER),
@@ -4264,10 +4264,10 @@ class MigrationCustom
                 'created_at' => $now,
                 'updated_at' => $now
             ]);
-	} catch (PDOException $e) {
-		error_log('El usuario '.$username.' no pudo ser insertado - quizás ya exista ('.$e->getMessage().')');
-		return false;
-	}
+        } catch (Exception $e) {
+            error_log('El usuario '.$username.' no pudo ser insertado - quizás ya exista ('.$e->getMessage().')');
+            return false;
+        }
 
         if (!empty($userId)) {
 

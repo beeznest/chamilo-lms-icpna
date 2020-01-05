@@ -1066,9 +1066,19 @@ class Migration
                 //Get uncompleted transactions
                 $transactions = array();
                 if (isset($params['check_attend']) && $params['check_attend'] == true) {
-                    $transactions = self::get_transactions(0, $branch_info['branch_id'], true);
+                    $transactions = self::get_transactions(
+                        0,
+                        $branch_info['branch_id'],
+                        true,
+                        $params['time_threshold']
+                    );
                 } else {
-                    $transactions = self::get_transactions(0, $branch_info['branch_id']);
+                    $transactions = self::get_transactions(
+                        0,
+                        $branch_info['branch_id'],
+                        null,
+                        $params['time_threshold']
+                    );
                 }
 
                 //Getting latest executed transaction
@@ -1095,7 +1105,7 @@ class Migration
                 $item = 1;//counter
                 if (!empty($transactions)) {
 
-                    error_log("Local:   B#".$branch_info['branch_id'].": $count transaction(s) found starting from transaction #$latest_id_attempt \n");
+                    error_log("Local:   B#".$branch_info['branch_id'].": $count transaction(s) found getting to latest executed transaction #$latest_id_attempt \n");
 
                     //Looping transactions
                     if (!empty($transactions)) {
@@ -1123,7 +1133,7 @@ class Migration
                         }
                     }
                 } else {
-                    error_log("Local:   Branch #".$branch_info['branch_id']." - No transactions to load (checked for tx after #$latest_id_attempt in local DB)");
+                    error_log("Local:   Branch #".$branch_info['branch_id']." - No transactions to load (last executed tx in local DB: #$latest_id_attempt)");
                 }
             }
         } else {
@@ -1145,9 +1155,10 @@ class Migration
      * @param int $status_id State ID (0=unprocessed (default), 2=completed)
      * @param int $branch_id Branch ID
      * @param bool $check_attend
+     * @param int $timeThreshold Only get transactions that are older than the given threshold
      * @return array Associative array containing the details of the transactions requested
      */
-    static function get_transactions($status_id = 0, $branch_id = 0, $check_attend = false)
+    static function get_transactions($status_id = 0, $branch_id = 0, $check_attend = false, $timeThreshold = null)
     {
         $table = Database::get_main_table(TABLE_BRANCH_TRANSACTION);
         $branch_id = intval($branch_id);
@@ -1158,6 +1169,10 @@ class Migration
         $extra_conditions = " AND branch_id = $branch_id AND (action < 31 OR action > 500)";
         if ($check_attend) {
             $extra_conditions = " AND branch_id = $branch_id ";
+        }
+        if (!empty($timeThreshold)) {
+            $time = api_get_utc_datetime(time() + (int)$timeThreshold);
+            $extra_conditions .= " AND time_insert < '$time' ";
         }
         $sql = "SELECT * FROM $table WHERE status_id = $status_id $extra_conditions ORDER BY id ";
         $result = Database::query($sql);

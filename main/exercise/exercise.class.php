@@ -7021,6 +7021,10 @@ class Exercise
         $em->flush();
 
         if ($allowTimeControlPerCategory) {
+            if (empty($totalExpiredTime)) {
+                $totalExpiredTime = $this->expired_time;
+            }
+
             Database::update(
                 Database::get_course_table(TABLE_QUIZ_TEST),
                 ['expired_time' => $totalExpiredTime],

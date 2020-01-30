@@ -1284,6 +1284,132 @@ $_configuration['required_extra_fields_in_profile'] = [
 // Disable webservices.
 //$_configuration['disable_webservices'] = true;
 
+// Allow extra settings for the quiz results page
+// ALTER TABLE c_quiz ADD page_result_configuration LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)';
+//$_configuration['allow_quiz_results_page_config'] = false;
+
+// Allow multiple options for the exercise "save answer" option
+// ALTER TABLE c_quiz MODIFY COLUMN save_correct_answers INT NULL DEFAULT NULL;
+//$_configuration['allow_quiz_save_correct_options'] = false;
+
+// Show languages flags by country in the language switcher.
+//$_configuration['language_flags_by_country'] = false;
+
+// Allow compilatio plagiarism prevention tool
+/*
+CREATE TABLE c_plagiarism_compilatio_docs (
+    id INT AUTO_INCREMENT NOT NULL,
+    c_id int(11) NOT NULL,
+    document_id int(11) NOT NULL,
+    compilatio_id varchar(32) CHARACTER SET utf8 NOT NULL,
+    PRIMARY KEY (id)
+) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
+
+// If table exists already
+ALTER TABLE c_plagiarism_compilatio_docs drop primary key;
+ALTER TABLE c_plagiarism_compilatio_docs ADD COLUMN id INT AUTO_INCREMENT NOT NULL PRIMARY KEY;
+ALTER TABLE c_plagiarism_compilatio_docs CHANGE COLUMN id_doc document_id INT NOT NULL;
+
+requires extension "php-soap"  sudo apt-get install php-soap
+*/
+//$_configuration['allow_compilatio_tool'] = false;
+//$_configuration['compilatio_tool'] = [
+//    'settings' => [
+//        'key' => '',
+//        'soap_url' => '',
+//        'proxy_host' => '',
+//        'proxy_port' => '',
+//        'max_filesize' => '',
+//        'transport_mode' => '',
+//        'wget_uri' => '',
+//        'wget_login' => '',
+//        'wget_password' => '',
+//    ]
+//];
+
+// Allow user to enter a LP item if it was validated in another session.
+// $_configuration['validate_lp_prerequisite_from_other_session'] = false;
+
+// 1 = SCORE_AVERAGE (5 / 10)
+// 2 = SCORE_PERCENT (50%)
+// 3 = SCORE_DIV_PERCENT (5 / 10 (50%))
+// $_configuration['exercise_score_format'] = 0;
+
+// Hide course sidebar
+//$_configuration['hide_course_sidebar'] = true;
+
+// Allow online users by user profile
+// 1 = COURSEMANAGER (teacher)
+// 5 = STUDENT
+// 11 = PLATFORM_ADMIN
+// Example: The online users will be available only for teachers and students.
+//$_configuration['allow_online_users_by_status'] = ['status' =>  [1, 5]];
+
+// Allow add one column by each user extra field indicated to the Gradebook Flatview for each user.
+/*$_configuration['gradebook_flatview_extrafields_columns'] = [
+    'variables' => [],
+];*/
+
+// Show hidden exercises that were added to a LP in the exercise list
+// $_configuration['show_hidden_exercise_added_to_lp'] = true;
+
+// Show full lp item title
+// $_configuration['show_full_lp_item_title_in_edition'] = false;
+
+// Hide course catalog welcome message
+//$_configuration['hide_course_catalog_welcome'] = true;
+
+// Survey
+// ALTER TABLE c_survey_question ADD parent_id INT(11) DEFAULT 0 NOT NULL;
+// ALTER TABLE c_survey_question ADD parent_option_id INT(11) DEFAULT 0 NOT NULL;
+//$_configuration['survey_question_dependency'] = true;
+
+// Student publication: force to download document before upload an assignment.
+// $_configuration['force_download_doc_before_upload_work' ] = true;
+
+// Allow teachers to decide which skills are assigned through their courses
+// $_configuration['skills_teachers_can_assign_skills'] = false;
+
+// Changes the ck editor enter mode value. Default: CKEDITOR.ENTER_P
+// $_configuration['ck_editor_enter_mode_value'] = 'CKEDITOR.ENTER_BR';
+
+// CREATE TABLE user_career (id INT AUTO_INCREMENT NOT NULL, user_id INT NOT NULL, career_id INT NOT NULL, created_at DATETIME NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
+// ALTER TABLE user_career ADD COLUMN extra_data LONGTEXT;
+// ALTER TABLE user_career ADD COLUMN updated_at DATETIME NOT NULL;
+// $_configuration['allow_career_users'] = false;
+
+// LP view menu location. Options: "left" or "right"
+// $_configuration['lp_menu_location'] = 'left';
+
+// Show notification events
+/*CREATE TABLE IF NOT EXISTS notification_event (
+id INT unsigned NOT NULL auto_increment PRIMARY KEY,
+        title VARCHAR(255),
+        content TEXT,
+        link TEXT,
+        persistent INT,
+        day_diff INT,
+        event_type VARCHAR(255)
+    );
+ALTER TABLE notification_event ADD COLUMN event_id INT NULL;
+*/
+// create new user text extra field called 'notification_event' to save the persistent settings.
+// $_configuration['notification_event'] = false;
+
+// Add help text to put 2 names in registration form
+//$_configuration['registration_add_helptext_for_2_names'] = false;
+
+// Allow career/promotions in global announcements
+// ALTER TABLE sys_announcement ADD COLUMN career_id INT DEFAULT 0;
+// ALTER TABLE sys_announcement ADD COLUMN promotion_id INT DEFAULT 0;
+//$_configuration['allow_careers_in_global_announcements'] = false;
+
+// Hide start/end dates in "My courses" page (user_portal.php)
+//$_configuration['hide_session_dates_in_user_portal'] = false;
+
+// Catalog search settings visibility
+// $_configuration['catalog_settings'] = ['sessions' => ['by_title' => true, 'by_date' => true, 'by_tag' => true ]];
+
 // KEEP THIS AT THE END
 // -------- Custom DB changes
 // Add user activation by confirmation email

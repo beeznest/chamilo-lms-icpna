@@ -563,7 +563,7 @@ class MigrationCustom
             $data['coach_access_end_date'],
             null,
             null,
-            null,
+            SESSION_VISIBLE_READ_ONLY,
             null,
             null,
             null,

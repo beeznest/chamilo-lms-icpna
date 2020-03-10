@@ -1164,8 +1164,8 @@ class MigrationCustom
                 $chamilo_user_info = api_get_user_info($chamilo_user_info['id'], false, false, true);
 
                 // We extra-update the user to set a password that works with the salt
-                $sql = "UPDATE user 
-                    SET password = SHA1(CONCAT('".$user_info['password']."', '{', salt, '}')), 
+                $sql = "UPDATE user
+                    SET password = SHA1(CONCAT('".$user_info['password']."', '{', salt, '}')),
                         auth_source = 'platform'
                     WHERE id = ".$chamilo_user_info['id']." AND salt IS NOT NULL AND salt != ''";
                 $res = Database::query($sql);
@@ -1277,8 +1277,8 @@ class MigrationCustom
                 );
                 $chamilo_user_info = api_get_user_info($user_id, false, false, true);
                 // We extra-update the user to set a password that works with the salt
-                $sql = "UPDATE user 
-                    SET password = SHA1(CONCAT('".$user_info['password']."', '{', salt, '}')), 
+                $sql = "UPDATE user
+                    SET password = SHA1(CONCAT('".$user_info['password']."', '{', salt, '}')),
                         auth_source = 'platform'
                     WHERE id = ".$chamilo_user_info['id']." AND salt IS NOT NULL AND salt != ''";
                 $res = Database::query($sql);
@@ -1460,9 +1460,9 @@ class MigrationCustom
         $course_id = intval($course_id);
         $user_id = intval($user_id);
         $sql = "SELECT * FROM $tbl_session_course_user
-            WHERE user_id = $user_id 
-            AND session_id = $session_id 
-            AND c_id = $course_id 
+            WHERE user_id = $user_id
+            AND session_id = $session_id
+            AND c_id = $course_id
             AND status = 2";
         $result = Database::query($sql);
         if (Database::num_rows($result) > 0) {
@@ -1662,7 +1662,7 @@ class MigrationCustom
                 $session_info['coach_access_end_date'],
                 null,
                 null,
-                null,
+                SESSION_VISIBLE_READ_ONLY,
                 null,
                 null,
                 null,
@@ -4135,10 +4135,10 @@ class MigrationCustom
                             $or .= ' OR action = '.self::TRANSACTION_TYPE_DEL_USER.' ';
                             break;
                     }
-                    $sql = 'SELECT id FROM branch_transaction 
-                      WHERE branch_id = '.$t['idsede'].' 
-                        AND item_id = '.$t['id'].' 
-                        AND  (action = '.$t['ida'].' '.$or.' ) 
+                    $sql = 'SELECT id FROM branch_transaction
+                      WHERE branch_id = '.$t['idsede'].'
+                        AND item_id = '.$t['id'].'
+                        AND  (action = '.$t['ida'].' '.$or.' )
                         AND transaction_id > '.$t['idt'];
                     $res = Database::query($sql);
                     if ($res === false or Database::num_rows($res) <= 0) {

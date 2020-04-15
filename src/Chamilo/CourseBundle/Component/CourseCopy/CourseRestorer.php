@@ -1423,8 +1423,8 @@ class CourseRestorer
 
             if ($new_id) {
                 $courseInfo = api_get_course_info_by_id($this->destination_course_id);
-                $sql = "UPDATE $link_cat_table 
-                        SET id = iid 
+                $sql = "UPDATE $link_cat_table
+                        SET id = iid
                         WHERE iid = $new_id";
                 Database::query($sql);
                 api_item_property_update(
@@ -2486,8 +2486,6 @@ class CourseRestorer
                 }
             }
         }
-
-        return $return;
     }
 
     /**
@@ -2596,9 +2594,22 @@ class CourseRestorer
     /**
      * @param int  $sessionId
      * @param bool $baseContent
+     *
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function restore_learnpath_category($sessionId = 0, $baseContent = false)
     {
+        $reuseExisting = false;
+
+        if (isset($this->tool_copy_settings['learnpath_category']) &&
+            isset($this->tool_copy_settings['learnpath_category']['reuse_existing']) &&
+            true === $this->tool_copy_settings['learnpath_category']['reuse_existing']
+        ) {
+            $reuseExisting = true;
+        }
+
+        $tblLpCategory = Database::get_course_table(TABLE_LP_CATEGORY);
+
         if ($this->course->has_resources(RESOURCE_LEARNPATH_CATEGORY)) {
             $resources = $this->course->resources;
             /** @var LearnPathCategory $item */
@@ -2607,11 +2618,29 @@ class CourseRestorer
                 $lpCategory = $item->object;
 
                 if ($lpCategory) {
-                    $values = [
-                        'c_id' => $this->destination_course_id,
-                        'name' => $lpCategory->getName(),
-                    ];
-                    $categoryId = \learnpath::createCategory($values);
+                    $categoryId = 0;
+
+                    $existingLpCategory = Database::select(
+                        'iid',
+                        $tblLpCategory,
+                        [
+                            'WHERE' => [
+                                'c_id = ? AND name = ?' => [$this->destination_course_id, $lpCategory->getName()]
+                            ]
+                        ],
+                        'first'
+                    );
+
+                    if ($reuseExisting && !empty($existingLpCategory)) {
+                        $categoryId = $existingLpCategory['iid'];
+                    } else {
+                        $values = [
+                            'c_id' => $this->destination_course_id,
+                            'name' => $lpCategory->getName(),
+                        ];
+                        $categoryId = \learnpath::createCategory($values);
+                    }
+
                     if ($categoryId) {
                         $this->course->resources[RESOURCE_LEARNPATH_CATEGORY][$id]->destination_id = $categoryId;
                     }

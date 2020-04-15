@@ -93,6 +93,11 @@ foreach ($args as $masterCourseCode => $courseParams) {
     foreach ($courseParams['courses'] as $courseCode) {
         $courseRestorer = new CourseRestorer($course);
         $courseRestorer->set_add_text_in_items(false);
+        $courseRestorer->set_tool_copy_settings(
+            [
+                'learnpath_category' => ['reuse_existing' => true],
+            ]
+        );
         $courseRestorer->restore(
             $courseCode,
             0,

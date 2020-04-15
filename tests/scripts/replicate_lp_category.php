@@ -7,15 +7,10 @@
  *
  * First param will be considered as category ID.
  * The following params be considered as course codes.
- *
- * To replicate in all courses.
- *
- * php tests/scripts/replicate_lp_category.php 1
- *
- * To replicate in specific courses.
- *
- * php tests/scripts/replicate_lp_category.php 1 CODE1 CODE2 CODE3
  */
+
+use Chamilo\CourseBundle\Component\CourseCopy\CourseBuilder;
+use Chamilo\CourseBundle\Component\CourseCopy\CourseRestorer;
 
 die("Script disabled".PHP_EOL);
 
@@ -24,141 +19,197 @@ if (PHP_SAPI !== 'cli') {
 }
 
 require_once __DIR__.'/../../main/inc/global.inc.php';
+$args = [
+    'CODE1' => [
+        'courses' => ['CODE2', 'CODE3', 'CODE4'],
+        'lps' => [
+            'Category name 1' => [], // replicate all learning paths in this category
+            'Category name 2' => ['Learning path 1 to ignore']
+        ]
+    ],
+];
 
-array_shift($argv);
+printLog(PHP_EOL);
+printLog('Replicating learning paths to courses');
 
-// Params
-$origLpCategoryId = array_shift($argv);
-$destCourses = $argv;
+foreach ($args as $masterCourseCode => $courseParams) {
+    $courseInfo = api_get_course_info($masterCourseCode);
 
-if (empty($origLpCategoryId)) {
-    die("LP Category ID not indicated.".PHP_EOL);
-}
+    if (empty($courseInfo)) {
+        printLog("Course $masterCourseCode not found");
 
-// Process
+        continue;
+    }
 
-$tblLp = Database::get_course_table(TABLE_LP_MAIN);
+    printLog("From course $masterCourseCode");
 
-$lpCategory = getCategoryInfo($origLpCategoryId);
-$lps = getLearningPaths($origLpCategoryId);
+    $cbLpCategory = [];
+    $cbLp = [];
+    $cbDocuments = [];
 
-printLog(
-    "Learning path category to replicate: {$lpCategory['iid']} - \"{$lpCategory['name']}\" with "
-        .count($lps).' learning paths.'
-);
+    foreach ($courseParams['lps'] as $categoryName => $lpNamesToAvoid) {
+        $lpCategoryId = getLpCategoryId($categoryName, $masterCourseCode);
 
-foreach (getCourses($lpCategory['c_id'], $destCourses) as $courseInfo) {
-    printLog("Replicating in course {$courseInfo['id']} - \"{$courseInfo['title']}\"");
+        if (empty($lpCategoryId)) {
+            continue;
+        }
 
-    $newLpCategoryId = learnpath::createCategory(['c_id' => $courseInfo['id'], 'name' => $lpCategory['name']]);
+        $lpIds = getLpIds($lpCategoryId, $lpNamesToAvoid);
 
-    printLog("\tCategory created: $newLpCategoryId");
+        $cbLpCategory[] = $lpCategoryId;
+        $cbLp = array_merge($cbLp, $lpIds);
+    }
 
-    foreach ($lps as $lp) {
-        $newLpId = createLp($lp, $newLpCategoryId, $courseInfo['id']);
+    $cbDocuments = getDocumentIds($courseInfo['real_id'], $cbLp);
 
-        printLog("\tLearning path created: $newLpId");
+    printLog("Documents: ".implode(', ', $cbDocuments));
+    printLog("Learning path categories: ".implode(', ', $cbLpCategory));
+    printLog("Learning paths: ".implode(', ', $cbLp));
+
+    $courseBuilder = new CourseBuilder('', $courseInfo);
+    $courseBuilder->set_tools_to_build(['documents', 'learnpath_category', 'learnpaths']);
+    $courseBuilder->set_tools_specific_id_list(
+        [
+            'documents' => $cbDocuments,
+            'learnpath_category' => $cbLpCategory,
+            'learnpaths' => $cbLp,
+        ]
+    );
+
+    $course = $courseBuilder->build(0, $masterCourseCode);
+
+    $courseParams['courses'] = array_filter($courseParams['courses'], function ($courseCode) use ($cbLp) {
+        $cInfo = api_get_course_info($courseCode);
+
+        if (empty($cInfo)) {
+            printLog("\tCourse $courseCode not found");
+
+            return false;
+        }
+
+        learnpath::generate_learning_path_folder($cInfo);
+
+        foreach ($cbLp as $lpId) {
+            $lpName = getLpName($lpId);
+
+            if (empty($lpName)) {
+                continue;
+            }
+
+            $lp = new learnpath($courseCode, 0, 0);
+            $lp->generate_lp_folder($cInfo, $lpName);
+        }
+
+        return true;
+    });
+
+    foreach ($courseParams['courses'] as $courseCode) {
+        $courseRestorer = new CourseRestorer($course);
+        $courseRestorer->set_add_text_in_items(false);
+        $courseRestorer->restore(
+            $courseCode,
+            0,
+            false,
+            false
+        );
+
+        printLog("\tReplicated in course $courseCode");
     }
 }
 
-printLog('Ending.');
-
 /**
- * Get category info.
+ * @param string $categoryName
+ * @param string $courseCode
  *
- * @param int $id
- *
- * @return array
+ * @return int
  */
-function getCategoryInfo($id)
-{
-    $tblLpCategory = Database::get_course_table(TABLE_LP_CATEGORY);
-
-    return Database::select('*', $tblLpCategory, ['WHERE' => ['iid = ?' => $id]], 'first');
-}
-
-/**
- * @param int $lpCategoryId
- *
- * @return array
- */
-function getLearningPaths($lpCategoryId)
-{
-    $tblLp = Database::get_course_table(TABLE_LP_MAIN);
-
-    return Database::select('*', $tblLp, ['WHERE' => ['category_id = ? AND session_id = 0' => [$lpCategoryId]]]);
-}
-
-/**
- * @param int   $origCourseId
- * @param array $destCourses
- *
- * @return array
- */
-function getCourses($origCourseId, array $destCourses = [])
+function getLpCategoryId($categoryName, $courseCode)
 {
     $tblCourse = Database::get_main_table(TABLE_MAIN_COURSE);
+    $tblLpCategory = Database::get_course_table(TABLE_LP_CATEGORY);
 
-    $filterCourses = $destCourses ? "AND code IN('".implode("', '", $destCourses)."')" : '';
+    $row = Database::fetch_assoc(
+        Database::query(
+            "SELECT lpc.iid FROM $tblLpCategory lpc
+            INNER JOIN $tblCourse c ON lpc.c_id = c.id
+            WHERE c.code = '$courseCode' AND lpc.name = '$categoryName'"
+        )
+    );
 
-    $result = Database::query("SELECT id, title FROM $tblCourse WHERE id != $origCourseId $filterCourses");
-
-    while ($row = Database::fetch_assoc($result)) {
-        yield $row;
+    if (empty($row)) {
+        return 0;
     }
+
+    return $row['iid'];
 }
 
 /**
- * @param array $origLp
- * @param int   $lpCategoryId
- * @param int   $destCourseId
+ * @param int   $categoryId
+ * @param array $lpNamesToAvoid
  *
- * @return false|int
+ * @return array
  */
-function createLp(array $origLp, $lpCategoryId, $destCourseId)
+function getLpIds($categoryId, array $lpNamesToAvoid = [])
+{
+    $sql = "SELECT iid FROM c_lp WHERE category_id = $categoryId";
+
+    if (!empty($lpNamesToAvoid)) {
+        $sql .= " AND name NOT IN ('".implode(', ', $lpNamesToAvoid)."')";
+    }
+
+    $query = Database::query($sql);
+
+    $result = [];
+
+    while ($row = Database::fetch_assoc($query)) {
+        $result[] = $row['iid'];
+    }
+
+    return $result;
+}
+
+/**
+ * @param int $lpId
+ *
+ * @return string|null
+ */
+function getLpName($lpId)
 {
     $tblLp = Database::get_course_table(TABLE_LP_MAIN);
 
-    $lpParams = [
-        'c_id' => $destCourseId,
-        'lp_type' => $origLp['lp_type'],
-        'name' => $origLp['name'],
-        'path' => $origLp['path'],
-        'ref' => $origLp['ref'],
-        'description' => $origLp['description'],
-        'content_local' => $origLp['content_local'],
-        'default_encoding' => $origLp['default_encoding'],
-        'default_view_mod' => $origLp['default_view_mod'],
-        'prevent_reinit' => $origLp['prevent_reinit'],
-        'force_commit' => $origLp['force_commit'],
-        'content_maker' => $origLp['content_maker'],
-        'display_order' => $origLp['display_order'],
-        'js_lib' => $origLp['js_lib'],
-        'content_license' => $origLp['content_license'],
-        'author' => $origLp['author'],
-        'preview_image' => $origLp['preview_image'],
-        'use_max_score' => $origLp['use_max_score'],
-        'autolaunch' => isset($origLp['autolaunch']) ? $origLp['autolaunch'] : '',
-        'created_on' => empty($origLp['created_on']) ? api_get_utc_datetime() : $origLp['created_on'],
-        'modified_on' => empty($origLp['modified_on']) ? api_get_utc_datetime() : $origLp['modified_on'],
-        'publicated_on' => empty($origLp['publicated_on']) ? api_get_utc_datetime() : $origLp['publicated_on'],
-        'expired_on' => $origLp['expired_on'],
-        'debug' => $origLp['debug'],
-        'theme' => '',
-        'session_id' => 0,
-        'prerequisite' => 0,
-        'hide_toc_frame' => 0,
-        'seriousgame_mode' => 0,
-        'category_id' => $lpCategoryId,
-        'max_attempts' => 0,
-        'subscribe_users' => 0,
-    ];
+    $lp = Database::select('name', $tblLp, ['WHERE' => ['iid = ?' => $lpId]], 'first');
 
-    $lpId = Database::insert($tblLp, $lpParams);
+    if (empty($lp)) {
+        return null;
+    }
 
-    Database::query("UPDATE $tblLp SET id = iid WHERE iid = $lpId");
+    return $lp['name'];
+}
 
-    return $lpId;
+/**
+ * @param int   $courseId
+ * @param array $categoryIds
+ *
+ * @return array
+ */
+function getDocumentIds($courseId, array $categoryIds = [])
+{
+    $tblDocument = Database::get_course_table(TABLE_DOCUMENT);
+    $tblLpItem = Database::get_course_table(TABLE_LP_ITEM);
+
+    $query = Database::query(
+        "SELECT d.iid FROM $tblDocument d
+        INNER JOIN $tblLpItem lpi ON (d.iid = lpi.path AND d.c_id = lpi.c_id)
+        WHERE d.c_id = $courseId AND lpi.lp_id IN (".implode(', ', $categoryIds).")"
+    );
+
+    $result = [];
+
+    while ($row = Database::fetch_assoc($query)) {
+        $result[] = $row['iid'];
+    }
+
+    return $result;
 }
 
 /**

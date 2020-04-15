@@ -29,8 +29,8 @@ $args = [
     ],
 ];
 
-printLog(PHP_EOL);
 printLog('Replicating learning paths to courses');
+printLog(PHP_EOL);
 
 foreach ($args as $masterCourseCode => $courseParams) {
     $courseInfo = api_get_course_info($masterCourseCode);
@@ -79,25 +79,12 @@ foreach ($args as $masterCourseCode => $courseParams) {
     $course = $courseBuilder->build(0, $masterCourseCode);
 
     $courseParams['courses'] = array_filter($courseParams['courses'], function ($courseCode) use ($cbLp) {
-        $cInfo = api_get_course_info($courseCode);
+        $courseInfo = api_get_course_info($courseCode);
 
-        if (empty($cInfo)) {
+        if (empty($courseInfo)) {
             printLog("\tCourse $courseCode not found");
 
             return false;
-        }
-
-        learnpath::generate_learning_path_folder($cInfo);
-
-        foreach ($cbLp as $lpId) {
-            $lpName = getLpName($lpId);
-
-            if (empty($lpName)) {
-                continue;
-            }
-
-            $lp = new learnpath($courseCode, 0, 0);
-            $lp->generate_lp_folder($cInfo, $lpName);
         }
 
         return true;
@@ -169,24 +156,6 @@ function getLpIds($categoryId, array $lpNamesToAvoid = [])
 }
 
 /**
- * @param int $lpId
- *
- * @return string|null
- */
-function getLpName($lpId)
-{
-    $tblLp = Database::get_course_table(TABLE_LP_MAIN);
-
-    $lp = Database::select('name', $tblLp, ['WHERE' => ['iid = ?' => $lpId]], 'first');
-
-    if (empty($lp)) {
-        return null;
-    }
-
-    return $lp['name'];
-}
-
-/**
  * @param int   $courseId
  * @param array $categoryIds
  *
@@ -198,16 +167,57 @@ function getDocumentIds($courseId, array $categoryIds = [])
     $tblLpItem = Database::get_course_table(TABLE_LP_ITEM);
 
     $query = Database::query(
-        "SELECT d.iid FROM $tblDocument d
+        "SELECT d.iid, d.path FROM $tblDocument d
         INNER JOIN $tblLpItem lpi ON (d.iid = lpi.path AND d.c_id = lpi.c_id)
-        WHERE d.c_id = $courseId AND lpi.lp_id IN (".implode(', ', $categoryIds).")"
+        WHERE d.c_id = $courseId AND lpi.lp_id IN (".implode(', ', $categoryIds).")
+            AND (d.session_id = 0 OR d.session_id IS NULL)"
     );
 
     $result = [];
 
     while ($row = Database::fetch_assoc($query)) {
         $result[] = $row['iid'];
+
+        $directoriesId = getDirectoriesId($row['path'], $courseId);
+
+        $result = array_merge($result, $directoriesId);
     }
+
+    $result = array_unique($result);
+
+    sort($result);
+
+    return $result;
+}
+
+/**
+ * @param string $filePath
+ * @param int    $courseId
+ *
+ * @return array
+ */
+function getDirectoriesId($filePath, $courseId)
+{
+    $tblDocument = Database::get_course_table(TABLE_DOCUMENT);
+
+    $result = [];
+
+    do {
+        $filePath = dirname($filePath);
+
+        $row = Database::fetch_assoc(
+            Database::query(
+                "SELECT iid FROM $tblDocument d
+                WHERE path = '$filePath' AND c_id = $courseId AND (session_id = 0 OR session_id IS NULL)"
+            )
+        );
+
+        if (empty($row)) {
+            break;
+        }
+
+        $result[] = $row['iid'];
+    } while (empty($filePath) || $filePath != '/');
 
     return $result;
 }

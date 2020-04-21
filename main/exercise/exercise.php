@@ -462,21 +462,22 @@ $condition_session = api_get_session_condition($sessionId, true, true);
 
 // Only for administrators
 if ($is_allowedToEdit) {
-    $total_sql = "SELECT count(iid) as count 
+    $total_sql = "SELECT count(iid) as count
                   FROM $TBL_EXERCISES
-                  WHERE c_id = $courseId AND active<>'-1' $condition_session ";
+                  WHERE c_id = $courseId AND active <> -1 $condition_session ";
     $sql = "SELECT * FROM $TBL_EXERCISES
-            WHERE c_id = $courseId AND active<>'-1' $condition_session
+            WHERE c_id = $courseId AND active <> -1 $condition_session
             ORDER BY title
             LIMIT ".$from.",".$limit;
 } else {
     // Only for students
-    $total_sql = "SELECT count(iid) as count 
+    $total_sql = "SELECT count(iid) as count
                   FROM $TBL_EXERCISES
-                  WHERE c_id = $courseId AND active = '1' $condition_session ";
+                  WHERE c_id = $courseId AND active = 1 $condition_session ";
     $sql = "SELECT * FROM $TBL_EXERCISES
             WHERE c_id = $courseId AND
-                  active='1' $condition_session
+                  active='1'
+                  $condition_session
             ORDER BY title LIMIT ".$from.",".$limit;
 }
 $result = Database::query($sql);
@@ -498,13 +499,13 @@ if ($is_allowedToEdit) {
     $res = Database::query($sql);
     $hp_count = Database :: num_rows($res);
 } else {
-    $sql = "SELECT * FROM $TBL_DOCUMENT d 
+    $sql = "SELECT * FROM $TBL_DOCUMENT d
             INNER JOIN $TBL_ITEM_PROPERTY ip
-            ON (d.id = ip.ref AND d.c_id = ip.c_id) 
-            WHERE                
+            ON (d.id = ip.ref AND d.c_id = ip.c_id)
+            WHERE
                 ip.tool = '".TOOL_DOCUMENT."' AND
                 d.path LIKE '".Database::escape_string($uploadPath.'/%/%')."' AND
-                ip.visibility ='1' AND
+                ip.visibility = 1 AND
                 d.c_id = $courseId AND
                 ip.c_id  = $courseId";
     $res = Database::query($sql);
@@ -658,6 +659,7 @@ $tableRows = [];
 /*  Listing exercises  */
 if (!empty($exerciseList)) {
     if ($origin != 'learnpath') {
+        $visibilitySetting = api_get_configuration_value('show_hidden_exercise_added_to_lp');
         //avoid sending empty parameters
         $mylpid = (empty($learnpath_id) ? '' : '&learnpath_id='.$learnpath_id);
         $mylpitemid = (empty($learnpath_item_id) ? '' : '&learnpath_item_id='.$learnpath_item_id);
@@ -742,6 +744,7 @@ if (!empty($exerciseList)) {
                     );
                 }
 
+                // Get visibility in base course
                 $visibility = api_get_item_visibility(
                     $courseInfo,
                     TOOL_QUIZ,
@@ -750,16 +753,15 @@ if (!empty($exerciseList)) {
                 );
 
                 if (!empty($sessionId)) {
-                    $setting = api_get_configuration_value('show_hidden_exercise_added_to_lp');
-                    if ($setting) {
-                        if ($exercise->exercise_was_added_in_lp == false) {
-                            if ($visibility == 0) {
+                    // If we are in a session, the test is invisible
+                    // in the base course, it is included in a LP
+                    // *and* the setting to show it is *not*
+                    // specifically set to true, then hide it.
+                    if ($visibility == 0) {
+                        if (!$visibilitySetting) {
+                            if ($exercise->exercise_was_added_in_lp == true) {
                                 continue;
                             }
-                        }
-                    } else {
-                        if ($visibility == 0) {
-                            continue;
                         }
                     }
 

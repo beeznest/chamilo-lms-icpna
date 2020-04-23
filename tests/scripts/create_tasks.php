@@ -44,7 +44,7 @@ if ($courseFilter) {
 $sql .= " WHERE s.access_start_date < '$date' AND s.access_end_date > '$date'";
 
 if ($courseFilter) {
-    $sql .= " AND c.code IN ('".implode(',', $courseFilter)."')";
+    $sql .= " AND c.code IN ('".implode("','", $courseFilter)."')";
 }
 
 $res = Database::query($sql);

@@ -28,20 +28,18 @@ require_once __DIR__.'/../../main/inc/global.inc.php';
 require_once __DIR__.'/../../main/work/work.lib.php';
 $date = api_get_utc_datetime();
 $workNameConstant = 'ALP';
-$courseList = [];
-$sessionList = [];
 
 /**
  * Get the sessions list
  */
-$sql = "SELECT id FROM session 
+$sql = "SELECT id FROM session
         WHERE access_start_date < '$date' AND access_end_date > '$date'";
 $res = Database::query($sql);
 
 /**
  * Get the course-session couple
  */
-$sessionCourse = array();
+$sessionList = [];
 while ($row = Database::fetch_assoc($res)) {
     $courseList = SessionManager::getCoursesInSession($row['id']);
     $sessionList[$row['id']] = $courseList;
@@ -55,11 +53,11 @@ while ($row = Database::fetch_assoc($res)) {
 foreach ($sessionList as $sessionId => $courseList) {
     foreach ($courseList as $courseId) {
         // Check if a folder already exists in this session
-        $sql = "SELECT id, title 
+        $sql = "SELECT id, title
                 FROM c_student_publication
-                WHERE 
-                    filetype = 'folder' AND 
-                    c_id = $courseId AND 
+                WHERE
+                    filetype = 'folder' AND
+                    c_id = $courseId AND
                     session_id = $sessionId";
         $res = Database::query($sql);
         if (Database::num_rows($res) > 0) {

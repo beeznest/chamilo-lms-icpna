@@ -65,10 +65,15 @@ while ($row = Database::fetch_assoc($res)) {
  */
 foreach ($sessionList as $sessionId => $courseList) {
     foreach ($courseList as $courseId) {
+        $courseInfo = api_get_course_info_by_id($courseId);
+        $workName = $workNameConstant.'_'.$courseInfo['code'];
+        $workNameWithSession = $workName.'_'.$sessionId;
+
         // Check if a folder already exists in this session
         $sql = "SELECT id, title
                 FROM c_student_publication
                 WHERE
+                    title = '$workName' AND
                     filetype = 'folder' AND
                     c_id = $courseId AND
                     session_id = $sessionId";
@@ -80,9 +85,6 @@ foreach ($sessionList as $sessionId => $courseList) {
             continue;
         }
 
-        $courseInfo = api_get_course_info_by_id($courseId);
-        $workName = $workNameConstant.'_'.$courseInfo['code'];
-        $workNameWithSession = $workName.'_'.$sessionId;
         $params = array(
             'new_dir' => $workNameWithSession, // the internal name path
             'work_title' => $workName, // soft name

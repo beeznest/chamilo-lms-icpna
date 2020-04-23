@@ -29,11 +29,24 @@ require_once __DIR__.'/../../main/work/work.lib.php';
 $date = api_get_utc_datetime();
 $workNameConstant = 'ALP';
 
+// Course codes to find sessions.
+$courseFilter = [];
+
 /**
  * Get the sessions list
  */
-$sql = "SELECT id FROM session
-        WHERE access_start_date < '$date' AND access_end_date > '$date'";
+$sql = "SELECT s.id FROM session s";
+
+if ($courseFilter) {
+    $sql .= ' INNER JOIN session_rel_course src ON src.session_id = s.id INNER JOIN course c ON src.c_id = c.id';
+}
+
+$sql .= " WHERE s.access_start_date < '$date' AND s.access_end_date > '$date'";
+
+if ($courseFilter) {
+    $sql .= " AND c.code IN ('".implode(',', $courseFilter)."')";
+}
+
 $res = Database::query($sql);
 
 /**
@@ -80,9 +93,9 @@ foreach ($sessionList as $sessionId => $courseList) {
         );
         $res = addDir($params, 1, $courseInfo, null, $sessionId);
         if ($res === false) {
-            echo "Could not create task $workName in course #$courseId, session #$sessionId, for some reason\n";
+            echo "Could not create task \"$workName\" in course #$courseId, session #$sessionId, for some reason\n";
         } else {
-            echo "Task $workName created in course $courseId, session $sessionId. Task ID is $res\n";
+            echo "Task \"$workName\" created in course $courseId, session $sessionId. Task ID is $res\n";
         }
     }
 }

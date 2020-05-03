@@ -1,10 +1,10 @@
 <?php
 $langStudentView="Go to Learner View";
 $langCourseManagerview="Go to Teacher View";
-$langMyCourses = "Courses";
-$langMyAgenda = "Agenda";
-$CampusHomepage = "Home";
-$SocialNetwork = "Social";
+$langMyCourses="Courses";
+$langMyAgenda="Agenda";
+$CampusHomepage="Home";
+$SocialNetwork="Social";
 $ShowStudentViewTitle="Learner View";
 $EditInformation="Update personal information";
 $EditStudentInformation="Update personal information - Student";
@@ -17,3 +17,8 @@ $EncryptedFile="Archivo cifrado";
 $WrongPassword="Wrong password";
 $EncryptedUpload="Encrypted upload";
 $EditProfileNotAllowed="The option to modify personal information is not available to teachers. Please, contact your branch management area if needed.";
+$ThisDocumentHasNoOfficialValue="This document has no official value. Only for informational purposes.";
+$TheQuizResultsWereSentToYourEmail="The written test has ended. Please approach the test administrator to continue with the final evaluation stage.";
+$QuizResult="Exam result";
+$HelloXAsYouCanSeeYourCourseListIsEmpty="<p>Hello <strong>%s</strong> and welcome,</p> <p>Here you will see your courses soon!</p>";
+$PleaseAllowUsALittleTimeToSubscribeYouToOneOfOurCourses="Please verify the course start and end dates.";

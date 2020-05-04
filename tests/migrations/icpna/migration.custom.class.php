@@ -1794,7 +1794,7 @@ class MigrationCustom
                     $session_info['coach_access_end_date'],
                     $coachId,
                     null,
-                    null,
+                    SESSION_VISIBLE_READ_ONLY,
                     null,
                     null,
                     null,

@@ -41,7 +41,7 @@ try {
 
     /** @var \Chamilo\CoreBundle\Entity\Course $course */
     foreach ($courses as $course) {
-        $slctCourses[$course->getId()] = $course->getName();
+        $slctCourses[$course->getId()] = $course->getTitle();
     }
 
     $selectedCoursesIds = array_keys($slctCourses);

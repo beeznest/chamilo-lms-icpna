@@ -1,12 +1,13 @@
 <?php
 /* For licensing terms, see /license.txt */
 /**
- * Redefine the web_service_calls array initially defined in git-included 
+ * Redefine the web_service_calls array initially defined in git-included
  * db_matches.php.
  */
-$matches['web_service_calls'] = array(       
+$matches['web_service_calls'] = array(
     'url' => "http://***/***/***?wsdl",
     'filename' => 'migration.custom.class.php',
     'class' => 'MigrationCustom',
     'accessUrlId' => 0,
+    'sessionAdmin' => 0,
 );

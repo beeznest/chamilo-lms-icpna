@@ -1668,7 +1668,7 @@ class MigrationCustom
                 null,
                 null,
                 $extra,
-                null,
+                isset($matches['web_service_calls']['sessionAdmin']) ? $matches['web_service_calls']['sessionAdmin'] : 0,
                 null,
                 isset($matches['web_service_calls']['accessUrlId']) ? ((int) $matches['web_service_calls']['accessUrlId']) : 1
             );

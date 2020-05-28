@@ -31,10 +31,10 @@ foreach ($args as $masterCourseCode => $childrenCourseCodes) {
         continue;
     }
 
-    deleteFromCourse($masterCourseCode);
+    deleteFromCourse($masterCourseCode, $masterCourseCode);
 
     foreach ($childrenCourseCodes as $childCourseCode) {
-        deleteFromCourse($childCourseCode);
+        deleteFromCourse($childCourseCode, $masterCourseCode);
     }
 }
 
@@ -120,8 +120,9 @@ function getDocumentIds($lpId, $courseId)
 
 /**
  * @param strgin $courseCode
+ * @param strgin $prefixLp
  */
-function deleteFromCourse($courseCode)
+function deleteFromCourse($courseCode, $prefixLp)
 {
     echo "Deleting in course $courseCode".PHP_EOL;
 
@@ -135,18 +136,18 @@ function deleteFromCourse($courseCode)
 
     $documentDirectory = api_get_path(SYS_COURSE_PATH).$courseInfo['directory'].'/document';
 
-    $lpCategoryId = getLpCategoryId("$courseCode Ebook", $courseInfo['real_id']);
+    $lpCategoryId = getLpCategoryId("$prefixLp Ebook", $courseInfo['real_id']);
 
     if (empty($lpCategoryId)) {
-        echo "\tLP category \"$courseCode Ebook\" not found in $courseCode".PHP_EOL;
+        echo "\tLP category \"$prefixLp Ebook\" not found in $courseCode".PHP_EOL;
 
         return;
     }
 
-    $lpId = getLpId("$courseCode Ebook", $lpCategoryId, $courseInfo['real_id']);
+    $lpId = getLpId("$prefixLp Ebook", $lpCategoryId, $courseInfo['real_id']);
 
     if (empty($lpCategoryId)) {
-        echo "\tLP \"$courseCode Ebook\" not found in $courseCode".PHP_EOL;
+        echo "\tLP \"$prefixLp Ebook\" not found in $courseCode".PHP_EOL;
 
         return;
     }

@@ -20,6 +20,8 @@ $args = [
     'B01' => ['B01TT', 'B01MW', 'B01AM', 'B01AT', 'B01SI', 'B01SA', 'AB02D'],
 ];
 
+$deleteItemOnly = false;
+
 // Process
 
 foreach ($args as $masterCourseCode => $childrenCourseCodes) {
@@ -31,10 +33,10 @@ foreach ($args as $masterCourseCode => $childrenCourseCodes) {
         continue;
     }
 
-    deleteFromCourse($masterCourseCode, $masterCourseCode);
+    deleteFromCourse($masterCourseCode, $masterCourseCode, $deleteItemOnly);
 
     foreach ($childrenCourseCodes as $childCourseCode) {
-        deleteFromCourse($childCourseCode, $masterCourseCode);
+        deleteFromCourse($childCourseCode, $masterCourseCode, $deleteItemOnly);
     }
 }
 
@@ -92,18 +94,50 @@ function getLpId($lpName, $categoryId, $courseId)
  * @param int $lpId
  * @param int $courseId
  *
- * @return array
+ * @return int
  */
-function getDocumentIds($lpId, $courseId)
+function getLpItemId($lpId, $courseId)
 {
     $tblDocument = Database::get_course_table(TABLE_DOCUMENT);
     $tblLpItem = Database::get_course_table(TABLE_LP_ITEM);
 
     $query = Database::query(
-        "SELECT d.iid FROM $tblDocument d
-        INNER JOIN $tblLpItem lpi ON (d.iid = lpi.path AND d.c_id = lpi.c_id)
-        WHERE d.c_id = $courseId AND lpi.lp_id = $lpId AND (d.session_id = 0 OR d.session_id IS NULL)"
+        "SELECT lpi.iid FROM $tblLpItem lpi
+        INNER JOIN $tblDocument d ON (lpi.path = d.iid AND lpi.c_id = d.c_id)
+        WHERE lpi.c_id = $courseId AND lpi.lp_id = $lpId AND (d.session_id = 0 OR d.session_id IS NULL)
+            AND d.path LIKE '%Ebook%.pdf'"
     );
+
+    $item = Database::fetch_assoc($query);
+
+    if (empty($item)) {
+        return 0;
+    }
+
+    return $item['iid'];
+}
+
+/**
+ * @param int  $lpId
+ * @param int  $courseId
+ * @param bool $deleteItemOnly
+ *
+ * @return array
+ */
+function getDocumentIds($lpId, $courseId, $deleteItemOnly = false)
+{
+    $tblDocument = Database::get_course_table(TABLE_DOCUMENT);
+    $tblLpItem = Database::get_course_table(TABLE_LP_ITEM);
+
+    $sql = "SELECT d.iid FROM $tblDocument d
+        INNER JOIN $tblLpItem lpi ON (d.iid = lpi.path AND d.c_id = lpi.c_id)
+        WHERE d.c_id = $courseId AND lpi.lp_id = $lpId AND (d.session_id = 0 OR d.session_id IS NULL)";
+
+    if ($deleteItemOnly) {
+        $sql .= " AND d.path LIKE '%Ebook%.pdf'";
+    }
+
+    $query = Database::query($sql);
 
     $result = [];
 
@@ -119,10 +153,11 @@ function getDocumentIds($lpId, $courseId)
 }
 
 /**
- * @param strgin $courseCode
- * @param strgin $prefixLp
+ * @param string $courseCode
+ * @param string $prefixLp
+ * @param bool   $deleteItemOnly
  */
-function deleteFromCourse($courseCode, $prefixLp)
+function deleteFromCourse($courseCode, $prefixLp, $deleteItemOnly = false)
 {
     echo "Deleting in course $courseCode".PHP_EOL;
 
@@ -152,7 +187,7 @@ function deleteFromCourse($courseCode, $prefixLp)
         return;
     }
 
-    $documentIds = getDocumentIds($lpId, $courseInfo['real_id']);
+    $documentIds = getDocumentIds($lpId, $courseInfo['real_id'], $deleteItemOnly);
 
     foreach ($documentIds as $documentId) {
         $documentIsDeleted = DocumentManager::delete_document($courseInfo, null, $documentDirectory, 0, $documentId);
@@ -161,11 +196,22 @@ function deleteFromCourse($courseCode, $prefixLp)
     }
 
     $lp = new learnpath($courseCode, $lpId, 0);
-    $lp->delete($courseInfo, $lpId);
 
-    echo "\tLearning path $lpId deleted".PHP_EOL;
+    if (!$deleteItemOnly) {
+        $lp->delete($courseInfo, $lpId);
 
-    learnpath::deleteCategory($lpCategoryId);
+        echo "\tLearning path $lpId deleted".PHP_EOL;
 
-    echo "\tLearning path category $lpCategoryId deleted".PHP_EOL;
+        learnpath::deleteCategory($lpCategoryId);
+
+        echo "\tLearning path category $lpCategoryId deleted".PHP_EOL;
+    } else {
+        $itemId = getLpItemId($lpId, $courseInfo['real_id']);
+
+        if (empty($itemId)) {
+            echo "\tLP item for Ebook not found in LP $lpId".PHP_EOL;
+        }
+
+        $lp->delete_item($itemId);
+    }
 }

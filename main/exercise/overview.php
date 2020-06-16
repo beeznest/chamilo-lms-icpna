@@ -19,6 +19,7 @@ Session::erase('objExercise');
 Session::erase('calculatedAnswerId');
 Session::erase('duration_time_previous');
 Session::erase('duration_time');
+Session::erase('track_e_adaptive');
 
 $this_section = SECTION_COURSES;
 
@@ -29,18 +30,30 @@ $htmlHeadXtra[] = $js;
 api_protect_course_script(true);
 $sessionId = api_get_session_id();
 $courseCode = api_get_course_id();
-$exercise_id = isset($_REQUEST['exerciseId']) ? intval($_REQUEST['exerciseId']) : 0;
+$exercise_id = isset($_REQUEST['exerciseId']) ? (int) $_REQUEST['exerciseId'] : 0;
+$categoryIdToStart = isset($_REQUEST['category_id']) ? (int) $_REQUEST['category_id'] : 0;
 
 $objExercise = new Exercise();
 $result = $objExercise->read($exercise_id, true);
+
+$exerciseIsAdaptive = EXERCISE_FEEDBACK_TYPE_PROGRESSIVE_ADAPTIVE == $objExercise->selectFeedbackType();
+
+if (
+    !$exerciseIsAdaptive ||
+    empty($objExercise->categoryWithQuestionList) ||
+    empty($objExercise->categoryWithQuestionList[$categoryIdToStart]) ||
+    empty($objExercise->categoryWithQuestionList[$categoryIdToStart]['question_list'])
+) {
+    $categoryIdToStart = 0;
+}
 
 if (!$result) {
     api_not_allowed(true);
 }
 
-$learnpath_id = isset($_REQUEST['learnpath_id']) ? intval($_REQUEST['learnpath_id']) : null;
-$learnpath_item_id = isset($_REQUEST['learnpath_item_id']) ? intval($_REQUEST['learnpath_item_id']) : null;
-$learnpathItemViewId = isset($_REQUEST['learnpath_item_view_id']) ? intval($_REQUEST['learnpath_item_view_id']) : null;
+$learnpath_id = isset($_REQUEST['learnpath_id']) ? (int) $_REQUEST['learnpath_id'] : 0;
+$learnpath_item_id = isset($_REQUEST['learnpath_item_id']) ? (int) $_REQUEST['learnpath_item_id'] : 0;
+$learnpathItemViewId = isset($_REQUEST['learnpath_item_view_id']) ? (int) $_REQUEST['learnpath_item_view_id'] : 0;
 $origin = api_get_origin();
 
 $logInfo = [
@@ -135,19 +148,67 @@ $exercise_stat_info = $objExercise->get_stat_track_exercise_info(
     0
 );
 
+$questionListInAttempt = $objExercise->questionList;
+
+if (!empty($exercise_stat_info)) {
+    if (!empty($exercise_stat_info['category_to_start'])) {
+        $categoryIdToStart = (int) $exercise_stat_info['category_to_start'];
+    }
+
+    $questionListInAttempt = explode(',', $exercise_stat_info['data_tracking']);
+}
+
 //1. Check if this is a new attempt or a previous
 $label = get_lang('StartTest');
 if ($time_control && !empty($clock_expired_time) || isset($exercise_stat_info['exe_id'])) {
     $label = get_lang('ContinueTest');
 }
 
+$questionNumToStart = 0;
+
 if (isset($exercise_stat_info['exe_id'])) {
     $message = Display::return_message(get_lang('YouTriedToResolveThisExerciseEarlier'));
+
+    if ($exerciseIsAdaptive) {
+        $latestQuestionId = Event::getLatestQuestionIdFromAttempt($exercise_stat_info['exe_id']);
+
+        if ($categoryIdToStart && false === $latestQuestionId) {
+            $questionIdToStart = $objExercise->getFirstQuestionInCategory($categoryIdToStart);
+            $questionNumToStart = array_search($questionIdToStart, $questionListInAttempt);
+        } else {
+            $latestQuestion = Question::read($latestQuestionId, [], false);
+
+            if ($latestQuestion && $latestQuestion->category) {
+                // Flag category as taken
+                Session::write('track_e_adaptive', [$latestQuestion->category]);
+            }
+
+            $questionNumToStart = array_search($latestQuestionId, $questionListInAttempt);
+        }
+    }
+} else {
+    if ($exerciseIsAdaptive && $categoryIdToStart) {
+        $questionIdToStart = $objExercise->getFirstQuestionInCategory($categoryIdToStart);
+        $questionNumToStart = array_search($questionIdToStart, $questionListInAttempt);
+
+        $timeControlKey = ExerciseLib::get_time_control_key($objExercise->id, $learnpath_id, $learnpath_item_id);
+        Session::write('category_to_start', [$timeControlKey => $categoryIdToStart]);
+    }
 }
 
 // 2. Exercise button
 // Notice we not add there the lp_item_view_id because is not already generated
-$exercise_url = api_get_path(WEB_CODE_PATH).'exercise/exercise_submit.php?'.api_get_cidreq().'&exerciseId='.$objExercise->id.'&learnpath_id='.$learnpath_id.'&learnpath_item_id='.$learnpath_item_id.'&learnpath_item_view_id='.$learnpathItemViewId.$extra_params;
+$exercise_url = api_get_path(WEB_CODE_PATH).'exercise/exercise_submit.php?'.api_get_cidreq().'&'
+    .http_build_query(
+        [
+            'exerciseId' => $objExercise->id,
+            'num' => empty($questionNumToStart) ? null : $questionNumToStart,
+            'learnpath_id' => $learnpath_id,
+            'learnpath_item_id' => $learnpath_item_id,
+            'learnpath_item_view_id' => $learnpathItemViewId,
+        ]
+    )
+    .$extra_params;
 $exercise_url_button = Display::url(
     $label,
     $exercise_url,
@@ -227,7 +288,18 @@ if (!empty($attempts)) {
             );
         }
 
-        $score = ExerciseLib::show_score($attempt_result['exe_result'], $attempt_result['exe_weighting']);
+        if ($exerciseIsAdaptive) {
+            $destinationResult = Database::getManager()
+                ->getRepository('ChamiloCourseBundle:CQuizDestinationResult')
+                ->findOneBy(['exe' => $attempt_result['exe_id'], 'user' => $attempt_result['exe_user_id']]);
+
+            $score = !empty($destinationResult)
+                ? sprintf(get_lang('LevelReachedX'), $destinationResult->getAchievedLevel())
+                : '';
+        } else {
+            $score = ExerciseLib::show_score($attempt_result['exe_result'], $attempt_result['exe_weighting']);
+        }
+
         $attempt_url = api_get_path(WEB_CODE_PATH).'exercise/result.php?';
         $attempt_url .= api_get_cidreq().'&show_headers=1&';
         $attempt_url .= http_build_query([

@@ -464,10 +464,12 @@ define('GROUP_TITLE_LENGTH', 50);
 // @todo move into a class
 define('ALL_ON_ONE_PAGE', 1);
 define('ONE_PER_PAGE', 2);
+define('ONE_CATEGORY_PER_PAGE', 3);
 
 define('EXERCISE_FEEDBACK_TYPE_END', 0); //Feedback 		 - show score and expected answers
 define('EXERCISE_FEEDBACK_TYPE_DIRECT', 1); //DirectFeedback - Do not show score nor answers
 define('EXERCISE_FEEDBACK_TYPE_EXAM', 2); //NoFeedback 	 - Show score only
+define('EXERCISE_FEEDBACK_TYPE_PROGRESSIVE_ADAPTIVE', 3);
 
 define('RESULT_DISABLE_SHOW_SCORE_AND_EXPECTED_ANSWERS', 0); //show score and expected answers
 define('RESULT_DISABLE_NO_SCORE_AND_EXPECTED_ANSWERS', 1); //Do not show score nor answers

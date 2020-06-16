@@ -1,6 +1,7 @@
 <?php
 /* For licensing terms, see /license.txt */
 
+use Chamilo\CourseBundle\Entity\CQuizDestinationResult;
 use ChamiloSession as Session;
 
 /**
@@ -101,6 +102,7 @@ if (api_is_course_admin() && !in_array($origin, ['learnpath', 'embeddable'])) {
 }
 
 $feedback_type = $objExercise->feedback_type;
+$isAdaptive = EXERCISE_FEEDBACK_TYPE_PROGRESSIVE_ADAPTIVE == $objExercise->selectFeedbackType();
 $exercise_stat_info = $objExercise->get_stat_track_exercise_info_by_exe_id($exe_id);
 
 if (!empty($exercise_stat_info['data_tracking'])) {
@@ -180,7 +182,7 @@ if (!empty($exercise_stat_info)) {
 
 $max_score = $objExercise->get_max_score();
 
-if ($origin !== 'embeddable') {
+if ($origin !== 'embeddable' && !$isAdaptive) {
     echo Display::return_message(get_lang('Saved').'<br />', 'normal', false);
 }
 
@@ -195,6 +197,69 @@ ExerciseLib::displayQuestionListByAttempt(
     true,
     $remainingMessage
 );
+
+if ($isAdaptive) {
+    $em = Database::getManager();
+
+    $achievedLevel = Session::read('adaptive_quiz_level');
+
+    $user = api_get_user_entity($exercise_stat_info['exe_user_id']);
+    $exe = $em->find('ChamiloCoreBundle:TrackEExercises', $exe_id);
+    $destinationResult = new CQuizDestinationResult();
+    $destinationResult
+        ->setAchievedLevel($achievedLevel)
+        ->setHash(md5($user->getId().uniqid()))
+        ->setUser($user)
+        ->setExe($exe);
+
+    $em->persist($destinationResult);
+    $em->flush();
+
+    $quizzesDir = ExerciseLib::checkQuizzesPath($user->getId());
+
+    if (!empty($quizzesDir)) {
+        $qrUrl = api_get_path(WEB_CODE_PATH).'exercise/progressive_adaptive_results.php?'
+            .http_build_query(['hash' => $destinationResult->getHash(), 'origin' => $origin]);
+        $qrFileName = $destinationResult->getHash().'.png';
+
+        $content = [
+            $user->getCompleteNameWithUsername(),
+            sprintf(get_lang('LevelReachedX'), $destinationResult->getAchievedLevel()),
+            api_convert_and_format_date($exe->getStartDate(), DATE_TIME_FORMAT_SHORT),
+            $qrUrl,
+        ];
+        $content = array_map(
+            function ($item) {
+                return strip_tags($item);
+            },
+            $content
+        );
+        $qrContent = implode("\n\r", $content);
+        $qrSystemPath = $quizzesDir['system'].$qrFileName;
+        $qrWebPath = $quizzesDir['web'].$qrFileName;
+
+        PHPQRCode\QRcode::png($qrContent, $qrSystemPath, 'H', 2, 2);
+
+        echo '
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3">
+                    '.Display::img($qrWebPath, '', ['class' => 'pull-right']).'
+                    <p class="lead">'.sprintf(get_lang('LevelReachedX'), $destinationResult->getAchievedLevel()).'</p>
+                    <p>'.$user->getCompleteNameWithUsername().'</p>
+                    <p>'.sprintf(get_lang('ResultHashX'), $destinationResult->getHash()).'</p>
+                    <p>'.Display::url(get_lang('SeeResults'), $qrUrl, ['target' => '_blank']).'</p>
+                    <hr>
+                    '.Display::return_message(get_lang('TheQuizResultsWereSentToYourEmail'), 'info').'
+                </div>
+            </div>
+        ';
+
+        ExerciseLib::sendEmailNotificationForAdaptiveResult($destinationResult);
+    }
+
+    Session::erase('adaptive_quiz_level');
+    Session::erase('track_e_adaptive');
+}
 
 //Unset session for clock time
 ExerciseLib::exercise_time_control_delete(

@@ -433,6 +433,8 @@ class TestCategory
             $result[$cat['id']] = $cat;
         }
 
+        ksort($result);
+
         return $result;
     }
 
@@ -621,15 +623,20 @@ class TestCategory
     /**
      * Returns an array of $numberElements from $array.
      *
-     * @param array
-     * @param int
+     * @param array $array
+     * @param int   $numberElements
+     * @param bool  $shuffle
      *
      * @return array
      */
-    public static function getNElementsFromArray($array, $numberElements)
+    public static function getNElementsFromArray($array, $numberElements, $shuffle = true)
     {
         $list = $array;
-        shuffle($list);
+
+        if ($shuffle) {
+            shuffle($list);
+        }
+
         if ($numberElements < count($list)) {
             $list = array_slice($list, 0, $numberElements);
         }
@@ -638,33 +645,44 @@ class TestCategory
     }
 
     /**
-     * @param int $questionId
-     * @param int $displayCategoryName
+     * @param int  $questionId
+     * @param int  $displayCategoryName
+     * @param bool $showCategoryLabel
      */
-    public static function displayCategoryAndTitle($questionId, $displayCategoryName = 1)
+    public static function displayCategoryAndTitle($questionId, $displayCategoryName = 1, $showCategoryLabel = true)
     {
-        echo self::returnCategoryAndTitle($questionId, $displayCategoryName);
+        echo self::returnCategoryAndTitle($questionId, $displayCategoryName, $showCategoryLabel);
     }
 
     /**
-     * @param int $questionId
-     * @param int $in_display_category_name
+     * @param int  $questionId
+     * @param int  $in_display_category_name
+     * @param bool $showCategoryLabel
      *
      * @return string|null
      */
-    public static function returnCategoryAndTitle($questionId, $in_display_category_name = 1)
+    public static function returnCategoryAndTitle($questionId, $in_display_category_name = 1, $showCategoryLabel = true)
     {
         $is_student = !(api_is_allowed_to_edit(null, true) || api_is_session_admin());
+        /** @var Exercise $objExercise */
         $objExercise = Session::read('objExercise');
         if (!empty($objExercise)) {
             $in_display_category_name = $objExercise->display_category_name;
         }
         $content = null;
-        if (self::getCategoryNameForQuestion($questionId) != '' &&
+
+        $categoryName = self::getCategoryNameForQuestion($questionId);
+
+        if (!$showCategoryLabel && $categoryName != ''
+        ) {
+            return Display::page_header($categoryName, null, 'h3');
+        }
+
+        if ($categoryName != '' &&
             ($in_display_category_name == 1 || !$is_student)
         ) {
             $content .= '<div class="page-header">';
-            $content .= '<h4>'.get_lang('Category').": ".self::getCategoryNameForQuestion($questionId).'</h4>';
+            $content .= '<h4>'.get_lang('Category').": ".$categoryName.'</h4>';
             $content .= "</div>";
         }
 
@@ -1061,6 +1079,8 @@ class TestCategory
             $nbQuestionsTotal = $exercise->getNumberQuestionExerciseCategory();
             $exercise->setCategoriesGrouping(true);
             $real_question_count = count($exercise->getQuestionList());
+            $allowTimeControlPerCategory = $exercise->type == ONE_CATEGORY_PER_PAGE &&
+                api_get_configuration_value('quiz_allow_time_control_per_category');
 
             $warning = null;
             if ($nbQuestionsTotal != $real_question_count) {
@@ -1071,10 +1091,18 @@ class TestCategory
             }
 
             $return .= $warning;
-            $return .= '<table class="data_table">';
+            $return .= '<table class="table table-bordered table-hover table-striped">';
+            $return .= '<thead>';
             $return .= '<tr>';
             $return .= '<th height="24">'.get_lang('Categories').'</th>';
-            $return .= '<th width="70" height="24">'.get_lang('Number').'</th></tr>';
+            $return .= '<th width="100" height="24">'.get_lang('Number').'</th>';
+
+            if ($allowTimeControlPerCategory) {
+                $return .= Display::tag('th', get_lang('QuizCategoryDurationInMinutes'), ['width' => '100']);
+            }
+
+            $return .= '</tr>';
+            $return .= '</thead>';
 
             $emptyCategory = [
                 'id' => '0',
@@ -1094,8 +1122,33 @@ class TestCategory
                 $return .= '</td>';
                 $return .= '<td>';
                 $value = isset($saved_categories) && isset($saved_categories[$cat_id]) ? $saved_categories[$cat_id]['count_questions'] : -1;
-                $return .= '<input name="category['.$cat_id.']" value="'.$value.'" />';
+                $return .= Display::input(
+                    'number',
+                    "category[$cat_id]",
+                    $value,
+                    ['class' => 'form-control', 'min' => -1, 'step' => 1]
+                );
                 $return .= '</td>';
+
+                if ($allowTimeControlPerCategory) {
+                    if (!empty($cat_id)) {
+                        $time = isset($saved_categories) && isset($saved_categories[$cat_id])
+                            ? $saved_categories[$cat_id]['expired_time']
+                            : 0;
+                        $return .= Display::tag(
+                            'td',
+                            Display::input(
+                                'number',
+                                "time[$cat_id]",
+                                $time,
+                                ['class' => 'form-control', 'step' => '1', 'min' => 0]
+                            )
+                        );
+                    } else {
+                        $return .= Display::tag('td', '&nbsp;');
+                    }
+                }
+
                 $return .= '</tr>';
             }
 
@@ -1300,5 +1353,27 @@ class TestCategory
         $res = str_replace('"', "\'\'", $res);
 
         return $res;
+    }
+
+    /**
+     * @param int      $categoryId
+     * @param Exercise $exercise
+     *
+     * @return int
+     *
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public static function getExpiredTime($categoryId = 0, Exercise $exercise)
+    {
+        $result = Database::getManager()
+            ->createQuery(
+                'SELECT qc.expiredTime FROM ChamiloCourseBundle:CQuizCategory qc
+                    WHERE qc.cId = :course AND qc.categoryId = :category AND qc.exerciseId = :exercise'
+            )
+            ->setParameters(['course' => $exercise->course_id, 'category' => $categoryId, 'exercise' => $exercise->iId])
+            ->getSingleResult();
+
+        return $result['expiredTime'];
     }
 }

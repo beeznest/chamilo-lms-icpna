@@ -3,6 +3,7 @@
 
 use Chamilo\CoreBundle\Component\Utils\ChamiloApi;
 use Chamilo\CoreBundle\Entity\TrackEExercises;
+use Chamilo\CourseBundle\Entity\CQuizDestinationResult;
 use ChamiloSession as Session;
 
 /**
@@ -77,7 +78,11 @@ class ExerciseLib
                 $questionDescription = $objQuestionTmp->selectDescription();
                 if ($show_title) {
                     if ($exercise->display_category_name) {
-                        TestCategory::displayCategoryAndTitle($objQuestionTmp->id);
+                        TestCategory::displayCategoryAndTitle(
+                            $objQuestionTmp->id,
+                            1,
+                            EXERCISE_FEEDBACK_TYPE_PROGRESSIVE_ADAPTIVE != $exercise->feedback_type
+                        );
                     }
                     $titleToDisplay = $objQuestionTmp->getTitleToDisplay($current_item);
                     if ($answerType == READING_COMPREHENSION) {
@@ -256,38 +261,38 @@ class ExerciseLib
                 $header = Display::tag('th', get_lang('Options'), ['width' => '50%']);
                 echo "
                 <script>
-                    function RadioValidator(question_id, answer_id) 
+                    function RadioValidator(question_id, answer_id)
                     {
                         var ShowAlert = '';
                         var typeRadioB = '';
                         var AllFormElements = window.document.getElementById('exercise_form').elements;
-                    
+
                         for (i = 0; i < AllFormElements.length; i++) {
                             if (AllFormElements[i].type == 'radio') {
                                 var ThisRadio = AllFormElements[i].name;
                                 var ThisChecked = 'No';
                                 var AllRadioOptions = document.getElementsByName(ThisRadio);
-                              
+
                                 for (x = 0; x < AllRadioOptions.length; x++) {
                                      if (AllRadioOptions[x].checked && ThisChecked == 'No') {
                                          ThisChecked = 'Yes';
                                          break;
-                                     } 
-                                }  
-                              
-                                var AlreadySearched = ShowAlert.indexOf(ThisRadio);                                
-                                if (ThisChecked == 'No' && AlreadySearched == -1) { 
+                                     }
+                                }
+
+                                var AlreadySearched = ShowAlert.indexOf(ThisRadio);
+                                if (ThisChecked == 'No' && AlreadySearched == -1) {
                                     ShowAlert = ShowAlert + ThisRadio;
-                                }     
+                                }
                             }
                         }
                         if (ShowAlert != '') {
-                    
+
                         } else {
                             $('.question-validate-btn').removeAttr('disabled');
                         }
                     }
-                    
+
                     function handleRadioRow(event, question_id, answer_id) {
                         var t = event.target;
                         if (t && t.tagName == 'INPUT')
@@ -299,39 +304,39 @@ class ExerciseLib
                         r.click();
                         RadioValidator(question_id, answer_id);
                     }
-                    
+
                     $(function() {
                         var ShowAlert = '';
                         var typeRadioB = '';
                         var question_id = $('input[name=question_id]').val();
                         var AllFormElements = window.document.getElementById('exercise_form').elements;
-                    
+
                         for (i = 0; i < AllFormElements.length; i++) {
                             if (AllFormElements[i].type == 'radio') {
                                 var ThisRadio = AllFormElements[i].name;
                                 var ThisChecked = 'No';
                                 var AllRadioOptions = document.getElementsByName(ThisRadio);
-                                
+
                                 for (x = 0; x < AllRadioOptions.length; x++) {
                                     if (AllRadioOptions[x].checked && ThisChecked == 'No') {
                                         ThisChecked = \"Yes\";
                                         break;
                                     }
                                 }
-                                
-                                var AlreadySearched = ShowAlert.indexOf(ThisRadio);                                
-                                if (ThisChecked == 'No' && AlreadySearched == -1) { 
+
+                                var AlreadySearched = ShowAlert.indexOf(ThisRadio);
+                                if (ThisChecked == 'No' && AlreadySearched == -1) {
                                     ShowAlert = ShowAlert + ThisRadio;
                                 }
                             }
                         }
-                        
+
                         if (ShowAlert != '') {
                              $('.question-validate-btn').attr('disabled', 'disabled');
                         } else {
                             $('.question-validate-btn').removeAttr('disabled');
                         }
-                    
+
                     });
                 </script>";
 
@@ -404,7 +409,7 @@ class ExerciseLib
                         $header2 .= Display::tag(
                             'td',
                             nl2br($descriptionList[$counter2]),
-                            ['style' => 'background-color: #EFEFFC; color: black; width: 110px; text-align:center; 
+                            ['style' => 'background-color: #EFEFFC; color: black; width: 110px; text-align:center;
                                 vertical-align: top; padding:5px; '.$color_border2]);
                         $counter2++;
                     }
@@ -496,16 +501,16 @@ class ExerciseLib
                         if ($answerType == UNIQUE_ANSWER_IMAGE) {
                             if ($show_comment) {
                                 if (empty($comment)) {
-                                    $s .= '<div id="answer'.$questionId.$numAnswer.'" 
+                                    $s .= '<div id="answer'.$questionId.$numAnswer.'"
                                             class="exercise-unique-answer-image" style="text-align: center">';
                                 } else {
-                                    $s .= '<div id="answer'.$questionId.$numAnswer.'" 
-                                            class="exercise-unique-answer-image col-xs-6 col-sm-12" 
+                                    $s .= '<div id="answer'.$questionId.$numAnswer.'"
+                                            class="exercise-unique-answer-image col-xs-6 col-sm-12"
                                             style="text-align: center">';
                                 }
                             } else {
-                                $s .= '<div id="answer'.$questionId.$numAnswer.'" 
-                                        class="exercise-unique-answer-image col-xs-6 col-md-3" 
+                                $s .= '<div id="answer'.$questionId.$numAnswer.'"
+                                        class="exercise-unique-answer-image col-xs-6 col-md-3"
                                         style="text-align: center">';
                             }
                         }
@@ -1060,8 +1065,8 @@ class ExerciseLib
                             // Id of select is # question + # of option
                             $s .= '<td width="10%" valign="top" align="center">
                                 <div class="select-matching">
-                                <select 
-                                    id="choice_id_'.$current_item.'_'.$lines_count.'" 
+                                <select
+                                    id="choice_id_'.$current_item.'_'.$lines_count.'"
                                     name="choice['.$questionId.']['.$numAnswer.']">';
 
                             // fills the list-box
@@ -1213,9 +1218,9 @@ class ExerciseLib
                             $s .= <<<HTML
                             <tr>
                                 <td width="45%">
-                                    <div id="window_{$windowId}" 
+                                    <div id="window_{$windowId}"
                                         class="window window_left_question window{$questionId}_question">
-                                        <strong>$lines_count.</strong> 
+                                        <strong>$lines_count.</strong>
                                         $answer
                                     </div>
                                 </td>
@@ -1286,7 +1291,7 @@ HTML;
                             if (isset($select_items[$lines_count])) {
                                 $s .= <<<HTML
                                 <div id="window_{$windowId}_answer" class="window window_right_question">
-                                    <strong>{$select_items[$lines_count]['letter']}.</strong> 
+                                    <strong>{$select_items[$lines_count]['letter']}.</strong>
                                     {$select_items[$lines_count]['answer']}
                                 </div>
 HTML;
@@ -1446,7 +1451,7 @@ HTML;
                     echo "
                         <div class=\"row\">
                             <div class=\"col-sm-9\">
-                                <div id=\"hotspot-preview-$questionId\"></div>                                
+                                <div id=\"hotspot-preview-$questionId\"></div>
                             </div>
                             <div class=\"col-sm-3\">
                                 $answerList
@@ -1471,7 +1476,11 @@ HTML;
             if (!$only_questions) {
                 if ($show_title) {
                     if ($exercise->display_category_name) {
-                        TestCategory::displayCategoryAndTitle($objQuestionTmp->id);
+                        TestCategory::displayCategoryAndTitle(
+                            $objQuestionTmp->id,
+                            1,
+                            EXERCISE_FEEDBACK_TYPE_PROGRESSIVE_ADAPTIVE != $exercise->feedback_type
+                        );
                     }
                     echo $objQuestionTmp->getTitleToDisplay($current_item);
                 }
@@ -1541,7 +1550,11 @@ HOTSPOT;
             if (!$only_questions) {
                 if ($show_title) {
                     if ($exercise->display_category_name) {
-                        TestCategory::displayCategoryAndTitle($objQuestionTmp->id);
+                        TestCategory::displayCategoryAndTitle(
+                            $objQuestionTmp->id,
+                            1,
+                            EXERCISE_FEEDBACK_TYPE_PROGRESSIVE_ADAPTIVE != $exercise->feedback_type
+                        );
                     }
                     echo $objQuestionTmp->getTitleToDisplay($current_item);
                 }
@@ -1568,15 +1581,15 @@ HOTSPOT;
                                         <div class="btn-group" data-toggle="buttons">
                                             <label class="btn btn-default active"
                                                 aria-label="'.get_lang('AddAnnotationPath').'">
-                                                <input 
-                                                    type="radio" value="0" 
+                                                <input
+                                                    type="radio" value="0"
                                                     name="'.$questionId.'-options" autocomplete="off" checked>
                                                 <span class="fa fa-pencil" aria-hidden="true"></span>
                                             </label>
                                             <label class="btn btn-default"
                                                 aria-label="'.get_lang('AddAnnotationText').'">
-                                                <input 
-                                                    type="radio" value="1" 
+                                                <input
+                                                    type="radio" value="1"
                                                     name="'.$questionId.'-options" autocomplete="off">
                                                 <span class="fa fa-font fa-fw" aria-hidden="true"></span>
                                             </label>
@@ -2003,12 +2016,12 @@ HOTSPOT;
         $sql_inner_join_tbl_track_exercices = "
         (
             SELECT DISTINCT ttte.*, if(tr.exe_id,1, 0) as revised
-            FROM $TBL_TRACK_EXERCICES ttte 
+            FROM $TBL_TRACK_EXERCICES ttte
             LEFT JOIN $TBL_TRACK_ATTEMPT_RECORDING tr
             ON (ttte.exe_id = tr.exe_id)
             WHERE
                 c_id = $course_id AND
-                exe_exo_id = $exercise_id 
+                exe_exo_id = $exercise_id
                 $sessionCondition
         )";
 
@@ -2152,7 +2165,7 @@ HOTSPOT;
                 ON (user.user_id = exe_user_id)
                 WHERE
                     te.c_id = $course_id $session_id_and AND
-                    ce.active <> -1 AND 
+                    ce.active <> -1 AND
                     ce.c_id = $course_id
                     $exercise_where
                     $extra_where_conditions
@@ -3032,7 +3045,7 @@ HOTSPOT;
             return '';
         }
         $js = <<<EOT
-        
+
         function updateSelect(element) {
             var spanTag = element.parent().find('span.filter-option');
             var value = element.val();
@@ -3041,7 +3054,7 @@ HOTSPOT;
             spanTag.removeClass('$cssListToString');
             spanTag.addClass(optionClass);
         }
-        
+
         $(function() {
             // Loading values
             $('.exercise_mark_select').on('loaded.bs.select', function() {
@@ -4404,6 +4417,8 @@ EOT;
         $save_user_result = false,
         $remainingMessage = ''
     ) {
+        $exerciseIsAdaptive = EXERCISE_FEEDBACK_TYPE_PROGRESSIVE_ADAPTIVE == $objExercise->selectFeedbackType();
+        $showResultsWhenIsAdaptive = $exerciseIsAdaptive && !$save_user_result;
         $origin = api_get_origin();
         $courseCode = api_get_course_id();
         $courseId = api_get_course_int_id();
@@ -4518,6 +4533,12 @@ EOT;
             }
         }
 
+        if ($exerciseIsAdaptive && !$showResultsWhenIsAdaptive) {
+            $show_only_score = true;
+            $show_results = false;
+            $showTotalScore = false;
+        }
+
         if (($show_results || $show_only_score) && $origin != 'embeddable') {
             if (isset($exercise_stat_info['exe_user_id'])) {
                 if ($studentInfo) {
@@ -4559,9 +4580,21 @@ EOT;
         $result = [];
         // Loop over all question to show results for each of them, one by one
         if (!empty($question_list)) {
+            $questionsAnswered = [];
+
+            if ($exerciseIsAdaptive) {
+                $adaptiveQuestionAnswered = Session::read('adaptive_questions_answered', []);
+
+                $questionsAnswered = $adaptiveQuestionAnswered["q_{$objExercise->iId}"];
+            }
+
             foreach ($question_list as $questionId) {
+                if ($exerciseIsAdaptive && !empty($questionsAnswered) && !in_array($questionId, $questionsAnswered)) {
+                    continue;
+                }
+
                 // Creates a temporary Question object
-                $objQuestionTmp = Question::read($questionId, $objExercise->course);
+                $objQuestionTmp = Question::read($questionId, $objExercise->course, false);
                 // This variable came from exercise_submit_modal.php
                 ob_start();
                 $choice = null;
@@ -4574,7 +4607,7 @@ EOT;
                 // We're inside *one* question. Go through each possible answer for this question
                 $result = $objExercise->manage_answer(
                     $exeId,
-                    $questionId,
+                    $objQuestionTmp,
                     $choice,
                     'exercise_result',
                     $exerciseResultCoordinates,
@@ -4732,6 +4765,10 @@ EOT;
                     }
                 }
             } // end foreach() block that loops over all questions
+
+            if ($exerciseIsAdaptive && !empty($questionsAnswered)) {
+                Session::erase('adaptive_questions_answered');
+            }
         }
 
         $totalScoreText = null;
@@ -4789,16 +4826,20 @@ EOT;
             echo $chartMultiAnswer;
         }
 
-        if (!empty($category_list) && ($show_results || $show_only_score)) {
-            // Adding total
-            $category_list['total'] = [
-                'score' => $total_score,
-                'total' => $total_weight,
-            ];
-            echo TestCategory::get_stats_table_by_attempt(
-                $objExercise->id,
-                $category_list
-            );
+        if (!$exerciseIsAdaptive ||
+            ($exerciseIsAdaptive && $showResultsWhenIsAdaptive)
+        ) {
+            if (!empty($category_list) && ($show_results || $show_only_score)) {
+                // Adding total
+                $category_list['total'] = [
+                    'score' => $total_score,
+                    'total' => $total_weight,
+                ];
+                echo TestCategory::get_stats_table_by_attempt(
+                    $objExercise->id,
+                    $category_list
+                );
+            }
         }
 
         if ($show_all_but_expected_answer) {
@@ -4822,7 +4863,11 @@ EOT;
             echo Display::div($objExercise->description, ['class' => 'exercise_description']);
         }
 
-        echo $exercise_content;
+        if (!$exerciseIsAdaptive ||
+            ($exerciseIsAdaptive && $showResultsWhenIsAdaptive)
+        ) {
+            echo $exercise_content;
+        }
 
         if (!$show_only_score) {
             echo $totalScoreText;
@@ -4888,6 +4933,73 @@ EOT;
         if (!empty($remainingMessage)) {
             echo Display::return_message($remainingMessage, 'normal', false);
         }
+    }
+
+    /**
+     * Send a mail to current user with the result of a adaptive/progressive quiz.
+     *
+     * @param CQuizDestinationResult $result
+     */
+    public static function sendEmailNotificationForAdaptiveResult(CQuizDestinationResult $result)
+    {
+        $exe = $result->getExe();
+        $courseId = $result->getExe()->getCId();
+        $sessionId = $result->getExe()->getSessionId();
+        $qrFilename = $result->getHash().'.png';
+
+        $extraFields = api_get_configuration_value('quiz_adaptive_show_extrafields');
+
+        $quizzesDir = ExerciseLib::checkQuizzesPath($exe->getExeUserId());
+
+        $course = api_get_course_entity($courseId);
+        $courseExtra = [
+            'course' => $course,
+            'fields' => isset($extraFields['course'])
+                ? ExtraFieldValue::getValuesForSelectedFields('course', $courseId, $extraFields['course'])
+                : [],
+        ];
+
+        $sessionExtra = [];
+
+        if ($sessionId) {
+            $session = api_get_session_entity($sessionId);
+            $sessionExtra = [
+                'session' => $session,
+                'fields' => isset($extraFields['session'])
+                    ? ExtraFieldValue::getValuesForSelectedFields('session', $sessionId, $extraFields['session'])
+                    : [],
+            ];
+        }
+
+        $view = new Template('', false, false, false, true, false, false);
+        $view->assign('result', $result);
+        $view->assign('exe_duration', api_format_time($exe->getExeDuration(), 'js'));
+        $view->assign('course_info', $courseExtra);
+        $view->assign('session_info', $sessionExtra);
+        $view->assign('qr', $quizzesDir['web'].$qrFilename);
+
+        $layout = $view->get_template('mail/quiz_student_adaptive_result.tpl');
+        $content = $view->fetch($layout);
+
+        MessageManager::send_message_simple(
+            $result->getUser()->getId(),
+            get_lang('LevelReachedInQuiz'),
+            $content,
+            0,
+            false,
+            true,
+            [],
+            true,
+            [
+                [
+                    'name' => $result->getHash().'.png',
+                    'tmp_name' => $quizzesDir['system'].$qrFilename,
+                    'size' => filesize($quizzesDir['system'].$qrFilename),
+                    'error' => 0,
+                    'comment' => '',
+                ],
+            ]
+        );
     }
 
     /**
@@ -5465,5 +5577,40 @@ EOT;
         }
 
         return Category::getDownloadCertificateBlock($certificate);
+    }
+
+    /**
+     * Check the quizzes directory path into user directory path.
+     *
+     * @param int $userId
+     *
+     * @return array
+     */
+    public static function checkQuizzesPath($userId)
+    {
+        $systemUserPath = UserManager::getUserPathById($userId, 'system');
+
+        if (empty($systemUserPath)) {
+            return [];
+        }
+
+        $permissions = api_get_permissions_for_new_directories();
+
+        if (!is_dir($systemUserPath)) {
+            mkdir($systemUserPath, $permissions, true);
+        }
+
+        $systemDirPath = $systemUserPath.'quizzes/';
+
+        if (!is_dir($systemDirPath)) {
+            mkdir($systemDirPath, $permissions);
+        }
+
+        $webDirPath = UserManager::getUserPathById($userId, 'web').'quizzes/';
+
+        return [
+            'system' => $systemDirPath,
+            'web' => $webDirPath,
+        ];
     }
 }

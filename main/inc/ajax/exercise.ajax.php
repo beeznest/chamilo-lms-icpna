@@ -388,6 +388,9 @@ switch ($action) {
         $course_info = api_get_course_info_by_id($course_id);
         $course_id = $course_info['real_id'];
 
+        $exerciseIsProgressiveAdaptive = false;
+        $adaptiveQuestionsAnswered = [];
+
         // Use have permissions?
         if (api_is_allowed_to_session_edit()) {
             // "all" or "simple" strings means that there's one or all questions exercise type
@@ -427,9 +430,21 @@ switch ($action) {
             /** @var Exercise $objExercise */
             $objExercise = Session::read('objExercise');
 
+            $exerciseIsProgressiveAdaptive = EXERCISE_FEEDBACK_TYPE_PROGRESSIVE_ADAPTIVE == $objExercise->selectFeedbackType();
+
+            if ($exerciseIsProgressiveAdaptive) {
+                $adaptiveQuestionsAnswered = Session::read('adaptive_questions_answered', []);
+            }
+
             // Question info.
             $question_id = isset($_REQUEST['question_id']) ? (int) $_REQUEST['question_id'] : null;
             $question_list = Session::read('questionList');
+
+            $currentCategoryId = $type === 'category' && isset($_REQUEST['category']) ? (int) $_REQUEST['category'] : 0;
+
+            if ($type === 'category' && $objExercise->type == ONE_CATEGORY_PER_PAGE) {
+                $question_list = $objExercise->getQuestionsInCategory($currentCategoryId);
+            }
 
             // If exercise or question is not set then exit.
             if (empty($question_list) || empty($objExercise)) {
@@ -518,6 +533,7 @@ switch ($action) {
             });
 
             // Getting the total weight if the request is simple
+            $total_score = 0;
             $total_weight = 0;
             if ($type == 'simple') {
                 foreach ($question_list as $my_question_id) {
@@ -537,6 +553,12 @@ switch ($action) {
                     continue;
                 }
 
+                if ($exerciseIsProgressiveAdaptive) {
+                    $adaptiveQuestionsAnswered["q_{$objExercise->iId}"][] = $my_question_id;
+
+                    Session::write('adaptive_questions_answered', $adaptiveQuestionsAnswered);
+                }
+
                 $my_choice = isset($choice[$my_question_id]) ? $choice[$my_question_id] : null;
 
                 if ($debug) {
@@ -554,13 +576,15 @@ switch ($action) {
                 }
 
                 // Getting free choice data.
-                if (in_array($objQuestionTmp->type, [FREE_ANSWER, ORAL_EXPRESSION]) && $type == 'all') {
+                if (in_array($objQuestionTmp->type, [FREE_ANSWER, ORAL_EXPRESSION]) &&
+                    in_array($type, ['all', 'category'])
+                ) {
                     $my_choice = isset($_REQUEST['free_choice'][$my_question_id]) && !empty($_REQUEST['free_choice'][$my_question_id])
                         ? $_REQUEST['free_choice'][$my_question_id]
                         : null;
                 }
 
-                if ($type == 'all') {
+                if (in_array($type, ['all', 'category'])) {
                     $total_weight += $objQuestionTmp->selectWeighting();
                 }
 
@@ -576,7 +600,7 @@ switch ($action) {
                     // Getting old attempt in order to decrees the total score.
                     $old_result = $objExercise->manage_answer(
                         $exeId,
-                        $my_question_id,
+                        $objQuestionTmp,
                         null,
                         'exercise_show',
                         [],
@@ -627,7 +651,7 @@ switch ($action) {
                     $myChoiceTmp['choiceDegreeCertainty'] = $myChoiceDegreeCertainty;
                     $result = $objExercise->manage_answer(
                         $exeId,
-                        $my_question_id,
+                        $objQuestionTmp,
                         $myChoiceTmp,
                         'exercise_result',
                         $hot_spot_coordinates,
@@ -640,7 +664,7 @@ switch ($action) {
                 } else {
                     $result = $objExercise->manage_answer(
                         $exeId,
-                        $my_question_id,
+                        $objQuestionTmp,
                         $my_choice,
                         'exercise_result',
                         $hot_spot_coordinates,
@@ -662,7 +686,7 @@ switch ($action) {
 
                 $duration = 0;
                 $now = time();
-                if ($type == 'all') {
+                if (in_array($type, ['all', 'category'])) {
                     $exercise_stat_info = $objExercise->get_stat_track_exercise_info_by_exe_id($exeId);
                 }
 
@@ -693,20 +717,6 @@ switch ($action) {
                 }
 
                 Session::write('duration_time', [$key => $now]);
-                Event::updateEventExercise(
-                    $exeId,
-                    $objExercise->selectId(),
-                    $total_score,
-                    $total_weight,
-                    $session_id,
-                    $exercise_stat_info['orig_lp_id'],
-                    $exercise_stat_info['orig_lp_item_id'],
-                    $exercise_stat_info['orig_lp_item_view_id'],
-                    $duration,
-                    $question_list,
-                    'incomplete',
-                    $remind_list
-                );
 
                 // Destruction of the Question object
                 unset($objQuestionTmp);
@@ -714,6 +724,21 @@ switch ($action) {
                     error_log("---------- end question ------------");
                 }
             }
+
+            Event::updateEventExercise(
+                $exeId,
+                $objExercise->selectId(),
+                $total_score,
+                $total_weight,
+                $session_id,
+                $exercise_stat_info['orig_lp_id'],
+                $exercise_stat_info['orig_lp_item_id'],
+                $exercise_stat_info['orig_lp_item_view_id'],
+                $duration,
+                Session::read('questionList'),
+                'incomplete',
+                $remind_list
+            );
         }
 
         if ($type == 'all') {
@@ -729,6 +754,96 @@ switch ($action) {
             echo 'one_per_page';
             exit;
         }
+
+        if ($objExercise->type == ONE_CATEGORY_PER_PAGE && $type === 'category' && $exerciseIsProgressiveAdaptive) {
+            $params = api_get_cidreq().'&'.http_build_query(
+                [
+                    'exe_id' => $exeId,
+                    'exerciseId' => $objExercise->iId,
+                    'learnpath_id' => $learnpath_id,
+                    'learnpath_item_id' => $learnpath_item_id,
+                    //'learnpath_item_view_id' => $learnpath_item_view_id,
+                    //'reminder' => $reminder,
+                ]
+            );
+
+            $categoryList = Session::read('track_e_adaptive', []);
+            $destinationCategory = $objExercise->findCategoryDestination($exeId, $currentCategoryId);
+            $previousCategoryId = end($categoryList);
+
+            if ($objExercise->expired_time != 0) {
+                $currentExpiredTimeKey = ExerciseLib::get_time_control_key(
+                    $objExercise->iId,
+                    $learnpath_id,
+                    $learnpath_item_id
+                );
+                $currentUtcTime = api_get_utc_datetime(null, false, true);
+
+                $expiredTime = new DateTime($_SESSION['expired_time'][$currentExpiredTimeKey], new DateTimeZone('UTC'));
+
+                if ($expiredTime <= $currentUtcTime) {
+                    $categoryInfo = 0 === $destinationCategory
+                        ? $objExercise->categoryWithQuestionList[$currentCategoryId]['category']
+                        : $objExercise->categoryWithQuestionList[$destinationCategory]['category'];
+
+                    Session::write('adaptive_quiz_level', $categoryInfo['name']);
+
+                    echo "exercise_result.php?$params";
+                    break;
+                }
+
+                $allowTimeControlPerCategory = api_get_configuration_value('quiz_allow_time_control_per_category');
+
+                if ($allowTimeControlPerCategory) {
+                    $categoryExpiredTime = TestCategory::getExpiredTime($destinationCategory, $objExercise);
+                    $timeLeft = $categoryExpiredTime * 60;
+
+                    $currentUtcTime->add(new DateInterval("PT{$timeLeft}S"));
+                    $_SESSION['expired_time'][$currentExpiredTimeKey] = $currentUtcTime->format('Y-m-d H:i:s');
+                }
+            }
+
+            if (0 === $destinationCategory) {
+                $categoryInfo = $objExercise->categoryWithQuestionList[$currentCategoryId]['category'];
+
+                Session::write('adaptive_quiz_level', $categoryInfo['name']);
+
+                echo "exercise_result.php?$params";
+                break;
+            }
+
+            if (!in_array($destinationCategory, $categoryList)) {
+                $destinationQuestionId = $objExercise->getFirstQuestionInCategory($destinationCategory);
+                $destinationPosition = $objExercise->getPositionInCompressedQuestionList(
+                    $destinationQuestionId
+                );
+
+                if (!in_array($currentCategoryId, $categoryList)) {
+                    $categoryList[] = $currentCategoryId;
+                }
+
+                Session::write('track_e_adaptive', $categoryList);
+
+                echo "exercise_submit.php?$params&num=".($destinationPosition - 1);
+                break;
+            }
+
+            $isDestinationInLastRange = $objExercise->isDestinationInLastRange($currentCategoryId, $destinationCategory);
+
+            if ($isDestinationInLastRange) {
+                $categoryInfo = $objExercise->categoryWithQuestionList[$previousCategoryId]['category'];
+            }
+
+            $categoryInfo = $isDestinationInLastRange
+                ? $objExercise->categoryWithQuestionList[$previousCategoryId]['category']
+                : $objExercise->categoryWithQuestionList[$currentCategoryId]['category'];
+
+            Session::write('adaptive_quiz_level', $categoryInfo['name']);
+
+            echo "exercise_result.php?$params";
+            break;
+        }
+
         if ($debug) {
             error_log("result: ok");
             error_log(" ------ end ajax call ------- ");

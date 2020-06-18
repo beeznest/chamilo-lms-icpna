@@ -433,7 +433,12 @@ class TestCategory
             $result[$cat['id']] = $cat;
         }
 
-        ksort($result);
+        uasort(
+            $result,
+            function ($a, $b) {
+                return strnatcmp($a['title'], $b['title']);
+            }
+        );
 
         return $result;
     }

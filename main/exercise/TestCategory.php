@@ -224,7 +224,7 @@ class TestCategory
         $categories = [];
         if (empty($field)) {
             $sql = "SELECT id FROM $table
-                    WHERE c_id = $courseId 
+                    WHERE c_id = $courseId
                     ORDER BY title ASC";
             $res = Database::query($sql);
             while ($row = Database::fetch_array($res)) {
@@ -315,7 +315,7 @@ class TestCategory
         $courseId = (int) $courseId;
         $categoryId = self::getCategoryForQuestion($questionId, $courseId);
         $table = Database::get_course_table(TABLE_QUIZ_QUESTION_CATEGORY);
-        $sql = "SELECT title 
+        $sql = "SELECT title
                 FROM $table
                 WHERE id = $categoryId AND c_id = $courseId";
         $res = Database::query($sql);
@@ -744,17 +744,17 @@ class TestCategory
         $in_user_id = (int) $in_user_id;
 
         $query = "SELECT DISTINCT
-                        marks, 
-                        exe_id, 
-                        user_id, 
-                        ta.question_id, 
+                        marks,
+                        exe_id,
+                        user_id,
+                        ta.question_id,
                         category_id
-                  FROM $tbl_track_attempt ta 
+                  FROM $tbl_track_attempt ta
                   INNER JOIN $tbl_question_rel_category qrc
                   ON (ta.question_id = qrc.question_id)
                   WHERE
                     qrc.category_id = $in_cat_id AND
-                    exe_id = $in_exe_id AND 
+                    exe_id = $in_exe_id AND
                     user_id = $in_user_id";
         $res = Database::query($query);
         $score = '';

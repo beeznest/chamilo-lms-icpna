@@ -67,13 +67,31 @@
             '<td>&nbsp;</td>' +
             '</tr>';
 
-        /**
-         * @param {String} destinationStr
-         * @param {Number} categoryId
-         */
-        function generateForm(destinationStr, categoryId) {
-            destinationStr = $.trim(destinationStr);
+        function displayPretestTable(categoryId, destinationStr) {
+            destinationStr.split('##').forEach(function (part, index) {
+                switch (index) {
+                    case 0:
+                        if (part === '1') {
+                            $('#cat-pretest-' + categoryId).prop('checked', true);
+                        }
+                        return;
+                    case 1:
+                        var parts = part.split(':');
 
+                        $('[name="cat_pre_i[' + categoryId + ']"]').val(parts[0]);
+                        $('[name="cat_pre_r[' + categoryId + ']"]').val(parts[1]);
+                        break;
+                    case 2:
+                        var parts = part.split(':');
+
+                        $('[name="cat_final_i[' + categoryId + ']"]').val(parts[0]);
+                        $('[name="cat_final_r[' + categoryId + ']"]').val(parts[1]);
+                        break;
+                }
+            });
+        }
+
+        function displayNonPretestTable(categoryId, destinationsStr) {
             var table = $('#tbl-category-' + categoryId + ' tbody'),
                 firstTemplate = firstDestination.replace(/#category_id#/g, categoryId),
                 middleTemplate = middleDestination.replace(/#category_id#/g, categoryId),
@@ -81,32 +99,42 @@
 
             table.append(firstTemplate);
 
-            if (destinationStr.length) {
-                var destinationsStr = destinationStr.split('@@');
+            var destinations = destinationsStr.split('@@');
 
-                for (var i = 0; i < destinationsStr.length; i++) {
-                    if (i > 0 && i < destinationsStr.length - 1) {
-                        table.append(middleTemplate);
-                    }
+            destinations.forEach(function (part, index, parts) {
+                if (index > 0 && index < parts.length - 1) {
+                    table.append(middleTemplate);
                 }
-            }
+            });
 
             table.append(lastTemplate);
 
-            if (destinationStr.length) {
-                var destinationsStr = destinationStr.split('@@');
+            destinations.forEach(function (part, index) {
+                var parts = part.split(':');
 
-                for (var i = 0; i < destinationsStr.length; i++) {
-                    var destinationParts = destinationsStr[i].split(':'),
-                        max = $('[name="max[' + categoryId +  '][]"]').get(i),
-                        destination = $('[name="destination[' + categoryId +  '][]"]').get(i);
-
-                    $(max).val(destinationParts[0]);
-                    $(destination).val(destinationParts[1]);
-                }
-            }
+                $('[name="max[' + categoryId + '][]"]').get(index).value = parts[0];
+                $('[name="destination[' + categoryId + '][]"]').get(index).value = parts[1];
+            });
 
             $('[name="max[' + categoryId +  '][]"]').trigger('change');
+        }
+
+        /**
+         * @param {String} destinationStr
+         * @param {Number} categoryId
+         */
+        function generateForm(destinationStr, categoryId) {
+            destinationStr = $.trim(destinationStr);
+
+            if (!destinationStr.length) {
+                return;
+            }
+
+            if (destinationStr.split('##').length > 1) {
+                displayPretestTable(categoryId, destinationStr);
+            } else {
+                displayNonPretestTable(categoryId, destinationStr);
+            }
         }
 
         $('#category_destinations').on('change', 'input[data-category]', function () {
@@ -163,5 +191,15 @@
                 generateForm('', {{ category.id }});
             {% endfor %}
         {% endif %}
+
+        $('.chk-pretest').on('change', function () {
+            if (this.checked) {
+                $('#tbl-category-pre-' + this.value).show();
+                $('#tbl-category-' + this.value).hide();
+            } else {
+                $('#tbl-category-' + this.value).show();
+                $('#tbl-category-pre-' + this.value).hide();
+            }
+        }).trigger('change');
     });
 </script>

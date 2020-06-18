@@ -18,6 +18,8 @@ if (!api_is_allowed_to_edit(null, true) ||
     api_not_allowed(true);
 }
 
+$quizAdaptivePreTest = api_get_configuration_value('quiz_adaptive_pretest');
+
 $courseId = api_get_course_int_id();
 
 $objExercise = new Exercise();
@@ -58,32 +60,65 @@ foreach ($categoriesInfo as $categoryId => $categoryInfo) {
         );
     $txtId = "copy-link-$categoryId";
 
-    $table = '<div id="tbl-category-'.$categoryId.'" class="table-responsive">
-        <table class="data_table">
-            <thead>
-            <tr>
-                <th>'.get_lang('From').'</th>
-                <th>&nbsp;</th>
-                <th>'.get_lang('To').'</th>
-                <th>'.get_lang('GoTo').'</th>
-                <th>&nbsp;</th>
-            </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
-        <p>
-            <strong>'.get_lang('DestinationUrl').'</strong>
-            <div class="input-group">
-                <input type="text" id="'.$txtId.'" class="form-control" readonly value="'.$url.'">
-                <span class="input-group-btn">
-                    <button class="btn btn-info" type="button" onclick="copyTextToClipBoard(\''.$txtId.'\');">'
+    $table = '
+        <div class="checkbox">
+            <label>
+                <input name="catpretest[]" type="checkbox" class="chk-pretest" value="'.$categoryId.'" id="cat-pretest-'.$categoryId.'"> '
+        .get_lang('IsCategoryForPreTest')
+        .'
+            </label>
+        </div>
+        <div id="tbl-category-'.$categoryId.'" class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>'.get_lang('From').'</th>
+                    <th>&nbsp;</th>
+                    <th>'.get_lang('To').'</th>
+                    <th>'.get_lang('GoTo').'</th>
+                    <th>&nbsp;</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>';
+
+    if ($quizAdaptivePreTest) {
+        $table .= '<div id="tbl-category-pre-'.$categoryId.'" class="table-responsive" style="display: none">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>'.get_lang('Correct').'</th>
+                        <th>'.get_lang('Incorrect').'</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <th>'.get_lang('QuizAdaptivePreStep').'</th>
+                        <td>'.foo($categoriesInfo, "cat_pre_r[$categoryId]").'</td>
+                        <td>'.foo($categoriesInfo, "cat_pre_i[$categoryId]").'</td>
+                    </tr>
+                    <tr>
+                        <th>'.get_lang('QuizAdaptiveFinalStep').'</th>
+                        <td>'.foo($categoriesInfo, "cat_final_r[$categoryId]").'</td>
+                        <td>'.foo($categoriesInfo, "cat_final_i[$categoryId]").'</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>';
+    }
+
+    $table .= '<strong>'.get_lang('DestinationUrl').'</strong>
+        <div class="input-group">
+            <input type="text" id="'.$txtId.'" class="form-control" readonly value="'.$url.'">
+            <span class="input-group-btn">
+                <button class="btn btn-info" type="button" onclick="copyTextToClipBoard(\''.$txtId.'\');">'
         .get_lang('CopyTextToClipboard')
         .'</button>
-                </span>
-            </div>
-        </p>
-    </div>';
+            </span>
+        </div>';
 
     $form->addLabel($categoryInfo['name'], $table);
     $form->addHidden("category_destination[$categoryId]", '');
@@ -95,12 +130,6 @@ $form->addButtonSave(get_lang('Save'));
 
 if (!empty($_POST)) {
     foreach ($categoriesInfo as $categoryId => $categoryInfo) {
-        $destinations = [];
-
-        foreach ($_POST['min'][$categoryId] as $key => $value) {
-            $destinations[] .= "{$_POST['max'][$categoryId][$key]}:{$_POST['destination'][$categoryId][$key]}";
-        }
-
         /** @var CQuizCategory $cQuizRelCategory */
         $cQuizRelCategory = $quizCategoryRepo->findOneBy(['exerciseId' => $exerciseId, 'categoryId' => $categoryId]);
 
@@ -113,9 +142,25 @@ if (!empty($_POST)) {
                 ->setCountQuestions(-1);
         }
 
-        $cQuizRelCategory->setDestinations(
-            implode('@@', $destinations)
-        );
+        $destinations = [];
+
+        if ($quizAdaptivePreTest && in_array($categoryId, $_POST['catpretest'])) {
+            $destinations[] = '1';
+            $destinations[] = "{$_POST['cat_pre_i'][$categoryId]}:{$_POST['cat_pre_r'][$categoryId]}";
+            $destinations[] = "{$_POST['cat_final_i'][$categoryId]}:{$_POST['cat_final_r'][$categoryId]}";
+
+            $cQuizRelCategory->setDestinations(
+                implode('##', $destinations)
+            );
+        } else {
+            foreach ($_POST['min'][$categoryId] as $key => $value) {
+                $destinations[] .= "{$_POST['max'][$categoryId][$key]}:{$_POST['destination'][$categoryId][$key]}";
+            }
+
+            $cQuizRelCategory->setDestinations(
+                implode('@@', $destinations)
+            );
+        }
 
         $em->persist($cQuizRelCategory);
     }
@@ -152,3 +197,20 @@ $view->assign(
 );
 $view->assign('content', $view->fetch($layout));
 $view->display_one_col_template();
+
+/**
+ * @param array  $categoriesInfo
+ * @param string $name
+ *
+ * @return string
+ */
+function foo($categoriesInfo, $name)
+{
+    $options = [];
+
+    foreach ($categoriesInfo as $categoryId => $categoryInfo) {
+        $options[$categoryId] = $categoryInfo['name'];
+    }
+
+    return Display::select($name, $options);
+}

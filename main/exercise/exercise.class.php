@@ -8992,6 +8992,62 @@ class Exercise
     }
 
     /**
+     * @param int   $categoryId
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     *
+     * @return int
+     */
+    public function getSomeQuestionInCategory($categoryId)
+    {
+        $quizCategory = Database::getManager()
+            ->getRepository('ChamiloCourseBundle:CQuizCategory')
+            ->findOneBy(['categoryId' => $categoryId, 'exerciseId' => $this->iId]);
+
+        if (!$quizCategory) {
+            return 0;
+        }
+
+        $questionsInCategory = $this->getQuestionsInCategory($categoryId);
+
+        $rand = (array) array_rand($questionsInCategory, $quizCategory->getCountQuestions());
+
+        return $questionsInCategory[$rand[0]];
+    }
+
+    public function getQuestionNotAnsweredInQuizByCategory($exeId, $categoryId)
+    {
+        $tblTrackEAttempt = Database::get_main_table(TABLE_STATISTIC_TRACK_E_ATTEMPT);
+
+        $loopCount = 0;
+
+        do {
+            if ($loopCount >= count($this->getQuestionsInCategory($categoryId))) {
+                return 0;
+            }
+
+            $questionId = $this->getSomeQuestionInCategory($categoryId);
+
+            $count = Database::select(
+                'COUNT(1) number',
+                $tblTrackEAttempt,
+                [
+                    'where' => [
+                        'exe_id = ? AND question_id = ?' => [$exeId, $questionId]
+                    ]
+                ],
+                'first'
+            );
+
+            ++$loopCount;
+        } while ($count['number'] > 0);
+
+        return $questionId;
+    }
+
+    /**
      * @param int $categoryId
      *
      * @return int
@@ -9066,7 +9122,27 @@ class Exercise
      *
      * @return array
      */
-    public function decodeCategoryDestination(CQuizCategory $category)
+    private function decodePreTestCategoryDestination(CQuizCategory $category)
+    {
+        $result = [];
+
+        $parts = explode('##', $category->getDestinations());
+
+        array_shift($parts);
+
+        foreach ($parts as $part) {
+            $result[] = explode(':', $part);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param CQuizCategory $category
+     *
+     * @return array
+     */
+    private function decodeNonPreTestCategoryDestination(CQuizCategory $category)
     {
         $result = [];
 
@@ -9082,21 +9158,27 @@ class Exercise
     }
 
     /**
-     * @param int $exeId
-     * @param int $refCategoryId
+     * @param CQuizCategory $category
+     *
+     * @return array
+     */
+    public function decodeCategoryDestination(CQuizCategory $category)
+    {
+        if ($category->isForPreTest()) {
+            return $this->decodePreTestCategoryDestination($category);
+        }
+
+        return $this->decodeNonPreTestCategoryDestination($category);
+    }
+
+    /**
+     * @param array $destinations
+     * @param float $scoreInCategory
      *
      * @return int
      */
-    public function findCategoryDestination($exeId, $refCategoryId)
+    private function findDestinationForCategoryNonPreTest(array $destinations, $scoreInCategory)
     {
-        $questionsInCategory = $this->getQuestionsInCategory($refCategoryId);
-        $scoreInCategory = $this->calculatePercentageScoreInCategory($exeId, $questionsInCategory);
-
-        $quizCategory = Database::getManager()
-            ->getRepository('ChamiloCourseBundle:CQuizCategory')
-            ->findOneBy(['exerciseId' => $this->iId, 'categoryId' => $refCategoryId]);
-
-        $destinations = $this->decodeCategoryDestination($quizCategory);
         $destinationCategoryId = 0;
 
         foreach ($destinations as $percentage => $categoryId) {
@@ -9112,6 +9194,89 @@ class Exercise
         }
 
         return $destinationCategoryId;
+    }
+
+    /**
+     * @param array $destination
+     * @param float $scoreInCategory
+     *
+     * @return mixed
+     */
+    private function findDestinationForCategoryPreTest(array $destination, $scoreInCategory)
+    {
+        $middleStepIncorrect = $destination[0][0];
+        $middleStepCorrect = $destination[0][1];
+        $finalStepIncorrect = $destination[1][0];
+        $finalStepCorrect = $destination[1][1];
+
+        if ($this->isInPreTest()) {
+            if ($scoreInCategory == 100) {
+                return $middleStepCorrect;
+            }
+
+            return $middleStepIncorrect;
+        }
+
+        if ($scoreInCategory == 100) {
+            return $finalStepCorrect;
+        }
+
+        return $finalStepIncorrect;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxStepsForAdaptive()
+    {
+        $extraFieldValue = new ExtraFieldValue('exercise');
+        $value = $extraFieldValue->get_values_by_handler_and_field_variable(
+            $this->id,
+            'adaptive_pretest_question_limit'
+        );
+
+        return empty($value) ? 0 : $value['value'];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isInPreTest()
+    {
+        $currentStep = Session::read('adaptive_pretest_step');
+        $maxSteps = $this->getMaxStepsForAdaptive();
+
+        return $currentStep < $maxSteps;
+    }
+
+    /**
+     * @param int $exeId
+     * @param int $refCategoryId
+     * @param array $questionList
+     *
+     * @return int
+     */
+    public function findCategoryDestination($exeId, $refCategoryId, array $questionList = [])
+    {
+        $quizCategory = Database::getManager()
+            ->getRepository('ChamiloCourseBundle:CQuizCategory')
+            ->findOneBy(['exerciseId' => $this->iId, 'categoryId' => $refCategoryId]);
+
+        $destinations = $this->decodeCategoryDestination($quizCategory);
+        $questionsInCategory = $questionList ?: $this->getQuestionsInCategory($refCategoryId);
+        $scoreInCategory = $this->calculatePercentageScoreInCategory($exeId, $questionsInCategory);
+
+        if ($quizCategory->isForPreTest()) {
+            $tempScore = float_format($quizCategory->getCountQuestions() / count($questionsInCategory) * 100);
+
+            if ($scoreInCategory == (float) $tempScore) {
+                $scoreInCategory = 100;
+            }
+
+            return $this->findDestinationForCategoryPreTest($destinations, $scoreInCategory);
+        }
+
+        return $this->findDestinationForCategoryNonPreTest($destinations, $scoreInCategory);
     }
 
     /**
@@ -9232,6 +9397,9 @@ class Exercise
         $addAll = true;
         $categoryCountArray = [];
 
+        $isAdaptiveAndPreTest = EXERCISE_FEEDBACK_TYPE_PROGRESSIVE_ADAPTIVE == $this->feedback_type &&
+            api_get_configuration_value('quiz_adaptive_pretest');
+
         // Getting how many questions will be selected per category.
         if (!empty($categoriesAddedInExercise)) {
             $addAll = false;
@@ -9241,6 +9409,11 @@ class Exercise
                 if (isset($questions_by_category[$category_id])) {
                     // How many question will be picked from this category.
                     $count = $category_info['count_questions'];
+
+                    if ($isAdaptiveAndPreTest && strpos($category_info['destinations'], '##') > 0) {
+                        $count = -1;
+                    }
+
                     // -1 means all questions
                     $categoryCountArray[$category_id] = $count;
                     if ($count == -1) {

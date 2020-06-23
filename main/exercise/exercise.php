@@ -76,6 +76,7 @@ Session::erase('objAnswer');
 Session::erase('questionList');
 Session::erase('exerciseResult');
 Session::erase('firstTime');
+Session::erase('adaptive_pretest_step');
 Session::erase('calculatedAnswerId');
 Session::erase('duration_time_previous');
 Session::erase('duration_time');

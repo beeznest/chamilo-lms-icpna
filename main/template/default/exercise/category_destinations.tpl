@@ -112,6 +112,10 @@
             destinations.forEach(function (part, index) {
                 var parts = part.split(':');
 
+                if (parts.length < 2) {
+                    return;
+                }
+
                 $('[name="max[' + categoryId + '][]"]').get(index).value = parts[0];
                 $('[name="destination[' + categoryId + '][]"]').get(index).value = parts[1];
             });
@@ -125,10 +129,6 @@
          */
         function generateForm(destinationStr, categoryId) {
             destinationStr = $.trim(destinationStr);
-
-            if (!destinationStr.length) {
-                return;
-            }
 
             if (destinationStr.split('##').length > 1) {
                 displayPretestTable(categoryId, destinationStr);

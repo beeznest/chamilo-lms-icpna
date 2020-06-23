@@ -216,4 +216,12 @@ class CQuizCategory
 
         return $this;
     }
+
+    /**
+     * @return bool
+     */
+    public function isForPreTest()
+    {
+        return strpos($this->destinations, '##') > 0;
+    }
 }

@@ -1198,8 +1198,8 @@ if (!empty($error)) {
     echo Display::return_message($error, 'error', false);
 } else {
     if (!empty($exercise_sound)) {
-        echo "<a 
-            href=\"../document/download.php?doc_url=%2Faudio%2F".Security::remove_XSS($exercise_sound)."\" 
+        echo "<a
+            href=\"../document/download.php?doc_url=%2Faudio%2F".Security::remove_XSS($exercise_sound)."\"
             target=\"_blank\">";
         echo "<img src=\"../img/sound.gif\" border=\"0\" align=\"absmiddle\" alt=", get_lang('Sound')."\" /></a>";
     }
@@ -1253,27 +1253,27 @@ if (!empty($error)) {
                 elm.attachEvent(\'on\' + evType, fn);
             } else{
                 elm[\'on\'+evType] = fn;
-            }            
+            }
             return;
         }
-        
-        var calledUpdateDuration = false;        
+
+        var calledUpdateDuration = false;
         function updateDuration() {
             if (calledUpdateDuration === false) {
                 var saveDurationUrl = "'.$saveDurationUrl.'";
                 // Logout of course just in case
                 $.ajax({
-                    async: false, 
+                    async: false,
                     url: saveDurationUrl,
                     success: function (data) {
                         calledUpdateDuration = true;
                         return;
-                    }, 
+                    },
                 });
                 return;
             }
         }
-        
+
         $(function() {
             //This pre-load the save.png icon
             var saveImage = new Image();
@@ -1296,7 +1296,7 @@ if (!empty($error)) {
 
             $(".no_remind_highlight").hide();
 
-            // if the users validates the form using return key, 
+            // if the users validates the form using return key,
             // prevent form action and simulates click on validation button
             /*$("#exercise_form").submit(function(){
                 $(".question-validate-btn").first().trigger("click");
@@ -1304,10 +1304,10 @@ if (!empty($error)) {
             });*/
 
             $("form#exercise_form").prepend($("#exercise-description"));
-        
+
             $(\'button[name="previous_question_and_save"]\').on("touchstart click", function (e) {
                 e.preventDefault();
-                e.stopPropagation();    
+                e.stopPropagation();
                 var
                     $this = $(this),
                     previousId = parseInt($this.data(\'prev\')) || 0,
@@ -1328,7 +1328,7 @@ if (!empty($error)) {
             $(\'button[name="save_now"]\').on(\'touchstart click\', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 var
                     $this = $(this),
                     questionId = parseInt($this.data(\'question\')) || 0,
@@ -1340,23 +1340,23 @@ if (!empty($error)) {
             $(\'button[name="validate_all"]\').on(\'touchstart click\', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 validate_all();
             });
-            
+
             $(\'button[name="save_category_now"]\').on(\'touchstart click\', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 var self = $(this),
                     categoryId = parseInt(self.data(\'category\')) || 0;
-                
+
                 save_category_now(categoryId);
             });
 
             // Save attempt duration
-            addExerciseEvent(window, \'unload\', updateDuration , false);            
-            addExerciseEvent(window, \'beforeunload\', updateDuration , false);                                    
+            addExerciseEvent(window, \'unload\', updateDuration , false);
+            addExerciseEvent(window, \'beforeunload\', updateDuration , false);
         });
 
         function previous_question(question_num) {
@@ -1388,8 +1388,8 @@ if (!empty($error)) {
             //$("#save_for_now_"+question_id).html(\''.Display::return_icon('save.png', get_lang('Saved')).'\');
             window.location = url;
         }
-        
-        function redirectExerciseToResult() 
+
+        function redirectExerciseToResult()
         {
             window.location = "'.$script_php.'?'.$params.'";
         }
@@ -1403,7 +1403,7 @@ if (!empty($error)) {
 
             //3. Hotspots
             var hotspot = $(\'*[name*="hotspot[\'+question_id+\']"]\').serialize();
-            
+
             //4. choice for degree of certainty
             var my_choiceDc = $(\'*[name*="choiceDegreeCertainty[\'+question_id+\']"]\').serialize();
 
@@ -1416,7 +1416,7 @@ if (!empty($error)) {
                     my_choice = $.param(my_choice);
                 }
             }
-            
+
             if ($(\'input[name="remind_list[\'+question_id+\']"]\').is(\':checked\')) {
                 $("#question_div_"+question_id).addClass("remind_highlight");
             } else {
@@ -1426,7 +1426,7 @@ if (!empty($error)) {
             // Only for the first time
             var dataparam = "'.$params.'&type=simple&question_id="+question_id;
             dataparam += "&"+my_choice+"&"+hotspot+"&"+remind_list+"&"+my_choiceDc;
-            
+
             $("#save_for_now_"+question_id).html(\''.
                 Display::returnFontAwesomeIcon('spinner', null, true, 'fa-spin').'\');
             $.ajax({
@@ -1437,7 +1437,7 @@ if (!empty($error)) {
                 success: function(return_value) {
                     if (return_value == "ok") {
                         $("#save_for_now_"+question_id).html(\''.
-                        Display::return_icon('save.png', get_lang('Saved'), [], ICON_SIZE_SMALL).'\');                                                    
+                        Display::return_icon('save.png', get_lang('Saved'), [], ICON_SIZE_SMALL).'\');
                     } else if (return_value == "error") {
                         $("#save_for_now_"+question_id).html(\''.
                             Display::return_icon('error.png', get_lang('Error'), [], ICON_SIZE_SMALL).'\');
@@ -1479,7 +1479,7 @@ if (!empty($error)) {
 
             // 3. Hotspots.
             var hotspot = $(\'*[name*="hotspot"]\').serialize();
-            
+
             // Question list.
             var question_list = ['.implode(',', $questionList).'];
             var free_answers = {};
@@ -1515,7 +1515,7 @@ if (!empty($error)) {
             });
             return false;
         }
-        
+
         function save_category_now (categoryId) {
             $(\'button[name="save_category_now"]\').prop(\'disabled\', true);
 
@@ -1542,7 +1542,7 @@ if (!empty($error)) {
             });
 
             free_answers = $.param(free_answers);
-            
+
             $.ajax({
                 type: "post",
                 async: false,
@@ -1554,12 +1554,12 @@ if (!empty($error)) {
                         loader.html(\''.Display::return_icon('wrong.gif').'\');
 
                         $(\'button[name="save_category_now"]\').prop(\'disabled\', false);
-                        
+
                         return;
                     }
 
                     loader.html(\''.Display::return_icon('save.png', get_lang('Saved')).'\');
-                    
+
                     window.location.href = response;
                 }
             });
@@ -1581,7 +1581,7 @@ if (!empty($error)) {
          <input type="hidden" name="origin" value="'.$origin.'" />
          <input type="hidden" name="reminder" value="'.$reminder.'" />
          <input type="hidden" name="learnpath_id" value="'.$learnpath_id.'" />
-         <input type="hidden" name="learnpath_item_id" value="'.$learnpath_item_id.'" />         
+         <input type="hidden" name="learnpath_item_id" value="'.$learnpath_item_id.'" />
          <input type="hidden" name="learnpath_item_view_id" value="'.$learnpath_item_view_id.'" />';
 
     // Show list of questions
@@ -1632,6 +1632,11 @@ if (!empty($error)) {
             }
         } elseif ($objExercise->type == ONE_CATEGORY_PER_PAGE) {
             if (!in_array($questionId, $questionsInCategory)) {
+                $i++;
+                continue;
+            }
+
+            if ($objExercise->isInPreTest() && $currentQuestion != $i) {
                 $i++;
                 continue;
             }

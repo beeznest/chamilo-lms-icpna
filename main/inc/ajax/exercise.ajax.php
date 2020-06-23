@@ -434,6 +434,10 @@ switch ($action) {
 
             if ($exerciseIsProgressiveAdaptive) {
                 $adaptiveQuestionsAnswered = Session::read('adaptive_questions_answered', []);
+                Session::write(
+                    'adaptive_pretest_step',
+                    Session::read('adaptive_pretest_step', 0) + 1
+                );
             }
 
             // Question info.
@@ -444,6 +448,10 @@ switch ($action) {
 
             if ($type === 'category' && $objExercise->type == ONE_CATEGORY_PER_PAGE) {
                 $question_list = $objExercise->getQuestionsInCategory($currentCategoryId);
+
+                if ($objExercise->isInPreTest()) {
+                    $question_list = array_keys($choice);
+                }
             }
 
             // If exercise or question is not set then exit.
@@ -768,7 +776,13 @@ switch ($action) {
             );
 
             $categoryList = Session::read('track_e_adaptive', []);
-            $destinationCategory = $objExercise->findCategoryDestination($exeId, $currentCategoryId);
+
+            if ($objExercise->isInPreTest()) {
+                $destinationCategory = $objExercise->findCategoryDestination($exeId, $currentCategoryId, $question_list);
+            } else {
+                $destinationCategory = $objExercise->findCategoryDestination($exeId, $currentCategoryId);
+            }
+
             $previousCategoryId = end($categoryList);
 
             if ($objExercise->expired_time != 0) {
@@ -812,8 +826,23 @@ switch ($action) {
                 break;
             }
 
-            if (!in_array($destinationCategory, $categoryList)) {
-                $destinationQuestionId = $objExercise->getFirstQuestionInCategory($destinationCategory);
+            if (!in_array($destinationCategory, $categoryList) ||
+                (in_array($destinationCategory, $categoryList) && $objExercise->isInPreTest())
+            ) {
+                if ($objExercise->isInPreTest()) {
+                    $destinationQuestionId = $objExercise->getQuestionNotAnsweredInQuizByCategory(
+                        $exeId,
+                        $destinationCategory
+                    );
+                } else {
+                    $destinationQuestionId = $objExercise->getFirstQuestionInCategory($destinationCategory);
+                }
+
+                if (empty($destinationQuestionId)) {
+                    echo 'error';
+                    exit;
+                }
+
                 $destinationPosition = $objExercise->getPositionInCompressedQuestionList(
                     $destinationQuestionId
                 );
@@ -839,6 +868,7 @@ switch ($action) {
                 : $objExercise->categoryWithQuestionList[$currentCategoryId]['category'];
 
             Session::write('adaptive_quiz_level', $categoryInfo['name']);
+            Session::erase('adaptive_pretest_step');
 
             echo "exercise_result.php?$params";
             break;

@@ -188,7 +188,12 @@ if (isset($exercise_stat_info['exe_id'])) {
     }
 } else {
     if ($exerciseIsAdaptive && $categoryIdToStart) {
-        $questionIdToStart = $objExercise->getFirstQuestionInCategory($categoryIdToStart);
+        if ($objExercise->isInPreTest()) {
+            $questionIdToStart = $objExercise->getSomeQuestionInCategory($categoryIdToStart);
+        } else {
+            $questionIdToStart = $objExercise->getFirstQuestionInCategory($categoryIdToStart);
+        }
+
         $questionNumToStart = array_search($questionIdToStart, $questionListInAttempt);
 
         $timeControlKey = ExerciseLib::get_time_control_key($objExercise->id, $learnpath_id, $learnpath_item_id);

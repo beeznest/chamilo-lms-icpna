@@ -3301,15 +3301,17 @@ class MigrationCustom
      */
     static function processTransactions($params, $web_service_details, $check_duplicates_in_db = false)
     {
+        error_log('WS: Query last '.$params['cantidad'].' tx from tx '.$params['ultimo'].' in branch '.$params['intIdSede']);
         $transactions = Migration::soap_call($web_service_details, 'transacciones', $params);
+        error_log('WS:   WS called, answer received');
         $transaction_status_list = self::getTransactionStatusList();
         $counter = 0;
 
         if (isset($transactions) && isset($transactions['error']) && $transactions['error'] == true) {
-            error_log($transactions['message']);
+            error_log('WS:   '.$transactions['message']);
         } else {
             $counter = count($transactions);
-            error_log("Processing ".$counter." transaction(s)");
+            error_log("WS:   Processing $counter transaction(s)");
             // YYYY Uncomment following line to get a detailed list of transactions read
             //error_log("Transactions: \n".print_r($transactions,1));
             $count = 1;
@@ -3334,6 +3336,7 @@ class MigrationCustom
                     }
                 }
             }
+	    error_log("WS:   Done processing $counter transaction(s) for branch ".$params['intIdSede']);
         }
         return $counter;
     }
@@ -4235,31 +4238,36 @@ class MigrationCustom
             return false;
         }
 
-        $userId = Database::insert($t_user, [
-            'username' => $loginName,
-            'username_canonical' => mb_convert_case($loginName, MB_CASE_LOWER),
-            'email' => $email,
-            'email_canonical' => mb_convert_case($email, MB_CASE_LOWER),
-            'lastname' => $lastName,
-            'firstname' => $firstName,
-            'password' => $password,
-            'auth_source' => PLATFORM_AUTH_SOURCE,
-            'status' => $status,
-            'official_code' => '',
-            'phone' => '',
-            'address' => '',
-            'picture_uri' => '',
-            'creator_id' => $creator_id,
-            'language' => $language,
-            'registration_date' => $now,
-            'hr_dept_id' => 0,
-            'active' => 1,
-            'enabled' => 1,
-            'salt' => sha1(uniqid(null, true)),
-            'roles' => 'a:0:{}',
-            'created_at' => $now,
-            'updated_at' => $now
-        ]);
+        try {
+            $userId = Database::insert($t_user, [
+                'username' => $loginName,
+                'username_canonical' => mb_convert_case($loginName, MB_CASE_LOWER),
+                'email' => $email,
+                'email_canonical' => mb_convert_case($email, MB_CASE_LOWER),
+                'lastname' => $lastName,
+                'firstname' => $firstName,
+                'password' => $password,
+                'auth_source' => PLATFORM_AUTH_SOURCE,
+                'status' => $status,
+                'official_code' => '',
+                'phone' => '',
+                'address' => '',
+                'picture_uri' => '',
+                'creator_id' => $creator_id,
+                'language' => $language,
+                'registration_date' => $now,
+                'hr_dept_id' => 0,
+                'active' => 1,
+                'enabled' => 1,
+                'salt' => sha1(uniqid(null, true)),
+                'roles' => 'a:0:{}',
+                'created_at' => $now,
+                'updated_at' => $now
+            ]);
+        } catch (Exception $e) {
+            error_log('El usuario '.$username.' no pudo ser insertado - quizás ya exista ('.$e->getMessage().')');
+            return false;
+        }
 
         if (!empty($userId)) {
 

@@ -8,7 +8,14 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * CQuizCategory.
  *
- * @ORM\Table(name="c_quiz_rel_category")
+ * Add @ to the ORM\Index line if $_configuration['quiz_allow_time_control_per_category'] is true.
+ *
+ * @ORM\Table(
+ *     name="c_quiz_rel_category",
+ *     indexes={
+ *          ORM\Index(name="idx_course_category_exercise", columns={"c_id", "category_id", "exercise_id"})
+ *     }
+ * )
  * @ORM\Entity
  */
 class CQuizCategory
@@ -49,6 +56,30 @@ class CQuizCategory
      * @ORM\Column(name="count_questions", type="integer", nullable=true)
      */
     protected $countQuestions;
+
+    /**
+     * @var string
+     *
+     * Add @ to the next line if api_get_configuration_value('quiz_question_category_destinations') is true
+     * ORM\Column(name="destinations", type="text", nullable=true)
+     */
+    protected $destinations;
+
+    /**
+     * @var int
+     *
+     * Add @ to the next line if $_configuration['quiz_allow_time_control_per_category'] is true
+     * ORM\Column(name="expired_time", type="integer", nullable=false, options={"default": 0})
+     */
+    protected $expiredTime = 0;
+
+    /**
+     * CQuizCategory constructor.
+     */
+    public function __construct()
+    {
+        $this->expiredTime = 0;
+    }
 
     /**
      * @return int
@@ -148,5 +179,49 @@ class CQuizCategory
         $this->countQuestions = $countQuestions;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDestinations()
+    {
+        return $this->destinations;
+    }
+
+    /**
+     * @param string $destinations
+     */
+    public function setDestinations($destinations)
+    {
+        $this->destinations = $destinations;
+    }
+
+    /**
+     * @return int
+     */
+    public function getExpiredTime()
+    {
+        return $this->expiredTime;
+    }
+
+    /**
+     * @param int $expiredTime
+     *
+     * @return CQuizCategory
+     */
+    public function setExpiredTime($expiredTime)
+    {
+        $this->expiredTime = $expiredTime;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isForPreTest()
+    {
+        return strpos($this->destinations, '##') > 0;
     }
 }

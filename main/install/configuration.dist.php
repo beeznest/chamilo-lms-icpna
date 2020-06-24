@@ -624,7 +624,7 @@ $_configuration['quiz_adaptive_show_extrafields'] = [
 */
 // Allow a pre-test for adaptive/progressive test
 // INSERT INTO extra_field (extra_field_type, field_type, variable, display_text, default_value, field_order, visible_to_self, visible_to_others, changeable, filter, created_at) VALUES ('17', '15', 'adaptive_pretest_question_limit', 'Question limit for adaptive pre-test', NULL, NULL, '1', '0', '1', NULL, now());
-$_configuration['quiz_adaptive_pretest'] = false;
+// $_configuration['quiz_adaptive_pretest'] = false;
 // Allow set time control for each category when ONE_CATEGORY_PER_PAGE mode is enabled in the quiz.
 // 1. Add "@" in the ORM phpdoc block for CQuizCategory::$expiredTime property.
 // 2. Add "@" in the ORM phpdoc block for TrackEExercises::$categoryToStart property

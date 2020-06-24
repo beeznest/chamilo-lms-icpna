@@ -1636,7 +1636,7 @@ if (!empty($error)) {
                 continue;
             }
 
-            if ($objExercise->isInPreTest() && $currentQuestion != $i) {
+            if ($objExercise->isCurrentStepInPreTestAMiddleStep() && $currentQuestion != $i) {
                 $i++;
                 continue;
             }

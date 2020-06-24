@@ -9204,24 +9204,20 @@ class Exercise
      */
     private function findDestinationForCategoryPreTest(array $destination, $scoreInCategory)
     {
-        $middleStepIncorrect = $destination[0][0];
-        $middleStepCorrect = $destination[0][1];
-        $finalStepIncorrect = $destination[1][0];
-        $finalStepCorrect = $destination[1][1];
-
-        if ($this->isInPreTest()) {
-            if ($scoreInCategory == 100) {
-                return $middleStepCorrect;
-            }
-
-            return $middleStepIncorrect;
+        if (!$this->isInPreTest()) {
+            return 0;
         }
 
-        if ($scoreInCategory == 100) {
-            return $finalStepCorrect;
+        $middleStepIncorrect = (int) $destination[0][0];
+        $middleStepCorrect = (int) $destination[0][1];
+        $finalStepIncorrect = (int) $destination[1][0];
+        $finalStepCorrect = (int) $destination[1][1];
+
+        if ($this->isFinalStepInPreTest()) {
+            return $scoreInCategory == 100 ? $finalStepCorrect : $finalStepIncorrect;
         }
 
-        return $finalStepIncorrect;
+        return $scoreInCategory == 100 ? $middleStepCorrect : $middleStepIncorrect;
     }
 
     /**
@@ -9235,7 +9231,18 @@ class Exercise
             'adaptive_pretest_question_limit'
         );
 
-        return empty($value) ? 0 : $value['value'];
+        return empty($value) ? 0 : (int) $value['value'];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFinalStepInPreTest()
+    {
+        $currentStep = (int) Session::read('adaptive_pretest_step');
+        $maxSteps = $this->getMaxStepsForAdaptive();
+
+        return $currentStep == $maxSteps;
     }
 
     /**
@@ -9243,7 +9250,18 @@ class Exercise
      */
     public function isInPreTest()
     {
-        $currentStep = Session::read('adaptive_pretest_step');
+        $currentStep = (int) Session::read('adaptive_pretest_step');
+        $maxSteps = $this->getMaxStepsForAdaptive();
+
+        return $currentStep <= $maxSteps;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCurrentStepInPreTestAMiddleStep()
+    {
+        $currentStep = (int) Session::read('adaptive_pretest_step');
         $maxSteps = $this->getMaxStepsForAdaptive();
 
         return $currentStep < $maxSteps;

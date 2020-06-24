@@ -829,7 +829,7 @@ switch ($action) {
             if (!in_array($destinationCategory, $categoryList) ||
                 (in_array($destinationCategory, $categoryList) && $objExercise->isInPreTest())
             ) {
-                if ($objExercise->isInPreTest()) {
+                if ($objExercise->isInPreTest() && !$objExercise->isFinalStepInPreTest()) {
                     $destinationQuestionId = $objExercise->getQuestionNotAnsweredInQuizByCategory(
                         $exeId,
                         $destinationCategory

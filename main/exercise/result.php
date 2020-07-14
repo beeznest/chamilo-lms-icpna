@@ -67,12 +67,10 @@ if ($show_headers) {
     ];
     $interbreadcrumb[] = ['url' => '#', 'name' => get_lang('Result')];
     $this_section = SECTION_COURSES;
-    Display::display_header();
 } else {
     $htmlHeadXtra[] = '<style>
         body { background: none;}
     </style>';
-    Display::display_reduced_header();
 }
 
 $message = Session::read('attempt_remaining');
@@ -86,7 +84,9 @@ if ($isAdaptive) {
         ->findOneBy(['user' => $studentId, 'exe' => $id]);
 
     if (empty($destinationResult)) {
-        echo Display::return_message(get_lang('NoData'), 'warning');
+        Display::addFlash(
+            Display::return_message(get_lang('NoData'), 'warning')
+        );
     }
 
     $studentInfo = api_get_user_info($studentId);
@@ -94,12 +94,12 @@ if ($isAdaptive) {
     $qrUrl = api_get_path(WEB_CODE_PATH).'exercise/progressive_adaptive_results.php?'
         .http_build_query(['hash' => $destinationResult->getHash(), 'origin' => $origin]);
 
-    echo $objExercise->showExerciseResultHeader(
+    $pageContent = $objExercise->showExerciseResultHeader(
         api_get_user_info($studentId),
         $trackExerciseInfo
     );
-    echo PHP_EOL;
-    echo '
+    $pageContent .= PHP_EOL;
+    $pageContent .= '
         <div class="row">
             <div class="col-md-4 text-right">
                 '.Display::img($quizzesDir['web'].$destinationResult->getHash().'.png').'
@@ -113,16 +113,21 @@ if ($isAdaptive) {
         </div>
     ';
 } else {
+    ob_start();
     ExerciseLib::displayQuestionListByAttempt(
         $objExercise,
         $id,
         false,
         $message
     );
+    $pageContent = ob_get_contents();
+    ob_end_clean();
 }
 
-if ($show_headers) {
-    Display::display_footer();
-} else {
-    Display::display_reduced_footer();
-}
+$template = new Template('', $show_headers, $show_headers);
+$template->assign('page_content', $pageContent);
+$layout = $template->fetch(
+    $template->get_template('exercise/result.tpl')
+);
+$template->assign('content', $layout);
+$template->display_one_col_template();

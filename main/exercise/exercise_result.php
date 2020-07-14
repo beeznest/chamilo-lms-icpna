@@ -261,7 +261,11 @@ if ($isAdaptive) {
     Session::erase('track_e_adaptive');
 }
 
-//Unset session for clock time
+$hookQuizEnd = HookQuizEnd::create();
+$hookQuizEnd->setEventData(['exe_id' => $exe_id]);
+$hookQuizEnd->notifyQuizEnd();
+
+// Unset session for clock time
 ExerciseLib::exercise_time_control_delete(
     $objExercise->id,
     $learnpath_id,
@@ -326,7 +330,7 @@ function showEmbeddableFinishButton()
 {
     echo '<script>
         $(function () {
-            $(\'.btn-close-quiz\').on(\'click\', function () {    
+            $(\'.btn-close-quiz\').on(\'click\', function () {
                 window.parent.$(\'video:not(.skip), audio:not(.skip)\').get(0).play();
             });
         });

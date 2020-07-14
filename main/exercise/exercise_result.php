@@ -79,6 +79,9 @@ if (api_get_configuration_value('quiz_prevent_copy_paste')) {
 
 $showHeader = false;
 $showFooter = false;
+$pageActions = '';
+$pageTop = '';
+$pageBottom = '';
 $pageContent = '';
 
 if (!in_array($origin, ['learnpath', 'embeddable'])) {
@@ -88,14 +91,13 @@ if (!in_array($origin, ['learnpath', 'embeddable'])) {
 
 // I'm in a preview mode as course admin. Display the action menu.
 if (api_is_course_admin() && !in_array($origin, ['learnpath', 'embeddable'])) {
-    $pageContent .= Display::toolbarAction(
+    $pageActions = Display::toolbarAction(
         'exercise_result_actions',
         [
             Display::url(
                 Display::return_icon('back.png', get_lang('GoBackToQuestionList'), [], 32),
                 'admin.php?'.api_get_cidreq().'&exerciseId='.$objExercise->id
             )
-            .PHP_EOL
             .Display::url(
                 Display::return_icon('edit.png', get_lang('ModifyExercise'), [], 32),
                 'exercise_admin.php?'.api_get_cidreq().'&modifyExercise=yes&exerciseId='.$objExercise->id
@@ -126,7 +128,7 @@ $logInfo = [
 Event::registerLog($logInfo);
 
 if ($origin === 'learnpath') {
-    $pageContent .= '
+    $pageTop .= '
         <form method="GET" action="exercise.php?'.api_get_cidreq().'">
             <input type="hidden" name="origin" value='.$origin.'/>
             <input type="hidden" name="learnpath_id" value="'.$learnpath_id.'"/>
@@ -166,17 +168,20 @@ if ($objExercise->selectAttempts() > 0) {
         $learnpath_item_view_id
     );
     if ($attempt_count >= $objExercise->selectAttempts()) {
-        $pageContent .= Display::return_message(
-            sprintf(get_lang('ReachedMaxAttempts'), $objExercise->selectTitle(), $objExercise->selectAttempts()),
-            'warning',
-            false
+        Display::addFlash(
+            Display::return_message(
+                sprintf(get_lang('ReachedMaxAttempts'), $objExercise->selectTitle(), $objExercise->selectAttempts()),
+                'warning',
+                false
+            )
         );
+
         if (!in_array($origin, ['learnpath', 'embeddable'])) {
             $showFooter = true;
         }
 
         $template = new Template($nameTools, $showHeader, $showFooter);
-        $template->assign('content', $pageContent);
+        $template->assign('actions', $pageActions);
         $template->display_one_col_template();
         exit;
     } else {
@@ -200,9 +205,11 @@ if (!empty($exercise_stat_info)) {
 $max_score = $objExercise->get_max_score();
 
 if ($origin !== 'embeddable' && !$isAdaptive) {
-    $pageContent .= Display::return_message(get_lang('Saved').'<br />', 'normal', false);
+    Display::addFlash(
+        Display::return_message(get_lang('Saved'), 'normal', false)
+    );
 } else {
-    $pageContent .= showEmbeddableFinishButton();
+    $pageTop .= showEmbeddableFinishButton();
 }
 
 if ($origin == 'embeddable') {
@@ -297,13 +304,13 @@ ExerciseLib::exercise_time_control_delete(
 ExerciseLib::delete_chat_exercise_session($exe_id);
 
 if (!in_array($origin, ['learnpath', 'embeddable'])) {
-    $pageContent .= '<div class="question-return">';
-    $pageContent .= Display::url(
+    $pageBottom .= '<div class="question-return">';
+    $pageBottom .= Display::url(
         get_lang('ReturnToCourseHomepage'),
         api_get_course_url(),
         ['class' => 'btn btn-primary']
     );
-    $pageContent .= '</div>';
+    $pageBottom .= '</div>';
 
     if (api_is_allowed_to_session_edit()) {
         Session::erase('objExercise');
@@ -342,14 +349,21 @@ if (!in_array($origin, ['learnpath', 'embeddable'])) {
     Session::write('attempt_remaining', $remainingMessage);
 
     // Record the results in the learning path, using the SCORM interface (API)
-    $pageContent .= "<script>window.parent.API.void_save_asset('$total_score', '$max_score', 0, 'completed');</script>";
-    $pageContent .= '<script type="text/javascript">'.$href.'</script>';
+    $pageBottom .= "<script>window.parent.API.void_save_asset('$total_score', '$max_score', 0, 'completed');</script>";
+    $pageBottom .= '<script type="text/javascript">'.$href.'</script>';
 
     $showFooter = false;
 }
 
 $template = new Template($nameTools, $showHeader, $showFooter);
-$template->assign('content', $pageContent);
+$template->assign('page_top', $pageTop);
+$template->assign('page_content', $pageContent);
+$template->assign('page_bottom', $pageBottom);
+$layout = $template->fetch(
+    $template->get_template('exercise/result.tpl')
+);
+$template->assign('actions', $pageActions);
+$template->assign('content', $layout);
 $template->display_one_col_template();
 
 function showEmbeddableFinishButton()

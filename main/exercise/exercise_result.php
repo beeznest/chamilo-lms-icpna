@@ -227,6 +227,8 @@ ExerciseLib::displayQuestionListByAttempt(
 $pageContent .= ob_get_contents();
 ob_end_clean();
 
+$adaptiveResultData = [];
+
 if ($isAdaptive) {
     $em = Database::getManager();
 
@@ -265,23 +267,16 @@ if ($isAdaptive) {
         );
         $qrContent = implode("\n\r", $content);
         $qrSystemPath = $quizzesDir['system'].$qrFileName;
-        $qrWebPath = $quizzesDir['web'].$qrFileName;
 
         PHPQRCode\QRcode::png($qrContent, $qrSystemPath, 'H', 2, 2);
 
-        echo '
-            <div class="row">
-                <div class="col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3">
-                    '.Display::img($qrWebPath, '', ['class' => 'pull-right']).'
-                    <p class="lead">'.sprintf(get_lang('LevelReachedX'), $destinationResult->getAchievedLevel()).'</p>
-                    <p>'.$user->getCompleteNameWithUsername().'</p>
-                    <p>'.sprintf(get_lang('ResultHashX'), $destinationResult->getHash()).'</p>
-                    <p>'.Display::url(get_lang('SeeResults'), $qrUrl, ['target' => '_blank']).'</p>
-                    <hr>
-                    '.Display::return_message(get_lang('TheQuizResultsWereSentToYourEmail'), 'info').'
-                </div>
-            </div>
-        ';
+        $adaptiveResultData = [
+            'quiz_dir_web' => $quizzesDir['web'],
+            'destination_result' => $destinationResult,
+            'user_complete_name' => $user->getCompleteNameWithUsername(),
+            'origin' => $origin,
+            'mail_sent' => true,
+        ];
 
         ExerciseLib::sendEmailNotificationForAdaptiveResult($destinationResult);
     }
@@ -358,6 +353,7 @@ if (!in_array($origin, ['learnpath', 'embeddable'])) {
 $template = new Template($nameTools, $showHeader, $showFooter);
 $template->assign('page_top', $pageTop);
 $template->assign('page_content', $pageContent);
+$template->assign('adaptive_result', $adaptiveResultData);
 $template->assign('page_bottom', $pageBottom);
 $layout = $template->fetch(
     $template->get_template('exercise/result.tpl')

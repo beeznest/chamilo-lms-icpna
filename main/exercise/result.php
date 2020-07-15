@@ -76,6 +76,8 @@ if ($show_headers) {
 $message = Session::read('attempt_remaining');
 Session::erase('attempt_remaining');
 
+$adaptiveResultData = [];
+
 if ($isAdaptive) {
     $em = Database::getManager();
 
@@ -98,20 +100,13 @@ if ($isAdaptive) {
         api_get_user_info($studentId),
         $trackExerciseInfo
     );
-    $pageContent .= PHP_EOL;
-    $pageContent .= '
-        <div class="row">
-            <div class="col-md-4 text-right">
-                '.Display::img($quizzesDir['web'].$destinationResult->getHash().'.png').'
-            </div>
-            <div class="col-md-8 text-left">
-                <p class="lead">'.sprintf(get_lang('LevelReachedX'), $destinationResult->getAchievedLevel()).'</p>
-                <p>'.$studentInfo['complete_name_with_username'].'</p>
-                <p>'.sprintf(get_lang('ResultHashX'), $destinationResult->getHash()).'</p>
-                <p>'.Display::url(get_lang('SeeResults'), $qrUrl, ['target' => '_blank']).'</p>
-            </div>
-        </div>
-    ';
+
+    $adaptiveResultData = [
+        'quiz_dir_web' => $quizzesDir['web'],
+        'destination_result' => $destinationResult,
+        'user_complete_name' => $studentInfo['complete_name_with_username'],
+        'origin' => $origin,
+    ];
 } else {
     ob_start();
     ExerciseLib::displayQuestionListByAttempt(
@@ -126,6 +121,7 @@ if ($isAdaptive) {
 
 $template = new Template('', $show_headers, $show_headers);
 $template->assign('page_content', $pageContent);
+$template->assign('adaptive_result', $adaptiveResultData);
 $layout = $template->fetch(
     $template->get_template('exercise/result.tpl')
 );

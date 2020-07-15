@@ -208,12 +208,8 @@ if ($origin !== 'embeddable' && !$isAdaptive) {
     Display::addFlash(
         Display::return_message(get_lang('Saved'), 'normal', false)
     );
-} else {
+} elseif ($origin == 'embeddable') {
     $pageTop .= showEmbeddableFinishButton();
-}
-
-if ($origin == 'embeddable') {
-    showEmbeddableFinishButton();
 }
 
 ob_start();

@@ -1715,7 +1715,7 @@ class MigrationCustom
         $session_id = self::getSessionIDByProgramID($uidIdPrograma, $data_list);
         if (!empty($session_id)) {
             $session_info_before = api_get_session_info($session_id);
-            SessionManager::delete($session_id);
+            SessionManager::delete($session_id, true);
             $session_info = api_get_session_info($session_id);
             $data_list['sessions'][$data['item_id']] = null;
             return array(

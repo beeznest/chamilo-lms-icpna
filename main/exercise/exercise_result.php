@@ -272,6 +272,10 @@ if ($isAdaptive) {
             'user_complete_name' => $user->getCompleteNameWithUsername(),
             'origin' => $origin,
             'mail_sent' => true,
+            'enrollment_page' => api_get_plugin_setting(
+                'icpna_plex_config',
+                IcpnaPlexConfigPlugin::SETTING_ENROLLMENT_PAGE
+            ),
         ];
 
         ExerciseLib::sendEmailNotificationForAdaptiveResult($destinationResult);

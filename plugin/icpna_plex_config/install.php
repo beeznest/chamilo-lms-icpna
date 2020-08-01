@@ -1,7 +1,7 @@
 <?php
 /* For licensing terms, see /license.txt */
 
-if (!api_is_platform_admin()) {
+if (api_is_platform_admin()) {
     $extraField = new ExtraField('course');
     $params = [
         'variable' => IcpnaPlexConfigPlugin::FIELD_COURSE_CATEGORY,

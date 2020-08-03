@@ -145,8 +145,8 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
 
         $json = json_decode($responseBody, true);
 
-        if ('sucess' !== strtolower($json['response'])) {
-            throw new Exception($json['message']);
+        if ('success' !== strtolower($json['response'])) {
+            throw new Exception($json['description']);
         }
 
         return $json;

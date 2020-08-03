@@ -128,7 +128,7 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
                             'Authorization' => "$token",
                         ],
                         'json' => [
-                            'colAl' => $user->getUsername(),
+                            'codAl' => $user->getUsername(),
                             'curso' => $destinationResult->getAchievedLevel(),
                             'score' => $levelScore,
                         ],

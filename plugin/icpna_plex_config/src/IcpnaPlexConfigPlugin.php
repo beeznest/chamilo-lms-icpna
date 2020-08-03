@@ -11,7 +11,6 @@ class IcpnaPlexConfigPlugin extends Plugin
     const SETTING_ERROR_EMAIL = 'error_email';
     const SETTING_WS_URL = 'ws_url';
     const SETTING_ENROLLMENT_PAGE = 'enrollment_page';
-    const FIELD_COURSE_CATEGORY = 'plugin_icpna_plex_config_category_id';
 
     /**
      * IcpnaPlexConfigPlugin constructor.

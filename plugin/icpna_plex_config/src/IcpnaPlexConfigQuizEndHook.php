@@ -125,7 +125,7 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
                     self::$plugin->get(IcpnaPlexConfigPlugin::SETTING_WS_URL),
                     [
                         'headers' => [
-                            'Authorization' => "Token $token",
+                            'Authorization' => "$token",
                         ],
                         'json' => [
                             'colAl' => $user->getUsername(),

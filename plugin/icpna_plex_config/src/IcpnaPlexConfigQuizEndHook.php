@@ -2,6 +2,7 @@
 /* For licensing terms, see /license.txt */
 
 use Chamilo\CourseBundle\Entity\CQuizDestinationResult;
+use Chamilo\CourseBundle\Entity\CQuizQuestionCategory;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
@@ -65,7 +66,7 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
             $responseJson = $this->getWsResponse($destinationResult);
         } catch (Exception $e) {
             Display::addFlash(
-                Display::return_message($e->getMessage(), 'error')
+                Display::return_message(self::$plugin->get_lang('WsResponseError'), 'warning')
             );
 
             $this->sendErrorEmail($e->getMessage(), $destinationResult);
@@ -81,7 +82,7 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
     /**
      * @param CQuizDestinationResult $destinationResult
      *
-     * @return \Chamilo\CourseBundle\Entity\CQuizQuestionCategory
+     * @return CQuizQuestionCategory
      */
     private function getQuestionCategoryByDestination(CQuizDestinationResult $destinationResult)
     {
@@ -98,7 +99,7 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
     /**
      * @param CQuizDestinationResult $destinationResult
      *
-     * @return void
+     * @return array
      *
      * @throws Exception
      */
@@ -161,23 +162,22 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
         $student = $destinationResult->getUser();
         $exercise = $destinationResult->getExe();
 
-        $mailMessage = ''.PHP_EOL;
-        $mailMessage .= Display::div(
-            $exceptionMessage,
-            ['style' => 'border: 1px solid red; padding: 10px;']
-        );
-        $mailMessage .= '<hr>'.PHP_EOL
+        $mailMessage = '<hr>'.PHP_EOL
             .'<strong>Información del examen:</strong>'.PHP_EOL
             .'<ul>'
-            .'<li>Fecha y hora del examen tomado: '.api_convert_and_format_date($exercise->getExeDate()).'</li>'
-            .'<li>Estudiante (código): '.$student->getUsername().'</li>'
             .'<li>ID de examen tomado: '.$exercise->getExeId().'</li>'
-            .'</ul>';
+            .'<li>Estudiante (código): '.$student->getUsername().'</li>'
+            .'<li>Fecha y hora de inicio: '.api_convert_and_format_date($exercise->getStartDate()).'</li>'
+            .'<li>Fecha y hora de finalización: '.api_convert_and_format_date($exercise->getExeDate()).'</li>'
+            .'<li>Duración: '.api_time_to_hms($exercise->getExeDuration()).'</li>'
+            .'<li>Nivel alcanzado: '.$destinationResult->getAchievedLevel().'</li>'
+            .'<li>Error generado: <em>'.$exceptionMessage.'</em></li>'
+            .'</ul>'.PHP_EOL;
 
         api_mail_html(
             'Adaptive Plex Support',
             self::$plugin->get(IcpnaPlexConfigPlugin::SETTING_ERROR_EMAIL),
-            'Adaptive PLEX: Error en proceso de matrícula.',
+            'Adaptive PLEX: Error en proceso de examen.',
             $mailMessage
         );
     }

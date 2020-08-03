@@ -14,3 +14,5 @@ $strings['error_email_help'] = 'E-mail to send notification when an error occurs
 $strings['enrollment_page'] = 'Enrollment process page';
 
 $strings['FieldCourseCategory'] = 'PLEX: Question category related';
+
+$strings['WsResponseError'] = 'Your result has been saved but a problem occurred while processing your registration. An internal report has been generated for review.';

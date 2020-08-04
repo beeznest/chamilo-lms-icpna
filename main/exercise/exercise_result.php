@@ -229,6 +229,7 @@ if ($isAdaptive) {
     $em = Database::getManager();
 
     $achievedLevel = Session::read('adaptive_quiz_level');
+    $achievedLevelIsPreTest = 0 === strpos($achievedLevel, 'P - ');
 
     $user = api_get_user_entity($exercise_stat_info['exe_user_id']);
     $exe = $em->find('ChamiloCoreBundle:TrackEExercises', $exe_id);
@@ -242,9 +243,13 @@ if ($isAdaptive) {
     $em->persist($destinationResult);
     $em->flush();
 
-    $quizzesDir = ExerciseLib::checkQuizzesPath($user->getId());
+    if ($achievedLevelIsPreTest) {
+        Display::addFlash(
+            Display::return_message(get_lang('AdaptiveQuizResultIsPreTestCategory'), 'warning')
+        );
+    } else {
+        $quizzesDir = ExerciseLib::checkQuizzesPath($user->getId());
 
-    if (!empty($quizzesDir)) {
         $qrUrl = api_get_path(WEB_CODE_PATH).'exercise/progressive_adaptive_results.php?'
             .http_build_query(['hash' => $destinationResult->getHash(), 'origin' => $origin]);
         $qrFileName = $destinationResult->getHash().'.png';

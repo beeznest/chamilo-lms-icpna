@@ -62,6 +62,10 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
             return;
         }
 
+        if (0 === strpos($destinationResult->getAchievedLevel(), 'P - ')) {
+            return;
+        }
+
         try {
             $responseJson = $this->getWsResponse($destinationResult);
         } catch (Exception $e) {

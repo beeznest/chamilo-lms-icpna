@@ -70,7 +70,7 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
             $responseJson = $this->getWsResponse($destinationResult);
         } catch (Exception $e) {
             Display::addFlash(
-                Display::return_message(self::$plugin->get_lang('WsResponseError'), 'warning')
+                Display::return_message(self::$plugin->get_lang('WsResponseError'), 'warning', false)
             );
 
             $this->sendErrorEmail($e->getMessage(), $destinationResult);

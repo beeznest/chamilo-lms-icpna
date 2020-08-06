@@ -15,4 +15,4 @@ $strings['enrollment_page'] = 'Enrollment process page';
 
 $strings['FieldCourseCategory'] = 'PLEX: Question category related';
 
-$strings['WsResponseError'] = 'Your result has been saved but a problem occurred while processing your registration. An internal report has been generated for review.';
+$strings['WsResponseError'] = 'The exam has finished, however in order to enroll you must mail to <a href=\"mailto:plex.virtual@icpna.edu.pe\">PLEX.VIRTUAL@ICPNA.EDU.PE</a>.';

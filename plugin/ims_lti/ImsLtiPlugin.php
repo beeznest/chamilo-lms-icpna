@@ -346,12 +346,13 @@ class ImsLtiPlugin extends Plugin
     /**
      * Add the course tool.
      *
-     * @param Course $course
+     * @param Course     $course
      * @param ImsLtiTool $ltiTool
+     * @param bool       $isVisible
      *
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function addCourseTool(Course $course, ImsLtiTool $ltiTool)
+    public function addCourseTool(Course $course, ImsLtiTool $ltiTool, $isVisible = true)
     {
         $cTool = $this->createLinkToCourseTool(
             $ltiTool->getName(),
@@ -359,9 +360,11 @@ class ImsLtiPlugin extends Plugin
             null,
             self::generateToolLink($ltiTool)
         );
-        $cTool->setTarget(
-            $ltiTool->getDocumentTarget() === 'iframe' ? '_self' : '_blank'
-        );
+        $cTool
+            ->setTarget(
+                $ltiTool->getDocumentTarget() === 'iframe' ? '_self' : '_blank'
+            )
+            ->setVisibility($isVisible);
 
         $em = Database::getManager();
         $em->persist($cTool);

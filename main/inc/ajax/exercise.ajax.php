@@ -456,6 +456,13 @@ switch ($action) {
 
             // If exercise or question is not set then exit.
             if (empty($question_list) || empty($objExercise)) {
+                if ($exerciseIsProgressiveAdaptive) {
+                    Session::write(
+                        'adaptive_pretest_step',
+                        Session::read('adaptive_pretest_step') - 1
+                    );
+                }
+
                 echo 'error';
                 if ($debug) {
                     if (empty($question_list)) {

@@ -1014,11 +1014,7 @@ if ($time_control) { //Sends the exercise form when the expired time is finished
 }
 
 if (!in_array($origin, ['learnpath', 'embeddable'])) { //so we are not in learnpath tool
-    if (!api_is_allowed_to_session_edit()) {
-        Display::addFlash(
-            Display::return_message(get_lang('SessionIsReadOnly'), 'warning')
-        );
-    }
+    SessionManager::addFlashSessionReadOnly();
 
     Display::display_header(null, 'Exercises');
 } else {
@@ -1052,6 +1048,13 @@ if ($is_visible_return['value'] == false) {
     echo $is_visible_return['message'];
     if (!in_array($origin, ['learnpath', 'embeddable'])) {
         Display :: display_footer();
+    }
+    exit;
+}
+
+if (!api_is_allowed_to_session_edit()) {
+    if (!in_array($origin, ['learnpath', 'embeddable'])) {
+        Display::display_footer();
     }
     exit;
 }

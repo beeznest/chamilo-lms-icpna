@@ -9307,4 +9307,16 @@ SQL;
             return -1;
         }
     }
+
+    /**
+     * Add a warning message when session is read-only mode.
+     */
+    public static function addFlashSessionReadOnly()
+    {
+        if (api_get_session_id() && !api_is_allowed_to_session_edit()) {
+            Display::addFlash(
+                Display::return_message(get_lang('SessionIsReadOnly'), 'warning')
+            );
+        }
+    }
 }

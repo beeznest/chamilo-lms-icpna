@@ -245,7 +245,7 @@ if ($isAdaptive) {
 
     if ($achievedLevelIsPreTest) {
         Display::addFlash(
-            Display::return_message(get_lang('AdaptiveQuizResultIsPreTestCategory'), 'warning')
+            Display::return_message(get_lang('AdaptiveQuizResultIsPreTestCategory'), 'warning', false)
         );
     } else {
         $quizzesDir = ExerciseLib::checkQuizzesPath($user->getId());

@@ -306,7 +306,7 @@ if (!empty($attempts)) {
             $achievedLevelIsPreTest = 0 === strpos($destinationResult->getAchievedLevel(), 'P - ');
 
             if ($achievedLevelIsPreTest) {
-                $score = Display::return_message(get_lang('AdaptiveQuizResultIsPreTestCategory'), 'warning');
+                $score = Display::return_message(get_lang('AdaptiveQuizResultIsPreTestCategory'), 'warning', false);
             } else {
                 $score = '';
 

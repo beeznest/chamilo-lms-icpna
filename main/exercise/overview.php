@@ -303,10 +303,33 @@ if (!empty($attempts)) {
             $destinationResult = Database::getManager()
                 ->getRepository('ChamiloCourseBundle:CQuizDestinationResult')
                 ->findOneBy(['exe' => $attempt_result['exe_id'], 'user' => $attempt_result['exe_user_id']]);
+            $achievedLevelIsPreTest = 0 === strpos($destinationResult->getAchievedLevel(), 'P - ');
 
-            $score = !empty($destinationResult)
-                ? sprintf(get_lang('LevelReachedX'), $destinationResult->getAchievedLevel())
-                : '';
+            if ($achievedLevelIsPreTest) {
+                $score = Display::return_message(get_lang('AdaptiveQuizResultIsPreTestCategory'), 'warning');
+            } else {
+                $score = '';
+
+                if (!empty($destinationResult)) {
+                    $score = sprintf(get_lang('LevelReachedX'), $destinationResult->getAchievedLevel());
+
+                    $icpnaPlexConfigEnrollmentPage = api_get_plugin_setting(
+                        'icpna_plex_config',
+                        IcpnaPlexConfigPlugin::SETTING_ENROLLMENT_PAGE
+                    );
+
+                    if (!empty($icpnaPlexConfigEnrollmentPage)) {
+                        $score .= PHP_EOL
+                            .Display::toolbarButton(
+                                get_plugin_lang('GoToEnrollment', IcpnaPlexConfigPlugin::class),
+                                $icpnaPlexConfigEnrollmentPage,
+                                'check',
+                                'success',
+                                ['class' => 'btn-sm', 'target' => '_blank']
+                            );
+                    }
+                }
+            }
         } else {
             $score = ExerciseLib::show_score($attempt_result['exe_result'], $attempt_result['exe_weighting']);
         }

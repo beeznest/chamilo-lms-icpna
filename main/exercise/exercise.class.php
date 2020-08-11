@@ -9021,13 +9021,7 @@ class Exercise
     {
         $tblTrackEAttempt = Database::get_main_table(TABLE_STATISTIC_TRACK_E_ATTEMPT);
 
-        $loopCount = 0;
-
         do {
-            if ($loopCount >= count($this->getQuestionsInCategory($categoryId))) {
-                return 0;
-            }
-
             $questionId = $this->getSomeQuestionInCategory($categoryId);
 
             $count = Database::select(
@@ -9040,8 +9034,6 @@ class Exercise
                 ],
                 'first'
             );
-
-            ++$loopCount;
         } while ($count['number'] > 0);
 
         return $questionId;

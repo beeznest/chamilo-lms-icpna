@@ -1169,9 +1169,7 @@ if (!empty($exerciseList)) {
                                         ->getRepository('ChamiloCourseBundle:CQuizDestinationResult')
                                         ->findOneBy(['exe' => $rowTrack['exe_id'], 'user' => $rowTrack['exe_user_id']]);
 
-                                    $attemptText = !empty($destinationResult)
-                                        ? sprintf(get_lang('LevelReachedX'), $destinationResult->getAchievedLevel())
-                                        : '';
+                                    $attemptText = ExerciseLib::getAdaptiveResulMessage($destinationResult);
                                 } else {
                                     $attemptText = get_lang('LatestAttempt').' : ';
                                     $attemptText .= ExerciseLib::show_score(
@@ -1245,9 +1243,7 @@ if (!empty($exerciseList)) {
                                     ->getRepository('ChamiloCourseBundle:CQuizDestinationResult')
                                     ->findOneBy(['exe' => $rowTrack['exe_id'], 'user' => $rowTrack['exe_user_id']]);
 
-                                $attemptText = !empty($destinationResult)
-                                    ? sprintf(get_lang('LevelReachedX'), $destinationResult->getAchievedLevel())
-                                    : '';
+                                $attemptText = ExerciseLib::getAdaptiveResulMessage($destinationResult);
                             } else {
                                 $attemptText = get_lang('LatestAttempt').' : ';
                                 $attemptText .= ExerciseLib::show_score(

@@ -5629,4 +5629,42 @@ EOT;
             'web' => $webDirPath,
         ];
     }
+
+    /**
+     * @param CQuizDestinationResult|null $destinationResult
+     *
+     * @return string
+     */
+    public static function getAdaptiveResulMessage(CQuizDestinationResult $destinationResult = null)
+    {
+        if (empty($destinationResult)) {
+            return '';
+        }
+
+        $achievedLevelIsPreTest = 0 === strpos($destinationResult->getAchievedLevel(), 'P - ');
+
+        if ($achievedLevelIsPreTest) {
+            return Display::return_message(get_lang('AdaptiveQuizResultIsPreTestCategory'), 'warning', false);
+        }
+
+        $message = sprintf(get_lang('LevelReachedX'), '<strong>'.$destinationResult->getAchievedLevel().'</strong>');
+
+        $icpnaPlexConfigEnrollmentPage = api_get_plugin_setting(
+            'icpna_plex_config',
+            IcpnaPlexConfigPlugin::SETTING_ENROLLMENT_PAGE
+        );
+
+        if (!empty($icpnaPlexConfigEnrollmentPage)) {
+            $message .= PHP_EOL
+                .Display::toolbarButton(
+                    get_plugin_lang('GoToEnrollment', IcpnaPlexConfigPlugin::class),
+                    $icpnaPlexConfigEnrollmentPage,
+                    'check',
+                    'success',
+                    ['class' => 'btn-sm', 'target' => '_blank']
+                );
+        }
+
+        return $message;
+    }
 }

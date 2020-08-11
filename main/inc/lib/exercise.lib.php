@@ -4985,6 +4985,15 @@ EOT;
         $view->assign('session_info', $sessionExtra);
         $view->assign('qr', $quizzesDir['web'].$qrFilename);
 
+        $icpnaPlexConfigEnrollmentPage = api_get_plugin_setting(
+            'icpna_plex_config',
+            IcpnaPlexConfigPlugin::SETTING_ENROLLMENT_PAGE
+        );
+
+        if (!empty($icpnaPlexConfigEnrollmentPage)) {
+            $view->assign('enrollment_page', $icpnaPlexConfigEnrollmentPage);
+        }
+
         $layout = $view->get_template('mail/quiz_student_adaptive_result.tpl');
         $content = $view->fetch($layout);
 

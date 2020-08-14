@@ -229,6 +229,11 @@ if ($isAdaptive) {
     $em = Database::getManager();
 
     $achievedLevel = Session::read('adaptive_quiz_level');
+
+    if (api_get_plugin_setting('icpna_plex_config', IcpnaPlexConfigPlugin::SETTING_WS_URL)) {
+        $achievedLevel = IcpnaPlexConfigPlugin::fixAchievedLevelWhenIsAdvanced($achievedLevel, $exe_id);
+    }
+
     $achievedLevelIsPreTest = 0 === strpos($achievedLevel, 'P - ');
 
     $user = api_get_user_entity($exercise_stat_info['exe_user_id']);

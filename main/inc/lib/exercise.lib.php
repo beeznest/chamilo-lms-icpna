@@ -5667,4 +5667,33 @@ EOT;
 
         return $message;
     }
+
+    /**
+     * @param int $exeId
+     *
+     * @return array
+     */
+    public static function getAdaptieAnsweredCategoriesInAttempts($exeId)
+    {
+        $exeId = (int) $exeId;
+
+        $sql = "SELECT qc.id, qc.title
+            FROM track_e_attempt ta
+            INNER JOIN track_e_exercises te ON ta.exe_id = te.exe_id AND ta.c_id = te.c_id
+            INNER JOIN c_quiz_question qq ON ta.question_id = qq.iid AND ta.c_id = qq.c_id
+            INNER JOIN c_quiz_question_rel_category qrc ON qq.iid = qrc.question_id
+            INNER JOIN c_quiz_question_category qc ON qrc.category_id = qc.id
+            INNER JOIN c_quiz_answer qa ON qq.iid = qa.question_id AND ta.answer = qa.iid
+            WHERE te.exe_id = $exeId";
+
+        $result = Database::query($sql);
+
+        $categories = [];
+
+        while ($row = Database::fetch_assoc($result)) {
+            $categories[$row['id']] = $row['title'];
+        }
+
+        return $categories;
+    }
 }

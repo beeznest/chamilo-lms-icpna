@@ -462,11 +462,37 @@ if (empty($exercise_stat_info)) {
         }
     }
 
-    if ($isFirstTime && $exerciseIsProgressiveAdaptive && $objExercise->type == ONE_CATEGORY_PER_PAGE && api_get_configuration_value('quiz_allow_time_control_per_category')) {
-        $currentQuestion = array_search(
-            $objExercise->getFirstQuestionInCategory($exercise_stat_info['category_to_start']),
-            explode(',', $exercise_stat_info['data_tracking'])
-        );
+    if ($isFirstTime && $objExercise->type == ONE_CATEGORY_PER_PAGE
+        && $exerciseIsProgressiveAdaptive
+        && api_get_configuration_value('quiz_allow_time_control_per_category')
+    ) {
+        $resolvedQuestions = Event::getAllExerciseEventByExeId($exe_id);
+
+        if (empty($resolvedQuestions)) {
+            $currentQuestion = array_search(
+                $objExercise->getFirstQuestionInCategory($exercise_stat_info['category_to_start']),
+                explode(',', $exercise_stat_info['data_tracking'])
+            );
+        } else {
+            $answeredCategories = ExerciseLib::getAdaptieAnsweredCategoriesInAttempts($exe_id);
+
+            Session::write('track_e_adaptive', array_keys($answeredCategories));
+            Session::write('adaptive_pretest_step', count($answeredCategories) - 1);
+
+            $adaptiveQuestionsAnswered = [];
+
+            foreach ($resolvedQuestions as $resolvedQuestion) {
+                $adaptiveQuestionsAnswered["q_{$objExercise->iId}"][] = $resolvedQuestion[0]['question_id'];
+            }
+
+            Session::write('adaptive_questions_answered', $adaptiveQuestionsAnswered);
+
+            $last = current(end($resolvedQuestions));
+            $attemptQuestionList = explode(',', $exercise_stat_info['data_tracking']);
+            $currentQuestion = in_array($last['question_id'], $attemptQuestionList)
+                ? array_search($last['question_id'], $attemptQuestionList)
+                : 0;
+        }
     }
 
     if ($debug) {

@@ -5696,4 +5696,47 @@ EOT;
 
         return $categories;
     }
+
+    /**
+     * @param string $achievedLevel
+     * @param array  $exercise_stat_info
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     *
+     * @return CQuizDestinationResult
+     */
+    public static function adaptiveSaveResult($achievedLevel, array $exercise_stat_info)
+    {
+        $em = Database::getManager();
+
+        $destinationResult = $em
+            ->getRepository('ChamiloCourseBundle:CQuizDestinationResult')
+            ->findOneBy(
+                [
+                    'user' => $exercise_stat_info['exe_user_id'],
+                    'exe' => $exercise_stat_info['exe_id']
+                ]
+            );
+
+        if ($destinationResult) {
+            return $destinationResult;
+        }
+
+        $user = api_get_user_entity($exercise_stat_info['exe_user_id']);
+        $exe = $em->find('ChamiloCoreBundle:TrackEExercises', $exercise_stat_info['exe_id']);
+
+        $destinationResult = new CQuizDestinationResult();
+        $destinationResult
+            ->setAchievedLevel($achievedLevel)
+            ->setHash(md5($user->getId().uniqid()))
+            ->setUser($user)
+            ->setExe($exe);
+
+        $em->persist($destinationResult);
+        $em->flush();
+
+        return $destinationResult;
+    }
 }

@@ -236,24 +236,18 @@ if ($isAdaptive) {
 
     $achievedLevelIsPreTest = 0 === strpos($achievedLevel, 'P - ');
 
-    $user = api_get_user_entity($exercise_stat_info['exe_user_id']);
-    $exe = $em->find('ChamiloCoreBundle:TrackEExercises', $exe_id);
-    $destinationResult = new CQuizDestinationResult();
-    $destinationResult
-        ->setAchievedLevel($achievedLevel)
-        ->setHash(md5($user->getId().uniqid()))
-        ->setUser($user)
-        ->setExe($exe);
+    $destinationResult = ExerciseLib::adaptiveSaveResult($achievedLevel, $exercise_stat_info);
 
-    $em->persist($destinationResult);
-    $em->flush();
+    $user = $destinationResult->getUser();
 
     if ($achievedLevelIsPreTest) {
         Display::addFlash(
             Display::return_message(get_lang('AdaptiveQuizResultIsPreTestCategory'), 'warning', false)
         );
     } else {
-        $quizzesDir = ExerciseLib::checkQuizzesPath($user->getId());
+        $quizzesDir = ExerciseLib::checkQuizzesPath(
+            $exercise_stat_info['exe_user_id']
+        );
 
         $qrUrl = api_get_path(WEB_CODE_PATH).'exercise/progressive_adaptive_results.php?'
             .http_build_query(['hash' => $destinationResult->getHash(), 'origin' => $origin]);
@@ -262,7 +256,10 @@ if ($isAdaptive) {
         $content = [
             $user->getCompleteNameWithUsername(),
             sprintf(get_lang('LevelReachedX'), $destinationResult->getAchievedLevel()),
-            api_convert_and_format_date($exe->getStartDate(), DATE_TIME_FORMAT_SHORT),
+            api_convert_and_format_date(
+                $destinationResult->getExe()->getStartDate(),
+                DATE_TIME_FORMAT_SHORT
+            ),
             $qrUrl,
         ];
         $content = array_map(

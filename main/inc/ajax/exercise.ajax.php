@@ -398,6 +398,7 @@ switch ($action) {
 
             // Questions choices.
             $choice = isset($_REQUEST['choice']) ? $_REQUEST['choice'] : [];
+            $choice2 = isset($_REQUEST['choice2']) && is_array($_REQUEST['choice2']) ? $_REQUEST['choice2'] : [];
 
             // certainty degree choice
             $choiceDegreeCertainty = isset($_REQUEST['choiceDegreeCertainty'])
@@ -450,7 +451,7 @@ switch ($action) {
                 $question_list = $objExercise->getQuestionsInCategory($currentCategoryId);
 
                 if ($objExercise->isInPreTest()) {
-                    $question_list = array_keys($choice);
+                    $question_list = array_keys($choice2);
                 }
             }
 

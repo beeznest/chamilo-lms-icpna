@@ -6137,6 +6137,10 @@ class Exercise
             $data['title'] = $this->get_formated_title().get_lang('Result');
 	} else if (EXERCISE_FEEDBACK_TYPE_PROGRESSIVE_ADAPTIVE == $this->feedback_type) {
             $data['title'] = get_lang('QuizResult');
+
+            $data['end_date'] = api_convert_and_format_date($trackExerciseInfo['exe_date']);
+
+            unset($data['duration']);
         } else {
             $data['title'] = PHP_EOL.$this->exercise.' : '.get_lang('Result');
         }

@@ -4340,6 +4340,7 @@ class Exercise
                                         $questionScore += $i_answerWeighting;
                                         $totalScore += $i_answerWeighting;
                                         $user_answer = Display::label(get_lang('Correct'), 'success');
+
                                         if ($this->showExpectedChoice()) {
                                             $user_answer = $answerMatching[$i_answer_id_auto];
                                         }
@@ -4356,7 +4357,6 @@ class Exercise
                                         $questionScore += $i_answerWeighting;
                                         $totalScore += $i_answerWeighting;
                                         $status = Display::label(get_lang('Correct'), 'success');
-
                                         // Try with id
                                         if (isset($real_list[$i_answer_id])) {
                                             $user_answer = Display::span(
@@ -4417,6 +4417,12 @@ class Exercise
                                 switch ($answerType) {
                                     case MATCHING:
                                     case MATCHING_DRAGGABLE:
+                                        if (RESULT_DISABLE_SHOW_SCORE_ATTEMPT_SHOW_ANSWERS_LAST_ATTEMPT_NO_FEEDBACK == $this->results_disabled) {
+                                            if (empty($s_user_answer)) {
+                                                break;
+                                            }
+                                        }
+
                                         echo '<tr>';
                                         if ($this->results_disabled != RESULT_DISABLE_SHOW_ONLY_IN_CORRECT_ANSWER) {
                                             echo '<td>'.$s_answer_label.'</td>';
@@ -4459,6 +4465,12 @@ class Exercise
                                         if ($showTotalScoreAndUserChoicesInLastAttempt == false) {
                                             $s_answer_label = '';
                                         }
+                                        if (RESULT_DISABLE_SHOW_SCORE_ATTEMPT_SHOW_ANSWERS_LAST_ATTEMPT_NO_FEEDBACK == $this->results_disabled) {
+                                            if (empty($s_user_answer)) {
+                                                break;
+                                            }
+                                        }
+
                                         echo '<tr>';
                                         if ($this->showExpectedChoice()) {
                                             if ($this->results_disabled != RESULT_DISABLE_SHOW_ONLY_IN_CORRECT_ANSWER) {
@@ -4483,6 +4495,7 @@ class Exercise
                                                 }
                                             }
                                             echo '</td>';
+
                                         }
                                         echo '</tr>';
                                         break;
@@ -9756,7 +9769,7 @@ class Exercise
             'results_disabled',
             null,
             get_lang('ShowScoreAndRightAnswer'),
-            '0',
+            RESULT_DISABLE_SHOW_SCORE_AND_EXPECTED_ANSWERS,
             ['id' => 'result_disabled_0']
         );
 
@@ -9765,7 +9778,7 @@ class Exercise
             'results_disabled',
             null,
             get_lang('DoNotShowScoreNorRightAnswer'),
-            '1',
+            RESULT_DISABLE_NO_SCORE_AND_EXPECTED_ANSWERS,
             ['id' => 'result_disabled_1', 'onclick' => 'check_results_disabled()']
         );
 
@@ -9774,7 +9787,7 @@ class Exercise
             'results_disabled',
             null,
             get_lang('OnlyShowScore'),
-            '2',
+            RESULT_DISABLE_SHOW_SCORE_ONLY,
             ['id' => 'result_disabled_2', 'onclick' => 'check_results_disabled()']
         );
 
@@ -9793,7 +9806,7 @@ class Exercise
             'results_disabled',
             null,
             get_lang('ShowScoreEveryAttemptShowAnswersLastAttempt'),
-            '4',
+            RESULT_DISABLE_SHOW_SCORE_ATTEMPT_SHOW_ANSWERS_LAST_ATTEMPT,
             ['id' => 'result_disabled_4']
         );
 
@@ -9802,7 +9815,7 @@ class Exercise
             'results_disabled',
             null,
             get_lang('DontShowScoreOnlyWhenUserFinishesAllAttemptsButShowFeedbackEachAttempt'),
-            '5',
+            RESULT_DISABLE_DONT_SHOW_SCORE_ONLY_IF_USER_FINISHES_ATTEMPTS_SHOW_ALWAYS_FEEDBACK,
             ['id' => 'result_disabled_5', 'onclick' => 'check_results_disabled()']
         );
 
@@ -9824,7 +9837,34 @@ class Exercise
             ['id' => 'result_disabled_7']
         );
 
-        $group = $form->addGroup(
+        $resultDisabledGroup[] = $form->createElement(
+            'radio',
+            'results_disabled',
+            null,
+            get_lang('ExerciseAutoEvaluationAndRankingMode'),
+            RESULT_DISABLE_SHOW_SCORE_AND_EXPECTED_ANSWERS_AND_RANKING,
+            ['id' => 'result_disabled_8']
+        );
+
+        $resultDisabledGroup[] = $form->createElement(
+            'radio',
+            'results_disabled',
+            null,
+            get_lang('ExerciseCategoriesRadarMode'),
+            RESULT_DISABLE_RADAR,
+            ['id' => 'result_disabled_9']
+        );
+
+        $resultDisabledGroup[] = $form->createElement(
+            'radio',
+            'results_disabled',
+            null,
+            get_lang('ShowScoreEveryAttemptShowAnswersLastAttemptNoFeedback'),
+            RESULT_DISABLE_SHOW_SCORE_ATTEMPT_SHOW_ANSWERS_LAST_ATTEMPT_NO_FEEDBACK,
+            ['id' => 'result_disabled_10']
+        );
+
+        return $form->addGroup(
             $resultDisabledGroup,
             null,
             get_lang('ShowResultsToStudents')

@@ -2299,12 +2299,20 @@ class Category implements GradebookItem
     }
 
     /**
-     * @param int   $catId
-     * @param array $userList
+     * @param int         $catId
+     * @param array       $userList
+     * @param string|null $courseCode
+     * @param bool        $generateToFile
+     * @param string      $pdfName
+     *
+     * @throws \MpdfException
      */
     public static function exportAllCertificates(
         $catId,
-        $userList = []
+        $userList = [],
+        $courseCode = null,
+        $generateToFile = false,
+        $pdfName = ''
     ) {
         $orientation = api_get_configuration_value('certificate_pdf_orientation');
 
@@ -2344,10 +2352,13 @@ class Category implements GradebookItem
             //  stuff) and return as one multiple-pages PDF
             $pdf->html_to_pdf(
                 $certificate_path_list,
-                get_lang('Certificates'),
-                null,
+                empty($pdfName) ? get_lang('Certificates') : $pdfName,
+                $courseCode,
                 false,
-                false
+                false,
+                true,
+                '',
+                $generateToFile
             );
         }
     }

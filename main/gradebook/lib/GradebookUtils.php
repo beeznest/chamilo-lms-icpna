@@ -779,12 +779,12 @@ class GradebookUtils
         $cat_id = null
     ) {
         $table_certificate = Database::get_main_table(TABLE_MAIN_GRADEBOOK_CERTIFICATE);
-        $sql = 'SELECT 
-                    gc.score_certificate, 
-                    gc.created_at, 
-                    gc.path_certificate, 
-                    gc.cat_id, 
-                    gc.user_id, 
+        $sql = 'SELECT
+                    gc.score_certificate,
+                    gc.created_at,
+                    gc.path_certificate,
+                    gc.cat_id,
+                    gc.user_id,
                     gc.id
                 FROM  '.$table_certificate.' gc
                 WHERE gc.user_id="'.intval($user_id).'" ';
@@ -836,9 +836,9 @@ class GradebookUtils
 
         //add print header
         if (!$hide_print_button) {
-            $print = '<style>#print_div {               
+            $print = '<style>#print_div {
                 padding:4px;border: 0 none;position: absolute;top: 0px;right: 0px;
-            }            
+            }
             @media print {
                 #print_div  {
                     display: none !important;
@@ -881,7 +881,7 @@ class GradebookUtils
             $session_id = api_get_session_id();
 
             $t = Database::get_main_table(TABLE_MAIN_GRADEBOOK_CATEGORY);
-            $sql = "SELECT * FROM $t 
+            $sql = "SELECT * FROM $t
                     WHERE course_code = '".Database::escape_string($course_code)."' ";
             if (!empty($session_id)) {
                 $sql .= " AND session_id = ".(int) $session_id;
@@ -1158,10 +1158,10 @@ class GradebookUtils
 
         if (!empty($current_session)) {
             $sql = "SELECT user.user_id, user.username, lastname, firstname, official_code
-                    FROM $tbl_session_course_user as scru 
+                    FROM $tbl_session_course_user as scru
                     INNER JOIN $tbl_user as user
                     ON (scru.user_id = user.user_id)
-                    WHERE                        
+                    WHERE
                         scru.status = 0 AND
                         scru.c_id='$courseId' AND
                         session_id ='$current_session'
@@ -1169,7 +1169,7 @@ class GradebookUtils
                     ";
         } else {
             $sql = 'SELECT user.user_id, user.username, lastname, firstname, official_code
-                    FROM '.$tbl_course_user.' as course_rel_user 
+                    FROM '.$tbl_course_user.' as course_rel_user
                     INNER JOIN '.$tbl_user.' as user
                     ON (course_rel_user.user_id=user.user_id)
                     WHERE
@@ -1330,7 +1330,7 @@ class GradebookUtils
         $tbl_forum_thread = Database::get_course_table(TABLE_FORUM_THREAD);
         $tbl_attendance = Database::get_course_table(TABLE_ATTENDANCE);
 
-        $sql = 'UPDATE '.$table_link.' 
+        $sql = 'UPDATE '.$table_link.'
                 SET weight = '."'".Database::escape_string($weight)."'".'
                 WHERE id = '.$linkId;
 
@@ -1343,13 +1343,13 @@ class GradebookUtils
         $rs_attendance = Database::query($sql);
         if (Database::num_rows($rs_attendance) > 0) {
             $row_attendance = Database::fetch_array($rs_attendance);
-            $sql = 'UPDATE '.$tbl_attendance.' SET 
+            $sql = 'UPDATE '.$tbl_attendance.' SET
                     attendance_weight ='.api_float_val($weight).'
                     WHERE c_id = '.$course_id.' AND  id = '.intval($row_attendance['ref_id']);
             Database::query($sql);
         }
         // Update weight into forum thread
-        $sql = 'UPDATE '.$tbl_forum_thread.' SET 
+        $sql = 'UPDATE '.$tbl_forum_thread.' SET
                 thread_weight = '.api_float_val($weight).'
                 WHERE
                     c_id = '.$course_id.' AND
@@ -1647,5 +1647,100 @@ class GradebookUtils
         }
 
         return $file;
+    }
+
+    public static function getComment($gradeBookId, $userId)
+    {
+        $gradeBookId = (int) $gradeBookId;
+        $userId = (int) $userId;
+
+        $table = Database::get_main_table(TABLE_MAIN_GRADEBOOK_COMMENT);
+        $sql = "SELECT * FROM $table
+                WHERE user_id = $userId AND gradebook_id = $gradeBookId";
+        $result = Database::query($sql);
+
+        return Database::fetch_array($result);
+    }
+
+    public static function saveComment($gradeBookId, $userId, $comment)
+    {
+        $commentInfo = self::getComment($gradeBookId, $userId);
+        $table = Database::get_main_table(TABLE_MAIN_GRADEBOOK_COMMENT);
+        if (empty($commentInfo)) {
+            $params = [
+                'gradebook_id' => $gradeBookId,
+                'user_id' => $userId,
+                'comment' => $comment,
+                'created_at' => api_get_utc_datetime(),
+                'updated_at' => api_get_utc_datetime(),
+            ];
+            Database::insert($table, $params);
+        } else {
+            $params = [
+                'comment' => $comment,
+                'updated_at' => api_get_utc_datetime(),
+            ];
+            Database::update($table, $params, ['id = ?' => $commentInfo['id']]);
+        }
+    }
+
+    public static function returnJsExportAllCertificates(
+        $buttonSelector,
+        $categoryId,
+        $courseCode,
+        $sessionId = 0,
+        $filterOfficialCodeGet = null
+    ) {
+        $params = [
+            'a' => 'export_all_certificates',
+            'cat_id' => $categoryId,
+            'cidReq' => $courseCode,
+            'id_session' => $sessionId,
+            'filter' => $filterOfficialCodeGet,
+        ];
+        $urlExportAll = 'gradebook.ajax.php?'.http_build_query($params);
+
+        $params['a'] = 'verify_export_all_certificates';
+        $urlVerifyExportAll = 'gradebook.ajax.php?'.http_build_query($params);
+
+        $imgSrcLoading = api_get_path(WEB_LIBRARY_JS_PATH).'loading.gif';
+        $imgSrcPdf = Display::return_icon('pdf.png', '', [], ICON_SIZE_MEDIUM, false, true);
+
+        return "<script>
+            $(function () {
+                var \$btnExport = $('$buttonSelector'),
+                    interval = 0;
+
+                function verifyExportSuccess (response) {
+                    if (response.length > 0) {
+                        \$btnExport.find('img').prop('src', '$imgSrcPdf');
+                        window.clearInterval(interval);
+                        window.removeEventListener('beforeunload', onbeforeunloadListener);
+                        window.location.href = response;
+                    }
+                }
+
+                function exportAllSuccess () {
+                    interval = window.setInterval(
+                        function () {
+                            $.ajax(_p.web_ajax + '$urlVerifyExportAll').then(verifyExportSuccess);
+                        },
+                        15000
+                    );
+                }
+
+                function onbeforeunloadListener (e) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                }
+
+                \$btnExport.on('click', function (e) {
+                    e.preventDefault();
+                    \$btnExport.find('img').prop({src: '$imgSrcLoading', width: 40, height: 40});
+                    window.addEventListener('beforeunload', onbeforeunloadListener);
+                    $.ajax(_p.web_ajax + '$urlExportAll').then(exportAllSuccess);
+                });
+            });
+            </script>";
     }
 }

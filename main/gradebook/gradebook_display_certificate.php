@@ -274,10 +274,27 @@ $actions .= Display::url(
 $hideCertificateExport = api_get_setting('hide_certificate_export_link');
 
 if (count($certificate_list) > 0 && $hideCertificateExport !== 'true') {
-    $actions .= Display::url(
-        Display::return_icon('pdf.png', get_lang('ExportAllCertificatesToPDF'), [], ICON_SIZE_MEDIUM),
-        $url.'&action=export_all_certificates'
-    );
+    if ($allowExportToZip) {
+        $actions = Display::url(
+            Display::return_icon('pdf.png', get_lang('ExportAllCertificatesToPDF'), [], ICON_SIZE_MEDIUM),
+            api_get_path(WEB_PLUGIN_PATH)
+                .'customcertificate/src/print_certificate.php?'.api_get_cidreq().'&'
+                .http_build_query(
+                    [
+                        'export_all_in_one' => 1,
+                        'course_code' => api_get_course_id(),
+                        'session_id' => api_get_session_id(),
+                        'cat_id' => $categoryId,
+                    ]
+                )
+        );
+    } else {
+        $actions .= Display::url(
+            Display::return_icon('pdf.png', get_lang('ExportAllCertificatesToPDF'), [], ICON_SIZE_MEDIUM),
+            '#',
+            ['id' => 'btn-export-all']
+        );
+    }
 
     if ($allowExportToZip) {
         $actions .= Display::url(
@@ -332,5 +349,13 @@ if (count($certificate_list) == 0) {
         echo '</td></tr>';
     }
     echo '</table>';
+
+    echo GradebookUtils::returnJsExportAllCertificates(
+        '#btn-export-all',
+        $categoryId,
+        api_get_course_id(),
+        api_get_session_id(),
+        $filterOfficialCodeGet
+    );
 }
 Display::display_footer();

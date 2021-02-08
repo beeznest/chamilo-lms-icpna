@@ -1263,6 +1263,9 @@ $_configuration['required_extra_fields_in_profile'] = [
 // Add a version number to css files to avoid browser cache after upgrade.
 // $_configuration['css_version_number'] = 2019 + 20 + 5;
 
+// Hide session to user when any of its courses has this extrafield set to '1'
+//$_configuration['hide_session_with_course_field'] = '';
+
 // KEEP THIS AT THE END
 // -------- Custom DB changes
 // Add user activation by confirmation email

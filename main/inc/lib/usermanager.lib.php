@@ -3282,6 +3282,59 @@ class UserManager
             ];
         }
 
+        if (!$is_time_over) {
+            return self::filteActiveSessionsByExtraFieldInCourse($categories);
+        }
+
+        return $categories;
+    }
+
+    /**
+     * Filter active session by categories when 'hide_session_with_course_field' is set to = '1'
+     */
+    private function filteActiveSessionsByExtraFieldInCourse(array $categories)
+    {
+        $fieldVariable = api_get_configuration_value('hide_session_with_course_field');
+
+        if (empty($fieldVariable)) {
+            return $categories;
+        }
+
+        $fieldValue = new ExtraFieldValue('course');
+        $coursesToAvoid = $fieldValue->get_item_id_from_field_variable_and_field_value(
+            $fieldVariable,
+            '1',
+            false,
+            false,
+            true
+        );
+        $coursesToAvoid = array_column($coursesToAvoid, 'item_id');
+
+        foreach ($categories as $categoryId => &$categoryInfo) {
+            if (empty($categoryInfo['sessions'])) {
+                continue;
+            }
+
+            $categoryInfo['sessions'] = array_filter(
+                $categoryInfo['sessions'],
+                function (array $sessionInfo) use ($coursesToAvoid) {
+                    if (empty($sessionInfo['courses'])) {
+                        return true;
+                    }
+
+                    $coursesId = array_column($sessionInfo['courses'], 'id');
+
+                    foreach ($coursesId as $courseId) {
+                        if (in_array($courseId, $coursesToAvoid)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+            );
+        }
+
         return $categories;
     }
 

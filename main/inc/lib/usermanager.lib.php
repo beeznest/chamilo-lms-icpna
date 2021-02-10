@@ -3322,7 +3322,8 @@ class UserManager
                         return true;
                     }
 
-                    $coursesId = array_column($sessionInfo['courses'], 'id');
+                    $coursesId = array_column($sessionInfo['courses'], 'id')
+                        ?: array_column($sessionInfo['courses'], 'real_id');
 
                     foreach ($coursesId as $courseId) {
                         if (in_array($courseId, $coursesToAvoid)) {

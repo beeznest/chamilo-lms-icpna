@@ -4584,7 +4584,12 @@ function getFormWork($form, $defaults = [], $workId = 0)
     }
 
     // Create the form that asks for the directory name
-    $form->addText('new_dir', get_lang('AssignmentName'));
+    $form->addText(
+        'new_dir',
+        get_lang('AssignmentName'),
+        true,
+        ['maxlength' => CStudentPublication::WORK_TITLE_MAX_LENGTH]
+    );
     $form->addHtmlEditor(
         'description',
         get_lang('Description'),

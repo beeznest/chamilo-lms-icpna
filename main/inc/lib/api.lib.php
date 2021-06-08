@@ -1946,7 +1946,7 @@ function api_get_anonymous_id()
     $ip = Database::escape_string(api_get_real_ip());
     $max = (int) api_get_configuration_value('max_anonymous_users');
     if ($max >= 2) {
-        $sql = "SELECT * FROM $table as TEL 
+        $sql = "SELECT * FROM $table as TEL
                 JOIN $tableU as U
                 ON U.user_id = TEL.login_user_id
                 WHERE TEL.user_ip = '$ip'
@@ -1981,8 +1981,8 @@ function api_get_anonymous_id()
     }
 
     $table = Database::get_main_table(TABLE_MAIN_USER);
-    $sql = "SELECT user_id 
-            FROM $table 
+    $sql = "SELECT user_id
+            FROM $table
             WHERE status = ".ANONYMOUS." ";
     $res = Database::query($sql);
     if (Database::num_rows($res) > 0) {
@@ -4723,7 +4723,7 @@ function api_display_language_form($hide_if_no_choice = false, $showAsButton = f
     } else {
         $html = '
             <a href="'.$url.'" class="dropdown-toggle" data-toggle="dropdown" role="button">
-                <span class="flag-icon flag-icon-'.$countryCode.'"></span> 
+                <span class="flag-icon flag-icon-'.$countryCode.'"></span>
                 '.$currentLanguageInfo['original_name'].'
                 <span class="caret"></span>
             </a>
@@ -4830,7 +4830,7 @@ function languageToCountryIsoCode($languageIsoCode)
 function api_get_languages()
 {
     $tbl_language = Database::get_main_table(TABLE_MAIN_LANGUAGE);
-    $sql = "SELECT * FROM $tbl_language WHERE available='1' 
+    $sql = "SELECT * FROM $tbl_language WHERE available='1'
             ORDER BY original_name ASC";
     $result = Database::query($sql);
     $language_list = [];
@@ -8135,8 +8135,8 @@ function api_get_password_checker_js($usernameInputId, $passwordInputId, $blockS
     };
 
     $(function() {
-        var lang = ".json_encode($translations).";     
-        var options = {        
+        var lang = ".json_encode($translations).";
+        var options = {
             onLoad : function () {
                 //$('#messages').text('Start typing password');
             },
@@ -8154,7 +8154,7 @@ function api_get_password_checker_js($usernameInputId, $passwordInputId, $blockS
         options.i18n = {
             t: function (key) {
                 var result = lang[key];
-                return result === key ? '' : result; // This assumes you return the                
+                return result === key ? '' : result; // This assumes you return the
             }
         };
         options.ui = {
@@ -8167,7 +8167,7 @@ function api_get_password_checker_js($usernameInputId, $passwordInputId, $blockS
                 onScore: function (options, word, totalScoreCalculated) {
                     $('".$passwordInputId."').parents('form').find(':submit')
                         .prop('disabled', totalScoreCalculated < options.ui.scores[3]);
-    
+
                     return totalScoreCalculated;
                 }
             };
@@ -9499,7 +9499,7 @@ function api_find_template($template)
 function api_get_language_list_for_flag()
 {
     $table = Database::get_main_table(TABLE_MAIN_LANGUAGE);
-    $sql = "SELECT english_name, isocode FROM $table 
+    $sql = "SELECT english_name, isocode FROM $table
             ORDER BY original_name ASC";
     static $languages = [];
     if (empty($languages)) {
@@ -9530,11 +9530,11 @@ function api_get_language_translate_html()
         $hideAll .= '
         $("span:lang('.$language['isocode'].')").filter(
             function(e, val) {
-                // Only find the spans if they have set the lang                
-                if ($(this).attr("lang") == null) {                
+                // Only find the spans if they have set the lang
+                if ($(this).attr("lang") == null) {
                     return false;
                 }
-                
+
                 // Ignore ckeditor classes
                 return !this.className.match(/cke(.*)/);
         }).hide();'."\n";
@@ -9546,32 +9546,32 @@ function api_get_language_translate_html()
 
     return '
             $(function() {
-                '.$hideAll.'                 
-                var defaultLanguageFromUser = "'.$languageInfo['isocode'].'";   
-                                             
+                '.$hideAll.'
+                var defaultLanguageFromUser = "'.$languageInfo['isocode'].'";
+
                 $("span:lang('.$languageInfo['isocode'].')").filter(
                     function() {
                         // Ignore ckeditor classes
                         return !this.className.match(/cke(.*)/);
                 }).show();
-                
+
                 var defaultLanguage = "";
                 var langFromUserFound = false;
-                
+
                 $(this).find("span").filter(
                     function() {
                         // Ignore ckeditor classes
                         return !this.className.match(/cke(.*)/);
                 }).each(function() {
-                    defaultLanguage = $(this).attr("lang");                            
+                    defaultLanguage = $(this).attr("lang");
                     if (defaultLanguage) {
-                        $(this).before().next("br").remove();                
+                        $(this).before().next("br").remove();
                         if (defaultLanguageFromUser == defaultLanguage) {
                             langFromUserFound = true;
                         }
                     }
                 });
-                
+
                 // Show default language
                 if (langFromUserFound == false && defaultLanguage) {
                     $("span:lang("+defaultLanguage+")").filter(
@@ -9582,4 +9582,90 @@ function api_get_language_translate_html()
                 }
             });
     ';
+}
+
+/**
+ * Filter a multi-language HTML string (for the multi-language HTML
+ * feature) into the given language (strip the rest).
+ *
+ * @param string $htmlString The HTML string to "translate". Usually <p><span lang="en">Some string</span></p><p><span lang="fr">Une chaîne</span></p>
+ * @param string $language   The language in which we want to get the
+ *
+ * @throws Exception
+ *
+ * @return string The filtered string in the given language, or the full string if no translated string was identified
+ */
+function api_get_filtered_multilingual_HTML_string($htmlString, $language = null)
+{
+    if (api_get_configuration_value('translate_html') != true) {
+        return $htmlString;
+    }
+    $userInfo = api_get_user_info();
+    $languageId = 0;
+    if (!empty($language)) {
+        $languageId = api_get_language_id($language);
+    } elseif (!empty($userInfo['language'])) {
+        $languageId = api_get_language_id($userInfo['language']);
+    }
+    $languageInfo = api_get_language_info($languageId);
+    $isoCode = 'en';
+
+    if (!empty($languageInfo)) {
+        $isoCode = $languageInfo['isocode'];
+    }
+
+    // Split HTML in the separate language strings
+    // Note: some strings might look like <p><span ..>...</span></p> but others might be like combine 2 <span> in 1 <p>
+    if (!preg_match('/<span.*?lang="(\w\w)">/is', $htmlString)) {
+        return $htmlString;
+    }
+    $matches = [];
+    preg_match_all('/<span.*?lang="(\w\w)">(.*?)<\/span>/is', $htmlString, $matches);
+    if (!empty($matches)) {
+        // matches[0] are the full string
+        // matches[1] are the languages
+        // matches[2] are the strings
+        foreach ($matches[1] as $id => $match) {
+            if ($match == $isoCode) {
+                return $matches[2][$id];
+            }
+        }
+        // Could find the pattern but could not find our language. Return the first language found.
+        return $matches[2][0];
+    }
+    // Could not find pattern. Just return the whole string. We shouldn't get here.
+    return $htmlString;
+}
+
+/**
+ * Get the print.css file for current theme.
+ * Only the file path or the file contents when $getFileContents is true.
+ */
+function api_get_print_css(bool $getFileContents = true, bool $useWebPath = false): string
+{
+    $sysCssPath = api_get_path(SYS_CSS_PATH);
+    $cssFile = $sysCssPath.'themes/'.api_get_visual_theme().'/print.css';
+
+    if (!file_exists($cssFile)) {
+        $cssFile = $sysCssPath.'print.css';
+    }
+
+    if ($getFileContents) {
+        return file_get_contents($cssFile);
+    }
+
+    if ($useWebPath) {
+        return str_replace($sysCssPath, api_get_path(WEB_CSS_PATH), $cssFile);
+    }
+
+    return $cssFile;
+}
+
+function api_protect_webservices()
+{
+    if (api_get_configuration_value('disable_webservices')) {
+        echo "Webservices are disabled. \n";
+        echo "To enable, add \$_configuration['disable_webservices'] = true; in configuration.php";
+        exit;
+    }
 }

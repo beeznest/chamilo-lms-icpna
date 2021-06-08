@@ -1281,6 +1281,9 @@ $_configuration['required_extra_fields_in_profile'] = [
 // CREATE INDEX idx_tee_user ON track_e_plex (user_id);
 //$_configuration['exercise_plex_max_failed_attempts'] = 0;
 
+// Disable webservices.
+//$_configuration['disable_webservices'] = true;
+
 // KEEP THIS AT THE END
 // -------- Custom DB changes
 // Add user activation by confirmation email

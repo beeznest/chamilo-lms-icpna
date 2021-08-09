@@ -39,6 +39,7 @@ var user_status = 0;
 var widthBox = 320; // see css class .chatbox
 //var ajax_url = 'chat.php'; // This variable is loaded in the template/layout/head.tpl file
 var doubleCheck = '<span class="chatbox_checked"><i class="fa fa-check"></i><i class="fa fa-check"></i></span>';
+var currentToken = '';
 
 function set_user_status(status)
 {
@@ -134,6 +135,7 @@ function startChatSession()
 			dataType: "json",
 			success: function(data) {
 				if (data) {
+					currentToken = data.sec_token;
 					username = data.me;
 					currentUserId = data.user_id;
 					user_status = data.user_status;
@@ -914,9 +916,11 @@ function checkChatBoxInputKey(event, chatboxtextarea, user_id)
 		if (message != '') {
 			$.post(ajax_url + "?action=sendchat", {
 				to: user_id,
-				message: message
+				message: message,
+				chat_sec_token: currentToken
 			}, function (messageId) {
-				if (messageId > 0) {
+				if (messageId.id > 0) {
+					currentToken = messageId.sec_token;
 					message = message.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;");
 					var item = {
 						from_user_info : {id: currentUserId, complete_name: 'me'},
@@ -924,7 +928,7 @@ function checkChatBoxInputKey(event, chatboxtextarea, user_id)
 						date: moment().unix(),
 						f: currentUserId,
 						message: message,
-						id: messageId
+						id: messageId.id
 					};
 					var bubble = createChatBubble(user_id, item);
 					//$("#chatbox_" + user_id + " .chatboxcontent").append(bubble);
@@ -932,7 +936,7 @@ function checkChatBoxInputKey(event, chatboxtextarea, user_id)
 						$("#chatbox_" + user_id + " .chatboxcontent")[0].scrollHeight
 					);
 
-					intervals[messageId] = setInterval(checkMessageStatus, chatHeartbeatTime, messageId);
+					intervals[messageId.id] = setInterval(checkMessageStatus, chatHeartbeatTime, messageId.id);
 				} else {
 					$("#chatbox_" + user_id + " .chatboxcontent").
                     append('<i class="fa fa-exclamation-triangle" aria-hidden="true"></i><br />');

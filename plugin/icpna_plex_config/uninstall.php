@@ -5,4 +5,6 @@ if (api_is_platform_admin()) {
     HookQuizEnd::create()->detach(
         IcpnaPlexConfigQuizEndHook::create()
     );
+
+    IcpnaPlexConfigPlugin::create()->dropDbTables();
 }

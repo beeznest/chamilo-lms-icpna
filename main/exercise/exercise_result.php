@@ -279,11 +279,23 @@ if ($isAdaptive) {
             'user_complete_name' => $user->getCompleteNameWithUsername(),
             'origin' => $origin,
             'mail_sent' => true,
-            'enrollment_page' => api_get_plugin_setting(
-                'icpna_plex_config',
-                IcpnaPlexConfigPlugin::SETTING_ENROLLMENT_PAGE
-            ),
         ];
+
+        $plexConfig = api_get_plugin_setting('icpna_plex_config', IcpnaPlexConfigPlugin::SETTING_ENROLLMENT_PAGE);
+
+        if (!empty($plexConfig)) {
+            $adaptiveResultData['enrollment_page'] = $plexConfig;
+
+            $enrollmentInfo = Database::select(
+                '*',
+                'plugin_plex_enrollment',
+                ['where' => ['exe_id = ?' => [$exe_id]]],
+                'first'
+            );
+
+            $adaptiveResultData['exam_validity'] = api_format_date($enrollmentInfo['exam_validity'], DATE_FORMAT_LONG);
+            $adaptiveResultData['period_validity'] = $enrollmentInfo['period_validity'];
+        }
 
         ExerciseLib::sendEmailNotificationForAdaptiveResult($destinationResult);
     }

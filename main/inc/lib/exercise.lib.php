@@ -4992,6 +4992,16 @@ EOT;
 
         if (!empty($icpnaPlexConfigEnrollmentPage)) {
             $view->assign('enrollment_page', $icpnaPlexConfigEnrollmentPage);
+
+            $enrollmentInfo = Database::select(
+                '*',
+                'plugin_plex_enrollment',
+                ['where' => ['exe_id = ?' => [$exe->getExeId()]]],
+                'first'
+            );
+
+            $view->assign('exam_validity', api_format_date($enrollmentInfo['exam_validity'], DATE_FORMAT_LONG));
+            $view->assign('period_validity', $enrollmentInfo['period_validity']);
         }
 
         $layout = $view->get_template('mail/quiz_student_adaptive_result.tpl');

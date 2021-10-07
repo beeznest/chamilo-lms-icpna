@@ -104,4 +104,27 @@ class IcpnaPlexConfigPlugin extends Plugin
 
         return $achievedLevel;
     }
+
+    public function createDbTables()
+    {
+        $queries = [
+            "CREATE TABLE plugin_plex_log (id INT AUTO_INCREMENT NOT NULL, exe_id INT DEFAULT NULL, request LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)', response LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)', success TINYINT(1) NOT NULL, INDEX IDX_5727B343B5A18F57 (exe_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE `utf8_unicode_ci` ENGINE = InnoDB",
+            "CREATE TABLE plugin_plex_enrollment (id INT AUTO_INCREMENT NOT NULL, exe_id INT DEFAULT NULL, score DOUBLE PRECISION NOT NULL, exam_validity VARCHAR(255) NOT NULL, period_validity VARCHAR(255) NOT NULL, level_reached VARCHAR(255) NOT NULL, INDEX IDX_FB93A9F0B5A18F57 (exe_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE `utf8_unicode_ci` ENGINE = InnoDB",
+            "ALTER TABLE plugin_plex_log ADD CONSTRAINT FK_5727B343B5A18F57 FOREIGN KEY (exe_id) REFERENCES track_e_exercises (exe_id) ON DELETE SET NULL",
+            "ALTER TABLE plugin_plex_enrollment ADD CONSTRAINT FK_FB93A9F0B5A18F57 FOREIGN KEY (exe_id) REFERENCES track_e_exercises (exe_id) ON DELETE SET NULL",
+        ];
+
+        foreach ($queries as $query) {
+            Database::query($query);
+        }
+    }
+
+    public function dropDbTables()
+    {
+        $sql = "DROP TABLE IF EXISTS plugin_plex_log";
+        Database::query($sql);
+
+        $sql = "DROP TABLE IF EXISTS plugin_plex_enrollment";
+        Database::query($sql);
+    }
 }

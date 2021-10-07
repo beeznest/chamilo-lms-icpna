@@ -1,6 +1,7 @@
 <?php
 /* For licensing terms, see /license.txt */
 
+use Chamilo\CoreBundle\Entity\TrackEExercises;
 use Chamilo\CourseBundle\Entity\CQuizDestinationResult;
 use Chamilo\CourseBundle\Entity\CQuizQuestionCategory;
 use GuzzleHttp\Client;
@@ -54,6 +55,7 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
 
         $userId = api_get_user_id();
 
+        /** @var CQuizDestinationResult $destinationResult */
         $destinationResult = Database::getManager()
             ->getRepository('ChamiloCourseBundle:CQuizDestinationResult')
             ->findOneBy(['exe' => $exeId, 'user' => $userId]);
@@ -66,20 +68,29 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
             return;
         }
 
-        try {
-            $responseJson = $this->getWsResponse($destinationResult);
-        } catch (Exception $e) {
+        $responseJson = [];
+
+        do {
+            try {
+                $responseJson = $this->getWsResponse($destinationResult);
+
+                $done = true;
+            } catch (Exception $exception) {
+                $done = false;
+            }
+        } while (false === $done);
+
+        if (empty($responseJson)) {
             Display::addFlash(
                 Display::return_message(self::$plugin->get_lang('WsResponseError'), 'warning', false)
             );
-
-            $this->sendErrorEmail($e->getMessage(), $destinationResult);
-
             return;
         }
 
+        $this->saveEnrollment($responseJson, $destinationResult->getExe());
+
         Display::addFlash(
-            Display::return_message($responseJson['description'], 'success')
+            Display::return_message('<strong>'.$responseJson['description'].'</strong>', 'success', false)
         );
     }
 
@@ -122,7 +133,20 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
             $user->getId()
         );
 
+        $efv = new ExtraFieldValue('session');
+        $uididPrograma = $efv->get_values_by_handler_and_field_variable(
+            $destinationResult->getExe()->getSessionId(),
+            'uididprograma'
+        );
+
         $httpClient = new Client();
+
+        $requestData = [
+            'codAl' => $user->getUsername(),
+            'curso' => $destinationResult->getAchievedLevel(),
+            'score' => $levelScore,
+            'uiuidPrograma' => is_array($uididPrograma) ? $uididPrograma['value'] : '',
+        ];
 
         try {
             $responseBody = $httpClient
@@ -132,23 +156,25 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
                         'headers' => [
                             'Authorization' => "$token",
                         ],
-                        'json' => [
-                            'codAl' => $user->getUsername(),
-                            'curso' => $destinationResult->getAchievedLevel(),
-                            'score' => $levelScore,
-                        ],
+                        'json' => $requestData,
                     ]
                 )
                 ->getBody()
                 ->getContents();
 
         } catch (RequestException $requestException) {
+            $this->saveLog($requestData, [$requestException->getMessage()], false, $destinationResult->getExe());
+
             throw new Exception($requestException->getMessage());
         } catch (Exception $exception) {
+            $this->saveLog($requestData, [$exception->getMessage()], false, $destinationResult->getExe());
+
             throw new Exception($exception->getMessage());
         }
 
         $json = json_decode($responseBody, true);
+
+        $this->saveLog($requestData, $json, true, $destinationResult->getExe());
 
         if ('success' !== strtolower($json['response'])) {
             throw new Exception($json['description']);
@@ -158,31 +184,39 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
     }
 
     /**
-     * @param string                 $exceptionMessage
-     * @param CQuizDestinationResult $destinationResult
+     * @param array           $request
+     * @param array           $response
+     * @param bool            $success
+     * @param TrackEExercises $trackExercise
      */
-    private function sendErrorEmail($exceptionMessage, CQuizDestinationResult $destinationResult)
+    private function saveLog(array $request, array $response, $success, TrackEExercises $trackExercise)
     {
-        $student = $destinationResult->getUser();
-        $exercise = $destinationResult->getExe();
+        Database::insert(
+            'plugin_plex_log',
+            [
+                'exe_id' => $trackExercise->getExeId(),
+                'request' => serialize($request),
+                'response' => serialize($response),
+                'success' => $success,
+            ]
+        );
+    }
 
-        $mailMessage = '<hr>'.PHP_EOL
-            .'<strong>Información del examen:</strong>'.PHP_EOL
-            .'<ul>'
-            .'<li>ID de examen tomado: '.$exercise->getExeId().'</li>'
-            .'<li>Estudiante (código): '.$student->getUsername().'</li>'
-            .'<li>Fecha y hora de inicio: '.api_convert_and_format_date($exercise->getStartDate()).'</li>'
-            .'<li>Fecha y hora de finalización: '.api_convert_and_format_date($exercise->getExeDate()).'</li>'
-            .'<li>Duración: '.api_time_to_hms($exercise->getExeDuration()).'</li>'
-            .'<li>Nivel alcanzado: '.$destinationResult->getAchievedLevel().'</li>'
-            .'<li>Error generado: <em>'.$exceptionMessage.'</em></li>'
-            .'</ul>'.PHP_EOL;
-
-        api_mail_html(
-            'Adaptive Plex Support',
-            self::$plugin->get(IcpnaPlexConfigPlugin::SETTING_ERROR_EMAIL),
-            'Adaptive PLEX: Error en proceso de examen.',
-            $mailMessage
+    /**
+     * @param array $enrollment
+     * @param TrackEExercises $trackExercise
+     */
+    private function saveEnrollment(array $enrollment, TrackEExercises $trackExercise)
+    {
+        Database::insert(
+            'plugin_plex_enrollment',
+            [
+                'exe_id' => $trackExercise->getExeId(),
+                'score' => $enrollment['score'],
+                'exam_validity' => $enrollment['examvalidity'],
+                'period_validity' => $enrollment['periodvalidity'],
+                'level_reached' => $enrollment['levelreached'],
+            ]
         );
     }
 }

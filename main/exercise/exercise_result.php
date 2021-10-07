@@ -223,10 +223,6 @@ ExerciseLib::displayQuestionListByAttempt(
 $pageContent .= ob_get_contents();
 ob_end_clean();
 
-$hookQuizEnd = HookQuizEnd::create();
-$hookQuizEnd->setEventData(['exe_id' => $exe_id]);
-$hookQuizEnd->notifyQuizEnd();
-
 $adaptiveResultData = [];
 
 if ($isAdaptive) {
@@ -307,6 +303,10 @@ if ($isAdaptive) {
     Session::erase('adaptive_quiz_level');
     Session::erase('track_e_adaptive');
 }
+
+$hookQuizEnd = HookQuizEnd::create();
+$hookQuizEnd->setEventData(['exe_id' => $exe_id]);
+$hookQuizEnd->notifyQuizEnd();
 
 // Unset session for clock time
 ExerciseLib::exercise_time_control_delete(

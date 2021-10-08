@@ -359,6 +359,8 @@ if (!empty($adaptiveResultData)) {
     if (!empty($plexConfig)) {
         $adaptiveResultData['enrollment_page'] = $plexConfig;
 
+        $exe_id = isset($_REQUEST['exe_id']) ? (int) $_REQUEST['exe_id'] : 0;
+
         $enrollmentInfo = Database::select(
             '*',
             'plugin_plex_enrollment',

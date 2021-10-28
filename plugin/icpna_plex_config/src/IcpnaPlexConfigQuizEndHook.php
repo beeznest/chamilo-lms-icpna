@@ -174,11 +174,18 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
 
         $json = json_decode($responseBody, true);
 
-        $this->saveLog($requestData, $json, true, $destinationResult->getExe());
-
         if ('success' !== strtolower($json['response'])) {
-            throw new Exception($json['description']);
+            $successfulFailedResponse = [
+                'response' => $json['response'],
+                'description' => isset($json['ViewModelMessage']) ? $json['ViewModelMessage'] : 'Webservice internal error',
+            ];
+
+            $this->saveLog($requestData, $successfulFailedResponse, false, $destinationResult->getExe());
+
+            throw new Exception($successfulFailedResponse['description']);
         }
+
+        $this->saveLog($requestData, $json, true, $destinationResult->getExe());
 
         return $json;
     }

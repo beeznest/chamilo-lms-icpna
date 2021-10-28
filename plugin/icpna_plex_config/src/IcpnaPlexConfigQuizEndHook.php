@@ -87,10 +87,12 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
             return;
         }
 
-        $this->saveEnrollment($responseJson, $destinationResult->getExe());
-
         Display::addFlash(
-            Display::return_message('<strong>'.$responseJson['description'].'</strong>', 'success', false)
+            Display::return_message(
+                '<strong>'.$responseJson['description'].'</strong>',
+                'SUCCESS' === strtoupper($responseJson['response']) ? 'success' : 'danger',
+                false
+            )
         );
     }
 
@@ -175,17 +177,15 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
         $json = json_decode($responseBody, true);
 
         if ('success' !== strtolower($json['response'])) {
-            $successfulFailedResponse = [
-                'response' => $json['response'],
-                'description' => isset($json['ViewModelMessage']) ? $json['ViewModelMessage'] : 'Webservice internal error',
-            ];
+            if (empty($json['description'])) {
+                $json['description'] = 'Internal error while processing enrollment.';
+            }
 
-            $this->saveLog($requestData, $successfulFailedResponse, false, $destinationResult->getExe());
-
-            throw new Exception($successfulFailedResponse['description']);
+            $this->saveLog($requestData, $json, false, $destinationResult->getExe());
+        } else {
+            $this->saveLog($requestData, $json, true, $destinationResult->getExe());
+            $this->saveEnrollment($json, $destinationResult->getExe());
         }
-
-        $this->saveLog($requestData, $json, true, $destinationResult->getExe());
 
         return $json;
     }
@@ -219,10 +219,10 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
             'plugin_plex_enrollment',
             [
                 'exe_id' => $trackExercise->getExeId(),
-                'score' => $enrollment['score'],
-                'exam_validity' => $enrollment['examvalidity'],
-                'period_validity' => $enrollment['periodvalidity'],
-                'level_reached' => $enrollment['levelreached'],
+                'score' => (int) $enrollment['score'],
+                'exam_validity' => (string) $enrollment['examvalidity'],
+                'period_validity' => (string) $enrollment['periodvalidity'],
+                'level_reached' => (string) $enrollment['levelreached'],
             ]
         );
     }

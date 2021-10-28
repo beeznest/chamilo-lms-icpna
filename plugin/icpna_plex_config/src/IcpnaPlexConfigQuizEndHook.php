@@ -145,7 +145,7 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
             'codAl' => $user->getUsername(),
             'curso' => $destinationResult->getAchievedLevel(),
             'score' => $levelScore,
-            'uiuidPrograma' => is_array($uididPrograma) ? $uididPrograma['value'] : '',
+            'uididprograma' => is_array($uididPrograma) ? $uididPrograma['value'] : '',
         ];
 
         try {

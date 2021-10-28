@@ -762,7 +762,7 @@ class TestCategory
                     exe_id = $in_exe_id AND
                     user_id = $in_user_id";
         $res = Database::query($query);
-        $score = '';
+        $score = 0;
         while ($data = Database::fetch_array($res)) {
             $score += $data['marks'];
         }

@@ -6136,7 +6136,7 @@ class Exercise
         if (api_get_configuration_value('save_titles_as_html')) {
             $data['title'] = $this->get_formated_title().get_lang('Result');
 	} else if (EXERCISE_FEEDBACK_TYPE_PROGRESSIVE_ADAPTIVE == $this->feedback_type) {
-            $data['title'] = get_lang('QuizResult');
+            $data['title'] = get_lang('Result');
 
             $data['end_date'] = api_convert_and_format_date($trackExerciseInfo['exe_date']);
 

@@ -5000,7 +5000,7 @@ EOT;
                 'first'
             );
 
-            $view->assign('exam_validity', api_format_date($enrollmentInfo['exam_validity'], DATE_FORMAT_LONG));
+            $view->assign('exam_validity', $enrollmentInfo['exam_validity']);
             $view->assign('period_validity', $enrollmentInfo['period_validity']);
         }
 

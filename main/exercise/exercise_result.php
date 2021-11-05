@@ -372,7 +372,7 @@ if (!empty($adaptiveResultData)) {
             $adaptiveResultData['destination_result']->setAchievedLevel($enrollmentInfo['level_reached']);
         }
 
-        $adaptiveResultData['exam_validity'] = api_format_date($enrollmentInfo['exam_validity'], DATE_FORMAT_LONG);
+        $adaptiveResultData['exam_validity'] = $enrollmentInfo['exam_validity'];
         $adaptiveResultData['period_validity'] = $enrollmentInfo['period_validity'];
     }
 }

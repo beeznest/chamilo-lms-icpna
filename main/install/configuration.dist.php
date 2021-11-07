@@ -499,6 +499,11 @@ ALTER TABLE portfolio_category CHANGE title title LONGTEXT NOT NULL;
 // information the browser includes with navigation away from a document
 // and should be set by all sites.
 //$_configuration['security_referrer_policy'] = 'origin-when-cross-origin';
+//
+// Enable samesite:None parameter for session cookie.
+// More info: https://www.chromium.org/updates/same-site
+// Also: https://developers.google.com/search/blog/2020/01/get-ready-for-new-samesitenone-secure
+//$_configuration['security_session_cookie_samesite_none'] = false;
 // ------ HTTP headers security section ends here
 //
 // ------ Survey configuration settings
@@ -1265,11 +1270,6 @@ $_configuration['required_extra_fields_in_profile'] = [
 
 // Hide session to user when any of its courses has this extrafield set to '1'
 //$_configuration['hide_session_with_course_field'] = '';
-
-// Enable samesite:None parameter for session cookie.
-// More info: https://www.chromium.org/updates/same-site
-// Also: https://developers.google.com/search/blog/2020/01/get-ready-for-new-samesitenone-secure
-//$_configuration['allow_session_samesite_none_cookie_parameter'] = false;
 
 // KEEP THIS AT THE END
 // -------- Custom DB changes

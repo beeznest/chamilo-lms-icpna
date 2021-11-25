@@ -88,10 +88,9 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
         }
 
         Display::addFlash(
-            Display::return_message(
-                '<strong>'.$responseJson['description'].'</strong>',
-                'SUCCESS' === strtoupper($responseJson['response']) ? 'success' : 'danger',
-                false
+            Display::div(
+                "<strong>{$responseJson['description']}</strong>",
+                ['class' => 'alert text-center', 'style' => 'color: #FFF;background-color: #F00;']
             )
         );
     }

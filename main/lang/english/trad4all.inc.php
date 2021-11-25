@@ -5832,7 +5832,7 @@ $Item = "Item";
 $ConfigureDashboardPlugin = "Configure Dashboard Plugin";
 $EditBlocks = "Edit blocks";
 $Never = "Never";
-$YourAccountIsActiveYouCanLoginAndCheckYourCourses = "Dear user, 
+$YourAccountIsActiveYouCanLoginAndCheckYourCourses = "Dear user,
 
 Your account has now been activated on the platform. Please login and enjoy your courses.";
 $SessionFields = "Session fields";
@@ -8006,11 +8006,11 @@ $SpecificDate = "Specific dispatch date";
 $BaseDate = "Dispatch based on the session's start/end dates";
 $AfterOrBefore = "After or before";
 $Before = "Before";
-$ScheduleAnnouncementDescription = "This form allows scheduling announcements to be sent automatically to the students who are taking a course in a session. 
+$ScheduleAnnouncementDescription = "This form allows scheduling announcements to be sent automatically to the students who are taking a course in a session.
 
-There are two types of announcements that can be sent: 
+There are two types of announcements that can be sent:
 
-Specific date: In this case a specific day is selected to make the announcement. 
+Specific date: In this case a specific day is selected to make the announcement.
 
 Based on the start / end date of the session: in this case the number of days to pass before sending the announcement must be indicated. And those days can be associated to before or after the start / end date. For example: 3 days after the start date.";
 $MandatorySurveyNoAnswered = "A mandatory survey is waiting your answer. To enter the course, you must first complete the survey.";
@@ -8399,4 +8399,18 @@ $WelcomeToPortalXInCourseSessionX = "Welcome to portal %s Course session: %s";
 $WelcomeToPortalXInCourseSessionXCoursePartOfCareerX = "Welcome to portal %s in course %s, part of career %s";
 $YourNextModule = "Your next module";
 $FirstLesson = "First lesson";
+$CategoryDestinations = "Category destinations";
+$ProgressiveAdaptive = "Progressive / Adaptative";
+$LevelReachedX = "Level Reached: <strong>%s</strong>";
+$ResultHashX = "Unique ID: %s";
+$CategoryDestinationsSaved = "Category destinations saved.";
+$DestinationUrl = "URl for the entry point";
+$LevelReachedInQuiz = "Level reached in quiz";
+$TheQuizResultsWereSentToYourEmail = "The quiz results were sent to your email.";
+$OneCategoryPerPage = "One category per page";
+$QuizCategoryDurationInMinutes = "Category duration (in minutes)";
+$IsCategoryForPreTest = "This category is for pre-test";
+$QuizAdaptivePreStep = "Destination as pre-test step";
+$QuizAdaptiveFinalStep = "Destination as final step";
+$AdaptiveQuizResultIsPreTestCategory = "The exam has ended but you have obtained a result that is not valid for the PLEX exam";
 ?>

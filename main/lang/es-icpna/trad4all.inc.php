@@ -222,4 +222,4 @@ $AdaptiveQuizResultIsPreTestCategory = "El examen ha terminado pero has obtenido
 $ExeStartTime = "Fecha y hora de inicio de examen";
 $ExeEndTime = "Fecha y hora de fin de examen";
 $Username = "Código de alumno";
-$LevelReachedX = "Curso alcanzado: <strong>%s</strong>";
+$LevelReachedX = "<strong>Curso alcanzado: %s</strong>";

@@ -5657,7 +5657,7 @@ EOT;
             return Display::return_message(get_lang('AdaptiveQuizResultIsPreTestCategory'), 'warning', false);
         }
 
-        $message = sprintf(get_lang('LevelReachedX'), '<strong>'.$destinationResult->getAchievedLevel().'</strong>');
+        $message = sprintf(get_lang('LevelReachedX'), $destinationResult->getAchievedLevel());
 
         $icpnaPlexConfigEnrollmentPage = api_get_plugin_setting(
             'icpna_plex_config',
@@ -5665,6 +5665,15 @@ EOT;
         );
 
         if (!empty($icpnaPlexConfigEnrollmentPage)) {
+            $enrollmentInfo = Database::select(
+                '*',
+                'plugin_plex_enrollment',
+                ['where' => ['exe_id = ?' => [$destinationResult->getExe()->getExeId()]]],
+                'first'
+            );
+
+            $message = sprintf(get_lang('LevelReachedX'), $enrollmentInfo['level_reached']);
+
             $message .= PHP_EOL
                 .Display::toolbarButton(
                     get_plugin_lang('GoToEnrollment', IcpnaPlexConfigPlugin::class),

@@ -96,6 +96,22 @@ if ($session) {
         : [];
 }
 
+$icpnaPlexConfigEnrollmentPage = api_get_plugin_setting(
+    'icpna_plex_config',
+    IcpnaPlexConfigPlugin::SETTING_ENROLLMENT_PAGE
+);
+
+$enrollmentInfo = [];
+
+if (!empty($icpnaPlexConfigEnrollmentPage)) {
+    $enrollmentInfo = Database::select(
+        '*',
+        'plugin_plex_enrollment',
+        ['where' => ['exe_id = ?' => [$exe->getExeId()]]],
+        'first'
+    );
+}
+
 $this_section = SECTION_COURSES;
 
 $view = new Template(get_lang('LevelReachedInQuiz'), $showHeaders, $showHeaders);
@@ -107,6 +123,7 @@ $view->assign('session', $session);
 $view->assign('session_fields', $sessionFields);
 $view->assign('exe_duration', api_format_time($exe->getExeDuration(), 'js'));
 $view->assign('qr', $quizzesDir['web'].$destinationResult->getHash().'.png');
+$view->assign('enrollment_info', $enrollmentInfo);
 $layout = $view->get_template('exercise/progressive_adaptive_results.tpl');
 $content = $view->fetch($layout);
 $view->assign('content', $content);

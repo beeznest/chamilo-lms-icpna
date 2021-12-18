@@ -223,8 +223,6 @@ ExerciseLib::displayQuestionListByAttempt(
 $pageContent .= ob_get_contents();
 ob_end_clean();
 
-$adaptiveResultData = [];
-
 if ($isAdaptive) {
     $em = Database::getManager();
 
@@ -244,44 +242,6 @@ if ($isAdaptive) {
         Display::addFlash(
             Display::return_message(get_lang('AdaptiveQuizResultIsPreTestCategory'), 'warning', false)
         );
-    } else {
-        $quizzesDir = ExerciseLib::checkQuizzesPath(
-            $exercise_stat_info['exe_user_id']
-        );
-
-        $qrUrl = api_get_path(WEB_CODE_PATH).'exercise/progressive_adaptive_results.php?'
-            .http_build_query(['hash' => $destinationResult->getHash(), 'origin' => $origin]);
-        $qrFileName = $destinationResult->getHash().'.png';
-
-        $content = [
-            $user->getCompleteNameWithUsername(),
-            sprintf(get_lang('LevelReachedX'), $destinationResult->getAchievedLevel()),
-            api_convert_and_format_date(
-                $destinationResult->getExe()->getStartDate(),
-                DATE_TIME_FORMAT_SHORT
-            ),
-            $qrUrl,
-        ];
-        $content = array_map(
-            function ($item) {
-                return strip_tags($item);
-            },
-            $content
-        );
-        $qrContent = implode("\n\r", $content);
-        $qrSystemPath = $quizzesDir['system'].$qrFileName;
-
-        PHPQRCode\QRcode::png($qrContent, $qrSystemPath, 'H', 2, 2);
-
-        $adaptiveResultData = [
-            'quiz_dir_web' => $quizzesDir['web'],
-            'destination_result' => $destinationResult,
-            'user_complete_name' => $user->getCompleteNameWithUsername(),
-            'origin' => $origin,
-            'mail_sent' => true,
-        ];
-
-        ExerciseLib::sendEmailNotificationForAdaptiveResult($destinationResult);
     }
 
     Session::erase('adaptive_quiz_level');
@@ -353,23 +313,10 @@ if (!in_array($origin, ['learnpath', 'embeddable'])) {
     $showFooter = false;
 }
 
-if (!empty($adaptiveResultData)) {
-    $plexConfig = api_get_plugin_setting('icpna_plex_config', IcpnaPlexConfigPlugin::SETTING_ENROLLMENT_PAGE);
+$adaptiveResultData = [];
 
-    if (!empty($plexConfig)) {
-        $adaptiveResultData['enrollment_page'] = $plexConfig;
-
-        $exe_id = isset($_REQUEST['exe_id']) ? (int) $_REQUEST['exe_id'] : 0;
-
-        $enrollmentInfo = IcpnaPlexConfigPlugin::getEnrollmentByExeId($exe_id);
-
-        if (!empty($enrollmentInfo['level_reached'])) {
-            $adaptiveResultData['destination_result']->setAchievedLevel($enrollmentInfo['level_reached']);
-        }
-
-        $adaptiveResultData['exam_validity'] = $enrollmentInfo['exam_validity'];
-        $adaptiveResultData['period_validity'] = $enrollmentInfo['period_validity'];
-    }
+if ($isAdaptive) {
+    $adaptiveResultData = IcpnaPlexConfigPlugin::generateQrCodeAndNotifyUser($destinationResult);
 }
 
 $template = new Template($nameTools, $showHeader, $showFooter);

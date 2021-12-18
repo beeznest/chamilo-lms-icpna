@@ -142,4 +142,56 @@ class IcpnaPlexConfigPlugin extends Plugin
             'first'
         );
     }
+
+    public static function generateQrCodeAndNotifyUser(CQuizDestinationResult $destinationResult)
+    {
+        $origin = api_get_origin();
+        $user = $destinationResult->getUser();
+        $exe = $destinationResult->getExe();
+
+        $enrollmentInfo = IcpnaPlexConfigPlugin::getEnrollmentByExeId($exe->getExeId());
+
+        $destinationResult->setAchievedLevel($enrollmentInfo['level_reached']);
+
+        $quizzesDir = ExerciseLib::checkQuizzesPath($user->getId());
+
+        $qrUrl = api_get_path(WEB_CODE_PATH).'exercise/progressive_adaptive_results.php?'
+            .http_build_query(['hash' => $destinationResult->getHash(), 'origin' => $origin]);
+        $qrFileName = $destinationResult->getHash().'.png';
+
+        $content = [
+            $user->getCompleteNameWithUsername(),
+            sprintf(get_lang('LevelReachedX'), $destinationResult->getAchievedLevel()),
+            api_convert_and_format_date(
+                $exe->getStartDate(),
+                DATE_TIME_FORMAT_SHORT
+            ),
+            $qrUrl,
+        ];
+        $content = array_map(
+            function ($item) {
+                return strip_tags($item);
+            },
+            $content
+        );
+        $qrContent = implode("\n\r", $content);
+        $qrSystemPath = $quizzesDir['system'].$qrFileName;
+
+        PHPQRCode\QRcode::png($qrContent, $qrSystemPath, 'H', 2, 2);
+
+        ExerciseLib::sendEmailNotificationForAdaptiveResult($destinationResult);
+
+        $plexConfig = api_get_plugin_setting('icpna_plex_config', IcpnaPlexConfigPlugin::SETTING_ENROLLMENT_PAGE);
+
+        return [
+            'quiz_dir_web' => $quizzesDir['web'],
+            'destination_result' => $destinationResult,
+            'user_complete_name' => $user->getCompleteNameWithUsername(),
+            'origin' => $origin,
+            'mail_sent' => true,
+            'enrollment_page' => $plexConfig,
+            'exam_validity' => $enrollmentInfo['exam_validity'],
+            'period_validity' => $enrollmentInfo['period_validity'],
+        ];
+    }
 }

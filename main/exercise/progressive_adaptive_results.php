@@ -104,12 +104,7 @@ $icpnaPlexConfigEnrollmentPage = api_get_plugin_setting(
 $enrollmentInfo = [];
 
 if (!empty($icpnaPlexConfigEnrollmentPage)) {
-    $enrollmentInfo = Database::select(
-        '*',
-        'plugin_plex_enrollment',
-        ['where' => ['exe_id = ?' => [$exe->getExeId()]]],
-        'first'
-    );
+    $enrollmentInfo = IcpnaPlexConfigPlugin::getEnrollmentByExeId($exe->getExeId());
 }
 
 $this_section = SECTION_COURSES;

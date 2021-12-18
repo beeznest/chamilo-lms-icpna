@@ -127,4 +127,19 @@ class IcpnaPlexConfigPlugin extends Plugin
         $sql = "DROP TABLE IF EXISTS plugin_plex_enrollment";
         Database::query($sql);
     }
+
+    /**
+     * @param int $exeId
+     *
+     * @return array
+     */
+    public static function getEnrollmentByExeId($exeId)
+    {
+        return Database::select(
+            '*',
+            'plugin_plex_enrollment',
+            ['where' => ['exe_id = ?' => [(int) $exeId]]],
+            'first'
+        );
+    }
 }

@@ -361,12 +361,7 @@ if (!empty($adaptiveResultData)) {
 
         $exe_id = isset($_REQUEST['exe_id']) ? (int) $_REQUEST['exe_id'] : 0;
 
-        $enrollmentInfo = Database::select(
-            '*',
-            'plugin_plex_enrollment',
-            ['where' => ['exe_id = ?' => [$exe_id]]],
-            'first'
-        );
+        $enrollmentInfo = IcpnaPlexConfigPlugin::getEnrollmentByExeId($exe_id);
 
         if (!empty($enrollmentInfo['level_reached'])) {
             $adaptiveResultData['destination_result']->setAchievedLevel($enrollmentInfo['level_reached']);

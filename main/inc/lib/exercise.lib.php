@@ -4993,12 +4993,7 @@ EOT;
         if (!empty($icpnaPlexConfigEnrollmentPage)) {
             $view->assign('enrollment_page', $icpnaPlexConfigEnrollmentPage);
 
-            $enrollmentInfo = Database::select(
-                '*',
-                'plugin_plex_enrollment',
-                ['where' => ['exe_id = ?' => [$exe->getExeId()]]],
-                'first'
-            );
+            $enrollmentInfo = IcpnaPlexConfigPlugin::getEnrollmentByExeId($exe->getExeId());
 
             $view->assign('exam_validity', $enrollmentInfo['exam_validity']);
             $view->assign('period_validity', $enrollmentInfo['period_validity']);
@@ -5665,12 +5660,7 @@ EOT;
         );
 
         if (!empty($icpnaPlexConfigEnrollmentPage)) {
-            $enrollmentInfo = Database::select(
-                '*',
-                'plugin_plex_enrollment',
-                ['where' => ['exe_id = ?' => [$destinationResult->getExe()->getExeId()]]],
-                'first'
-            );
+            $enrollmentInfo = IcpnaPlexConfigPlugin::getEnrollmentByExeId($destinationResult->getExe()->getExeId());
 
             $message = sprintf(get_lang('LevelReachedX'), $enrollmentInfo['level_reached']);
 

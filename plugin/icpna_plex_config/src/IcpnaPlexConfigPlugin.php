@@ -149,7 +149,11 @@ class IcpnaPlexConfigPlugin extends Plugin
         $user = $destinationResult->getUser();
         $exe = $destinationResult->getExe();
 
-        $enrollmentInfo = IcpnaPlexConfigPlugin::getEnrollmentByExeId($exe->getExeId());
+        $enrollmentInfo = self::getEnrollmentByExeId($exe->getExeId());
+
+        if (empty($enrollmentInfo)) {
+            return [];
+        }
 
         $destinationResult->setAchievedLevel($enrollmentInfo['level_reached']);
 
@@ -181,7 +185,7 @@ class IcpnaPlexConfigPlugin extends Plugin
 
         ExerciseLib::sendEmailNotificationForAdaptiveResult($destinationResult);
 
-        $plexConfig = api_get_plugin_setting('icpna_plex_config', IcpnaPlexConfigPlugin::SETTING_ENROLLMENT_PAGE);
+        $plexConfig = api_get_plugin_setting('icpna_plex_config', self::SETTING_ENROLLMENT_PAGE);
 
         return [
             'quiz_dir_web' => $quizzesDir['web'],

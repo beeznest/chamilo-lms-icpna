@@ -37,6 +37,13 @@ if (empty($destinationResult)) {
     );
 }
 
+if (0 === strpos($destinationResult->getAchievedLevel(), 'P - ')) {
+    api_not_allowed(
+        $showHeaders,
+        Display::return_message(get_lang('AdaptiveQuizResultIsPreTestCategory'), 'warning', false)
+    );
+}
+
 $exe = $destinationResult->getExe();
 $student = $destinationResult->getUser();
 $course = api_get_course_entity($exe->getCId());

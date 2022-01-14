@@ -495,7 +495,7 @@ foreach ($questionList as $questionId) {
                                     $(function() {
                                         new HotspotQuestion({
                                             questionId: $questionId,
-                                            exerciseId: {$objExercise->id},                                            
+                                            exerciseId: {$objExercise->id},
                                             exeId: $id,
                                             selector: '#hotspot-solution-$questionId-$id',
                                             for: 'solution',
@@ -649,7 +649,7 @@ foreach ($questionList as $questionId) {
                 }
 
                 //showing the score
-                $queryfree = "SELECT marks from ".$TBL_TRACK_ATTEMPT." 
+                $queryfree = "SELECT marks from ".$TBL_TRACK_ATTEMPT."
                               WHERE exe_id = ".intval($id)." AND question_id= ".intval($questionId);
                 $resfree = Database::query($queryfree);
                 $questionScore = Database::result($resfree, 0, "marks");

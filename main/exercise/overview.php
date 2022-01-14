@@ -300,11 +300,7 @@ if (!empty($attempts)) {
         }
 
         if ($exerciseIsAdaptive) {
-            $destinationResult = Database::getManager()
-                ->getRepository('ChamiloCourseBundle:CQuizDestinationResult')
-                ->findOneBy(['exe' => $attempt_result['exe_id'], 'user' => $attempt_result['exe_user_id']]);
-
-            $score = ExerciseLib::getAdaptiveResulMessage($destinationResult);
+            $score = ExerciseLib::getAdaptiveResulMessage($attempt_result['exe_id'], $attempt_result['exe_user_id']);
         } else {
             $score = ExerciseLib::show_score($attempt_result['exe_result'], $attempt_result['exe_weighting']);
         }

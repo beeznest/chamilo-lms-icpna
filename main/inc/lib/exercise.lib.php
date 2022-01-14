@@ -5636,12 +5636,17 @@ EOT;
     }
 
     /**
-     * @param CQuizDestinationResult|null $destinationResult
+     * @param int $exeId
+     * @param int $userId
      *
      * @return string
      */
-    public static function getAdaptiveResulMessage(CQuizDestinationResult $destinationResult = null)
+    public static function getAdaptiveResulMessage($exeId, $userId)
     {
+        $destinationResult = Database::getManager()
+            ->getRepository('ChamiloCourseBundle:CQuizDestinationResult')
+            ->findOneBy(['exe' => $exeId, 'user' => $userId]);
+
         if (empty($destinationResult)) {
             return '';
         }
@@ -5652,18 +5657,23 @@ EOT;
             return Display::return_message(get_lang('AdaptiveQuizResultIsPreTestCategory'), 'warning', false);
         }
 
+        $configPlugin = IcpnaPlexConfigPlugin::create();
+
         $message = sprintf(get_lang('LevelReachedX'), $destinationResult->getAchievedLevel());
 
-        $icpnaPlexConfigEnrollmentPage = api_get_plugin_setting(
-            'icpna_plex_config',
-            IcpnaPlexConfigPlugin::SETTING_ENROLLMENT_PAGE
-        );
+        if (!$configPlugin->isEnableInCourse(api_get_cidreq())) {
+            return $message;
+        }
+
+        $enrollmentInfo = IcpnaPlexConfigPlugin::getEnrollmentByExeId($destinationResult->getExe()->getExeId());
+
+        if (!empty($enrollmentInfo['level_reached'])) {
+            $message = sprintf(get_lang('LevelReachedX'), $enrollmentInfo['level_reached']);
+        }
+
+        $icpnaPlexConfigEnrollmentPage = $configPlugin->get(IcpnaPlexConfigPlugin::SETTING_ENROLLMENT_PAGE);
 
         if (!empty($icpnaPlexConfigEnrollmentPage)) {
-            $enrollmentInfo = IcpnaPlexConfigPlugin::getEnrollmentByExeId($destinationResult->getExe()->getExeId());
-
-            $message = sprintf(get_lang('LevelReachedX'), $enrollmentInfo['level_reached']);
-
             $message .= PHP_EOL
                 .Display::toolbarButton(
                     get_plugin_lang('GoToEnrollment', IcpnaPlexConfigPlugin::class),

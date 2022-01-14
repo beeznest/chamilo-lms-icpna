@@ -198,4 +198,12 @@ class IcpnaPlexConfigPlugin extends Plugin
             'period_validity' => $enrollmentInfo['period_validity'],
         ];
     }
+
+    public function isEnableInCourse($courseCode)
+    {
+        $enabledCourses = (string) $this->get(self::SETTING_COURSES);
+        $enabledCourses = explode(',', $enabledCourses);
+
+        return in_array($courseCode, $enabledCourses);
+    }
 }

@@ -1165,11 +1165,7 @@ if (!empty($exerciseList)) {
                                 $rowTrack = Database::fetch_array($qryres);
 
                                 if (EXERCISE_FEEDBACK_TYPE_PROGRESSIVE_ADAPTIVE == $exercise->selectFeedbackType()) {
-                                    $destinationResult = $em
-                                        ->getRepository('ChamiloCourseBundle:CQuizDestinationResult')
-                                        ->findOneBy(['exe' => $rowTrack['exe_id'], 'user' => $rowTrack['exe_user_id']]);
-
-                                    $attemptText = ExerciseLib::getAdaptiveResulMessage($destinationResult);
+                                    $attemptText = ExerciseLib::getAdaptiveResulMessage($rowTrack['exe_id'], $rowTrack['exe_user_id']);
                                 } else {
                                     $attemptText = get_lang('LatestAttempt').' : ';
                                     $attemptText .= ExerciseLib::show_score(
@@ -1239,11 +1235,7 @@ if (!empty($exerciseList)) {
                             $rowTrack = Database::fetch_array($qryres);
 
                             if (EXERCISE_FEEDBACK_TYPE_PROGRESSIVE_ADAPTIVE == $exercise->selectFeedbackType()) {
-                                $destinationResult = $em
-                                    ->getRepository('ChamiloCourseBundle:CQuizDestinationResult')
-                                    ->findOneBy(['exe' => $rowTrack['exe_id'], 'user' => $rowTrack['exe_user_id']]);
-
-                                $attemptText = ExerciseLib::getAdaptiveResulMessage($destinationResult);
+                                $attemptText = ExerciseLib::getAdaptiveResulMessage($rowTrack['exe_id'], $rowTrack['exe_user_id']);
                             } else {
                                 $attemptText = get_lang('LatestAttempt').' : ';
                                 $attemptText .= ExerciseLib::show_score(

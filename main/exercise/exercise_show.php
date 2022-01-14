@@ -1004,6 +1004,17 @@ if ($origin != 'learnpath' || ($origin == 'learnpath' && isset($_GET['fb_type'])
                 true,
                 $countPendingQuestions
             );
+
+            if (EXERCISE_FEEDBACK_TYPE_PROGRESSIVE_ADAPTIVE == $objExercise->selectFeedbackType()) {
+                $totalScoreText .= Display::return_message(
+                    ExerciseLib::getAdaptiveResulMessage(
+                        $track_exercise_info['exe_id'],
+                        $track_exercise_info['exe_user_id']
+                    ),
+                    'success',
+                    false
+                );
+            }
         }
 
         $totalScoreText .= '</div>';

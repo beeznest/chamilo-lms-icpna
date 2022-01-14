@@ -12,6 +12,9 @@ use GuzzleHttp\Exception\RequestException;
  */
 class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObserverInterface
 {
+    /**
+     * @var IcpnaPlexConfigPlugin
+     */
     private static $plugin;
 
     /**
@@ -34,16 +37,16 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
     {
         $hookData = $hookvent->getEventData();
         $exeId = !empty($hookData['exe_id']) ? (int) $hookData['exe_id'] : 0;
-        $currentCourseCode = api_get_course_id();
 
         if (empty($exeId)) {
             return;
         }
 
-        $courses = (string) self::$plugin->get(IcpnaPlexConfigPlugin::SETTING_COURSES);
-        $courses = explode(',', $courses);
+        if (!self::$plugin->isEnableInCourse(api_get_course_id())) {
+            Display::addFlash(
+                Display::return_message(get_lang('ThankYouForPassingTheTest'), 'success')
+            );
 
-        if (!in_array($currentCourseCode, $courses)) {
             return;
         }
 

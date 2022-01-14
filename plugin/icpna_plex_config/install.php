@@ -1,8 +1,10 @@
 <?php
 /* For licensing terms, see /license.txt */
 
-if (api_is_platform_admin()) {
-    IcpnaPlexConfigPlugin::create()->createDbTables();
+$plexConfigPlugin = IcpnaPlexConfigPlugin::create();
+
+if (api_is_platform_admin() && !$plexConfigPlugin->isEnabled()) {
+    $plexConfigPlugin->createDbTables();
 
     HookQuizEnd::create()->attach(
         IcpnaPlexConfigQuizEndHook::create()

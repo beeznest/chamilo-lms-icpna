@@ -223,3 +223,4 @@ $ExeStartTime = "Fecha y hora de inicio de examen";
 $ExeEndTime = "Fecha y hora de fin de examen";
 $Username = "Código de alumno";
 $LevelReachedX = "Curso alcanzado: <strong>%s</strong>";
+$ThankYouForTakingTheTest="Gracias por tomar el examen.";

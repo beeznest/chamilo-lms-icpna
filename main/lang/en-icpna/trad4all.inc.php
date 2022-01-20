@@ -23,3 +23,4 @@ $QuizResult="Exam result";
 $HelloXAsYouCanSeeYourCourseListIsEmpty="<p>Hello <strong>%s</strong> and welcome,</p> <p>Here you will see your courses soon!</p>";
 $PleaseAllowUsALittleTimeToSubscribeYouToOneOfOurCourses="Please verify the course start and end dates.";
 $AdaptiveQuizResultIsPreTestCategory="The exam has ended but you have obtained a result that is not valid for the PLEX exam. However in order to enroll you must mail to <a href=\"mailto:PLEX.VIRTUAL@ICPNA.EDU.PE\">PLEX.VIRTUAL@ICPNA.EDU.PE</a>.";
+$ThankYouForTakingTheTest="Thank you for taking the test.";

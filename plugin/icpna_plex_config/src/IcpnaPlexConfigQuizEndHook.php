@@ -44,7 +44,7 @@ class IcpnaPlexConfigQuizEndHook extends HookObserver implements HookQuizEndObse
 
         if (!self::$plugin->isEnableInCourse(api_get_course_id())) {
             Display::addFlash(
-                Display::return_message(get_lang('ThankYouForPassingTheTest'), 'success')
+                Display::return_message(get_lang('ThankYouForTakingTheTest'), 'success')
             );
 
             return;

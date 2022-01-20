@@ -317,6 +317,14 @@ $adaptiveResultData = [];
 
 if ($isAdaptive) {
     $adaptiveResultData = IcpnaPlexConfigPlugin::generateQrCodeAndNotifyUser($destinationResult);
+
+    if (empty($adaptiveResultData && RESULT_DISABLE_SHOW_SCORE_ONLY == $objExercise->selectResultsDisabled())) {
+        $quizzesPath = ExerciseLib::checkQuizzesPath($user->getId());
+
+        $adaptiveResultData = [
+            'destination_result' => $destinationResult,
+        ];
+    }
 }
 
 $template = new Template($nameTools, $showHeader, $showFooter);

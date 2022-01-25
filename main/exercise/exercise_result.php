@@ -109,6 +109,7 @@ if (api_is_course_admin() && !in_array($origin, ['learnpath', 'embeddable'])) {
 $feedback_type = $objExercise->feedback_type;
 $isAdaptive = EXERCISE_FEEDBACK_TYPE_PROGRESSIVE_ADAPTIVE == $objExercise->selectFeedbackType();
 $exercise_stat_info = $objExercise->get_stat_track_exercise_info_by_exe_id($exe_id);
+$resultsDisabled = $objExercise->selectResultsDisabled();
 
 if (!empty($exercise_stat_info['data_tracking'])) {
     $question_list = explode(',', $exercise_stat_info['data_tracking']);
@@ -318,12 +319,12 @@ $adaptiveResultData = [];
 if ($isAdaptive) {
     $adaptiveResultData = IcpnaPlexConfigPlugin::generateQrCodeAndNotifyUser($destinationResult);
 
-    if (empty($adaptiveResultData && RESULT_DISABLE_SHOW_SCORE_ONLY == $objExercise->selectResultsDisabled())) {
-        $quizzesPath = ExerciseLib::checkQuizzesPath($user->getId());
-
-        $adaptiveResultData = [
-            'destination_result' => $destinationResult,
-        ];
+    if (empty($adaptiveResultData) && RESULT_DISABLE_SHOW_SCORE_ONLY == $resultsDisabled) {
+        if (!isset($achievedLevelIsPreTest) || !$achievedLevelIsPreTest) {
+            $adaptiveResultData = [
+                'destination_result' => $destinationResult,
+            ];
+        }
     }
 }
 

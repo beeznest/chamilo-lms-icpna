@@ -5661,7 +5661,7 @@ EOT;
 
         $message = sprintf(get_lang('LevelReachedX'), $destinationResult->getAchievedLevel());
 
-        if (!$configPlugin->isEnableInCourse(api_get_cidreq())) {
+        if (!$configPlugin->isEnableInCourse(api_get_course_id())) {
             return $message;
         }
 

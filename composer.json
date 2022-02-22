@@ -116,7 +116,10 @@
         "symfony/dom-crawler": "~3.4",
         "brumann/polyfill-unserialize": "^1.0",
         "yuloh/bccomp-polyfill":  "dev-master",
-        "defuse/php-encryption": "^2.1"
+        "defuse/php-encryption": "^2.1",
+        "firebase/php-jwt": "~5.0",
+        "phpseclib/phpseclib": "^2.0"
+
     },
     "require-dev": {
         "behat/behat": "@stable",

@@ -143,7 +143,7 @@ class IcpnaPlexConfigPlugin extends Plugin
         );
     }
 
-    public static function generateQrCodeAndNotifyUser(CQuizDestinationResult $destinationResult)
+    public static function generateQrCodeAndNotifyUser(CQuizDestinationResult $destinationResult, $sendEmail = true)
     {
         $origin = api_get_origin();
         $user = $destinationResult->getUser();
@@ -183,7 +183,9 @@ class IcpnaPlexConfigPlugin extends Plugin
 
         PHPQRCode\QRcode::png($qrContent, $qrSystemPath, 'H', 2, 2);
 
-        ExerciseLib::sendEmailNotificationForAdaptiveResult($destinationResult);
+        if ($sendEmail) {
+            ExerciseLib::sendEmailNotificationForAdaptiveResult($destinationResult);
+        }
 
         $plexConfig = api_get_plugin_setting('icpna_plex_config', self::SETTING_ENROLLMENT_PAGE);
 
@@ -192,7 +194,7 @@ class IcpnaPlexConfigPlugin extends Plugin
             'destination_result' => $destinationResult,
             'user_complete_name' => $user->getCompleteNameWithUsername(),
             'origin' => $origin,
-            'mail_sent' => true,
+            'mail_sent' => $sendEmail,
             'enrollment_page' => $plexConfig,
             'exam_validity' => $enrollmentInfo['exam_validity'],
             'period_validity' => $enrollmentInfo['period_validity'],
@@ -205,5 +207,51 @@ class IcpnaPlexConfigPlugin extends Plugin
         $enabledCourses = explode(',', $enabledCourses);
 
         return in_array($courseCode, $enabledCourses);
+    }
+
+    public function displayAdaptiveResultInsteadOfOverview(array $exercise_stat_info)
+    {
+        if (!$this->isEnableInCourse(api_get_course_id())) {
+            return;
+        }
+
+        $objExercise = new Exercise();
+        $objExercise->read($exercise_stat_info['exe_exo_id']);
+
+        if (EXERCISE_FEEDBACK_TYPE_PROGRESSIVE_ADAPTIVE != $objExercise->selectFeedbackType()
+            || 1 != $objExercise->selectAttempts()
+        ) {
+            return;
+        }
+
+        $em = Database::getManager();
+
+        $pageContent = $objExercise->showExerciseResultHeader(
+            api_get_user_info($exercise_stat_info['exe_user_id']),
+            $exercise_stat_info
+        );
+
+        $destinationResult = $em
+            ->getRepository('ChamiloCourseBundle:CQuizDestinationResult')
+            ->findOneBy(
+                [
+                    'user' => $exercise_stat_info['exe_user_id'],
+                    'exe' => $exercise_stat_info['exe_id']
+                ]
+            );
+
+        $template = new Template(get_lang('Exercises'));
+        $template->assign('page_content', $pageContent);
+        $template->assign(
+            'adaptive_result',
+            self::generateQrCodeAndNotifyUser($destinationResult, false)
+        );
+        $layout = $template->fetch(
+            $template->get_template('exercise/result.tpl')
+        );
+        $template->assign('content', $layout);
+        $template->display_one_col_template();
+
+        exit;
     }
 }

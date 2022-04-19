@@ -47,6 +47,8 @@ if (empty($objExercise)) {
     $objExercise = new Exercise();
     $exercise_stat_info = $objExercise->get_stat_track_exercise_info_by_exe_id($exe_id);
     if (!empty($exercise_stat_info) && isset($exercise_stat_info['exe_exo_id'])) {
+        IcpnaPlexConfigPlugin::create()->displayAdaptiveResultInsteadOfOverview($exercise_stat_info);
+
         header('Location: overview.php?exerciseId='.$exercise_stat_info['exe_exo_id'].'&'.api_get_cidreq());
         exit;
     }

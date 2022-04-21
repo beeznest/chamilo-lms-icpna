@@ -244,7 +244,7 @@ class IcpnaPlexConfigPlugin extends Plugin
         $template->assign('page_content', $pageContent);
         $template->assign(
             'adaptive_result',
-            self::generateQrCodeAndNotifyUser($destinationResult, false)
+            IcpnaPlexConfigPlugin::returnAdaptiveResultData($destinationResult, $objExercise->selectResultsDisabled())
         );
         $layout = $template->fetch(
             $template->get_template('exercise/result.tpl')
@@ -253,5 +253,20 @@ class IcpnaPlexConfigPlugin extends Plugin
         $template->display_one_col_template();
 
         exit;
+    }
+
+    public static function returnAdaptiveResultData(CQuizDestinationResult $destinationResult, $resultsDisabled)
+    {
+        $adaptiveResultData = IcpnaPlexConfigPlugin::generateQrCodeAndNotifyUser($destinationResult);
+
+        if (empty($adaptiveResultData) && RESULT_DISABLE_SHOW_SCORE_ONLY == $resultsDisabled) {
+            if (!isset($achievedLevelIsPreTest) || !$achievedLevelIsPreTest) {
+                $adaptiveResultData = [
+                    'destination_result' => $destinationResult,
+                ];
+            }
+        }
+
+        return $adaptiveResultData;
     }
 }

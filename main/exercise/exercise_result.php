@@ -319,15 +319,7 @@ if (!in_array($origin, ['learnpath', 'embeddable'])) {
 $adaptiveResultData = [];
 
 if ($isAdaptive) {
-    $adaptiveResultData = IcpnaPlexConfigPlugin::generateQrCodeAndNotifyUser($destinationResult);
-
-    if (empty($adaptiveResultData) && RESULT_DISABLE_SHOW_SCORE_ONLY == $resultsDisabled) {
-        if (!isset($achievedLevelIsPreTest) || !$achievedLevelIsPreTest) {
-            $adaptiveResultData = [
-                'destination_result' => $destinationResult,
-            ];
-        }
-    }
+    $adaptiveResultData = IcpnaPlexConfigPlugin::returnAdaptiveResultData($destinationResult, $resultsDisabled);
 }
 
 $template = new Template($nameTools, $showHeader, $showFooter);

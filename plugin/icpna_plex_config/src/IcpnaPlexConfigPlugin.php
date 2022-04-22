@@ -240,6 +240,17 @@ class IcpnaPlexConfigPlugin extends Plugin
                 ]
             );
 
+        $plexLog = self::getLogByAttempt($exercise_stat_info['exe_id']);
+
+        if (!empty($plexLog) && !empty($plexLog['description'])) {
+            Display::addFlash(
+                Display::div(
+                    "<strong>{$plexLog['description']}</strong>",
+                    ['class' => 'alert text-center', 'style' => 'color: #FFF;background-color: #F00;']
+                )
+            );
+        }
+
         $template = new Template(get_lang('Exercises'));
         $template->assign('page_content', $pageContent);
         $template->assign(
@@ -268,5 +279,31 @@ class IcpnaPlexConfigPlugin extends Plugin
         }
 
         return $adaptiveResultData;
+    }
+
+    /**
+     * @param int $exeId
+     *
+     * @return array
+     */
+    public static function getLogByAttempt($exeId)
+    {
+        $logInfo = Database::select(
+            '*',
+            'plugin_plex_log',
+            [
+                'where' => ['exe_id = ?' => $exeId],
+            ],
+            'first'
+        );
+
+        if (empty($logInfo)) {
+            return [];
+        }
+
+        $logInfo['request'] = unserialize($logInfo['request']);
+        $logInfo['response'] = unserialize($logInfo['response']);
+
+        return $logInfo;
     }
 }

@@ -242,10 +242,10 @@ class IcpnaPlexConfigPlugin extends Plugin
 
         $plexLog = self::getLogByAttempt($exercise_stat_info['exe_id']);
 
-        if (!empty($plexLog) && !empty($plexLog['description'])) {
+        if (!empty($plexLog) &&!empty($plexLog['response']) && !empty($plexLog['response']['description'])) {
             Display::addFlash(
                 Display::div(
-                    "<strong>{$plexLog['description']}</strong>",
+                    "<strong>{$plexLog['response']['description']}</strong>",
                     ['class' => 'alert text-center', 'style' => 'color: #FFF;background-color: #F00;']
                 )
             );

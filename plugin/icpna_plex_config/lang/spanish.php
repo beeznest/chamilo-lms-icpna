@@ -13,5 +13,5 @@ $strings['error_email'] = 'E-mail para Error';
 $strings['error_email_help'] = 'E-mail al cual enviar notificación cuando un error ocurre con el web service.';
 $strings['enrollment_page'] = 'Página para matrícula';
 
-$strings['WsResponseError'] = "El examen ha finalizado, sin embargo para poder matricularte debes escribir a <a href=\"mailto:plex.virtual@icpna.edu.pe\">PLEX.VIRTUAL@ICPNA.EDU.PE</a>.";
+$strings['WsResponseError'] = "El examen ha finalizado, sin embargo para poder matricularte debes escribir a <a href=\"mailto:examendeclasificacion@icpna.edu.pe\">examendeclasificacion@icpna.edu.pe</a>.";
 $strings['GoToEnrollment'] = "Realizar Reserva";

@@ -15,5 +15,5 @@ $strings['enrollment_page'] = 'Enrollment process page';
 
 $strings['FieldCourseCategory'] = 'PLEX: Question category related';
 
-$strings['WsResponseError'] = 'The exam has finished, however in order to enroll you must mail to <a href=\"mailto:plex.virtual@icpna.edu.pe\">PLEX.VIRTUAL@ICPNA.EDU.PE</a>.';
+$strings['WsResponseError'] = 'The exam has finished, however in order to enroll you must mail to <a href=\"mailto:examendeclasificacion@icpna.edu.pe\">examendeclasificacion@icpna.edu.pe</a>.';
 $strings['GoToEnrollment'] = "Go to Enrollment";

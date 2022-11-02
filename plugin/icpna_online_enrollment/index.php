@@ -5,6 +5,7 @@
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Symfony\Component\HttpFoundation\Request as HttpRequest;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 require_once __DIR__.'/../../main/inc/global.inc.php';
 
@@ -12,7 +13,11 @@ $plugin = IcpnaOnlineEnrollmentPlugin::create();
 
 $httpRequest = HttpRequest::createFromGlobals();
 
-$jwt = trim($httpRequest->query->get('token'));
+$methodIsGet = HttpRequest::METHOD_GET === $httpRequest->getMethod();
+
+$jwt = $methodIsGet
+    ? trim($httpRequest->query->get('token'))
+    : trim($httpRequest->request->get('token'));
 
 try {
     if (empty($jwt)) {
@@ -109,16 +114,26 @@ try {
         );
     }
 
-    ChamiloSession::clear();
-    ChamiloSession::write('_user', $chamiloUserInfo);
-    ChamiloSession::write('_user_auth_source', 'platform');
+    if ($methodIsGet) {
+        ChamiloSession::clear();
+        ChamiloSession::write('_user', $chamiloUserInfo);
+        ChamiloSession::write('_user_auth_source', 'platform');
 
-    Event::eventLogin($chamiloUserId);
+        Event::eventLogin($chamiloUserId);
 
-    Redirect::session_request_uri(true, $chamiloUserId);
+        Redirect::session_request_uri(true, $chamiloUserId);
+    } else {
+        HttpResponse::create()->send();
+    }
 } catch (Exception $exception) {
-    api_not_allowed(
-        true,
-        Display::return_message($exception->getMessage())
-    );
+    $message = $exception->getMessage();
+
+    if ($methodIsGet) {
+        api_not_allowed(
+            true,
+            Display::return_message($message)
+        );
+    } else {
+        HttpResponse::create($message, HttpResponse::HTTP_FORBIDDEN)->send();
+    }
 }

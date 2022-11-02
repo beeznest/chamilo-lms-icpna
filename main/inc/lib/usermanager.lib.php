@@ -3292,7 +3292,7 @@ class UserManager
     /**
      * Filter active session by categories when 'hide_session_with_course_field' is set to = '1'
      */
-    private function filteActiveSessionsByExtraFieldInCourse(array $categories)
+    private static function filteActiveSessionsByExtraFieldInCourse(array $categories)
     {
         $fieldVariable = api_get_configuration_value('hide_session_with_course_field');
 

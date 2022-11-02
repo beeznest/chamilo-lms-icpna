@@ -67,9 +67,13 @@ try {
         $plugin->throwException('NoCoursesForThisSession');
     }
 
+    $firstCourseInfo = current($courseList);
+
     $chamiloUserInfo = api_get_user_info_from_username($jwtData['username']);
+    $userExists = false;
 
     if (false !== $chamiloUserInfo) {
+        $userExists = true;
         $chamiloUserId = $chamiloUserInfo['id'];
     } else {
         $chamiloUserId = UserManager::create_user(
@@ -83,10 +87,10 @@ try {
             '',
             $jwtData['phone']
         );
-    }
 
-    if (empty($chamiloUserId)) {
-        $plugin->throwException('UserNotAdded');
+        if (empty($chamiloUserId)) {
+            $plugin->throwException('UserNotAdded');
+        }
     }
 
     $userExtraValue->save([
@@ -97,33 +101,44 @@ try {
 
     $chamiloUserInfo = api_get_user_info($chamiloUserId);
 
-    if ('student' === $jwtData['role']) {
-        SessionManager::subscribeUsersToSession(
-            $sessionId,
-            [$chamiloUserId],
-            SESSION_VISIBLE_READ_ONLY,
-            false
-        );
-    } else {
-        $firstCourseInfo = current($courseList);
+    $existingUserSubscription = SessionManager::getUserSession($chamiloUserId, $sessionId);
+    $userSubscriptionExists = !empty($existingUserSubscription);
 
-        SessionManager::set_coach_to_course_session(
-            $chamiloUserId,
-            $sessionId,
-            $firstCourseInfo['real_id']
-        );
+    if (!$userSubscriptionExists) {
+        if ('student' === $jwtData['role']) {
+            SessionManager::subscribeUsersToSession(
+                $sessionId,
+                [$chamiloUserId],
+                SESSION_VISIBLE_READ_ONLY,
+                false
+            );
+        } else {
+            SessionManager::set_coach_to_course_session(
+                $chamiloUserId,
+                $sessionId,
+                $firstCourseInfo['real_id']
+            );
+        }
     }
 
     if ($methodIsGet) {
         ChamiloSession::clear();
         ChamiloSession::write('_user', $chamiloUserInfo);
         ChamiloSession::write('_user_auth_source', 'platform');
+        ChamiloSession::write(
+            'redirect_after_not_allow_page',
+            api_get_course_url($firstCourseInfo['code'], $sessionId)
+        );
 
         Event::eventLogin($chamiloUserId);
 
+        $_GET['redirect_after_not_allow_page'] = 1;
+
         Redirect::session_request_uri(true, $chamiloUserId);
     } else {
-        HttpResponse::create()->send();
+        $httpStatus = $userExists || $userSubscriptionExists ? HttpResponse::HTTP_OK : HttpResponse::HTTP_CREATED;
+
+        HttpResponse::create('', $httpStatus)->send();
     }
 } catch (Exception $exception) {
     $message = $exception->getMessage();

@@ -2,7 +2,7 @@
 
 /* For licensing terms, see /license.txt */
 
-class IcpnaOnlineEnrollmentPlugin extends Plugin
+class IcpnaOnlineEnrollmentPlugin extends Plugin implements HookPluginInterface
 {
     const SETTING_JWT_PUBLIC_KEY = 'jwt_public_key';
 
@@ -34,5 +34,19 @@ class IcpnaOnlineEnrollmentPlugin extends Plugin
     public function throwException($languageVariable)
     {
         throw new Exception($this->get_lang($languageVariable));
+    }
+
+    public function installHook()
+    {
+        $observer = IcpnaOnlineEnrollmentQuizEndHook::create();
+
+        HookQuizEnd::create()->attach($observer);
+    }
+
+    public function uninstallHook()
+    {
+        $observer = IcpnaOnlineEnrollmentQuizEndHook::create();
+
+        HookQuizEnd::create()->detach($observer);
     }
 }

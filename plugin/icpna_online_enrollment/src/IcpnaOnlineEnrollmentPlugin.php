@@ -6,6 +6,8 @@ class IcpnaOnlineEnrollmentPlugin extends Plugin implements HookPluginInterface
 {
     const SETTING_JWT_PUBLIC_KEY = 'jwt_public_key';
 
+    const FIELD_SO_SESSION = 'o_e_session';
+
     protected function __construct()
     {
         $settings = [

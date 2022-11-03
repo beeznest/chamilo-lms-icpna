@@ -12,3 +12,4 @@ $strings['jwt_public_key_help'] = "Ruta absoluta al archivo de clave pública";
 $strings['TokenIsMissing'] = 'Falta el token';
 $strings['PlublicKeyNotFound'] = 'Llave pública no encontrada';
 $strings['UidProgramaNotFound'] = 'UidIdPrograma no registrado';
+$strings['IsOnlineEnrollment'] = 'Con matrícula en línea';

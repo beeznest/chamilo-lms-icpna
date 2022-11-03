@@ -121,6 +121,12 @@ try {
         }
     }
 
+    $sessionExtraValue->save([
+        'item_id' => $sessionId,
+        'variable' => IcpnaOnlineEnrollmentPlugin::FIELD_SO_SESSION,
+        'value' => '1',
+    ]);
+
     if ($methodIsGet) {
         ChamiloSession::clear();
         ChamiloSession::write('_user', $chamiloUserInfo);

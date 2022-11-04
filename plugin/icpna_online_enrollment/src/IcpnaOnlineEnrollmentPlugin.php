@@ -2,7 +2,10 @@
 
 /* For licensing terms, see /license.txt */
 
-class IcpnaOnlineEnrollmentPlugin extends Plugin implements HookPluginInterface
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
+class IcpnaOnlineEnrollmentPlugin extends Plugin
 {
     const SETTING_JWT_PUBLIC_KEY = 'jwt_public_key';
 
@@ -31,24 +34,112 @@ class IcpnaOnlineEnrollmentPlugin extends Plugin implements HookPluginInterface
     }
 
     /**
+     * @param string $jwt
+     *
      * @throws Exception
+     *
+     * @return array
      */
-    public function throwException($languageVariable)
+    public function getJwtData($jwt)
     {
-        throw new Exception($this->get_lang($languageVariable));
+        $jwt = trim($jwt);
+
+        if (empty($jwt)) {
+            throw new Exception($this->get_lang('UserNotAdded'));
+        }
+
+        $keyFilePath = $this->get(self::SETTING_JWT_PUBLIC_KEY);
+
+        if (!file_exists($keyFilePath) || !is_readable($keyFilePath)) {
+            throw new Exception($this->get_lang('PlublicKeyNotFound'));
+        }
+
+        $key = new Key(
+            file_get_contents($keyFilePath),
+            'RS256'
+        );
+
+        $decoded = (array) JWT::decode($jwt, $key);
+
+        if (empty($decoded['data'])) {
+            throw new Exception($this->get_lang('NoData'));
+        }
+
+        $jwtData = (array) $decoded['data'];
+        $jwtData['uididprograma'] = strtoupper($jwtData['uididprograma']);
+        $jwtData['uididpersona'] = strtoupper($jwtData['uididpersona']);
+
+        return $jwtData;
     }
 
-    public function installHook()
+    /**
+     * @param string $uidIdPrograma
+     *
+     * @throws Exception
+     *
+     * @return int
+     */
+    public function getSessionId($uidIdPrograma)
     {
-        $observer = IcpnaOnlineEnrollmentQuizEndHook::create();
+        $sessionExtraValue = new ExtraFieldValue('session');
 
-        HookQuizEnd::create()->attach($observer);
+        $uidProgramaValue = $sessionExtraValue->get_item_id_from_field_variable_and_field_value(
+            'uidIdPrograma',
+            $uidIdPrograma
+        );
+
+        if (!is_array($uidProgramaValue) || empty($uidProgramaValue['item_id'])) {
+            throw new Exception($this->get_lang('UidProgramaNotFound'));
+        }
+
+        return (int) $uidProgramaValue['item_id'];
     }
 
-    public function uninstallHook()
+    /**
+     * @param int    $userId
+     * @param string $courseCode
+     * @param int    $sessionId
+     *
+     * @return void
+     */
+    public function impersonate($userId, $courseCode, $sessionId)
     {
-        $observer = IcpnaOnlineEnrollmentQuizEndHook::create();
+        ChamiloSession::clear();
+        ChamiloSession::write(
+            '_user',
+            api_get_user_info($userId)
+        );
+        ChamiloSession::write('_user_auth_source', 'platform');
+        ChamiloSession::write(
+            'redirect_after_not_allow_page',
+            api_get_course_url($courseCode, $sessionId)
+        );
 
-        HookQuizEnd::create()->detach($observer);
+        Event::eventLogin($userId);
+    }
+
+    public function deletePreviousExerciseAttempt($userId, $sessionId)
+    {
+        $tblTrackExercises = Database::get_main_table(TABLE_STATISTIC_TRACK_E_EXERCISES);
+        $tblTrackAttempt = Database::get_main_table(TABLE_STATISTIC_TRACK_E_ATTEMPT);
+
+        Database::delete(
+            $tblTrackExercises,
+            ['session_id = ? AND exe_user_id = ?' => [$sessionId, $userId]]
+        );
+        Database::delete(
+            $tblTrackAttempt,
+            ['session_id = ? AND user_id = ?' => [$sessionId, $userId]]
+        );
+
+        Event::addEvent(
+            'reset_session',
+            'session_and_user_id',
+            [
+                'session_id' => $sessionId,
+                'user_id' => $userId,
+            ],
+            api_get_utc_datetime()
+        );
     }
 }

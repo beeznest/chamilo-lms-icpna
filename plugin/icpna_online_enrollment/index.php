@@ -16,55 +16,18 @@ $httpRequest = HttpRequest::createFromGlobals();
 $methodIsGet = HttpRequest::METHOD_GET === $httpRequest->getMethod();
 
 $jwt = $methodIsGet
-    ? trim($httpRequest->query->get('token'))
-    : trim($httpRequest->request->get('token'));
+    ? $httpRequest->query->get('token')
+    : $httpRequest->request->get('token');
 
 try {
-    if (empty($jwt)) {
-        $plugin->throwException('TokenIsMissing');
-    }
+    $jwtData = $plugin->getJwtData($jwt);
 
-    $keyFilePath = $plugin->get(IcpnaOnlineEnrollmentPlugin::SETTING_JWT_PUBLIC_KEY);
-
-    if (!file_exists($keyFilePath)
-        || !is_readable($keyFilePath)
-    ) {
-        $plugin->throwException('PlublicKeyNotFound');
-    }
-
-    $key = new Key(
-        file_get_contents($keyFilePath),
-        'RS256'
-    );
-
-    $decoded = (array) JWT::decode($jwt, $key);
-
-    if (empty($decoded['data'])) {
-        $plugin->throwException('NoData');
-    }
-
-    $jwtData = (array) $decoded['data'];
-    $jwtData['uididprograma'] = strtoupper($jwtData['uididprograma']);
-    $jwtData['uididpersona'] = strtoupper($jwtData['uididpersona']);
-
-    $sessionExtraValue = new ExtraFieldValue('session');
-    $userExtraValue = new ExtraFieldValue('user');
-
-    $uidProgramaValue = $sessionExtraValue->get_item_id_from_field_variable_and_field_value(
-        'uidIdPrograma',
-        $jwtData['uididprograma']
-    );
-
-    if (false === $uidProgramaValue || empty($uidProgramaValue['item_id'])) {
-        $plugin->throwException('UidProgramaNotFound');
-    }
-
-    $sessionId = (int) $uidProgramaValue['item_id'];
+    $sessionId = $plugin->getSessionId($jwtData['uididprograma']);
 
     $courseList = SessionManager::get_course_list_by_session_id($sessionId);
 
     if (empty($courseList)) {
-        $plugin->throwException('NoCoursesForThisSession');
+        throw new Exception($plugin->get_lang('NoCoursesForThisSession'));
     }
 
     $firstCourseInfo = current($courseList);
@@ -89,17 +52,16 @@ try {
         );
 
         if (empty($chamiloUserId)) {
-            $plugin->throwException('UserNotAdded');
+            throw new Exception($plugin->get('UserNotAdded'));
         }
     }
 
+    $userExtraValue = new ExtraFieldValue('user');
     $userExtraValue->save([
         'item_id' => $chamiloUserId,
         'variable' => 'uididpersona',
         'value' => $jwtData['uididpersona'],
     ]);
-
-    $chamiloUserInfo = api_get_user_info($chamiloUserId);
 
     $existingUserSubscription = SessionManager::getUserSession($chamiloUserId, $sessionId);
     $userSubscriptionExists = !empty($existingUserSubscription);
@@ -121,22 +83,10 @@ try {
         }
     }
 
-    $sessionExtraValue->save([
-        'item_id' => $sessionId,
-        'variable' => IcpnaOnlineEnrollmentPlugin::FIELD_SO_SESSION,
-        'value' => '1',
-    ]);
+    $plugin->deletePreviousExerciseAttempt($chamiloUserId, $sessionId);
 
     if ($methodIsGet) {
-        ChamiloSession::clear();
-        ChamiloSession::write('_user', $chamiloUserInfo);
-        ChamiloSession::write('_user_auth_source', 'platform');
-        ChamiloSession::write(
-            'redirect_after_not_allow_page',
-            api_get_course_url($firstCourseInfo['code'], $sessionId)
-        );
-
-        Event::eventLogin($chamiloUserId);
+        $plugin->impersonate($chamiloUserId, $firstCourseInfo['code'], $sessionId);
 
         $_GET['redirect_after_not_allow_page'] = 1;
 

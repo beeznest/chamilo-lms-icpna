@@ -12,4 +12,3 @@ $strings['jwt_public_key_help'] = "Absolute path to public key file";
 $strings['TokenIsMissing'] = 'Token is missing';
 $strings['PlublicKeyNotFound'] = 'Public key not found';
 $strings['UidProgramaNotFound'] = 'UidIdPrograma not found';
-$strings['IsOnlineEnrollment'] = 'Is for online enrollment';

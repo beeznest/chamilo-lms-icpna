@@ -11,6 +11,10 @@ require_once __DIR__.'/../../main/inc/global.inc.php';
 
 $plugin = IcpnaOnlineEnrollmentPlugin::create();
 
+if ('true' !== $plugin->get('tool_enable')) {
+    api_not_allowed(true);
+}
+
 $httpRequest = HttpRequest::createFromGlobals();
 
 $methodIsGet = HttpRequest::METHOD_GET === $httpRequest->getMethod();

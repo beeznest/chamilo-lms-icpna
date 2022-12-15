@@ -77,6 +77,7 @@ $message = Session::read('attempt_remaining');
 Session::erase('attempt_remaining');
 
 $adaptiveResultData = [];
+$pageBottom = '';
 
 if ($isAdaptive) {
     $em = Database::getManager();
@@ -117,10 +118,24 @@ if ($isAdaptive) {
     );
     $pageContent = ob_get_contents();
     ob_end_clean();
+
+    $lpId = (int) $trackExerciseInfo['orig_lp_id'];
+    $lpItemId = (int) $trackExerciseInfo['orig_lp_item_id'];
+    $lpViewId = (int) $trackExerciseInfo['orig_lp_item_view_id'];
+
+    $pageBottom = '<div class="question-return">';
+    $pageBottom .= Display::url(
+        get_lang('GoBackToEx'),
+        api_get_path(WEB_CODE_PATH).'exercise/overview.php?exerciseId='.$exercise_id.'&'.api_get_cidreq().
+        "&learnpath_id=$lpId&learnpath_item_id=$lpItemId&learnpath_item_view_id=$lpViewId",
+        ['class' => 'btn btn-primary']
+    );
+    $pageBottom .= '</div>';
 }
 
 $template = new Template('', $show_headers, $show_headers);
 $template->assign('page_content', $pageContent);
+$template->assign('page_bottom', $pageBottom);
 $template->assign('adaptive_result', $adaptiveResultData);
 $layout = $template->fetch(
     $template->get_template('exercise/result.tpl')

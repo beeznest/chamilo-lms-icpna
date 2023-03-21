@@ -103,7 +103,7 @@ foreach ($branches as $id => $branch) {
     }
     if ($mode == 'process') {
         //Load transactions saved before
-        $params = array('branch_id' => $branch_id, 'number_of_transactions' => '500');
+        $params = array('branch_id' => $branch_id, 'number_of_transactions' => '500', 'time_threshold' => 0);
         $count_total_transactions += $migration->get_transactions_from_webservice($params);
         error_log('WS:   Returned to transaction.cron.php after getting tx from branch '.$branch_id.'. Calling execute...');
         $count_transactions += $migration->execute_transactions($params);

@@ -1659,7 +1659,7 @@ class MigrationCustom
                 $session_info['display_end_date'],
                 $session_info['coach_access_start_date'],
                 $session_info['coach_access_end_date'],
-                null,
+                $session_info['id_coach'],
                 null,
                 SESSION_VISIBLE_READ_ONLY,
                 null,
@@ -3277,6 +3277,8 @@ class MigrationCustom
         } else {
             error_log('Data is not valid');
         }
+
+        return [];
     }
 
     /*  object(SimpleXMLElement)#11 (5) {
@@ -3633,7 +3635,9 @@ class MigrationCustom
         //$result['estado'] = intval($result['estado']);
 
         //Searching id_coach
-        $result['id_coach'] = MigrationCustom::getUserIDByPersonaID($result['id_coach'], $data_list);
+        $result['id_coach'] = isset($result['id_coach'])
+                ? MigrationCustom::getUserIDByPersonaID($result['id_coach'], $data_list)
+                : null;
 
         unset($result['uididprograma']);
         unset($result['uididsede']);

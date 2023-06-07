@@ -1996,9 +1996,9 @@ class ExtraField extends Model
     {
         $form = new FormValidator($this->type.'_field', 'post', $url);
 
-        $form->addElement('hidden', 'type', $this->type);
+        $form->addHidden('type', $this->type);
         $id = isset($_GET['id']) ? (int) $_GET['id'] : null;
-        $form->addElement('hidden', 'id', $id);
+        $form->addHidden('id', $id);
 
         // Setting the form elements
         $header = get_lang('Add');
@@ -2010,7 +2010,7 @@ class ExtraField extends Model
             $defaults = $this->get($id, false);
         }
 
-        $form->addElement('header', $header);
+        $form->addHeader($header);
 
         if ($action === 'edit') {
             $translateUrl = api_get_path(WEB_CODE_PATH).'extrafield/translate.php?'
@@ -2022,7 +2022,7 @@ class ExtraField extends Model
                 [get_lang('Name'), $translateButton]
             );
         } else {
-            $form->addElement('text', 'display_text', get_lang('Name'));
+            $form->addText('display_text', get_lang('Name'));
         }
 
         // Field type
@@ -2035,8 +2035,8 @@ class ExtraField extends Model
             $types,
             ['id' => 'field_type']
         );
-        $form->addElement('label', get_lang('Example'), '<div id="example">-</div>');
-        $form->addElement('text', 'variable', get_lang('FieldLabel'), ['class' => 'span5']);
+        $form->addLabel(get_lang('Example'), '<div id="example">-</div>');
+        $form->addText('variable', get_lang('FieldLabel'), false);
         $form->addElement(
             'text',
             'field_options',
@@ -2060,23 +2060,23 @@ class ExtraField extends Model
                     get_lang('EditExtraFieldOptions'),
                     'extra_field_options.php?type='.$this->type.'&field_id='.$id
                 );
-                $form->addElement('label', null, $url);
+                $form->addLabel(null, $url);
 
                 if ($defaults['field_type'] == self::FIELD_TYPE_SELECT) {
                     $urlWorkFlow = Display::url(
                         get_lang('EditExtraFieldWorkFlow'),
                         'extra_field_workflow.php?type='.$this->type.'&field_id='.$id
                     );
-                    $form->addElement('label', null, $urlWorkFlow);
+                    $form->addLabel(null, $urlWorkFlow);
                 }
 
                 $form->freeze('field_options');
             }
         }
-        $form->addElement(
-            'text',
+        $form->addText(
             'default_value',
             get_lang('FieldDefaultValue'),
+            false,
             ['id' => 'default_value']
         );
 
@@ -2114,7 +2114,7 @@ class ExtraField extends Model
         $form->addGroup($group, '', get_lang('FieldLoggeable'), '', false);
         */
 
-        $form->addElement('text', 'field_order', get_lang('FieldOrder'));
+        $form->addNumeric('field_order', get_lang('FieldOrder'), ['step' => 1, 'min' => 0]);
 
         if ($action == 'edit') {
             $option = new ExtraFieldOption($this->type);

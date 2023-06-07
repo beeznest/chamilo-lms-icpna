@@ -86,7 +86,7 @@ class UserGroup extends Model
             $urlId = api_get_current_access_url_id();
             $sql = "SELECT $select
                     FROM ".$this->usergroup_rel_user_table." u
-                    INNER JOIN ".$this->access_url_rel_usergroup." a 
+                    INNER JOIN ".$this->access_url_rel_usergroup." a
                     ON (u.user_id = a.user_id)
                     WHERE usergroup_id = $id AND access_url_id = $urlId ";
         } else {
@@ -202,7 +202,7 @@ class UserGroup extends Model
 
             $sql = "SELECT count(a.id) as count
                     FROM {$this->table} a
-                    WHERE 1 =1 
+                    WHERE 1 =1
                     $typeCondition
                     $authorCondition
             ";
@@ -551,7 +551,7 @@ class UserGroup extends Model
                     ],
                 ],
             ];
-            $from = $this->usergroup_rel_course_table." as c 
+            $from = $this->usergroup_rel_course_table." as c
                     INNER JOIN ".$this->access_url_rel_usergroup." a
                     ON c.usergroup_id = a.usergroup_id";
         } else {
@@ -1057,7 +1057,7 @@ class UserGroup extends Model
         if ($this->useMultipleUrl) {
             $urlId = api_get_current_access_url_id();
             $sql = "SELECT * FROM $this->table u
-                    INNER JOIN {$this->access_url_rel_usergroup} a 
+                    INNER JOIN {$this->access_url_rel_usergroup} a
                     ON (a.usergroup_id = u.id)
                     WHERE name = '".$name."' AND access_url_id = $urlId";
         } else {
@@ -1568,7 +1568,7 @@ class UserGroup extends Model
             $needle = api_convert_encoding($needle, $charset, 'utf-8');
             $needle = Database::escape_string($needle);
             // search courses where username or firstname or lastname begins likes $needle
-            $sql = 'SELECT id, name 
+            $sql = 'SELECT id, name
                     FROM '.Database::get_main_table(TABLE_USERGROUP).' u
                     WHERE name LIKE "'.$needle.'%"
                     ORDER BY name
@@ -1629,11 +1629,8 @@ class UserGroup extends Model
 
         $form->addElement('header', $header);
 
-        //Name
-        $form->addElement('text', 'name', get_lang('Name'), ['maxlength' => 255]);
-        $form->applyFilter('name', 'trim');
-
-        $form->addRule('name', get_lang('ThisFieldIsRequired'), 'required');
+        // Name
+        $form->addText('name', get_lang('Name'), true, ['maxlength' => 255]);
         $form->addRule('name', '', 'maxlength', 255);
 
         // Description
@@ -1650,13 +1647,12 @@ class UserGroup extends Model
         }
 
         // url
-        $form->addElement('text', 'url', get_lang('Url'));
-        $form->applyFilter('url', 'trim');
+        $form->addText('url', get_lang('Url'), false);
 
         // Picture
         $allowed_picture_types = $this->getAllowedPictureExtensions();
 
-        $form->addElement('file', 'picture', get_lang('AddPicture'));
+        $form->addFile('picture', get_lang('AddPicture'));
         $form->addRule(
             'picture',
             get_lang('OnlyImagesAllowed').' ('.implode(',', $allowed_picture_types).')',
@@ -1667,7 +1663,7 @@ class UserGroup extends Model
         if (isset($data['picture']) && strlen($data['picture']) > 0) {
             $picture = $this->get_picture_group($data['id'], $data['picture'], 80);
             $img = '<img src="'.$picture['file'].'" />';
-            $form->addElement('label', null, $img);
+            $form->addLabel(null, $img);
             $form->addElement('checkbox', 'delete_picture', '', get_lang('DelImage'));
         }
 
@@ -2216,13 +2212,13 @@ class UserGroup extends Model
             $num = intval($num);
         }
 
-        $where = " WHERE 
+        $where = " WHERE
                         g.group_type = ".self::SOCIAL_CLASS." AND
-                        gu.relation_type IN 
-                        ('".GROUP_USER_PERMISSION_ADMIN."' , 
+                        gu.relation_type IN
+                        ('".GROUP_USER_PERMISSION_ADMIN."' ,
                         '".GROUP_USER_PERMISSION_READER."',
-                        '".GROUP_USER_PERMISSION_MODERATOR."',  
-                        '".GROUP_USER_PERMISSION_HRM."') 
+                        '".GROUP_USER_PERMISSION_MODERATOR."',
+                        '".GROUP_USER_PERMISSION_HRM."')
                     ";
         $sql = "SELECT DISTINCT
                   count(user_id) as count,

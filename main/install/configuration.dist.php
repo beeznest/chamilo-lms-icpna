@@ -1288,3 +1288,9 @@ $_configuration['required_extra_fields_in_profile'] = [
 // You need add a new option called "confirmation" to the registration settings
 //INSERT INTO settings_options (variable, value, display_text) VALUES ('allow_registration', 'confirmation', 'MailConfirmation');
 // ------ (End) Custom DB changes
+
+// Enable use of a custom course logo in mail & PDF headers
+// $_configuration['mail_header_from_custom_course_logo'] = false;
+
+// Enable additional_webservices.php for *remote* PPT2PNG/Oogie service
+//$_configuration['webservice_remote_ppt2png_enable'] = false;

@@ -32,6 +32,8 @@ set_time_limit(0);
 $purification_option_for_usernames = false;
 $inserted_in_course = [];
 
+$error_message = '';
+
 $warn = null;
 if (isset($_POST['formSent']) && $_POST['formSent']) {
     if (isset($_FILES['import_file']['tmp_name']) &&
@@ -168,9 +170,14 @@ if (isset($_POST['formSent']) && $_POST['formSent']) {
 
                         // Looking up for the teacher.
                         $username = trim(api_utf8_decode($courseNode->CourseTeacher));
-                        $sql = "SELECT user_id, lastname, firstname FROM $tbl_user WHERE username='$username'";
-                        $rs = Database::query($sql);
-                        list($user_id, $lastname, $firstname) = Database::fetch_array($rs);
+                        $rs = Database::select(
+                            ['user_id', 'lastname', 'firstname'],
+                            $tbl_user,
+                            ['where' => ['username = ?' => $username]],
+                            'first',
+                            'NUM'
+                        );
+                        list($user_id, $lastname, $firstname) = $rs;
 
                         $params['teachers'] = $user_id;
                         CourseManager::create_course($params);
@@ -231,7 +238,7 @@ if (isset($_POST['formSent']) && $_POST['formSent']) {
                         $visibility = trim(api_utf8_decode($node_session->Visibility));
                         $session_category_id = trim(api_utf8_decode($node_session->SessionCategory));
 
-                        if (!$updatesession) {
+                        if (!$isOverwrite) {
                             // Always create a session.
                             $unique_name = false; // This MUST be initializead.
                             $i = 0;
@@ -259,7 +266,7 @@ if (isset($_POST['formSent']) && $_POST['formSent']) {
                                     access_end_date = '$date_end',
                                     visibility = '$visibility',
                                     session_category_id = '$session_category_id',
-                                    session_admin_id=".intval($_user['user_id']);
+                                    session_admin_id=".api_get_user_id();
                             $rs_session = Database::query($sql_session);
                             $session_id = Database::insert_id();
                             $session_counter++;
@@ -275,7 +282,7 @@ if (isset($_POST['formSent']) && $_POST['formSent']) {
                                         access_end_date = '$date_end',
                                         visibility = '$visibility',
                                         session_category_id = '$session_category_id',
-                                        session_admin_id=".intval($_user['user_id']);
+                                        session_admin_id=".api_get_user_id();
                                 $rs_session = Database::query($sql_session);
                                 $session_id = Database::insert_id();
                                 $session_counter++;
@@ -335,7 +342,7 @@ if (isset($_POST['formSent']) && $_POST['formSent']) {
                                             c_id = $courseId,
                                             session_id = $session_id";
                                     $rs_course = Database::query($sql_course);
-                                    SessionManager::installCourse($id_session, $courseId);
+                                    SessionManager::installCourse($session_id, $courseId);
                                 }
 
                                 $course_coaches = explode(',', $node_course->Coach);
@@ -352,7 +359,7 @@ if (isset($_POST['formSent']) && $_POST['formSent']) {
                                                 status = 2 ";
                                         $rs_coachs = Database::query($sql);
                                     } else {
-                                        $error_message .= get_lang('UserDoesNotExist').' : '.$user.'<br />';
+                                        $error_message .= get_lang('UserDoesNotExist').' : '.$course_coach.'<br />';
                                     }
                                 }
 

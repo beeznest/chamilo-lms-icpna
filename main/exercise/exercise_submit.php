@@ -500,6 +500,7 @@ if (empty($exercise_stat_info)) {
     }
 }
 
+Session::write('exe_id', $exe_id);
 $saveDurationUrl = api_get_path(WEB_AJAX_PATH).'exercise.ajax.php?a=update_duration&exe_id='.$exe_id.'&'.api_get_cidreq();
 $questionListInSession = Session::read('questionList');
 

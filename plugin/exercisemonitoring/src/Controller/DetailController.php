@@ -8,6 +8,7 @@ use Chamilo\CoreBundle\Entity\TrackEExercises;
 use Chamilo\CourseBundle\Entity\CQuiz;
 use Chamilo\CourseBundle\Entity\CQuizQuestion;
 use Chamilo\PluginBundle\ExerciseFocused\Traits\DetailControllerTrait;
+use Chamilo\CourseBundle\Entity\CQuizQuestionCategory;
 use Display;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
@@ -86,6 +87,10 @@ class DetailController
             $qb
                 ->addSelect(['qq.question AS log_level'])
                 ->innerJoin(CQuizQuestion::class, 'qq', Join::WITH, 'l.level = qq.iid');
+        } elseif (ONE_CATEGORY_PER_PAGE == $objExercise->selectType()) {
+            $qb
+                ->addSelect(['qqc.title AS log_level'])
+                ->innerJoin(CQuizQuestionCategory::class, 'qqc', Join::WITH, 'l.level = qqc.iid');
         }
 
         $logs = $qb

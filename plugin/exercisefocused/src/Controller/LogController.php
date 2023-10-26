@@ -6,6 +6,7 @@ namespace Chamilo\PluginBundle\ExerciseFocused\Controller;
 
 use Chamilo\CoreBundle\Entity\TrackEExercises;
 use Chamilo\CourseBundle\Entity\CQuizQuestion;
+use Chamilo\CourseBundle\Entity\CQuizQuestionCategory;
 use Chamilo\PluginBundle\ExerciseFocused\Entity\Log;
 use ChamiloSession;
 use Exception;
@@ -65,6 +66,14 @@ class LogController extends BaseController
             }
 
             $level = $question->getIid();
+        } elseif (ONE_CATEGORY_PER_PAGE == $objExercise->selectType()) {
+            try {
+                $category = $this->em->find(CQuizQuestionCategory::class, $levelId);
+
+                $level = $category->getId();
+            } catch (Exception $exception) {
+                throw new Exception('Invalid level');
+            }
         }
 
         $log = new Log();

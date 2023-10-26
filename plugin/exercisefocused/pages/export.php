@@ -130,13 +130,41 @@ foreach ($results as $result) {
             $data[] = $row;
         }
     } elseif (ALL_ON_ONE_PAGE === $quizType) {
+    } elseif (ONE_CATEGORY_PER_PAGE === $quizType) {
+        $categorySequence = TestCategory::getCategorySequence($trackExe->getExeId());
+
+        foreach ($categorySequence as $details) {
+            $score = strip_tags(
+                ExerciseLib::show_score($details['score'], $details['weight'])
+            );
+            $outfocused = $focusedLogRepository->countByActionAndLevel(
+                $trackExe,
+                FocusedLog::TYPE_OUTFOCUSED,
+                $details['category_id']
+            );
+            $returns = $focusedLogRepository->countByActionAndLevel(
+                $trackExe,
+                FocusedLog::TYPE_RETURN,
+                $details['category_id']
+            );
+
+            $row = [
+                $details['category_title'],
+                api_get_local_time($details['tms']),
+                $score,
+                $outfocused,
+                $returns,
+                getSnapshotListForLevel($details['category_id'], $trackExe),
+            ];
+
+            $data[] = $row;
+        }
     }
 
     $data[] = [];
     $data[] = [];
 }
 
-//var_dump($data);
 Export::arrayToXls($data);
 
 function getSessionIdFromFormValues(array $formValues, array $fieldVariableList): array

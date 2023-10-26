@@ -6,7 +6,7 @@
 
     {% set ALL_ON_ONE_PAGE = exercisefocused.exercise_type == 1 %}
     {% set ONE_PER_PAGE = exercisefocused.exercise_type == 2 %}
-
+    {% set ONE_CATEGORY_PER_PAGE = exercisefocused.exercise_type == 3 %}
 <script>
     $(function () {
         var $exerciseFocused = $("#exercisefocused-block").appendTo('body');
@@ -43,6 +43,8 @@
             {% elseif ONE_PER_PAGE %}
                 window.quizTimeEnding = true;
                 $('[name="save_now"]').trigger('click');
+            {% elseif ONE_CATEGORY_PER_PAGE %}
+                $('button[name="save_category_now"]').trigger('click');
             {% endif %}
         }
 
@@ -71,6 +73,8 @@
                 var levelId = 0;
             {% elseif ONE_PER_PAGE %}
                 var levelId = $btnSaveNow.data('question') || -1;
+            {% elseif ONE_CATEGORY_PER_PAGE %}
+                var levelId = $('button[name="save_category_now"]').data('category') || -1;
             {% endif %}
 
             $.ajax({

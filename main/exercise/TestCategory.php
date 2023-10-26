@@ -1381,4 +1381,46 @@ class TestCategory
 
         return $result['expiredTime'];
     }
+
+    public static function getCategorySequence($exeId)
+    {
+        $sql = "SELECT qc.id AS category_id, qc.title category, ta.tms, qq.iid AS question_id, ta.marks
+            FROM track_e_attempt ta
+            INNER JOIN track_e_exercises te ON ta.exe_id = te.exe_id AND ta.c_id = te.c_id
+            INNER JOIN c_quiz_question qq ON ta.question_id = qq.iid AND ta.c_id = qq.c_id
+            INNER JOIN c_quiz_question_rel_category qrc ON qq.iid = qrc.question_id
+            INNER JOIN c_quiz_question_category qc ON qrc.category_id = qc.id
+            LEFT JOIN c_quiz_answer qa ON qq.iid = qa.question_id AND ta.answer = qa.iid
+            WHERE te.exe_id = ".(int) $exeId." ORDER BY ta.tms";
+
+        $dbStmt = Database::query($sql);
+
+        $lastCatId = 0;
+        $lastCatWeight = 0;
+        $lastCatScore = 0;
+
+        $sequence = [];
+
+        while ($row = Database::fetch_assoc($dbStmt)) {
+            $lastCatScore += $row['marks'];
+            $lastCatWeight += Question::read($row['question_id'])->selectWeighting();
+
+            if ($lastCatId != $row['category_id']) {
+                $lastCatId = $row['category_id'];
+
+                $sequence[] = [
+                    'category_id' => $lastCatId,
+                    'category_title' => $row['category'],
+                    'score' => $lastCatScore,
+                    'weight' => $lastCatWeight,
+                    'tms' => $row['tms'],
+                ];
+
+                $lastCatWeight = 0;
+                $lastCatScore = 0;
+            }
+        }
+
+        return $sequence;
+    }
 }

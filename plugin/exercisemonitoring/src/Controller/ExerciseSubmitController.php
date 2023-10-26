@@ -5,6 +5,7 @@
 use Chamilo\CoreBundle\Entity\TrackEExercises;
 use Chamilo\CourseBundle\Entity\CQuiz;
 use Chamilo\CourseBundle\Entity\CQuizQuestion;
+use Chamilo\CourseBundle\Entity\CQuizQuestionCategory;
 use Chamilo\PluginBundle\ExerciseMonitoring\Entity\Log;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Filesystem\Filesystem;
@@ -59,6 +60,9 @@ class ExerciseSubmitController
         if (ONE_PER_PAGE == $objExercise->selectType()) {
             $question = $this->em->find(CQuizQuestion::class, $levelId);
             $level = $question->getIid();
+        } elseif (ONE_CATEGORY_PER_PAGE == $objExercise->selectType()) {
+            $questionCategory = $this->em->find(CQuizQuestionCategory::class, $levelId);
+            $level = $questionCategory->getId();
         }
 
         $log = new Log();

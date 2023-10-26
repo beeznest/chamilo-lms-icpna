@@ -1,6 +1,7 @@
 {% if exercisemonitoring.show_submit_region and exercisemonitoring.enabled %}
     {% set ALL_ON_ONE_PAGE = exercisemonitoring.exercise_type == 1 %}
     {% set ONE_PER_PAGE = exercisemonitoring.exercise_type == 2 %}
+    {% set ONE_CATEGORY_PER_PAGE = exercisemonitoring.exercise_type == 3 %}
 
     <div id="monitoring-camera"></div>
 
@@ -9,6 +10,7 @@
         $(function () {
             var $btnSaveNow = $('button[name="save_now"]');
             var $btnEndTest = $('button[name="validate_all"]');
+            var $btnSaveCategoryNow = $('button[name="save_category_now"]');
 
             Webcam.set({
                 height: 480,
@@ -20,6 +22,8 @@
                     snapAndSendData(0);
                 {% elseif ONE_PER_PAGE %}
                     snapByQuestion();
+                {% elseif ONE_CATEGORY_PER_PAGE %}
+                    snapByCategory();
                 {% endif %}
             });
 
@@ -30,6 +34,10 @@
             {% elseif ONE_PER_PAGE %}
                 $btnSaveNow.on('click', function () {
                     snapByQuestion();
+                });
+            {% elseif ONE_CATEGORY_PER_PAGE %}
+                $btnSaveCategoryNow.on('click', function () {
+                    snapByCategory();
                 });
             {% endif %}
 
@@ -43,6 +51,12 @@
                 var questionId = $btnSaveNow.data('question') || 0;
 
                 snapAndSendData(questionId);
+            }
+
+            function snapByCategory() {
+                var categoryId = $btnSaveCategoryNow.data('category') || 0;
+
+                snapAndSendData(categoryId);
             }
 
             function sendData(questionId, imageUri) {

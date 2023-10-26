@@ -6,6 +6,7 @@ namespace Chamilo\PluginBundle\ExerciseFocused\Controller;
 
 use Chamilo\CoreBundle\Entity\TrackEExercises;
 use Chamilo\CourseBundle\Entity\CQuizQuestion;
+use Chamilo\CourseBundle\Entity\CQuizQuestionCategory;
 use Chamilo\PluginBundle\ExerciseFocused\Entity\Log;
 use Chamilo\PluginBundle\ExerciseFocused\Traits\DetailControllerTrait;
 use Doctrine\ORM\OptimisticLockException;
@@ -74,6 +75,13 @@ class DetailController extends BaseController
                     $question = $this->em->find(CQuizQuestion::class, $log->getLevel());
 
                     $strLevel = $question->getQuestion();
+                } catch (Exception $exception) {
+                }
+            } elseif (ONE_CATEGORY_PER_PAGE == $objExercise->selectType()) {
+                try {
+                    $category = $this->em->find(CQuizQuestionCategory::class, $log->getLevel());
+
+                    $strLevel = $category->getTitle();
                 } catch (Exception $exception) {
                 }
             }

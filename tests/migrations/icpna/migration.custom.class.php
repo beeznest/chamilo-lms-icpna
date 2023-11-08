@@ -1130,13 +1130,14 @@ class MigrationCustom
                     $extraFieldValue->save($params);
                 }
 
-                return [
+                /*return [
                     'entity' => 'user',
                     'before' => null,
                     'after' => $chamiloUserInfo,
                     'message' => "Existing user $uidIdPersonaId: ".print_r($chamiloUserInfo, true),
                     'status_id' => self::TRANSACTION_STATUS_DEPRECATED
-                ];
+                ];*/
+                return self::transaction_3($data, $web_service_details);
             }
 
             $chamilo_user_id = self::create_user_custom_ws(

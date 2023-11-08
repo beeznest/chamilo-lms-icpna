@@ -66,6 +66,8 @@ foreach ($results as $result) {
         ];
     }
 
+    $enrollmentInfo = IcpnaPlexConfigPlugin::getEnrollmentByExeId($trackExe->getExeId());
+
     $data[] = [
         get_lang('CourseTitle'),
         api_get_course_entity($trackExe->getCId())->getTitle(),
@@ -90,6 +92,14 @@ foreach ($results as $result) {
         $plugin->get_lang('Motive'),
         $plugin->calculateMotive($outfocusedLimitCount, $timeLimitCount),
     ];
+
+    if ($enrollmentInfo) {
+        $data[] = [
+            $plugin->get_lang('LevelReached'),
+            $enrollmentInfo ? $enrollmentInfo['level_reached'] : null,
+        ];
+    }
+
     $data[] = [];
 
     $data[] = [

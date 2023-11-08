@@ -1159,6 +1159,9 @@ class MigrationCustom
                 ];
                 $extraFieldValue->save($params);
             }
+            if (!empty($user_info['extra_birthdate'])) {
+                UserManager::update_extra_field_value($chamilo_user_id, 'birthdate', $user_info['extra_birthdate']);
+            }
             $chamilo_user_info = api_get_user_info($chamilo_user_id);
 
             if ($chamilo_user_info && $chamilo_user_info['id']) {
@@ -1276,6 +1279,9 @@ class MigrationCustom
                     [],
                     $chamilo_user_info_before['language']
                 );
+                if (!empty($user_info['extra_birthdate'])) {
+                    UserManager::update_extra_field_value($user_id, 'birthdate', $user_info['extra_birthdate']);
+                }
                 $chamilo_user_info = api_get_user_info($user_id, false, false, true);
                 // We extra-update the user to set a password that works with the salt
                 UserManager::updatePassword($chamilo_user_info['id'], $user_info['password']);
@@ -3538,6 +3544,7 @@ class MigrationCustom
         $result['phone'] = (string)$result['phone'];
         $result['active'] = (int)$result['active'];
         $result['extra_uididpersona'] = strtoupper($params['uididpersona']);
+        $result['extra_birthdate'] = (string) $params['birthdate'];
         unset($result['rol']);
         return $result;
     }

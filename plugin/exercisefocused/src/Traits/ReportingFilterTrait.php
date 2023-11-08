@@ -17,6 +17,7 @@ use ExtraField;
 use ExtraFieldValue;
 use FormValidator;
 use HTML_Table;
+use IcpnaPlexConfigPlugin;
 
 trait ReportingFilterTrait
 {
@@ -217,6 +218,7 @@ trait ReportingFilterTrait
             $tableHeaders[] = get_lang('ExerciseName');
         }
 
+        $tableHeaders[] = $this->plugin->get_lang('LevelReached');
         $tableHeaders[] = $this->plugin->get_lang('ExerciseStartDateAndTime');
         $tableHeaders[] = $this->plugin->get_lang('ExerciseEndDateAndTime');
         $tableHeaders[] = $this->plugin->get_lang('Outfocused');
@@ -240,6 +242,8 @@ trait ReportingFilterTrait
                 $actionLinks .= $pluginMonitoring->generateDetailLink((int) $result['id']);
             }
 
+            $enrollmentInfo = IcpnaPlexConfigPlugin::getEnrollmentByExeId($result['id']);
+
             $row = [];
 
             $row[] = $result['username'];
@@ -251,6 +255,7 @@ trait ReportingFilterTrait
                 $row[] = $result['quiz_title'];
             }
 
+            $row[] = $enrollmentInfo ? $enrollmentInfo['level_reached'] : null;
             $row[] = api_get_local_time($result['start_date'], null, null, true, true, true);
             $row[] = api_get_local_time($result['end_date'], null, null, true, true, true);
             $row[] = $result['count_outfocused'];
@@ -264,12 +269,12 @@ trait ReportingFilterTrait
         $table = new HTML_Table(['class' => 'table table-hover table-striped data_table']);
         $table->setHeaders($tableHeaders);
         $table->setData($tableData);
-        $table->setColAttributes($courseId ? 2 : 5, ['class' => 'text-center']);
         $table->setColAttributes($courseId ? 3 : 6, ['class' => 'text-center']);
-        $table->setColAttributes($courseId ? 4 : 7, ['class' => 'text-right']);
+        $table->setColAttributes($courseId ? 4 : 7, ['class' => 'text-center']);
         $table->setColAttributes($courseId ? 5 : 8, ['class' => 'text-right']);
-        $table->setColAttributes($courseId ? 6 : 9, ['class' => 'text-center']);
-        $table->setColAttributes($courseId ? 7 : 10, ['class' => 'text-right']);
+        $table->setColAttributes($courseId ? 6 : 9, ['class' => 'text-right']);
+        $table->setColAttributes($courseId ? 7 : 10, ['class' => 'text-center']);
+        $table->setColAttributes($courseId ? 8 : 11, ['class' => 'text-right']);
 
         foreach ($resultData as $idx => $result) {
             $table->setRowAttributes($idx + 1, ['class' => $result['class']], true);

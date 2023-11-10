@@ -3544,7 +3544,8 @@ class MigrationCustom
         $result['phone'] = (string)$result['phone'];
         $result['active'] = (int)$result['active'];
         $result['extra_uididpersona'] = strtoupper($params['uididpersona']);
-        $result['extra_birthdate'] = (string) $params['birthdate'];
+        $result['extra_birthdate'] = (string) $result['birthdate'];
+        unset($result['birthdate']);
         unset($result['rol']);
         return $result;
     }

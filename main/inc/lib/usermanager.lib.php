@@ -756,8 +756,8 @@ class UserManager
         $table_work = Database::get_course_table(TABLE_STUDENT_PUBLICATION);
 
         // Unsubscribe the user from all groups in all his courses
-        $sql = "SELECT c.id 
-                FROM $table_course c 
+        $sql = "SELECT c.id
+                FROM $table_course c
                 INNER JOIN $table_course_user cu
                 ON (c.id = cu.c_id)
                 WHERE
@@ -2302,13 +2302,13 @@ class UserManager
                     </a>';
                 if ($showDelete) {
                     $production_list .= '&nbsp;&nbsp;
-                        <input 
-                            style="width:16px;" 
-                            type="image" 
-                            name="remove_production['.urlencode($file).']" 
-                            src="'.$del_image.'" 
-                            alt="'.$del_text.'" 
-                            title="'.$del_text.' '.htmlentities($file).'" 
+                        <input
+                            style="width:16px;"
+                            type="image"
+                            name="remove_production['.urlencode($file).']"
+                            src="'.$del_image.'"
+                            alt="'.$del_text.'"
+                            title="'.$del_text.' '.htmlentities($file).'"
                             onclick="javascript: return confirmation(\''.htmlentities($file).'\');" /></li>';
                 }
             }
@@ -2522,13 +2522,13 @@ class UserManager
                         '.htmlentities($filename).
                     '</a> ';
                 if ($showDelete) {
-                    $extra_file_list .= '<input 
-                        style="width:16px;" 
-                        type="image" 
-                        name="remove_extra_'.$extra_field.'['.urlencode($file).']" 
-                        src="'.$del_image.'" 
+                    $extra_file_list .= '<input
+                        style="width:16px;"
+                        type="image"
+                        name="remove_extra_'.$extra_field.'['.urlencode($file).']"
+                        src="'.$del_image.'"
                         alt="'.$del_text.'"
-                        title="'.$del_text.' '.htmlentities($filename).'" 
+                        title="'.$del_text.' '.htmlentities($filename).'"
                         onclick="javascript: return confirmation(\''.htmlentities($filename).'\');" /></li>';
                 }
             }
@@ -2783,7 +2783,7 @@ class UserManager
         $res = Database::query($sql);
         if (Database::num_rows($res) > 0) {
             while ($row = Database::fetch_array($res)) {
-                $sqlu = "SELECT value as fval FROM $t_ufv v 
+                $sqlu = "SELECT value as fval FROM $t_ufv v
                          INNER JOIN $t_uf f
                          ON (v.field_id = f.id)
                          WHERE
@@ -3540,7 +3540,7 @@ class UserManager
             FROM $tbl_session_course_user as session_course_user
             INNER JOIN $tbl_course AS course
             ON course.id = session_course_user.c_id AND session_course_user.session_id = $session_id
-            INNER JOIN $tbl_session as session 
+            INNER JOIN $tbl_session as session
             ON session_course_user.session_id = session.id
             LEFT JOIN $tbl_user as user ON user.id = session_course_user.user_id
             WHERE session_course_user.user_id = $user_id
@@ -3628,7 +3628,7 @@ class UserManager
 
         if (api_is_allowed_to_create_course()) {
             $sql = "SELECT DISTINCT
-                        c.visibility, 
+                        c.visibility,
                         c.id as real_id,
                         c.code as course_code,
                         sc.position
@@ -3931,7 +3931,7 @@ class UserManager
             return false;
         }
         $t_api = Database::get_main_table(TABLE_MAIN_USER_API_KEY);
-        $sql = "SELECT id FROM $t_api 
+        $sql = "SELECT id FROM $t_api
                 WHERE user_id=".$user_id." AND api_service='".$api_service."'";
         $res = Database::query($sql);
         $num = Database::num_rows($res);
@@ -3965,7 +3965,7 @@ class UserManager
         }
         $t_api = Database::get_main_table(TABLE_MAIN_USER_API_KEY);
         $api_service = Database::escape_string($api_service);
-        $sql = "SELECT id FROM $t_api 
+        $sql = "SELECT id FROM $t_api
                 WHERE user_id=".$user_id." AND api_service='".$api_service."'";
         $res = Database::query($sql);
         if (Database::num_rows($res) < 1) {
@@ -4012,14 +4012,14 @@ class UserManager
         $t_a = Database::get_main_table(TABLE_MAIN_ACCESS_URL_REL_USER);
 
         if (api_is_multiple_url_enabled()) {
-            $sql = "SELECT count(u.id) 
-                    FROM $t_u u 
+            $sql = "SELECT count(u.id)
+                    FROM $t_u u
                     INNER JOIN $t_a url_user
                     ON (u.id = url_user.user_id)
-                    WHERE url_user.access_url_id = $access_url_id                
+                    WHERE url_user.access_url_id = $access_url_id
             ";
         } else {
-            $sql = "SELECT count(u.id) 
+            $sql = "SELECT count(u.id)
                     FROM $t_u u
                     WHERE 1 = 1 ";
         }
@@ -4656,10 +4656,10 @@ class UserManager
         $js = '<script>
         extra_field_toogle();
         function extra_field_toogle() {
-            if (jQuery("select[name=search_type]").val() != "1") { 
-                jQuery(".extra_field").hide(); 
-            } else { 
-                jQuery(".extra_field").show(); 
+            if (jQuery("select[name=search_type]").val() != "1") {
+                jQuery(".extra_field").hide();
+            } else {
+                jQuery(".extra_field").show();
             }
         }
         </script>';
@@ -4773,13 +4773,13 @@ class UserManager
                 $extra_condition = ' AND relation_type = '.intval($with_status_condition);
             }
             $sql = 'DELETE FROM '.$tbl_my_friend.'
-                    WHERE 
-                        relation_type <> '.USER_RELATION_TYPE_RRHH.' AND 
+                    WHERE
+                        relation_type <> '.USER_RELATION_TYPE_RRHH.' AND
                         friend_user_id='.$friend_id.' '.$extra_condition;
             Database::query($sql);
             $sql = 'DELETE FROM '.$tbl_my_friend.'
-                   WHERE 
-                    relation_type <> '.USER_RELATION_TYPE_RRHH.' AND 
+                   WHERE
+                    relation_type <> '.USER_RELATION_TYPE_RRHH.' AND
                     user_id='.$friend_id.' '.$extra_condition;
             Database::query($sql);
         } else {
@@ -4796,16 +4796,16 @@ class UserManager
                           WHERE user_id='.$user_id.' AND friend_user_id='.$friend_id;
 
                 $sql_j = 'UPDATE '.$tbl_my_message.' SET msg_status='.MESSAGE_STATUS_INVITATION_DENIED.'
-                          WHERE 
-                                user_receiver_id='.$user_id.' AND 
+                          WHERE
+                                user_receiver_id='.$user_id.' AND
                                 user_sender_id='.$friend_id.' AND update_date="0000-00-00 00:00:00" ';
                 // Delete user
                 $sql_ij = 'UPDATE '.$tbl_my_friend.'  SET relation_type='.USER_RELATION_TYPE_DELETED.'
                            WHERE user_id='.$friend_id.' AND friend_user_id='.$user_id;
                 $sql_ji = 'UPDATE '.$tbl_my_message.' SET msg_status='.MESSAGE_STATUS_INVITATION_DENIED.'
-                           WHERE 
-                                user_receiver_id='.$friend_id.' AND 
-                                user_sender_id='.$user_id.' AND 
+                           WHERE
+                                user_receiver_id='.$friend_id.' AND
+                                user_sender_id='.$user_id.' AND
                                 update_date="0000-00-00 00:00:00" ';
                 Database::query($sql_i);
                 Database::query($sql_j);
@@ -4815,15 +4815,15 @@ class UserManager
         }
 
         // Delete accepted invitations
-        $sql = "DELETE FROM $tbl_my_message 
+        $sql = "DELETE FROM $tbl_my_message
                 WHERE
                     msg_status = ".MESSAGE_STATUS_INVITATION_ACCEPTED." AND
                     (
-                        user_receiver_id = $user_id AND 
+                        user_receiver_id = $user_id AND
                         user_sender_id = $friend_id
-                    ) OR 
+                    ) OR
                     (
-                        user_sender_id = $user_id AND 
+                        user_sender_id = $user_id AND
                         user_receiver_id = $friend_id
                     )
         ";
@@ -5042,7 +5042,7 @@ class UserManager
                                     $tbl_session_rel_access_url session_rel_access_rel_user
                                     ON session_rel_access_rel_user.session_id = s.id
                                     WHERE access_url_id = ".api_get_current_access_url_id()."
-                                    $sessionConditionsCoach                                  
+                                    $sessionConditionsCoach
                                 ) OR sru.session_id IN (
                                     SELECT DISTINCT(s.id) FROM $tbl_session s
                                     INNER JOIN $tbl_session_rel_access_url url
@@ -5052,7 +5052,7 @@ class UserManager
                                     WHERE access_url_id = ".api_get_current_access_url_id()."
                                     $sessionConditionsTeacher
                                 )
-                            )                            
+                            )
                             $userConditions
                     )
                     UNION ALL(
@@ -5222,29 +5222,29 @@ class UserManager
         if ($deleteOtherAssignedUsers) {
             if (api_get_multiple_access_url()) {
                 // Deleting assigned users to hrm_id
-                $sql = "SELECT s.user_id 
-                        FROM $userRelUserTable s 
+                $sql = "SELECT s.user_id
+                        FROM $userRelUserTable s
                         INNER JOIN $userRelAccessUrlTable a
-                        ON (a.user_id = s.user_id) 
-                        WHERE 
-                            friend_user_id = $userId AND 
-                            relation_type = $relationType AND 
+                        ON (a.user_id = s.user_id)
+                        WHERE
+                            friend_user_id = $userId AND
+                            relation_type = $relationType AND
                             access_url_id = ".api_get_current_access_url_id();
             } else {
-                $sql = "SELECT user_id 
-                        FROM $userRelUserTable 
-                        WHERE 
-                            friend_user_id = $userId AND 
+                $sql = "SELECT user_id
+                        FROM $userRelUserTable
+                        WHERE
+                            friend_user_id = $userId AND
                             relation_type = $relationType";
             }
             $result = Database::query($sql);
 
             if (Database::num_rows($result) > 0) {
                 while ($row = Database::fetch_array($result)) {
-                    $sql = "DELETE FROM $userRelUserTable 
+                    $sql = "DELETE FROM $userRelUserTable
                             WHERE
-                                user_id = {$row['user_id']} AND 
-                                friend_user_id = $userId AND 
+                                user_id = {$row['user_id']} AND
+                                friend_user_id = $userId AND
                                 relation_type = $relationType";
                     Database::query($sql);
                 }
@@ -5252,8 +5252,8 @@ class UserManager
         }
 
         if ($deleteUsersBeforeInsert) {
-            $sql = "DELETE FROM $userRelUserTable 
-                    WHERE 
+            $sql = "DELETE FROM $userRelUserTable
+                    WHERE
                         user_id = $userId AND
                         relation_type = $relationType";
             Database::query($sql);
@@ -5410,12 +5410,12 @@ class UserManager
             $session_condition = " AND session_id = $session_id";
         }
 
-        $sql = 'SELECT * FROM '.$tbl_grade_certificate.' 
+        $sql = 'SELECT * FROM '.$tbl_grade_certificate.'
                 WHERE cat_id = (
                     SELECT id FROM '.$tbl_grade_category.'
                     WHERE
-                        course_code = "'.Database::escape_string($course_code).'" '.$session_condition.' 
-                    LIMIT 1 
+                        course_code = "'.Database::escape_string($course_code).'" '.$session_condition.'
+                    LIMIT 1
                 ) AND user_id='.intval($user_id);
 
         $rs = Database::query($sql);
@@ -5468,7 +5468,7 @@ class UserManager
         $sql = "SELECT tc.path_certificate,tc.cat_id,tgc.course_code,tgc.name
                 FROM $table_certificate tc, $table_gradebook_category tgc
                 WHERE tgc.id = tc.cat_id AND tc.user_id = $user_id
-                ORDER BY tc.date_certificate DESC 
+                ORDER BY tc.date_certificate DESC
                 LIMIT 5";
 
         $rs = Database::query($sql);
@@ -5646,7 +5646,7 @@ class UserManager
         }
 
         $userRelUserTable = Database::get_main_table(TABLE_MAIN_USER_REL_USER);
-        $sql = "DELETE FROM $userRelUserTable 
+        $sql = "DELETE FROM $userRelUserTable
                 WHERE user_id = $userId AND relation_type = ".USER_RELATION_TYPE_BOSS;
         Database::query($sql);
 
@@ -6017,7 +6017,7 @@ class UserManager
         $sql = <<<SQL
             SELECT id, username, lastname, firstname
             FROM $userTable
-            WHERE 
+            WHERE
                 firstname LIKE '$firstname%' AND
                 lastname LIKE '$lastname%'
 SQL;
@@ -6745,6 +6745,491 @@ SQL;
         );
 
         return $calendar;
+    }
+
+    /**
+     * Return the user's full name. Optionally with the username.
+     *
+     * @param bool $includeUsername Optional. By default username is not included.
+     *
+     * @return string
+     */
+    public static function formatUserFullName(User $user, $includeUsername = false)
+    {
+        $fullName = api_get_person_name($user->getFirstname(), $user->getLastname());
+
+        if ($includeUsername && api_get_configuration_value('hide_username_with_complete_name') !== true) {
+            $username = $user->getUsername();
+
+            return "$fullName ($username)";
+        }
+
+        return $fullName;
+    }
+
+    /**
+     * @param int $userId
+     *
+     * @return array
+     */
+    public static function getUserCareers($userId)
+    {
+        $table = Database::get_main_table(TABLE_MAIN_USER_CAREER);
+        $tableCareer = Database::get_main_table(TABLE_CAREER);
+        $userId = (int) $userId;
+
+        $sql = "SELECT c.id, c.name
+                FROM $table uc
+                INNER JOIN $tableCareer c
+                ON uc.career_id = c.id
+                WHERE user_id = $userId
+                ORDER BY uc.created_at
+                ";
+        $result = Database::query($sql);
+
+        return Database::store_result($result, 'ASSOC');
+    }
+
+    /**
+     * @param int $userId
+     * @param int $careerId
+     */
+    public static function addUserCareer($userId, $careerId)
+    {
+        if (!api_get_configuration_value('allow_career_users')) {
+            return false;
+        }
+
+        if (self::userHasCareer($userId, $careerId) === false) {
+            $params = [
+                'user_id' => $userId,
+                'career_id' => $careerId,
+                'created_at' => api_get_utc_datetime(),
+                'updated_at' => api_get_utc_datetime(),
+            ];
+            $table = Database::get_main_table(TABLE_MAIN_USER_CAREER);
+            Database::insert($table, $params);
+        }
+
+        return true;
+    }
+
+    /**
+     * @param int   $userCareerId
+     * @param array $data
+     *
+     * @return bool
+     */
+    public static function updateUserCareer($userCareerId, $data)
+    {
+        if (!api_get_configuration_value('allow_career_users')) {
+            return false;
+        }
+
+        $params = ['extra_data' => $data, 'updated_at' => api_get_utc_datetime()];
+        $table = Database::get_main_table(TABLE_MAIN_USER_CAREER);
+        Database::update(
+            $table,
+            $params,
+            ['id = ?' => (int) $userCareerId]
+        );
+
+        return true;
+    }
+
+    /**
+     * @param int $userId
+     * @param int $careerId
+     *
+     * @return array
+     */
+    public static function getUserCareer($userId, $careerId)
+    {
+        $userId = (int) $userId;
+        $careerId = (int) $careerId;
+        $table = Database::get_main_table(TABLE_MAIN_USER_CAREER);
+
+        $sql = "SELECT * FROM $table WHERE user_id = $userId AND career_id = $careerId";
+        $result = Database::query($sql);
+
+        return Database::fetch_array($result, 'ASSOC');
+    }
+
+    /**
+     * @param int $userId
+     * @param int $careerId
+     *
+     * @return bool
+     */
+    public static function userHasCareer($userId, $careerId)
+    {
+        $userId = (int) $userId;
+        $careerId = (int) $careerId;
+        $table = Database::get_main_table(TABLE_MAIN_USER_CAREER);
+
+        $sql = "SELECT id FROM $table WHERE user_id = $userId AND career_id = $careerId";
+        $result = Database::query($sql);
+
+        return Database::num_rows($result) > 0;
+    }
+
+    /**
+     * @param int $userId
+     *
+     * @throws Exception
+     */
+    public static function deleteUserFiles($userId)
+    {
+        $path = self::getUserPathById($userId, 'system');
+
+        $fs = new Filesystem();
+        $fs->remove($path);
+    }
+
+    public static function redirectToResetPassword($userId)
+    {
+        $forceRenew = api_get_configuration_value('force_renew_password_at_first_login');
+
+        if ($forceRenew) {
+            $askPassword = self::get_extra_user_data_by_field(
+                $userId,
+                'ask_new_password'
+            );
+
+            if (!empty($askPassword) && isset($askPassword['ask_new_password']) &&
+                1 === (int)$askPassword['ask_new_password']
+            ) {
+                $uniqueId = api_get_unique_id();
+                $userObj = api_get_user_entity($userId);
+
+                $userObj->setConfirmationToken($uniqueId);
+                $userObj->setPasswordRequestedAt(new \DateTime());
+
+                Database::getManager()->persist($userObj);
+                Database::getManager()->flush();
+
+                $url = api_get_path(WEB_CODE_PATH).'auth/reset.php?token='.$uniqueId;
+                api_location($url);
+            }
+        }
+
+        $forceRotateDays = api_get_configuration_value('security_password_rotate_days');
+        $forceRotate = false;
+
+        if ($forceRotateDays > 0) {
+            // get the date of the last password update recorded
+            $lastUpdate = self::get_extra_user_data_by_field(
+                $userId,
+                'password_updated_at'
+            );
+
+            if (empty($lastUpdate) or empty($lastUpdate['password_updated_at'])) {
+                $userObj = api_get_user_entity($userId);
+                $registrationDate = $userObj->getRegistrationDate();
+                $now = new \DateTime(null, new DateTimeZone('UTC'));
+                $interval = $now->diff($registrationDate);
+                $daysSince = $interval->format('%a');
+                if ($daysSince > $forceRotateDays) {
+                    $forceRotate = true;
+                }
+            } else {
+                $now = new \DateTime(null, new DateTimeZone('UTC'));
+                // In some cases, old records might contain an incomplete Y-m-d H:i:s format
+                if (strlen($lastUpdate['password_updated_at']) == 16) {
+                    $lastUpdate['password_updated_at'] .= ':00';
+                }
+                $date = \DateTime::createFromFormat('Y-m-d H:i:s', $lastUpdate['password_updated_at'], new DateTimeZone('UTC'));
+                $interval = $now->diff($date);
+                $daysSince = $interval->format('%a');
+                if ($daysSince > $forceRotateDays) {
+                    $forceRotate = true;
+                }
+            }
+            if ($forceRotate) {
+                $uniqueId = api_get_unique_id();
+                $userObj = api_get_user_entity($userId);
+
+                $userObj->setConfirmationToken($uniqueId);
+                $userObj->setPasswordRequestedAt(new \DateTime());
+
+                Database::getManager()->persist($userObj);
+                Database::getManager()->flush();
+
+                $url = api_get_path(WEB_CODE_PATH).'auth/reset.php?token='.$uniqueId.'&rotate=1';
+                api_location($url);
+            }
+        }
+    }
+
+    /**
+     * It returns the list of user status available.
+     *
+     * @return array
+     */
+    public static function getUserStatusList()
+    {
+        $userStatusConfig = [];
+        // it gets the roles to show in creation/edition user
+        if (true === api_get_configuration_value('user_status_show_options_enabled')) {
+            $userStatusConfig = api_get_configuration_value('user_status_show_option');
+        }
+        // it gets the roles to show in creation/edition user (only for admins)
+        if (true === api_get_configuration_value('user_status_option_only_for_admin_enabled') && api_is_platform_admin()) {
+            $userStatusConfig = api_get_configuration_value('user_status_option_show_only_for_admin');
+        }
+
+        $status = [];
+        if (!empty($userStatusConfig)) {
+            $statusLang = api_get_status_langvars();
+            foreach ($userStatusConfig as $role => $enabled) {
+                if ($enabled) {
+                    $constStatus = constant($role);
+                    $status[$constStatus] = $statusLang[$constStatus];
+                }
+            }
+        } else {
+            $status[COURSEMANAGER] = get_lang('Teacher');
+            $status[STUDENT] = get_lang('Learner');
+            $status[DRH] = get_lang('Drh');
+            $status[SESSIONADMIN] = get_lang('SessionsAdmin');
+            $status[STUDENT_BOSS] = get_lang('RoleStudentBoss');
+            $status[INVITEE] = get_lang('Invitee');
+        }
+
+        return $status;
+    }
+
+    /**
+     * Get the expiration date by user status from configuration value.
+     *
+     * @param $status
+     *
+     * @throws Exception
+     *
+     * @return array
+     */
+    public static function getExpirationDateByRole($status)
+    {
+        $status = (int) $status;
+        $nbDaysByRole = api_get_configuration_value('user_number_of_days_for_default_expiration_date_per_role');
+        $dates = [];
+        if (!empty($nbDaysByRole)) {
+            $date = new DateTime();
+            foreach ($nbDaysByRole as $strVariable => $nDays) {
+                $constStatus = constant($strVariable);
+                if ($status == $constStatus) {
+                    $duration = "P{$nDays}D";
+                    $date->add(new DateInterval($duration));
+                    $newExpirationDate = $date->format('Y-m-d H:i');
+                    $formatted = api_format_date($newExpirationDate, DATE_TIME_FORMAT_LONG_24H);
+                    $dates = ['formatted' => $formatted, 'date' => $newExpirationDate];
+                }
+            }
+        }
+
+        return $dates;
+    }
+
+    public static function getAllowedRolesAsTeacher(): array
+    {
+        return [
+            COURSEMANAGER,
+            SESSIONADMIN,
+        ];
+    }
+
+    /**
+     * Count users in courses and if they have certificate.
+     * This function is resource intensive.
+     *
+     * @return array
+     */
+    public static function countUsersWhoFinishedCourses()
+    {
+        $courses = [];
+        $currentAccessUrlId = api_get_current_access_url_id();
+        $sql = "SELECT course.code, cru.user_id
+                FROM course_rel_user cru
+                    JOIN course ON cru.c_id = course.id
+                    JOIN access_url_rel_user auru on cru.user_id = auru.user_id
+                    JOIN access_url_rel_course ON course.id = access_url_rel_course.c_id
+                WHERE access_url_rel_course.access_url_id = $currentAccessUrlId
+                ORDER BY course.code
+        ";
+
+        $res = Database::query($sql);
+        if (Database::num_rows($res) > 0) {
+            while ($row = Database::fetch_array($res)) {
+                if (!isset($courses[$row['code']])) {
+                    $courses[$row['code']] = [
+                        'subscribed' => 0,
+                        'finished' => 0,
+                    ];
+                }
+
+                $courses[$row['code']]['subscribed']++;
+                $entityManager = Database::getManager();
+                $repository = $entityManager->getRepository('ChamiloCoreBundle:GradebookCategory');
+                //todo check when have more than 1 gradebook
+                /** @var \Chamilo\CoreBundle\Entity\GradebookCategory $gradebook */
+                $gradebook = $repository->findOneBy(['courseCode' => $row['code']]);
+
+                if (!empty($gradebook)) {
+                    $finished = 0;
+                    $gb = Category::createCategoryObjectFromEntity($gradebook);
+                    $finished = $gb->is_certificate_available($row['user_id']);
+                    if (!empty($finished)) {
+                        $courses[$row['code']]['finished']++;
+                    }
+                }
+            }
+        }
+
+        return $courses;
+    }
+
+    /**
+     * Count users in sessions and if they have certificate.
+     * This function is resource intensive.
+     *
+     * @return array
+     */
+    public static function countUsersWhoFinishedCoursesInSessions()
+    {
+        $coursesInSessions = [];
+        $currentAccessUrlId = api_get_current_access_url_id();
+        $sql = "SELECT course.code, srcru.session_id, srcru.user_id, session.name
+                FROM session_rel_course_rel_user srcru
+                    JOIN course ON srcru.c_id = course.id
+                    JOIN access_url_rel_session aurs on srcru.session_id = aurs.session_id
+                    JOIN session ON srcru.session_id = session.id
+                WHERE aurs.access_url_id = $currentAccessUrlId
+                ORDER BY course.code, session.name
+        ";
+
+        $res = Database::query($sql);
+        if (Database::num_rows($res) > 0) {
+            while ($row = Database::fetch_array($res)) {
+                $index = $row['code'].' ('.$row['name'].')';
+                if (!isset($coursesInSessions[$index])) {
+                    $coursesInSessions[$index] = [
+                        'subscribed' => 0,
+                        'finished' => 0,
+                    ];
+                }
+
+                $coursesInSessions[$index]['subscribed']++;
+                $entityManager = Database::getManager();
+                $repository = $entityManager->getRepository('ChamiloCoreBundle:GradebookCategory');
+                /** @var \Chamilo\CoreBundle\Entity\GradebookCategory $gradebook */
+                $gradebook = $repository->findOneBy(
+                    [
+                        'courseCode' => $row['code'],
+                        'sessionId' => $row['session_id'],
+                    ]
+                );
+
+                if (!empty($gradebook)) {
+                    $finished = 0;
+                    $gb = Category::createCategoryObjectFromEntity($gradebook);
+                    $finished = $gb->is_certificate_available($row['user_id']);
+                    if (!empty($finished)) {
+                        $coursesInSessions[$index]['finished']++;
+                    }
+                }
+            }
+        }
+
+        return $coursesInSessions;
+    }
+
+    /**
+     * Build the active-column of the table to lock or unlock a certain user
+     * lock = the user can no longer use this account.
+     *
+     * @author Patrick Cool <patrick.cool@UGent.be>, Ghent University
+     *
+     * @return string Some HTML-code with the lock/unlock button
+     */
+    public static function getActiveFilterForTable(string $active, string $params, array $row): string
+    {
+        if ('1' == $active) {
+            $action = 'Lock';
+            $image = 'accept';
+        } elseif ('-1' == $active) {
+            $action = 'edit';
+            $image = 'warning';
+        } elseif ('0' == $active) {
+            $action = 'Unlock';
+            $image = 'error';
+        }
+
+        if ('edit' === $action) {
+            $langAccountExpired = get_lang('AccountExpired');
+
+            return Display::return_icon(
+                $image.'.png',
+                    $langAccountExpired,
+                [],
+                ICON_SIZE_TINY
+            ).'<span class="sr-only" aria-hidden="true">'.$langAccountExpired.'</span>';
+        }
+
+        if ($row['0'] != api_get_user_id()) {
+            $langAction = get_lang(ucfirst($action));
+            // you cannot lock yourself out otherwise you could disable all the
+            // accounts including your own => everybody is locked out and nobody
+            // can change it anymore.
+            return Display::return_icon(
+                $image.'.png',
+                $langAction,
+                ['onclick' => 'active_user(this);', 'id' => 'img_'.$row['0'], 'style' => 'cursor: pointer;'],
+                ICON_SIZE_TINY
+                ).'<span class="sr-only" aria-hidden="true">'.$langAction.'</span>';
+        }
+
+        return '';
+    }
+
+    public static function getScriptFunctionForActiveFilter(): string
+    {
+        return 'function active_user(element_div) {
+            id_image = $(element_div).attr("id");
+            image_clicked = $(element_div).attr("src");
+            image_clicked_info = image_clicked.split("/");
+            image_real_clicked = image_clicked_info[image_clicked_info.length-1];
+            var status = 1;
+            if (image_real_clicked == "accept.png") {
+                status = 0;
+            }
+            user_id = id_image.split("_");
+            ident = "#img_"+user_id[1];
+            if (confirm("'.get_lang('AreYouSureToEditTheUserStatus', '').'")) {
+                 $.ajax({
+                    contentType: "application/x-www-form-urlencoded",
+                    beforeSend: function(myObject) {
+                        $(ident).attr("src","'.Display::returnIconPath('loading1.gif').'"); //candy eye stuff
+                    },
+                    type: "GET",
+                    url: _p.web_ajax + "user_manager.ajax.php?a=active_user",
+                    data: "user_id=" + user_id[1] + "&status=" + status,
+                    success: function(data) {
+                        if (data == 1) {
+                            $(ident).attr("src", "'.Display::returnIconPath('accept.png', ICON_SIZE_TINY).'");
+                            $(ident).attr("title","'.get_lang('Lock').'");
+                        }
+                        if (data == 0) {
+                            $(ident).attr("src","'.Display::returnIconPath('error.png').'");
+                            $(ident).attr("title","'.get_lang('Unlock').'");
+                        }
+                        if (data == -1) {
+                            $(ident).attr("src", "'.Display::returnIconPath('warning.png').'");
+                            $(ident).attr("title","'.get_lang('ActionNotAllowed').'");
+                        }
+                    }
+                });
+            }
+        }';
     }
 
     /**

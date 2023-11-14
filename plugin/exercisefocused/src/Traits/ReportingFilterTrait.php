@@ -182,7 +182,8 @@ trait ReportingFilterTrait
                 'id' => $value['exe']->getExeId(),
                 'quiz_title' => $value['title'],
                 'username' => $value['username'],
-                'user_fullname' => api_get_person_name($value['firstname'], $value['lastname']),
+                'firstname' => $value['firstname'],
+                'lastname' => $value['lastname'],
                 'start_date' => $value['exe']->getStartDate(),
                 'end_date' => $value['exe']->getExeDate(),
                 'count_outfocused' => $outfocusedCount,
@@ -210,7 +211,8 @@ trait ReportingFilterTrait
 
         $tableHeaders = [];
         $tableHeaders[] = get_lang('LoginName');
-        $tableHeaders[] = get_lang('FullUserName');
+        $tableHeaders[] = get_lang('FirstName');
+        $tableHeaders[] = get_lang('LastName');
 
         if (!$courseId) {
             $tableHeaders[] = get_lang('SessionName');
@@ -247,7 +249,8 @@ trait ReportingFilterTrait
             $row = [];
 
             $row[] = $result['username'];
-            $row[] = $result['user_fullname'];
+            $row[] = $result['firstname'];
+            $row[] = $result['lastname'];
 
             if (!$courseId) {
                 $row[] = $result['session_name'];

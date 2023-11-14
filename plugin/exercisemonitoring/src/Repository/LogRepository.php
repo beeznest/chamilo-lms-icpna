@@ -33,11 +33,11 @@ class LogRepository extends EntityRepository
         if (ONE_PER_PAGE == $objExercise->selectType()) {
             $qb
                 ->addSelect(['qq.question AS log_level'])
-                ->innerJoin(CQuizQuestion::class, 'qq', Join::WITH, 'l.level = qq.iid');
+                ->leftJoin(CQuizQuestion::class, 'qq', Join::WITH, 'l.level = qq.iid');
         } elseif (ONE_CATEGORY_PER_PAGE == $objExercise->selectType()) {
             $qb
                 ->addSelect(['qqc.title AS log_level'])
-                ->innerJoin(CQuizQuestionCategory::class, 'qqc', Join::WITH, 'l.level = qqc.iid');
+                ->leftJoin(CQuizQuestionCategory::class, 'qqc', Join::WITH, 'l.level = qqc.iid');
         }
 
         $query = $qb

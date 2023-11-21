@@ -271,12 +271,12 @@ trait ReportingFilterTrait
         $table = new HTML_Table(['class' => 'table table-hover table-striped data_table']);
         $table->setHeaders($tableHeaders);
         $table->setData($tableData);
-        $table->setColAttributes($courseId ? 3 : 6, ['class' => 'text-center']);
         $table->setColAttributes($courseId ? 4 : 7, ['class' => 'text-center']);
-        $table->setColAttributes($courseId ? 5 : 8, ['class' => 'text-right']);
+        $table->setColAttributes($courseId ? 5 : 8, ['class' => 'text-center']);
         $table->setColAttributes($courseId ? 6 : 9, ['class' => 'text-right']);
-        $table->setColAttributes($courseId ? 7 : 10, ['class' => 'text-center']);
-        $table->setColAttributes($courseId ? 8 : 11, ['class' => 'text-right']);
+        $table->setColAttributes($courseId ? 7 : 10, ['class' => 'text-right']);
+        //$table->setColAttributes($courseId ? 8 : 11, ['class' => 'text-center']);
+        $table->setColAttributes($courseId ? 9 : 12, ['class' => 'text-right']);
 
         foreach ($resultData as $idx => $result) {
             $table->setRowAttributes($idx + 1, ['class' => $result['class']], true);

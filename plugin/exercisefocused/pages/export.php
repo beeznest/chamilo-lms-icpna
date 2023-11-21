@@ -5,6 +5,7 @@
 use Chamilo\CoreBundle\Entity\TrackEAttempt;
 use Chamilo\CoreBundle\Entity\TrackEExercises;
 use Chamilo\CourseBundle\Entity\CQuiz;
+use Chamilo\CourseBundle\Entity\CQuizDestinationResult;
 use Chamilo\PluginBundle\ExerciseFocused\Entity\Log as FocusedLog;
 use Chamilo\PluginBundle\ExerciseMonitoring\Entity\Log as MonitoringLog;
 use Chamilo\UserBundle\Entity\User;
@@ -69,7 +70,7 @@ foreach ($results as $result) {
         ];
     }
 
-    $enrollmentInfo = IcpnaPlexConfigPlugin::getEnrollmentByExeId($trackExe->getExeId());
+    $destinationResult = getAchievedResult($em, (int) $trackExe->getExeId());
 
     $data[] = [
         get_lang('CourseTitle'),
@@ -96,10 +97,10 @@ foreach ($results as $result) {
         $plugin->calculateMotive($outfocusedLimitCount, $timeLimitCount),
     ];
 
-    if ($enrollmentInfo) {
+    if ($destinationResult) {
         $data[] = [
             $plugin->get_lang('LevelReached'),
-            $enrollmentInfo ? $enrollmentInfo['level_reached'] : null,
+            $destinationResult,
         ];
     }
 
@@ -313,4 +314,23 @@ function getSnapshotListForLevel(int $level, TrackEExercises $trackExe): string
     }
 
     return implode(PHP_EOL, $snapshotList);
+}
+
+function getAchievedResult(EntityManagerInterface $em, int $exeId): string
+{
+    $enrollmentInfo = IcpnaPlexConfigPlugin::getEnrollmentByExeId($exeId);
+
+    if ($enrollmentInfo) {
+        return $enrollmentInfo['level_reached'];
+    }
+
+    $repo = $em->getRepository(CQuizDestinationResult::class);
+
+    $destinationResult = $repo->findOneBy(['exe' => $exeId]);
+
+    if ($destinationResult) {
+        return $destinationResult->getAchievedLevel();
+    }
+
+    return '';
 }

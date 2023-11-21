@@ -6,6 +6,7 @@ namespace Chamilo\PluginBundle\ExerciseFocused\Traits;
 
 use Chamilo\CoreBundle\Entity\TrackEExercises;
 use Chamilo\CourseBundle\Entity\CQuiz;
+use Chamilo\CourseBundle\Entity\CQuizDestinationResult;
 use Chamilo\PluginBundle\ExerciseFocused\Entity\Log;
 use Chamilo\UserBundle\Entity\User;
 use Database;
@@ -242,7 +243,7 @@ trait ReportingFilterTrait
                 $actionLinks .= $pluginMonitoring->generateDetailLink((int) $result['id']);
             }
 
-            $enrollmentInfo = IcpnaPlexConfigPlugin::getEnrollmentByExeId($result['id']);
+            $destinationResult = $this->getAchievedResult((int) $result['id']);
 
             $row = [];
 
@@ -256,7 +257,7 @@ trait ReportingFilterTrait
                 $row[] = $result['quiz_title'];
             }
 
-            $row[] = $enrollmentInfo ? $enrollmentInfo['level_reached'] : null;
+            $row[] = $destinationResult;
             $row[] = api_get_local_time($result['start_date'], null, null, true, true, true);
             $row[] = api_get_local_time($result['end_date'], null, null, true, true, true);
             $row[] = $result['count_outfocused'];
@@ -364,5 +365,24 @@ trait ReportingFilterTrait
         }
 
         return array_unique($fieldItemIdList);
+    }
+
+    private function getAchievedResult(int $exeId): string
+    {
+        $enrollmentInfo = IcpnaPlexConfigPlugin::getEnrollmentByExeId($exeId);
+
+        if ($enrollmentInfo) {
+            return $enrollmentInfo['level_reached'];
+        }
+
+        $repo = $this->em->getRepository(CQuizDestinationResult::class);
+
+        $destinationResult = $repo->findOneBy(['exe' => $exeId]);
+
+        if ($destinationResult) {
+            return $destinationResult->getAchievedLevel();
+        }
+
+        return '';
     }
 }

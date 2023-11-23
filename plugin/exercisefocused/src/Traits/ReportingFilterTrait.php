@@ -74,7 +74,7 @@ trait ReportingFilterTrait
 
         $qb = $this->em->createQueryBuilder();
         $qb
-            ->select('te AS exe, q.title, te.startDate, u.firstname, u.lastname, u.username, te.sessionId, te.cId')
+            ->select('te AS exe, q.title, te.startDate, u.id AS user_id, u.firstname, u.lastname, u.username, te.sessionId, te.cId')
             ->from(TrackEExercises::class, 'te')
             ->innerJoin(CQuiz::class, 'q', Join::WITH, 'te.exeExoId = q.iid')
             ->innerJoin(User::class, 'u', Join::WITH, 'te.exeUserId = u.id');
@@ -180,6 +180,7 @@ trait ReportingFilterTrait
             $results[] = [
                 'id' => $value['exe']->getExeId(),
                 'quiz_title' => $value['title'],
+                'user_id' => $value['user_id'],
                 'username' => $value['username'],
                 'firstname' => $value['firstname'],
                 'lastname' => $value['lastname'],
@@ -240,7 +241,10 @@ trait ReportingFilterTrait
             );
 
             if ($isPluginMonitoringEnabled) {
-                $actionLinks .= $pluginMonitoring->generateDetailLink((int) $result['id']);
+                $actionLinks .= $pluginMonitoring->generateDetailLink(
+                    (int) $result['id'],
+                    $result['user_id']
+                );
             }
 
             $destinationResult = $this->getAchievedResult((int) $result['id']);
@@ -325,7 +329,7 @@ trait ReportingFilterTrait
 
         $qb = $this->em->createQueryBuilder();
         $qb
-            ->select('te AS exe, q.title, te.startDate, u.firstname, u.lastname, u.username, te.sessionId, te.cId')
+            ->select('te AS exe, q.title, te.startDate, u.id AS user_id, u.firstname, u.lastname, u.username, te.sessionId, te.cId')
             ->from(TrackEExercises::class, 'te')
             ->innerJoin(CQuiz::class, 'q', Join::WITH, 'te.exeExoId = q.iid')
             ->innerJoin(User::class, 'u', Join::WITH, 'te.exeUserId = u.id')

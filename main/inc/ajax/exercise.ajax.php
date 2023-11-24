@@ -804,6 +804,8 @@ switch ($action) {
                 $expiredTime = new DateTime($_SESSION['expired_time'][$currentExpiredTimeKey], new DateTimeZone('UTC'));
 
                 if ($expiredTime <= $currentUtcTime) {
+                    ExerciseFocusedPlugin::create()->markTrackExeWithMotiveExpired($exeId);
+
                     $categoryInfo = 0 === $destinationCategory
                         ? $objExercise->categoryWithQuestionList[$currentCategoryId]['category']
                         : $objExercise->categoryWithQuestionList[$destinationCategory]['category'];

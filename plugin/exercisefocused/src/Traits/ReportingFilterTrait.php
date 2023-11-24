@@ -13,6 +13,7 @@ use Database;
 use Display;
 use Doctrine\ORM\Query\Expr\Join;
 use Exception;
+use ExerciseFocusedPlugin;
 use ExerciseMonitoringPlugin;
 use ExtraField;
 use ExtraFieldValue;
@@ -174,6 +175,12 @@ trait ReportingFilterTrait
                 }
             }
 
+            if ($markedMotive = ExerciseFocusedPlugin::getTrackExeMotive($value['exe']->getExeId())) {
+                if (ExerciseFocusedPlugin::TRACK_EXE_MOTIVE_EXPIRED_TIME_CATEGORY === $markedMotive) {
+                    $motive = $this->plugin->get_lang('MotiveExpiredTime');
+                }
+            }
+
             $session = api_get_session_entity($value['sessionId']);
             $course = api_get_course_entity($value['cId']);
 
@@ -294,7 +301,7 @@ trait ReportingFilterTrait
         $orderCondition = "ORDER BY exe_id";
 
         if ($randomResults) {
-            $percentage = (int) $this->plugin->get(\ExerciseFocusedPlugin::SETTING_PERCENTAGE_SAMPLING);
+            $percentage = (int) $this->plugin->get(ExerciseFocusedPlugin::SETTING_PERCENTAGE_SAMPLING);
 
             if (empty($percentage)) {
                 return [];

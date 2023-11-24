@@ -21,6 +21,8 @@ class ExerciseFocusedPlugin extends Plugin
 
     private const TABLE_LOG = 'plugin_exercisefocused_log';
 
+    public const TRACK_EXE_MOTIVE_EXPIRED_TIME_CATEGORY = 1;
+
     protected function __construct()
     {
         $settings = [
@@ -74,6 +76,8 @@ class ExerciseFocusedPlugin extends Plugin
             'changeable' => true,
             'filter' => false,
         ]);
+
+        Database::query("ALTER TABLE track_e_exercises ADD plugin_focused_log_motive INT DEFAULT NULL");
     }
 
     public function uninstall()
@@ -192,6 +196,19 @@ class ExerciseFocusedPlugin extends Plugin
         return $motive;
     }
 
+    public function markTrackExeWithMotiveExpired($trackExeId)
+    {
+        if ('true' !== $this->get(self::SETTING_TOOL_ENABLE)) {
+            return;
+        }
+
+        Database::update(
+            Database::get_main_table(TABLE_STATISTIC_TRACK_E_EXERCISES),
+            ['plugin_focused_log_motive' => self::TRACK_EXE_MOTIVE_EXPIRED_TIME_CATEGORY],
+            ['exe_id = ?' => (int) $trackExeId]
+        );
+    }
+
     protected function createLinkToCourseTool($name, $courseId, $iconName = null, $link = null, $sessionId = 0, $category = 'plugin'): ?CTool
     {
         $tool = parent::createLinkToCourseTool($name, $courseId, $iconName, $link, $sessionId, $category);
@@ -209,5 +226,25 @@ class ExerciseFocusedPlugin extends Plugin
         $em->flush();
 
         return $tool;
+    }
+
+    public static function getTrackExeMotive(int $trackExeId): int
+    {
+        $result = Database::select(
+            '*',
+            Database::get_main_table(TABLE_STATISTIC_TRACK_E_EXERCISES),
+            [
+                'where' => [
+                    'exe_id = ?' => $trackExeId,
+                ],
+            ],
+            'first'
+        );
+
+        if (!empty($result['plugin_focused_log_motive'])) {
+            return (int) $result['plugin_focused_log_motive'];
+        }
+
+        return 0;
     }
 }

@@ -37,3 +37,4 @@ $strings['LevelReached'] = 'Nivel alcanzado';
 $strings['ExerciseStartDateAndTime'] = "Fecha y hora de inicio del ejercicio";
 $strings['ExerciseEndDateAndTime'] = "Fecha y hora de finalización del ejercicio";
 $strings['MotiveExerciseFinished'] = "Culminó exitosamente el examen (al dar clic al botón Guardar y finalizar el examen)";
+$strings['MotiveExpiredTime'] = "El tiempo límite de ejercicio ha expirado";

@@ -398,6 +398,8 @@ if ($is_allowedToEdit && $origin != 'learnpath') {
             ),
             ['style' => 'display:none', 'id' => 'datepicker_span']
         );
+
+        $actions .= ExerciseFocusedPlugin::create()->getLinkReporting($exercise_id);
     }
 } else {
     $actions .= '<a href="exercise.php">'.

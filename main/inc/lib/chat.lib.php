@@ -144,6 +144,7 @@ class Chat extends Model
             'me' => get_lang('Me'),
             'user_id' => api_get_user_id(),
             'items' => $chats,
+            'sec_token' => Security::get_token('chat'),
         ];
         echo json_encode($return);
 
@@ -238,16 +239,16 @@ class Chat extends Model
         }
 
         $sql = "SELECT * FROM ".$this->table."
-                WHERE 
+                WHERE
                     (
-                        to_user = $toUserId AND 
+                        to_user = $toUserId AND
                         from_user = $fromUserId
                     )
                     OR
                     (
-                        from_user = $toUserId AND 
+                        from_user = $toUserId AND
                         to_user =  $fromUserId
-                    )  
+                    )
                 $orderBy
                 LIMIT $start, $end
                 ";
@@ -385,7 +386,14 @@ class Chat extends Model
     ) {
         $relation = SocialManager::get_relation_between_contacts($fromUserId, $to_user_id);
 
-        if ($relation == USER_RELATION_TYPE_FRIEND) {
+        if (!Security::check_token('post', null, 'chat')) {
+            if ($printResult) {
+                echo '0';
+                exit;
+            }
+        }
+
+        if (USER_RELATION_TYPE_FRIEND == $relation) {
             $now = api_get_utc_datetime();
             $user_info = api_get_user_info($to_user_id, true);
             $this->saveWindow($to_user_id);
@@ -423,8 +431,10 @@ class Chat extends Model
 
             if (!empty($fromUserId) && !empty($to_user_id)) {
                 $messageId = $this->save($params);
+
                 if ($printResult) {
-                    echo $messageId;
+                    header('Content-Type: application/json');
+                    echo json_encode(['id' => $messageId, 'sec_token' => Security::get_token('chat')]);
                     exit;
                 }
             }

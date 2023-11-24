@@ -500,6 +500,7 @@ if (empty($exercise_stat_info)) {
     }
 }
 
+Session::write('exe_id', $exe_id);
 $saveDurationUrl = api_get_path(WEB_AJAX_PATH).'exercise.ajax.php?a=update_duration&exe_id='.$exe_id.'&'.api_get_cidreq();
 $questionListInSession = Session::read('questionList');
 
@@ -1460,7 +1461,6 @@ if (!empty($error)) {
                 Display::returnFontAwesomeIcon('spinner', null, true, 'fa-spin').'\');
             $.ajax({
                 type:"post",
-                async: false,
                 url: "'.api_get_path(WEB_AJAX_PATH).'exercise.ajax.php?'.api_get_cidreq().'&a=save_exercise_by_now",
                 data: dataparam,
                 success: function(return_value) {
@@ -1527,7 +1527,6 @@ if (!empty($error)) {
 
             $.ajax({
                 type:"post",
-                async: false,
                 url: "'.api_get_path(WEB_AJAX_PATH).'exercise.ajax.php?'.api_get_cidreq().'&a=save_exercise_by_now",
                 data: "'.$params.'&type=all&"+my_choice+"&"+hotspot+"&"+free_answers+"&"+remind_list,
                 success: function(return_value) {
@@ -1574,7 +1573,6 @@ if (!empty($error)) {
 
             $.ajax({
                 type: "post",
-                async: false,
                 url: "'.api_get_path(WEB_AJAX_PATH).'exercise.ajax.php?'.api_get_cidreq().'&a=save_exercise_by_now",
                 data: "'.$params.'&category=" + categoryId + "&type=category&"
                     + [my_choice, hotspot, free_answers, remind_list].join("&"),

@@ -36,7 +36,7 @@ class SocialManager extends UserManager
     {
         $table = Database::get_main_table(TABLE_MAIN_USER_FRIEND_RELATION_TYPE);
         $sql = 'SELECT id, title FROM '.$table.'
-                WHERE id<>6 
+                WHERE id<>6
                 ORDER BY id ASC';
         $result = Database::query($sql);
         $friend_relation_list = [];
@@ -85,10 +85,10 @@ class SocialManager extends UserManager
     {
         $table = Database::get_main_table(TABLE_MAIN_USER_FRIEND_RELATION_TYPE);
         $userRelUserTable = Database::get_main_table(TABLE_MAIN_USER_REL_USER);
-        $sql = 'SELECT rt.id as id 
+        $sql = 'SELECT rt.id as id
                 FROM '.$table.' rt
                 WHERE rt.id = (
-                    SELECT uf.relation_type 
+                    SELECT uf.relation_type
                     FROM '.$userRelUserTable.' uf
                     WHERE
                         user_id='.((int) $user_id).' AND
@@ -390,12 +390,12 @@ class SocialManager extends UserManager
         }
 
         $table = Database::get_main_table(TABLE_MESSAGE);
-        $sql = 'SELECT COUNT(*) 
+        $sql = 'SELECT COUNT(*)
                 FROM '.$table.'
                 WHERE
                     user_sender_id='.$userId.' AND
-                    (msg_status = '.MESSAGE_STATUS_WALL.' OR 
-                    msg_status = '.MESSAGE_STATUS_WALL_POST.') AND 
+                    (msg_status = '.MESSAGE_STATUS_WALL.' OR
+                    msg_status = '.MESSAGE_STATUS_WALL_POST.') AND
                     parent_id = 0';
         $res = Database::query($sql);
         $row = Database::fetch_row($res);
@@ -1655,14 +1655,14 @@ class SocialManager extends UserManager
             $select = ' SELECT count(id) count ';
         }
 
-        $sql = "$select                    
+        $sql = "$select
                     FROM $tblMessage tm
                 WHERE
                     msg_status <> ".MESSAGE_STATUS_WALL_DELETE.' AND ';
 
         // My own posts
         $userReceiverCondition = ' (
-            user_receiver_id = '.$userId.' AND 
+            user_receiver_id = '.$userId.' AND
             msg_status IN ('.MESSAGE_STATUS_WALL_POST.', '.MESSAGE_STATUS_WALL.') AND
             parent_id = '.$parentId.'
         )';
@@ -1706,7 +1706,7 @@ class SocialManager extends UserManager
             if ($getCount) {
                 $select = ' SELECT count(iid) count ';
             } else {
-                $select = " SELECT 
+                $select = " SELECT
                                 iid,
                                 poster_id,
                                 '' as user_receiver_id,
@@ -1717,18 +1717,18 @@ class SocialManager extends UserManager
                                 '' as group_id,
                                 forum_id,
                                 thread_id,
-                                c_id                            
+                                c_id
         ";
             }
 
             $threadList = array_map('intval', $threadList);
             $threadList = implode("','", $threadList);
             $condition = " thread_id IN ('$threadList') ";
-            $sql .= "                
+            $sql .= "
                 UNION (
                     $select
-                    FROM c_forum_post  
-                    WHERE $condition                                         
+                    FROM c_forum_post
+                    WHERE $condition
                 )
                 ";
         }
@@ -1877,8 +1877,8 @@ class SocialManager extends UserManager
         $comment .= '<div class="col-md-2 col-xs-2 social-post-answers">';
         $comment .= '<div class="user-image pull-right">';
         $comment .= '<a href="'.$url.'">
-                        <img src="'.$users[$userIdLoop]['avatar'].'" 
-                        alt="'.$users[$userIdLoop]['complete_name'].'" 
+                        <img src="'.$users[$userIdLoop]['avatar'].'"
+                        alt="'.$users[$userIdLoop]['complete_name'].'"
                         class="avatar-thumb">
                      </a>';
         $comment .= '</div>';
@@ -1886,7 +1886,7 @@ class SocialManager extends UserManager
         $comment .= '<div class="col-md-7 col-xs-7 social-post-answers">';
         $comment .= '<div class="user-data">';
         $comment .= $iconStatus;
-        $comment .= '<div class="username"><a href="'.$url.'">'.$nameComplete.'</a> 
+        $comment .= '<div class="username"><a href="'.$url.'">'.$nameComplete.'</a>
                         <span>'.Security::remove_XSS($message['content']).'</span>
                        </div>';
         $comment .= '<div>'.$date.'</div>';
@@ -2424,57 +2424,12 @@ class SocialManager extends UserManager
         </script>';
     }
 
-    /**
-     * @param string $urlForm
-     *
-     * @return string
-     */
-    public static function getWallForm($urlForm)
+    public static function displayWallForm(string $urlForm): string
     {
-        $userId = isset($_GET['u']) ? '?u='.intval($_GET['u']) : '';
-        $form = new FormValidator(
-            'social_wall_main',
-            'post',
-            $urlForm.$userId,
-            null,
-            ['enctype' => 'multipart/form-data'],
-            FormValidator::LAYOUT_HORIZONTAL
-        );
+        $form = self::getWallForm($urlForm);
+        $form->protect();
 
-        $socialWallPlaceholder = isset($_GET['u']) ? get_lang('SocialWallWriteNewPostToFriend') : get_lang(
-            'SocialWallWhatAreYouThinkingAbout'
-        );
-
-        $form->addTextarea(
-            'social_wall_new_msg_main',
-            null,
-            [
-                'placeholder' => $socialWallPlaceholder,
-                'cols-size' => [1, 10, 1],
-                'aria-label' => $socialWallPlaceholder,
-            ]
-        );
-        $form->addHtml('<div class="form-group">');
-        $form->addHtml('<div class="col-sm-4 col-md-offset-1">');
-        $form->addFile('picture', get_lang('UploadFile'), ['custom' => true]);
-        $form->addHtml('</div>');
-        $form->addHtml('<div class="col-sm-6">');
-        $form->addButtonSend(
-            get_lang('Post'),
-            'wall_post_button',
-            false,
-            [
-                'cols-size' => [1, 10, 1],
-                'custom' => true,
-            ]
-        );
-        $form->addHtml('</div>');
-        $form->addHtml('</div>');
-
-        $form->addHidden('url_content', '');
-        $html = Display::panel($form->returnForm(), get_lang('SocialWall'));
-
-        return $html;
+        return Display::panel($form->returnForm(), get_lang('SocialWall'));
     }
 
     /**
@@ -2740,8 +2695,8 @@ class SocialManager extends UserManager
                             $value_options = [];
                             // get option display text from user_field_options table
                             foreach ($id_options as $id_option) {
-                                $sql = "SELECT display_text 
-                                    FROM $t_ufo 
+                                $sql = "SELECT display_text
+                                    FROM $t_ufo
                                     WHERE id = '$id_option'";
                                 $res_options = Database::query($sql);
                                 $row_options = Database::fetch_row($res_options);
@@ -2889,12 +2844,19 @@ class SocialManager extends UserManager
     {
         $friendId = isset($_GET['u']) ? (int) $_GET['u'] : api_get_user_id();
         $url = Security::remove_XSS($url);
+        $wallSocialAddPost = SocialManager::getWallForm(api_get_self());
+
+        if (!$wallSocialAddPost->validate()) {
+            return;
+        }
+
+        $values = $wallSocialAddPost->exportValues();
 
         // Main post
-        if (!empty($_POST['social_wall_new_msg_main']) || !empty($_FILES['picture']['tmp_name'])) {
-            $messageContent = $_POST['social_wall_new_msg_main'];
+        if (!empty($values['social_wall_new_msg_main']) || !empty($_FILES['picture']['tmp_name'])) {
+            $messageContent = $values['social_wall_new_msg_main'];
             if (!empty($_POST['url_content'])) {
-                $messageContent = $_POST['social_wall_new_msg_main'].'<br /><br />'.$_POST['url_content'];
+                $messageContent = $values['social_wall_new_msg_main'].'<br /><br />'.$values['url_content'];
             }
 
             $messageId = self::sendWallMessage(
@@ -2947,15 +2909,15 @@ class SocialManager extends UserManager
                     loadingHtml: "<div class=\"well_border\">'.get_lang('Loading').' </div>",
                     nextSelector: "a.nextPage:last",
                     contentSelector: "",
-                    callback: timeAgo                    
+                    callback: timeAgo
                 });
             });
             </script>';
         }
 
         $htmlHeadXtra[] = '<script>
-            function deleteMessage(id) 
-            {                      
+            function deleteMessage(id)
+            {
                 $.ajax({
                     url: "'.$socialAjaxUrl.'?a=delete_message" + "&id=" + id,
                     success: function (result) {
@@ -2963,11 +2925,11 @@ class SocialManager extends UserManager
                             $("#message_" + id).parent().parent().parent().parent().html(result);
                         }
                     }
-                });                        
+                });
             }
-            
-            function deleteComment(id) 
-            {                      
+
+            function deleteComment(id)
+            {
                 $.ajax({
                     url: "'.$socialAjaxUrl.'?a=delete_message" + "&id=" + id,
                     success: function (result) {
@@ -2975,40 +2937,40 @@ class SocialManager extends UserManager
                             $("#message_" + id).parent().parent().parent().html(result);
                         }
                     }
-                });                     
-            }           
-            
-            function submitComment(messageId) 
+                });
+            }
+
+            function submitComment(messageId)
             {
-                var data = $("#form_comment_"+messageId).serializeArray();                                
+                var data = $("#form_comment_"+messageId).serializeArray();
                 $.ajax({
                     type : "POST",
                     url: "'.$socialAjaxUrl.'?a=send_comment" + "&id=" + messageId,
                     data: data,
-                    success: function (result) {                        
+                    success: function (result) {
                         if (result) {
                             $("#post_" + messageId + " textarea").val("");
                             $("#post_" + messageId + " .sub-mediapost").prepend(result);
                             $("#post_" + messageId + " .sub-mediapost").append(
                                 $(\'<div id=result_\' + messageId +\'>'.addslashes(get_lang('Saved')).'</div>\')
-                            ); 
-                                                        
+                            );
+
                             $("#result_" + messageId + "").fadeIn("fast", function() {
                                 $("#result_" + messageId + "").delay(1000).fadeOut("fast", function() {
                                     $(this).remove();
-                                }); 
+                                });
                             });
                         }
                     }
-                });  
-            } 
-            
+                });
+            }
+
             $(function() {
                 timeAgo();
-                
+
                 /*$(".delete_message").on("click", function() {
                     var id = $(this).attr("id");
-                    id = id.split("_")[1];          
+                    id = id.split("_")[1];
                     $.ajax({
                         url: "'.$socialAjaxUrl.'?a=delete_message" + "&id=" + id,
                         success: function (result) {
@@ -3016,13 +2978,13 @@ class SocialManager extends UserManager
                                 $("#message_" + id).parent().parent().parent().parent().html(result);
                             }
                         }
-                    });        
-                });                  
-                
-                
+                    });
+                });
+
+
                 $(".delete_comment").on("click", function() {
                     var id = $(this).attr("id");
-                    id = id.split("_")[1];                    
+                    id = id.split("_")[1];
                     $.ajax({
                         url: "'.$socialAjaxUrl.'?a=delete_message" + "&id=" + id,
                         success: function (result) {
@@ -3031,10 +2993,10 @@ class SocialManager extends UserManager
                             }
                         }
                     });
-                });          
+                });
                 */
             });
-            
+
             function timeAgo() {
                 $(".timeago").timeago();
             }
@@ -3256,6 +3218,101 @@ class SocialManager extends UserManager
         }
 
         return $social_group_block;
+    }
+
+    /**
+     * @param string $selected
+     *
+     * @return string
+     */
+    public static function getHomeProfileTabs($selected = 'home')
+    {
+        $headers = [
+            [
+                'url' => api_get_path(WEB_CODE_PATH).'auth/profile.php',
+                'content' => get_lang('Profile'),
+            ],
+        ];
+        $allowJustification = api_get_plugin_setting('justification', 'tool_enable') === 'true';
+        if ($allowJustification) {
+            $plugin = Justification::create();
+            $headers[] = [
+                'url' => api_get_path(WEB_CODE_PATH).'auth/justification.php',
+                'content' => $plugin->get_lang('Justification'),
+            ];
+        }
+
+        $allowPauseTraining = api_get_plugin_setting('pausetraining', 'tool_enable') === 'true';
+        $allowEdit = api_get_plugin_setting('pausetraining', 'allow_users_to_edit_pause_formation') === 'true';
+        if ($allowPauseTraining && $allowEdit) {
+            $plugin = PauseTraining::create();
+            $headers[] = [
+                'url' => api_get_path(WEB_CODE_PATH).'auth/pausetraining.php',
+                'content' => $plugin->get_lang('PauseTraining'),
+            ];
+        }
+
+        $selectedItem = 1;
+        foreach ($headers as $header) {
+            $info = pathinfo($header['url']);
+            if ($selected === $info['filename']) {
+                break;
+            }
+            $selectedItem++;
+        }
+
+        $tabs = '';
+        if (count($headers) > 1) {
+            $tabs = Display::tabsOnlyLink($headers, $selectedItem);
+        }
+
+        return $tabs;
+    }
+
+    private static function getWallForm(string $urlForm): FormValidator
+    {
+        $userId = isset($_GET['u']) ? '?u='.((int) $_GET['u']) : '';
+        $form = new FormValidator(
+            'social_wall_main',
+            'post',
+            $urlForm.$userId,
+            null,
+            ['enctype' => 'multipart/form-data'],
+            FormValidator::LAYOUT_HORIZONTAL
+        );
+
+        $socialWallPlaceholder = isset($_GET['u'])
+            ? get_lang('SocialWallWriteNewPostToFriend')
+            : get_lang('SocialWallWhatAreYouThinkingAbout');
+
+        $form->addTextarea(
+            'social_wall_new_msg_main',
+            null,
+            [
+                'placeholder' => $socialWallPlaceholder,
+                'cols-size' => [1, 12, 1],
+                'aria-label' => $socialWallPlaceholder,
+            ]
+        );
+        $form->addHtml('<div class="form-group">');
+        $form->addHtml('<div class="col-sm-6">');
+        $form->addFile('picture', get_lang('UploadFile'), ['custom' => true]);
+        $form->addHtml('</div>');
+        $form->addHtml('<div class="col-sm-6 "><div class="pull-right">');
+        $form->addButtonSend(
+            get_lang('Post'),
+            'wall_post_button',
+            false,
+            [
+                'cols-size' => [1, 10, 1],
+                'custom' => true,
+            ]
+        );
+        $form->addHtml('</div></div>');
+        $form->addHtml('</div>');
+        $form->addHidden('url_content', '');
+
+        return $form;
     }
 
     /**

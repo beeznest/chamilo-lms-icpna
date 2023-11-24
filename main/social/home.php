@@ -67,8 +67,8 @@ if (api_get_setting('profile', 'picture') == 'true') {
             )) {
                 $table_user = Database::get_main_table(TABLE_MAIN_USER);
                 $sql = "UPDATE $table_user
-                        SET 
-                            picture_uri = '$new_picture' 
+                        SET
+                            picture_uri = '$new_picture'
                         WHERE user_id =  ".api_get_user_id();
                 $result = Database::query($sql);
             }
@@ -112,7 +112,7 @@ if (count($sessionList) > 0) {
     $social_session_block = $sessionList;
 }
 
-$wallSocialAddPost = SocialManager::getWallForm(api_get_self());
+$wallSocialAddPost = SocialManager::displayWallForm(api_get_self());
 $socialAutoExtendLink = SocialManager::getAutoExtendLink($user_id, $countPost);
 
 $formSearch = new FormValidator(

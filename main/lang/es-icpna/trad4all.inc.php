@@ -224,3 +224,6 @@ $ExeEndTime = "Fecha y hora de fin de examen";
 $Username = "Código de alumno";
 $LevelReachedX = "Curso alcanzado: <strong>%s</strong>";
 $ThankYouForTakingTheTest="Gracias por tomar el examen.";
+$QuizRemindStartDate = "Fecha de inicio del examen: %s <br />";
+$QuizRemindEndDate = "Fecha de fin del examen: %s <br />";
+$QuizRemindDuration = "Duración del examen: %s <br />";

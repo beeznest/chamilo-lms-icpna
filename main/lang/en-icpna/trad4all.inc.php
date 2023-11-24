@@ -24,3 +24,6 @@ $HelloXAsYouCanSeeYourCourseListIsEmpty="<p>Hello <strong>%s</strong> and welcom
 $PleaseAllowUsALittleTimeToSubscribeYouToOneOfOurCourses="Please verify the course start and end dates.";
 $AdaptiveQuizResultIsPreTestCategory="The exam has ended but you have obtained a result that is not valid for the PLEX exam. However in order to enroll you must mail to <a href=\"mailto:examendeclasificacion@icpna.edu.pe\">examendeclasificacion@icpna.edu.pe</a>.";
 $ThankYouForTakingTheTest="Thank you for taking the test.";
+$QuizRemindDuration = "Test duration: %s <br />";
+$QuizRemindStartDate = "Test start date: %s <br />";
+$QuizRemindEndDate = "Test end date: %s <br />";

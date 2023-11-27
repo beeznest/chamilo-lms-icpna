@@ -27,6 +27,7 @@ $monitoringPluginIsEnabled = $monitoringPlugin->isEnabled(true);
 $request = HttpRequest::createFromGlobals();
 $em = Database::getManager();
 $focusedLogRepository = $em->getRepository(FocusedLog::class);
+
 $attempsRepository = $em->getRepository(TrackEAttempt::class);
 
 if (!$plugin->isEnabled(true)) {
@@ -123,7 +124,7 @@ foreach ($results as $result) {
 
     $data[] = [
         $plugin->get_lang('LevelReached'),
-        get_lang('DateExo'),
+        get_lang('DateTime'),
         get_lang('Score'),
         $plugin->get_lang('Outfocused'),
         $plugin->get_lang('Returns'),
@@ -168,34 +169,10 @@ foreach ($results as $result) {
         }
     } elseif (ALL_ON_ONE_PAGE === $quizType) {
     } elseif (ONE_CATEGORY_PER_PAGE === $quizType) {
-        $categorySequence = TestCategory::getCategorySequence($trackExe->getExeId());
+        $monitoringLogs = getMonitoringRows($exercise, $trackExe);
+        $rows = getOneCategoryPerPage($monitoringLogs, $trackExe, $user);
 
-        foreach ($categorySequence as $details) {
-            $score = strip_tags(
-                ExerciseLib::show_score($details['score'], $details['weight'])
-            );
-            $outfocused = $focusedLogRepository->countByActionAndLevel(
-                $trackExe,
-                FocusedLog::TYPE_OUTFOCUSED,
-                $details['category_id']
-            );
-            $returns = $focusedLogRepository->countByActionAndLevel(
-                $trackExe,
-                FocusedLog::TYPE_RETURN,
-                $details['category_id']
-            );
-
-            $row = [
-                $details['category_title'],
-                api_get_local_time($details['tms']),
-                $score,
-                $outfocused,
-                $returns,
-                getSnapshotListForLevel($details['category_id'], $trackExe),
-            ];
-
-            $data[] = $row;
-        }
+        array_push($data, ...$rows);
     }
 
     $data[] = [];
@@ -348,4 +325,62 @@ function getAchievedResult(EntityManagerInterface $em, int $exeId): string
     }
 
     return '';
+}
+
+function getMonitoringRows(Exercise $objExercise, TrackEExercises $trackExe) {
+    $monitoringLogRepo = Database::getManager()->getRepository(MonitoringLog::class);
+
+    return $monitoringLogRepo->findSnapshots($objExercise, $trackExe);
+}
+
+function getOneCategoryPerPage(array $monitoringLogs, TrackEExercises $trackExe, User $user): array
+{
+    $em = Database::getManager();
+    $focusedLogRepository = $em->getRepository(FocusedLog::class);
+
+    $rows = [];
+
+    foreach ($monitoringLogs as $monitoringLog) {
+        $score = TestCategory::getCatScoreForExeidForUserid(
+            $monitoringLog['level'],
+            $trackExe->getExeId(),
+            $user->getId()
+        );
+        $categoryInQuiz = TestCategory::findCategoryInQuiz(
+            $trackExe->getExeExoId(),
+            $monitoringLog['level'],
+            $trackExe->getCId()
+        );
+        $scoreWeight = $categoryInQuiz
+            ? strip_tags(ExerciseLib::show_score($score, $categoryInQuiz->getCountQuestions()))
+            : $score;
+
+        $outfocused = $focusedLogRepository->countByActionAndLevel(
+            $trackExe,
+            FocusedLog::TYPE_OUTFOCUSED,
+            $monitoringLog['level']
+        );
+        $returns = $focusedLogRepository->countByActionAndLevel(
+            $trackExe,
+            FocusedLog::TYPE_RETURN,
+            $monitoringLog['level']
+        );
+        $snapshotUrl = ExerciseMonitoringPlugin::generateSnapshotUrl(
+            $user->getId(),
+            $monitoringLog['imageFilename']
+        );
+
+        $hasLevel = $monitoringLog['level'] > 0;
+
+        $rows[] = [
+            $hasLevel ? $monitoringLog['log_level'] : null,
+            api_get_local_time($monitoringLog['createdAt']),
+            $hasLevel ? $scoreWeight : null,
+            $hasLevel ? $outfocused : null,
+            $hasLevel ? $returns : null,
+            $snapshotUrl,
+        ];
+    }
+
+    return $rows;
 }

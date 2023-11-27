@@ -1,6 +1,7 @@
 <?php
 /* For licensing terms, see /license.txt */
 
+use Chamilo\CourseBundle\Entity\CQuizCategory;
 use ChamiloSession as Session;
 
 /**
@@ -1422,5 +1423,18 @@ class TestCategory
         }
 
         return $sequence;
+    }
+
+    public static function findCategoryInQuiz(int $exerciseId, int $categoryId, int $cId): ?CQuizCategory
+    {
+        $categoriesInQuizRepo = Database::getManager()->getRepository(CQuizCategory::class);
+
+        return $categoriesInQuizRepo->findOneBy(
+            [
+                'cId' => $cId,
+                'categoryId' => $categoryId,
+                'exerciseId' => $exerciseId,
+            ]
+        );
     }
 }

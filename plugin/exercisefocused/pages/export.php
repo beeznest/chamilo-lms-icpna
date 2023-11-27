@@ -169,8 +169,20 @@ foreach ($results as $result) {
         }
     } elseif (ALL_ON_ONE_PAGE === $quizType) {
     } elseif (ONE_CATEGORY_PER_PAGE === $quizType) {
-        $monitoringLogs = getMonitoringRows($exercise, $trackExe);
-        $rows = getOneCategoryPerPage($monitoringLogs, $trackExe, $user);
+        $rowsByMonitoring = false;
+
+        if ($monitoringPluginIsEnabled
+            && 'true' === $monitoringPlugin->get(ExerciseMonitoringPlugin::SETTING_INSTRUCTION_AGE_DISTINCTION_ENABLE)
+            && $monitoringPlugin->isAdult($user->getId())
+        ) {
+                $rowsByMonitoring = true;
+        }
+
+        if ($rowsByMonitoring) {
+            $rows = getOneCategoryPerPageByMonitoring($exercise, $trackExe, $user);
+        } else {
+            $rows = getOneCategoryPerPageByFocused($trackExe);
+        }
 
         array_push($data, ...$rows);
     }
@@ -330,16 +342,49 @@ function getAchievedResult(EntityManagerInterface $em, int $exeId): string
     return '';
 }
 
-function getMonitoringRows(Exercise $objExercise, TrackEExercises $trackExe) {
-    $monitoringLogRepo = Database::getManager()->getRepository(MonitoringLog::class);
+function getOneCategoryPerPageByFocused(TrackEExercises $trackExe): array
+{
+    $focusedLogRepository = Database::getManager()->getRepository(FocusedLog::class);
 
-    return $monitoringLogRepo->findSnapshots($objExercise, $trackExe);
+    $categorySequence = TestCategory::getCategorySequence($trackExe->getExeId());
+
+    $rows = [];
+
+    foreach ($categorySequence as $details) {
+        $score = strip_tags(
+            ExerciseLib::show_score($details['score'], $details['weight'])
+        );
+        $outfocused = $focusedLogRepository->countByActionAndLevel(
+            $trackExe,
+            FocusedLog::TYPE_OUTFOCUSED,
+            $details['category_id']
+        );
+        $returns = $focusedLogRepository->countByActionAndLevel(
+            $trackExe,
+            FocusedLog::TYPE_RETURN,
+            $details['category_id']
+        );
+
+        $rows[] = [
+            $details['category_title'],
+            api_get_local_time($details['tms']),
+            $score,
+            $outfocused,
+            $returns,
+            getSnapshotListForLevel($details['category_id'], $trackExe),
+        ];
+    }
+
+    return $rows;
 }
 
-function getOneCategoryPerPage(array $monitoringLogs, TrackEExercises $trackExe, User $user): array
+function getOneCategoryPerPageByMonitoring(Exercise $objExercise, TrackEExercises $trackExe, User $user): array
 {
     $em = Database::getManager();
+    $monitoringLogRepo = $em->getRepository(MonitoringLog::class);
     $focusedLogRepository = $em->getRepository(FocusedLog::class);
+
+    $monitoringLogs = $monitoringLogRepo->findSnapshots($objExercise, $trackExe);
 
     $rows = [];
 

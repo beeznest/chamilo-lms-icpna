@@ -2810,13 +2810,13 @@ table.certaintyTable td.globalChart {
     padding: 5px;
     text-align: center;
     margin-bottom: 10px;
-    background: url(../../main/img/clock-exercise.png) no-repeat center 3px #FFF;
+    background: url(../../main/img/clock-exercise.png) no-repeat center center #FFF;
     border: 1px solid #DDD;
     border-radius: 5px;
 }
 
 .time_warning_two {
-    background: url(../../main/img/clock-exercise.png) no-repeat center center #FFD700;
+    background: url(../../main/img/clock-exercise.png) no-repeat center 3px #FFD700;
     border: 1px solid #FFCC00;
     color: #C00;
 }

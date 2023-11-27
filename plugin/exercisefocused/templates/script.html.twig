@@ -23,6 +23,9 @@
                 function () { $backdrop.addClass('out').removeClass('inmediate'); }
             );
 
+        $('#exercise_clock_warning')
+            .append('<div class="exercisefocused-text">' + '{{ 'AlertBeforeLeaving'|get_plugin_lang('ExerciseFocusedPlugin') }}' + '</div>')
+
         var $btnSaveNow = $('button[name="save_now"]');
 
         $backdrop.appendTo('body');

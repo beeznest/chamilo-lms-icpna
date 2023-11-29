@@ -81,6 +81,8 @@ if (api_get_setting('enable_record_audio') === 'true') {
     $htmlHeadXtra[] = api_get_js('record_audio/record_audio.js');
 }
 
+$quizSubmitModalEnable = true === api_get_configuration_value('quiz_submit_modal_enable');
+
 $template = new Template();
 
 // General parameters passed via POST/GET
@@ -1274,6 +1276,16 @@ if (!empty($error)) {
         true
     );
 
+    $quizSubmitModalEnableBlockReady = '';
+    $quizSubmitModalEnableBlockBefore = '';
+    $quizSubmitModalEnableBlockAfter = '';
+
+    if ($quizSubmitModalEnable) {
+        $quizSubmitModalEnableBlockReady = '$("#quiz_submit_modal").appendTo("body").hide();';
+        $quizSubmitModalEnableBlockBefore = '$("#quiz_submit_modal").show();';
+        $quizSubmitModalEnableBlockAfter = '$("#quiz_submit_modal").hide();';
+    }
+
     echo '<script>
         function addExerciseEvent(elm, evType, fn, useCapture) {
             if (elm.addEventListener) {
@@ -1308,6 +1320,8 @@ if (!empty($error)) {
             //This pre-load the save.png icon
             var saveImage = new Image();
             saveImage.src = "'.$saveIcon.'";
+
+            '.$quizSubmitModalEnableBlockReady.'
 
             // Block form submition on enter
             $(".block_on_enter").keypress(function(event) {
@@ -1571,6 +1585,8 @@ if (!empty($error)) {
 
             free_answers = $.param(free_answers);
 
+            '.$quizSubmitModalEnableBlockBefore.'
+
             $.ajax({
                 type: "post",
                 url: "'.api_get_path(WEB_AJAX_PATH).'exercise.ajax.php?'.api_get_cidreq().'&a=save_exercise_by_now",
@@ -1588,6 +1604,8 @@ if (!empty($error)) {
                     loader.html(\''.Display::return_icon('save.png', get_lang('Saved')).'\');
 
                     window.location.href = response;
+
+                    /*'.$quizSubmitModalEnableBlockAfter.'*/
                 }
             });
         }
@@ -1891,6 +1909,10 @@ if (!empty($error)) {
 if (!in_array($origin, ['learnpath', 'embeddable'])) {
     // So we are not in learnpath tool
     echo '</div>'; //End glossary div
+}
+
+if ($quizSubmitModalEnable) {
+    echo '<div id="quiz_submit_modal"><div id="quiz_submit_modal__message" class="text-primary h3">'.get_lang('PleaseWaitThisCouldTakeAWhile').'</div></div>';
 }
 
 Display::display_footer();

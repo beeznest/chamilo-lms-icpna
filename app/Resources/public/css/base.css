@@ -10203,6 +10203,25 @@ ul.dropdown-menu.inner > li > a {
     clear: left;
 }
 
+#quiz_submit_modal {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 3000;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+#quiz_submit_modal #quiz_submit_modal__message {
+    left: 50%;
+    position: absolute;
+    text-align: center;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+}
+
 @media (min-width: 768px) {
     .clear-rows-6-4-3 .col-sm-6:nth-child(2n+1) {
         clear: left;

@@ -105,10 +105,20 @@ foreach ($results as $result) {
         get_lang('IP'),
         $result['exe']->getUserIp(),
     ];
-    $data[] = [
-        $plugin->get_lang('Motive'),
-        $plugin->calculateMotive($outfocusedLimitCount, $timeLimitCount),
-    ];
+
+    if ($markedMotive = ExerciseFocusedPlugin::getTrackExeMotive($result['exe']->getExeId())) {
+        if (ExerciseFocusedPlugin::TRACK_EXE_MOTIVE_EXPIRED_TIME_CATEGORY === $markedMotive) {
+            $data[] = [
+                $plugin->get_lang('Motive'),
+                $plugin->get_lang('MotiveExpiredTime'),
+            ];
+        }
+    } else {
+        $data[] = [
+            $plugin->get_lang('Motive'),
+            $plugin->calculateMotive($outfocusedLimitCount, $timeLimitCount),
+        ];
+    }
 
     if ($destinationResult) {
         $data[] = [

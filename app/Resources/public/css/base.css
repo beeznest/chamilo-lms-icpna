@@ -2810,7 +2810,7 @@ table.certaintyTable td.globalChart {
     padding: 5px;
     text-align: center;
     margin-bottom: 10px;
-    background: url(../../main/img/clock-exercise.png) no-repeat center center #FFF;
+    background: url(../../main/img/clock-exercise.png) no-repeat center 3px #FFF;
     border: 1px solid #DDD;
     border-radius: 5px;
 }
@@ -2822,7 +2822,7 @@ table.certaintyTable td.globalChart {
 }
 
 .time_warning_one {
-    background: url(../../main/img/clock-exercise.png) no-repeat center center #FB3A35;
+    background: url(../../main/img/clock-exercise.png) no-repeat center 3px #FB3A35;
     border: 1px solid #FB3A35;
     color: #FFF;
 }

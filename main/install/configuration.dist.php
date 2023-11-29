@@ -1271,6 +1271,9 @@ $_configuration['required_extra_fields_in_profile'] = [
 // Hide session to user when any of its courses has this extrafield set to '1'
 //$_configuration['hide_session_with_course_field'] = '';
 
+// Enable a window-occulting message while the exercise is getting submitted
+//$_configuration['quiz_submit_modal_enable'] = false;
+
 // KEEP THIS AT THE END
 // -------- Custom DB changes
 // Add user activation by confirmation email

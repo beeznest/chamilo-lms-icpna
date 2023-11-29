@@ -297,7 +297,7 @@ if ($objExercise->selectAttempts() > 0) {
                                 $question_id = $question_data['question_id'];
                                 $marks = $question_data['marks'];
 
-                                $question_info = Question::read($question_id);
+                                $question_info = Question::read($question_id, [], false);
                                 $attempt_html .= Display::div(
                                     $question_info->question,
                                     ['class' => 'question_title']
@@ -366,7 +366,7 @@ if (empty($exercise_stat_info)) {
     $total_weight = 0;
     $questionList = $objExercise->get_validated_question_list();
     foreach ($questionListUncompressed as $question_id) {
-        $objQuestionTmp = Question::read($question_id);
+        $objQuestionTmp = Question::read($question_id, [], false);
         $total_weight += floatval($objQuestionTmp->weighting);
     }
 
@@ -988,7 +988,7 @@ if ($question_count != 0) {
                 } else {
                     $certaintyQuestionPresent = false;
                     foreach ($questionList as $questionId) {
-                        $question = Question::read($questionId);
+                        $question = Question::read($questionId, [], false);
                         if ($question->type == MULTIPLE_ANSWER_TRUE_FALSE_DEGREE_CERTAINTY) {
                             $certaintyQuestionPresent = true;
                             break;
@@ -1242,7 +1242,7 @@ if (!empty($error)) {
     if (!empty($questionList)) {
         foreach ($questionList as $questionId) {
             $i++;
-            $objQuestionTmp = Question::read($questionId);
+            $objQuestionTmp = Question::read($questionId, [], false);
             // for sequential exercises
 
             if ($objExercise->type == ONE_PER_PAGE) {
@@ -1665,7 +1665,7 @@ if (!empty($error)) {
                     // if the user has already answered this question
                     if (isset($exerciseResult[$questionId])) {
                         // construction of the Question object
-                        $objQuestionTmp = Question::read($questionId);
+                        $objQuestionTmp = Question::read($questionId, [], false);
                         $questionName = $objQuestionTmp->selectTitle();
                         // destruction of the Question object
                         unset($objQuestionTmp);
@@ -1752,7 +1752,7 @@ if (!empty($error)) {
 
         if (!empty($mediaQuestions) && isset($mediaQuestions[$questionId])) {
             $mediaQuestionList = $mediaQuestions[$questionId];
-            $objQuestionTmp = Question::read($questionId);
+            $objQuestionTmp = Question::read($questionId, [], false);
 
             $counter = 1;
 

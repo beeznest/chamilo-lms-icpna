@@ -36,5 +36,5 @@ $strings['WindowTitleOutfocused'] = '🚨 Stay within the exam!';
 $strings['LevelReached'] = 'Level reached';
 $strings['ExerciseStartDateAndTime'] = "Exercise start date and time";
 $strings['ExerciseEndDateAndTime'] = "Exercise end date and time";
-$strings['MotiveExerciseFinished'] = "Successfully completed the exam (by clicking the save and finish exam button)";
+$strings['MotiveExerciseFinished'] = "Successfully completed the exam";
 $strings['MotiveExpiredTime'] = "The exercise time limit has expired";

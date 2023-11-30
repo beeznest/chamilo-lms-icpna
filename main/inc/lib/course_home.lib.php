@@ -535,7 +535,7 @@ class CourseHome
                             category = "authoring" OR
                             category = "interaction" OR
                             category = "plugin"
-                        ) OR (t.name = "'.TOOL_TRACKING.'")
+                        ) OR (t.name = "'.TOOL_TRACKING.'") OR (t.name = "'.TOOL_QUIZ.'")
                     )';
                 }
 

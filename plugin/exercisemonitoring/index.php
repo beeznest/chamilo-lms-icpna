@@ -57,5 +57,13 @@ if ($showSubmitRegion && $_template['enabled']) {
         ) {
             $_template['enable_snapshots'] = false;
         }
+
+        if (true === $_template['enable_snapshots']) {
+            if ($exercise->expired_time != 0) {
+                $quizTimeLeft = ChamiloSession::read('quiz_time_left');
+
+                $_template['quiz_time_left'] = rand(1, $quizTimeLeft) * 1000;
+            }
+        }
     }
 }

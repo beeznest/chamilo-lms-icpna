@@ -1040,6 +1040,8 @@ $interbreadcrumb[] = ["url" => "#", "name" => $objExercise->selectTitle(true)];
  */
 if ($time_control) { //Sends the exercise form when the expired time is finished
     $htmlHeadXtra[] = $objExercise->showTimeControlJS($time_left);
+
+    Session::write('quiz_time_left', $time_left);
 }
 
 if (!in_array($origin, ['learnpath', 'embeddable'])) { //so we are not in learnpath tool

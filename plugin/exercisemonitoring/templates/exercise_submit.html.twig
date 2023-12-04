@@ -24,6 +24,13 @@
                     snapByQuestion();
                 {% elseif ONE_CATEGORY_PER_PAGE %}
                     snapByCategory();
+
+                    if ({{ exercisemonitoring.quiz_time_left }} > 0) {
+                        window.setTimeout(
+                            snapByCategory,
+                            {{ exercisemonitoring.quiz_time_left }}
+                        );
+                    }
                 {% endif %}
             });
 

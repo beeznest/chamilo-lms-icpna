@@ -50,6 +50,10 @@ class ReportingController extends BaseController
             1
         );
 
+        if (isset($_GET['submit'])) {
+            $content .= '<script>$(function () { $(\'#exercise-focused-tabs2\').tab(\'show\'); });</script>';
+        }
+
         $this->setBreadcrumb($exercise->getId());
 
         return $this->renderView(

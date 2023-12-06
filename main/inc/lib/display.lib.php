@@ -1170,7 +1170,8 @@ class Display
         $items,
         $id = 'tabs',
         $attributes = [],
-        $ul_attributes = []
+        $ul_attributes = [],
+        $selected = ''
     ) {
         if (empty($headers) || count($headers) == 0) {
             return '';
@@ -1183,6 +1184,14 @@ class Display
             if ($i == 1) {
                 $active = ' active';
             }
+
+            if (!empty($selected)) {
+                $active = '';
+                if ($selected == $i) {
+                    $active = ' active';
+                }
+            }
+
             $item = self::tag(
                 'a',
                 $item,
@@ -1215,6 +1224,14 @@ class Display
             if ($i == 1) {
                 $active = ' active';
             }
+
+            if (!empty($selected)) {
+                $active = '';
+                if ($selected == $i) {
+                    $active = ' active';
+                }
+            }
+
             $divs .= self::tag(
                 'div',
                 $content,

@@ -19,7 +19,7 @@
                             {{ 'ImageStudentCameraInstructions'|get_plugin_lang('ExerciseMonitoringPlugin') }}
                         </p>
                         <div style="position: relative">
-                            <div id="monitoring-camera" class="embed-responsive embed-responsive-4by3"></div>
+                            <div id="monitoring-camera"></div>
                             <img id="img-iddoc-placeholder" style="display: block;" src="{{ _p.web_plugin }}exercisemonitoring/assets/images/idcard.png">
                             <img id="img-learner-placeholder" style="display: none" src="{{ _p.web_plugin }}exercisemonitoring/assets/images/user.png">
                         </div>
@@ -107,6 +107,8 @@
                     Webcam.set({
                         height: 480,
                         width: 640,
+                        dest_height: 480,
+                        dest_width: 640,
                     });
                     Webcam.attach('#monitoring-camera');
                     Webcam.on('live', function () {
@@ -116,7 +118,6 @@
                         $imgLearnerPlaceholder.hide();
 
                         $btnSnap.prop({disabled: false}).focus();
-                        $('#monitoring-camera video').addClass('embed-responsive-item');
                     });
                 });
 
@@ -255,23 +256,29 @@
         </script>
         <style>
             #monitoring-camera {
-                height: auto !important;
-                max-width: 100% !important;
-                margin: 0 auto;
+                max-width: 100%;
+                min-width: 100%;
+                width: 100%;
+            }
+
+            #monitoring-camera video {
+                display: block;
+                max-width: 100%;
+                min-width: 100%;
+                width: 100%;
             }
 
             #em-camera-body img#img-iddoc-placeholder,
             #em-camera-body img#img-learner-placeholder {
                 height: auto;
                 left: 0;
-                position: absolute;
-                top: 0;
-                width: 100%;
-            }
-
-            #monitoring-camera video {
-                height: auto !important;
                 max-width: 100%;
+                min-width: 100%;
+                position: absolute;
+                top: 50%;
+                width: 100%;
+                transform: translate(0%, -50%);
+                -webkit-transform: translate(0%, -50%);
             }
         </style>
     {% else %}

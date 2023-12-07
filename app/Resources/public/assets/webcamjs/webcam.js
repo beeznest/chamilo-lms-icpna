@@ -271,22 +271,6 @@ var Webcam = {
 			var video = document.createElement('video');
 			video.setAttribute('autoplay', 'autoplay');
 			video.setAttribute('playsinline', 'playsinline');
-			video.style.width = '' + this.params.dest_width + 'px';
-			video.style.height = '' + this.params.dest_height + 'px';
-			
-			if ((scaleX != 1.0) || (scaleY != 1.0)) {
-				elem.style.overflow = 'hidden';
-				video.style.webkitTransformOrigin = '0px 0px';
-				video.style.mozTransformOrigin = '0px 0px';
-				video.style.msTransformOrigin = '0px 0px';
-				video.style.oTransformOrigin = '0px 0px';
-				video.style.transformOrigin = '0px 0px';
-				video.style.webkitTransform = 'scaleX('+scaleX+') scaleY('+scaleY+')';
-				video.style.mozTransform = 'scaleX('+scaleX+') scaleY('+scaleY+')';
-				video.style.msTransform = 'scaleX('+scaleX+') scaleY('+scaleY+')';
-				video.style.oTransform = 'scaleX('+scaleX+') scaleY('+scaleY+')';
-				video.style.transform = 'scaleX('+scaleX+') scaleY('+scaleY+')';
-			}
 			
 			// add video element to dom
 			elem.appendChild( video );
@@ -306,6 +290,14 @@ var Webcam = {
 			.then( function(stream) {
 				// got access, attach stream to video
 				video.onloadedmetadata = function(e) {
+                    self.params.width = video.clientWidth;
+                    self.params.height = video.clientHeight;
+                    self.params.dest_width = self.params.width;
+                    self.params.dest_height = self.params.height;
+
+                    scaleX = self.params.width / self.params.dest_width;
+                    scaleY = self.params.height / self.params.dest_height;
+
 					self.stream = stream;
 					self.loaded = true;
 					self.live = true;
@@ -452,18 +444,11 @@ var Webcam = {
 		if (this.params.crop_width && this.params.crop_height) {
 			var scaled_crop_width = Math.floor( this.params.crop_width * scaleX );
 			var scaled_crop_height = Math.floor( this.params.crop_height * scaleY );
-			
-			elem.style.width = '' + scaled_crop_width + 'px';
-			elem.style.height = '' + scaled_crop_height + 'px';
+
 			elem.style.overflow = 'hidden';
 			
 			elem.scrollLeft = Math.floor( (this.params.width / 2) - (scaled_crop_width / 2) );
 			elem.scrollTop = Math.floor( (this.params.height / 2) - (scaled_crop_height / 2) );
-		}
-		else {
-			// no crop, set size to desired
-			elem.style.width = '' + this.params.width + 'px';
-			elem.style.height = '' + this.params.height + 'px';
 		}
 	},
 	

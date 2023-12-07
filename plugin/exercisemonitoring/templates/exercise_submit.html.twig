@@ -15,6 +15,8 @@
             Webcam.set({
                 height: 480,
                 width: 640,
+                dest_height: 480,
+                dest_width: 640,
             });
             Webcam.attach('#monitoring-camera');
             Webcam.on('live', function () {
@@ -93,13 +95,11 @@
             bottom: 15px;
             right: 15px;
             max-width: 108px;
-            max-height: 81px;
             position: fixed;
             z-index: 1015;
         }
         #monitoring-camera video {
             max-width: 108px;
-            max-height: 81px;
         }
     </style>
 {% endif %}

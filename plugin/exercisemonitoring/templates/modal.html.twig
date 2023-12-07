@@ -59,7 +59,7 @@
             </div>
         </div>
 
-        <script src="{{ _p.web }}web/assets/webcamjs/webcam.js"></script>
+        <script src="{{ _p.web_plugin }}exercisemonitoring/assets/js/webcam.js"></script>
         <script>
             $(function () {
                 var $btnStartExercise = $('.exercise_overview_options a');
@@ -105,9 +105,7 @@
                     $footCamera.show();
 
                     Webcam.set({
-                        height: 480,
                         width: 640,
-                        dest_height: 480,
                         dest_width: 640,
                     });
                     Webcam.attach('#monitoring-camera');

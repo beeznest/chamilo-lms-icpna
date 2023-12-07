@@ -63,7 +63,7 @@ class ReportingController extends BaseController
     {
         $results = $this->findResultsInCourse($exercise->getId());
 
-        return $this->createTable($results)->toHtml();
+        return '<div class="table-responsive">'.$this->createTable($results)->toHtml().'</div>';
     }
 
     /**
@@ -105,7 +105,7 @@ class ReportingController extends BaseController
 
             $results = $this->findResults($formValues);
 
-            $tableHtml = $this->createTable($results)->toHtml();
+            $tableHtml = '<div class="table-responsive">'.$this->createTable($results)->toHtml().'</div>';
         }
 
         return $form->returnForm().$actions.$tableHtml;
@@ -115,7 +115,7 @@ class ReportingController extends BaseController
     {
         $results = $this->findRandomResults($exercise->getId());
 
-        return $this->createTable($results)->toHtml();
+        return '<div class="table-responsive">'.$this->createTable($results)->toHtml().'</div>';
     }
 
     /**

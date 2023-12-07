@@ -30,7 +30,7 @@ class AdminController extends BaseController
 
         $content = $form->returnForm()
             .Display::page_subheader2($this->plugin->get_lang('ReportByAttempts'))
-            .$table->toHtml();
+            .'<div class="table-responsive">'.$table->toHtml().'</div>';
 
         $this->setBreadcrumb();
 

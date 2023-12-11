@@ -3,22 +3,18 @@
         <div id="em-modal-start" class="modal fade in" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">{{ 'ExerciseMonitored'|get_plugin_lang('ExerciseMonitoringPlugin') }}</h4>
-                    </div>
-
                     <div class="modal-body" id="em-terms-body">
                         {{ exercisemonitoring.instructions }}
                     </div>
 
                     <div class="modal-body text-center" id="em-camera-body" style="display: none;">
-                        <p id="txt-iddoc-img-instructions" class="lead" style="display: block;">
+                        <p id="txt-iddoc-img-instructions" style="display: block;">
                             {{ 'ImageIdDocumentCameraInstructions'|get_plugin_lang('ExerciseMonitoringPlugin') }}
                         </p>
-                        <p id="txt-learner-img-instructions" class="lead" style="display: none;">
+                        <p id="txt-learner-img-instructions" style="display: none;">
                             {{ 'ImageStudentCameraInstructions'|get_plugin_lang('ExerciseMonitoringPlugin') }}
                         </p>
-                        <div style="position: relative">
+                        <div style="position: relative; margin: 0 auto; max-width: 97%;">
                             <div id="monitoring-camera"></div>
                             <img id="img-iddoc-placeholder" style="display: block;" src="{{ _p.web_plugin }}exercisemonitoring/assets/images/idcard.png">
                             <img id="img-learner-placeholder" style="display: none" src="{{ _p.web_plugin }}exercisemonitoring/assets/images/user.png">

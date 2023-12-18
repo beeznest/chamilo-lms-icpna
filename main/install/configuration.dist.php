@@ -1297,3 +1297,23 @@ $_configuration['required_extra_fields_in_profile'] = [
 
 // Enable additional_webservices.php for *remote* PPT2PNG/Oogie service
 //$_configuration['webservice_remote_ppt2png_enable'] = false;
+
+// Add more speed options to reading comprehension question type (type id = 21) in words per minute
+//$_configuration['exercise_question_reading_comprehension_extra_speeds'] = ['speeds' => [70, 110, 170]];
+
+//hide copy icon in LP's authoring options
+//$_configuration['lp_hide_copy_option'] = false;
+
+// Password rotation
+// Requires creating a "Date and time" extra user field with the system id "password_updated_at"
+// Note: only a password change by the user itself will be taken into account.
+// Admins editing someone else's password do not count as a password update that would avoid the rotation request.
+// If this feature is enabled on an existing portal, the registration date of users will be taken as
+// the latest password change date.
+//$_configuration['security_password_rotate_days'] = 90;
+
+// Prevent login/pass cache by browser
+// If enabled, users' browsers will not be able to re-use previous
+// login/passwords in the main login form. Browsers might choose not to
+// support this feature.
+//$_configuration['security_login_autocomplete_disable'] = false;

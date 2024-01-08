@@ -1635,7 +1635,8 @@ function _api_format_user($user, $add_password = false, $loadAvatars = true)
     $result['profile_url'] = api_get_path(WEB_CODE_PATH).'social/profile.php?u='.$user_id;
 
     // Send message link
-    $sendMessage = api_get_path(WEB_AJAX_PATH).'user_manager.ajax.php?a=get_user_popup&user_id='.$user_id;
+    $userIdHash = UserManager::generateUserHash($user_id);
+    $sendMessage = api_get_path(WEB_AJAX_PATH).'user_manager.ajax.php?a=get_user_popup&hash='.$userIdHash;
     $result['complete_name_with_message_link'] = Display::url(
         $result['complete_name_with_username'],
         $sendMessage,
@@ -9668,4 +9669,148 @@ function api_protect_webservices()
         echo "To enable, add \$_configuration['disable_webservices'] = true; in configuration.php";
         exit;
     }
+}
+
+function api_filename_has_blacklisted_stream_wrapper(string $filename)
+{
+    if (strpos($filename, '://') > 0) {
+        $wrappers = stream_get_wrappers();
+        $allowedWrappers = ['http', 'https', 'file'];
+
+        foreach ($wrappers as $wrapper) {
+            if (in_array($wrapper, $allowedWrappers)) {
+                continue;
+            }
+
+            if (stripos($filename, $wrapper.'://') === 0) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Calculate the percent between two numbers.
+ *
+ * @return string
+ */
+function api_calculate_increment_percent(int $newValue, int $oldValue)
+{
+    if ($oldValue <= 0) {
+        $result = " - ";
+    } else {
+        $result = ' '.round(100 * (($newValue / $oldValue) - 1), 2).' %';
+    }
+
+    return $result;
+}
+
+/**
+ * Erase settings from cache (because of some update) if applicable.
+ *
+ * @param int $url_id The ID of the present URL
+ */
+function api_flush_settings_cache(int $url_id): bool
+{
+    global $_configuration;
+    $cacheAvailable = api_get_configuration_value('apc');
+    if (!$cacheAvailable) {
+        return false;
+    }
+    $apcRootVarName = api_get_configuration_value('apc_prefix');
+    // Delete the APCu-stored settings array, if present
+    $apcVarName = $apcRootVarName.'settings';
+    apcu_delete($apcVarName);
+    if (api_is_multiple_url_enabled() && $url_id === 1) {
+        // if we are on the main URL of a multi-url portal, we must
+        // invalidate the cache for all other URLs as well as some
+        // main settings span multiple URLs
+        $urls = api_get_access_urls();
+        foreach ($urls as $i => $row) {
+            if ($row['id'] == 1) {
+                continue;
+            }
+            $apcVarName = $_configuration['main_database'].'_'.$row['id'].'_settings';
+            apcu_delete($apcVarName);
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Decrypt sent data with encoded secret defined in app/config/configuration.php
+ * in the variable $_configuration['ldap_admin_password_salt'].
+ *
+ * @param $encryptedText The text to be decrypted
+ */
+function api_decrypt_ldap_password(string $encryptedText): string
+{
+    if (!empty(api_get_configuration_value('ldap_admin_password_salt'))) {
+        $secret = api_get_configuration_value('ldap_admin_password_salt');
+    } else {
+        return false;
+    }
+
+    return api_decrypt_hash($encryptedText,$secret);
+}
+
+/**
+ * Decrypt sent hash encoded with secret
+ *
+ * @param $encryptedText The hash text to be decrypted
+ * @param $secret        The secret used to encoded the hash
+ *
+ * @return string The decrypted text or false
+ */
+function api_decrypt_hash(string $encryptedHash, string $secret): string
+{
+    $secret = hex2bin($secret);
+    $iv = base64_decode(substr($encryptedHash, 0, 16), true);
+    $data = base64_decode(substr($encryptedHash, 16), true);
+    $tag = substr($data, strlen($data) - 16);
+    $data = substr($data, 0, strlen($data) - 16);
+
+    try {
+        return openssl_decrypt(
+        $data,
+        'aes-256-gcm',
+        $secret,
+        OPENSSL_RAW_DATA,
+        $iv,
+        $tag
+      );
+    } catch (\Exception $e) {
+        return false;
+    }
+}
+
+/**
+ * Encrypt sent data with secret
+ *
+ * @param $data   The text to be encrypted
+ * @param $secret The secret to use encode data
+ *
+ * @return string The encrypted text or false
+ */
+function api_encrypt_hash($data, $secret)
+{
+  $secret = hex2bin($secret);
+  $iv = random_bytes(12);
+  $tag = '';
+
+  $encrypted = openssl_encrypt(
+    $data,
+    'aes-256-gcm',
+    $secret,
+    OPENSSL_RAW_DATA,
+    $iv,
+    $tag,
+    '',
+    16
+  );
+
+  return base64_encode($iv) . base64_encode($encrypted . $tag);
 }

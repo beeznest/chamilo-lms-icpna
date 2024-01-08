@@ -1976,7 +1976,8 @@ class CourseManager
                 $userPicture = UserManager::getUserPicture($teacher['user_id'], USER_IMAGE_SIZE_SMALL);
                 $teachers['avatar'] = $userPicture;
             }
-            $teachers['url'] = $url.'&user_id='.$teacher['user_id'];
+            $userIdHash = UserManager::generateUserHash($teacher['user_id']);
+            $teachers['url'] = $url.'&hash='.$userIdHash;
             $listTeachers[] = $teachers;
         }
 
@@ -2009,7 +2010,8 @@ class CourseManager
                     $teacher['lastname']
                 );
                 if ($add_link_to_profile) {
-                    $url = api_get_path(WEB_AJAX_PATH).'user_manager.ajax.php?a=get_user_popup&user_id='.$teacher['user_id'];
+                    $userIdHash = UserManager::generateUserHash($teacher['user_id']);
+                    $url = api_get_path(WEB_AJAX_PATH).'user_manager.ajax.php?a=get_user_popup&hash='.$userIdHash;
                     $teacher_name = Display::url(
                         $teacher_name,
                         $url,
@@ -2091,7 +2093,9 @@ class CourseManager
                 $row['avatar'] = $loadAvatars
                     ? UserManager::getUserPicture($row['user_id'], USER_IMAGE_SIZE_SMALL)
                     : '';
-                $row['url'] = "$url&user_id={$row['user_id']}";
+                $userIdHash = UserManager::generateUserHash($row['user_id']);
+                $row['url'] = $url.'&hash='.$userIdHash;
+                $row['hash'] = $userIdHash; 
 
                 $coaches[] = $row;
             }
@@ -2122,7 +2126,8 @@ class CourseManager
             foreach ($coachList as $coach_course) {
                 $coach_name = $coach_course['full_name'];
                 if ($add_link_to_profile) {
-                    $url = api_get_path(WEB_AJAX_PATH).'user_manager.ajax.php?a=get_user_popup&user_id='.$coach_course['user_id'].'&course_id='.$courseId.'&session_id='.$session_id;
+                    $userIdHash = UserManager::generateUserHash($coach_course['user_id']);
+                    $url = api_get_path(WEB_AJAX_PATH).'user_manager.ajax.php?a=get_user_popup&hash='.$userIdHash.'&course_id='.$courseId.'&session_id='.$session_id;
                     $coach_name = Display::url(
                         $coach_name,
                         $url,

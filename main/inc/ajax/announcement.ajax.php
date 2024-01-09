@@ -12,6 +12,7 @@ $isAllowedToEdit = api_is_allowed_to_edit();
 $courseInfo = api_get_course_info();
 $groupId = api_get_group_id();
 $sessionId = api_get_session_id();
+$currentUserId = api_get_user_id();
 
 $isTutor = false;
 if (!empty($groupId)) {
@@ -24,9 +25,14 @@ if (!empty($groupId)) {
 
 switch ($action) {
     case 'preview':
+        $userInCourse = false;
+        if (CourseManager::is_user_subscribed_in_course($currentUserId, CourseManager::get_course_code_from_course_id($courseId), $sessionId)) {
+            $userInCourse = true;
+        }
         $allowToEdit = (
             api_is_allowed_to_edit(false, true) ||
-            (api_get_course_setting('allow_user_edit_announcement') && !api_is_anonymous())
+            (api_get_course_setting('allow_user_edit_announcement') && !api_is_anonymous() && $userInCourse) ||
+            ($sessionId && api_is_coach() && api_get_configuration_value('allow_coach_to_edit_announcements'))
         );
 
         $drhHasAccessToSessionContent = api_drh_can_access_all_session_content();
@@ -40,6 +46,15 @@ switch ($action) {
             $isTutor = GroupManager::is_tutor_of_group(api_get_user_id(), $groupProperties, $courseId);
             if ($isTutor) {
                 $allowToEdit = true;
+            }
+
+            // Last chance ... students can send announcements.
+            if ($groupProperties['announcements_state'] == GroupManager::TOOL_PRIVATE_BETWEEN_USERS) {
+                // check if user is a group member to give access
+                $groupInfo = GroupManager::get_group_properties($groupId);
+                if (array_key_exists($currentUserId,GroupManager::get_subscribed_users($groupInfo))) {
+                    $allowToEdit = true;
+                }
             }
         }
 

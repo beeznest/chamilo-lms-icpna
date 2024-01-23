@@ -1,6 +1,6 @@
 // WebcamJS v1.0.26
 // Webcam library for capturing JPEG/PNG images in JavaScript
-// Attempts getUserMedia, falls back to Flash
+// Attempts getUserMedia
 // Author: Joseph Huckaby: http://github.com/jhuckaby
 // Based on JPEGCam: http://code.google.com/p/jpegcam/
 // Copyright (c) 2012 - 2019 Joseph Huckaby
@@ -13,13 +13,6 @@ var _userMedia;
 
 // inheritance pattern here:
 // https://stackoverflow.com/questions/783818/how-do-i-create-a-custom-error-in-javascript
-function FlashError() {
-	var temp = Error.apply(this, arguments);
-	temp.name = this.name = "FlashError";
-	this.stack = temp.stack;
-	this.message = temp.message;
-}
-
 function WebcamError() {
 	var temp = Error.apply(this, arguments);
 	temp.name = this.name = "WebcamError";
@@ -30,7 +23,6 @@ function WebcamError() {
 var IntermediateInheritor = function() {};
 IntermediateInheritor.prototype = Error.prototype;
 
-FlashError.prototype = new IntermediateInheritor();
 WebcamError.prototype = new IntermediateInheritor();
 
 var Webcam = {
@@ -49,14 +41,10 @@ var Webcam = {
 		dest_height: 0,        // these default to width/height
 		image_format: 'jpeg',  // image format (may be jpeg or png)
 		jpeg_quality: 90,      // jpeg image quality from 0 (worst) to 100 (best)
-		enable_flash: true,    // enable flash fallback,
-		force_flash: false,    // force flash mode,
 		flip_horiz: false,     // flip image horiz (mirror mode)
 		fps: 30,               // camera frames per second
 		upload_name: 'webcam', // name of file in upload post data
 		constraints: null,     // custom user media constraints,
-		swfURL: '',            // URI to webcam.swf movie (defaults to the js location)
-		flashNotDetectedText: 'ERROR: No Adobe Flash Player detected.  Webcam.js relies on Flash for browsers that do not support getUserMedia (like yours).',
 		noInterfaceFoundText: 'No supported webcam interface found.',
 		unfreeze_snap: true,    // Whether to unfreeze the camera after snap (defaults to true)
 		user_callback: null,    // callback function for snapshot (used if no user_callback parameter given to snap function)
@@ -64,7 +52,6 @@ var Webcam = {
 	},
 
 	errors: {
-		FlashError: FlashError,
 		WebcamError: WebcamError
 	},
 	
@@ -131,12 +118,7 @@ var Webcam = {
 		if (!this.params.dest_width) this.params.dest_width = this.params.width;
 
 		this.userMedia = _userMedia === undefined ? this.userMedia : _userMedia;
-		// if force_flash is set, disable userMedia
-		if (this.params.force_flash) {
-			_userMedia = this.userMedia;
-			this.userMedia = null;
-		}
-		
+
 		// check for default fps
 		if (typeof this.params.fps !== "number") this.params.fps = 30;
 
@@ -185,14 +167,7 @@ var Webcam = {
 				}
 			})
 			.catch( function(err) {
-				// JH 2016-07-31 Instead of dispatching error, now falling back to Flash if userMedia fails (thx @john2014)
-				// JH 2016-08-07 But only if flash is actually installed -- if not, dispatch error here and now.
-				if (self.params.enable_flash && self.detectFlash()) {
-					setTimeout( function() { self.params.force_flash = 1; self.attach(elem); }, 1 );
-				}
-				else {
-					self.dispatch('error', err);
-				}
+                self.dispatch('error', err);
 			});
 		}
 		else {
@@ -237,12 +212,6 @@ var Webcam = {
 			}
 			delete this.stream;
 			delete this.video;
-		}
-
-		if ((this.userMedia !== true) && this.loaded) {
-			// call for turn off camera in flash
-			var movie = this.getMovie();
-			if (movie && movie._releaseCamera) movie._releaseCamera();
 		}
 
 		if (this.container) {
@@ -316,7 +285,7 @@ var Webcam = {
 		}
 		else if (name == 'error') {
 			var message;
-			if ((args[0] instanceof FlashError) || (args[0] instanceof WebcamError)) {
+			if (args[0] instanceof WebcamError) {
 				message = args[0].message;
 			} else {
 				message = "Could not access webcam: " + args[0].name + ": " + 
@@ -328,102 +297,6 @@ var Webcam = {
 		}
 		
 		return false; // no hook defined
-	},
-
-	setSWFLocation: function(value) {
-		// for backward compatibility.
-		this.set('swfURL', value);
-	},
-	
-	detectFlash: function() {
-		// return true if browser supports flash, false otherwise
-		// Code snippet borrowed from: https://github.com/swfobject/swfobject
-		var SHOCKWAVE_FLASH = "Shockwave Flash",
-			SHOCKWAVE_FLASH_AX = "ShockwaveFlash.ShockwaveFlash",
-        	FLASH_MIME_TYPE = "application/x-shockwave-flash",
-        	win = window,
-        	nav = navigator,
-        	hasFlash = false;
-        
-        if (typeof nav.plugins !== "undefined" && typeof nav.plugins[SHOCKWAVE_FLASH] === "object") {
-        	var desc = nav.plugins[SHOCKWAVE_FLASH].description;
-        	if (desc && (typeof nav.mimeTypes !== "undefined" && nav.mimeTypes[FLASH_MIME_TYPE] && nav.mimeTypes[FLASH_MIME_TYPE].enabledPlugin)) {
-        		hasFlash = true;
-        	}
-        }
-        else if (typeof win.ActiveXObject !== "undefined") {
-        	try {
-        		var ax = new ActiveXObject(SHOCKWAVE_FLASH_AX);
-        		if (ax) {
-        			var ver = ax.GetVariable("$version");
-        			if (ver) hasFlash = true;
-        		}
-        	}
-        	catch (e) {;}
-        }
-        
-        return hasFlash;
-	},
-	
-	getSWFHTML: function() {
-		// Return HTML for embedding flash based webcam capture movie		
-		var html = '',
-			swfURL = this.params.swfURL;
-		
-		// make sure we aren't running locally (flash doesn't work)
-		if (location.protocol.match(/file/)) {
-			this.dispatch('error', new FlashError("Flash does not work from local disk.  Please run from a web server."));
-			return '<h3 style="color:red">ERROR: the Webcam.js Flash fallback does not work from local disk.  Please run it from a web server.</h3>';
-		}
-		
-		// make sure we have flash
-		if (!this.detectFlash()) {
-			this.dispatch('error', new FlashError("Adobe Flash Player not found.  Please install from get.adobe.com/flashplayer and try again."));
-			return '<h3 style="color:red">' + this.params.flashNotDetectedText + '</h3>';
-		}
-		
-		// set default swfURL if not explicitly set
-		if (!swfURL) {
-			// find our script tag, and use that base URL
-			var base_url = '';
-			var scpts = document.getElementsByTagName('script');
-			for (var idx = 0, len = scpts.length; idx < len; idx++) {
-				var src = scpts[idx].getAttribute('src');
-				if (src && src.match(/\/webcam(\.min)?\.js/)) {
-					base_url = src.replace(/\/webcam(\.min)?\.js.*$/, '');
-					idx = len;
-				}
-			}
-			if (base_url) swfURL = base_url + '/webcam.swf';
-			else swfURL = 'webcam.swf';
-		}
-		
-		// if this is the user's first visit, set flashvar so flash privacy settings panel is shown first
-		if (window.localStorage && !localStorage.getItem('visited')) {
-			this.params.new_user = 1;
-			localStorage.setItem('visited', 1);
-		}
-		
-		// construct flashvars string
-		var flashvars = '';
-		for (var key in this.params) {
-			if (flashvars) flashvars += '&';
-			flashvars += key + '=' + escape(this.params[key]);
-		}
-		
-		// construct object/embed tag
-		html += '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" type="application/x-shockwave-flash" codebase="'+this.protocol+'://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="'+this.params.width+'" height="'+this.params.height+'" id="webcam_movie_obj" align="middle"><param name="wmode" value="opaque" /><param name="allowScriptAccess" value="always" /><param name="allowFullScreen" value="false" /><param name="movie" value="'+swfURL+'" /><param name="loop" value="false" /><param name="menu" value="false" /><param name="quality" value="best" /><param name="bgcolor" value="#ffffff" /><param name="flashvars" value="'+flashvars+'"/><embed id="webcam_movie_embed" src="'+swfURL+'" wmode="opaque" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="'+this.params.width+'" height="'+this.params.height+'" name="webcam_movie_embed" align="middle" allowScriptAccess="always" allowFullScreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="'+flashvars+'"></embed></object>';
-		
-		return html;
-	},
-	
-	getMovie: function() {
-		// get reference to movie object/embed in DOM
-		if (!this.loaded) return this.dispatch('error', new FlashError("Flash Movie is not loaded yet"));
-		var movie = document.getElementById('webcam_movie_obj');
-		if (!movie || !movie._snap) movie = document.getElementById('webcam_movie_embed');
-		if (!movie) this.dispatch('error', new FlashError("Cannot locate Flash movie in DOM"));
-		return movie;
 	},
 	
 	freeze: function() {
@@ -583,9 +456,9 @@ var Webcam = {
 			context.scale( -1, 1 );
 		}
 
-		// create inline function, called after image load (flash) or immediately (native)
+		// create inline function, called after image load or immediately
 		var func = function() {
-			// render image if needed (flash)
+			// render image if needed
 			if (this.src && this.width && this.height) {
 				context.drawImage(this, 0, 0, params.dest_width, params.dest_height);
 			}
@@ -627,7 +500,7 @@ var Webcam = {
 			);
 		};
 
-		// grab image frame from userMedia or flash movie
+		// grab image frame from userMedia
 		if (this.userMedia) {
 			// native implementation
 			context.drawImage(this.video, 0, 0, this.params.dest_width, this.params.dest_height);
@@ -635,51 +508,8 @@ var Webcam = {
 			// fire callback right away
 			func();
 		}
-		else {
-			// flash fallback
-			var raw_data = this.getMovie()._snap();
-
-			// render to image, fire callback when complete
-			var img = new Image();
-			img.onload = func;
-			img.src = 'data:image/'+this.params.image_format+';base64,' + raw_data;
-		}
 
 		return null;
-	},
-
-	configure: function(panel) {
-		// open flash configuration panel -- specify tab name:
-		// "camera", "privacy", "default", "localStorage", "microphone", "settingsManager"
-		if (!panel) panel = "camera";
-		this.getMovie()._configure(panel);
-	},
-
-	flashNotify: function(type, msg) {
-		// receive notification from flash about event
-		switch (type) {
-			case 'flashLoadComplete':
-				// movie loaded successfully
-				this.loaded = true;
-				this.dispatch('load');
-				break;
-			
-			case 'cameraLive':
-				// camera is live and ready to snap
-				this.live = true;
-				this.dispatch('live');
-				break;
-
-			case 'error':
-				// Flash error
-				this.dispatch('error', new FlashError(msg));
-				break;
-
-			default:
-				// catch-all event, just in case
-				// console.log("webcam flash_notify: " + type + ": " + msg);
-				break;
-		}
 	},
 
 	b64ToUint6: function(nChr) {

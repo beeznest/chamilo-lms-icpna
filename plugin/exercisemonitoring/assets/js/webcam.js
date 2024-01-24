@@ -293,7 +293,7 @@ var Webcam = {
 			}
 
 			// default error handler if no custom one specified
-			alert("Webcam.js Error: " + message);
+			alert("Error: " + message);
 		}
 		
 		return false; // no hook defined

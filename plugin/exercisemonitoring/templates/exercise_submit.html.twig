@@ -33,6 +33,7 @@
                     }
                 {% endif %}
             });
+            Webcam.on('error', function () { });
 
             {% if ALL_ON_ONE_PAGE %}
                 $btnEndTest.on('click', function () {

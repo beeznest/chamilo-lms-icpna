@@ -109,6 +109,9 @@
 
                         $btnSnap.prop({disabled: false}).focus();
                     });
+                    Webcam.on('error', function () {
+                        finishOverview();
+                    })
                 });
 
                 $btnSnap.on('click', function (e) {
@@ -169,9 +172,7 @@
                         Webcam.reset();
 
                         sendData().done(function () {
-                            $btnStartExercise.removeClass('disabled').removeAttr('aria-disabled');
-
-                            window.location = $btnStartExercise.prop('href');
+                            finishOverview();
 
                             $("#em-modal-start").modal('hide');
                         });
@@ -241,6 +242,12 @@
                         processData: false,
                         contentType: false,
                     });
+                }
+
+                function finishOverview() {
+                    $btnStartExercise.removeClass('disabled').removeAttr('aria-disabled');
+
+                    window.location = $btnStartExercise.prop('href');
                 }
             });
         </script>

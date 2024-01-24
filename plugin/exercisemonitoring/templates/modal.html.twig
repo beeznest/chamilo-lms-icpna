@@ -16,8 +16,6 @@
                         </p>
                         <div style="position: relative; margin: 0 auto; max-width: 97%;">
                             <div id="monitoring-camera"></div>
-                            <img id="img-iddoc-placeholder" style="display: block;" src="{{ _p.web_plugin }}exercisemonitoring/assets/images/idcard.png">
-                            <img id="img-learner-placeholder" style="display: none" src="{{ _p.web_plugin }}exercisemonitoring/assets/images/user.png">
                         </div>
                         <br>
                         <button class="btn btn-default" type="button" id="btn-snap" disabled>
@@ -76,8 +74,6 @@
 
                 var $txtIdDocInstructions = $('#txt-iddoc-img-instructions');
                 var $txtLearnerInstructions = $('#txt-learner-img-instructions');
-                var $imgIdDocPlaceholder = $('#img-iddoc-placeholder');
-                var $imgLearnerPlaceholder = $('#img-learner-placeholder');
 
                 var hasIdDoc = false;
                 var hasLearner = false;
@@ -107,9 +103,9 @@
                     Webcam.attach('#monitoring-camera');
                     Webcam.on('live', function () {
                         $txtIdDocInstructions.show();
-                        $imgIdDocPlaceholder.show();
+
+                        $('#monitoring-camera').removeClass('learner-placeholder').addClass('iddoc-placeholder');
                         $txtLearnerInstructions.hide();
-                        $imgLearnerPlaceholder.hide();
 
                         $btnSnap.prop({disabled: false}).focus();
                     });
@@ -161,9 +157,9 @@
                         $bodyCamera.show();
 
                         $txtIdDocInstructions.hide();
-                        $imgIdDocPlaceholder.hide();
+
+                        $('#monitoring-camera').removeClass('iddoc-placeholder').addClass('learner-placeholder');
                         $txtLearnerInstructions.show();
-                        $imgLearnerPlaceholder.show();
 
                         $btnSnap.prop({disabled: false}).focus();
                     } else if (hasIdDoc && hasLearner) {
@@ -253,6 +249,21 @@
                 max-width: 100%;
                 min-width: 100%;
                 width: 100%;
+                position: relative;
+                z-index: 1;
+            }
+            #monitoring-camera > div {
+                position: absolute;
+                background-size: 100% 100%;
+                z-index: 2;
+                height: 100%;
+                width: 100%;
+            }
+            #monitoring-camera.iddoc-placeholder > div {
+                background-image: url("{{ _p.web_plugin }}exercisemonitoring/assets/images/idcard.png");
+            }
+            #monitoring-camera.learner-placeholder > div {
+                background-image: url("{{ _p.web_plugin }}exercisemonitoring/assets/images/user.png");
             }
 
             #monitoring-camera video {
@@ -262,19 +273,6 @@
                 width: 100%;
                 transform: scaleX(-1);
                 -webkit-transform: scaleX(-1);
-            }
-
-            #em-camera-body img#img-iddoc-placeholder,
-            #em-camera-body img#img-learner-placeholder {
-                height: auto;
-                left: 0;
-                max-width: 100%;
-                min-width: 100%;
-                position: absolute;
-                top: 50%;
-                width: 100%;
-                transform: translate(0%, -50%);
-                -webkit-transform: translate(0%, -50%);
             }
         </style>
     {% else %}

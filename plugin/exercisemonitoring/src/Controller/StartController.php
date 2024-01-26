@@ -36,39 +36,46 @@ class StartController
 
         $fileNamesToUpdate = [];
 
+        $logImgIdDoc = new Log();
+        $logImgIdDoc
+            ->setExercise($exercise)
+            ->setLevel(-1)
+        ;
+
         if ($imgIddoc) {
             $newFilename = uniqid().'_iddoc.jpg';
-            $fileNamesToUpdate[] = $newFilename;
 
             $imgIddoc->move($userDirName, $newFilename);
 
-            $log = new Log();
-            $log
-                ->setExercise($exercise)
-                ->setLevel(-1)
-                ->setImageFilename($newFilename)
-            ;
-
-            $this->em->persist($log);
+            $logImgIdDoc->setImageFilename($newFilename);
+        } else {
+            $logImgIdDoc->setIsError(true);
         }
+
+        $this->em->persist($logImgIdDoc);
+
+        $logImgLearner = new Log();
+        $logImgLearner
+            ->setExercise($exercise)
+            ->setLevel(-1)
+        ;
 
         if ($imgLearner) {
             $newFilename = uniqid().'_learner.jpg';
-            $fileNamesToUpdate[] = $newFilename;
 
             $imgLearner->move($userDirName, $newFilename);
 
-            $log = new Log();
-            $log
-                ->setExercise($exercise)
-                ->setLevel(-1)
-                ->setImageFilename($newFilename)
-            ;
-
-            $this->em->persist($log);
+            $logImgLearner->setImageFilename($newFilename);
+        } else {
+            $logImgLearner->setIsError(true);
         }
 
+        $this->em->persist($logImgLearner);
+
         $this->em->flush();
+
+        $fileNamesToUpdate[] = $logImgIdDoc->getId();
+        $fileNamesToUpdate[] = $logImgLearner->getId();
 
         ChamiloSession::write($this->plugin->get_name().'_orphan_snapshots', $fileNamesToUpdate);
 

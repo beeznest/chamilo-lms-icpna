@@ -33,7 +33,21 @@
                     }
                 {% endif %}
             });
-            Webcam.on('error', function () { });
+            Webcam.on('error', function () {
+                {% if ALL_ON_ONE_PAGE %}
+                    sendData(0, '');
+                {% elseif ONE_PER_PAGE %}
+                    sendData(
+                        $btnSaveNow.data('question') || 0,
+                        ''
+                    );
+                {% elseif ONE_CATEGORY_PER_PAGE %}
+                    sendData(
+                        $btnSaveCategoryNow.data('category') || 0,
+                        ''
+                    );
+                {% endif %}
+            });
 
             {% if ALL_ON_ONE_PAGE %}
                 $btnEndTest.on('click', function () {
@@ -68,13 +82,17 @@
             }
 
             function sendData(questionId, imageUri) {
-                var rawImgIdDoc = imageUri.replace(/^data:image\/\w+;base64,/, '');
-                var blobImgIdDoc = new Blob( [ Webcam.base64DecToArr(rawImgIdDoc) ], {type: 'image/jpeg'} );
-
                 var formData = new FormData();
+
+                if (imageUri) {
+                    var rawImgIdDoc = imageUri.replace(/^data:image\/\w+;base64,/, '');
+                    var blobImgIdDoc = new Blob( [ Webcam.base64DecToArr(rawImgIdDoc) ], {type: 'image/jpeg'} );
+
+                    formData.append('snapshot', blobImgIdDoc, 'snapshot.jpg');
+                }
+
                 formData.append('exercise_id', '{{ exercisemonitoring.exercise_id }}');
                 formData.append('level_id', questionId);
-                formData.append('snapshot', blobImgIdDoc, 'snapshot.jpg');
 
                 return $.ajax({
                     url: '{{ _p.web_plugin }}exercisemonitoring/pages/exercise_submit.ajax.php',

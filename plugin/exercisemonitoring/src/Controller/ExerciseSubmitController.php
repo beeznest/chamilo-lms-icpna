@@ -50,11 +50,21 @@ class ExerciseSubmitController
         $newFilename = '';
         $level = 0;
 
+        $log = new Log();
+        $log
+            ->setExercise($exercise)
+            ->setExe($trackingExercise)
+        ;
+
         /** @var UploadedFile $imgSubmit */
         if ($imgSubmit = $this->request->files->get('snapshot')) {
             $newFilename = uniqid().'_submit.jpg';
 
             $imgSubmit->move($userDirName, $newFilename);
+
+            $log->setImageFilename($newFilename);
+        } else {
+            $log->setIsError(true);
         }
 
         if (ONE_PER_PAGE == $objExercise->selectType()) {
@@ -65,13 +75,7 @@ class ExerciseSubmitController
             $level = $questionCategory->getId();
         }
 
-        $log = new Log();
-        $log
-            ->setExercise($exercise)
-            ->setExe($trackingExercise)
-            ->setLevel($level)
-            ->setImageFilename($newFilename)
-        ;
+        $log->setLevel($level);
 
         $this->em->persist($log);
 
@@ -109,7 +113,7 @@ class ExerciseSubmitController
         }
 
         foreach ($fileNamesToUpdate as $filename) {
-            $log = $repo->findOneBy(['imageFilename' => $filename, 'exercise' => $exercise, 'exe' => null]);
+            $log = $repo->findOneBy(['id' => $filename, 'exercise' => $exercise, 'exe' => null]);
 
             if (!$log) {
                 continue;

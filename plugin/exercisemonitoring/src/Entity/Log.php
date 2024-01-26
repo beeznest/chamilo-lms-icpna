@@ -52,7 +52,7 @@ class Log
     /**
      * @var string
      *
-     * @ORM\Column(name="image_filename", type="string")
+     * @ORM\Column(name="image_filename", type="string", nullable=true)
      */
     private $imageFilename;
 
@@ -63,12 +63,20 @@ class Log
      */
     private $removed;
 
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_error", type="boolean", nullable=false, options={"default": false})
+     */
+    private $isError;
+
     public function __construct()
     {
         $this->removed = false;
+        $this->isError = false;
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -109,12 +117,12 @@ class Log
         return $this;
     }
 
-    public function getImageFilename(): string
+    public function getImageFilename(): ?string
     {
         return $this->imageFilename;
     }
 
-    public function setImageFilename(string $imageFilename): Log
+    public function setImageFilename(?string $imageFilename): Log
     {
         $this->imageFilename = $imageFilename;
 
@@ -129,5 +137,15 @@ class Log
     public function setRemoved(bool $removed): void
     {
         $this->removed = $removed;
+    }
+
+    public function isError(): bool
+    {
+        return $this->isError;
+    }
+
+    public function setIsError(bool $isError): void
+    {
+        $this->isError = $isError;
     }
 }

@@ -110,7 +110,9 @@
                         $btnSnap.prop({disabled: false}).focus();
                     });
                     Webcam.on('error', function () {
-                        finishOverview();
+                        sendData().done(function () {
+                            finishOverview();
+                        });
                     })
                 });
 
@@ -224,15 +226,22 @@
                 }
 
                 function sendData() {
-                    var rawImgIdDoc = imgIdDoc.replace(/^data:image\/\w+;base64,/, '');
-                    var blobImgIdDoc = new Blob( [ Webcam.base64DecToArr(rawImgIdDoc) ], {type: 'image/jpeg'} );
-
-                    var rawImgLearner = imgLearner.replace(/^data:image\/\w+;base64,/, '');
-                    var blobImgLearner = new Blob( [ Webcam.base64DecToArr(rawImgLearner) ], {type: 'image/jpeg'} );
-
                     var formData = new FormData();
-                    formData.append('iddoc', blobImgIdDoc, 'iddoc.jpg');
-                    formData.append('learner', blobImgLearner, 'learner.jpg');
+
+                    if (imgIdDoc) {
+                        var rawImgIdDoc = imgIdDoc.replace(/^data:image\/\w+;base64,/, '');
+                        var blobImgIdDoc = new Blob( [ Webcam.base64DecToArr(rawImgIdDoc) ], {type: 'image/jpeg'} );
+
+                        formData.append('iddoc', blobImgIdDoc, 'iddoc.jpg');
+                    }
+
+                    if (imgLearner) {
+                        var rawImgLearner = imgLearner.replace(/^data:image\/\w+;base64,/, '');
+                        var blobImgLearner = new Blob( [ Webcam.base64DecToArr(rawImgLearner) ], {type: 'image/jpeg'} );
+
+                        formData.append('learner', blobImgLearner, 'learner.jpg');
+                    }
+
                     formData.append('exercise_id', '{{ exercisemonitoring.exercise_id }}');
 
                     return $.ajax({

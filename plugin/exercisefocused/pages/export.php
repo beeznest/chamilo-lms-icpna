@@ -423,10 +423,15 @@ function getOneCategoryPerPageByMonitoring(Exercise $objExercise, TrackEExercise
             FocusedLog::TYPE_RETURN,
             $monitoringLog['level']
         );
-        $snapshotUrl = ExerciseMonitoringPlugin::generateSnapshotUrl(
-            $user->getId(),
-            $monitoringLog['imageFilename']
-        );
+
+        if ($monitoringLog['isError']) {
+            $snapshotUrl = get_plugin_lang('CameraError', 'ExerciseMonitoringPlugin');
+        } else {
+            $snapshotUrl = ExerciseMonitoringPlugin::generateSnapshotUrl(
+                $user->getId(),
+                $monitoringLog['imageFilename']
+            );
+        }
 
         $hasLevel = $monitoringLog['level'] > 0;
 

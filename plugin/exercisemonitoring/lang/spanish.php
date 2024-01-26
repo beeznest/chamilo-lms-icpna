@@ -30,3 +30,4 @@ $strings['ExerciseUnmonitored'] = "Ejercicio no monitoreado";
 $strings['Birthdate'] = "Fecha de nacimiento";
 $strings['AdultStudent'] = "Estudiante adulto";
 $strings['MinorStudent'] = "Estudiante menor de edad";
+$strings['CameraError'] = 'Error de cámara';

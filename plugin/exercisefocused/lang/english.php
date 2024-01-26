@@ -38,3 +38,4 @@ $strings['ExerciseStartDateAndTime'] = "Exercise start date and time";
 $strings['ExerciseEndDateAndTime'] = "Exercise end date and time";
 $strings['MotiveExerciseFinished'] = "Successfully completed the exam";
 $strings['MotiveExpiredTime'] = "The exercise time limit has expired";
+$strings['CameraError'] = 'Camera error';

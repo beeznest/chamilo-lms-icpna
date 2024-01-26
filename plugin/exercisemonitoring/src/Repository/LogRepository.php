@@ -28,7 +28,7 @@ class LogRepository extends EntityRepository
     {
         $qb = $this->createQueryBuilder('l');
 
-        $qb->select(['l.level', 'l.imageFilename', 'l.createdAt']);
+        $qb->select(['l.level', 'l.imageFilename', 'l.createdAt', 'l.isError']);
 
         if (ONE_PER_PAGE == $objExercise->selectType()) {
             $qb

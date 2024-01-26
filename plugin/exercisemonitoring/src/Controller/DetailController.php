@@ -94,13 +94,29 @@ class DetailController
 
             $html .= '<div class="col-xs-12 col-sm-6 col-md-3" style="clear: '.($i % 4 === 0 ? 'both' : 'none').';">';
             $html .= '<div class="thumbnail">';
-            $html .= Display::img(
-                ExerciseMonitoringPlugin::generateSnapshotUrl($userId, $log['imageFilename']),
-                $date
-            );
-            $html .= '<div class="caption">';
-            $html .= Display::tag('p', $date, ['class' => 'text-center']);
-            $html .= Display::tag('div', $log['log_level'], ['class' => 'text-center']);
+            if ($log['isError']) {
+                $html .= Display::img(
+                    api_get_path(WEB_PLUGIN_PATH).'exercisemonitoring/assets/images/error_placeholder.jpg',
+                    $date
+                );
+            } else {
+                $html .= Display::img(
+                    ExerciseMonitoringPlugin::generateSnapshotUrl($userId, $log['imageFilename']),
+                    $date
+                );
+            }
+            $html .= '<div class="caption text-center">';
+            $html .= Display::tag('span', $date, ['style' => 'display: inline-block;']).PHP_EOL;
+            $html .= Display::tag('strong', $log['log_level'], ['style' => 'display: inline-block;']).PHP_EOL;
+
+            if ($log['isError']) {
+                $html .= Display::tag(
+                    'em',
+                    $this->plugin->get_lang('CameraError'),
+                    ['style' => 'display: inline-block;']
+                ).PHP_EOL;
+            }
+
             $html .= '</div>';
             $html .= '</div>';
             $html .= '</div>';

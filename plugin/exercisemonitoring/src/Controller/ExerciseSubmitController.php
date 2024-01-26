@@ -48,36 +48,39 @@ class ExerciseSubmitController
         $trackingExercise = $this->em->find(TrackEExercises::class, $existingExeId);
 
         $newFilename = '';
-        $level = 0;
 
-        $log = new Log();
-        $log
-            ->setExercise($exercise)
-            ->setExe($trackingExercise)
-        ;
+        if (!$this->thereAreErrorsForTrackingExe($trackingExercise)) {
+            $log = new Log();
+            $log
+                ->setExercise($exercise)
+                ->setExe($trackingExercise)
+            ;
 
-        /** @var UploadedFile $imgSubmit */
-        if ($imgSubmit = $this->request->files->get('snapshot')) {
-            $newFilename = uniqid().'_submit.jpg';
+            /** @var UploadedFile $imgSubmit */
+            if ($imgSubmit = $this->request->files->get('snapshot')) {
+                $newFilename = uniqid().'_submit.jpg';
 
-            $imgSubmit->move($userDirName, $newFilename);
+                $imgSubmit->move($userDirName, $newFilename);
 
-            $log->setImageFilename($newFilename);
-        } else {
-            $log->setIsError(true);
+                $log->setImageFilename($newFilename);
+            } else {
+                $log->setIsError(true);
+            }
+
+            $level = 0;
+
+            if (ONE_PER_PAGE == $objExercise->selectType()) {
+                $question = $this->em->find(CQuizQuestion::class, $levelId);
+                $level = $question->getIid();
+            } elseif (ONE_CATEGORY_PER_PAGE == $objExercise->selectType()) {
+                $questionCategory = $this->em->find(CQuizQuestionCategory::class, $levelId);
+                $level = $questionCategory->getId();
+            }
+
+            $log->setLevel($level);
+
+            $this->em->persist($log);
         }
-
-        if (ONE_PER_PAGE == $objExercise->selectType()) {
-            $question = $this->em->find(CQuizQuestion::class, $levelId);
-            $level = $question->getIid();
-        } elseif (ONE_CATEGORY_PER_PAGE == $objExercise->selectType()) {
-            $questionCategory = $this->em->find(CQuizQuestionCategory::class, $levelId);
-            $level = $questionCategory->getId();
-        }
-
-        $log->setLevel($level);
-
-        $this->em->persist($log);
 
         $this->updateOrphanSnapshots($exercise, $trackingExercise);
 
@@ -123,5 +126,13 @@ class ExerciseSubmitController
         }
 
         ChamiloSession::erase($this->plugin->get_name().'_orphan_snapshots');
+    }
+
+    private function thereAreErrorsForTrackingExe(TrackEExercises $trackingExe): bool
+    {
+        $repo = $this->em->getRepository(Log::class);
+        $errors = $repo->findBy(['exe' => $trackingExe, 'isError' => true]);
+
+        return count($errors);
     }
 }

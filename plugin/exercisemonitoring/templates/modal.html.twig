@@ -85,6 +85,8 @@
                     $("#em-modal-start").modal("show");
                 }
 
+                window.localStorage.setItem('chamilo.exercisemonitoring.disabled', '0');
+
                 $btnStartExercise.addClass('disabled').attr('aria-disabled', 'true');
 
                 $("#btn-accept").on('click', function (e) {
@@ -111,6 +113,8 @@
                     });
                     Webcam.on('error', function () {
                         sendData().done(function () {
+                            window.localStorage.setItem('chamilo.exercisemonitoring.disabled', '1');
+
                             finishOverview();
                         });
                     })
@@ -191,6 +195,12 @@
 
                 function snap() {
                     var deferred = $.Deferred();
+
+                    var snapDisabled = window.localStorage.getItem('chamilo.exercisemonitoring.disabled') || '0';
+
+                    if ('1' === snapDisabled) {
+                        return;
+                    }
 
                     Webcam.snap(function (dataUri) {
                         var $imgSnapshot = $('<img>')

@@ -12,28 +12,48 @@
             var $btnEndTest = $('button[name="validate_all"]');
             var $btnSaveCategoryNow = $('button[name="save_category_now"]');
 
-            Webcam.set({
-                width: 640,
-                dest_width: 640,
-            });
-            Webcam.attach('#monitoring-camera');
-            Webcam.on('live', function () {
-                {% if ALL_ON_ONE_PAGE %}
-                    snapAndSendData(0);
-                {% elseif ONE_PER_PAGE %}
-                    snapByQuestion();
-                {% elseif ONE_CATEGORY_PER_PAGE %}
-                    snapByCategory();
+            var snapDisabled = window.localStorage.getItem('chamilo.exercisemonitoring.disabled') || '0';
 
-                    if ({{ exercisemonitoring.quiz_time_left }} > 0) {
-                        window.setTimeout(
-                            snapByCategory,
-                            {{ exercisemonitoring.quiz_time_left }}
+            if ('0' === snapDisabled) {
+                Webcam.set({
+                    width: 640,
+                    dest_width: 640,
+                });
+                Webcam.attach('#monitoring-camera');
+                Webcam.on('live', function () {
+                    {% if ALL_ON_ONE_PAGE %}
+                        snapAndSendData(0);
+                    {% elseif ONE_PER_PAGE %}
+                        snapByQuestion();
+                    {% elseif ONE_CATEGORY_PER_PAGE %}
+                        snapByCategory();
+
+                        if ({{ exercisemonitoring.quiz_time_left }} > 0) {
+                            window.setTimeout(
+                                snapByCategory,
+                                {{ exercisemonitoring.quiz_time_left }}
+                            );
+                        }
+                    {% endif %}
+                });
+                Webcam.on('error', function () {
+                    window.localStorage.setItem('chamilo.exercisemonitoring.disabled', '1');
+
+                    {% if ALL_ON_ONE_PAGE %}
+                        sendData(0, '');
+                    {% elseif ONE_PER_PAGE %}
+                        sendData(
+                            $btnSaveNow.data('question') || 0,
+                            ''
                         );
-                    }
-                {% endif %}
-            });
-            Webcam.on('error', function () {
+                    {% elseif ONE_CATEGORY_PER_PAGE %}
+                        sendData(
+                            $btnSaveCategoryNow.data('category') || 0,
+                            ''
+                        );
+                    {% endif %}
+                });
+            } else {
                 {% if ALL_ON_ONE_PAGE %}
                     sendData(0, '');
                 {% elseif ONE_PER_PAGE %}
@@ -47,7 +67,7 @@
                         ''
                     );
                 {% endif %}
-            });
+            }
 
             {% if ALL_ON_ONE_PAGE %}
                 $btnEndTest.on('click', function () {
@@ -64,6 +84,12 @@
             {% endif %}
 
             function snapAndSendData(levelId) {
+                var snapDisabled = window.localStorage.getItem('chamilo.exercisemonitoring.disabled') || '0';
+
+                if ('1' === snapDisabled) {
+                    return;
+                }
+
                 Webcam.snap(function (dataUri) {
                     sendData(levelId, dataUri);
                 });

@@ -18,8 +18,8 @@ $strings['snapshots_lifetime_help'] = 'Cantidad de días que las fotos tomadas p
 
 $strings['ExerciseMonitored'] = "Ejercicio monitoreado";
 $strings['Retry'] = "Reintentar";
-$strings['IdDocumentSnapshot'] = "Foto validada del documento de identidad";
-$strings['StudentSnapshot'] = "Foto validada del estudiante";
+$strings['ValidatedIdDocumentSnapshot'] = "Foto validada del documento de identidad";
+$strings['ValidatedStudentSnapshot'] = "Foto validada del estudiante";
 
 $strings['ImageIdDocumentCameraInstructions'] = "Coloca tu DNI o documento de identidad frente a la cámara y ubícalo en el recuadro marcado. Dale clic al botón <i>Capturar</i> o presiona la barra de espacio de tu teclado.";
 $strings['ImageStudentCameraInstructions'] = "Coloca tu rostro frente a la cámara y ubícalo dentro del círculo marcado. Dale click al botón <i>Capturar</i> o presiona la barra de espacio de tu teclado";
@@ -30,4 +30,5 @@ $strings['ExerciseUnmonitored'] = "Ejercicio no monitoreado";
 $strings['Birthdate'] = "Fecha de nacimiento";
 $strings['AdultStudent'] = "Estudiante adulto";
 $strings['MinorStudent'] = "Estudiante menor de edad";
-$strings['CameraError'] = 'Error de cámara';
+$strings['CameraError'] = 'Cámara no disponible';
+$strings['IdDocument'] = "Documento de identidad";

@@ -106,8 +106,12 @@ class DetailController
                 );
             }
             $html .= '<div class="caption text-center">';
-            $html .= Display::tag('span', $date, ['style' => 'display: inline-block;']).PHP_EOL;
-            $html .= Display::tag('strong', $log['log_level'], ['style' => 'display: inline-block;']).PHP_EOL;
+            $html .= Display::tag('small', $date, ['style' => 'display: inline-block;']).PHP_EOL;
+            $html .= Display::tag(
+                'strong',
+                $log['log_level'] ?: $this->plugin->parseLevel($log['level']),
+                ['style' => 'display: inline-block;']
+            ).PHP_EOL;
 
             if ($log['isError']) {
                 $html .= Display::tag(

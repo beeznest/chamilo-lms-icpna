@@ -39,7 +39,7 @@ class StartController
         $logImgIdDoc = new Log();
         $logImgIdDoc
             ->setExercise($exercise)
-            ->setLevel(-1)
+            ->setLevel(-2)
         ;
 
         if ($imgIddoc) {

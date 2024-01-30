@@ -182,4 +182,17 @@ class ExerciseMonitoringPlugin extends Plugin
 
         return !$diff->invert && $diff->y >= $legalAge;
     }
+
+    public function parseLevel(int $level): string
+    {
+        if (-1 === $level) {
+            return $this->get_lang('IdDocument');
+        }
+
+        if (-2 === $level) {
+            return get_lang('Student');
+        }
+
+        return '';
+    }
 }

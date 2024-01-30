@@ -186,7 +186,7 @@ foreach ($results as $result) {
         }
 
         if ($rowsByMonitoring) {
-            $rows = getOneCategoryPerPageByMonitoring($exercise, $trackExe, $user);
+            $rows = getOneCategoryPerPageByMonitoring($exercise, $trackExe, $user, $monitoringPlugin);
         } else {
             $rows = getOneCategoryPerPageByFocused($trackExe);
         }
@@ -388,7 +388,7 @@ function getOneCategoryPerPageByFocused(TrackEExercises $trackExe): array
     return $rows;
 }
 
-function getOneCategoryPerPageByMonitoring(Exercise $objExercise, TrackEExercises $trackExe, User $user): array
+function getOneCategoryPerPageByMonitoring(Exercise $objExercise, TrackEExercises $trackExe, User $user, ExerciseMonitoringPlugin $monitoringPlugin): array
 {
     $em = Database::getManager();
     $monitoringLogRepo = $em->getRepository(MonitoringLog::class);
@@ -436,7 +436,7 @@ function getOneCategoryPerPageByMonitoring(Exercise $objExercise, TrackEExercise
         $hasLevel = $monitoringLog['level'] > 0;
 
         $rows[] = [
-            $hasLevel ? $monitoringLog['log_level'] : null,
+            $hasLevel ? $monitoringLog['log_level'] : $monitoringPlugin->parseLevel($monitoringLog['level']),
             api_get_local_time($monitoringLog['createdAt']),
             $hasLevel ? $scoreWeight : null,
             $hasLevel ? $outfocused : null,

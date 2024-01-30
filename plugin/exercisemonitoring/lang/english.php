@@ -18,8 +18,8 @@ $strings['snapshots_lifetime_help'] = 'Number of days that taken photos can rema
 
 $strings['ExerciseMonitored'] = "Exercise monitored";
 $strings['Retry'] = "Retry";
-$strings['IdDocumentSnapshot'] = "Validated photo of the ID document";
-$strings['StudentSnapshot'] = "Validated photo of the student";
+$strings['ValidatedIdDocumentSnapshot'] = "Validated photo of the ID document";
+$strings['ValidatedStudentSnapshot'] = "Validated photo of the student";
 
 $strings['ImageIdDocumentCameraInstructions'] = "Place your ID document in front of the camera and place it in the marked box. Click the <i>Capture</i> button or press the space bar on your keyboard.";
 $strings['ImageStudentCameraInstructions'] = "Place your face in front of the camera and place it within the marked circle. Click the <i>Capture</i> button or press the space bar on your keyboard";
@@ -30,4 +30,5 @@ $strings['ExerciseUnmonitored'] = "Exercise unmonitored";
 $strings['Birthdate'] = "Birthdate";
 $strings['AdultStudent'] = "Adult student";
 $strings['MinorStudent'] = "Minor student";
-$strings['CameraError'] = 'Camera error';
+$strings['CameraError'] = 'Camera not available';
+$strings['IdDocument'] = "ID document";

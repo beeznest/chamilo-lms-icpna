@@ -272,7 +272,7 @@ class HTML_QuickForm_file extends HTML_QuickForm_input
 
             function isValidType(file) {
                 var fileTypes = [\'image/jpg\', \'image/jpeg\', \'image/gif\', \'image/png\'];
-        
+
                 for(var i = 0; i < fileTypes.length; i++) {
                     if(file.type === fileTypes[i]) {
                         return true;
@@ -281,7 +281,7 @@ class HTML_QuickForm_file extends HTML_QuickForm_input
 
                 return false;
             }
-            
+
             function imageCropper() {
                 $formGroup.show();
                 $cropButton.show();
@@ -402,41 +402,41 @@ class HTML_QuickForm_file extends HTML_QuickForm_input
             case FormValidator::LAYOUT_HORIZONTAL:
                 if (isset($attributes['custom']) && $attributes['custom']) {
                     $template = '
-                        <div class="input-file-container">  
+                        <div class="input-file-container">
                             {element}
                             <label tabindex="0" {label-for} class="input-file-trigger">
                                 <i class="fa fa-picture-o fa-lg" aria-hidden="true"></i> {label}
                             </label>
                         </div>
-                        <p class="file-return"></p>                        
+                        <p class="file-return"></p>
                         <script>
                             document.querySelector("html").classList.add(\'js\');
-                            var fileInput  = document.querySelector( ".input-file" ),  
+                            var fileInput  = document.querySelector( ".input-file" ),
                                 button     = document.querySelector( ".input-file-trigger" ),
                                 the_return = document.querySelector(".file-return");
-                                  
-                            button.addEventListener("keydown", function(event) {  
-                                if ( event.keyCode == 13 || event.keyCode == 32 ) {  
-                                    fileInput.focus();  
-                                }  
+
+                            button.addEventListener("keydown", function(event) {
+                                if ( event.keyCode == 13 || event.keyCode == 32 ) {
+                                    fileInput.focus();
+                                }
                             });
                             button.addEventListener("click", function(event) {
                                fileInput.focus();
                                return false;
-                            });  
+                            });
                             fileInput.addEventListener("change", function(event) {
                                 fileName = this.value;
                                 if (this.files[0]) {
                                     fileName = this.files[0].name;
                                 }
-                                the_return.innerHTML = fileName;  
-                            });                            
+                                the_return.textContent = fileName;
+                            });
                         </script>
                     ';
                 } else {
                     $template = '
                     <div id="file_'.$name.'" class="form-group {error_class}">
-                        
+
                         <label {label-for} class="col-sm-'.$size[0].' control-label" >
                             <!-- BEGIN required --><span class="form_required">*</span><!-- END required -->
                             {label}
@@ -464,7 +464,7 @@ class HTML_QuickForm_file extends HTML_QuickForm_input
                 return '
                         <label {label-for}>{label}</label>
                         <div class="input-group">
-                            
+
                             {icon}
                             {element}
                         </div>';

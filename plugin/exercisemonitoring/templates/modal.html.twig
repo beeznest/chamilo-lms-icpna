@@ -18,7 +18,7 @@
                             <div id="monitoring-camera"></div>
                         </div>
                         <br>
-                        <button class="btn btn-default" type="button" id="btn-snap" disabled>
+                        <button class="btn btn-default" type="button" id="btn-snap" disabled style="display: none;">
                             <span class="fa fa-camera" aria-hidden="true"></span>
                             {{ 'Snapshot'|get_lang }}
                         </button>
@@ -56,6 +56,14 @@
         <script src="{{ _p.web_plugin }}exercisemonitoring/assets/js/webcam.js"></script>
         <script>
             $(function () {
+                function setMonitoringFlag(value) {
+                    window.localStorage.setItem('chamilo.exercisemonitoring.disabled', value);
+                }
+
+                function getMonitoringFlag() {
+                    return window.localStorage.getItem('chamilo.exercisemonitoring.disabled') || '0';
+                }
+
                 var $btnStartExercise = $('.exercise_overview_options a');
                 var $bodyTerms = $('#em-terms-body');
                 var $bodyCamera = $('#em-camera-body');
@@ -92,28 +100,28 @@
                 $("#btn-accept").on('click', function (e) {
                     e.preventDefault();
 
-                    $bodyTerms.hide();
-                    $footTerms.hide();
-
-                    $bodyCamera.show();
-                    $footCamera.show();
-
                     Webcam.set({
                         width: 640,
                         dest_width: 640,
                     });
                     Webcam.attach('#monitoring-camera');
                     Webcam.on('live', function () {
+                        $bodyTerms.hide();
+                        $footTerms.hide();
+
+                        $bodyCamera.show();
+                        $footCamera.show();
+
                         $txtIdDocInstructions.show();
 
                         $('#monitoring-camera').removeClass('learner-placeholder').addClass('iddoc-placeholder');
                         $txtLearnerInstructions.hide();
 
-                        $btnSnap.prop({disabled: false}).focus();
+                        $btnSnap.css('display', 'inline-block').prop({disabled: false}).focus();
                     });
                     Webcam.on('error', function () {
                         sendData().done(function () {
-                            window.localStorage.setItem('chamilo.exercisemonitoring.disabled', '1');
+                            setMonitoringFlag('1');
 
                             finishOverview();
                         });
@@ -196,9 +204,7 @@
                 function snap() {
                     var deferred = $.Deferred();
 
-                    var snapDisabled = window.localStorage.getItem('chamilo.exercisemonitoring.disabled') || '0';
-
-                    if ('1' === snapDisabled) {
+                    if ('0' !== getMonitoringFlag()) {
                         return;
                     }
 

@@ -8,13 +8,19 @@
     <script src="{{ _p.web_plugin }}exercisemonitoring/assets/js/webcam.js"></script>
     <script>
         $(function () {
+            function setMonitoringFlag(value) {
+                window.localStorage.setItem('chamilo.exercisemonitoring.disabled', value);
+            }
+
+            function getMonitoringFlag() {
+                return window.localStorage.getItem('chamilo.exercisemonitoring.disabled') || '0';
+            }
+
             var $btnSaveNow = $('button[name="save_now"]');
             var $btnEndTest = $('button[name="validate_all"]');
             var $btnSaveCategoryNow = $('button[name="save_category_now"]');
 
-            var snapDisabled = window.localStorage.getItem('chamilo.exercisemonitoring.disabled') || '0';
-
-            if ('0' === snapDisabled) {
+            if ('0' === getMonitoringFlag()) {
                 Webcam.set({
                     width: 640,
                     dest_width: 640,
@@ -37,7 +43,7 @@
                     {% endif %}
                 });
                 Webcam.on('error', function () {
-                    window.localStorage.setItem('chamilo.exercisemonitoring.disabled', '1');
+                    setMonitoringFlag('1');
 
                     {% if ALL_ON_ONE_PAGE %}
                         sendData(0, '');
@@ -84,9 +90,7 @@
             {% endif %}
 
             function snapAndSendData(levelId) {
-                var snapDisabled = window.localStorage.getItem('chamilo.exercisemonitoring.disabled') || '0';
-
-                if ('1' === snapDisabled) {
+                if ('0' !== getMonitoringFlag()) {
                     return;
                 }
 

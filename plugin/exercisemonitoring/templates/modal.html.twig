@@ -170,6 +170,8 @@
                     $btnRetry.prop({disabled: true});
 
                     if (hasIdDoc && !hasLearner) {
+                        $btnNext.prop({disabled: true});
+
                         $bodyIdDoc.hide();
                         $bodyCamera.show();
 

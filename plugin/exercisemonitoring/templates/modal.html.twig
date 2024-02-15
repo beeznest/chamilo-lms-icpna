@@ -89,8 +89,14 @@
                 var imgIdDoc = null;
                 var imgLearner = null;
 
+                var isStarted = parseInt({{ exercisemonitoring.exercise_is_started }});
+
                 if ($btnStartExercise.length > 0) {
-                    $("#em-modal-start").modal("show");
+                    if (!isStarted) {
+                        $("#em-modal-start").modal("show");
+                    } else {
+                        finishOverview();
+                    }
                 }
 
                 window.localStorage.setItem('chamilo.exercisemonitoring.disabled', '0');

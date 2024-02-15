@@ -13,8 +13,14 @@ $_template['enabled'] = false;
 $_template['show_overview_region'] = $showOverviewRegion;
 $_template['show_submit_region'] = $showSubmitRegion;
 
+$exercise = null;
+$readExercise = false;
+
 if ($showOverviewRegion || $showSubmitRegion) {
     $exerciseId = (int) $_GET['exerciseId'];
+
+    $exercise = new Exercise(api_get_course_int_id());
+    $readExercise = $exercise->read($exerciseId);
 
     $objFieldValue = new ExtraFieldValue('exercise');
     $values = $objFieldValue->get_values_by_handler_and_field_variable(
@@ -44,12 +50,17 @@ if ($showOverviewRegion && $_template['enabled']) {
     }
 
     $_template['instructions'] = Security::remove_XSS($_template['instructions']);
+
+    $learnpathId = isset($_REQUEST['learnpath_id']) ? (int) $_REQUEST['learnpath_id'] : 0;
+    $learnpathItemId = isset($_REQUEST['learnpath_item_id']) ? (int) $_REQUEST['learnpath_item_id'] : 0;
+
+    $exerciseStatInfo = $exercise->get_stat_track_exercise_info($learnpathId, $learnpathItemId);
+
+    $_template['exercise_is_started'] = (int) !empty($exerciseStatInfo);
 }
 
 if ($showSubmitRegion && $_template['enabled']) {
-    $exercise = new Exercise(api_get_course_int_id());
-
-    if ($exercise->read($_template['exercise_id'])) {
+    if ($readExercise) {
         $_template['exercise_type'] = (int) $exercise->selectType();
 
         if ('true' === $plugin->get(ExerciseMonitoringPlugin::SETTING_INSTRUCTION_AGE_DISTINCTION_ENABLE)

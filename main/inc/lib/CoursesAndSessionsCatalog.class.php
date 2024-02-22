@@ -284,21 +284,21 @@ class CoursesAndSessionsCatalog
     }
 
     /**
-     * @param string $category_code
-     * @param int    $random_value
-     * @param array  $limit         will be used if $random_value is not set.
-     *                              This array should contains 'start' and 'length' keys
+     * @param string $categoryCode
+     * @param int    $randomValue
+     * @param array  $limit        will be used if $randomValue is not set.
+     *                             This array should contain 'start' and 'length' keys
      *
      * @return array
      */
-    public static function getCoursesInCategory($category_code, $random_value = null, $limit = [])
+    public static function getCoursesInCategory(string $categoryCode, $randomValue = null, $limit = [])
     {
         $tbl_course = Database::get_main_table(TABLE_MAIN_COURSE);
         $avoidCoursesCondition = self::getAvoidCourseCondition();
         $visibilityCondition = CourseManager::getCourseVisibilitySQLCondition('course', true);
 
-        if (!empty($random_value)) {
-            $random_value = (int) $random_value;
+        if (!empty($randomValue)) {
+            $randomValue = (int) $randomValue;
 
             $sql = "SELECT COUNT(*) FROM $tbl_course";
             $result = Database::query($sql);
@@ -327,19 +327,19 @@ class CoursesAndSessionsCatalog
                         ON (url_rel_course.c_id = course.id)
                         WHERE
                             $urlCondition AND
-                            RAND()*$num_records< $random_value
+                            RAND()*$num_records< $randomValue
                             $avoidCoursesCondition
                             $visibilityCondition
                         ORDER BY RAND()
-                        LIMIT 0, $random_value";
+                        LIMIT 0, $randomValue";
             } else {
                 $sql = "SELECT id, id as real_id FROM $tbl_course course
                         WHERE
-                            RAND()*$num_records< $random_value
+                            RAND()*$num_records< $randomValue
                             $avoidCoursesCondition
                             $visibilityCondition
                         ORDER BY RAND()
-                        LIMIT 0, $random_value";
+                        LIMIT 0, $randomValue";
             }
 
             $result = Database::query($sql);
@@ -357,7 +357,7 @@ class CoursesAndSessionsCatalog
             $sql = "SELECT *, id as real_id FROM $tbl_course WHERE id IN($id_in)";
         } else {
             $limitFilter = self::getLimitFilterFromArray($limit);
-            $category_code = Database::escape_string($category_code);
+            $category_code = Database::escape_string($categoryCode);
             $listCode = self::childrenCategories($category_code);
             $conditionCode = ' ';
 
@@ -1642,7 +1642,7 @@ class CoursesAndSessionsCatalog
         $action = isset($action) ? Security::remove_XSS($action) : $requestAction;
         $searchTerm = isset($_REQUEST['search_term']) ? Security::remove_XSS($_REQUEST['search_term']) : '';
         $keyword = isset($_REQUEST['keyword']) ? Security::remove_XSS($_REQUEST['keyword']) : '';
-        $searchTag = $_REQUEST['search_tag'] ?? '';
+        $searchTag = $_REQUEST['search_tag'] ? Security::remove_XSS($_REQUEST['search_tag']) : '';
 
         if ($action === 'subscribe_user_with_password') {
             $action = 'subscribe';

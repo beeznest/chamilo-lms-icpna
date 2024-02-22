@@ -185,11 +185,11 @@ class ExerciseMonitoringPlugin extends Plugin
 
     public function parseLevel(int $level): string
     {
-        if (-1 === $level) {
+        if (-2 === $level) {
             return $this->get_lang('IdDocument');
         }
 
-        if (-2 === $level) {
+        if (-1 === $level) {
             return get_lang('Student');
         }
 

@@ -92,19 +92,16 @@ class DetailController
         foreach ($logs as $i => $log) {
             $date = api_get_local_time($log['createdAt'], null, null, true, true, true);
 
+            $imageUrl = api_get_path(WEB_PLUGIN_PATH).'exercisemonitoring/assets/images/error_placeholder.jpg';
+
+            if (!$log['isError'] && !empty($log['imageFilename'])) {
+                $imageUrl = ExerciseMonitoringPlugin::generateSnapshotUrl($userId, $log['imageFilename']);
+            }
+
             $html .= '<div class="col-xs-12 col-sm-6 col-md-3" style="clear: '.($i % 4 === 0 ? 'both' : 'none').';">';
             $html .= '<div class="thumbnail">';
-            if ($log['isError']) {
-                $html .= Display::img(
-                    api_get_path(WEB_PLUGIN_PATH).'exercisemonitoring/assets/images/error_placeholder.jpg',
-                    $date
-                );
-            } else {
-                $html .= Display::img(
-                    ExerciseMonitoringPlugin::generateSnapshotUrl($userId, $log['imageFilename']),
-                    $date
-                );
-            }
+
+            $html .= Display::img($imageUrl, $date);
             $html .= '<div class="caption text-center">';
             $html .= Display::tag('small', $date, ['style' => 'display: inline-block;']).PHP_EOL;
             $html .= Display::tag(
@@ -113,7 +110,7 @@ class DetailController
                 ['style' => 'display: inline-block;']
             ).PHP_EOL;
 
-            if ($log['isError']) {
+            if ($log['isError'] || empty($log['imageFilename'])) {
                 $html .= Display::tag(
                     'em',
                     $this->plugin->get_lang('CameraError'),

@@ -32,6 +32,9 @@ class StartController
         /** @var UploadedFile $imgLearner */
         $imgLearner = $this->request->files->get('learner');
 
+        $isSkippedIddoc = $this->request->request->getBoolean('is_skipped_iddoc');
+        $isSkippedLearner = $this->request->request->getBoolean('is_skipped_learner');
+
         $exercise = $this->em->find(CQuiz::class, $this->request->request->getInt('exercise_id'));
 
         $fileNamesToUpdate = [];
@@ -49,7 +52,7 @@ class StartController
 
             $logImgIdDoc->setImageFilename($newFilename);
         } else {
-            $logImgIdDoc->setIsError(true);
+            $logImgIdDoc->setIsError(!$isSkippedIddoc);
         }
 
         $this->em->persist($logImgIdDoc);
@@ -67,7 +70,7 @@ class StartController
 
             $logImgLearner->setImageFilename($newFilename);
         } else {
-            $logImgLearner->setIsError(true);
+            $logImgLearner->setIsError(!$isSkippedLearner);
         }
 
         $this->em->persist($logImgLearner);

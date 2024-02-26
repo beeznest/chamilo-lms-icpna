@@ -45,7 +45,7 @@
                             <span class="fa fa-refresh" aria-hidden="true"></span>
                             {{ 'Retry'|get_plugin_lang('ExerciseMonitoringPlugin') }}
                         </button>
-                        <button class="btn btn-primary" type="button" id="btn-next" disabled>
+                        <button class="btn btn-primary" type="button" id="btn-next">
                             <span class="fa fa-forward" aria-hidden="true"></span> {{ 'Next'|get_lang }}
                         </button>
                     </div>
@@ -88,6 +88,9 @@
 
                 var imgIdDoc = null;
                 var imgLearner = null;
+
+                var isSkippedIdDoc = false;
+                var isSkippedLearner = false;
 
                 var isStarted = parseInt({{ exercisemonitoring.exercise_is_started }});
 
@@ -139,12 +142,10 @@
 
                     $btnSnap.prop({disabled: true});
                     $btnRetry.prop({disabled: true});
-                    $btnNext.prop({disabled: true});
 
                     snap()
                         .done(function () {
                             $btnRetry.prop({disabled: false});
-                            $btnNext.prop({disabled: false});
                         });
                 });
 
@@ -153,19 +154,16 @@
 
                     $btnSnap.prop({disabled: false}).focus();
                     $btnRetry.prop({disabled: true});
-                    $btnNext.prop({disabled: true});
 
-                    if (hasIdDoc && !hasLearner) {
+                    if ($bodyIdDoc.is(':visible')) {
                         $bodyCamera.show();
                         $bodyIdDoc.hide();
 
                         hasIdDoc = false;
-                        hasLearner = false;
-                    } else if (hasIdDoc && hasLearner) {
+                    } else if ($bodyStudent.is(':visible')) {
                         $bodyCamera.show();
                         $bodyStudent.hide();
 
-                        hasIdDoc = true;
                         hasLearner = false;
                     }
                 });
@@ -175,8 +173,10 @@
 
                     $btnRetry.prop({disabled: true});
 
-                    if (hasIdDoc && !hasLearner) {
-                        $btnNext.prop({disabled: true});
+                    if ($bodyIdDoc.is(':visible') || $txtIdDocInstructions.is(':visible')) {
+                        if ($txtIdDocInstructions.is(':visible')) {
+                            isSkippedIdDoc = true;
+                        }
 
                         $bodyIdDoc.hide();
                         $bodyCamera.show();
@@ -187,11 +187,13 @@
                         $txtLearnerInstructions.show();
 
                         $btnSnap.prop({disabled: false}).focus();
-                    } else if (hasIdDoc && hasLearner) {
+                    } else if ($bodyStudent.is(':visible') || $txtLearnerInstructions.is(':visible')) {
+                        if ($txtLearnerInstructions.is(':visible')) {
+                            isSkippedLearner = true;
+                        }
+
                         $btnNext.prop({disabled: true});
                         $btnSnap.prop({disabled: true});
-
-                        Webcam.reset();
 
                         sendData().done(function () {
                             finishOverview();
@@ -221,23 +223,21 @@
                             .prop({src: dataUri, id: 'img-snapshot'})
                             .addClass('img-responsive');
 
-                        if (!hasIdDoc && !hasLearner) {
+                        if ($txtIdDocInstructions.is(':visible')) {
                             $imgIdDoc.html($imgSnapshot);
 
                             $bodyCamera.hide();
                             $bodyIdDoc.show();
 
                             hasIdDoc = true;
-                            hasLearner = false;
 
                             imgIdDoc = dataUri;
-                        } else if (hasIdDoc && !hasLearner) {
+                        } else if ($txtLearnerInstructions.is(':visible')) {
                             $imgLearner.html($imgSnapshot);
 
                             $bodyCamera.hide();
                             $bodyStudent.show();
 
-                            hasIdDoc = true;
                             hasLearner = true;
 
                             imgLearner = dataUri;
@@ -252,18 +252,26 @@
                 function sendData() {
                     var formData = new FormData();
 
-                    if (imgIdDoc) {
+                    if (hasIdDoc) {
                         var rawImgIdDoc = imgIdDoc.replace(/^data:image\/\w+;base64,/, '');
                         var blobImgIdDoc = new Blob( [ Webcam.base64DecToArr(rawImgIdDoc) ], {type: 'image/jpeg'} );
 
                         formData.append('iddoc', blobImgIdDoc, 'iddoc.jpg');
                     }
 
-                    if (imgLearner) {
+                    if (hasLearner) {
                         var rawImgLearner = imgLearner.replace(/^data:image\/\w+;base64,/, '');
                         var blobImgLearner = new Blob( [ Webcam.base64DecToArr(rawImgLearner) ], {type: 'image/jpeg'} );
 
                         formData.append('learner', blobImgLearner, 'learner.jpg');
+                    }
+
+                    if (isSkippedIdDoc) {
+                        formData.append('is_skipped_iddoc', '1');
+                    }
+
+                    if (isSkippedLearner) {
+                        formData.append('is_skipped_learner', '1');
                     }
 
                     formData.append('exercise_id', '{{ exercisemonitoring.exercise_id }}');

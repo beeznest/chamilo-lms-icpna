@@ -424,9 +424,9 @@ function getOneCategoryPerPageByMonitoring(Exercise $objExercise, TrackEExercise
             $monitoringLog['level']
         );
 
-        if ($monitoringLog['isError']) {
-            $snapshotUrl = get_plugin_lang('CameraError', 'ExerciseMonitoringPlugin');
-        } else {
+        $snapshotUrl = get_plugin_lang('CameraError', 'ExerciseMonitoringPlugin');
+
+        if (!$monitoringLog['isError'] && !empty($monitoringLog['imageFilename'])) {
             $snapshotUrl = ExerciseMonitoringPlugin::generateSnapshotUrl(
                 $user->getId(),
                 $monitoringLog['imageFilename']

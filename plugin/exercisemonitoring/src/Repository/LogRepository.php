@@ -45,7 +45,7 @@ class LogRepository extends EntityRepository
                 $qb->expr()->eq('l.exe', $trackExe->getExeId())
             )
             ->addOrderBy('l.createdAt', 'ASC')
-            ->addOrderBy('l.level', 'DESC')
+            ->addOrderBy('l.level', 'ASC')
             ->getQuery();
 
         return $query->getResult();

@@ -14,6 +14,7 @@ $action = $_GET['a'];
 
 switch ($action) {
     case 'get_count_message':
+        api_block_anonymous_users(false);
         $userId = api_get_user_id();
         $invitations = [];
         $group_pending_invitations = 0;

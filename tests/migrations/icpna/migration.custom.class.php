@@ -1666,7 +1666,7 @@ class MigrationCustom
                 $session_info['display_end_date'],
                 $session_info['coach_access_start_date'],
                 $session_info['coach_access_end_date'],
-                $session_info['id_coach'],
+                $session_info['id_coach'] ?: null,
                 null,
                 SESSION_VISIBLE_READ_ONLY,
                 null,

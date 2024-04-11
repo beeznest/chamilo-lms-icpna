@@ -60,7 +60,8 @@ class Security
             return false;
         }
 
-        $true_path = str_replace("\\", '/', realpath($abs_path));
+        // Clean $abs_path.
+        $true_path = self::cleanPath($abs_path);
         $checker_path = str_replace("\\", '/', realpath($checker_path));
 
         if (empty($checker_path)) {
@@ -82,6 +83,13 @@ class Security
         }
 
         return false;
+    }
+
+    public static function cleanPath(string $absPath): string
+    {
+        $absPath = str_replace(['//', '../'], ['/', ''], $absPath);
+
+        return str_replace("\\", '/', realpath($absPath));
     }
 
     /**

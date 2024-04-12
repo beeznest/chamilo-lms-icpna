@@ -254,7 +254,7 @@ class Agenda
                 $attributes = [
                     'user' => api_get_user_id(),
                     'title' => $title,
-                    'text' => $content,
+                    'text' => Security::remove_XSS($content),
                     'date' => $start,
                     'enddate' => $end,
                     'all_day' => $allDay,
@@ -269,7 +269,7 @@ class Agenda
             case 'course':
                 $attributes = [
                     'title' => $title,
-                    'content' => $content,
+                    'content' => Security::remove_XSS($content),
                     'start_date' => $start,
                     'end_date' => $end,
                     'all_day' => $allDay,
@@ -425,7 +425,7 @@ class Agenda
                 if (api_is_platform_admin()) {
                     $attributes = [
                         'title' => $title,
-                        'content' => $content,
+                        'content' => Security::remove_XSS($content),
                         'start_date' => $start,
                         'end_date' => $end,
                         'all_day' => $allDay,
@@ -1392,8 +1392,8 @@ class Agenda
                 case 'course':
                     $sql = "UPDATE $this->tbl_course_agenda SET
                             end_date = DATE_ADD(end_date, INTERVAL $delta MINUTE)
-							WHERE 
-							    c_id = ".$this->course['real_id']." AND 
+							WHERE
+							    c_id = ".$this->course['real_id']." AND
 							    id = ".$id;
                     Database::query($sql);
                     break;
@@ -1440,11 +1440,11 @@ class Agenda
                     break;
                 case 'course':
                     $sql = "UPDATE $this->tbl_course_agenda SET
-                            all_day = $allDay, 
+                            all_day = $allDay,
                             start_date = DATE_ADD(start_date, INTERVAL $delta MINUTE),
                             end_date = DATE_ADD(end_date, INTERVAL $delta MINUTE)
-							WHERE 
-							    c_id = ".$this->course['real_id']." AND 
+							WHERE
+							    c_id = ".$this->course['real_id']." AND
 							    id=".$id;
                     Database::query($sql);
                     break;
@@ -1482,7 +1482,7 @@ class Agenda
                 if (Database::num_rows($result)) {
                     $event = Database::fetch_array($result, 'ASSOC');
                     $event['description'] = $event['text'];
-                    $event['content'] = $event['text'];
+                    $event['content'] = Security::remove_XSS($event['text'], STUDENT);
                     $event['start_date'] = $event['date'];
                     $event['end_date'] = $event['enddate'];
                 }
@@ -1494,7 +1494,7 @@ class Agenda
                     $result = Database::query($sql);
                     if (Database::num_rows($result)) {
                         $event = Database::fetch_array($result, 'ASSOC');
-                        $event['description'] = $event['content'];
+                        $event['description'] = Security::remove_XSS($event['content'], STUDENT);
 
                         // Getting send to array
                         $event['send_to'] = $this->getUsersAndGroupSubscribedToEvent(
@@ -1529,7 +1529,7 @@ class Agenda
                 $result = Database::query($sql);
                 if (Database::num_rows($result)) {
                     $event = Database::fetch_array($result, 'ASSOC');
-                    $event['description'] = $event['content'];
+                    $event['description'] = Security::remove_XSS($event['content']);
                 }
                 break;
         }
@@ -1898,8 +1898,8 @@ class Agenda
                 FROM $tlb_course_agenda agenda
                 INNER JOIN $tbl_property ip
                 ON (
-                    agenda.id = ip.ref AND 
-                    agenda.c_id = ip.c_id AND 
+                    agenda.id = ip.ref AND
+                    agenda.c_id = ip.c_id AND
                     ip.tool = '".TOOL_CALENDAR_EVENT."'
                 )
                 WHERE

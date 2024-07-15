@@ -298,7 +298,10 @@ switch ($action) {
         }
         break;
     case 'user_by_role':
-        api_block_anonymous_users(false);
+        if (!api_is_platform_admin()) {
+            api_not_allowed(false, null, 403);
+        }
+
 
         $criteria = new Criteria();
         $criteria

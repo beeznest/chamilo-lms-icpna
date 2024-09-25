@@ -218,7 +218,7 @@ $EncryptedFile="Archivo cifrado";
 $WrongPassword="Contraseña incorrecta";
 $EncryptedUpload="Subida (Con cifrado)";
 $MandatorySurveyNoAnswered="Estimado(a) Alumno (a): Porque valoramos tu opinión, te invitamos a desarrollar esta breve encuesta de satisfacción sobre el desempeño de tu docente.";
-$AdaptiveQuizResultIsPreTestCategory = "El examen ha terminado pero has obtenido un resultado que no es válido para el examen PLEX. Sin embargo para poder matricularte debes escribir a <a href=\"mailto:examendeclasificacion@icpna.edu.pe\">examendeclasificacion@icpna.edu.pe</a>.";
+$AdaptiveQuizResultIsPreTestCategory = "El examen ha terminado pero has obtenido un resultado que no es válido para el examen PLEX. Sin embargo para poder matricularte debes escribir a <a href=\"mailto:atencionalalumno@icpna.edu.pe\">atencionalalumno@icpna.edu.pe</a>.";
 $ExeStartTime = "Fecha y hora de inicio de examen";
 $ExeEndTime = "Fecha y hora de fin de examen";
 $Username = "Código de alumno";

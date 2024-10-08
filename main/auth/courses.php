@@ -189,10 +189,24 @@ switch ($action) {
             exit;
         }
         if (Security::check_token('get')) {
-            CourseManager::autoSubscribeToCourse($courseCodeToSubscribe);
-            header('Location: '.api_get_self());
-            exit;
+            $courseInfo = api_get_course_info($courseCodeToSubscribe);
+            if (!empty($courseInfo)) {
+                CourseManager::autoSubscribeToCourse($courseCodeToSubscribe);
+                $redirectionTarget = CoursesAndSessionsCatalog::generateRedirectUrlAfterSubscription(
+                    $courseInfo['course_public_url']
+                );
+
+                header("Location: $redirectionTarget");
+                exit;
+            }
         }
+        Display::addFlash(
+            Display::return_message(get_lang('NoResults'), 'warning')
+        );
+        CoursesAndSessionsCatalog::displayCoursesList('search_course', $searchTerm, $categoryCode);
+
+        exit;
+
         break;
     case 'subscribe_course_validation':
         $courseCodeToSubscribe = isset($_GET['subscribe_course']) ? Security::remove_XSS($_GET['subscribe_course']) : '';

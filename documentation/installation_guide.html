@@ -764,6 +764,9 @@ If you have issues with files taking a long time to download, make sure you reco
   <Files "web.config">
     Require all denied
   </Files>
+  <IfModule mod_autoindex.c>
+    Options -Indexes
+  </IfModule>
     </pre>
     <h3>Nginx</h3>
     Nginx doesn't support .htaccess rules, so you have no other option than to apply the following rules (note that your PHP backend configuration may vary).
@@ -846,6 +849,7 @@ If you have issues with files taking a long time to download, make sure you reco
     deny all;
     return 403;
   }
+  autoindex off;
     </pre>
     <h3>Apple on OS X servers</h3>
     <div>

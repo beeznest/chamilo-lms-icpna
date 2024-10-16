@@ -777,12 +777,13 @@ foreach ($questionList as $questionId) {
             $default = [$textareaId => $comnt];
 
             if ($useAdvancedEditor) {
-                $feedback_form->addElement(
-                    'html_editor',
+                $feedback_form->addHtmlEditor(
                     $textareaId,
-                    null,
-                    ['id' => $textareaId],
+                    '',
+                    false,
+                    false,
                     [
+                        'id' => $textareaId,
                         'ToolbarSet' => 'TestAnswerFeedback',
                         'Width' => '100%',
                         'Height' => '120'
@@ -790,6 +791,7 @@ foreach ($questionList as $questionId) {
                 );
             } else {
                 $feedback_form->addElement('textarea', $textareaId, ['id' => $textareaId]);
+                $feedback_form->applyFilter($textareaId, 'attr_on_filter');
             }
             $feedback_form->setDefaults($default);
             $feedback_form->display();

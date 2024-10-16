@@ -8412,5 +8412,4 @@ $QuizCategoryDurationInMinutes = "Category duration (in minutes)";
 $IsCategoryForPreTest = "This category is for pre-test";
 $QuizAdaptivePreStep = "Destination as pre-test step";
 $QuizAdaptiveFinalStep = "Destination as final step";
-$AdaptiveQuizResultIsPreTestCategory = "The exam has ended but you have obtained a result that is not valid for the PLEX exam";
 ?>

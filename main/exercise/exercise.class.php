@@ -3061,6 +3061,19 @@ class Exercise
 
         $id = Database::insert($track_exercises, $params);
 
+        if (api_get_configuration_value('exercise_plex_max_failed_attempts')) {
+            Database::insert(
+                'track_e_plex',
+                [
+                    'user_id' => api_get_user_id(),
+                    'quiz_id' => $this->id,
+                    'c_id' => api_get_course_int_id(),
+                    'session_id' => api_get_session_id(),
+                    'created_at' => api_get_utc_datetime(),
+                ]
+            );
+        }
+
         return $id;
     }
 

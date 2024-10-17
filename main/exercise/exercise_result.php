@@ -264,8 +264,52 @@ ExerciseLib::exercise_time_control_delete(
 
 ExerciseLib::delete_chat_exercise_session($exe_id);
 
+$adaptiveResultData = [];
+$deleteAttempt = false;
+
+if ($isAdaptive) {
+    $adaptiveResultData = IcpnaPlexConfigPlugin::returnAdaptiveResultData($destinationResult, $resultsDisabled);
+    $plexMaxFailedAttempts = api_get_configuration_value('exercise_plex_max_failed_attempts');
+
+    if ($achievedLevelIsPreTest) {
+        $deleteAttempt = true;
+
+        if (!empty($plexMaxFailedAttempts)) {
+            $countFails = Database::select(
+                'COUNT(1) AS nbr',
+                'track_e_plex',
+                [
+                    'where' => [
+                        'user_id = ? AND c_id = ? AND session_id = ? AND quiz_id = ?' => [
+                            $exercise_stat_info['exe_user_id'],
+                            $exercise_stat_info['c_id'],
+                            $exercise_stat_info['session_id'],
+                            $exercise_stat_info['exe_exo_id']
+                        ],
+                    ],
+                ],
+                'first'
+            );
+
+            $deleteAttempt = $countFails['nbr'] < $plexMaxFailedAttempts;
+        }
+
+        if ($deleteAttempt) {
+            ExerciseLib::deleteExerciseAttempt($exercise_stat_info['exe_id']);
+        }
+    }
+
+    Session::erase('adaptive_pretest_step');
+    Session::erase('quiz_time_left');
+    Session::erase('current_exercises');
+    Session::erase('questionList');
+    Session::erase('expired_time');
+    Session::erase('question_list_uncompressed');
+    Session::erase('firstTime');
+}
+
 if (!in_array($origin, ['learnpath', 'embeddable'])) {
-    $linkText = $isAdaptive && $achievedLevelIsPreTest
+    $linkText = $deleteAttempt
         ? get_lang('ToTakeYourExamAgainClickHere')
         : get_lang('ReturnToCourseHomepage');
     $pageBottom .= '<div class="question-return">';
@@ -317,24 +361,6 @@ if (!in_array($origin, ['learnpath', 'embeddable'])) {
     $pageBottom .= '<script type="text/javascript">'.$href.'</script>';
 
     $showFooter = false;
-}
-
-$adaptiveResultData = [];
-
-if ($isAdaptive) {
-    $adaptiveResultData = IcpnaPlexConfigPlugin::returnAdaptiveResultData($destinationResult, $resultsDisabled);
-
-    if ($achievedLevelIsPreTest) {
-        ExerciseLib::deleteExerciseAttempt($exercise_stat_info['exe_id']);
-    }
-
-    Session::erase('adaptive_pretest_step');
-    Session::erase('quiz_time_left');
-    Session::erase('current_exercises');
-    Session::erase('questionList');
-    Session::erase('expired_time');
-    Session::erase('question_list_uncompressed');
-    Session::erase('firstTime');
 }
 
 $template = new Template($nameTools, $showHeader, $showFooter);

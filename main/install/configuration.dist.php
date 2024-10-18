@@ -1274,6 +1274,13 @@ $_configuration['required_extra_fields_in_profile'] = [
 // Enable a window-occulting message while the exercise is getting submitted
 //$_configuration['quiz_submit_modal_enable'] = false;
 
+// Enable maximum attempts when student fails the PLEX exam with a pretest result. Requires DB changes:
+// CREATE TABLE track_e_plex(id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NULL, quiz_id INT NOT NULL, c_id INT NOT NULL, session_id SMALLINT NOT NULL, created_at DATETIME NOT NULL) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
+// CREATE INDEX idx_tee_course ON track_e_plex (c_id);
+// CREATE INDEX idx_tee_session ON track_e_plex (session_id);
+// CREATE INDEX idx_tee_user ON track_e_plex (user_id);
+//$_configuration['exercise_plex_max_failed_attempts'] = 0;
+
 // KEEP THIS AT THE END
 // -------- Custom DB changes
 // Add user activation by confirmation email

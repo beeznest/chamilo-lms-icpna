@@ -5641,7 +5641,7 @@ EOT;
      *
      * @return string
      */
-    public static function getAdaptiveResulMessage($exeId, $userId)
+    public static function getAdaptiveResulMessage($exeId, $userId, $isShortMessage = false)
     {
         $destinationResult = Database::getManager()
             ->getRepository('ChamiloCourseBundle:CQuizDestinationResult')
@@ -5654,6 +5654,10 @@ EOT;
         $achievedLevelIsPreTest = 0 === strpos($destinationResult->getAchievedLevel(), 'P - ');
 
         if ($achievedLevelIsPreTest) {
+            if ($isShortMessage) {
+                return Display::return_message(get_lang('AdaptiveQuizResultIsPreTestCategoryShort'), 'icpna', false);
+            }
+
             return Display::return_message(get_lang('AdaptiveQuizResultIsPreTestCategory'), 'warning', false);
         }
 

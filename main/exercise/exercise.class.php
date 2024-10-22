@@ -6405,6 +6405,8 @@ class Exercise
         }
 
         // 4. We check if the student have attempts
+        $showMessageCustomStyle = false;
+
         if ($isVisible) {
             $exerciseAttempts = $this->selectAttempts();
 
@@ -6418,6 +6420,8 @@ class Exercise
                 );
 
                 if ($attemptCount >= $exerciseAttempts) {
+                    $showMessageCustomStyle = true;
+
                     $message = sprintf(
                         get_lang('ReachedMaxAttempts'),
                         $this->name,
@@ -6431,7 +6435,7 @@ class Exercise
         $rawMessage = '';
         if (!empty($message)) {
             $rawMessage = $message;
-            $message = Display::return_message($message, 'warning', false);
+            $message = Display::return_message($message, $showMessageCustomStyle ? 'icpna' : 'warning', false);
         }
 
         return [

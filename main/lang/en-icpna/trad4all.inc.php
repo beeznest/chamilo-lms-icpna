@@ -29,3 +29,5 @@ $QuizRemindStartDate = "Test start date: %s <br />";
 $QuizRemindEndDate = "Test end date: %s <br />";
 $InvalidResult = "Invalid result";
 $ToTakeYourExamAgainClickHere = "To take your exam again, click here";
+$AdaptiveQuizResultIsPreTestCategoryShort = "The exam you just took is invalid";
+$ReachedMaxAttempts = "You cannot take test <b>%s</b> because you have already reached the maximum of attempt(s).";

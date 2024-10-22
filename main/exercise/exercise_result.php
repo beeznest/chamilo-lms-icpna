@@ -243,7 +243,7 @@ if ($isAdaptive) {
 
     if ($achievedLevelIsPreTest) {
         Display::addFlash(
-            Display::return_message(get_lang('AdaptiveQuizResultIsPreTestCategory'), 'warning', false)
+            Display::return_message(get_lang('AdaptiveQuizResultIsPreTestCategory'), 'icpna', false)
         );
     }
 

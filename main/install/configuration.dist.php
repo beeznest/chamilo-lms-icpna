@@ -1275,7 +1275,7 @@ $_configuration['required_extra_fields_in_profile'] = [
 //$_configuration['quiz_submit_modal_enable'] = false;
 
 // Enable maximum attempts when student fails the PLEX exam with a pretest result. Requires DB changes:
-// CREATE TABLE track_e_plex(id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NULL, quiz_id INT NOT NULL, c_id INT NOT NULL, session_id SMALLINT NOT NULL, created_at DATETIME NOT NULL) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
+// CREATE TABLE track_e_plex(id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NULL, quiz_id INT NOT NULL, c_id INT NOT NULL, session_id INT NOT NULL, created_at DATETIME NOT NULL) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
 // CREATE INDEX idx_tee_course ON track_e_plex (c_id);
 // CREATE INDEX idx_tee_session ON track_e_plex (session_id);
 // CREATE INDEX idx_tee_user ON track_e_plex (user_id);

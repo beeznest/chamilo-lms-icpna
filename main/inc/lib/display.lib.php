@@ -597,6 +597,9 @@ class Display
             case 'success':
                 $class .= 'alert alert-success';
                 break;
+            case 'icpna':
+                $class .= 'alert alert-icpna';
+                break;
             case 'normal':
             default:
                 $class .= 'alert alert-info';

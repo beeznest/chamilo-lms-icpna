@@ -1621,32 +1621,32 @@ EOT;
             );
             $this->addHtml('</div>');
 
-            $this->addHtml("<script>            
+            $this->addHtml("<script>
             $(function() {
                 var defaultValue = '$defaultId';
                 $('#$typeNoDots').val(defaultValue);
                 $('#$typeNoDots').selectpicker('render');
                 if (defaultValue != '') {
-                    var selected = $('#$typeNoDots option:selected').val();                    
-                    $.ajax({ 
+                    var selected = $('#$typeNoDots option:selected').val();
+                    $.ajax({
                         url: '$url' + '&id=' + selected+ '&template_name=$type',
                         success: function (data) {
                             $('#$templateNoDots').html(data);
                             $('#$templateNoDotsBlock').show();
                             return;
-                        }, 
+                        },
                     });
                 }
-                                
-                $('#$typeNoDots').on('change', function(){                    
-                    var selected = $('#$typeNoDots option:selected').val();                    
-                    $.ajax({ 
+
+                $('#$typeNoDots').on('change', function(){
+                    var selected = $('#$typeNoDots option:selected').val();
+                    $.ajax({
                         url: '$url' + '&id=' + selected,
                         success: function (data) {
                             $('#$templateNoDots').html(data);
                             $('#$templateNoDotsBlock').show();
                             return;
-                        }, 
+                        },
                     });
                 });
             });
@@ -1696,8 +1696,8 @@ EOT;
                     data.submit().always(function () {
                         \$this.remove();
                     });
-                });               
-                
+                });
+
             $('#".$inputName."').fileupload({
                 url: url,
                 dataType: 'json',
@@ -1708,11 +1708,11 @@ EOT;
                 previewMaxWidth: 300,
                 previewMaxHeight: 169,
                 previewCrop: true,
-                dropzone: $('#dropzone'),                                
-            }).on('fileuploadadd', function (e, data) {                
+                dropzone: $('#dropzone'),
+            }).on('fileuploadadd', function (e, data) {
                 data.context = $('<div class=\"row\" />').appendTo('#files');
                 $.each(data.files, function (index, file) {
-                    var node = $('<div class=\"col-sm-5 file_name\">').text(file.name);                    
+                    var node = $('<div class=\"col-sm-5 file_name\">').text(file.name);
                     node.appendTo(data.context);
                 });
             }).on('fileuploadprocessalways', function (e, data) {
@@ -1762,8 +1762,8 @@ EOT;
                         $('<span class=\"message-image-success\"/>').text('".addslashes(get_lang('UplUploadSucceeded'))."')
                     );
                     $(data.context.children()[index]).parent().append(message);
-                });                
-                $('#dropzone').removeClass('hover');                
+                });
+                $('#dropzone').removeClass('hover');
                 ".$redirectCondition."
             }).on('fileuploadfail', function (e, data) {
                 $.each(data.files, function (index) {
@@ -1774,14 +1774,14 @@ EOT;
                     $(data.context.children()[index]).parent().append(error);
                 });
                 $('#dropzone').removeClass('hover');
-            }).prop('disabled', !$.support.fileInput).parent().addClass($.support.fileInput ? undefined : 'disabled');           
-            
+            }).prop('disabled', !$.support.fileInput).parent().addClass($.support.fileInput ? undefined : 'disabled');
+
             $('#dropzone').on('dragover', function (e) {
-                // dragleave callback implementation                
+                // dragleave callback implementation
                 $('#dropzone').addClass('hover');
             });
-            
-            $('#dropzone').on('dragleave', function (e) {                
+
+            $('#dropzone').on('dragleave', function (e) {
                 $('#dropzone').removeClass('hover');
             });
             $('.fileinput-button').hide();
@@ -1843,12 +1843,10 @@ function mobile_phone_number_filter($mobilePhoneNumber)
 
 /**
  * Prevent execution of event handlers in HTML elements.
- *
- * @param string $html
- * @return string
  */
-function attr_on_filter($html) {
-    $prefix = uniqid('data-cke-').'-';
+function attr_on_filter(string $html): string
+{
+    $pattern = '/\s*on\w+=(?:"[^"]*"|\'[^\']*\'|[^\s>]+)/i';
 
-    return preg_replace('/\b(on[a-z]+)\b\s*=/i', '$1'.$prefix.'$2', $html);
+    return preg_replace($pattern, '', $html);
 }

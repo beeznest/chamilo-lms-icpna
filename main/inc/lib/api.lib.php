@@ -479,8 +479,9 @@ define('RESULT_DISABLE_SHOW_SCORE_ATTEMPT_SHOW_ANSWERS_LAST_ATTEMPT', 4);
 define('RESULT_DISABLE_DONT_SHOW_SCORE_ONLY_IF_USER_FINISHES_ATTEMPTS_SHOW_ALWAYS_FEEDBACK', 5);
 define('RESULT_DISABLE_RANKING', 6);
 define('RESULT_DISABLE_SHOW_ONLY_IN_CORRECT_ANSWER', 7);
-
-// 4: Show final score only with  and show expected answers only on the last attempt
+define('RESULT_DISABLE_SHOW_SCORE_AND_EXPECTED_ANSWERS_AND_RANKING', 8);
+define('RESULT_DISABLE_RADAR', 9);
+define('RESULT_DISABLE_SHOW_SCORE_ATTEMPT_SHOW_ANSWERS_LAST_ATTEMPT_NO_FEEDBACK', 10);
 
 define('EXERCISE_MAX_NAME_SIZE', 80);
 
@@ -1635,7 +1636,8 @@ function _api_format_user($user, $add_password = false, $loadAvatars = true)
     $result['profile_url'] = api_get_path(WEB_CODE_PATH).'social/profile.php?u='.$user_id;
 
     // Send message link
-    $sendMessage = api_get_path(WEB_AJAX_PATH).'user_manager.ajax.php?a=get_user_popup&user_id='.$user_id;
+    $userIdHash = UserManager::generateUserHash($user_id);
+    $sendMessage = api_get_path(WEB_AJAX_PATH).'user_manager.ajax.php?a=get_user_popup&hash='.$userIdHash;
     $result['complete_name_with_message_link'] = Display::url(
         $result['complete_name_with_username'],
         $sendMessage,
@@ -1946,7 +1948,7 @@ function api_get_anonymous_id()
     $ip = Database::escape_string(api_get_real_ip());
     $max = (int) api_get_configuration_value('max_anonymous_users');
     if ($max >= 2) {
-        $sql = "SELECT * FROM $table as TEL 
+        $sql = "SELECT * FROM $table as TEL
                 JOIN $tableU as U
                 ON U.user_id = TEL.login_user_id
                 WHERE TEL.user_ip = '$ip'
@@ -1981,8 +1983,8 @@ function api_get_anonymous_id()
     }
 
     $table = Database::get_main_table(TABLE_MAIN_USER);
-    $sql = "SELECT user_id 
-            FROM $table 
+    $sql = "SELECT user_id
+            FROM $table
             WHERE status = ".ANONYMOUS." ";
     $res = Database::query($sql);
     if (Database::num_rows($res) > 0) {
@@ -4723,7 +4725,7 @@ function api_display_language_form($hide_if_no_choice = false, $showAsButton = f
     } else {
         $html = '
             <a href="'.$url.'" class="dropdown-toggle" data-toggle="dropdown" role="button">
-                <span class="flag-icon flag-icon-'.$countryCode.'"></span> 
+                <span class="flag-icon flag-icon-'.$countryCode.'"></span>
                 '.$currentLanguageInfo['original_name'].'
                 <span class="caret"></span>
             </a>
@@ -4830,7 +4832,7 @@ function languageToCountryIsoCode($languageIsoCode)
 function api_get_languages()
 {
     $tbl_language = Database::get_main_table(TABLE_MAIN_LANGUAGE);
-    $sql = "SELECT * FROM $tbl_language WHERE available='1' 
+    $sql = "SELECT * FROM $tbl_language WHERE available='1'
             ORDER BY original_name ASC";
     $result = Database::query($sql);
     $language_list = [];
@@ -8135,8 +8137,8 @@ function api_get_password_checker_js($usernameInputId, $passwordInputId, $blockS
     };
 
     $(function() {
-        var lang = ".json_encode($translations).";     
-        var options = {        
+        var lang = ".json_encode($translations).";
+        var options = {
             onLoad : function () {
                 //$('#messages').text('Start typing password');
             },
@@ -8154,7 +8156,7 @@ function api_get_password_checker_js($usernameInputId, $passwordInputId, $blockS
         options.i18n = {
             t: function (key) {
                 var result = lang[key];
-                return result === key ? '' : result; // This assumes you return the                
+                return result === key ? '' : result; // This assumes you return the
             }
         };
         options.ui = {
@@ -8167,7 +8169,7 @@ function api_get_password_checker_js($usernameInputId, $passwordInputId, $blockS
                 onScore: function (options, word, totalScoreCalculated) {
                     $('".$passwordInputId."').parents('form').find(':submit')
                         .prop('disabled', totalScoreCalculated < options.ui.scores[3]);
-    
+
                     return totalScoreCalculated;
                 }
             };
@@ -9499,7 +9501,7 @@ function api_find_template($template)
 function api_get_language_list_for_flag()
 {
     $table = Database::get_main_table(TABLE_MAIN_LANGUAGE);
-    $sql = "SELECT english_name, isocode FROM $table 
+    $sql = "SELECT english_name, isocode FROM $table
             ORDER BY original_name ASC";
     static $languages = [];
     if (empty($languages)) {
@@ -9530,11 +9532,11 @@ function api_get_language_translate_html()
         $hideAll .= '
         $("span:lang('.$language['isocode'].')").filter(
             function(e, val) {
-                // Only find the spans if they have set the lang                
-                if ($(this).attr("lang") == null) {                
+                // Only find the spans if they have set the lang
+                if ($(this).attr("lang") == null) {
                     return false;
                 }
-                
+
                 // Ignore ckeditor classes
                 return !this.className.match(/cke(.*)/);
         }).hide();'."\n";
@@ -9546,32 +9548,32 @@ function api_get_language_translate_html()
 
     return '
             $(function() {
-                '.$hideAll.'                 
-                var defaultLanguageFromUser = "'.$languageInfo['isocode'].'";   
-                                             
+                '.$hideAll.'
+                var defaultLanguageFromUser = "'.$languageInfo['isocode'].'";
+
                 $("span:lang('.$languageInfo['isocode'].')").filter(
                     function() {
                         // Ignore ckeditor classes
                         return !this.className.match(/cke(.*)/);
                 }).show();
-                
+
                 var defaultLanguage = "";
                 var langFromUserFound = false;
-                
+
                 $(this).find("span").filter(
                     function() {
                         // Ignore ckeditor classes
                         return !this.className.match(/cke(.*)/);
                 }).each(function() {
-                    defaultLanguage = $(this).attr("lang");                            
+                    defaultLanguage = $(this).attr("lang");
                     if (defaultLanguage) {
-                        $(this).before().next("br").remove();                
+                        $(this).before().next("br").remove();
                         if (defaultLanguageFromUser == defaultLanguage) {
                             langFromUserFound = true;
                         }
                     }
                 });
-                
+
                 // Show default language
                 if (langFromUserFound == false && defaultLanguage) {
                     $("span:lang("+defaultLanguage+")").filter(
@@ -9582,4 +9584,232 @@ function api_get_language_translate_html()
                 }
             });
     ';
+}
+
+/**
+ * Filter a multi-language HTML string (for the multi-language HTML
+ * feature) into the given language (strip the rest).
+ *
+ * @param string $htmlString The HTML string to "translate". Usually <p><span lang="en">Some string</span></p><p><span lang="fr">Une chaîne</span></p>
+ * @param string $language   The language in which we want to get the
+ *
+ * @throws Exception
+ *
+ * @return string The filtered string in the given language, or the full string if no translated string was identified
+ */
+function api_get_filtered_multilingual_HTML_string($htmlString, $language = null)
+{
+    if (api_get_configuration_value('translate_html') != true) {
+        return $htmlString;
+    }
+    $userInfo = api_get_user_info();
+    $languageId = 0;
+    if (!empty($language)) {
+        $languageId = api_get_language_id($language);
+    } elseif (!empty($userInfo['language'])) {
+        $languageId = api_get_language_id($userInfo['language']);
+    }
+    $languageInfo = api_get_language_info($languageId);
+    $isoCode = 'en';
+
+    if (!empty($languageInfo)) {
+        $isoCode = $languageInfo['isocode'];
+    }
+
+    // Split HTML in the separate language strings
+    // Note: some strings might look like <p><span ..>...</span></p> but others might be like combine 2 <span> in 1 <p>
+    if (!preg_match('/<span.*?lang="(\w\w)">/is', $htmlString)) {
+        return $htmlString;
+    }
+    $matches = [];
+    preg_match_all('/<span.*?lang="(\w\w)">(.*?)<\/span>/is', $htmlString, $matches);
+    if (!empty($matches)) {
+        // matches[0] are the full string
+        // matches[1] are the languages
+        // matches[2] are the strings
+        foreach ($matches[1] as $id => $match) {
+            if ($match == $isoCode) {
+                return $matches[2][$id];
+            }
+        }
+        // Could find the pattern but could not find our language. Return the first language found.
+        return $matches[2][0];
+    }
+    // Could not find pattern. Just return the whole string. We shouldn't get here.
+    return $htmlString;
+}
+
+/**
+ * Get the print.css file for current theme.
+ * Only the file path or the file contents when $getFileContents is true.
+ */
+function api_get_print_css(bool $getFileContents = true, bool $useWebPath = false): string
+{
+    $sysCssPath = api_get_path(SYS_CSS_PATH);
+    $cssFile = $sysCssPath.'themes/'.api_get_visual_theme().'/print.css';
+
+    if (!file_exists($cssFile)) {
+        $cssFile = $sysCssPath.'print.css';
+    }
+
+    if ($getFileContents) {
+        return file_get_contents($cssFile);
+    }
+
+    if ($useWebPath) {
+        return str_replace($sysCssPath, api_get_path(WEB_CSS_PATH), $cssFile);
+    }
+
+    return $cssFile;
+}
+
+function api_protect_webservices()
+{
+    if (api_get_configuration_value('disable_webservices')) {
+        echo "Webservices are disabled. \n";
+        echo "To enable, add \$_configuration['disable_webservices'] = true; in configuration.php";
+        exit;
+    }
+}
+
+function api_filename_has_blacklisted_stream_wrapper(string $filename)
+{
+    if (strpos($filename, '://') > 0) {
+        $wrappers = stream_get_wrappers();
+        $allowedWrappers = ['http', 'https', 'file'];
+
+        foreach ($wrappers as $wrapper) {
+            if (in_array($wrapper, $allowedWrappers)) {
+                continue;
+            }
+
+            if (stripos($filename, $wrapper.'://') === 0) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Calculate the percent between two numbers.
+ *
+ * @return string
+ */
+function api_calculate_increment_percent(int $newValue, int $oldValue)
+{
+    if ($oldValue <= 0) {
+        $result = " - ";
+    } else {
+        $result = ' '.round(100 * (($newValue / $oldValue) - 1), 2).' %';
+    }
+
+    return $result;
+}
+
+/**
+ * Erase settings from cache (because of some update) if applicable.
+ *
+ * @param int $url_id The ID of the present URL
+ */
+function api_flush_settings_cache(int $url_id): bool
+{
+    global $_configuration;
+    $cacheAvailable = api_get_configuration_value('apc');
+    if (!$cacheAvailable) {
+        return false;
+    }
+    $apcRootVarName = api_get_configuration_value('apc_prefix');
+    // Delete the APCu-stored settings array, if present
+    $apcVarName = $apcRootVarName.'settings';
+    apcu_delete($apcVarName);
+    if (api_is_multiple_url_enabled() && $url_id === 1) {
+        // if we are on the main URL of a multi-url portal, we must
+        // invalidate the cache for all other URLs as well as some
+        // main settings span multiple URLs
+        $urls = api_get_access_urls();
+        foreach ($urls as $i => $row) {
+            if ($row['id'] == 1) {
+                continue;
+            }
+            $apcVarName = $_configuration['main_database'].'_'.$row['id'].'_settings';
+            apcu_delete($apcVarName);
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Decrypt sent data with encoded secret defined in app/config/configuration.php
+ * in the variable $_configuration['ldap_admin_password_salt'].
+ *
+ * @param $encryptedText The text to be decrypted
+ */
+function api_decrypt_ldap_password(string $encryptedText): string
+{
+    if (!empty(api_get_configuration_value('ldap_admin_password_salt'))) {
+        $secret = api_get_configuration_value('ldap_admin_password_salt');
+    } else {
+        return false;
+    }
+
+    return api_decrypt_hash($encryptedText,$secret);
+}
+
+/**
+ * Decrypt sent hash encoded with secret
+ *
+ * @param $encryptedText The hash text to be decrypted
+ * @param $secret        The secret used to encoded the hash
+ *
+ * @return string The decrypted text or false
+ */
+function api_decrypt_hash(string $encryptedHash, string $secret): string
+{
+    $iv = base64_decode(substr($encryptedHash, 0, 16), true);
+    $data = base64_decode(substr($encryptedHash, 16), true);
+    $tag = substr($data, strlen($data) - 16);
+    $data = substr($data, 0, strlen($data) - 16);
+
+    try {
+        return openssl_decrypt(
+        $data,
+        'aes-256-gcm',
+        $secret,
+        OPENSSL_RAW_DATA,
+        $iv,
+        $tag
+      );
+    } catch (\Exception $e) {
+        return false;
+    }
+}
+
+/**
+ * Encrypt sent data with secret
+ *
+ * @param $data   The text to be encrypted
+ * @param $secret The secret to use encode data
+ *
+ * @return string The encrypted text or false
+ */
+function api_encrypt_hash($data, $secret)
+{
+  $iv = random_bytes(12);
+  $tag = '';
+
+  $encrypted = openssl_encrypt(
+    $data,
+    'aes-256-gcm',
+    $secret,
+    OPENSSL_RAW_DATA,
+    $iv,
+    $tag,
+    '',
+    16
+  );
+
+  return base64_encode($iv) . base64_encode($encrypted . $tag);
 }

@@ -561,9 +561,15 @@ that criteria</li>
 </ul>
 
 <hr style="width: 100%; height: 2px;" />
-<h2><a name="9._WIRIS_mathematical_formulas"></a>7. Mathematical formulas with WIRIS</h2>
-<p>Installing this plugin you get WIRIS editor and WIRIS CAS. <br/>
-This activation will not be completed unless you have previously downloaded the <a href="http://www.wiris.com/plugins/ckeditor/download" target="_blank">PHP plugin for CKeditor WIRIS</a> and unzipped its contents into the main/inc/lib/ckeditor/editor/plugins/ckeditor_wiris/ directory. <br/>This is necessary because Wiris is proprietary software and its services are <a href="http://www.wiris.com/store/who-pays" target="_blank">commercial</a>. To make adjustments to the plugin, edit configuration.ini file or replace his content by configuration.ini.default Chamilo file.</p>
+<h2><a id="9._WIRIS_mathematical_formulas"></a>7. Mathematical formulas with WIRIS MathType</h2>
+<p>Installing this plugin you get WIRIS MathType. <br/>
+This activation will not be completed unless you have previously downloaded
+    the <a href="https://www.wiris.com/plugins/ckeditor/download" target="_blank" rel="noopener noreferrer">PHP plugin for CKeditor WIRIS</a>
+    and unzipped its contents into the main/inc/lib/ckeditor/editor/plugins/ckeditor_wiris/ directory.<br/><br />
+    This is necessary because Wiris is proprietary software and its services are
+    <a href="https://www.wiris.com/store/who-pays" target="_blank" rel="noopener noreferrer">commercial</a>.
+    To make adjustments to the plugin, edit configuration.ini file or replace his content by
+    configuration.ini.default Chamilo file.</p>
 
 <hr style="width: 100%; height: 2px;" />
 <h2><a name="10._Xapian_fulltext_indexing"></a>8. Full-text indexation with Xapian</h2>
@@ -742,11 +748,25 @@ If you have issues with files taking a long time to download, make sure you reco
     RewriteRule ^(tests|.git) - [F,L,NC]
   &lt;/Directory&gt;
 
-    AddType application/font-woff .woff .woff2
-    &lt;IfModule mod_expires.c&gt;
-      ExpiresActive On
-      ExpiresByType application/font-woff "access plus 1 month"
-    &lt;/IfModule&gt;
+  AddType application/font-woff .woff .woff2
+  &lt;IfModule mod_expires.c&gt;
+    ExpiresActive On
+    ExpiresByType application/font-woff "access plus 1 month"
+  &lt;/IfModule&gt;
+  # Disallow direct access to /main/inc/lib/javascript/bigupload/files
+  RedirectMatch 403 ^/main/inc/lib/javascript/bigupload/files
+
+  # Disallow MIME sniffing to prevent XSS from unknown/incorrect file extensions
+  <IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+  </IfModule>
+
+  <Files "web.config">
+    Require all denied
+  </Files>
+  <IfModule mod_autoindex.c>
+    Options -Indexes
+  </IfModule>
     </pre>
     <h3>Nginx</h3>
     Nginx doesn't support .htaccess rules, so you have no other option than to apply the following rules (note that your PHP backend configuration may vary).
@@ -825,6 +845,11 @@ If you have issues with files taking a long time to download, make sure you reco
   location ^~ /tests/ {
     deny all;
   }
+  location ~* /web.config$ {
+    deny all;
+    return 403;
+  }
+  autoindex off;
     </pre>
     <h3>Apple on OS X servers</h3>
     <div>

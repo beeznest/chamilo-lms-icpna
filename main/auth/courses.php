@@ -183,16 +183,30 @@ switch ($action) {
         $courseController->courseList($action);
         break;
     case 'subscribe_course':
+        $courseCodeToSubscribe = isset($_GET['course_code']) ? Security::remove_XSS($_GET['course_code']) : '';
         if (api_is_anonymous()) {
             header('Location: '.api_get_path(WEB_CODE_PATH).'auth/inscription.php?c='.$courseCodeToSubscribe);
             exit;
         }
-        $courseCodeToSubscribe = isset($_GET['subscribe_course']) ? Security::remove_XSS($_GET['subscribe_course']) : '';
         if (Security::check_token('get')) {
-            CourseManager::autoSubscribeToCourse($courseCodeToSubscribe);
-            header('Location: '.api_get_self());
-            exit;
+            $courseInfo = api_get_course_info($courseCodeToSubscribe);
+            if (!empty($courseInfo)) {
+                CourseManager::autoSubscribeToCourse($courseCodeToSubscribe);
+                $redirectionTarget = CoursesAndSessionsCatalog::generateRedirectUrlAfterSubscription(
+                    $courseInfo['course_public_url']
+                );
+
+                header("Location: $redirectionTarget");
+                exit;
+            }
         }
+        Display::addFlash(
+            Display::return_message(get_lang('NoResults'), 'warning')
+        );
+        CoursesAndSessionsCatalog::displayCoursesList('search_course', $searchTerm, $categoryCode);
+
+        exit;
+
         break;
     case 'subscribe_course_validation':
         $courseCodeToSubscribe = isset($_GET['subscribe_course']) ? Security::remove_XSS($_GET['subscribe_course']) : '';
@@ -380,7 +394,7 @@ switch ($action) {
         }
 
         $table = Database::get_main_table(TABLE_USER_COURSE_CATEGORY);
-        $sql = "UPDATE $table 
+        $sql = "UPDATE $table
                 SET collapsed = $option
                 WHERE user_id = $userId AND id = $categoryId";
         Database::query($sql);

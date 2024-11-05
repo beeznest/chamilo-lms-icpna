@@ -4,6 +4,7 @@
 use Chamilo\CoreBundle\Entity\Message;
 use Chamilo\CoreBundle\Entity\MessageFeedback;
 use ChamiloSession as Session;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Responses to AJAX calls.
@@ -19,51 +20,65 @@ switch ($action) {
             echo '';
             break;
         }
-        $relation_type = USER_RELATION_TYPE_UNKNOWN; //Unknown contact
-        if (isset($_GET['is_my_friend'])) {
-            $relation_type = USER_RELATION_TYPE_FRIEND; //My friend
+
+        if (Security::check_token('get', null, 'invitation')) {
+            $relation_type = USER_RELATION_TYPE_UNKNOWN; //Unknown contact
+            if (isset($_GET['is_my_friend'])) {
+                $relation_type = USER_RELATION_TYPE_FRIEND; //My friend
+            }
+
+            if (isset($_GET['friend_id'])) {
+                $my_current_friend = $_GET['friend_id'];
+                UserManager::relate_users($current_user_id, $my_current_friend, $relation_type);
+                UserManager::relate_users($my_current_friend, $current_user_id, $relation_type);
+                SocialManager::invitation_accepted($my_current_friend, $current_user_id);
+                Display::addFlash(
+                    Display::return_message(get_lang('AddedContactToList'), 'success')
+                );
+            }
         }
 
-        if (isset($_GET['friend_id'])) {
-            $my_current_friend = $_GET['friend_id'];
-            UserManager::relate_users($current_user_id, $my_current_friend, $relation_type);
-            UserManager::relate_users($my_current_friend, $current_user_id, $relation_type);
-            SocialManager::invitation_accepted($my_current_friend, $current_user_id);
-            Display::addFlash(
-                Display::return_message(get_lang('AddedContactToList'), 'success')
-            );
-
-            header('Location: '.api_get_path(WEB_CODE_PATH).'social/invitations.php');
-            exit;
-        }
-        break;
+        header('Location: '.api_get_path(WEB_CODE_PATH).'social/invitations.php');
+        exit;
     case 'deny_friend':
         if (api_is_anonymous()) {
             echo '';
             break;
         }
-        $relation_type = USER_RELATION_TYPE_UNKNOWN; //Contact unknown
-        if (isset($_GET['is_my_friend'])) {
-            $relation_type = USER_RELATION_TYPE_FRIEND; //my friend
-        }
-        if (isset($_GET['denied_friend_id'])) {
-            SocialManager::invitation_denied($_GET['denied_friend_id'], $current_user_id);
-            Display::addFlash(
-                Display::return_message(get_lang('InvitationDenied'), 'success')
-            );
 
-            header('Location: '.api_get_path(WEB_CODE_PATH).'social/invitations.php');
-            exit;
+        if (Security::check_token('get', null, 'invitation')) {
+            $relation_type = USER_RELATION_TYPE_UNKNOWN; //Contact unknown
+            if (isset($_GET['is_my_friend'])) {
+                $relation_type = USER_RELATION_TYPE_FRIEND; //my friend
+            }
+            if (isset($_GET['denied_friend_id'])) {
+                SocialManager::invitation_denied($_GET['denied_friend_id'], $current_user_id);
+                Display::addFlash(
+                    Display::return_message(get_lang('InvitationDenied'), 'success')
+                );
+            }
         }
-        break;
+
+        header('Location: '.api_get_path(WEB_CODE_PATH).'social/invitations.php');
+        exit;
     case 'delete_friend':
         if (api_is_anonymous()) {
             echo '';
             break;
         }
-        $my_delete_friend = (int) $_POST['delete_friend_id'];
+
+        if (!Security::check_token('post', null, 'social')) {
+            exit;
+        }
+
         if (isset($_POST['delete_friend_id'])) {
+            $my_delete_friend = (int) $_POST['delete_friend_id'];
             SocialManager::remove_user_rel_user($my_delete_friend);
+
+            JsonResponse::create([
+                'secToken' => Security::get_token('social'),
+            ])->send();
+            break;
         }
         break;
     case 'show_my_friends':
@@ -207,6 +222,10 @@ switch ($action) {
             exit;
         }
 
+        if (!Security::check_token('get', null, 'wall')) {
+            exit;
+        }
+
         $messageId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
         if (empty($messageId)) {
@@ -234,7 +253,10 @@ switch ($action) {
                 }*/
                 if ($messageId) {
                     $messageInfo = MessageManager::get_message_by_id($messageId);
-                    echo SocialManager::processPostComment($messageInfo);
+                    JsonResponse::create([
+                        'secToken' => Security::get_token('wall'),
+                        'postHTML' => SocialManager::processPostComment($messageInfo),
+                    ])->send();
                 }
             }
         }
@@ -254,6 +276,10 @@ switch ($action) {
             exit;
         }
 
+        if (!Security::check_token('get', null, 'social')) {
+            exit;
+        }
+
         $userId = api_get_user_id();
         $messageInfo = MessageManager::get_message_by_id($messageId);
         if (!empty($messageInfo)) {
@@ -261,7 +287,10 @@ switch ($action) {
                 empty($messageInfo['group_id']);
             if ($canDelete || api_is_platform_admin()) {
                 SocialManager::deleteMessage($messageId);
-                echo Display::return_message(get_lang('MessageDeleted'));
+                echo json_encode([
+                    'message' => Display::return_message(get_lang('MessageDeleted')),
+                    'secToken' => Security::get_token('social')
+                ]);
                 break;
             }
         }

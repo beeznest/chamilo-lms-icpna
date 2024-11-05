@@ -68,16 +68,18 @@
                                 </li>
                             {% endif %}
 
-                            {% if row.date %}
-                                <li>
-                                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                                    {{ row.date }}
-                                </li>
-                            {% elseif row.duration %}
-                                <li>
-                                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                                    {{ row.duration }}
-                                </li>
+                            {% if hide_session_dates_in_user_portal == false %}
+                                {% if row.date %}
+                                    <li>
+                                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                                        {{ row.date }}
+                                    </li>
+                                {% elseif row.duration %}
+                                    <li>
+                                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                                        {{ row.duration }}
+                                    </li>
+                                {% endif %}
                             {% endif %}
                         </ul>
                         <div class="sessions-items">
@@ -97,11 +99,23 @@
                                                 <img src="{{ 'teacher.png'|icon(16) }}" width="16" height="16">
                                                 {% for coach in item.coaches %}
                                                     {{ loop.index > 1 ? ' | ' }}
-                                                    <a href="{{ _p.web_ajax ~ 'user_manager.ajax.php?' ~ {'a': 'get_user_popup', 'user_id': coach.user_id, 'session_id': row.id, 'course_id': item.real_id }|url_encode() }}"
+                                                    <a href="{{ _p.web_ajax ~ 'user_manager.ajax.php?' ~ {'a': 'get_user_popup', 'hash': coach.hash, 'session_id': row.id, 'course_id': item.real_id }|url_encode() }}"
                                                        data-title="{{ coach.full_name }}" class="ajax">
                                                         {{ coach.firstname }}, {{ coach.lastname }}
                                                     </a>
                                                 {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                        <div class="category">
+                                            {{ item.category }}
+                                        </div>
+                                        <div class="course_extrafields">
+                                            {% if item.extrafields|length > 0 %}
+                                            {% for extrafield in item.extrafields %}
+                                            {% set counter = counter + 1 %}
+                                            {% if counter > 1 %} | {% endif %}
+                                            {{ extrafield.text }} <strong>{{ extrafield.value }}</strong>
+                                            {% endfor %}
                                             {% endif %}
                                         </div>
                                     </div>

@@ -40,9 +40,10 @@
                   </h4>
                 </div>
                 <div class="block-author">
-                    {% if course.teachers | length > 2 %}
+                    {{ course.requirements }}
+                    {% if course.coaches | length > 2 %}
                         <a
-                            id="plist"
+                            id="plist-{{ course.real_id }}"
                             data-trigger="focus"
                             tabindex="0" role="button"
                             class="btn btn-default panel_popover"
@@ -52,11 +53,11 @@
                         >
                             <i class="fa fa-graduation-cap" aria-hidden="true"></i>
                         </a>
-                        <div id="popover-content-plist" class="hide">
+                        <div id="popover-content-plist-{{ course.real_id }}" class="hide">
                     {% endif %}
 
-                    {% for teacher in course.teachers %}
-                        {% if course.teachers | length > 2 %}
+                    {% for teacher in course.coaches %}
+                        {% if course.coaches | length > 2 %}
                               <div class="popover-teacher">
                               <a href="{{ teacher.url }}" class="ajax">
                                   <img src="{{ teacher.avatar }}"/>
@@ -84,7 +85,7 @@
                         {% endif %}
                     {% endfor %}
 
-                    {% if course.teachers | length > 2 %}
+                    {% if course.coaches | length > 2 %}
                         </div>
                     {% endif %}
                 </div>
@@ -184,10 +185,13 @@
                         {{ row.coach_name }}
                     </li>
                 {% endif %}
-                <li>
-                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                    {{ row.date ? row.date : row.duration }}
-                </li>
+
+                {% if hide_session_dates_in_user_portal == false %}
+                    <li>
+                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                        {{ row.date ? row.date : row.duration }}
+                    </li>
+                {% endif %}
             </ul>
             <div class="grid-courses">
                 {% if not group_courses %}

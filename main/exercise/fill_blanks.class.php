@@ -64,40 +64,40 @@ class FillBlanks extends Question
             }
         }
 
-        echo '<script>            
-            var firstTime = true;            
-            var originalOrder = new Array();   
+        echo '<script>
+            var firstTime = true;
+            var originalOrder = new Array();
             var blankSeparatorStart = "'.$blankSeparatorStart.'";
             var blankSeparatorEnd = "'.$blankSeparatorEnd.'";
             var blankSeparatorStartRegexp = getBlankSeparatorRegexp(blankSeparatorStart);
             var blankSeparatorEndRegexp = getBlankSeparatorRegexp(blankSeparatorEnd);
             var blanksRegexp = "/"+blankSeparatorStartRegexp+"[^"+blankSeparatorStartRegexp+"]*"+blankSeparatorEndRegexp+"/g";
-            
+
             CKEDITOR.on("instanceCreated", function(e) {
-                if (e.editor.name === "answer") {                  
+                if (e.editor.name === "answer") {
                     //e.editor.on("change", updateBlanks);
                     e.editor.on("change", function(){
                         updateBlanks();
                     });
                 }
             });
-            
+
             function updateBlanks()
-            {                
-                var answer;                
+            {
+                var answer;
                 if (firstTime) {
                     var field = document.getElementById("answer");
                     answer = field.value;
                 } else {
                     answer = CKEDITOR.instances["answer"].getData();
                 }
-                
+
                 // disable the save button, if not blanks have been created
                 $("button").attr("disabled", "disabled");
-                $("#defineoneblank").show();      
-                
-                var blanks = answer.match(eval(blanksRegexp));             
-                var fields = "<div class=\"form-group \">";                
+                $("#defineoneblank").show();
+
+                var blanks = answer.match(eval(blanksRegexp));
+                var fields = "<div class=\"form-group \">";
                 fields += "<label class=\"col-sm-2 control-label\"></label>";
                 fields += "<div class=\"col-sm-8\">";
                 fields += "<table class=\"data_table\">";
@@ -108,34 +108,34 @@ class FillBlanks extends Question
                 if (blanks != null) {
                     for (var i=0; i < blanks.length; i++) {
                         // remove forbidden characters that causes bugs
-                        blanks[i] = removeForbiddenChars(blanks[i]);                        
+                        blanks[i] = removeForbiddenChars(blanks[i]);
                         // trim blanks between brackets
                         blanks[i] = trimBlanksBetweenSeparator(blanks[i], blankSeparatorStart, blankSeparatorEnd);
-                        
+
                         // if the word is empty []
                         if (blanks[i] == blankSeparatorStartRegexp+blankSeparatorEndRegexp) {
                             break;
                         }
-                        
+
                         // get input size
-                        var inputSize = 100;                        
+                        var inputSize = 100;
                         var textValue = blanks[i].substr(1, blanks[i].length - 2);
                         var btoaValue = textValue.hashCode();
-                                                                      
+
                         if (firstTime == false) {
-                            var element = document.getElementById("samplesize["+i+"]");                                
+                            var element = document.getElementById("samplesize["+i+"]");
                             if (element) {
-                                inputSize = document.getElementById("sizeofinput["+i+"]").value;                                
+                                inputSize = document.getElementById("sizeofinput["+i+"]").value;
                             }
-                        }                                                                    
+                        }
 
                         if (document.getElementById("weighting["+i+"]")) {
                             var value = document.getElementById("weighting["+i+"]").value;
                         } else {
-                            var value = "1";    
-                        }                
+                            var value = "1";
+                        }
                         var blanksWithColor = trimBlanksBetweenSeparator(blanks[i], blankSeparatorStart, blankSeparatorEnd, 1);
-                        
+
                         fields += "<tr>";
                         fields += "<td>"+blanksWithColor+"</td>";
                         fields += "<td><input class=\"form-control\" style=\"width:60px\" value=\""+value+"\" type=\"text\" id=\"weighting["+i+"]\" name=\"weighting["+i+"]\" /></td>";
@@ -146,31 +146,31 @@ class FillBlanks extends Question
                         fields += "<input id=\"sizeofinput["+i+"]\" type=\"hidden\" value=\""+inputSize+"\" name=\"sizeofinput["+i+"]\"  />";
                         fields += "</td>";
                         fields += "</tr>";
-                        
+
                         // enable the save button
                         $("button").removeAttr("disabled");
                         $("#defineoneblank").hide();
                     }
-                }                         
-                
+                }
+
                 document.getElementById("blanks_weighting").innerHTML = fields + "</table></div></div>";
-                
+
                 $(originalOrder).each(function(i, data) {
                      if (firstTime == false) {
-                        value = data.value;                        
-                        var d = $("input.sample[data-btoa=\'"+value+"\']");                        
-                        var id = d.attr("id");   
+                        value = data.value;
+                        var d = $("input.sample[data-btoa=\'"+value+"\']");
+                        var id = d.attr("id");
                         if (id) {
-                            var sizeInputId = id.replace("samplesize", "sizeofinput");                            
+                            var sizeInputId = id.replace("samplesize", "sizeofinput");
                             var sizeInputId = sizeInputId.replace("[", "\\\[");
-                            var sizeInputId = sizeInputId.replace("]", "\\\]");                                                         
-                            $("#"+sizeInputId).val(data.width);                        
+                            var sizeInputId = sizeInputId.replace("]", "\\\]");
+                            $("#"+sizeInputId).val(data.width);
                             d.outerWidth(data.width+"px");
                         }
                     }
                 });
-                
-                updateOrder(blanks);               
+
+                updateOrder(blanks);
 
                 if (firstTime) {
                     firstTime = false;
@@ -178,7 +178,7 @@ class FillBlanks extends Question
                 }
             }
 
-            window.onload = updateBlanks;            
+            window.onload = updateBlanks;
             String.prototype.hashCode = function() {
                 var hash = 0, i, chr, len;
                 if (this.length === 0) return hash;
@@ -189,35 +189,35 @@ class FillBlanks extends Question
                 }
                 return hash;
             };
-            
-            function updateOrder(blanks) 
+
+            function updateOrder(blanks)
             {
-                originalOrder = new Array();                
+                originalOrder = new Array();
                  if (blanks != null) {
                     for (var i=0; i < blanks.length; i++) {
                         // remove forbidden characters that causes bugs
-                        blanks[i] = removeForbiddenChars(blanks[i]);                        
+                        blanks[i] = removeForbiddenChars(blanks[i]);
                         // trim blanks between brackets
                         blanks[i] = trimBlanksBetweenSeparator(blanks[i], blankSeparatorStart, blankSeparatorEnd);
-                        
+
                         // if the word is empty []
                         if (blanks[i] == blankSeparatorStartRegexp+blankSeparatorEndRegexp) {
                             break;
-                        }                        
+                        }
                         var textValue = blanks[i].substr(1, blanks[i].length - 2);
                         var btoaValue = textValue.hashCode();
-                        
+
                         if (firstTime == false) {
-                            var element = document.getElementById("samplesize["+i+"]");                                
+                            var element = document.getElementById("samplesize["+i+"]");
                             if (element) {
                                 inputSize = document.getElementById("sizeofinput["+i+"]").value;
-                                originalOrder.push({ "width" : inputSize, "value": btoaValue });                                                                               
+                                originalOrder.push({ "width" : inputSize, "value": btoaValue });
                             }
                         }
                     }
                 }
             }
-            
+
             function changeInputSize(coef, inIdNum)
             {
                 if (firstTime) {
@@ -226,7 +226,7 @@ class FillBlanks extends Question
                 } else {
                     answer = CKEDITOR.instances["answer"].getData();
                 }
-                
+
                 var blanks = answer.match(eval(blanksRegexp));
                 var currentWidth = $("#samplesize\\\["+inIdNum+"\\\]").width();
                 var newWidth = currentWidth + coef * 20;
@@ -234,7 +234,7 @@ class FillBlanks extends Question
                 newWidth = Math.min(newWidth, 600);
                 $("#samplesize\\\["+inIdNum+"\\\]").outerWidth(newWidth);
                 $("#sizeofinput\\\["+inIdNum+"\\\]").attr("value", newWidth);
-                
+
                 updateOrder(blanks);
             }
 
@@ -248,7 +248,7 @@ class FillBlanks extends Question
                 outTxt = outTxt.replace(/&nbsp;/g, " ");
                 outTxt = outTxt.replace(/^ +/, "");
                 outTxt = outTxt.replace(/ +$/, "");
-                
+
                 return outTxt;
             }
 
@@ -299,11 +299,11 @@ class FillBlanks extends Question
                 result = result.replace(inSeparatorStart, "");
                 result = result.replace(inSeparatorEnd, "");
                 result = result.trim();
-                
+
                 if (addColor == 1) {
                     var resultParts = result.split("|");
-                    var partsToString = "";                    
-                    resultParts.forEach(function(item, index) {                        
+                    var partsToString = "";
+                    resultParts.forEach(function(item, index) {
                         if (index == 0) {
                             item = "<b><font style=\"color:green\"> " + item +"</font></b>";
                         }
@@ -314,10 +314,10 @@ class FillBlanks extends Question
                     });
                     result = partsToString;
                 }
-                
+
                 return inSeparatorStart+result+inSeparatorEnd;
             }
-            
+
         </script>';
 
         // answer
@@ -325,14 +325,16 @@ class FillBlanks extends Question
             null,
             get_lang('TypeTextBelow').', '.get_lang('And').' '.get_lang('UseTagForBlank')
         );
-        $form->addElement(
-            'html_editor',
+        $form->addHtmlEditor(
             'answer',
             Display::return_icon('fill_field.png'),
-            ['id' => 'answer'],
-            ['ToolbarSet' => 'TestQuestionDescription']
+            true,
+            false,
+            [
+                'id' => 'answer',
+                'ToolbarSet' => 'TestQuestionDescription',
+            ]
         );
-        $form->addRule('answer', get_lang('GiveText'), 'required');
 
         //added multiple answers
         $form->addElement('checkbox', 'multiple_answer', '', get_lang('FillInBlankSwitchable'));
@@ -890,15 +892,15 @@ class FillBlanks extends Question
         // we got the less recent attempt first
         $sql = 'SELECT * FROM '.$tblTrackEAttempt.' tea
                 LEFT JOIN '.$tblTrackEExercise.' tee
-                ON 
-                    tee.exe_id = tea.exe_id AND 
-                    tea.c_id = '.$courseId.' AND 
-                    exe_exo_id = '.$testId.'    
-               WHERE 
-                    tee.c_id = '.$courseId.' AND 
-                    question_id = '.$questionId.' AND 
-                    tea.user_id IN ('.implode(',', $studentsIdList).')  AND 
-                    tea.tms >= "'.$startDate.'" AND 
+                ON
+                    tee.exe_id = tea.exe_id AND
+                    tea.c_id = '.$courseId.' AND
+                    exe_exo_id = '.$testId.'
+               WHERE
+                    tee.c_id = '.$courseId.' AND
+                    question_id = '.$questionId.' AND
+                    tea.user_id IN ('.implode(',', $studentsIdList).')  AND
+                    tea.tms >= "'.$startDate.'" AND
                     tea.tms <= "'.$endDate.'"
                ORDER BY user_id, tea.exe_id;
         ';
@@ -1231,6 +1233,11 @@ class FillBlanks extends Question
 
         // rebuild the sentence with student answer inserted
         for ($i = 0; $i < count($listStudentAnswerInfo['common_words']); $i++) {
+            if ($resultsDisabled == RESULT_DISABLE_SHOW_SCORE_ATTEMPT_SHOW_ANSWERS_LAST_ATTEMPT_NO_FEEDBACK) {
+                if (empty($listStudentAnswerInfo['student_answer'][$i])) {
+                    continue;
+                }
+            }
             $result .= isset($listStudentAnswerInfo['common_words'][$i]) ? $listStudentAnswerInfo['common_words'][$i] : '';
             $studentLabel = isset($listStudentAnswerInfo['student_answer'][$i]) ? $listStudentAnswerInfo['student_answer'][$i] : '';
             $result .= $studentLabel;
@@ -1274,6 +1281,7 @@ class FillBlanks extends Question
                 }
                 break;
             case RESULT_DISABLE_DONT_SHOW_SCORE_ONLY_IF_USER_FINISHES_ATTEMPTS_SHOW_ALWAYS_FEEDBACK:
+            case RESULT_DISABLE_SHOW_SCORE_ATTEMPT_SHOW_ANSWERS_LAST_ATTEMPT_NO_FEEDBACK:
             case RESULT_DISABLE_SHOW_SCORE_ATTEMPT_SHOW_ANSWERS_LAST_ATTEMPT:
                 $hideExpectedAnswer = true;
                 if ($showTotalScoreAndUserChoices) {
@@ -1318,8 +1326,8 @@ class FillBlanks extends Question
         }
 
         if ($hideExpectedAnswer) {
-            $correctAnswerHtml = "<span 
-                class='feedback-green' 
+            $correctAnswerHtml = "<span
+                class='feedback-green'
                 title='".get_lang('ExerciseWithFeedbackWithoutCorrectionComment')."'> &#8212; </span>";
         }
 
@@ -1380,6 +1388,9 @@ class FillBlanks extends Question
         $resultsDisabled = false,
         $showTotalScoreAndUserChoices = false
     ) {
+        if ($resultsDisabled == RESULT_DISABLE_SHOW_SCORE_ATTEMPT_SHOW_ANSWERS_LAST_ATTEMPT_NO_FEEDBACK) {
+            return '';
+        }
         return self::getHtmlAnswer(
             $answer,
             $correct,

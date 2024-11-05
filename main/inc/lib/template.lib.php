@@ -1097,6 +1097,9 @@ class Template
             'icon' => 'user fa-fw',
             'placeholder' => get_lang('UserName'),
         ];
+        if (api_get_configuration_value('security_login_autocomplete_disable') === true) {
+            $params['autocomplete'] = 'new-password';
+        }
         $browserAutoCapitalize = false;
         // Avoid showing the autocapitalize option if the browser doesn't
         // support it: this attribute is against the HTML5 standard
@@ -1115,6 +1118,9 @@ class Template
             'icon' => 'lock fa-fw',
             'placeholder' => get_lang('Pass'),
         ];
+        if (api_get_configuration_value('security_login_autocomplete_disable') === true) {
+            $params['autocomplete'] = 'new-password';
+        }
         if ($browserAutoCapitalize) {
             $params['autocapitalize'] = 'none';
         }
@@ -1183,7 +1189,7 @@ class Template
         $html = $form->returnForm();
         if (api_get_setting('openid_authentication') == 'true') {
             include_once api_get_path(SYS_CODE_PATH).'auth/openid/login.php';
-            $html .= '<div>'.openid_form().'</div>';
+            $html .= '<div>'.openid_form()->returnForm().'</div>';
         }
 
         $pluginKeycloak = api_get_plugin_setting('keycloak', 'tool_enable') === 'true';
@@ -1197,6 +1203,42 @@ class Template
         $html .= '<div></div>';
 
         return $html;
+    }
+
+    public function enableCookieUsageWarning()
+    {
+        $form = new FormValidator(
+            'cookiewarning',
+            'post',
+            '',
+            '',
+            [
+                //'onsubmit' => "$(this).toggle('show')",
+            ],
+            FormValidator::LAYOUT_BOX_NO_LABEL
+        );
+        $form->addHidden('acceptCookies', '1');
+        $form->addHtml(
+            '<div class="cookieUsageValidation">
+                '.get_lang('YouAcceptCookies').'
+                <button class="btn btn-link" onclick="$(this).next().toggle(\'slow\'); $(this).toggle(\'slow\')" type="button">
+                    ('.get_lang('More').')
+                </button>
+                <div style="display:none; margin:20px 0;">
+                    '.get_lang('HelpCookieUsageValidation').'
+                </div>
+                <button class="btn btn-link" onclick="$(this).parents(\'form\').submit()" type="button">
+                    ('.get_lang('Accept').')
+                </button>
+            </div>'
+        );
+        $form->protect();
+
+        if ($form->validate()) {
+            api_set_site_use_cookie_warning_cookie();
+        } else {
+            $this->assign('frmDisplayCookieUsageWarning', $form->returnForm());
+        }
     }
 
     /**

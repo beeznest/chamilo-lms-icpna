@@ -259,6 +259,7 @@ if (!empty($track_exercise_info)) {
             break;
         case RESULT_DISABLE_DONT_SHOW_SCORE_ONLY_IF_USER_FINISHES_ATTEMPTS_SHOW_ALWAYS_FEEDBACK:
         case RESULT_DISABLE_SHOW_SCORE_ATTEMPT_SHOW_ANSWERS_LAST_ATTEMPT:
+        case RESULT_DISABLE_SHOW_SCORE_ATTEMPT_SHOW_ANSWERS_LAST_ATTEMPT_NO_FEEDBACK:
             $attempts = Event::getExerciseResultsByUser(
                 $currentUserId,
                 $objExercise->id,
@@ -771,22 +772,26 @@ foreach ($questionList as $questionId) {
             $renderer->setFormTemplate('<form{attributes}><div>{content}</div></form>');
             $renderer->setCustomElementTemplate('<div>{element}</div>');
             $comnt = Event::get_comments($id, $questionId);
-            $default = ['comments_'.$questionId => $comnt];
+
+            $textareaId = 'comments_'.$questionId;
+            $default = [$textareaId => $comnt];
 
             if ($useAdvancedEditor) {
-                $feedback_form->addElement(
-                    'html_editor',
-                    'comments_'.$questionId,
-                    null,
-                    null,
+                $feedback_form->addHtmlEditor(
+                    $textareaId,
+                    '',
+                    false,
+                    false,
                     [
+                        'id' => $textareaId,
                         'ToolbarSet' => 'TestAnswerFeedback',
                         'Width' => '100%',
-                        'Height' => '120',
+                        'Height' => '120'
                     ]
                 );
             } else {
-                $feedback_form->addElement('textarea', 'comments_'.$questionId);
+                $feedback_form->addElement('textarea', $textareaId, ['id' => $textareaId]);
+                $feedback_form->applyFilter($textareaId, 'attr_on_filter');
             }
             $feedback_form->setDefaults($default);
             $feedback_form->display();

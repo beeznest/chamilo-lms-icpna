@@ -25,6 +25,7 @@
   <li><a href="#5.Files-permissions">Restricting files permissions</a></li>
   <li><a href="#6.HSTS">HTTP Headers Security</a></li>
   <li><a href="#7.Direct-web-access">Direct web access to files</a></li>
+  <li><a href="#8.Disable-webservices">Disable webservices</a></li>
 </ol>
 
 <h2><a name="1.Disclosing-server-info"></a>1. Disclosing server info</h2>
@@ -54,7 +55,7 @@ Subscribe to our free security alerts mailing-list:
     security of your computer and the data it contains, but you can also put others in danger by letting crackers take
     control of it and attacking others.</p>
 <p>To  avoid being a risk to yourself and others, you should download and install a recent browser. We recommend
-    <a href="http://www.getfirefox.com" target="_blank">the latest stable version of Firefox</a>.</p>
+    <a href="https://www.getfirefox.com" target="_blank" rel="noopener noreferrer">the latest stable version of Firefox</a>.</p>
 
 <h2><a name="4.Moving-config-file"></a>4. Moving your configuration file out of the web directory</h2>
 <p>It is considered unsafe to leave the configuration file inside the app/config/ directory, as it will be directly
@@ -196,6 +197,14 @@ This will prevent direct access to your settings and make it seem totally the sa
     do not contain confidential information. If you *DO* have confidential
     information in images, CSS or JavaScript files, you will need to update
     these rules to suit your needs.
+    </p>
+
+<h2><a name="8.Disable-webservices">Disable webservices</a></h2>
+    <p>
+        In order to disable webservices add the configuration below:
+    <pre>
+    $_configuration['disable_webservices'] = true;
+    </pre>
     </p>
 <h2>Authors</h2>
 <ul>

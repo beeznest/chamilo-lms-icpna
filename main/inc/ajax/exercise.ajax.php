@@ -819,7 +819,22 @@ switch ($action) {
                 $allowTimeControlPerCategory = api_get_configuration_value('quiz_allow_time_control_per_category');
 
                 if ($allowTimeControlPerCategory) {
-                    $categoryExpiredTime = TestCategory::getExpiredTime($destinationCategory, $objExercise);
+
+                    try {
+                        $categoryExpiredTime = TestCategory::getExpiredTime($destinationCategory, $objExercise);
+                    } catch (Exception $exception) {
+                        if ($debug) {
+                            error_log(
+                                'Time expired not found for destination category not found: '
+                                    .print_r($destinationCategory, true)
+                            );
+                            error_log($exception->getTraceAsString());
+                        }
+                        Session::erase('adaptive_pretest_step');
+                        echo "exercise_result.php?$params";
+                        break;
+                    }
+
                     $timeLeft = $categoryExpiredTime * 60;
 
                     $currentUtcTime->add(new DateInterval("PT{$timeLeft}S"));

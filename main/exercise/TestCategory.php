@@ -1368,7 +1368,6 @@ class TestCategory
      * @return int
      *
      * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public static function getExpiredTime($categoryId = 0, Exercise $exercise)
     {
@@ -1377,6 +1376,7 @@ class TestCategory
                 'SELECT qc.expiredTime FROM ChamiloCourseBundle:CQuizCategory qc
                     WHERE qc.cId = :course AND qc.categoryId = :category AND qc.exerciseId = :exercise'
             )
+            ->setMaxResults(1)
             ->setParameters(['course' => $exercise->course_id, 'category' => $categoryId, 'exercise' => $exercise->iId])
             ->getSingleResult();
 
